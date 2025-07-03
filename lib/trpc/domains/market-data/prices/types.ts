@@ -1,0 +1,52 @@
+/**
+ * Price Domain Types
+ */
+
+export interface CMCPriceData {
+  symbol: string;
+  name: string;
+  price: number;
+  updated: string;
+}
+
+export interface PanoraPriceItem {
+  symbol: string;
+  name: string;
+  asset_type: string;
+  price: string;
+  decimals: number;
+}
+
+export interface PanoraPricesData {
+  success: boolean;
+  prices: PanoraPriceItem[];
+  attribution: string;
+}
+
+export interface PriceServiceConfig {
+  timeout: number;
+  retries: number;
+  cacheTTL: number;
+}
+
+// CMC symbol ID mapping
+export const CMC_SYMBOL_IDS: Record<string, string> = {
+  susde: '29471',
+  btc: '1',
+  apt: '21794', // Aptos
+  // Add more mappings as needed
+};
+
+// Symbol display names
+export const SYMBOL_DISPLAY_NAMES: Record<string, string> = {
+  susde: 'sUSDe',
+  btc: 'BTC',
+  apt: 'APT',
+};
+
+// Full names
+export const SYMBOL_FULL_NAMES: Record<string, string> = {
+  susde: 'Ethena Staked USDe',
+  btc: 'Bitcoin',
+  apt: 'Aptos',
+};

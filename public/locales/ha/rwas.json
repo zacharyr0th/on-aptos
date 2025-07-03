@@ -1,0 +1,76 @@
+{
+  "page": {
+    "title": "Dukiyar Duniya ta Haƙiƙa akan Aptos",
+    "description": "RWAs da alamar kadarorin duniya na gaske akan blockchain na Aptos"
+  },
+  "stats": {
+    "total_rwa_value": "Jimlar ƙimar RWA",
+    "real_world_assets": "Dukiyar Duniya ta Gaskiya",
+    "data_powered_by": "Bayanan da RWA.xyz ke aiki",
+    "data_powered_by_prefix": "Bayani da aka yi amfani da shi",
+    "rwa_assets": "RWA Assets",
+    "market_share": "Rabon Kasuwa",
+    "total_value": "Jimlar Ƙimar",
+    "asset_count": "Kidaya kadari",
+    "protocols": "Ka'idoji"
+  },
+  "loading": {
+    "loading_rwa_data": "Loading RWA data...",
+    "loading": "Loading...",
+    "rate_limit_message": "An kai iyakar API. Da fatan za a jira kafin a sake gwadawa.",
+    "try_again_in": "Sake gwadawa",
+    "try_again": "Sake gwadawa",
+    "request_failed": "Buƙatar ta kasa. Da fatan za a sake gwadawa."
+  },
+  "error": {
+    "error_loading_rwa_data": "Kuskuren loda bayanan RWA",
+    "failed_to_load_chart": "An kasa loda ginshiƙi",
+    "try_again": "Sake gwadawa",
+    "failed_to_load_data": "An kasa loda bayanai"
+  },
+  "protocol": {
+    "pact": "Pact",
+    "securitize": "Ajiye",
+    "franklin_templeton": "Franklin Templeton",
+    "libre_capital": "Libre Capital",
+    "ondo": "Ondo",
+    "blackrock": "BlackRock"
+  },
+  "labels": {
+    "bridged": "gada",
+    "value_not_available": "Babu darajar",
+    "token_id": "ID na alama",
+    "current_value": "Ƙimar Yanzu",
+    "asset_name": "Sunan kadara",
+    "asset_issuer": "Mai Bayar da Kaya",
+    "standards": "Standards",
+    "not_specified": "Ba a ƙayyade ba",
+    "regulatory_framework": "Tsarin tsari",
+    "governing_body": "Hukumar Mulki",
+    "issuer_legal_structure_country": "Ƙasar Tsarin Shari'a",
+    "contract_address": "Adreshin kwangila",
+    "network_id": "ID na cibiyar sadarwa",
+    "asset_id": "ID ɗin kadari"
+  },
+  "sections": {
+    "value_information": "Bayanin darajar",
+    "asset_details": "Bayanan kadara",
+    "regulatory_information": "Bayanin tsari",
+    "legal_structure": "Tsarin doka",
+    "technical_details": "Bayanan fasaha"
+  },
+  "actions": {
+    "view_details": "Duba cikakkun bayanai",
+    "visit_website": "Ziyarci Yanar Gizo"
+  },
+  "filters": {
+    "all": "Duk",
+    "by_protocol": "Ta hanyar yarjejeniya",
+    "by_value": "Ta Ƙimar"
+  },
+  "fallbacks": {
+    "unknown_asset": "Ba a sani ba",
+    "data_not_available": "Babu bayanai",
+    "value_unavailable": "Babu darajar"
+  }
+}

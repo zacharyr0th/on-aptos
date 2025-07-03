@@ -1,0 +1,69 @@
+{
+  "page": {
+    "title": "Stablecoins akan Aptos",
+    "description": "Stablecoins da kwanciyar hankali a kan blockchain na Aptos"
+  },
+  "statistics": {
+    "total_stablecoin_value": "Total Stablecoin Darajar",
+    "stablecoins": "Stablecoins",
+    "market_share": "Rabon Kasuwa",
+    "market_cap": "Kasuwa Cap",
+    "price": "Farashi",
+    "supply": "Kayyade",
+    "juzu'i_24h": "Juzu'i na 24h",
+    "price_change_24h": "Farashin Canjin 24h"
+  },
+  "loading": {
+    "loading_stablecoin_data": "Loading stablecoin data...",
+    "loading": "Loading...",
+    "rate_limit_message": "Woah! Da fatan za a rage a can.",
+    "try_again_in": "Sake gwadawa",
+    "try_again": "Sake gwadawa",
+    "request_failed": "Ba a iya kammala buƙatar ba."
+  },
+  "kuskure": {
+    "error_loading_stablecoin_data": "Kuskuren loda bayanan Stablecoin",
+    "sake gwadawa": "Sake gwadawa",
+    "failed_to_load_chart": "An kasa loda ginshiƙi"
+  },
+  "stablecoins": {
+    "usdt": "Tsarin USD",
+    "usdc": "USD Coin",
+    "dai": "Dai Stablecoin",
+    "busd": "Binance USD",
+    "frax": "Frax",
+    "tusd": "TrueUSD",
+    "usdp": "Pax Dollar",
+    "gusd": "Dollar Gemini"
+  },
+  "iri": {
+    "fiat_collateralized": "Fiat Collateralized",
+    "crypto_collateralized": "Crypto Collateralized",
+    "algorithmic": "Algorithmic",
+    "commodity_backed": "Kayayyakin Tallafawa"
+  },
+  "ayyukan": {
+    "view_details": "Duba cikakkun bayanai",
+    "trade": "Kasuwanci",
+    "add_to_wallet": "Ƙara zuwa Wallet",
+    "visit_website": "Ziyarci Yanar Gizo"
+  },
+  "fita": {
+    "all": "Duk",
+    "by_type": "Ta Nau'i",
+    "by_market_cap": "Ta Hanyar Kasuwa",
+    "stable": "Stable",
+    "depegged": "Depegged"
+  },
+  "labarai": {
+    "tether_reserve_address": "Adreshin Reserve na Tether",
+    "subtracted_from_supply": "(An cire shi daga abubuwan da ake zagayawa)",
+    "view_on_explorer": "Duba kan Aptos Explorer",
+    "reserve_address": "adireshin ajiya"
+  },
+  "fadowa": {
+    "unknown_stablecoin": "Unknown Stablecoin",
+    "data_not_available": "Babu bayanai",
+    "price_unavailable": "Babu farashin"
+  }
+}

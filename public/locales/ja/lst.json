@@ -1,0 +1,78 @@
+{
+  "page": {
+    "title": "Aptos上のLST",
+    "description": "Aptosブロックチェーン上のリキッドステーキングトークン"
+  },
+  "stats": {
+    "total_lst_value": "LST総額",
+    "liquid_staking_tokens": "リキッドステーキングトークン",
+    "market_share": "マーケットシェア",
+    "apr": "APR",
+    "apy": "APY",
+    "staked_amount": "ステーキング額",
+    "total_staked": "総ステーキング額",
+    "exchange_rate": "交換レート",
+    "rewards": "リワード"
+  },
+  "loading": {
+    "loading_lst_data": "LSTデータを読み込み中...",
+    "loading": "読み込み中..."
+  },
+  "error": {
+    "error_loading_lst_data": "LSTデータ読み込みエラー",
+    "retry": "再試行",
+    "failed_to_load_chart": "チャートの読み込みに失敗しました"
+  },
+  "protocols": {
+    "thala": "Thala",
+    "amnis": "Amnis",
+    "trufin": "TruFin",
+    "ditto": "Ditto",
+    "tortuga": "Tortuga"
+  },
+  "tokens": {
+    "stapt": "stAPT",
+    "thapt": "thAPT",
+    "amapt": "amAPT",
+    "truapt": "truAPT",
+    "dapt": "dAPT",
+    "tapt": "tAPT"
+  },
+  "actions": {
+    "stake": "ステーキング",
+    "unstake": "アンステーキング",
+    "claim_rewards": "リワード請求",
+    "view_details": "詳細を表示",
+    "trade": "取引",
+    "add_to_wallet": "ウォレットに追加"
+  },
+  "staking": {
+    "liquid_staking": "リキッドステーキング",
+    "validator": "バリデーター",
+    "delegation": "デリゲーション",
+    "unstaking_period": "アンステーキング期間",
+    "minimum_stake": "最小ステーキング額",
+    "fees": "手数料",
+    "commission": "コミッション"
+  },
+  "filters": {
+    "all": "すべて",
+    "by_protocol": "プロトコル別",
+    "by_apy": "APY別",
+    "active": "アクティブ",
+    "paused": "一時停止"
+  },
+  "fallbacks": {
+    "unknown_lst": "不明なLST",
+    "data_not_available": "データが利用できません",
+    "apy_unavailable": "APYが利用できません"
+  },
+  "info": {
+    "what_is_lst": "LSTとは？",
+    "lst_description": "リキッドステーキングトークン（LST）により、ステーキングポジションを表すデリバティブトークンを通じて流動性を維持しながらAPTをステーキングできます。",
+    "benefits": "メリット",
+    "earn_rewards": "ステーキングリワードを獲得",
+    "maintain_liquidity": "流動性を維持",
+    "use_in_defi": "DeFiで使用"
+  }
+}

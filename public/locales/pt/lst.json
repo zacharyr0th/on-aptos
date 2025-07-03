@@ -1,0 +1,78 @@
+{
+  "page": {
+    "title": "LSTs em Aptos",
+    "description": "Tokens de staking líquido na blockchain Aptos"
+  },
+  "stats": {
+    "total_lst_value": "Valor LST total",
+    "liquid_staking_tokens": "Tokens de staking líquido",
+    "market_share": "Quota de mercado",
+    "apr": "APR",
+    "apy": "APY",
+    "staked_amount": "Quantidade em staking",
+    "total_staked": "Total em staking",
+    "exchange_rate": "Taxa de câmbio",
+    "rewards": "Recompensas"
+  },
+  "loading": {
+    "loading_lst_data": "Carregando dados LST ...",
+    "loading": "Carregando..."
+  },
+  "error": {
+    "error_loading_lst_data": "Erro ao carregar dados LST",
+    "retry": "Tente novamente",
+    "failed_to_load_chart": "Falha ao carregar gráfico"
+  },
+  "protocols": {
+    "thala": "Cabeça",
+    "amnis": "Rio",
+    "trufin": "Trufin",
+    "ditto": "Idem",
+    "tortuga": "Tortuga"
+  },
+  "tokens": {
+    "stapt": "passos",
+    "thapt": "THAPT",
+    "amapt": "Pronunciado",
+    "truapt": "Truapt",
+    "dapt": "Dapt",
+    "tapt": "perdido"
+  },
+  "actions": {
+    "stake": "Estaca",
+    "unstake": "Solte",
+    "claim_rewards": "Recompensas de reivindicação",
+    "view_details": "Ver detalhes",
+    "trade": "Troca",
+    "add_to_wallet": "Adicione à carteira"
+  },
+  "staking": {
+    "liquid_staking": "Staking líquido",
+    "validator": "Validador",
+    "delegation": "Delegação",
+    "unstaking_period": "Período de desencadeamento",
+    "minimum_stake": "Estaca mínima",
+    "fees": "Tarifas",
+    "commission": "Comissão"
+  },
+  "filters": {
+    "all": "Todos",
+    "by_protocol": "Por protocolo",
+    "by_apy": "Por APY",
+    "active": "Ativa",
+    "paused": "Parou"
+  },
+  "fallbacks": {
+    "unknown_lst": "LST desconhecido",
+    "data_not_available": "Dados não disponíveis",
+    "apy_unavailable": "APY indisponível"
+  },
+  "info": {
+    "what_is_lst": "O que é um LST?",
+    "lst_description": "Os tokens de staking líquido (LSTs) permitem que você faça staking de APT mantendo a liquidez através de tokens derivados que representam sua posição de staking.",
+    "benefits": "Benefícios",
+    "earn_rewards": "Ganhe recompensas de staking",
+    "maintain_liquidity": "Manter liquidez",
+    "use_in_defi": "Use no DeFi"
+  }
+}

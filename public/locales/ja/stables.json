@@ -1,0 +1,69 @@
+{
+  "page": {
+    "title": "Aptos上のステーブルコイン",
+    "description": "Aptosブロックチェーン上のステーブルコインと安定通貨"
+  },
+  "stats": {
+    "total_stablecoin_value": "ステーブルコイン総額",
+    "stablecoins": "ステーブルコイン",
+    "market_share": "マーケットシェア",
+    "market_cap": "時価総額",
+    "price": "価格",
+    "supply": "供給量",
+    "volume_24h": "24時間取引量",
+    "price_change_24h": "24時間価格変動"
+  },
+  "loading": {
+    "loading_stablecoin_data": "ステーブルコインデータを読み込み中...",
+    "loading": "読み込み中...",
+    "rate_limit_message": "おっと！少しペースを落としてください。",
+    "try_again_in": "再試行まで",
+    "try_again": "再試行",
+    "request_failed": "リクエストを完了できませんでした。"
+  },
+  "error": {
+    "error_loading_stablecoin_data": "ステーブルコインデータ読み込みエラー",
+    "retry": "再試行",
+    "failed_to_load_chart": "チャートの読み込みに失敗しました"
+  },
+  "stablecoins": {
+    "usdt": "Tether USD",
+    "usdc": "USD Coin",
+    "dai": "Dai Stablecoin",
+    "busd": "Binance USD",
+    "frax": "Frax",
+    "tusd": "TrueUSD",
+    "usdp": "Pax Dollar",
+    "gusd": "Gemini Dollar"
+  },
+  "types": {
+    "fiat_collateralized": "法定通貨担保型",
+    "crypto_collateralized": "暗号資産担保型",
+    "algorithmic": "アルゴリズム型",
+    "commodity_backed": "コモディティ担保型"
+  },
+  "actions": {
+    "view_details": "詳細を表示",
+    "trade": "取引",
+    "add_to_wallet": "ウォレットに追加",
+    "visit_website": "ウェブサイトを訪問"
+  },
+  "filters": {
+    "all": "すべて",
+    "by_type": "タイプ別",
+    "by_market_cap": "時価総額別",
+    "stable": "安定",
+    "depegged": "デペッグ済み"
+  },
+  "labels": {
+    "tether_reserve_address": "Tetherリザーブアドレス",
+    "subtracted_from_supply": "（流通供給量から減算）",
+    "view_on_explorer": "Aptos Explorerで表示",
+    "reserve_address": "リザーブアドレス"
+  },
+  "fallbacks": {
+    "unknown_stablecoin": "不明なステーブルコイン",
+    "data_not_available": "データが利用できません",
+    "price_unavailable": "価格が利用できません"
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "page": {
+    "title": "البيتكوين على أبتوس",
+    "description": "أصول البيتكوين وأسواق المال على بلوكتشين أبتوس"
+  },
+  "stats": {
+    "total_supply": "إجمالي المعروض",
+    "total_btc_value": "إجمالي قيمة البيتكوين",
+    "bitcoin_assets": "أصول البيتكوين",
+    "market_share": "حصة السوق",
+    "price": "السعر",
+    "market_cap": "القيمة السوقية",
+    "volume_24h": "حجم التداول خلال 24 ساعة",
+    "tvl": "إجمالي القيمة المقفلة (TVL)",
+    "apy": "العائد السنوي المئوي (APY)",
+    "utilization": "الاستخدام",
+    "decimals": "الخانات العشرية",
+    "network": "الشبكة",
+    "aptos_mainnet": "شبكة أبتوس الرئيسية"
+  },
+  "loading": {
+    "loading_btc_data": "جارٍ تحميل بيانات البيتكوين...",
+    "loading": "جارٍ التحميل...",
+    "loading_market_data": "جارٍ تحميل بيانات السوق...",
+    "error_title": "خطأ في تحميل البيانات",
+    "rate_limit_message": "تم الوصول إلى حد معدل واجهة البرمجة. يرجى الانتظار قبل المحاولة مرة أخرى.",
+    "try_again_in": "أعد المحاولة خلال",
+    "try_again": "أعد المحاولة",
+    "request_failed": "فشلت العملية. يرجى المحاولة مرة أخرى.",
+    "chart_error": "فشل تحميل الرسم البياني"
+  },
+  "error": {
+    "error_loading_btc_data": "خطأ في تحميل بيانات البيتكوين",
+    "retry": "إعادة المحاولة",
+    "failed_to_load_chart": "فشل تحميل الرسم البياني",
+    "error_calculating_supply": "خطأ في حساب المعروض",
+    "unknown_error": "خطأ غير معروف",
+    "invalid_data": "بيانات غير صالحة",
+    "invalid_metadata": "بيانات وصفية غير صالحة"
+  },
+  "assets": {
+    "bitcoin": "بيتكوين",
+    "wbtc": "بيتكوين مغلف",
+    "btc": "بيتكوين",
+    "sbtc": "بيتكوين مُكدس",
+    "tbtc": "بيتكوين العتبة"
+  },
+  "money_markets": {
+    "title": "أسواق المال",
+    "supply": "توريد",
+    "borrow": "اقتراض",
+    "supply_apy": "عائد التوريد السنوي (APY)",
+    "borrow_apy": "عائد الاقتراض السنوي (APY)",
+    "total_supplied": "إجمالي المُورَّد",
+    "total_borrowed": "إجمالي المُقترض",
+    "available_to_borrow": "المتاح للاقتراض",
+    "utilization_rate": "معدل الاستخدام"
+  },
+  "actions": {
+    "supply": "توريد",
+    "borrow": "اقتراض",
+    "withdraw": "سحب",
+    "repay": "سداد",
+    "view_details": "عرض التفاصيل",
+    "trade": "تداول",
+    "bridge": "جسر",
+    "wrap": "تغليف",
+    "unwrap": "فك التغليف"
+  },
+  "yield": {
+    "lending": "إقراض",
+    "borrowing": "اقتراض",
+    "farming": "الزراعة الرقمية",
+    "staking": "تخزين",
+    "rewards": "مكافآت",
+    "incentives": "حوافز"
+  },
+  "protocols": {
+    "aries": "Aries",
+    "echelon": "Echelon",
+    "aptin": "Aptin",
+    "thala": "Thala",
+    "echo": "Echo",
+    "protocol": "بروتوكول",
+    "echo_data_soon": "بيانات بروتوكول Echo قريباً"
+  },
+  "filters": {
+    "all": "الكل",
+    "by_protocol": "حسب البروتوكول",
+    "by_apy": "حسب العائد السنوي (APY)",
+    "lending": "إقراض",
+    "trading": "تداول",
+    "bridging": "جسور"
+  },
+  "bridge": {
+    "bridge_bitcoin": "جسر البيتكوين",
+    "from": "من",
+    "to": "إلى",
+    "amount": "المبلغ",
+    "fee": "الرسوم",
+    "estimated_time": "الوقت المقدر",
+    "supported_networks": "الشبكات المدعومة"
+  },
+  "fallbacks": {
+    "unknown_asset": "أصل غير معروف",
+    "data_not_available": "البيانات غير متوفرة",
+    "price_unavailable": "السعر غير متوفر"
+  },
+  "info": {
+    "what_is_wrapped_btc": "ما هو البيتكوين المغلف؟",
+    "wrapped_btc_description": "البيتكوين المغلف (wBTC) هو تمثيل مُرمَّز للبيتكوين على سلاسل كتل أخرى، ما يتيح استخدام البيتكوين في تطبيقات DeFi.",
+    "benefits": "الفوائد",
+    "defi_access": "الوصول إلى DeFi",
+    "earn_yield": "تحقيق عائد",
+    "maintain_btc_exposure": "الحفاظ على التعرض للبيتكوين",
+    "bitcoin_backed_asset": "أصل مدعوم بالبيتكوين"
+  },
+  "status": {
+    "coming_soon": "قريباً"
+  }
+}

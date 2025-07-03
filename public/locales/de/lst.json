@@ -1,0 +1,78 @@
+{
+  "page": {
+    "title": "LSTs auf Aptos",
+    "description": "Liquid-Staking-Token auf der Aptos-Blockchain"
+  },
+  "stats": {
+    "total_lst_value": "Gesamtwert LST",
+    "liquid_staking_tokens": "Liquid-Staking-Token",
+    "market_share": "Marktanteil",
+    "apr": "APR",
+    "apy": "APY",
+    "staked_amount": "Gestaktes Volumen",
+    "total_staked": "Insgesamt gestaket",
+    "exchange_rate": "Wechselkurs",
+    "rewards": "Belohnungen"
+  },
+  "loading": {
+    "loading_lst_data": "LST-Daten werden geladen …",
+    "loading": "Lädt …"
+  },
+  "error": {
+    "error_loading_lst_data": "Fehler beim Laden der LST-Daten",
+    "retry": "Wiederholen",
+    "failed_to_load_chart": "Diagramm konnte nicht geladen werden"
+  },
+  "protocols": {
+    "thala": "Thala",
+    "amnis": "Amnis",
+    "trufin": "TruFin",
+    "ditto": "Ditto",
+    "tortuga": "Tortuga"
+  },
+  "tokens": {
+    "stapt": "stAPT",
+    "thapt": "thAPT",
+    "amapt": "amAPT",
+    "truapt": "TruAPT",
+    "dapt": "dAPT",
+    "tapt": "tAPT"
+  },
+  "actions": {
+    "stake": "Staken",
+    "unstake": "Unstaken",
+    "claim_rewards": "Belohnungen einfordern",
+    "view_details": "Details anzeigen",
+    "trade": "Handeln",
+    "add_to_wallet": "Zur Wallet hinzufügen"
+  },
+  "staking": {
+    "liquid_staking": "Liquid Staking",
+    "validator": "Validator",
+    "delegation": "Delegation",
+    "unstaking_period": "Unstaking-Periode",
+    "minimum_stake": "Mindeststake",
+    "fees": "Gebühren",
+    "commission": "Provision"
+  },
+  "filters": {
+    "all": "Alle",
+    "by_protocol": "Nach Protokoll",
+    "by_apy": "Nach APY",
+    "active": "Aktiv",
+    "paused": "Pausiert"
+  },
+  "fallbacks": {
+    "unknown_lst": "Unbekannter LST",
+    "data_not_available": "Daten nicht verfügbar",
+    "apy_unavailable": "APY nicht verfügbar"
+  },
+  "info": {
+    "what_is_lst": "Was ist ein LST?",
+    "lst_description": "Liquid-Staking-Token (LSTs) ermöglichen es dir, APT zu staken und gleichzeitig durch derivative Token, die deine Staking-Position repräsentieren, liquide zu bleiben.",
+    "benefits": "Vorteile",
+    "earn_rewards": "Staking-Belohnungen verdienen",
+    "maintain_liquidity": "Liquidität bewahren",
+    "use_in_defi": "In DeFi nutzen"
+  }
+}

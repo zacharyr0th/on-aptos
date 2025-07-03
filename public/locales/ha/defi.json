@@ -1,0 +1,382 @@
+{
+  "page": {
+    "title": "DeFi akan Aptos",
+    "description": "Ƙararren jagora na ka'idojin DeFi akan blockchain Aptos"
+  },
+  "statistics": {
+    "total_value_locked": "Jimlar Ƙimar Kulle",
+    "volume_24h": "Juzu'i na 24h",
+    "protocols": "Ka'idoji",
+    "filtered_protocols": "Ka'idoji da aka tace",
+    "live_from_defillama": "Kai tsaye daga DeFiLlama",
+    "estimated_tvl": "Kimanin TVL",
+    "volume_data": "ƙarar ciniki na awa 24",
+    "defi_protocols": "Ka'idojin DeFi",
+    "fees_24h": "Kudaden shiga na 24h",
+    "protocol_fees": "Kudaden shiga na ka'ida",
+    "stablecoin_volume": "Juzu'in Stablecoin",
+    "coming_soon": "Ana zuwa",
+    "stablecoin_trading": "Cinikin stablecoin"
+  },
+  "stats": {
+    "fees_24h": "Kudaden shiga na 24h",
+    "protocol_fees": "Kudaden shiga na ka'ida",
+    "stablecoin_volume": "Juzu'in Stablecoin",
+    "coming_soon": "Ana zuwa",
+    "stablecoin_trading": "Cinikin stablecoin"
+  },
+  "search": {
+    "placeholder": "Bincika ka'ida...",
+    "results": "An samo ka'idojin {{count}}",
+    "results_of": "na {{total}} ka'idoji",
+    "no_results": "Ba a sami ka'idojin da suka dace da ma'aunin ku ba.",
+    "clear_search": "Share bincike",
+    "search_hint": "Bincika da suna, nau'i, ko bayanin"
+  },
+  "filters": {
+    "all": "Duk",
+    "category": "Kashi",
+    "subcategory": "Ƙananan kashi",
+    "clear_filters": "Share tacewa",
+    "filter_by_category": "Tace ta Rukunin",
+    "view_grid": "Kallon taswira",
+    "view_table": "Kallon tebur",
+    "mobile_filters": "Tacewa",
+    "active_filters": "Tacewa masu aiki",
+    "subcategories_header": "{{category}} rukunoni:"
+  },
+  "tooltips": {
+    "grid_view": "Canja zuwa duba grid",
+    "table_view": "Canja zuwa duba tebur",
+    "category_filter": "Tace ladabi ta nau'i",
+    "subcategory_filter": "Tace ka'idoji ta rukuni",
+    "clear_all_filters": "Cire duk masu tacewa",
+    "search_protocols": "Bincika duk ka'idoji",
+    "protocol_website": "Ziyarci gidan yanar gizon hukuma",
+    "protocol_github": "Duba lambar tushe akan GitHub",
+    "protocol_twitter": "Bi akan X (Twitter)",
+    "category_description": "{{category}} ladabi: {{bayani}}",
+    "subcategory_description": "{{subcategory}}: {{bayani}}"
+  },
+  "categories": {
+    "All": {
+      "name": "Duk",
+      "description": "Dukkan ka'idojin DeFi"
+    },
+    "Credit": {
+      "name": "Credit",
+      "description": "Ka'idojin da ke sauƙaƙe rance, lamuni, da sabis na tushen kuɗi",
+      "subcategories": {
+        "Lending": {
+          "name": "Lending",
+          "description": "Tsarin da masu amfani za su iya ba da rance da aro kadarorin crypto tare da ƙimar riba"
+        },
+        "RWA Lending": {
+          "name": "RWA Lamuni",
+          "description": "Ka'idojin bayar da lamuni masu goyan bayan kadarori na zahiri kamar dukiya ko kayayyaki"
+        },
+        "NFT Lending": {
+          "name": "NFT Lending",
+          "description": "Ari kuɗi ta amfani da NFT a matsayin lamuni ko ba da rance ga masu riƙe NFT"
+        },
+        "Uncollateralized Lending": {
+          "name": "Ba da Lamuni mara izini",
+          "description": "Lamuni ba tare da lamuni ba, bisa la'akari da ƙima ko ƙima"
+        },
+        "CDP": {
+          "name": "CDP",
+          "description": "Matsayin Bashi Mai Haɗin Kai - Ƙirƙiri stablecoins ta hanyar kulle haɗin gwiwa a cikin kwangiloli masu wayo"
+        }
+      }
+    },
+    "Yield": {
+      "name": "Yawa",
+      "description": "Ka'idojin da aka mayar da hankali kan tara kuɗi, samar da albarkatu, da rarraba lada",
+      "subcategories": {
+        "Liquid Staking": {
+          "name": "Liquid Staking",
+          "description": "Tsarin hannun jari yayin karɓar rasit ɗin kasuwanci don kiyaye yawan kuɗi"
+        },
+        "Restaking": {
+          "name": "Ajiyewa",
+          "description": "Yi amfani da riga-kafin rikodi don tabbatar da ƙarin ladabi don ƙarin lada"
+        },
+        "Liquid Restaking": {
+          "name": "Restaking Liquid",
+          "description": "Sake dawo da alamun ruwa wanda za'a iya ciniki ko amfani dashi a cikin DeFi"
+        },
+        "Liquidity Manager": {
+          "name": "Mai sarrafa Liquidity",
+          "description": "Kayan aiki ko ƙa'idodi waɗanda ke ingantawa da daidaita ma'aunin ruwa a cikin wuraren waha"
+        },
+        "Leveraged Farming": {
+          "name": "Ƙarfafa Noma",
+          "description": "Ari kuɗi don ƙara yawan samar da ruwa da haɓaka ladan noma"
+        },
+        "Yield Aggregator": {
+          "name": "Aggregator Haɓaka Haɓaka",
+          "description": "Nemo ku canza ta atomatik tsakanin mafi kyawun damar amfanin gona"
+        }
+      }
+    },
+    "Trading": {
+      "name": "Ciniki",
+      "description": "Ka'idojin ciniki, yin kasuwa, da samar da ruwa",
+      "subcategories": {
+        "DEX": {
+          "name": "DEX",
+          "description": "Musayar da aka raba don musanya alamu ba tare da masu shiga tsakani ba"
+        },
+        "DEX Aggregator": {
+          "name": "Aggregator DEX",
+          "description": "Nemo mafi kyawun farashi a cikin DEX da yawa don ingantattun cinikai"
+        },
+        "Perps": {
+          "name": "Perps",
+          "description": "Kasuwanci har abada kwangiloli tare da yin amfani da kadarorin crypto"
+        },
+        "Options": {
+          "name": "Zaɓuɓɓuka",
+          "description": "Saya da siyar da kwangilar zaɓuɓɓuka don shinge ko hasashe kan motsin farashi"
+        },
+        "Prediction Market": {
+          "name": "Kasuwar Hasashen",
+          "description": "Fare akan abubuwan da suka faru na ainihi da sakamako ta amfani da crypto"
+        },
+        "Launchpad": {
+          "name": "Launchpad",
+          "description": "Kaddamar da sababbin alamu tare da rarraba gaskiya da fasalin al'umma"
+        }
+      }
+    },
+    "Multiple": {
+      "name": "Da yawa",
+      "description": "Ka'idojin bayar da samfuran DeFi da yawa a cikin nau'i daban-daban"
+    }
+  },
+  "subcategories": {
+    "lending": "Lending",
+    "rwa_lending": "RWA Lamuni",
+    "nft_lending": "NFT Lamuni",
+    "uncollateralized_lending": "Ba da Lamuni mara izini",
+    "cdp": "CDP",
+    "liquid_staking": "Liquid Staking",
+    "restaking": "Ajiyewa",
+    "liquid_restaking": "Restaking Liquid",
+    "liquidity_manager": "Mai sarrafa Liquidity",
+    "leveraged_farming": "Ƙarfafa Noma",
+    "yield_aggregator": "Aggregator Haɓaka Haɓaka",
+    "dex": "DEX",
+    "dex_aggregator": "Aggregator DEX",
+    "perps": "Perps",
+    "launchpad": "Launchpad",
+    "options": "Zaɓuɓɓuka",
+    "prediction_markets": "Kasuwannin hasashen"
+  },
+  "protocol": {
+    "website": "Yanar gizo",
+    "github": "GitHub",
+    "twitter": "X (Twitter)",
+    "links": "Links",
+    "tvl": "TVL",
+    "volume": "Ƙarar",
+    "yield": "Yild",
+    "status": "Matsaka",
+    "launch_date": "Ranar Kaddamar",
+    "audit_status": "Yanayin Audit",
+    "networks": "Networks",
+    "category": "Kashi",
+    "subcategory": "Subcategory",
+    "description": "Bayyana",
+    "more_info": "Ƙarin Bayani",
+    "external_links": "Haɗin kai na waje",
+    "implementation": "Aiwatarwa",
+    "security": "Tsaro",
+    "token": "Alama"
+  },
+  "protocol_descriptions": {
+    "Panora": "Wani \"meta-DEX\" wanda ke haɗuwa da littafin oda na kan-layi da AMMs 10+, yana rarraba oda tsakanin wuraren da ke sarrafa jerin alamomin da ke sabuntawa ta atomatik a cikin UI ɗinsa.",
+    "Kana": "Tushen musayar ciniki a kan sarkakiya tara; kwangilar Paymaster yana ba masu amfani damar kasuwanci akan Aptos ba tare da riƙe APT azaman gas ba; injin kwangiloli masu dawwama na tushen littafin oda.",
+    "Thetis": "Thetis yana haɗa mai tarawa na dama, kwangiloli masu dawwama na 50× da wuraren jagorancin ruwa (LBPs) a ƙarƙashin rufin ɗaya.",
+    "Anqa": "Yana da'awar samun rufewar ruwa na 99% akan DEXs 15+ na Aptos; yana ba da samfurin ainihin lokaci kafin sa hannu don duba zamewa, kuma yana ba da damar sarrafa musayar alamu masu yawa don ajiye gas.",
+    "LiquidSwap": "AMM na tutoci na Pontem kuma DEX na farko da ya sauka akan Aptos mainnet; yana bayar da wuraren Uniswap-V2 na gargajiya, kwayoyin musayar kwanciyar hankali da ƙirar ruwa mai taro da aka tabbatar.",
+    "Econia": "Littafin oda na kan-layi mai ban mamaki da aka daidaita don haɗin kai mai kyau na Aptos; yana sarrafa kasuwanni a layi daya da kammala kasa da daƙiƙa ɗaya kuma yana fallasa cikakken stack na REST/MQTT data.",
+    "Cellana": "AMM ve(3,3) inda masu zaɓen veNFT ke jagorantar fitarwa kuma suna karɓar 100% na kudaden shiga.",
+    "PancakeSwap": "DEX na tutoci na Binance ya kwafi AMM V2 ɗinsa zuwa Move kuma ya haɗa wasu ruwaye CAKE zuwa Aptos.",
+    "SushiSwap": "Sushi ya aiwatar da haɗin kai na farko mara EVM, yana ba da damar tushen kan-sarkar yayin riƙe UX na Trident router na saba.",
+    "Hyperion": "Wani gaba ɗaya na kan-sarkar haɗin littafin oda + CL-AMM, yana amfani da ƙididdigi na Aptos don ciniki mai yawan mita.",
+    "Tapp": "DEX na farko mai kunna kugiya na Uniswap V4 akan testnet na Aptos; hooks na kwangila masu wayo suna ba da damar gine-gine su haɗa wuraren al'ada yayin da masu amfani ke samun musayar da za a iya tsarawa.",
+    "Merkle": "Wani DEX perp mai wasa tare da XP, akwatunan ganima da 150× leverage; sama da dalar Amurka biliyan 200 jimlar ciniki.",
+    "AGDEX": "Yana ba da kwangiloli masu dawwama na gabaɗaya 1-100× margin, kiyaye ƙananan zamewa ga masu ciniki marasa babba ta hanyar tasirin oracle mai ƙanƙanta.",
+    "Pump": "Kowa zai iya ƙirƙira alamomin meme ta hanyar kwayoyin dauri; kowane alama ana sakamakonsa da gaskiya ba tare da pre-sales ko rabon ƙungiya ba.",
+    "Emojicoin": "Yana ba masu amfani damar ƙirƙira alamomi waɗanda ke daidaitawa da alamomin Unicode emoji; kowane ƙaddamarwa yana amfani da Econia's CL-AMM curve don ganowa da bita na nan take.",
+    "Aries": "Kasuwar kuɗi irin na Compound na farko akan Aptos, da haɓakawa 90% LTV E-Mode, haɗaɗɗen gadoji da ciniki dama a cikin interface ɗaya.",
+    "Superposition": "Dandali na sarrafa haɗari na ci-gaba wanda aka yi wahayi daga Bank of England FHS VaR, yana ba da damar samun albarkatu mai leverage tare da sa ido kan haɗari na ainihin lokaci da daidaitawa mai canji na lamuni.",
+    "Joule": "Yana haɗa wuraren lamuni masu keɓe da \"wuraren bugun ruwa\" don noma mai leverage.",
+    "Echelon": "Cibiyar lamuni da ke goyan bayan E-Mode da kuma kasuwanni masu keɓe.",
+    "Aptin": "Dandali na lamuni mai sa tsaro da farko, yana amfani da Move Prover don tabbatarwa da kula da haɗarin wuraren keɓe.",
+    "Meso": "Lamuni mai tasiri na babban jari tare da iyakokin bashi da masu amfani za su iya saituninsa da module na tsaro don tallafawa rashin iya biyan bashin protocol.",
+    "TruFin": "Liquid staking na darajar kasuwanci; masu amfani suna saka hannun jari APT don samun TruAPT.",
+    "Amnis": "Tsarin alamomi biyu yana ba da stAPT (mai samar da amfanin ƙasa) da amAPT (kwanciyar hankali), yana ba masu amfani damar canzawa tsakanin amfanin ƙasa da kwanciyar hankali yayin da ke mayar da kuɗaden aikin da aka yi ga masu saka hannun jari.",
+    "Kofi": "Liquid staking da aka haɓaka da MEV tare da ɗakin ajiya na LSD mai leverage.",
+    "Ichi": "Automated liquidity manager vaults yana ba wa ayyuka damar bayar da ruwa na gefe ɗaya; haɓakan range da ke dacewa don rage asarar da ba ta daɗe ba yayin da ma'ajin ke samun kuɗin ciniki a cikin alamarsa ta asali.",
+    "Vibrant X": "Mai haɓaka amfanin ƙasa da dashboard na portfolio, yana sake rarraba ajiya zuwa wuraren Aptos masu mafi girman APY.",
+    "Moar": "Yana ginin Layer na noma mai leverage tare da asusun credit na kan-protocols, yana ba masu amfani damar ari a wuri ɗaya, aiwatarwa a wani wuri.",
+    "Thala": "Suite na aikace-aikacen DeFi tare da AMM mai wuraren da yawa, stablecoin MOD mai haɗin gwiwa da liquid staking ta hanyar sthAPT da thAPT."
+  },
+  "protocol_category_breakdown": {
+    "Thala": "Ciniki • Samarwa • Kuɗi"
+  },
+  "protocol_values": {
+    "status": {
+      "Active": "Mai aiki",
+      "Deprecated": "An yi watsi da shi",
+      "Beta": "Beta",
+      "Coming Soon": "Ana zuwa"
+    },
+    "audit_status": {
+      "Audited": "An yi bincike",
+      "Unaudited": "Ba a yi bincike ba",
+      "In Progress": "Ana ci gaba",
+      "Partially Audited": "An yi binciken wani yanki"
+    },
+    "networks": {
+      "mainnet": "Babban hanyar sadarwa",
+      "testnet": "Hanyar sadarwar gwaji",
+      "devnet": "Hanyar sadarwar haɓakawa"
+    },
+    "implementations": {
+      "Money Market": "Kasuwar Kuɗi",
+      "Isolated Pools": "Wuraren da aka keɓe",
+      "Validator Delegated": "Wakilci Mai tabbatarwa",
+      "Range Orders": "Odin Range",
+      "Borrowing-based": "Tushen lamuni",
+      "Multi-protocol": "Ka'idoji masu yawa",
+      "AMM": "AMM",
+      "CLOB": "CLOB",
+      "Hybrid": "Haɗe",
+      "Route Optimization": "Inganta hanya",
+      "Gas Optimization": "Inganta gas",
+      "Cross-chain": "Tsaren sarkar",
+      "Cross-margin": "Gefen gefe",
+      "Fair Launch": "Ƙaddamarwa mai adalci",
+      "Protocol Suite": "Tsarin Ka'ida"
+    }
+  },
+  "table": {
+    "protocol": "Ka'ida",
+    "category": "Kashi",
+    "subcategory": "Ƙananan kashi",
+    "tvl": "TVL",
+    "links": "Haɗin kai",
+    "sort_by": "A ware ta",
+    "sort_asc": "Tsarin hawa",
+    "sort_desc": "Tsarin saukowa"
+  },
+  "fallbacks": {
+    "multiple_defi_products": "Kayayyakin DeFi da yawa",
+    "defi_protocol_category": "Kashin ka'idar DeFi",
+    "defi_protocol_subcategory": "Kashi na ƙa'idar ƙa'idar DeFi",
+    "unknown_category": "Unknown Category",
+    "unknown_subcategory": "Unknown Subcategory",
+    "no_description": "Babu kwatance",
+    "visit_protocol": "Ziyara Protocol"
+  },
+  "actions": {
+    "view_protocol": "Duba Protocol",
+    "visit_website": "Ziyarci Yanar Gizo",
+    "view_on_github": "Duba kan GitHub",
+    "follow_on_twitter": "Bi akan X",
+    "copy_link": "Copy Link",
+    "share": "Share"
+  },
+  "errors": {
+    "failed_load_metrics": "An kasa loda ƙididdigon DeFi",
+    "please_refresh": "Don Allah sake wartsawa shafin don sake gwadawa"
+  },
+  "ui": {
+    "search": {
+      "placeholder": "Search protocol...",
+      "results_count": "sakamakon {{count}}",
+      "results_count_plural": "{{count}} sakamako",
+      "breadcrumb": "Duk> {{category}}"
+    },
+    "filters": {
+      "category": "Kategori:",
+      "all_categories": "Dukkan Rukunin",
+      "clear_filters": "Clear",
+      "view_mode": {
+        "grid": "Grid View",
+        "table": "Kallon Tebu"
+      },
+      "tooltips": {
+        "category_filter": "Tace ladabi ta nau'i",
+        "clear_filters": "Sharfe duk masu tacewa",
+        "grid_view": "Canja zuwa duba grid",
+        "table_view": "Canja zuwa duba tebur"
+      }
+    },
+    "stats": {
+      "total_protocols": "Total Protocols",
+      "total_protocols_tooltip": "Jimlar adadin ka'idojin DeFi da aka bibiya",
+      "categories": "Categories",
+      "categories_tooltip": "Yawancin nau'ikan DeFi akwai",
+      "data_source": "Data Tushen",
+      "data_source_tooltip": "Inda bayanan yarjejeniya suka fito",
+      "loading": "Loading statistics..."
+    },
+    "table": {
+      "headers": {
+        "name": "suna",
+        "category": "Kashi",
+        "links": "Links"
+      },
+      "tooltips": {
+        "sort_by_name": "A ware ta sunan yarjejeniya",
+        "sort_by_category": "A ware ta rukuni",
+        "visit_website": "Ziyarci gidan yanar gizon yarjejeniya",
+        "view_github": "Duba ma'ajiyar GitHub",
+        "follow_twitter": "Bi a kan Twitter"
+      },
+      "no_data": "Ba a sami ka'idoji ba",
+      "loading": "Loading protocols..."
+    },
+    "grid": {
+      "tooltips": {
+        "protocol_card": "Danna don duba bayanan {{protocol}}",
+        "visit_website": "Ziyarci gidan yanar gizon {{protocol}}",
+        "view_github": "Duba {{protocol}} akan GitHub",
+        "follow_twitter": "Bi {{protocol}} akan Twitter"
+      }
+    },
+    "messages": {
+      "no_protocols": "Ba a sami ka'idojin da suka dace da ma'aunin ku ba.",
+      "loading": "Loading...",
+      "error": "Kuskuren loda ladabi",
+      "empty_state": "Babu ka'idojin DeFi",
+      "try_clearing_filters": "Yi gwada share masu tacewa ko kalmomin bincike."
+    },
+    "common_values": {
+      "na": "Ba komai",
+      "not_available": "Ba shi samuwa",
+      "real_time": "Lokaci ainihi",
+      "live": "Rayuwa",
+      "estimated": "Kimanta",
+      "unknown": "Ba a sani ba",
+      "loading": "Ana lodawa...",
+      "error": "Kuskure",
+      "coming_soon": "Ana zuwa",
+      "tbd": "Za a ƙayyadda",
+      "varies": "Ya bambanta"
+    },
+    "units": {
+      "million": "M",
+      "billion": "B",
+      "trillion": "T",
+      "percent": "%",
+      "usd": "USD",
+      "apt": "APT",
+      "btc": "BTC"
+    }
+  }
+}

@@ -1,0 +1,167 @@
+name: 🚀 Feature Request
+description: Suggest an idea for OnAptos
+title: "[Feature]: "
+labels: ["enhancement", "needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a new feature! Please provide as much detail as possible to help us understand your request.
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Pre-flight checklist
+      description: Please check all the following items before submitting this feature request.
+      options:
+        - label: I have searched existing issues to ensure this feature hasn't been requested before
+          required: true
+        - label: I have checked the roadmap and documentation for planned features
+          required: true
+        - label: This feature aligns with the project's goals and scope
+          required: true
+
+  - type: dropdown
+    id: feature-type
+    attributes:
+      label: Feature type
+      description: What type of feature are you requesting?
+      options:
+        - New functionality
+        - User interface improvement
+        - Performance optimization
+        - Developer experience
+        - API enhancement
+        - Integration with external service
+        - Documentation improvement
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem-description
+    attributes:
+      label: Problem description
+      description: |
+        Is your feature request related to a problem? Please describe the problem you're trying to solve.
+        
+        **Example**: "I'm always frustrated when..."
+      placeholder: Describe the problem this feature would solve...
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Proposed solution
+      description: |
+        Describe the solution you'd like to see implemented.
+        
+        Be as specific as possible about:
+        - What the feature should do
+        - How users would interact with it
+        - Expected behavior
+      placeholder: Describe your proposed solution...
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: |
+        Describe any alternative solutions or features you've considered.
+        
+        This helps us understand the full scope of the problem and potential approaches.
+      placeholder: Describe alternative solutions you've considered...
+
+  - type: textarea
+    id: user-stories
+    attributes:
+      label: User stories
+      description: |
+        Provide user stories that describe how this feature would be used.
+        
+        **Example**:
+        - As a developer, I want to... so that I can...
+        - As an end user, I want to... so that I can...
+      placeholder: |
+        - As a [user type], I want to [action] so that I can [benefit]
+        - As a [user type], I want to [action] so that I can [benefit]
+
+  - type: textarea
+    id: mockups
+    attributes:
+      label: Mockups or examples
+      description: |
+        If applicable, add mockups, wireframes, or examples to help explain your feature request.
+        
+        **Tip**: You can attach images by clicking this area to highlight it and then dragging files in.
+      placeholder: Attach mockups, wireframes, or provide links to examples...
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this feature to you and your use case?
+      options:
+        - Critical - Blocking my use of the application
+        - High - Would significantly improve my workflow
+        - Medium - Would be nice to have
+        - Low - Minor improvement
+    validations:
+      required: true
+
+  - type: dropdown
+    id: complexity
+    attributes:
+      label: Expected complexity
+      description: How complex do you think this feature would be to implement?
+      options:
+        - Low - Simple change or addition
+        - Medium - Moderate development effort
+        - High - Significant development effort
+        - Unknown - Not sure about the complexity
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance criteria
+      description: |
+        Define the criteria that must be met for this feature to be considered complete.
+        
+        **Example**:
+        - [ ] Users can perform action X
+        - [ ] Feature works on mobile devices
+        - [ ] Feature is accessible to screen readers
+        - [ ] Performance impact is minimal
+      placeholder: |
+        - [ ] Criterion 1
+        - [ ] Criterion 2
+        - [ ] Criterion 3
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: |
+        Add any other context, screenshots, or references about the feature request here.
+        
+        **Helpful additions**:
+        - Links to relevant documentation
+        - References to similar features in other applications
+        - Technical considerations
+        - Dependencies or related features
+      placeholder: Any additional information that might be helpful...
+
+  - type: checkboxes
+    id: volunteer
+    attributes:
+      label: Contribution
+      description: Would you be interested in contributing to this feature?
+      options:
+        - label: I would be willing to help implement this feature
+        - label: I would be willing to help with design/mockups
+        - label: I would be willing to help with testing

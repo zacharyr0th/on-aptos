@@ -1,0 +1,78 @@
+{
+  "page": {
+    "title": "Aptos पर LSTs",
+    "description": "Aptos ब्लॉकचेन पर लिक्विड स्टेकिंग टोकन"
+  },
+  "stats": {
+    "total_lst_value": "कुल LST मूल्य",
+    "liquid_staking_tokens": "लिक्विड स्टेकिंग टोकन",
+    "market_share": "बाजार हिस्सेदारी",
+    "apr": "APR",
+    "apy": "APY",
+    "staked_amount": "स्टेक्ड राशि",
+    "total_staked": "कुल स्टेक्ड",
+    "exchange_rate": "विनिमय दर",
+    "rewards": "पुरस्कार"
+  },
+  "loading": {
+    "loading_lst_data": "LST डेटा लोड हो रहा है...",
+    "loading": "लोड हो रहा है..."
+  },
+  "error": {
+    "error_loading_lst_data": "LST डेटा लोड करने में त्रुटि",
+    "retry": "फिर से कोशिश करें",
+    "failed_to_load_chart": "चार्ट लोड करने में असफल"
+  },
+  "protocols": {
+    "thala": "Thala",
+    "amnis": "Amnis",
+    "trufin": "TruFin",
+    "ditto": "Ditto",
+    "tortuga": "Tortuga"
+  },
+  "tokens": {
+    "stapt": "stAPT",
+    "thapt": "thAPT",
+    "amapt": "amAPT",
+    "truapt": "TruAPT",
+    "dapt": "dAPT",
+    "tapt": "tAPT"
+  },
+  "actions": {
+    "stake": "स्टेक",
+    "unstake": "अनस्टेक",
+    "claim_rewards": "पुरस्कार दावा करें",
+    "view_details": "विवरण देखें",
+    "trade": "व्यापार",
+    "add_to_wallet": "वॉलेट में जोड़ें"
+  },
+  "staking": {
+    "liquid_staking": "लिक्विड स्टेकिंग",
+    "validator": "वैलिडेटर",
+    "delegation": "प्रतिनिधिमंडल",
+    "unstaking_period": "अनस्टेकिंग अवधि",
+    "minimum_stake": "न्यूनतम स्टेक",
+    "fees": "शुल्क",
+    "commission": "कमीशन"
+  },
+  "filters": {
+    "all": "सभी",
+    "by_protocol": "प्रोटोकॉल के अनुसार",
+    "by_apy": "APY के अनुसार",
+    "active": "सक्रिय",
+    "paused": "रोका गया"
+  },
+  "fallbacks": {
+    "unknown_lst": "अज्ञात LST",
+    "data_not_available": "डेटा उपलब्ध नहीं",
+    "apy_unavailable": "APY उपलब्ध नहीं"
+  },
+  "info": {
+    "what_is_lst": "LST क्या है?",
+    "lst_description": "लिक्विड स्टेकिंग टोकन (LSTs) आपको APT को स्टेक करते समय व्युत्पन्न टोकन के माध्यम से तरलता बनाए रखने की अनुमति देते हैं जो आपकी स्टेकिंग स्थिति का प्रतिनिधित्व करते हैं।",
+    "benefits": "लाभ",
+    "earn_rewards": "स्टेकिंग पुरस्कार अर्जित करें",
+    "maintain_liquidity": "तरलता बनाए रखें",
+    "use_in_defi": "DeFi में उपयोग करें"
+  }
+}

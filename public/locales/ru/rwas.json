@@ -1,0 +1,76 @@
+{
+  "page": {
+    "title": "Реальные активы в Aptos",
+    "description": "RWA и токенизированные реальные активы в блокчейне Aptos"
+  },
+  "stats": {
+    "total_rwa_value": "Общая стоимость RWA",
+    "real_world_assets": "Реальные активы",
+    "data_powered_by": "Данные предоставлены RWA.xyz",
+    "data_powered_by_prefix": "Данные предоставлены",
+    "rwa_assets": "RWA активы",
+    "market_share": "Доля рынка",
+    "total_value": "Общая стоимость",
+    "asset_count": "Количество активов",
+    "protocols": "Протоколы"
+  },
+  "loading": {
+    "loading_rwa_data": "Загрузка данных RWA...",
+    "loading": "Загрузка...",
+    "rate_limit_message": "Достигнут лимит API. Пожалуйста, подождите перед повторной попыткой.",
+    "try_again_in": "Попробовать снова через",
+    "try_again": "Попробовать снова",
+    "request_failed": "Запрос не выполнен. Пожалуйста, попробуйте снова."
+  },
+  "error": {
+    "error_loading_rwa_data": "Ошибка загрузки данных RWA",
+    "failed_to_load_chart": "Не удалось загрузить график",
+    "retry": "Повторить",
+    "failed_to_load_data": "Не удалось загрузить данные"
+  },
+  "protocols": {
+    "pact": "Pact",
+    "securitize": "Securitize",
+    "franklin_templeton": "Franklin Templeton",
+    "libre_capital": "Libre Capital",
+    "ondo": "Ondo",
+    "blackrock": "BlackRock"
+  },
+  "labels": {
+    "bridged": "переброшен",
+    "value_not_available": "Стоимость недоступна",
+    "token_id": "ID токена",
+    "current_value": "Текущая стоимость",
+    "asset_name": "Название актива",
+    "asset_issuer": "Эмитент актива",
+    "standards": "Стандарты",
+    "not_specified": "Не указано",
+    "regulatory_framework": "Регулятивная база",
+    "governing_body": "Регулирующий орган",
+    "issuer_legal_structure_country": "Страна юридической структуры эмитента",
+    "contract_address": "Адрес контракта",
+    "network_id": "ID сети",
+    "asset_id": "ID актива"
+  },
+  "sections": {
+    "value_information": "Информация о стоимости",
+    "asset_details": "Детали актива",
+    "regulatory_information": "Регулятивная информация",
+    "legal_structure": "Юридическая структура",
+    "technical_details": "Технические детали"
+  },
+  "actions": {
+    "view_details": "Просмотреть детали",
+    "visit_website": "Посетить сайт"
+  },
+  "filters": {
+    "all": "Все",
+    "by_protocol": "По протоколу",
+    "by_value": "По стоимости"
+  },
+  "fallbacks": {
+    "unknown_asset": "Неизвестный актив",
+    "data_not_available": "Данные недоступны",
+    "value_unavailable": "Стоимость недоступна"
+  }
+}

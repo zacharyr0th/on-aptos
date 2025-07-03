@@ -1,0 +1,78 @@
+{
+  "page": {
+    "title": "Aptos 上的 LST",
+    "description": "Aptos 区块链上的流动性质押代币"
+  },
+  "stats": {
+    "total_lst_value": "LST 总价值",
+    "liquid_staking_tokens": "流动性质押代币",
+    "market_share": "市场份额",
+    "apr": "APR",
+    "apy": "APY",
+    "staked_amount": "质押数量",
+    "total_staked": "总质押量",
+    "exchange_rate": "兑换率",
+    "rewards": "奖励"
+  },
+  "loading": {
+    "loading_lst_data": "正在加载 LST 数据...",
+    "loading": "加载中..."
+  },
+  "error": {
+    "error_loading_lst_data": "LST 数据加载错误",
+    "retry": "重试",
+    "failed_to_load_chart": "图表加载失败"
+  },
+  "protocols": {
+    "thala": "Thala",
+    "amnis": "Amnis",
+    "trufin": "TruFin",
+    "ditto": "Ditto",
+    "tortuga": "Tortuga"
+  },
+  "tokens": {
+    "stapt": "stAPT",
+    "thapt": "thAPT",
+    "amapt": "amAPT",
+    "truapt": "TruAPT",
+    "dapt": "dAPT",
+    "tapt": "tAPT"
+  },
+  "actions": {
+    "stake": "质押",
+    "unstake": "解除质押",
+    "claim_rewards": "领取奖励",
+    "view_details": "查看详情",
+    "trade": "交易",
+    "add_to_wallet": "添加到钱包"
+  },
+  "staking": {
+    "liquid_staking": "流动性质押",
+    "validator": "验证者",
+    "delegation": "委托",
+    "unstaking_period": "解押周期",
+    "minimum_stake": "最小质押量",
+    "fees": "手续费",
+    "commission": "佣金"
+  },
+  "filters": {
+    "all": "全部",
+    "by_protocol": "按协议",
+    "by_apy": "按 APY",
+    "active": "活跃",
+    "paused": "暂停"
+  },
+  "fallbacks": {
+    "unknown_lst": "未知 LST",
+    "data_not_available": "数据不可用",
+    "apy_unavailable": "APY 不可用"
+  },
+  "info": {
+    "what_is_lst": "什么是 LST？",
+    "lst_description": "流动性质押代币（LST）允许您在质押 APT 的同时通过代表您质押仓位的衍生代币保持流动性。",
+    "benefits": "优势",
+    "earn_rewards": "赚取质押奖励",
+    "maintain_liquidity": "保持流动性",
+    "use_in_defi": "在 DeFi 中使用"
+  }
+}

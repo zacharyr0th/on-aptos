@@ -1,0 +1,428 @@
+{
+  "page": {
+    "title": "Aptos 上的 DeFi",
+    "description": "Aptos 区块链上 DeFi 协议的综合目录"
+  },
+  "stats": {
+    "total_value_locked": "总锁定价值",
+    "volume_24h": "24小时交易量",
+    "protocols": "协议",
+    "filtered_protocols": "筛选协议",
+    "live_from_defillama": "来自 DeFiLlama 的实时数据",
+    "estimated_tvl": "预估 TVL",
+    "volume_data": "24小时交易量",
+    "defi_protocols": "DeFi 协议"
+  },
+  "search": {
+    "placeholder": "搜索协议...",
+    "results": "找到 {{count}} 个协议",
+    "results_of": "共 {{total}} 个协议",
+    "no_results": "未找到符合条件的协议。",
+    "clear_search": "清除搜索",
+    "search_hint": "按名称、类别或描述搜索"
+  },
+  "filters": {
+    "all": "全部",
+    "category": "类别",
+    "subcategory": "子类别",
+    "clear_filters": "清除筛选",
+    "filter_by_category": "按类别筛选",
+    "view_grid": "网格视图",
+    "view_table": "表格视图",
+    "mobile_filters": "筛选",
+    "active_filters": "活跃筛选",
+    "subcategories_header": "{{category}} 子类别："
+  },
+  "tooltips": {
+    "grid_view": "切换到网格视图",
+    "table_view": "切换到表格视图",
+    "category_filter": "按类别筛选协议",
+    "subcategory_filter": "按子类别筛选协议",
+    "clear_all_filters": "移除所有活跃筛选",
+    "search_protocols": "搜索所有协议",
+    "protocol_website": "访问官方网站",
+    "protocol_github": "在 GitHub 上查看源代码",
+    "protocol_twitter": "在 X (Twitter) 上关注",
+    "category_description": "{{category}} 协议：{{description}}",
+    "subcategory_description": "{{subcategory}}：{{description}}"
+  },
+  "categories": {
+    "All": {
+      "name": "全部",
+      "description": "所有 DeFi 协议"
+    },
+    "Credit": {
+      "name": "信贷",
+      "description": "促进借贷和基于信用服务的协议",
+      "subcategories": {
+        "Lending": {
+          "name": "借贷",
+          "description": "用户可以借出和借入加密资产并获得利息的平台"
+        },
+        "RWA Lending": {
+          "name": "RWA 借贷",
+          "description": "由房地产或大宗商品等现实世界资产支持的借贷协议"
+        },
+        "NFT Lending": {
+          "name": "NFT 借贷",
+          "description": "使用 NFT 作为抵押品借钱或向 NFT 持有者放贷"
+        },
+        "Uncollateralized Lending": {
+          "name": "无抵押借贷",
+          "description": "基于声誉或信用评分的无抵押贷款"
+        },
+        "CDP": {
+          "name": "CDP",
+          "description": "抵押债务头寸 - 通过在智能合约中锁定抵押品来创建稳定币"
+        }
+      }
+    },
+    "Yield": {
+      "name": "收益",
+      "description": "专注于质押、收益生成和奖励分配的协议",
+      "subcategories": {
+        "Liquid Staking": {
+          "name": "流动性质押",
+          "description": "质押代币同时接收可交易的凭证以保持流动性"
+        },
+        "Restaking": {
+          "name": "重新质押",
+          "description": "使用已质押的代币来保护额外协议以获得额外奖励"
+        },
+        "Liquid Restaking": {
+          "name": "流动性重新质押",
+          "description": "使用可交易或在 DeFi 中使用的流动性代币进行重新质押"
+        },
+        "Liquidity Manager": {
+          "name": "流动性管理器",
+          "description": "优化和重新平衡流动性池的工具或协议"
+        },
+        "Leveraged Farming": {
+          "name": "杠杆挖矿",
+          "description": "借入资金以增加流动性提供并放大挖矿奖励"
+        },
+        "Yield Aggregator": {
+          "name": "收益聚合器",
+          "description": "自动寻找并切换到最佳收益机会"
+        }
+      }
+    },
+    "Trading": {
+      "name": "交易",
+      "description": "用于交易、做市和流动性提供的协议",
+      "subcategories": {
+        "DEX": {
+          "name": "DEX",
+          "description": "无需中介即可交换代币的去中心化交易所"
+        },
+        "DEX Aggregator": {
+          "name": "DEX 聚合器",
+          "description": "在多个 DEX 中寻找最佳价格以实现最优交易"
+        },
+        "Perps": {
+          "name": "永续合约",
+          "description": "通过杠杆交易加密资产的永续期货合约"
+        },
+        "Options": {
+          "name": "期权",
+          "description": "买卖期权合约以对冲或投机价格变动"
+        },
+        "Prediction Market": {
+          "name": "预测市场",
+          "description": "使用加密货币对现实世界事件和结果进行投注"
+        },
+        "Launchpad": {
+          "name": "启动平台",
+          "description": "通过公平分配和社区功能推出新代币"
+        }
+      }
+    },
+    "Multiple": {
+      "name": "多元化",
+      "description": "跨不同类别提供多种 DeFi 产品的协议"
+    }
+  },
+  "subcategories": {
+    "lending": "借贷",
+    "rwa_lending": "RWA 借贷",
+    "nft_lending": "NFT 借贷",
+    "uncollateralized_lending": "无抵押借贷",
+    "cdp": "CDP",
+    "liquid_staking": "流动性质押",
+    "restaking": "重新质押",
+    "liquid_restaking": "流动性重新质押",
+    "liquidity_manager": "流动性管理器",
+    "leveraged_farming": "杠杆挖矿",
+    "yield_aggregator": "收益聚合器",
+    "dex": "DEX",
+    "dex_aggregator": "DEX 聚合器",
+    "perps": "永续合约",
+    "launchpad": "启动平台",
+    "options": "期权",
+    "prediction_markets": "预测市场"
+  },
+  "protocol": {
+    "website": "网站",
+    "github": "GitHub",
+    "twitter": "X (Twitter)",
+    "links": "链接",
+    "tvl": "TVL",
+    "volume": "交易量",
+    "yield": "收益",
+    "status": "状态",
+    "launch_date": "启动日期",
+    "audit_status": "审计状态",
+    "networks": "网络",
+    "category": "类别",
+    "subcategory": "子类别",
+    "description": "描述",
+    "more_info": "更多信息",
+    "external_links": "外部链接",
+    "implementation": "实现方式",
+    "security": "安全性",
+    "token": "代币"
+  },
+  "protocol_values": {
+    "status": {
+      "Active": "活跃",
+      "Deprecated": "已弃用",
+      "Beta": "测试版",
+      "Coming Soon": "即将推出"
+    },
+    "audit_status": {
+      "Audited": "已审计",
+      "Unaudited": "未审计",
+      "In Progress": "进行中",
+      "Partially Audited": "部分审计"
+    },
+    "networks": {
+      "mainnet": "主网",
+      "testnet": "测试网",
+      "devnet": "开发网"
+    },
+    "implementations": {
+      "Money Market": "货币市场",
+      "Isolated Pools": "隔离池",
+      "Validator Delegated": "验证者委托",
+      "Range Orders": "范围订单",
+      "Borrowing-based": "基于借贷",
+      "Multi-protocol": "多协议",
+      "AMM": "AMM",
+      "CLOB": "CLOB",
+      "Hybrid": "混合型",
+      "Route Optimization": "路径优化",
+      "Gas Optimization": "Gas优化",
+      "Cross-chain": "跨链",
+      "Cross-margin": "全仓保证金",
+      "Fair Launch": "公平启动",
+      "Protocol Suite": "协议套件"
+    }
+  },
+  "protocol_descriptions": {
+    "Panora": "一个“元DEX”，连接到链上订单簿和10多个AMM，在池间分割订单，同时管理在其UI中自动更新的规范代币列表。",
+    "Kana": "跨九条链路由交换；Paymaster合约让用户无需持有APT作为gas即可在Aptos上交易；基于订单簿的永续合约引擎。",
+    "Thetis": "Thetis将现货聚合器、50×永续合约和流动性引导池（LBPs）捆绑在一个屋檐下。",
+    "Anqa": "声称在15多个Aptos DEX上有99%的流动性覆盖；实时采样在签名前预览滑点，并允许批量处理多代币交换以节省gas。",
+    "LiquidSwap": "Pontem的旗舰AMM和在Aptos主网上第一个上线的DEX；提供经典的Uniswap-V2池、稳定币交换曲线和正式验证的集中流动性设计。",
+    "Econia": "为Aptos的乐观并发优化的超并行链上订单簿；以亚秒级的终结性并行处理市场，并暴露完整的REST/MQTT数据堆栈。",
+    "Cellana": "一个ve(3,3) AMM，其中veNFT投票者指导发行并获取100%的手续费。",
+    "PancakeSwap": "币安的旗舰DEX将其V2 AMM克隆到Move上，并将一些CAKE流动性桥接到Aptos。",
+    "SushiSwap": "Sushi执行了其第一个非EVM集成，在保持熟悉的Trident路由器UX的同时，实现了在Aptos上结算的跨链路由。",
+    "Hyperion": "一个完全链上的混合订单簿 + CL-AMM，利用Aptos的吞吐量进行高频交易风格的交易。",
+    "Tapp": "在Aptos测试网上第一个启用钩子的Uniswap V4风格模块化DEX；智能合约钩子让构建者可以组合自定义池，同时用户获得可编程交换。",
+    "Merkle": "一个具有XP、战利品箱和150×杠杆的游戏化perp DEX；总交易量超过200亿美元。",
+    "AGDEX": "提‗1-100×全仓保证金永续合约，低影响预言机成交保持个人交易者的低滑点。",
+    "Pump": "任何人都可以通过绑定曲线铸造模因代币；每个代币都是公平发射，没有预售或团队分配。",
+    "Emojicoin": "让用户铸造与Unicode表情符号1对1映射的代币；每次发射都使用Econia的CL-AMM曲线进行即时价格发现和投机。",
+    "Aries": "在Aptos上第一个Compound风格的货币市场，升级了90%LTV E-Mode、集成跨链桥和现货交易于一个界面。",
+    "Superposition": "受英格兰银行FHS VaR启发的高级风险管理平台，提供带有实时风险监控和动态抵押因子调整的杠杆收益机会。",
+    "Joule": "将孤立的借贷池与“流动性锤点”相结合，用于杠杆挖矿。",
+    "Echelon": "一个同时支持E-Mode和孤立市场的借贷中心。",
+    "Aptin": "以安全为先的借贷平台，使用Move Prover进行正式验证和精细的孤立池风险控制。",
+    "Meso": "资本高效的借贷，具有用户可配置的债务上限和支持协议不足的安全模块。",
+    "TruFin": "企业级流动性质押；用户质押APT可获得TruAPT。",
+    "Amnis": "双代币系统发行stAPT（产收益）和amAPT（稳定），让用户在收益和稳定性之间切换，同时将验证者佣金路由回质押者。",
+    "Kofi": "由MEV增强的流动性质押，带有杠杆LSD金库。",
+    "Ichi": "自动化流动性管理器金库让项目可以提供单边流动性；智能范围重新平衡以减少无常损失，同时财务在其原生代币中赚取交换手续费。",
+    "Vibrant X": "收益优化器和投资组合仪表板，将存款重新分配到最高APY的Aptos池。",
+    "Moar": "构建杠杆挖矿层，具有跨协议信用账户，使用户可以在一个地方借款，在另一个地方部署。",
+    "Thala": "一个DeFi应用程序套件，具有多池AMM、超额抵押MOD稳定币和通过sthAPT和thAPT进行的流动性质押。"
+  },
+  "protocol_category_breakdown": {
+    "Thala": "交易 • 收益 • 信贷"
+  },
+  "table": {
+    "protocol": "协议",
+    "category": "类别",
+    "subcategory": "子类别",
+    "tvl": "TVL",
+    "links": "链接",
+    "sort_by": "排序",
+    "sort_asc": "升序排列",
+    "sort_desc": "降序排列"
+  },
+  "fallbacks": {
+    "multiple_defi_products": "多种 DeFi 产品",
+    "defi_protocol_category": "DeFi 协议类别",
+    "defi_protocol_subcategory": "DeFi 协议子类别",
+    "unknown_category": "未知类别",
+    "unknown_subcategory": "未知子类别",
+    "no_description": "无可用描述",
+    "visit_protocol": "访问协议"
+  },
+  "actions": {
+    "view_protocol": "查看协议",
+    "visit_website": "访问网站",
+    "view_on_github": "在 GitHub 上查看",
+    "follow_on_twitter": "在 X 上关注",
+    "copy_link": "复制链接",
+    "share": "分享"
+  },
+  "ui": {
+    "search": {
+      "placeholder": "搜索协议...",
+      "results_count": "{{count}} 个结果",
+      "results_count_plural": "{{count}} 个结果",
+      "breadcrumb": "全部 > {{category}}"
+    },
+    "filters": {
+      "category": "类别：",
+      "all_categories": "所有类别",
+      "clear_filters": "清除",
+      "view_mode": {
+        "grid": "网格视图",
+        "table": "表格视图"
+      },
+      "tooltips": {
+        "category_filter": "按类别筛选协议",
+        "clear_filters": "清除所有活跃筛选",
+        "grid_view": "切换到网格视图",
+        "table_view": "切换到表格视图"
+      }
+    },
+    "stats": {
+      "total_protocols": "总协议数",
+      "total_protocols_tooltip": "跟踪的 DeFi 协议总数",
+      "categories": "类别",
+      "categories_tooltip": "可用的 DeFi 类别数量",
+      "data_source": "数据源",
+      "data_source_tooltip": "协议数据的来源",
+      "loading": "正在加载统计数据..."
+    },
+    "table": {
+      "headers": {
+        "name": "名称",
+        "category": "类别",
+        "links": "链接"
+      },
+      "tooltips": {
+        "sort_by_name": "按协议名称排序",
+        "sort_by_category": "按类别排序",
+        "visit_website": "访问协议网站",
+        "view_github": "查看 GitHub 仓库",
+        "follow_twitter": "在 Twitter 上关注"
+      },
+      "no_data": "未找到协议",
+      "loading": "正在加载协议..."
+    },
+    "grid": {
+      "tooltips": {
+        "protocol_card": "点击查看 {{protocol}} 详情",
+        "visit_website": "访问 {{protocol}} 网站",
+        "view_github": "在 GitHub 上查看 {{protocol}}",
+        "follow_twitter": "在 Twitter 上关注 {{protocol}}"
+      }
+    },
+    "messages": {
+      "no_protocols": "未找到符合条件的协议。",
+      "loading": "加载中...",
+      "error": "加载协议时出错",
+      "empty_state": "无可用的 DeFi 协议",
+      "try_clearing_filters": "尝试清除您的筛选或搜索条件。"
+    }
+  },
+  "protocols": {
+    "names": {
+      "Panora": "Panora",
+      "Kana": "Kana",
+      "Thetis": "Thetis",
+      "Anqa": "Anqa",
+      "LiquidSwap": "LiquidSwap",
+      "Econia": "Econia",
+      "Cellana": "Cellana",
+      "PancakeSwap": "PancakeSwap",
+      "SushiSwap": "SushiSwap",
+      "Hyperion": "Hyperion",
+      "Tapp": "Tapp",
+      "Merkle": "Merkle",
+      "AGDEX": "AGDEX",
+      "Pump": "Pump",
+      "Emojicoin": "Emojicoin",
+      "Aries": "Aries",
+      "Superposition": "Superposition",
+      "Joule": "Joule",
+      "Echelon": "Echelon",
+      "Aptin": "Aptin",
+      "Meso": "Meso",
+      "TruFin": "TruFin",
+      "Amnis": "Amnis",
+      "Kofi": "Kofi",
+      "Ichi": "Ichi",
+      "Vibrant X": "Vibrant X",
+      "Moar": "Moar",
+      "Thala": "Thala"
+    },
+    "short_descriptions": {
+      "Panora": "元DEX聚合器",
+      "Kana": "跨链交换路由器",
+      "Thetis": "多产品交易平台",
+      "Anqa": "高级DEX聚合器",
+      "LiquidSwap": "首个Aptos DEX",
+      "Econia": "高性能订单簿",
+      "Cellana": "ve(3,3) AMM",
+      "PancakeSwap": "热门多链DEX",
+      "SushiSwap": "跨链DeFi平台",
+      "Hyperion": "混合交易平台",
+      "Tapp": "支持Hook的模块化DEX",
+      "Merkle": "游戏化永续合约",
+      "AGDEX": "交叉保证金永续",
+      "Pump": "模因代币发射台",
+      "Emojicoin": "表情符号代币发射台",
+      "Aries": "Compound式借贷",
+      "Superposition": "高级风险管理",
+      "Joule": "隔离借贷池",
+      "Echelon": "多模式借贷中心",
+      "Aptin": "安全优先借贷",
+      "Meso": "资本高效借贷",
+      "TruFin": "企业级流动质押",
+      "Amnis": "双代币流动质押",
+      "Kofi": "MEV增强质押",
+      "Ichi": "自动化流动性管理器",
+      "Vibrant X": "收益优化器",
+      "Moar": "杠杆挖矿层",
+      "Thala": "DeFi协议套件"
+    }
+  },
+  "common_values": {
+    "na": "N/A",
+    "not_available": "不可用",
+    "real_time": "实时",
+    "live": "实时",
+    "estimated": "估计",
+    "unknown": "未知",
+    "loading": "加载中...",
+    "error": "错误",
+    "coming_soon": "即将推出",
+    "tbd": "待定",
+    "varies": "变化"
+  },
+  "units": {
+    "million": "百万",
+    "billion": "十亿",
+    "trillion": "万亿",
+    "percent": "%",
+    "usd": "USD",
+    "apt": "APT",
+    "btc": "BTC"
+  }
+}

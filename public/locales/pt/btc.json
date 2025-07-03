@@ -1,0 +1,121 @@
+{
+  "page": {
+    "title": "Bitcoin em Aptos",
+    "description": "Ativos de Bitcoin e mercados monetários na blockchain Aptos"
+  },
+  "stats": {
+    "total_supply": "Fornecimento total",
+    "total_btc_value": "Valor total do Bitcoin",
+    "bitcoin_assets": "Ativos de Bitcoin",
+    "market_share": "Quota de mercado",
+    "price": "Preço",
+    "market_cap": "Cap",
+    "volume_24h": "Volume 24h",
+    "tvl": "TVL",
+    "apy": "APY",
+    "utilization": "Utilização",
+    "decimals": "Decimais",
+    "network": "Rede",
+    "aptos_mainnet": "Aptos Mainnet"
+  },
+  "loading": {
+    "loading_btc_data": "Carregando dados de Bitcoin ...",
+    "loading": "Carregando...",
+    "loading_market_data": "Carregando dados do mercado ...",
+    "error_title": "Erro de carregamento de dados",
+    "rate_limit_message": "Limite de taxa de API alcançado.Por favor, espere antes de tentar novamente.",
+    "try_again_in": "Tente novamente",
+    "try_again": "Tente novamente",
+    "request_failed": "Solicitação falhou.Por favor, tente novamente.",
+    "chart_error": "Falha ao carregar gráfico"
+  },
+  "error": {
+    "error_loading_btc_data": "Erro ao carregar dados de bitcoin",
+    "retry": "Tente novamente",
+    "failed_to_load_chart": "Falha ao carregar gráfico",
+    "error_calculating_supply": "Erro calculando a oferta",
+    "unknown_error": "Erro desconhecido",
+    "invalid_data": "Dados inválidos",
+    "invalid_metadata": "Metadados inválidos"
+  },
+  "assets": {
+    "bitcoin": "Bitcoin",
+    "wbtc": "Bitcoin embrulhado",
+    "btc": "Bitcoin",
+    "sbtc": "Bitcoin apostado",
+    "tbtc": "Limiar Bitcoin"
+  },
+  "money_markets": {
+    "title": "Mercados monetários",
+    "supply": "Fornecer",
+    "borrow": "Emprestar",
+    "supply_apy": "APY de fornecimento",
+    "borrow_apy": "APY de empréstimo",
+    "total_supplied": "Total fornecido",
+    "total_borrowed": "Total emprestado",
+    "available_to_borrow": "Disponível para emprestar",
+    "utilization_rate": "Taxa de utilização"
+  },
+  "actions": {
+    "supply": "Fornecer",
+    "borrow": "Emprestar",
+    "withdraw": "Retirar",
+    "repay": "Reembolsar",
+    "view_details": "Ver detalhes",
+    "trade": "Troca",
+    "bridge": "Ponte",
+    "wrap": "Enrolar",
+    "unwrap": "Desembrulhar"
+  },
+  "yield": {
+    "lending": "Empréstimo",
+    "borrowing": "Emprestando",
+    "farming": "Agricultura",
+    "staking": "Staking",
+    "rewards": "Recompensas",
+    "incentives": "Incentivas"
+  },
+  "protocols": {
+    "aries": "Áries",
+    "echelon": "Escalão",
+    "aptin": "Envolto",
+    "thala": "Cabeça",
+    "echo": "Eco",
+    "protocol": "Protocolo",
+    "echo_data_soon": "Dados do protocolo Echo em breve"
+  },
+  "filters": {
+    "all": "Todos",
+    "by_protocol": "Por protocolo",
+    "by_apy": "Por APY",
+    "lending": "Empréstimo",
+    "trading": "Negociação",
+    "bridging": "Ponte"
+  },
+  "bridge": {
+    "bridge_bitcoin": "Ponte Bitcoin",
+    "from": "De",
+    "to": "Para",
+    "amount": "Quantia",
+    "fee": "Taxa",
+    "estimated_time": "Tempo estimado",
+    "supported_networks": "Redes suportadas"
+  },
+  "fallbacks": {
+    "unknown_asset": "Ativo desconhecido",
+    "data_not_available": "Dados não disponíveis",
+    "price_unavailable": "Preço indisponível"
+  },
+  "info": {
+    "what_is_wrapped_btc": "O que é embrulhado BTC?",
+    "wrapped_btc_description": "O Bitcoin embrulhado (wBTC) é uma representação tokenizada do Bitcoin em outras blockchains, permitindo o uso do Bitcoin em aplicativos DeFi.",
+    "benefits": "Benefícios",
+    "defi_access": "Acesso ao DeFi",
+    "earn_yield": "Ganhe rendimento",
+    "maintain_btc_exposure": "Mantenha a exposição ao BTC",
+    "bitcoin_backed_asset": "Ativo apoiado por Bitcoin"
+  },
+  "status": {
+    "coming_soon": "Em breve"
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "page": {
+    "title": "Aptos पर बिटकॉइन",
+    "description": "Aptos ब्लॉकचेन पर बिटकॉइन संपत्ति और मनी मार्केट"
+  },
+  "stats": {
+    "total_supply": "कुल आपूर्ति",
+    "total_btc_value": "कुल बिटकॉइन मूल्य",
+    "bitcoin_assets": "बिटकॉइन संपत्ति",
+    "market_share": "बाजार हिस्सेदारी",
+    "price": "मूल्य",
+    "market_cap": "बाजार पूंजी",
+    "volume_24h": "24 घंटे की मात्रा",
+    "tvl": "TVL",
+    "apy": "APY",
+    "utilization": "उपयोग",
+    "decimals": "दशमलव",
+    "network": "नेटवर्क",
+    "aptos_mainnet": "Aptos मेननेट"
+  },
+  "loading": {
+    "loading_btc_data": "बिटकॉइन डेटा लोड हो रहा है...",
+    "loading": "लोड हो रहा है...",
+    "loading_market_data": "बाजार डेटा लोड हो रहा है...",
+    "error_title": "डेटा लोड करने में त्रुटि",
+    "rate_limit_message": "API रेट लिमिट पहुंच गई। कृपया फिर से कोशिश करने से पहले प्रतीक्षा करें।",
+    "try_again_in": "फिर से कोशिश करें",
+    "try_again": "फिर से कोशिश करें",
+    "request_failed": "अनुरोध असफल। कृपया फिर से कोशिश करें।",
+    "chart_error": "चार्ट लोड करने में असफल"
+  },
+  "error": {
+    "error_loading_btc_data": "बिटकॉइन डेटा लोड करने में त्रुटि",
+    "retry": "फिर से कोशिश करें",
+    "failed_to_load_chart": "चार्ट लोड करने में असफल",
+    "error_calculating_supply": "आपूर्ति गणना में त्रुटि",
+    "unknown_error": "अज्ञात त्रुटि",
+    "invalid_data": "अमान्य डेटा",
+    "invalid_metadata": "अमान्य मेटाडेटा"
+  },
+  "assets": {
+    "bitcoin": "बिटकॉइन",
+    "wbtc": "रैप्ड बिटकॉइन",
+    "btc": "बिटकॉइन",
+    "sbtc": "स्टेक्ड बिटकॉइन",
+    "tbtc": "थ्रेशहोल्ड बिटकॉइन"
+  },
+  "money_markets": {
+    "title": "मनी मार्केट",
+    "supply": "आपूर्ति",
+    "borrow": "उधार",
+    "supply_apy": "Supply APY",
+    "borrow_apy": "Borrow APY",
+    "total_supplied": "कुल आपूर्ति",
+    "total_borrowed": "कुल उधार",
+    "available_to_borrow": "उधार के लिए उपलब्ध",
+    "utilization_rate": "उपयोग दर"
+  },
+  "actions": {
+    "supply": "आपूर्ति",
+    "borrow": "उधार",
+    "withdraw": "निकालें",
+    "repay": "वापसी",
+    "view_details": "विवरण देखें",
+    "trade": "व्यापार",
+    "bridge": "ब्रिज",
+    "wrap": "रैप",
+    "unwrap": "अनरैप"
+  },
+  "yield": {
+    "lending": "उधार देना",
+    "borrowing": "उधार लेना",
+    "farming": "फार्मिंग",
+    "staking": "स्टेकिंग",
+    "rewards": "पुरस्कार",
+    "incentives": "प्रोत्साहन"
+  },
+  "protocols": {
+    "aries": "Aries",
+    "echelon": "Echelon",
+    "aptin": "Aptin",
+    "thala": "Thala",
+    "echo": "Echo",
+    "protocol": "प्रोटोकॉल",
+    "echo_data_soon": "Echo प्रोटोकॉल डेटा जल्द आ रहा है"
+  },
+  "filters": {
+    "all": "सभी",
+    "by_protocol": "प्रोटोकॉल के अनुसार",
+    "by_apy": "APY के अनुसार",
+    "lending": "उधार देना",
+    "trading": "व्यापार",
+    "bridging": "ब्रिजिंग"
+  },
+  "bridge": {
+    "bridge_bitcoin": "ब्रिज बिटकॉइन",
+    "from": "से",
+    "to": "तक",
+    "amount": "राशि",
+    "fee": "शुल्क",
+    "estimated_time": "अनुमानित समय",
+    "supported_networks": "समर्थित नेटवर्क"
+  },
+  "fallbacks": {
+    "unknown_asset": "अज्ञात संपत्ति",
+    "data_not_available": "डेटा उपलब्ध नहीं",
+    "price_unavailable": "मूल्य उपलब्ध नहीं"
+  },
+  "info": {
+    "what_is_wrapped_btc": "रैप्ड BTC क्या है?",
+    "wrapped_btc_description": "रैप्ड बिटकॉइन (wBTC) अन्य ब्लॉकचेन पर बिटकॉइन का टोकनाइज़्ड प्रतिनिधित्व है, जो DeFi एप्लिकेशन में बिटकॉइन के उपयोग को सक्षम बनाता है।",
+    "benefits": "लाभ",
+    "defi_access": "DeFi पहुंच",
+    "earn_yield": "यील्ड अर्जित करें",
+    "maintain_btc_exposure": "BTC एक्सपोज़र बनाए रखें",
+    "bitcoin_backed_asset": "बिटकॉइन-समर्थित संपत्ति"
+  },
+  "status": {
+    "coming_soon": "जल्द आ रहा है"
+  }
+}

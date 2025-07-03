@@ -1,0 +1,78 @@
+{
+  "page": {
+    "title": "LSTs on Aptos",
+    "description": "Liquid Staking Tokens on the Aptos blockchain"
+  },
+  "stats": {
+    "total_lst_value": "Total LST Value",
+    "liquid_staking_tokens": "Liquid Staking Tokens",
+    "market_share": "Market Share",
+    "apr": "APR",
+    "apy": "APY",
+    "staked_amount": "Staked Amount",
+    "total_staked": "Total Staked",
+    "exchange_rate": "Exchange Rate",
+    "rewards": "Rewards"
+  },
+  "loading": {
+    "loading_lst_data": "Loading LST data...",
+    "loading": "Loading..."
+  },
+  "error": {
+    "error_loading_lst_data": "Error Loading LST Data",
+    "retry": "Retry",
+    "failed_to_load_chart": "Failed to load chart"
+  },
+  "protocols": {
+    "thala": "Thala",
+    "amnis": "Amnis",
+    "trufin": "TruFin",
+    "ditto": "Ditto",
+    "tortuga": "Tortuga"
+  },
+  "tokens": {
+    "stapt": "stAPT",
+    "thapt": "thAPT",
+    "amapt": "amAPT",
+    "truapt": "TruAPT",
+    "dapt": "dAPT",
+    "tapt": "tAPT"
+  },
+  "actions": {
+    "stake": "Stake",
+    "unstake": "Unstake",
+    "claim_rewards": "Claim Rewards",
+    "view_details": "View Details",
+    "trade": "Trade",
+    "add_to_wallet": "Add to Wallet"
+  },
+  "staking": {
+    "liquid_staking": "Liquid Staking",
+    "validator": "Validator",
+    "delegation": "Delegation",
+    "unstaking_period": "Unstaking Period",
+    "minimum_stake": "Minimum Stake",
+    "fees": "Fees",
+    "commission": "Commission"
+  },
+  "filters": {
+    "all": "All",
+    "by_protocol": "By Protocol",
+    "by_apy": "By APY",
+    "active": "Active",
+    "paused": "Paused"
+  },
+  "fallbacks": {
+    "unknown_lst": "Unknown LST",
+    "data_not_available": "Data not available",
+    "apy_unavailable": "APY unavailable"
+  },
+  "info": {
+    "what_is_lst": "What is an LST?",
+    "lst_description": "Liquid Staking Tokens (LSTs) allow you to stake APT while maintaining liquidity through derivative tokens that represent your staking position.",
+    "benefits": "Benefits",
+    "earn_rewards": "Earn staking rewards",
+    "maintain_liquidity": "Maintain liquidity",
+    "use_in_defi": "Use in DeFi"
+  }
+}

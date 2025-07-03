@@ -1,0 +1,433 @@
+{
+  "page": {
+    "title": "DeFi on Aptos",
+    "description": "Comprehensive directory of DeFi protocols on the Aptos blockchain"
+  },
+  "stats": {
+    "total_value_locked": "Total Value Locked",
+    "volume_24h": "24h Volume",
+    "protocols": "Protocols",
+    "filtered_protocols": "Filtered Protocols",
+    "live_from_defillama": "Live from DeFiLlama",
+    "estimated_tvl": "Estimated TVL",
+    "volume_data": "24h trading volume",
+    "defi_protocols": "DeFi protocols",
+    "fees_24h": "24h Fees",
+    "protocol_fees": "Protocol fees",
+    "stablecoin_volume": "Stablecoin Volume",
+    "stablecoin_trading": "Stablecoin trading volume",
+    "coming_soon": "Coming Soon"
+  },
+  "search": {
+    "placeholder": "Search protocols...",
+    "results": "{{count}} protocols found",
+    "results_of": "of {{total}} protocols",
+    "no_results": "No protocols found matching your criteria.",
+    "clear_search": "Clear search",
+    "search_hint": "Search by name, category, or description"
+  },
+  "filters": {
+    "all": "All",
+    "category": "Category",
+    "subcategory": "Sub-Category",
+    "clear_filters": "Clear Filters",
+    "filter_by_category": "Filter by Category",
+    "view_grid": "Grid View",
+    "view_table": "Table View",
+    "mobile_filters": "Filters",
+    "active_filters": "Active filters",
+    "subcategories_header": "{{category}} subcategories:"
+  },
+  "tooltips": {
+    "grid_view": "Switch to grid view",
+    "table_view": "Switch to table view",
+    "category_filter": "Filter protocols by category",
+    "subcategory_filter": "Filter protocols by subcategory",
+    "clear_all_filters": "Remove all active filters",
+    "search_protocols": "Search through all protocols",
+    "protocol_website": "Visit the official website",
+    "protocol_github": "View source code on GitHub",
+    "protocol_twitter": "Follow on X (Twitter)",
+    "category_description": "{{category}} protocols: {{description}}",
+    "subcategory_description": "{{subcategory}}: {{description}}"
+  },
+  "categories": {
+    "All": {
+      "name": "All",
+      "description": "All DeFi protocols"
+    },
+    "Credit": {
+      "name": "Credit",
+      "description": "Protocols that facilitate borrowing, lending, and credit-based services",
+      "subcategories": {
+        "Lending": {
+          "name": "Lending",
+          "description": "Platforms where users can lend and borrow crypto assets with interest rates"
+        },
+        "RWA Lending": {
+          "name": "RWA Lending",
+          "description": "Lending protocols backed by real-world assets like real estate or commodities"
+        },
+        "NFT Lending": {
+          "name": "NFT Lending",
+          "description": "Borrow money using NFTs as collateral or lend to NFT holders"
+        },
+        "Uncollateralized Lending": {
+          "name": "Uncollateralized Lending",
+          "description": "Loans without collateral, based on reputation or credit scoring"
+        },
+        "CDP": {
+          "name": "CDP",
+          "description": "Collateralized Debt Positions - Create stablecoins by locking collateral in smart contracts"
+        }
+      }
+    },
+    "Yield": {
+      "name": "Yield",
+      "description": "Protocols focused on staking, yield generation, and reward distribution",
+      "subcategories": {
+        "Liquid Staking": {
+          "name": "Liquid Staking",
+          "description": "Stake tokens while receiving tradeable receipts to maintain liquidity"
+        },
+        "Restaking": {
+          "name": "Restaking",
+          "description": "Use already staked tokens to secure additional protocols for extra rewards"
+        },
+        "Liquid Restaking": {
+          "name": "Liquid Restaking",
+          "description": "Restaking with liquid tokens that can be traded or used in DeFi"
+        },
+        "Liquidity Manager": {
+          "name": "Liquidity Manager",
+          "description": "Tools or protocols that optimize and rebalance liquidity across pools"
+        },
+        "Leveraged Farming": {
+          "name": "Leveraged Farming",
+          "description": "Borrow funds to increase liquidity provision and amplify farming rewards"
+        },
+        "Yield Aggregator": {
+          "name": "Yield Aggregator",
+          "description": "Automatically find and switch between the best yield opportunities"
+        }
+      }
+    },
+    "Trading": {
+      "name": "Trading",
+      "description": "Protocols for trading, market making, and liquidity provision",
+      "subcategories": {
+        "DEX": {
+          "name": "DEX",
+          "description": "Decentralized exchanges for swapping tokens without intermediaries"
+        },
+        "DEX Aggregator": {
+          "name": "DEX Aggregator",
+          "description": "Find the best prices across multiple DEXes for optimal trades"
+        },
+        "Perps": {
+          "name": "Perps",
+          "description": "Trade perpetual futures contracts with leverage on crypto assets"
+        },
+        "Options": {
+          "name": "Options",
+          "description": "Buy and sell options contracts to hedge or speculate on price movements"
+        },
+        "Prediction Market": {
+          "name": "Prediction Market",
+          "description": "Bet on real-world events and outcomes using crypto"
+        },
+        "Launchpad": {
+          "name": "Launchpad",
+          "description": "Launch new tokens with fair distribution and community features"
+        }
+      }
+    },
+    "Multiple": {
+      "name": "Multiple",
+      "description": "Protocols offering multiple DeFi products across different categories"
+    }
+  },
+  "subcategories": {
+    "lending": "Lending",
+    "rwa_lending": "RWA Lending",
+    "nft_lending": "NFT Lending",
+    "uncollateralized_lending": "Uncollateralized Lending",
+    "cdp": "CDP",
+    "liquid_staking": "Liquid Staking",
+    "restaking": "Restaking",
+    "liquid_restaking": "Liquid Restaking",
+    "liquidity_manager": "Liquidity Manager",
+    "leveraged_farming": "Leveraged Farming",
+    "yield_aggregator": "Yield Aggregator",
+    "dex": "DEX",
+    "dex_aggregator": "DEX Aggregator",
+    "perps": "Perps",
+    "launchpad": "Launchpad",
+    "options": "Options",
+    "prediction_markets": "Prediction Markets"
+  },
+  "protocol": {
+    "website": "Website",
+    "github": "GitHub",
+    "twitter": "X (Twitter)",
+    "links": "Links",
+    "tvl": "TVL",
+    "volume": "Volume",
+    "yield": "Yield",
+    "status": "Status",
+    "launch_date": "Launch Date",
+    "audit_status": "Audit Status",
+    "networks": "Networks",
+    "category": "Category",
+    "subcategory": "Subcategory",
+    "description": "Description",
+    "more_info": "More Info",
+    "external_links": "External Links",
+    "implementation": "Implementation",
+    "security": "Security",
+    "token": "Token"
+  },
+  "protocol_values": {
+    "status": {
+      "Active": "Active",
+      "Deprecated": "Deprecated",
+      "Beta": "Beta",
+      "Coming Soon": "Coming Soon"
+    },
+    "audit_status": {
+      "Audited": "Audited",
+      "Unaudited": "Unaudited",
+      "In Progress": "In Progress",
+      "Partially Audited": "Partially Audited"
+    },
+    "networks": {
+      "mainnet": "Mainnet",
+      "testnet": "Testnet",
+      "devnet": "Devnet"
+    },
+    "implementations": {
+      "Money Market": "Money Market",
+      "Isolated Pools": "Isolated Pools",
+      "Validator Delegated": "Validator Delegated",
+      "Range Orders": "Range Orders",
+      "Borrowing-based": "Borrowing-based",
+      "Multi-protocol": "Multi-protocol",
+      "AMM": "AMM",
+      "CLOB": "CLOB",
+      "Hybrid": "Hybrid",
+      "Route Optimization": "Route Optimization",
+      "Gas Optimization": "Gas Optimization",
+      "Cross-chain": "Cross-chain",
+      "Cross-margin": "Cross-margin",
+      "Fair Launch": "Fair Launch",
+      "Protocol Suite": "Protocol Suite"
+    }
+  },
+  "protocols": {
+    "names": {
+      "Panora": "Panora",
+      "Kana": "Kana",
+      "Thetis": "Thetis",
+      "Anqa": "Anqa",
+      "LiquidSwap": "LiquidSwap",
+      "Econia": "Econia",
+      "Cellana": "Cellana",
+      "PancakeSwap": "PancakeSwap",
+      "SushiSwap": "SushiSwap",
+      "Hyperion": "Hyperion",
+      "Tapp": "Tapp",
+      "Merkle": "Merkle",
+      "AGDEX": "AGDEX",
+      "Pump": "Pump",
+      "Emojicoin": "Emojicoin",
+      "Aries": "Aries",
+      "Superposition": "Superposition",
+      "Joule": "Joule",
+      "Echelon": "Echelon",
+      "Aptin": "Aptin",
+      "Meso": "Meso",
+      "TruFin": "TruFin",
+      "Amnis": "Amnis",
+      "Kofi": "Kofi",
+      "Ichi": "Ichi",
+      "Vibrant X": "Vibrant X",
+      "Moar": "Moar",
+      "Thala": "Thala"
+    },
+    "short_descriptions": {
+      "Panora": "Meta-DEX aggregator",
+      "Kana": "Cross-chain swap router",
+      "Thetis": "Multi-product trading platform",
+      "Anqa": "Advanced DEX aggregator",
+      "LiquidSwap": "First Aptos DEX",
+      "Econia": "High-performance order book",
+      "Cellana": "ve(3,3) AMM",
+      "PancakeSwap": "Popular multichain DEX",
+      "SushiSwap": "Cross-chain DeFi platform",
+      "Hyperion": "Hybrid trading platform",
+      "Tapp": "Hook-enabled modular DEX",
+      "Merkle": "Gamified perpetuals",
+      "AGDEX": "Cross-margin perps",
+      "Pump": "Meme token launchpad",
+      "Emojicoin": "Emoji token launchpad",
+      "Aries": "Compound-style lending",
+      "Superposition": "Advanced risk management",
+      "Joule": "Isolated lending pools",
+      "Echelon": "Multi-mode lending hub",
+      "Aptin": "Security-first lending",
+      "Meso": "Capital-efficient lending",
+      "TruFin": "Enterprise liquid staking",
+      "Amnis": "Dual-token liquid staking",
+      "Kofi": "MEV-boosted staking",
+      "Ichi": "Automated liquidity manager",
+      "Vibrant X": "Yield optimizer",
+      "Moar": "Leveraged farming layer",
+      "Thala": "DeFi protocol suite"
+    }
+  },
+  "protocol_descriptions": {
+    "Panora": "A \"meta-DEX\" that plugs into an on-chain order-book and 10+ AMMs, splitting orders across pools while curating a canonical token list that auto-updates in its UI.",
+    "Kana": "Routes swaps across nine chains; a Paymaster contract lets users trade on Aptos without holding APT for gas; an orderbook-based perp engine.",
+    "Thetis": "Thetis bundles a spot aggregator, 50× perpetuals, and liquidity-bootstrapping pools (LBPs) under one roof.",
+    "Anqa": "Claims 99% liquidity coverage across 15+ Aptos DEXes; real-time sampling previews slippage before you sign and lets you batch multi-token swaps to save gas.",
+    "LiquidSwap": "Pontem's flagship AMM and the first DEX live on Aptos mainnet; offers classic Uniswap-V2 pools, a stable-swap curve, and a formally-verified concentrated-liquidity design.",
+    "Econia": "A hyper-parallel on-chain order-book optimized for Aptos' optimistic concurrency; processes markets in parallel with sub-second finality and exposes a full REST/MQTT data stack.",
+    "Cellana": "A ve(3,3) AMM where veNFT voters direct emissions and capture 100% of fees.",
+    "PancakeSwap": "Binance's flagship DEX cloned its V2 AMM onto Move and bridged some CAKE liquidity to Aptos.",
+    "SushiSwap": "Sushi executed its first non-EVM integration, enabling cross-chain routes that settle on Aptos while preserving the familiar Trident router UX.",
+    "Hyperion": "A fully on-chain hybrid Order-book + CL-AMM that leverages Aptos' throughput for HFT-style trading.",
+    "Tapp": "The first hook-enabled, Uniswap V4-style modular DEX on Aptos testnet; smart-contract hooks let builders compose custom pools while users get programmable swaps.",
+    "Merkle": "A gamified perp DEX with XP, loot-boxes, and 150× leverage; more than $20b of total volume.",
+    "AGDEX": "Offers 1-100× cross-margin perps with low-impact oracle fills keep slippage tight for retail traders.",
+    "Pump": "Anyone can mint meme tokens via bonding curves; every coin is fair-launched with no presale or team allocation.",
+    "Emojicoin": "Lets users mint tokens mapped 1-to-1 with Unicode emojis; each launch uses Econia's CL-AMM curve for instant price discovery and speculation.",
+    "Aries": "The first Compound-style money market on Aptos, upgraded with 90%-LTV E-Mode, integrated bridging, and spot trading in one interface.",
+    "Superposition": "Advanced risk management platform inspired by Bank of England's FHS VaR, offering leveraged yield opportunities with real-time risk monitoring and dynamic collateral factor adjustment.",
+    "Joule": "Combines isolated lending pools with \"Liquidity Anchors\" for leveraged farming.",
+    "Echelon": "A lending hub that supports both E-Mode and isolated markets.",
+    "Aptin": "Security-first lending platform that uses the Move Prover for formal verification and granular, isolated-pool risk controls.",
+    "Meso": "Capital-efficient lending with user-configured debt ceilings and a Safety Module that backstops protocol shortfalls.",
+    "TruFin": "Enterprise-grade liquid staking; users receive TruAPT in exchange for staking APT.",
+    "Amnis": "Dual-token system issues stAPT (yield-bearing) and amAPT (stable), letting users toggle between yield and stability while routing validator commission back to stakers.",
+    "Kofi": "MEV-boosted liquid staking with leveraged-LSD vaults.",
+    "Ichi": "Automated Liquidity Manager vaults let projects seed single-sided liquidity; smart ranges rebalance to cut impermanent loss while treasuries earn swap fees in their native token.",
+    "Vibrant X": "Yield-optimizer and portfolio dashboard that reallocates deposits to top-APY Aptos pools.",
+    "Moar": "Building leveraged-farm layer with cross-protocol credit accounts enabling users to borrow in one place and deploy in another.",
+    "Thala": "A suite of DeFi apps featuring a multi-pool AMM, the over-collateralized MOD stablecoin, and liquid-staking via sthAPT and thAPT."
+  },
+  "protocol_category_breakdown": {
+    "Thala": "Trading • Yield • Credit"
+  },
+  "table": {
+    "protocol": "Protocol",
+    "category": "Category",
+    "subcategory": "Subcategory",
+    "tvl": "TVL",
+    "links": "Links",
+    "sort_by": "Sort by",
+    "sort_asc": "Sort ascending",
+    "sort_desc": "Sort descending"
+  },
+  "fallbacks": {
+    "multiple_defi_products": "Multiple DeFi products",
+    "defi_protocol_category": "DeFi protocol category",
+    "defi_protocol_subcategory": "DeFi protocol subcategory",
+    "unknown_category": "Unknown Category",
+    "unknown_subcategory": "Unknown Subcategory",
+    "no_description": "No description available",
+    "visit_protocol": "Visit Protocol"
+  },
+  "actions": {
+    "view_protocol": "View Protocol",
+    "visit_website": "Visit Website",
+    "view_on_github": "View on GitHub",
+    "follow_on_twitter": "Follow on X",
+    "copy_link": "Copy Link",
+    "share": "Share"
+  },
+  "ui": {
+    "search": {
+      "placeholder": "Search protocols...",
+      "results_count": "{{count}} result",
+      "results_count_plural": "{{count}} results",
+      "breadcrumb": "All > {{category}}"
+    },
+    "filters": {
+      "category": "Category:",
+      "all_categories": "All Categories",
+      "clear_filters": "Clear",
+      "view_mode": {
+        "grid": "Grid View",
+        "table": "Table View"
+      },
+      "tooltips": {
+        "category_filter": "Filter protocols by category",
+        "clear_filters": "Clear all active filters",
+        "grid_view": "Switch to grid view",
+        "table_view": "Switch to table view"
+      }
+    },
+    "stats": {
+      "total_protocols": "Total Protocols",
+      "total_protocols_tooltip": "Total number of DeFi protocols tracked",
+      "categories": "Categories",
+      "categories_tooltip": "Number of DeFi categories available",
+      "data_source": "Data Source",
+      "data_source_tooltip": "Where the protocol data comes from",
+      "loading": "Loading stats..."
+    },
+    "table": {
+      "headers": {
+        "name": "Name",
+        "category": "Category",
+        "links": "Links"
+      },
+      "tooltips": {
+        "sort_by_name": "Sort by protocol name",
+        "sort_by_category": "Sort by category",
+        "visit_website": "Visit protocol website",
+        "view_github": "View GitHub repository",
+        "follow_twitter": "Follow on Twitter"
+      },
+      "no_data": "No protocols found",
+      "loading": "Loading protocols..."
+    },
+    "grid": {
+      "tooltips": {
+        "protocol_card": "Click to view {{protocol}} details",
+        "visit_website": "Visit {{protocol}} website",
+        "view_github": "View {{protocol}} on GitHub",
+        "follow_twitter": "Follow {{protocol}} on Twitter"
+      }
+    },
+    "messages": {
+      "no_protocols": "No protocols found matching your criteria.",
+      "loading": "Loading...",
+      "error": "Error loading protocols",
+      "empty_state": "No DeFi protocols available",
+      "try_clearing_filters": "Try clearing your filters or search terms."
+    }
+  },
+  "common_values": {
+    "na": "N/A",
+    "not_available": "Not Available",
+    "real_time": "Real-time",
+    "live": "Live",
+    "estimated": "Estimated",
+    "unknown": "Unknown",
+    "loading": "Loading...",
+    "error": "Error",
+    "coming_soon": "Coming Soon",
+    "tbd": "TBD",
+    "varies": "Varies"
+  },
+  "units": {
+    "million": "M",
+    "billion": "B",
+    "trillion": "T",
+    "percent": "%",
+    "usd": "USD",
+    "apt": "APT",
+    "btc": "BTC"
+  }
+}

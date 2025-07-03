@@ -1,0 +1,76 @@
+{
+  "page": {
+    "title": "Aptos पर वास्तविक विश्व संपत्ति",
+    "description": "Aptos ब्लॉकचेन पर RWAs और टोकनाइ़्ड वास्तविक विश्व संपत्ति"
+  },
+  "stats": {
+    "total_rwa_value": "कुल RWA मूल्य",
+    "real_world_assets": "वास्तविक विश्व संपत्ति",
+    "data_powered_by": "RWA.xyz द्वारा डेटा",
+    "data_powered_by_prefix": "डेटा द्वारा:",
+    "rwa_assets": "RWA संपत्ति",
+    "market_share": "बाजार हिस्सेदारी",
+    "total_value": "कुल मूल्य",
+    "asset_count": "संपत्ति संख्या",
+    "protocols": "प्रोटोकॉल"
+  },
+  "loading": {
+    "loading_rwa_data": "RWA डेटा लोड हो रहा है...",
+    "loading": "लोड हो रहा है...",
+    "rate_limit_message": "API रेट लिमिट पहुंच गई। कृपया फिर से कोशिश करने से पहले प्रतीक्षा करें।",
+    "try_again_in": "फिर से कोशिश करें",
+    "try_again": "फिर से कोशिश करें",
+    "request_failed": "अनुरोध असफल। कृपया फिर से कोशिश करें।"
+  },
+  "error": {
+    "error_loading_rwa_data": "RWA डेटा लोड करने में त्रुटि",
+    "failed_to_load_chart": "चार्ट लोड करने में असफल",
+    "retry": "फिर से कोशिश करें",
+    "failed_to_load_data": "डेटा लोड करने में असफल"
+  },
+  "protocols": {
+    "pact": "Pact",
+    "securitize": "Securitize",
+    "franklin_templeton": "Franklin Templeton",
+    "libre_capital": "Libre Capital",
+    "ondo": "Ondo",
+    "blackrock": "BlackRock"
+  },
+  "labels": {
+    "bridged": "ब्रिज्ड",
+    "value_not_available": "मूल्य उपलब्ध नहीं",
+    "token_id": "टोकन ID",
+    "current_value": "वर्तमान मूल्य",
+    "asset_name": "संपत्ति नाम",
+    "asset_issuer": "संपत्ति जारीकर्ता",
+    "standards": "मानक",
+    "not_specified": "निर्दिष्ट नहीं",
+    "regulatory_framework": "नियामक ढांचा",
+    "governing_body": "शासी निकाय",
+    "issuer_legal_structure_country": "जारीकर्ता कानूनी संरचना देश",
+    "contract_address": "कॉन्ट्रैक्ट पता",
+    "network_id": "नेटवर्क ID",
+    "asset_id": "संपत्ति ID"
+  },
+  "sections": {
+    "value_information": "मूल्य जानकारी",
+    "asset_details": "संपत्ति विवरण",
+    "regulatory_information": "नियामक जानकारी",
+    "legal_structure": "कानूनी संरचना",
+    "technical_details": "तकनीकी विवरण"
+  },
+  "actions": {
+    "view_details": "विवरण देखें",
+    "visit_website": "वेबसाइट पर जाएं"
+  },
+  "filters": {
+    "all": "सभी",
+    "by_protocol": "प्रोटोकॉल के अनुसार",
+    "by_value": "मूल्य के अनुसार"
+  },
+  "fallbacks": {
+    "unknown_asset": "अज्ञात संपत्ति",
+    "data_not_available": "डेटा उपलब्ध नहीं",
+    "value_unavailable": "मूल्य उपलब्ध नहीं"
+  }
+}

@@ -1,0 +1,1 @@
+export { thalaRouter } from './router';

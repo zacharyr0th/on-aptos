@@ -1,0 +1,500 @@
+'use client';
+
+import React, { useState, useMemo, useCallback } from 'react';
+import { AlertTriangle } from 'lucide-react';
+import { GeistMono } from 'geist/font/mono';
+import { Card, CardContent } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Header } from '@/components/layout/Header';
+import { Footer } from '@/components/layout/Footer';
+import { ErrorBoundary } from '@/components/errors/ErrorBoundary';
+import { RootErrorBoundary } from '@/components/errors/RootErrorBoundary';
+import { TokenDialog } from '@/components/pages/lst/Dialog';
+import { MarketShareChart } from '@/components/pages/lst/Chart';
+import { trpc } from '@/lib/trpc/client';
+import Image from 'next/image';
+import {
+  LST_METADATA,
+  LST_COLORS,
+  Token,
+  DisplayToken,
+  SupplyData,
+} from '@/lib/config';
+import { formatQuantityValue, convertRawTokenAmount } from '@/lib/utils';
+import { usePageTranslation } from '@/hooks/useTranslation';
+import { useDataPrefetch } from '@/hooks/useDataPrefetching';
+// Simplified for better compatibility
+
+// Use LST_METADATA from config instead of redefining here
+const TOKEN_METADATA = LST_METADATA;
+
+// Define token types
+interface LSTToken extends Token {
+  formatted_supply: string;
+}
+
+interface LSTSupplyData extends SupplyData {
+  timestamp: string;
+}
+
+// Optimize token card by memoizing expensive calculations and component
+const TokenCard = React.memo(function TokenCard({
+  token,
+  totalSupply,
+  t,
+}: {
+  token: DisplayToken;
+  totalSupply: string;
+  t: (key: string) => string;
+}): React.ReactElement {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const { marketSharePercent, formattedDisplaySupply } = useMemo(() => {
+    const calcMarketShare = () => {
+      if (BigInt(totalSupply) === 0n) return '0';
+
+      // Calculate market share with proper precision
+      const tokenSupply = BigInt(token.supply);
+      const total = BigInt(totalSupply);
+      const marketShare = (tokenSupply * 10000n) / total; // Multiply by 10000 for 2 decimal places
+
+      // Convert to string with proper formatting (e.g., "12.34")
+      const integerPart = marketShare / 100n;
+      const decimalPart = marketShare % 100n;
+      const formattedDecimal = decimalPart.toString().padStart(2, '0');
+
+      return `${integerPart}.${formattedDecimal}`;
+    };
+
+    const formatSingle = (s: string, symbol: string) => {
+      const metadata = TOKEN_METADATA[symbol] || { decimals: 8 };
+      const decimals = metadata.decimals;
+      const tokens = convertRawTokenAmount(s, decimals);
+
+      return formatQuantityValue(tokens, '');
+    };
+
+    const calcFormattedDisplay = () => {
+      if ('isCombined' in token && token.isCombined) {
+        const parts: string[] = [];
+
+        // Sort components by supply in descending order
+        const sortedComponents = [...token.components].sort((a, b) => {
+          const supplyA = BigInt(a.supply);
+          const supplyB = BigInt(b.supply);
+          return supplyB > supplyA ? 1 : -1;
+        });
+
+        sortedComponents.forEach(c => {
+          parts.push(formatSingle(c.supply, c.symbol));
+        });
+
+        return parts.join(' / ');
+      }
+      return formatSingle(token.supply, token.symbol);
+    };
+
+    return {
+      marketSharePercent: calcMarketShare(),
+      formattedDisplaySupply: calcFormattedDisplay(),
+    };
+  }, [token, totalSupply]);
+
+  const cardSymbol = token.symbol;
+  const representativeSymbolForColor =
+    'isCombined' in token && token.isCombined
+      ? token.symbol.split('/')[0].trim()
+      : token.symbol;
+
+  const tokenColor =
+    LST_COLORS[representativeSymbolForColor as keyof typeof LST_COLORS] ||
+    LST_COLORS.default;
+  const metadata = TOKEN_METADATA[cardSymbol];
+
+  const handleCardClick = useCallback(() => {
+    if (metadata) {
+      setIsDialogOpen(true);
+    }
+  }, [metadata]);
+
+  return (
+    <>
+      <div
+        className="bg-card border rounded-lg overflow-hidden group cursor-pointer hover:border-primary/50 transition-colors"
+        onClick={handleCardClick}
+      >
+        <div className="h-1" style={{ backgroundColor: tokenColor }} />
+        <div className="flex justify-between items-center p-2.5 pb-0">
+          <div className="flex items-center gap-2">
+            {'isCombined' in token && token.isCombined ? (
+              <div className="flex items-center">
+                {/* Sort components by supply in descending order */}
+                {[...token.components]
+                  .sort((a, b) =>
+                    BigInt(b.supply) > BigInt(a.supply) ? 1 : -1
+                  )
+                  .map((component, index) => (
+                    <React.Fragment key={component.symbol}>
+                      <div className="flex items-center">
+                        <div className="w-5 h-5 relative mr-1">
+                          <Image
+                            src={
+                              TOKEN_METADATA[component.symbol]?.thumbnail ||
+                              '/icons/lst/default.png'
+                            }
+                            alt={`${component.symbol} icon`}
+                            width={16}
+                            height={16}
+                            className="object-contain rounded-full"
+                          />
+                        </div>
+                        <span className="text-sm font-semibold">
+                          {component.symbol}
+                        </span>
+                      </div>
+                      {index === 0 && <span className="mx-1">/</span>}
+                    </React.Fragment>
+                  ))}
+              </div>
+            ) : (
+              <>
+                <div className="w-5 h-5 relative mr-1">
+                  <Image
+                    src={metadata?.thumbnail || '/icons/lst/default.png'}
+                    alt={`${cardSymbol} icon`}
+                    width={20}
+                    height={20}
+                    className="object-contain"
+                  />
+                </div>
+                <h3 className="text-lg font-semibold text-card-foreground">
+                  {cardSymbol}
+                </h3>
+              </>
+            )}
+          </div>
+        </div>
+        <div className="px-2.5 pt-1.5 pb-0">
+          <p className="text-xl font-bold text-card-foreground">
+            {formattedDisplaySupply}
+          </p>
+        </div>
+        <div className="p-2.5 pt-1.5">
+          <div className="flex justify-between text-xs mb-1.5">
+            <span className="text-muted-foreground">
+              {t('lst:stats.market_share')}
+            </span>
+            <span className="font-medium text-muted-foreground">
+              {marketSharePercent}%
+            </span>
+          </div>
+          <Progress
+            className="h-1"
+            value={Number(marketSharePercent)}
+            trackColor={`${tokenColor}20`}
+            indicatorColor={tokenColor}
+          />
+        </div>
+      </div>
+
+      {metadata && (
+        <TokenDialog
+          isOpen={isDialogOpen}
+          onClose={() => setIsDialogOpen(false)}
+          metadata={metadata}
+          supply={formattedDisplaySupply}
+        />
+      )}
+    </>
+  );
+});
+
+// Loading state component
+function LoadingState(): React.ReactElement {
+  return (
+    <div className="space-y-6">
+      {/* Skeleton for total supply card */}
+      <Card className="border rounded-lg p-4 mb-6">
+        <div className="flex items-center">
+          <div className="flex-grow">
+            <Skeleton className="h-6 w-32 mb-2" />
+            <Skeleton className="h-8 w-60" />
+          </div>
+        </div>
+      </Card>
+
+      {/* Grid skeleton */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Token cards skeleton */}
+        <div className="md:col-span-1 space-y-4">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="bg-card border rounded-lg overflow-hidden">
+              <Skeleton className="h-1 w-full" />
+              <div className="p-2.5">
+                <div className="flex items-center gap-2 mb-2">
+                  <Skeleton className="h-5 w-5 rounded-full" />
+                  <Skeleton className="h-6 w-16" />
+                </div>
+                <Skeleton className="h-7 w-32 mb-1" />
+                <div className="flex justify-between text-xs mb-1.5">
+                  <Skeleton className="h-3 w-20" />
+                  <Skeleton className="h-3 w-8" />
+                </div>
+                <Skeleton className="h-1 w-full" />
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Chart skeleton */}
+        <div className="md:col-span-1 lg:col-span-3 bg-card border rounded-lg p-6">
+          <Skeleton className="h-[250px] sm:h-[300px] w-full" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Error state component
+function ErrorState({
+  error,
+  onRetry,
+  t,
+}: {
+  error: string;
+  onRetry: () => void;
+  t: (key: string) => string;
+}): React.ReactElement {
+  return (
+    <Card className="border-destructive mb-6">
+      <CardContent className="p-6 flex items-center">
+        <AlertTriangle className="h-10 w-10 mr-4 flex-shrink-0 text-destructive" />
+        <div>
+          <h3 className="font-bold text-lg mb-1 text-card-foreground">
+            {t('lst:error.error_loading_lst_data')}
+          </h3>
+          <p className="text-muted-foreground">
+            {error || t('lst:loading.loading_lst_data')}
+            <Button
+              onClick={onRetry}
+              variant="outline"
+              className="ml-3"
+              size="sm"
+            >
+              {t('lst:error.retry')}
+            </Button>
+          </p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+export default function LSTPage(): React.ReactElement {
+  const { t } = usePageTranslation('lst');
+  const [forceRefresh, setForceRefresh] = useState(false);
+
+  // Prefetch related data for this page
+  useDataPrefetch('lst');
+
+  // Use tRPC for LST data
+  const {
+    data: lstData,
+    isLoading,
+    error: lstError,
+    refetch,
+    isFetching,
+  } = trpc.domains.assets.liquidStaking.getSupplies.useQuery(
+    { forceRefresh },
+    {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      gcTime: 10 * 60 * 1000, // 10 minutes
+      refetchInterval: 5 * 60 * 1000, // Auto-refetch every 5 minutes
+      refetchIntervalInBackground: true,
+      retry: (failureCount, error) => {
+        // Don't retry on 4xx errors (like rate limits)
+        if (error?.message?.includes('Status: 4')) return false;
+        return failureCount < 3;
+      },
+      retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
+    }
+  );
+
+  // Extract the actual data from tRPC response
+  const data: SupplyData | null = lstData?.data || null;
+  const loading = isLoading;
+  const error = lstError?.message || null;
+  const refreshing = isFetching && !isLoading;
+
+  // Manual refresh handler
+  const fetchSupplyData = useCallback(async (): Promise<void> => {
+    setForceRefresh(prev => !prev); // Toggle to force refresh
+    await refetch();
+  }, [refetch]);
+
+  const { formattedTotalSupply, processedSupplies, adjustedTotal } =
+    useMemo(() => {
+      if (!data)
+        return {
+          formattedTotalSupply: '',
+          processedSupplies: [],
+          adjustedTotal: '0',
+        };
+
+      // Format total supply in APT
+      const formatTotal = () => {
+        const totalApt = Number(BigInt(data.total)) / 1_000_000_00; // 8 decimals
+        return (
+          new Intl.NumberFormat('en-US', {
+            maximumFractionDigits: 2,
+          }).format(totalApt) + ' APT'
+        );
+      };
+
+      // Group tokens into their pairs
+      const processSupplies = () => {
+        if (!data?.supplies) return [];
+
+        const thalaTokens = data.supplies.filter(
+          t => t.symbol === 'thAPT' || t.symbol === 'sthAPT'
+        );
+        const amnisTokens = data.supplies.filter(
+          t => t.symbol === 'amAPT' || t.symbol === 'stAPT'
+        );
+        const kofiTokens = data.supplies.filter(
+          t => t.symbol === 'kAPT' || t.symbol === 'stkAPT'
+        );
+
+        const displayTokens: DisplayToken[] = [];
+
+        // Add combined tokens
+        if (thalaTokens.length > 0) {
+          displayTokens.push({
+            symbol: 'thAPT/sthAPT',
+            isCombined: true,
+            supply: thalaTokens.reduce(
+              (acc, curr) => (BigInt(acc) + BigInt(curr.supply)).toString(),
+              '0'
+            ),
+            components: thalaTokens,
+          });
+        }
+
+        if (amnisTokens.length > 0) {
+          displayTokens.push({
+            symbol: 'amAPT/stAPT',
+            isCombined: true,
+            supply: amnisTokens.reduce(
+              (acc, curr) => (BigInt(acc) + BigInt(curr.supply)).toString(),
+              '0'
+            ),
+            components: amnisTokens,
+          });
+        }
+
+        if (kofiTokens.length > 0) {
+          displayTokens.push({
+            symbol: 'kAPT/stkAPT',
+            isCombined: true,
+            supply: kofiTokens.reduce(
+              (acc, curr) => (BigInt(acc) + BigInt(curr.supply)).toString(),
+              '0'
+            ),
+            components: kofiTokens,
+          });
+        }
+
+        // Sort by supply in descending order
+        return displayTokens.sort((a, b) => {
+          const supplyA = BigInt(a.supply);
+          const supplyB = BigInt(b.supply);
+          return supplyB > supplyA ? 1 : -1;
+        });
+      };
+
+      return {
+        formattedTotalSupply: formatTotal(),
+        processedSupplies: processSupplies(),
+        adjustedTotal: data.total,
+      };
+    }, [data]);
+
+  return (
+    <RootErrorBoundary>
+      <div
+        className={`min-h-screen bg-background dark:bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjMDAwIj48L3JlY3Q+CjxwYXRoIGQ9Ik0wIDVMNSAwWk02IDRMNCA2Wk0tMSAxTDEgLTFaIiBzdHJva2U9IiMyMjIiIHN0cm9rZS13aWR0aD0iMC41Ij48L3BhdGg+Cjwvc3ZnPg==')] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjZmZmIj48L3JlY3Q+CjxwYXRoIGQ9Ik0wIDVMNSAwWk02IDRMNCA2Wk0tMSAxTDEgLTFaIiBzdHJva2U9IiNlZWUiIHN0cm9rZS13aWR0aD0iMC41Ij48L3BhdGg+Cjwvc3ZnPg==')] ${GeistMono.className}`}
+      >
+        <div className="fixed top-0 left-0 right-0 h-1 z-50">
+          {refreshing && <div className="h-full bg-muted animate-pulse"></div>}
+        </div>
+
+        <div className="container mx-auto px-4 sm:px-6 py-6">
+          <Header />
+
+          <main className="my-6">
+            {loading ? (
+              <LoadingState />
+            ) : error ? (
+              <ErrorState error={error} onRetry={fetchSupplyData} t={t} />
+            ) : data ? (
+              <>
+                <div className="flex items-center bg-card border rounded-lg py-3 px-4 mb-6">
+                  <div className="flex-grow">
+                    <h2 className="text-base sm:text-lg font-medium text-card-foreground">
+                      {t('lst:stats.total_lst_value')}
+                    </h2>
+                    <p className="text-xl sm:text-2xl font-bold text-card-foreground">
+                      {formattedTotalSupply}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <div className="md:col-span-1 space-y-4">
+                    {processedSupplies.map(token => (
+                      <TokenCard
+                        key={token.symbol}
+                        token={token}
+                        totalSupply={adjustedTotal}
+                        t={t}
+                      />
+                    ))}
+                  </div>
+
+                  <div className="md:col-span-1 lg:col-span-3 bg-card border rounded-lg overflow-hidden min-h-[250px] sm:min-h-[300px]">
+                    <ErrorBoundary
+                      fallback={
+                        <div className="flex items-center justify-center h-full">
+                          <div className="text-center p-4">
+                            <AlertTriangle className="h-8 w-8 mx-auto mb-2 text-destructive" />
+                            <p className="text-sm text-muted-foreground">
+                              {t('lst:error.failed_to_load_chart')}
+                            </p>
+                          </div>
+                        </div>
+                      }
+                    >
+                      <MarketShareChart
+                        data={processedSupplies}
+                        totalSupply={adjustedTotal}
+                        tokenMetadata={TOKEN_METADATA}
+                      />
+                    </ErrorBoundary>
+                  </div>
+                </div>
+              </>
+            ) : null}
+          </main>
+
+          <div className="mt-6">
+            <Footer />
+          </div>
+        </div>
+      </div>
+    </RootErrorBoundary>
+  );
+}
+
+export { type LSTToken, type LSTSupplyData };

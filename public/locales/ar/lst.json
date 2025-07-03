@@ -1,0 +1,78 @@
+{
+  "page": {
+    "title": "رموز التخزين السائل على أبتوس",
+    "description": "رموز التخزين السائل على بلوكتشين أبتوس"
+  },
+  "stats": {
+    "total_lst_value": "إجمالي قيمة LST",
+    "liquid_staking_tokens": "رموز التخزين السائل",
+    "market_share": "حصة السوق",
+    "apr": "معدل النسبة السنوية (APR)",
+    "apy": "العائد السنوي المئوي (APY)",
+    "staked_amount": "المبلغ المُخزَّن",
+    "total_staked": "إجمالي المخزَّن",
+    "exchange_rate": "سعر الصرف",
+    "rewards": "المكافآت"
+  },
+  "loading": {
+    "loading_lst_data": "جارٍ تحميل بيانات LST...",
+    "loading": "جارٍ التحميل..."
+  },
+  "error": {
+    "error_loading_lst_data": "خطأ في تحميل بيانات LST",
+    "retry": "إعادة المحاولة",
+    "failed_to_load_chart": "فشل تحميل الرسم البياني"
+  },
+  "protocols": {
+    "thala": "Thala",
+    "amnis": "Amnis",
+    "trufin": "TruFin",
+    "ditto": "Ditto",
+    "tortuga": "Tortuga"
+  },
+  "tokens": {
+    "stapt": "stAPT",
+    "thapt": "thAPT",
+    "amapt": "amAPT",
+    "truapt": "TruAPT",
+    "dapt": "dAPT",
+    "tapt": "tAPT"
+  },
+  "actions": {
+    "stake": "تخزين",
+    "unstake": "إلغاء التخزين",
+    "claim_rewards": "مطالبة بالمكافآت",
+    "view_details": "عرض التفاصيل",
+    "trade": "تداول",
+    "add_to_wallet": "إضافة إلى المحفظة"
+  },
+  "staking": {
+    "liquid_staking": "التخزين السائل",
+    "validator": "المُوثِّق",
+    "delegation": "التفويض",
+    "unstaking_period": "فترة إلغاء التخزين",
+    "minimum_stake": "أقل مبلغ للتخزين",
+    "fees": "الرسوم",
+    "commission": "العمولة"
+  },
+  "filters": {
+    "all": "الكل",
+    "by_protocol": "حسب البروتوكول",
+    "by_apy": "حسب العائد السنوي (APY)",
+    "active": "نشط",
+    "paused": "متوقف"
+  },
+  "fallbacks": {
+    "unknown_lst": "LST غير معروف",
+    "data_not_available": "البيانات غير متوفرة",
+    "apy_unavailable": "العائد السنوي (APY) غير متوفر"
+  },
+  "info": {
+    "what_is_lst": "ما هو LST؟",
+    "lst_description": "تمكِّنك رموز التخزين السائل (LSTs) من تخزين APT مع الحفاظ على السيولة من خلال رموز مشتقة تمثل مركز التخزين الخاص بك.",
+    "benefits": "الفوائد",
+    "earn_rewards": "كسب مكافآت التخزين",
+    "maintain_liquidity": "الحفاظ على السيولة",
+    "use_in_defi": "الاستخدام في DeFi"
+  }
+}

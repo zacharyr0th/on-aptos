@@ -1,0 +1,69 @@
+{
+  "page": {
+    "title": "Aptos 上的稳定币",
+    "description": "Aptos 区块链上的稳定币和稳定货币"
+  },
+  "stats": {
+    "total_stablecoin_value": "稳定币总价值",
+    "stablecoins": "稳定币",
+    "market_share": "市场份额",
+    "market_cap": "市值",
+    "price": "价格",
+    "supply": "供应量",
+    "volume_24h": "24小时交易量",
+    "price_change_24h": "24小时价格变化"
+  },
+  "loading": {
+    "loading_stablecoin_data": "正在加载稳定币数据...",
+    "loading": "加载中...",
+    "rate_limit_message": "哇！请慢一点。",
+    "try_again_in": "请在以下时间后重试",
+    "try_again": "重试",
+    "request_failed": "请求无法完成。"
+  },
+  "error": {
+    "error_loading_stablecoin_data": "稳定币数据加载错误",
+    "retry": "重试",
+    "failed_to_load_chart": "图表加载失败"
+  },
+  "stablecoins": {
+    "usdt": "泰达币",
+    "usdc": "美元币",
+    "dai": "Dai 稳定币",
+    "busd": "币安美元",
+    "frax": "Frax",
+    "tusd": "TrueUSD",
+    "usdp": "Pax 美元",
+    "gusd": "双子星美元"
+  },
+  "types": {
+    "fiat_collateralized": "法币抵押",
+    "crypto_collateralized": "加密货币抵押",
+    "algorithmic": "算法稳定币",
+    "commodity_backed": "商品支持"
+  },
+  "actions": {
+    "view_details": "查看详情",
+    "trade": "交易",
+    "add_to_wallet": "添加到钱包",
+    "visit_website": "访问网站"
+  },
+  "filters": {
+    "all": "全部",
+    "by_type": "按类型",
+    "by_market_cap": "按市值",
+    "stable": "稳定",
+    "depegged": "脱锚"
+  },
+  "labels": {
+    "tether_reserve_address": "泰达币储备地址",
+    "subtracted_from_supply": "（从流通供应量中减去）",
+    "view_on_explorer": "在 Aptos 浏览器中查看",
+    "reserve_address": "储备地址"
+  },
+  "fallbacks": {
+    "unknown_stablecoin": "未知稳定币",
+    "data_not_available": "数据不可用",
+    "price_unavailable": "价格不可用"
+  }
+}

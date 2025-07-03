@@ -1,0 +1,76 @@
+{
+  "page": {
+    "title": "Aptos上のリアルワールドアセット",
+    "description": "Aptosブロックチェーン上のRWAとトークン化されたリアルワールドアセット"
+  },
+  "stats": {
+    "total_rwa_value": "RWA総額",
+    "real_world_assets": "リアルワールドアセット",
+    "data_powered_by": "RWA.xyzによるデータ提供",
+    "data_powered_by_prefix": "データ提供：",
+    "rwa_assets": "RWAアセット",
+    "market_share": "マーケットシェア",
+    "total_value": "総額",
+    "asset_count": "アセット数",
+    "protocols": "プロトコル"
+  },
+  "loading": {
+    "loading_rwa_data": "RWAデータを読み込み中...",
+    "loading": "読み込み中...",
+    "rate_limit_message": "APIレート制限に達しました。しばらくしてから再試行してください。",
+    "try_again_in": "再試行まで",
+    "try_again": "再試行",
+    "request_failed": "リクエストに失敗しました。もう一度お試しください。"
+  },
+  "error": {
+    "error_loading_rwa_data": "RWAデータ読み込みエラー",
+    "failed_to_load_chart": "チャートの読み込みに失敗しました",
+    "retry": "再試行",
+    "failed_to_load_data": "データの読み込みに失敗しました"
+  },
+  "protocols": {
+    "pact": "Pact",
+    "securitize": "Securitize",
+    "franklin_templeton": "Franklin Templeton",
+    "libre_capital": "Libre Capital",
+    "ondo": "Ondo",
+    "blackrock": "BlackRock"
+  },
+  "labels": {
+    "bridged": "ブリッジ済み",
+    "value_not_available": "価値が利用できません",
+    "token_id": "トークンID",
+    "current_value": "現在の価値",
+    "asset_name": "アセット名",
+    "asset_issuer": "アセット発行者",
+    "standards": "スタンダード",
+    "not_specified": "未指定",
+    "regulatory_framework": "規制フレームワーク",
+    "governing_body": "規制機関",
+    "issuer_legal_structure_country": "発行者の法的構造国",
+    "contract_address": "コントラクトアドレス",
+    "network_id": "ネットワークID",
+    "asset_id": "アセットID"
+  },
+  "sections": {
+    "value_information": "価値情報",
+    "asset_details": "アセット詳細",
+    "regulatory_information": "規制情報",
+    "legal_structure": "法的構造",
+    "technical_details": "技術詳細"
+  },
+  "actions": {
+    "view_details": "詳細を表示",
+    "visit_website": "ウェブサイトを訪問"
+  },
+  "filters": {
+    "all": "すべて",
+    "by_protocol": "プロトコル別",
+    "by_value": "価値別"
+  },
+  "fallbacks": {
+    "unknown_asset": "不明なアセット",
+    "data_not_available": "データが利用できません",
+    "value_unavailable": "価値が利用できません"
+  }
+}

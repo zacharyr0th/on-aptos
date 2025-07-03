@@ -1,0 +1,69 @@
+{
+  "page": {
+    "title": "Stablecoins auf Aptos",
+    "description": "Stablecoins und stabile Währungen auf der Aptos-Blockchain"
+  },
+  "stats": {
+    "total_stablecoin_value": "Gesamtwert Stablecoins",
+    "stablecoins": "Stablecoins",
+    "market_share": "Marktanteil",
+    "market_cap": "Marktkapitalisierung",
+    "price": "Preis",
+    "supply": "Angebot",
+    "volume_24h": "24-h-Volumen",
+    "price_change_24h": "24-h-Preisänderung"
+  },
+  "loading": {
+    "loading_stablecoin_data": "Stablecoin-Daten werden geladen …",
+    "loading": "Lädt …",
+    "rate_limit_message": "Wow! Bitte etwas langsamer.",
+    "try_again_in": "Erneut versuchen in",
+    "try_again": "Erneut versuchen",
+    "request_failed": "Die Anfrage konnte nicht abgeschlossen werden."
+  },
+  "error": {
+    "error_loading_stablecoin_data": "Fehler beim Laden der Stablecoin-Daten",
+    "retry": "Wiederholen",
+    "failed_to_load_chart": "Diagramm konnte nicht geladen werden"
+  },
+  "stablecoins": {
+    "usdt": "Tether USD",
+    "usdc": "USD Coin",
+    "dai": "Dai Stablecoin",
+    "busd": "Binance USD",
+    "frax": "Frax",
+    "tusd": "TrueUSD",
+    "usdp": "Pax Dollar",
+    "gusd": "Gemini Dollar"
+  },
+  "types": {
+    "fiat_collateralized": "Fiat-besichert",
+    "crypto_collateralized": "Krypto-besichert",
+    "algorithmic": "Algorithmisch",
+    "commodity_backed": "Rohstoff-gedeckt"
+  },
+  "actions": {
+    "view_details": "Details anzeigen",
+    "trade": "Handeln",
+    "add_to_wallet": "Zur Wallet hinzufügen",
+    "visit_website": "Website besuchen"
+  },
+  "filters": {
+    "all": "Alle",
+    "by_type": "Nach Typ",
+    "by_market_cap": "Nach Marktkapitalisierung",
+    "stable": "Stabil",
+    "depegged": "De-Pegged"
+  },
+  "labels": {
+    "tether_reserve_address": "Tether-Reserve-Adresse",
+    "subtracted_from_supply": "(Vom zirkulierenden Angebot abgezogen)",
+    "view_on_explorer": "Im Aptos Explorer ansehen",
+    "reserve_address": "Reserveadresse"
+  },
+  "fallbacks": {
+    "unknown_stablecoin": "Unbekannter Stablecoin",
+    "data_not_available": "Daten nicht verfügbar",
+    "price_unavailable": "Preis nicht verfügbar"
+  }
+}
