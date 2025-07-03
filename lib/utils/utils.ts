@@ -192,7 +192,7 @@ export const knownAptosRelatedAddresses: Record<string, string> = {
     'Cellana Rewards',
   '0x1c3206329806286fd2223647c9f9b130e66baeb6d7224a18c1f642ffe48f3b4c':
     'Panora Exchange',
-    '0x9538c839fe490ccfaf32ad9f7491b5e84e610ff6edc110ff883f06ebde82463d':
+  '0x9538c839fe490ccfaf32ad9f7491b5e84e610ff6edc110ff883f06ebde82463d':
     'KanaLabs',
   '0x8b4a2c4bb53857c718a04c020b98f8c2e1f99a68b0f57389a8bf5434cd22e05c':
     'Hyperion',

@@ -103,7 +103,10 @@ export const IconSection = ({
             <button
               onClick={handleApiClick}
               className="text-black/80 dark:text-white/80 hover:text-primary dark:hover:text-primary underline decoration-dotted underline-offset-2 transition-colors duration-200 bg-transparent border-none p-0 font-mono text-xs sm:text-sm cursor-pointer"
-              aria-label={t('labels.open_api_endpoint', 'Open API endpoint in new tab')}
+              aria-label={t(
+                'labels.open_api_endpoint',
+                'Open API endpoint in new tab'
+              )}
             >
               {apiEndpoint}
             </button>

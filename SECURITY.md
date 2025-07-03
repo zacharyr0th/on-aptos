@@ -4,10 +4,10 @@
 
 We release patches for security vulnerabilities. Which versions are eligible for receiving such patches depends on the CVSS v3.0 Rating:
 
-| Version | Supported          |
-| ------- | ------------------ |
-| latest  | ✅                |
-| < latest| ❌                |
+| Version  | Supported |
+| -------- | --------- |
+| latest   | ✅        |
+| < latest | ❌        |
 
 ## Reporting a Vulnerability
 
@@ -54,18 +54,21 @@ When we receive a security bug report, we will:
 When contributing to On Aptos, please follow these security best practices:
 
 ### API Keys and Secrets
+
 - Never commit API keys, passwords, or secrets to the repository
 - Use environment variables for sensitive configuration
 - Add sensitive files to `.gitignore`
 - Use `.env.example` to document required environment variables without exposing values
 
 ### Dependencies
+
 - Keep dependencies up to date
 - Run `pnpm audit` regularly to check for vulnerabilities
 - Review dependency licenses before adding new packages
 - Prefer well-maintained packages with good security track records
 
 ### Code Practices
+
 - Validate and sanitize all user inputs
 - Use parameterized queries for database operations
 - Implement proper authentication and authorization
@@ -75,6 +78,7 @@ When contributing to On Aptos, please follow these security best practices:
 - Log security events appropriately (without logging sensitive data)
 
 ### Content Security
+
 - Implement and maintain strict Content Security Policy (CSP) headers
 - Sanitize any user-generated content before rendering
 - Use secure cookie settings (HttpOnly, Secure, SameSite)
@@ -107,6 +111,7 @@ The goal is to limit the time window where vulnerabilities are known but unpatch
 ## Contact
 
 For any security-related questions or concerns, please contact:
+
 - Email: zacharyroth@pm.me
 - PGP Key: [Link to PGP key if available]
 

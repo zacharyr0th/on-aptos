@@ -78,10 +78,12 @@ export const ProtocolDisplay = React.memo(function ProtocolDisplay({
 
     const categoryDef =
       categoryDefinitions[category as keyof typeof categoryDefinitions];
-    if (categoryDef && 
-        'subcategories' in categoryDef && 
-        categoryDef.subcategories &&
-        Object.keys(categoryDef.subcategories).length > 0) {
+    if (
+      categoryDef &&
+      'subcategories' in categoryDef &&
+      categoryDef.subcategories &&
+      Object.keys(categoryDef.subcategories).length > 0
+    ) {
       const subcategoryDesc = (
         categoryDef.subcategories as unknown as Record<string, string>
       )[subcategory];

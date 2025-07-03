@@ -6,13 +6,19 @@ const envSchema = z.object({
   RWA_API_KEY: z.string().optional(),
   APTOS_BUILD_SECRET: z.string().optional(),
   APTOS_BUILD_KEY: z.string().optional(),
-  
+
   // Public URLs - optional with default
-  NEXT_PUBLIC_SITE_URL: z.string().url().optional().default('http://localhost:3000'),
-  
+  NEXT_PUBLIC_SITE_URL: z
+    .string()
+    .url()
+    .optional()
+    .default('http://localhost:3000'),
+
   // Node environment
-  NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
-  
+  NODE_ENV: z
+    .enum(['development', 'production', 'test'])
+    .default('development'),
+
   // Optional API keys for extended functionality
   VERCEL_URL: z.string().optional(),
   ANALYZE: z.string().optional(),
@@ -22,25 +28,25 @@ type EnvConfig = z.infer<typeof envSchema>;
 
 export function validateEnv(): EnvConfig {
   const result = envSchema.safeParse(process.env);
-  
+
   if (!result.success) {
     console.error('❌ Environment validation failed:');
     console.error(result.error.format());
-    
+
     const missingVars = result.error.errors
       .filter(err => err.message.includes('required'))
       .map(err => err.path.join('.'));
-    
+
     if (missingVars.length > 0) {
       throw new Error(
         `Missing required environment variables: ${missingVars.join(', ')}\n` +
-        'Please check your .env file and ensure all required variables are set.'
+          'Please check your .env file and ensure all required variables are set.'
       );
     }
-    
+
     throw new Error('Invalid environment configuration');
   }
-  
+
   return result.data;
 }
 

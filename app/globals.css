@@ -214,24 +214,24 @@
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-  
+
   /* Disable floating orbs animation */
   .animate-float {
     animation: none !important;
   }
-  
+
   /* Disable fade animations */
   .animate-fade-in-up {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;
   }
-  
+
   /* Disable all tw-animate animations */
-  [class*="animate-"] {
+  [class*='animate-'] {
     animation: none !important;
   }
-  
+
   /* Ensure floating orbs are hidden completely for reduced motion */
   .floating-orbs {
     display: none !important;

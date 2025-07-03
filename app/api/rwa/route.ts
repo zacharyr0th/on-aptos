@@ -368,110 +368,112 @@ export async function GET(request: NextRequest) {
   return withApiEnhancements(
     () =>
       withErrorHandling(async () => {
-          // Step 1: Get all protocols from DefiLlama with retry logic
-          const protocolsResponse = await fetchWithRetry(
-            'https://api.llama.fi/protocols'
-          );
-          const allProtocols: DefiLlamaProtocol[] = await protocolsResponse.json();
+        // Step 1: Get all protocols from DefiLlama with retry logic
+        const protocolsResponse = await fetchWithRetry(
+          'https://api.llama.fi/protocols'
+        );
+        const allProtocols: DefiLlamaProtocol[] =
+          await protocolsResponse.json();
 
-          // Step 2: Enhanced filtering for RWA protocols with Aptos support
-          const candidateProtocols = allProtocols.filter(
-            (protocol: DefiLlamaProtocol) => {
-              // Must have Aptos chain
-              const hasAptos = protocol.chains && protocol.chains.includes('Aptos');
-              if (!hasAptos) return false;
+        // Step 2: Enhanced filtering for RWA protocols with Aptos support
+        const candidateProtocols = allProtocols.filter(
+          (protocol: DefiLlamaProtocol) => {
+            // Must have Aptos chain
+            const hasAptos =
+              protocol.chains && protocol.chains.includes('Aptos');
+            if (!hasAptos) return false;
 
-              // Check if it's an official RWA protocol
-              const rwaCheck = isOfficialRWAProtocol(protocol);
+            // Check if it's an official RWA protocol
+            const rwaCheck = isOfficialRWAProtocol(protocol);
 
-              // Include only official RWA protocols
-              if (rwaCheck.isRWA) {
-                return true;
-              }
-
-              return false;
+            // Include only official RWA protocols
+            if (rwaCheck.isRWA) {
+              return true;
             }
-          );
 
-          // Step 3: Load CSV data for Pact and Securitize protocols
-          const csvAssets = loadCSVData();
-
-          // Step 4: Fetch detailed data for each candidate (excluding Pact and Securitize)
-          const validatedAssets: ValidatedRWAAsset[] = [...csvAssets];
-          const failedFetches: string[] = [];
-
-          for (const protocol of candidateProtocols) {
-            try {
-              const protocolResponse = await fetchWithRetry(
-                `https://api.llama.fi/protocol/${protocol.slug}`,
-                2, // Fewer retries for individual protocols
-                500
-              );
-
-              const protocolData: DefiLlamaProtocolData =
-                await protocolResponse.json();
-
-              // Extract Aptos-specific TVL with better error handling
-              let aptosValue = 0;
-
-              if (protocolData.chainTvls?.Aptos?.tvl) {
-                const aptosTvlData = protocolData.chainTvls.Aptos.tvl;
-                if (Array.isArray(aptosTvlData) && aptosTvlData.length > 0) {
-                  // Get the most recent value
-                  const latestTvl = aptosTvlData[aptosTvlData.length - 1];
-                  aptosValue = latestTvl.totalLiquidityUSD || 0;
-                }
-              }
-
-              // Validate and transform the asset
-              const validatedAsset = validateAndTransformAsset(
-                protocol,
-                protocolData,
-                aptosValue
-              );
-
-              if (validatedAsset) {
-                validatedAssets.push(validatedAsset);
-              }
-            } catch (error) {
-              failedFetches.push(protocol.name);
-            }
+            return false;
           }
+        );
 
-          // Sort by Aptos TVL and confidence
-          validatedAssets.sort((a, b) => {
-            // Primary sort: TVL (descending)
-            const tvlDiff = b.aptosTvl - a.aptosTvl;
-            if (Math.abs(tvlDiff) > 1000) return tvlDiff;
+        // Step 3: Load CSV data for Pact and Securitize protocols
+        const csvAssets = loadCSVData();
 
-            // Secondary sort: Confidence (descending)
-            return b.confidence - a.confidence;
-          });
+        // Step 4: Fetch detailed data for each candidate (excluding Pact and Securitize)
+        const validatedAssets: ValidatedRWAAsset[] = [...csvAssets];
+        const failedFetches: string[] = [];
 
-          const totalAptosValue = validatedAssets.reduce(
-            (sum, asset) => sum + asset.aptosTvl,
-            0
-          );
+        for (const protocol of candidateProtocols) {
+          try {
+            const protocolResponse = await fetchWithRetry(
+              `https://api.llama.fi/protocol/${protocol.slug}`,
+              2, // Fewer retries for individual protocols
+              500
+            );
 
-          return {
-            success: true,
-            dataSource: 'Enhanced DefiLlama API + CSV Export',
-            dataSources: {
-              csv: csvAssets.length,
-              defiLlama: validatedAssets.length - csvAssets.length,
-            },
-            totalAptosValue,
-            totalAptosValueFormatted: `$${(totalAptosValue / 1000000).toFixed(1)}M`,
-            assetCount: validatedAssets.length,
-            assets: validatedAssets,
-            failedFetches,
-            timestamp: new Date().toISOString(),
-            cacheInfo: {
-              cached: false,
-              ttl: SERVICE_CONFIG.rwa.ttl,
-            },
-            note: 'Enhanced data with Pact and Securitize protocols from CSV export',
-          };
+            const protocolData: DefiLlamaProtocolData =
+              await protocolResponse.json();
+
+            // Extract Aptos-specific TVL with better error handling
+            let aptosValue = 0;
+
+            if (protocolData.chainTvls?.Aptos?.tvl) {
+              const aptosTvlData = protocolData.chainTvls.Aptos.tvl;
+              if (Array.isArray(aptosTvlData) && aptosTvlData.length > 0) {
+                // Get the most recent value
+                const latestTvl = aptosTvlData[aptosTvlData.length - 1];
+                aptosValue = latestTvl.totalLiquidityUSD || 0;
+              }
+            }
+
+            // Validate and transform the asset
+            const validatedAsset = validateAndTransformAsset(
+              protocol,
+              protocolData,
+              aptosValue
+            );
+
+            if (validatedAsset) {
+              validatedAssets.push(validatedAsset);
+            }
+          } catch (error) {
+            failedFetches.push(protocol.name);
+          }
+        }
+
+        // Sort by Aptos TVL and confidence
+        validatedAssets.sort((a, b) => {
+          // Primary sort: TVL (descending)
+          const tvlDiff = b.aptosTvl - a.aptosTvl;
+          if (Math.abs(tvlDiff) > 1000) return tvlDiff;
+
+          // Secondary sort: Confidence (descending)
+          return b.confidence - a.confidence;
+        });
+
+        const totalAptosValue = validatedAssets.reduce(
+          (sum, asset) => sum + asset.aptosTvl,
+          0
+        );
+
+        return {
+          success: true,
+          dataSource: 'Enhanced DefiLlama API + CSV Export',
+          dataSources: {
+            csv: csvAssets.length,
+            defiLlama: validatedAssets.length - csvAssets.length,
+          },
+          totalAptosValue,
+          totalAptosValueFormatted: `$${(totalAptosValue / 1000000).toFixed(1)}M`,
+          assetCount: validatedAssets.length,
+          assets: validatedAssets,
+          failedFetches,
+          timestamp: new Date().toISOString(),
+          cacheInfo: {
+            cached: false,
+            ttl: SERVICE_CONFIG.rwa.ttl,
+          },
+          note: 'Enhanced data with Pact and Securitize protocols from CSV export',
+        };
       }, errorContext),
     {
       cacheKey: 'aptos-rwa-data',

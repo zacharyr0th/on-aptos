@@ -123,7 +123,7 @@ export function FilterControls({
           .map(category => {
             const categoryDef = getCategoryDefinition(category);
             const hasSubcategories =
-              categoryDef && 
+              categoryDef &&
               'subcategories' in categoryDef &&
               categoryDef.subcategories &&
               Object.keys(categoryDef.subcategories).length > 0;
@@ -191,8 +191,8 @@ export function FilterControls({
           const isExpanded = expandedCategory === category;
           const categoryDef = getCategoryDefinition(category);
           const hasSubcategories =
-            category !== 'All' && 
-            categoryDef && 
+            category !== 'All' &&
+            categoryDef &&
             'subcategories' in categoryDef &&
             categoryDef.subcategories &&
             Object.keys(categoryDef.subcategories).length > 0;
@@ -249,10 +249,12 @@ export function FilterControls({
         expandedCategory !== 'All' &&
         (() => {
           const categoryDef = getCategoryDefinition(expandedCategory);
-          return categoryDef && 
-                 'subcategories' in categoryDef &&
-                 categoryDef.subcategories &&
-                 Object.keys(categoryDef.subcategories).length > 0;
+          return (
+            categoryDef &&
+            'subcategories' in categoryDef &&
+            categoryDef.subcategories &&
+            Object.keys(categoryDef.subcategories).length > 0
+          );
         })() && (
           <div className="mt-4 overflow-hidden">
             <div className="animate-in slide-in-from-top-2 duration-300 ease-out">
@@ -269,7 +271,10 @@ export function FilterControls({
                     <button
                       onClick={() => setExpandedCategory(null)}
                       className="text-muted-foreground hover:text-foreground transition-colors"
-                      aria-label={t('common:actions.close_subcategories', 'Close subcategories')}
+                      aria-label={t(
+                        'common:actions.close_subcategories',
+                        'Close subcategories'
+                      )}
                     >
                       <ChevronUp className="h-4 w-4" />
                     </button>

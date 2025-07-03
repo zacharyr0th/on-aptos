@@ -156,43 +156,42 @@ const getProviderAverageColor = (
 };
 
 // Custom tooltip component
-const CustomTooltip = memo<TooltipProps<number, string>>(
-  ({ active, payload }) => {
-    if (!active || !payload?.length) return null;
+const CustomTooltip = memo<TooltipProps<number, string>>(props => {
+  const { active, payload } = props as any;
+  if (!active || !payload?.length) return null;
 
-    try {
-      const data = payload[0].payload as ProviderDataItem | AssetDataItem;
-      const isProvider = !('provider' in data);
+  try {
+    const data = payload[0].payload as ProviderDataItem | AssetDataItem;
+    const isProvider = !('provider' in data);
 
-      return (
-        <div
-          className="bg-popover/95 backdrop-blur border rounded-md shadow-lg p-3 z-10 text-sm space-y-1"
-          role="tooltip"
-        >
-          <p className="font-semibold text-popover-foreground">{data.name}</p>
-          <p className="text-muted-foreground">
-            {isProvider ? 'Total Value' : 'Asset Value'}: {data.formattedValue}
+    return (
+      <div
+        className="bg-popover/95 backdrop-blur border rounded-md shadow-lg p-3 z-10 text-sm space-y-1"
+        role="tooltip"
+      >
+        <p className="font-semibold text-popover-foreground">{data.name}</p>
+        <p className="text-muted-foreground">
+          {isProvider ? 'Total Value' : 'Asset Value'}: {data.formattedValue}
+        </p>
+        <p className="text-muted-foreground">
+          Share: {formatPercentage(data.value)}%
+        </p>
+        {!isProvider && (
+          <p className="text-muted-foreground text-xs">
+            Provider: {(data as AssetDataItem).provider}
           </p>
-          <p className="text-muted-foreground">
-            Share: {formatPercentage(data.value)}%
-          </p>
-          {!isProvider && (
-            <p className="text-muted-foreground text-xs">
-              Provider: {(data as AssetDataItem).provider}
-            </p>
-          )}
-        </div>
-      );
-    } catch (error) {
-      console.error('Error rendering tooltip:', error);
-      return (
-        <div className="bg-popover/95 backdrop-blur border rounded-md shadow-lg p-3 z-10 text-sm">
-          <p className="text-destructive">Error displaying data</p>
-        </div>
-      );
-    }
+        )}
+      </div>
+    );
+  } catch (error) {
+    console.error('Error rendering tooltip:', error);
+    return (
+      <div className="bg-popover/95 backdrop-blur border rounded-md shadow-lg p-3 z-10 text-sm">
+        <p className="text-destructive">Error displaying data</p>
+      </div>
+    );
   }
-);
+});
 
 CustomTooltip.displayName = 'CustomTooltip';
 

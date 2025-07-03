@@ -97,7 +97,7 @@ class RequestDeduplicator {
   private cleanup(): void {
     const entries = Array.from(this.pendingRequests.entries());
     const toRemove = entries.slice(0, Math.floor(entries.length / 2));
-    
+
     for (const [key] of toRemove) {
       this.pendingRequests.delete(key);
     }
@@ -128,7 +128,10 @@ export const requestDeduplicator = new RequestDeduplicator();
 /**
  * Enhanced fetch with request deduplication
  */
-export const dedupeFetch = (url: string, options?: RequestInit): Promise<Response> => {
+export const dedupeFetch = (
+  url: string,
+  options?: RequestInit
+): Promise<Response> => {
   return requestDeduplicator.dedupeFetch(url, options);
 };
 

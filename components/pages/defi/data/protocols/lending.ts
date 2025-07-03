@@ -107,7 +107,7 @@ export const lendingProtocols: DefiProtocol[] = [
     },
     integration: {
       smartContractLinks: ['https://github.com/EchelonMarket'],
-        },
+    },
   },
   {
     title: 'Meso',

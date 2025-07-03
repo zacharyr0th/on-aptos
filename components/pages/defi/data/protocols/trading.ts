@@ -217,7 +217,7 @@ export const tradingProtocols: DefiProtocol[] = [
     },
     integration: {
       smartContractLinks: ['https://github.com/pontem-network/liquidswap'],
-        },
+    },
   },
   {
     title: 'Cellana',
@@ -442,6 +442,6 @@ export const tradingProtocols: DefiProtocol[] = [
       socials: {
         twitter: 'https://twitter.com/UPTOS_APT',
       },
-        },
+    },
   },
 ];

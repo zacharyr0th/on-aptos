@@ -64,7 +64,9 @@ export function LanguageToggle() {
         disabled
       >
         <Globe className="h-[1.2rem] w-[1.2rem] transition-all" />
-        <span className="sr-only">{t('common:actions.switch_language', 'Switch language')}</span>
+        <span className="sr-only">
+          {t('common:actions.switch_language', 'Switch language')}
+        </span>
       </button>
     );
   }
@@ -80,7 +82,9 @@ export function LanguageToggle() {
           disabled={!isReady || isChanging}
         >
           <Globe className="h-[1.2rem] w-[1.2rem] transition-all" />
-          <span className="sr-only">{t('common:actions.switch_language', 'Switch language')}</span>
+          <span className="sr-only">
+            {t('common:actions.switch_language', 'Switch language')}
+          </span>
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
@@ -94,7 +98,11 @@ export function LanguageToggle() {
             <div className="flex w-full items-center justify-between gap-2">
               <span>{LANGUAGE_LABELS[lang]}</span>
               <span className="flex items-center gap-2 min-w-[56px] justify-end">
-                {lang !== 'en' && <Badge variant="secondary">{t('common:labels.beta', 'Beta')}</Badge>}
+                {lang !== 'en' && (
+                  <Badge variant="secondary">
+                    {t('common:labels.beta', 'Beta')}
+                  </Badge>
+                )}
                 {currentLanguage === lang && <span className="ml-1">✓</span>}
                 {isChanging && currentLanguage !== lang && (
                   <span className="ml-1 animate-spin">⟳</span>

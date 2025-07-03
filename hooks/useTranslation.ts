@@ -39,10 +39,10 @@ export function useTranslation(namespace: Namespace | Namespace[] = 'common') {
       if (typeof window !== 'undefined' && isMounted) {
         try {
           await preloadPageTranslations(namespaces as Namespace[]);
-          
+
           // Wait a bit for i18n to process the loaded resources
           await new Promise(resolve => setTimeout(resolve, 50));
-          
+
           // Double-check that all namespaces are actually loaded
           const allLoaded = namespaces.every(ns => i18n.hasLoadedNamespace(ns));
           if (mounted && allLoaded) {
@@ -52,7 +52,9 @@ export function useTranslation(namespace: Namespace | Namespace[] = 'common') {
             // More aggressive retry mechanism
             let retryCount = 0;
             const retryInterval = setInterval(() => {
-              const retryCheck = namespaces.every(ns => i18n.hasLoadedNamespace(ns));
+              const retryCheck = namespaces.every(ns =>
+                i18n.hasLoadedNamespace(ns)
+              );
               if (retryCheck || retryCount >= 10) {
                 clearInterval(retryInterval);
                 if (mounted) {
@@ -111,7 +113,7 @@ export function useTranslation(namespace: Namespace | Namespace[] = 'common') {
         const translated = i18nT(key, options);
         const translatedStr =
           typeof translated === 'string' ? translated : String(translated);
-        
+
         // If we got a real translation (not the key back), use it
         if (translatedStr && translatedStr !== key) {
           return translatedStr;
@@ -131,15 +133,20 @@ export function useTranslation(namespace: Namespace | Namespace[] = 'common') {
           }
           return fallback || key;
         }
-        
+
         // Debug logging in development
         if (process.env.NODE_ENV === 'development') {
-          console.log(`Translation missing for key: ${key}, namespaces loaded:`, 
+          console.log(
+            `Translation missing for key: ${key}, namespaces loaded:`,
             namespaces.map(ns => `${ns}:${i18n.hasLoadedNamespace(ns)}`),
-            'isReady:', isReady,
-            'isMounted:', isMounted,
-            'translationsLoaded:', translationsLoaded,
-            'i18n language:', i18n.language
+            'isReady:',
+            isReady,
+            'isMounted:',
+            isMounted,
+            'translationsLoaded:',
+            translationsLoaded,
+            'i18n language:',
+            i18n.language
           );
         }
 

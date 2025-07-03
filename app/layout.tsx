@@ -159,7 +159,7 @@ export default async function RootLayout({
 }: RootLayoutProps): Promise<React.ReactElement> {
   // Get nonce from headers
   const nonce = (await headers()).get('x-nonce');
-  
+
   // Structured data for the entire site
   const structuredData = {
     '@context': 'https://schema.org',

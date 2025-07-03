@@ -450,8 +450,8 @@ export const rwaRouter = router({
       }
 
       // Fetch from our RWA API endpoint
-      const baseUrl = API_CONFIG.rwa.baseUrl.includes('localhost') 
-        ? 'http://localhost:3000' 
+      const baseUrl = API_CONFIG.rwa.baseUrl.includes('localhost')
+        ? 'http://localhost:3000'
         : process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
       const response = await enhancedFetch(`${baseUrl}/api/rwa`, {
         timeout: config.timeout,

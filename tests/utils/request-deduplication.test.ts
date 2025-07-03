@@ -37,7 +37,7 @@ describe('Request Deduplication', () => {
 
       // Should only call fetch once
       expect(global.fetch).toHaveBeenCalledTimes(1);
-      
+
       // Both results should be the same response
       expect(result1).toBe(result2);
     });
@@ -65,8 +65,12 @@ describe('Request Deduplication', () => {
       (global.fetch as any).mockResolvedValue(mockResponse);
 
       // Make GET and POST requests to same URL
-      const promise1 = dedupeFetch('https://api.example.com/data', { method: 'GET' });
-      const promise2 = dedupeFetch('https://api.example.com/data', { method: 'POST' });
+      const promise1 = dedupeFetch('https://api.example.com/data', {
+        method: 'GET',
+      });
+      const promise2 = dedupeFetch('https://api.example.com/data', {
+        method: 'POST',
+      });
 
       await Promise.all([promise1, promise2]);
 
@@ -87,7 +91,7 @@ describe('Request Deduplication', () => {
 
       // Should only call the function once
       expect(mockFn).toHaveBeenCalledTimes(1);
-      
+
       // Both results should be the same
       expect(result1).toBe('test-result');
       expect(result2).toBe('test-result');
@@ -106,42 +110,39 @@ describe('Request Deduplication', () => {
       // Should call both functions
       expect(mockFn1).toHaveBeenCalledTimes(1);
       expect(mockFn2).toHaveBeenCalledTimes(1);
-      
+
       expect(result1).toBe('result1');
       expect(result2).toBe('result2');
     });
 
     it('should handle timeout', async () => {
-      const slowFn = () => new Promise(resolve => setTimeout(() => resolve('slow'), 100));
+      const slowFn = () =>
+        new Promise(resolve => setTimeout(() => resolve('slow'), 100));
 
-      await expect(
-        dedupeAsyncCall('timeout-test', slowFn, 50)
-      ).rejects.toThrow('Request timeout');
+      await expect(dedupeAsyncCall('timeout-test', slowFn, 50)).rejects.toThrow(
+        'Request timeout'
+      );
     });
   });
 
   describe('withDeduplication', () => {
     it('should create a deduplicated version of a function', async () => {
-      const originalFn = vi.fn().mockImplementation((id: number) => 
-        Promise.resolve(`result-${id}`)
-      );
-      
+      const originalFn = vi
+        .fn()
+        .mockImplementation((id: number) => Promise.resolve(`result-${id}`));
+
       const keyGenerator = (id: number) => `user-${id}`;
       const dedupedFn = withDeduplication(originalFn, keyGenerator);
 
       // Make multiple calls with same parameter
-      const promises = [
-        dedupedFn(123),
-        dedupedFn(123),
-        dedupedFn(123),
-      ];
+      const promises = [dedupedFn(123), dedupedFn(123), dedupedFn(123)];
 
       const results = await Promise.all(promises);
 
       // Should only call original function once
       expect(originalFn).toHaveBeenCalledTimes(1);
       expect(originalFn).toHaveBeenCalledWith(123);
-      
+
       // All results should be the same
       results.forEach(result => {
         expect(result).toBe('result-123');
@@ -151,10 +152,12 @@ describe('Request Deduplication', () => {
 
   describe('createDedupedEndpoint', () => {
     it('should create a deduplicated API endpoint', async () => {
-      const apiCall = vi.fn().mockImplementation((userId: string) => 
-        Promise.resolve({ id: userId, name: `User ${userId}` })
-      );
-      
+      const apiCall = vi
+        .fn()
+        .mockImplementation((userId: string) =>
+          Promise.resolve({ id: userId, name: `User ${userId}` })
+        );
+
       const keyGenerator = (userId: string) => `user-profile-${userId}`;
       const dedupedEndpoint = createDedupedEndpoint(apiCall, keyGenerator);
 
@@ -171,7 +174,7 @@ describe('Request Deduplication', () => {
       expect(apiCall).toHaveBeenCalledTimes(2);
       expect(apiCall).toHaveBeenCalledWith('user123');
       expect(apiCall).toHaveBeenCalledWith('user456');
-      
+
       // Results should match expectations
       expect(results[0]).toEqual({ id: 'user123', name: 'User user123' });
       expect(results[1]).toEqual({ id: 'user123', name: 'User user123' });
@@ -192,7 +195,7 @@ describe('Request Deduplication', () => {
       // Make some requests
       const promise1 = dedupeAsyncCall('test1', mockFn);
       const promise2 = dedupeAsyncCall('test2', mockFn);
-      
+
       // Check pending requests
       stats = requestDeduplicator.getStats();
       expect(stats.pendingRequests).toBe(2);

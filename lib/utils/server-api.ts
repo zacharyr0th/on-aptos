@@ -169,24 +169,30 @@ export async function withApiEnhancements<T>(
 ): Promise<NextResponse> {
   const startTime = Date.now();
   const clientIp = await getClientIp();
-  
+
   try {
     // Log API request
-    logger.debug({
-      cacheKey: options.cacheKey,
-      cacheName: options.cacheName,
-      clientIp,
-    }, 'API request started');
-    
+    logger.debug(
+      {
+        cacheKey: options.cacheKey,
+        cacheName: options.cacheName,
+        clientIp,
+      },
+      'API request started'
+    );
+
     // Rate limiting
     const rateLimitResult = checkRateLimit(clientIp);
 
     if (!rateLimitResult.allowed) {
-      logger.warn({
-        clientIp,
-        resetInSeconds: rateLimitResult.resetInSeconds,
-      }, 'Rate limit exceeded');
-      
+      logger.warn(
+        {
+          clientIp,
+          resetInSeconds: rateLimitResult.resetInSeconds,
+        },
+        'Rate limit exceeded'
+      );
+
       throw new RateLimitError(
         `Rate limit exceeded. Please try again in ${rateLimitResult.resetInSeconds} seconds.`,
         rateLimitResult.resetInSeconds || 60

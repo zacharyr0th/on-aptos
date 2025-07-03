@@ -7,24 +7,36 @@ export const SocialLinks = () => {
   const { t } = useTranslation('common');
 
   const socialLinks = [
-    ...(DEVELOPER_CONFIG.website ? [{
-      href: DEVELOPER_CONFIG.website,
-      icon: FaGlobe,
-      labelKey: 'actions.visit_personal_website',
-      hoverColor: 'hover:text-blue-600 dark:hover:text-blue-400',
-    }] : []),
-    ...(DEVELOPER_CONFIG.twitter ? [{
-      href: `https://x.com/${DEVELOPER_CONFIG.twitter.replace('@', '')}`,
-      icon: FaXTwitter,
-      labelKey: 'actions.twitter_profile',
-      hoverColor: 'hover:text-gray-900 dark:hover:text-white',
-    }] : []),
-    ...(DEVELOPER_CONFIG.github ? [{
-      href: DEVELOPER_CONFIG.github,
-      icon: FaGithub,
-      labelKey: 'actions.github_profile',
-      hoverColor: 'hover:text-gray-900 dark:hover:text-white',
-    }] : []),
+    ...(DEVELOPER_CONFIG.website
+      ? [
+          {
+            href: DEVELOPER_CONFIG.website,
+            icon: FaGlobe,
+            labelKey: 'actions.visit_personal_website',
+            hoverColor: 'hover:text-blue-600 dark:hover:text-blue-400',
+          },
+        ]
+      : []),
+    ...(DEVELOPER_CONFIG.twitter
+      ? [
+          {
+            href: `https://x.com/${DEVELOPER_CONFIG.twitter.replace('@', '')}`,
+            icon: FaXTwitter,
+            labelKey: 'actions.twitter_profile',
+            hoverColor: 'hover:text-gray-900 dark:hover:text-white',
+          },
+        ]
+      : []),
+    ...(DEVELOPER_CONFIG.github
+      ? [
+          {
+            href: DEVELOPER_CONFIG.github,
+            icon: FaGithub,
+            labelKey: 'actions.github_profile',
+            hoverColor: 'hover:text-gray-900 dark:hover:text-white',
+          },
+        ]
+      : []),
   ].filter(Boolean);
 
   return (

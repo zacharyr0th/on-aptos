@@ -158,6 +158,7 @@ Please follow these steps to have your contribution considered by the maintainer
    - Git
 
 2. **Setup**
+
    ```bash
    # Clone your fork
    git clone https://github.com/zacharyr0th/on-aptos.git

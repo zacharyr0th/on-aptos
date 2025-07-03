@@ -49,7 +49,12 @@ function useSidebar() {
   const { t } = useTranslation('common');
   const context = React.useContext(SidebarContext);
   if (!context) {
-    throw new Error(t('sidebar.provider_error', 'useSidebar must be used within a SidebarProvider.'));
+    throw new Error(
+      t(
+        'sidebar.provider_error',
+        'useSidebar must be used within a SidebarProvider.'
+      )
+    );
   }
 
   return context;
@@ -182,7 +187,7 @@ function Sidebar({
       </div>
     );
   }
-  
+
   if (isMobile) {
     return (
       <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
@@ -200,7 +205,9 @@ function Sidebar({
         >
           <SheetHeader className="sr-only">
             <SheetTitle>{t('sidebar.mobile_title', 'Sidebar')}</SheetTitle>
-            <SheetDescription>{t('sidebar.mobile_description', 'Displays the mobile sidebar.')}</SheetDescription>
+            <SheetDescription>
+              {t('sidebar.mobile_description', 'Displays the mobile sidebar.')}
+            </SheetDescription>
           </SheetHeader>
           <div className="flex h-full w-full flex-col">{children}</div>
         </SheetContent>
@@ -278,7 +285,9 @@ function SidebarTrigger({
       {...props}
     >
       <PanelLeftIcon />
-      <span className="sr-only">{t('actions.toggle_sidebar', 'Toggle Sidebar')}</span>
+      <span className="sr-only">
+        {t('actions.toggle_sidebar', 'Toggle Sidebar')}
+      </span>
     </Button>
   );
 }

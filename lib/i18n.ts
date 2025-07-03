@@ -191,7 +191,10 @@ export const preloadNamespace = async (namespace: Namespace) => {
     try {
       await i18n.loadNamespaces(namespace);
     } catch (fallbackError) {
-      console.warn(`Fallback namespace loading also failed for ${namespace}`, fallbackError);
+      console.warn(
+        `Fallback namespace loading also failed for ${namespace}`,
+        fallbackError
+      );
     }
   }
 };

@@ -32,12 +32,15 @@ const handler = (req: NextRequest) => {
       const errorContext = {
         path,
         type,
-        input: typeof input === 'object' ? JSON.stringify(input).slice(0, 500) : input,
+        input:
+          typeof input === 'object'
+            ? JSON.stringify(input).slice(0, 500)
+            : input,
         clientIp,
         userAgent: userAgent.slice(0, 100),
         timestamp: new Date().toISOString(),
       };
-      
+
       console.error(`[tRPC Error] ${path}:`, {
         error: error.message,
         cause: error.cause,
@@ -65,7 +68,8 @@ const handler = (req: NextRequest) => {
 
       // Add caching for successful GET requests
       if (type === 'query' && errors.length === 0) {
-        headers['Cache-Control'] = 'public, max-age=60, stale-while-revalidate=30';
+        headers['Cache-Control'] =
+          'public, max-age=60, stale-while-revalidate=30';
       }
 
       // Add rate limiting info (simplified for now)

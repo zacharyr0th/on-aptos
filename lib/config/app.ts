@@ -9,17 +9,18 @@ export const APP_CONFIG = {
   // Site configuration
   siteUrl: env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
   appName: process.env.NEXT_PUBLIC_APP_NAME || 'On Aptos',
-  siteDescription: process.env.NEXT_PUBLIC_SITE_DESCRIPTION || 'Aptos DeFi ecosystem tracker',
-  
+  siteDescription:
+    process.env.NEXT_PUBLIC_SITE_DESCRIPTION || 'Aptos DeFi ecosystem tracker',
+
   // CORS configuration
   corsOrigins: process.env.NEXT_PUBLIC_CORS_ORIGINS?.split(',') || [
     'http://localhost:3000',
-    'http://localhost:3001'
+    'http://localhost:3001',
   ],
-  
+
   // Port configuration
   port: process.env.PORT || process.env.DEV_PORT || '3000',
-  
+
   // Development settings
   isDevelopment: isDevelopment,
   isProduction: isProduction,
@@ -40,18 +41,19 @@ export const API_CONFIG = {
     baseUrl: process.env.RWA_API_BASE_URL || 'https://api.rwa.xyz/v4/assets',
     apiKey: env.RWA_API_KEY || '',
   },
-  
+
   // CoinMarketCap API
   cmc: {
-    baseUrl: process.env.CMC_API_BASE_URL || 'https://pro-api.coinmarketcap.com/v1',
+    baseUrl:
+      process.env.CMC_API_BASE_URL || 'https://pro-api.coinmarketcap.com/v1',
     apiKey: env.CMC_API_KEY || '',
   },
-  
+
   // Other APIs
   panora: {
     baseUrl: 'https://api.panora.exchange',
   },
-  
+
   llama: {
     baseUrl: 'https://api.llama.fi',
   },

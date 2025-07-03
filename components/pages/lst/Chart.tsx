@@ -66,10 +66,8 @@ const calculateMarketShare = (
   return (aptValue / totalAptValue) * 100;
 };
 
-const CustomTooltip: React.FC<TooltipProps<number, string>> = ({
-  active,
-  payload,
-}) => {
+const CustomTooltip: React.FC<TooltipProps<number, string>> = props => {
+  const { active, payload } = props as any;
   if (!active || !payload?.length) return null;
 
   const { name, value, formattedSupply } = payload[0].payload as ChartDataItem;

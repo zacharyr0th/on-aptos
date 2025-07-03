@@ -36,8 +36,9 @@ export async function enhancedFetch(
 
   try {
     // Use deduplicated fetch for GET requests, regular fetch for mutations
-    const isGetRequest = !fetchOptions.method || fetchOptions.method.toUpperCase() === 'GET';
-    const response = isGetRequest 
+    const isGetRequest =
+      !fetchOptions.method || fetchOptions.method.toUpperCase() === 'GET';
+    const response = isGetRequest
       ? await dedupeFetch(url, fetchWithTimeout)
       : await fetch(url, fetchWithTimeout);
     clearTimeout(timeoutId);

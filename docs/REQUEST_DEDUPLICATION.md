@@ -18,6 +18,7 @@ Request deduplication automatically prevents identical requests from being made 
 ## How It Works
 
 The deduplication system creates unique keys for requests based on:
+
 - HTTP method (GET, POST, etc.)
 - URL
 - Request body (for POST/PUT requests)
@@ -60,7 +61,11 @@ const response = await enhancedFetch('/api/data');
 For custom API calls or other async operations:
 
 ```typescript
-import { dedupeFetch, dedupeAsyncCall, withDeduplication } from '@/lib/utils/request-deduplication';
+import {
+  dedupeFetch,
+  dedupeAsyncCall,
+  withDeduplication,
+} from '@/lib/utils/request-deduplication';
 
 // Deduplicate fetch requests
 const response = await dedupeFetch('https://api.example.com/data');
@@ -154,11 +159,13 @@ const slowResult = await dedupeAsyncCall('slow-key', slowAsyncFn, 30000);
 ## When Deduplication Occurs
 
 ✅ **Deduplicated:**
+
 - GET requests with identical URLs and headers
 - Identical async function calls with the same key
 - tRPC queries with the same parameters
 
 ❌ **Not Deduplicated:**
+
 - POST, PUT, DELETE requests (mutations should not be deduplicated)
 - Requests with different URLs, headers, or body content
 - Requests made after the previous request completes
@@ -198,12 +205,15 @@ setInterval(() => {
 ## Common Issues
 
 ### Memory Leaks
+
 The deduplicator automatically cleans up old requests when the cache gets too large (default: 1000 requests).
 
 ### Stale Data
+
 Use appropriate cache TTLs and React Query's `staleTime` to balance performance with data freshness.
 
 ### Testing
+
 Clear the deduplicator between tests:
 
 ```typescript

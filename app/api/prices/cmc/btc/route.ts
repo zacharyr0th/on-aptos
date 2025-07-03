@@ -51,7 +51,9 @@ export async function GET(request: NextRequest) {
           );
 
           if (!response.ok) {
-            const errorBody = await response.text().catch(() => 'Unknown error');
+            const errorBody = await response
+              .text()
+              .catch(() => 'Unknown error');
             throw new ApiError(
               `CMC API error: ${response.status} - ${errorBody}`,
               response.status,
@@ -74,24 +76,24 @@ export async function GET(request: NextRequest) {
             symbol: 'BTC',
             name: 'Bitcoin',
             price,
-            change24h: data?.data?.['1']?.quote?.USD?.percent_change_24h || null,
+            change24h:
+              data?.data?.['1']?.quote?.USD?.percent_change_24h || null,
             marketCap: data?.data?.['1']?.quote?.USD?.market_cap || null,
             updated: new Date().toISOString(),
             source: 'CoinMarketCap',
           };
         } catch (error) {
-          console.error('CMC Bitcoin price fetch error:', formatApiError(error));
+          console.error(
+            'CMC Bitcoin price fetch error:',
+            formatApiError(error)
+          );
 
           if (error instanceof ApiError) {
             throw error;
           }
 
           if (error instanceof Error && error.name === 'TimeoutError') {
-            throw new ApiError(
-              'CMC API request timed out',
-              504,
-              'CMC-Timeout'
-            );
+            throw new ApiError('CMC API request timed out', 504, 'CMC-Timeout');
           }
 
           throw new ApiError(

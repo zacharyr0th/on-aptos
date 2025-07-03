@@ -9,10 +9,10 @@ const isDevelopment = process.env.NODE_ENV === 'development';
 // Create the base logger
 const pinoLogger = pino({
   level: process.env.LOG_LEVEL || (isProduction ? 'info' : 'debug'),
-  
+
   // Disable pretty transport for now due to Turbopack compatibility issues
   // TODO: Re-enable when Turbopack supports worker scripts properly
-  
+
   // Redact sensitive information
   redact: {
     paths: ['*.password', '*.apiKey', '*.api_key', '*.token', '*.secret'],

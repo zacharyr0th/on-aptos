@@ -349,8 +349,8 @@ export class BitcoinService {
 
     for (const btcAsset of BTC_ASSETS) {
       const echelonAsset = echelonData.data.assets.find(
-        (asset: EchelonAsset) => 
-          asset.address === btcAsset.assetAddress || 
+        (asset: EchelonAsset) =>
+          asset.address === btcAsset.assetAddress ||
           asset.faAddress === btcAsset.assetAddress
       );
 

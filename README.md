@@ -20,7 +20,7 @@ You can view detailed information about each token by clicking on its card:
 
 ### Prerequisites
 
-- Node.js 18+ 
+- Node.js 18+
 - pnpm (recommended) or npm
 - API keys for:
   - [CoinMarketCap](https://coinmarketcap.com/api/)
@@ -29,12 +29,14 @@ You can view detailed information about each token by clicking on its card:
 ### Installation
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/zacharyr0th/on-aptos.git
 cd on-aptos
 ```
 
 2. Install dependencies:
+
 ```bash
 pnpm install
 # or
@@ -42,11 +44,13 @@ npm install
 ```
 
 3. Set up environment variables:
+
 ```bash
 cp .env.example .env
 ```
 
 4. Configure your `.env` file with your API keys and settings:
+
 ```env
 # Site Configuration
 NEXT_PUBLIC_SITE_URL=https://yourdomain.com
@@ -62,6 +66,7 @@ DEVELOPER_EMAIL=your-email@example.com
 ```
 
 5. Run the development server:
+
 ```bash
 pnpm dev
 # or

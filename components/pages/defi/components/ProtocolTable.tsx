@@ -31,7 +31,9 @@ interface ProtocolTableProps {
 type SortKey = 'protocol' | 'category' | 'subcategory';
 type SortDirection = 'asc' | 'desc';
 
-export const ProtocolTable = React.memo(function ProtocolTable({ filteredProtocols }: ProtocolTableProps) {
+export const ProtocolTable = React.memo(function ProtocolTable({
+  filteredProtocols,
+}: ProtocolTableProps) {
   const { isMobile } = useResponsive();
   const { getText, t } = usePageTranslation('defi');
   const [sortKey, setSortKey] = useState<SortKey>('protocol');
@@ -221,7 +223,10 @@ export const ProtocolTable = React.memo(function ProtocolTable({ filteredProtoco
                           {protocol.categoryBreakdown && !isMobile && (
                             <div className="text-xs text-muted-foreground">
                               <span className="inline-flex items-center gap-1">
-                                {t(protocol.categoryBreakdown, 'Multiple DeFi services')}
+                                {t(
+                                  protocol.categoryBreakdown,
+                                  'Multiple DeFi services'
+                                )}
                               </span>
                             </div>
                           )}
@@ -231,7 +236,10 @@ export const ProtocolTable = React.memo(function ProtocolTable({ filteredProtoco
                               {protocol.categoryBreakdown && (
                                 <div className="text-xs text-muted-foreground">
                                   <span className="inline-flex items-center gap-1 bg-muted/50 px-2 py-1 rounded-md">
-                                    {t(protocol.categoryBreakdown, 'Multiple DeFi services')}
+                                    {t(
+                                      protocol.categoryBreakdown,
+                                      'Multiple DeFi services'
+                                    )}
                                   </span>
                                 </div>
                               )}
