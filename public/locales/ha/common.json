@@ -10,6 +10,7 @@
     "rwas": "RWAs",
     "lsts": "LSTs",
     "liquid_staking": "Liquid Staking",
+    "portfolio": "Portfolio đin ku",
     "menu": "Menu",
     "mobile_menu": "Kewayawa",
     "close_menu": "Rufe menu na kewayawa",
@@ -117,12 +118,18 @@
       "choose_dashboard": "Zabi dashboard ɗin ku"
     },
     "sections": {
+      "portfolio": "Mai Bin Diddige Portfolio đin ku",
+      "portfolio_description": "Lura da kadarorin ku na Aptos, bin diddigin ayyuka da nazarin matsayin DeFi",
       "stablecoins": "Stablecoins",
+      "stablecoins_description": "Bin diddigin kayayyakin stablecoin da bayanan kasuwa akan Aptos",
       "bitcoin_assets": "Kadar Bitcoin",
+      "bitcoin_assets_description": "Tokens na Bitcoin da kayan BTC na roba akan Aptos",
+      "liquid_staking": "Liquid Staking",
+      "liquid_staking_description": "Tokens na liquid staking da abubuwan APT staking",
       "rwas": "RWAs",
       "rwas_description": "Dukiyar Duniya ta Gaskiya akan Aptos",
-      "liquid_staking": "Liquid Staking",
-      "defi_protocols": "DeFi Protocols"
+      "defi_protocols": "DeFi Protocols",
+      "defi_protocols_description": "Protocols na kuɗi marasa tsakiya da bincike"
     }
   },
   "page_titles": {
@@ -132,7 +139,8 @@
     "defi": "DeFi",
     "rwas": "RWAs",
     "whats": "Mene ne",
-    "about": "Game da"
+    "about": "Game da",
+    "portfolio": "Portfolio đin ku"
   },
   "language": {
     "english": "Turanci",

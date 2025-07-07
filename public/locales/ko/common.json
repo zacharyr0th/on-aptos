@@ -10,6 +10,7 @@
     "rwas": "실물 자산",
     "lsts": "유동성 스테이킹 토큰",
     "liquid_staking": "유동성 스테이킹",
+    "portfolio": "귀하의 포트폴리오",
     "menu": "메뉴",
     "mobile_menu": "네비게이션",
     "close_menu": "네비게이션 메뉴 닫기",
@@ -122,12 +123,18 @@
       "choose_dashboard": "대시보드를 선택하세요"
     },
     "sections": {
+      "portfolio": "귀하의 포트폴리오 트래커",
+      "portfolio_description": "Aptos 자산을 모니터링하고 성과를 추적하며 DeFi 포지션을 분석하세요",
       "stablecoins": "스테이블코인",
+      "stablecoins_description": "Aptos의 스테이블코인 공급량과 시장 데이터 추적",
       "bitcoin_assets": "비트코인 자산",
+      "bitcoin_assets_description": "비트코인 담보 토큰 및 Aptos의 합성 BTC 자산",
+      "liquid_staking": "유동성 스테이킹",
+      "liquid_staking_description": "유동성 스테이킹 토큰 및 APT 스테이킹 파생상품",
       "rwas": "실물 자산",
       "rwas_description": "Aptos의 실물 자산",
-      "liquid_staking": "유동성 스테이킹",
-      "defi_protocols": "DeFi 프로토콜"
+      "defi_protocols": "DeFi 프로토콜",
+      "defi_protocols_description": "탈중앙화 금융 프로토콜 및 분석"
     }
   },
   "page_titles": {
@@ -136,7 +143,8 @@
     "stablecoins": "스테이블코인",
     "defi": "DeFi",
     "rwas": "실물 자산",
-    "whats": "현황"
+    "whats": "현황",
+    "portfolio": "귀하의 포트폴리오"
   },
   "common": {
     "and": "그리고",

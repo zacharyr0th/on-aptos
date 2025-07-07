@@ -10,6 +10,7 @@
     "rwas": "आरडब्ल्यूए",
     "lsts": "LSTS",
     "liquid_staking": "लिक्विड स्टेकिंग",
+    "portfolio": "आपका पोर्टफोलियो",
     "menu": "मेनू",
     "mobile_menu": "नेवीगेशन",
     "close_menu": "नेवीगेशन मेनू बंद करें",
@@ -122,12 +123,18 @@
       "choose_dashboard": "अपना डैशबोर्ड चुनें"
     },
     "sections": {
+      "portfolio": "आपका पोर्टफोलियो ट्रैकर",
+      "portfolio_description": "अपनी Aptos संपत्ति की निगरानी करें, प्रदर्शन ट्रैक करें और अपनी DeFi पोजीशन का विश्लेषण करें",
       "stablecoins": "स्थिर सिक्के",
+      "stablecoins_description": "Aptos पर स्थिर सिक्का आपूर्ति और बाजार डेटा ट्रैक करें",
       "bitcoin_assets": "बिटकॉइन संपत्ति",
+      "bitcoin_assets_description": "बिटकॉइन-समर्थित टोकन और Aptos पर सिंथेटिक BTC संपत्ति",
+      "liquid_staking": "लिक्विड स्टेकिंग",
+      "liquid_staking_description": "लिक्विड स्टेकिंग टोकन और APT स्टेकिंग डेरिवेटिव",
       "rwas": "आरडब्ल्यूए",
       "rwas_description": "Aptos पर वास्तविक विश्व संपत्ति",
-      "liquid_staking": "लिक्विड स्टेकिंग",
-      "defi_protocols": "DeFi प्रोटोकॉल"
+      "defi_protocols": "DeFi प्रोटोकॉल",
+      "defi_protocols_description": "विकेंद्रीकृत वित्त प्रोटोकॉल और विश्लेषण"
     }
   },
   "page_titles": {
@@ -136,7 +143,8 @@
     "stablecoins": "स्थिर सिक्के",
     "defi": "डेफी",
     "rwas": "आरडब्ल्यूए",
-    "whats": "क्या"
+    "whats": "क्या",
+    "portfolio": "आपका पोर्टफोलियो"
   },
   "common": {
     "and": "और",

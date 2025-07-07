@@ -5,6 +5,7 @@ import './globals.css';
 import { ThemeProvider } from '@/components/layout/theme-provider';
 import { TRPCProvider } from '@/components/providers/TRPCProvider';
 import { I18nProvider } from '@/components/providers/I18nProvider';
+import { WalletProvider } from '@/components/wallet/WalletProvider';
 import { Toaster } from '@/components/ui/sonner';
 import { Analytics } from '@vercel/analytics/react';
 import { Metadata, Viewport } from 'next';
@@ -231,9 +232,11 @@ export default async function RootLayout({
               enableSystem
               disableTransitionOnChange
             >
-              <main>{children}</main>
-              <Toaster />
-              <Analytics />
+              <WalletProvider>
+                <main>{children}</main>
+                <Toaster />
+                <Analytics />
+              </WalletProvider>
             </ThemeProvider>
           </I18nProvider>
         </TRPCProvider>

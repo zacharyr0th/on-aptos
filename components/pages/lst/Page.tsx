@@ -142,12 +142,16 @@ const TokenCard = React.memo(function TokenCard({
                           <Image
                             src={
                               TOKEN_METADATA[component.symbol]?.thumbnail ||
-                              '/icons/lst/default.png'
+                              '/placeholder.jpg'
                             }
                             alt={`${component.symbol} icon`}
                             width={16}
                             height={16}
                             className="object-contain rounded-full"
+                            onError={(e) => {
+                              const img = e.target as HTMLImageElement;
+                              img.src = '/placeholder.jpg';
+                            }}
                           />
                         </div>
                         <span className="text-sm font-semibold">
@@ -162,11 +166,15 @@ const TokenCard = React.memo(function TokenCard({
               <>
                 <div className="w-5 h-5 relative mr-1">
                   <Image
-                    src={metadata?.thumbnail || '/icons/lst/default.png'}
+                    src={metadata?.thumbnail || '/placeholder.jpg'}
                     alt={`${cardSymbol} icon`}
                     width={20}
                     height={20}
                     className="object-contain"
+                    onError={(e) => {
+                      const img = e.target as HTMLImageElement;
+                      img.src = '/placeholder.jpg';
+                    }}
                   />
                 </div>
                 <h3 className="text-lg font-semibold text-card-foreground">
@@ -424,7 +432,7 @@ export default function LSTPage(): React.ReactElement {
   return (
     <RootErrorBoundary>
       <div
-        className={`min-h-screen bg-background dark:bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjMDAwIj48L3JlY3Q+CjxwYXRoIGQ9Ik0wIDVMNSAwWk02IDRMNCA2Wk0tMSAxTDEgLTFaIiBzdHJva2U9IiMyMjIiIHN0cm9rZS13aWR0aD0iMC41Ij48L3BhdGg+Cjwvc3ZnPg==')] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjZmZmIj48L3JlY3Q+CjxwYXRoIGQ9Ik0wIDVMNSAwWk02IDRMNCA2Wk0tMSAxTDEgLTFaIiBzdHJva2U9IiNlZWUiIHN0cm9rZS13aWR0aD0iMC41Ij48L3BhdGg+Cjwvc3ZnPg==')] ${GeistMono.className}`}
+        className={`min-h-screen flex flex-col bg-background dark:bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjMDAwIj48L3JlY3Q+CjxwYXRoIGQ9Ik0wIDVMNSAwWk02IDRMNCA2Wk0tMSAxTDEgLTFaIiBzdHJva2U9IiMyMjIiIHN0cm9rZS13aWR0aD0iMC41Ij48L3BhdGg+Cjwvc3ZnPg==')] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjZmZmIj48L3JlY3Q+CjxwYXRoIGQ9Ik0wIDVMNSAwWk02IDRMNCA2Wk0tMSAxTDEgLTFaIiBzdHJva2U9IiNlZWUiIHN0cm9rZS13aWR0aD0iMC41Ij48L3BhdGg+Cjwvc3ZnPg==')] ${GeistMono.className}`}
       >
         <div className="fixed top-0 left-0 right-0 h-1 z-50">
           {refreshing && <div className="h-full bg-muted animate-pulse"></div>}
@@ -432,8 +440,9 @@ export default function LSTPage(): React.ReactElement {
 
         <div className="container mx-auto px-4 sm:px-6 py-6">
           <Header />
+        </div>
 
-          <main className="my-6">
+        <main className="container mx-auto px-4 sm:px-6 py-6 flex-1">
             {loading ? (
               <LoadingState />
             ) : error ? (
@@ -486,12 +495,10 @@ export default function LSTPage(): React.ReactElement {
                 </div>
               </>
             ) : null}
-          </main>
+        </main>
 
-          <div className="mt-6">
-            <Footer />
-          </div>
-        </div>
+        <Footer />
+      </div>
       </div>
     </RootErrorBoundary>
   );

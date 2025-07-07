@@ -10,6 +10,7 @@
     "rwas": "RWAs",
     "lsts": "LSTs",
     "liquid_staking": "流动性质押",
+    "portfolio": "您的投资组合",
     "menu": "菜单",
     "mobile_menu": "导航",
     "close_menu": "关闭导航菜单",
@@ -122,12 +123,18 @@
       "choose_dashboard": "选择您的仪表板"
     },
     "sections": {
+      "portfolio": "您的投资组合跟踪器",
+      "portfolio_description": "监控您的 Aptos 资产，跟踪表现并分析您的 DeFi 仓位",
       "stablecoins": "稳定币",
+      "stablecoins_description": "跟踪 Aptos 上的稳定币供应量和市场数据",
       "bitcoin_assets": "比特币资产",
+      "bitcoin_assets_description": "比特币抵押代币和 Aptos 上的合成 BTC 资产",
+      "liquid_staking": "流动性质押",
+      "liquid_staking_description": "流动性质押代币和 APT 质押衍生品",
       "rwas": "RWAs",
       "rwas_description": "Aptos 上的现实世界资产",
-      "liquid_staking": "流动性质押",
-      "defi_protocols": "DeFi 协议"
+      "defi_protocols": "DeFi 协议",
+      "defi_protocols_description": "去中心化金融协议和分析"
     }
   },
   "page_titles": {
@@ -136,7 +143,8 @@
     "stablecoins": "稳定币",
     "defi": "DeFi",
     "rwas": "RWAs",
-    "whats": "什么"
+    "whats": "什么",
+    "portfolio": "您的投资组合"
   },
   "common": {
     "and": "和",

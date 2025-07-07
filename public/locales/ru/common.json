@@ -10,6 +10,7 @@
     "rwas": "RWA",
     "lsts": "LST",
     "liquid_staking": "Ликвидный стейкинг",
+    "portfolio": "Ваш портфель",
     "menu": "Меню",
     "mobile_menu": "Навигация",
     "close_menu": "Закрыть меню навигации",
@@ -122,12 +123,18 @@
       "choose_dashboard": "Выберите дашборд"
     },
     "sections": {
+      "portfolio": "Отслеживание вашего портфеля",
+      "portfolio_description": "Отслеживайте свои активы Aptos, следите за производительностью и анализируйте позиции DeFi",
       "stablecoins": "Стейблкоины",
+      "stablecoins_description": "Отслеживайте предложения стейблкоинов и рыночные данные в Aptos",
       "bitcoin_assets": "Bitcoin-активы",
+      "bitcoin_assets_description": "Токены, обеспеченные Bitcoin, и синтетические BTC-активы в Aptos",
+      "liquid_staking": "Ликвидный стейкинг",
+      "liquid_staking_description": "Токены ликвидного стейкинга и производные APT стейкинга",
       "rwas": "RWA",
       "rwas_description": "Реальные активы в Aptos",
-      "liquid_staking": "Ликвидный стейкинг",
-      "defi_protocols": "DeFi протоколы"
+      "defi_protocols": "DeFi протоколы",
+      "defi_protocols_description": "Протоколы децентрализованных финансов и аналитика"
     }
   },
   "page_titles": {
@@ -136,7 +143,8 @@
     "stablecoins": "Стейблкоины",
     "defi": "DeFi",
     "rwas": "RWA",
-    "whats": "Что происходит"
+    "whats": "Что происходит",
+    "portfolio": "Ваш портфель"
   },
   "common": {
     "and": "и",

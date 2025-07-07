@@ -10,6 +10,7 @@
     "rwas": "Real World Assets",
     "lsts": "Liquid Staking Tokens",
     "liquid_staking": "Liquid Staking",
+    "portfolio": "Ihr Portfolio",
     "menu": "Menü",
     "mobile_menu": "Navigation",
     "close_menu": "Navigationsmenü schließen",
@@ -122,12 +123,18 @@
       "choose_dashboard": "Wähle dein Dashboard"
     },
     "sections": {
+      "portfolio": "Ihr Portfolio-Tracker",
+      "portfolio_description": "Überwachen Sie Ihre Aptos-Assets, verfolgen Sie die Performance und analysieren Sie Ihre DeFi-Positionen",
       "stablecoins": "Stablecoins",
+      "stablecoins_description": "Verfolgen Sie Stablecoin-Bestände und Marktdaten auf Aptos",
       "bitcoin_assets": "Bitcoin-Assets",
+      "bitcoin_assets_description": "Bitcoin-gestützte Token und synthetische BTC-Assets auf Aptos",
+      "liquid_staking": "Liquid Staking",
+      "liquid_staking_description": "Liquid-Staking-Token und APT-Staking-Derivate",
       "rwas": "RWAs",
       "rwas_description": "Real-World-Assets auf Aptos",
-      "liquid_staking": "Liquid Staking",
-      "defi_protocols": "DeFi-Protokolle"
+      "defi_protocols": "DeFi-Protokolle",
+      "defi_protocols_description": "Dezentrale Finanzprotokolle und Analytics"
     }
   },
   "page_titles": {
@@ -136,7 +143,8 @@
     "stablecoins": "Stablecoins",
     "defi": "DeFi",
     "rwas": "RWAs",
-    "whats": "Was gibt's"
+    "whats": "Was gibt's",
+    "portfolio": "Ihr Portfolio"
   },
   "common": {
     "and": "und",

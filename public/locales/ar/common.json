@@ -10,6 +10,7 @@
     "rwas": "أصول العالم الحقيقي",
     "lsts": "رموز التخزين السائل",
     "liquid_staking": "التخزين السائل",
+    "portfolio": "محفظتك",
     "menu": "القائمة",
     "mobile_menu": "التنقل",
     "close_menu": "إغلاق قائمة التنقل",
@@ -122,12 +123,18 @@
       "choose_dashboard": "اختر لوحة التحكم"
     },
     "sections": {
+      "portfolio": "متتبع محفظتك",
+      "portfolio_description": "راقب أصولك في أبتوس، وتتبع الأداء، وحلل مواقع DeFi الخاصة بك",
       "stablecoins": "العملات المستقرة",
+      "stablecoins_description": "تتبع إمدادات العملات المستقرة وبيانات السوق على أبتوس",
       "bitcoin_assets": "أصول البيتكوين",
+      "bitcoin_assets_description": "رموز مدعومة بالبيتكوين وأصول BTC الاصطناعية على أبتوس",
+      "liquid_staking": "التخزين السائل",
+      "liquid_staking_description": "رموز التخزين السائل ومشتقات تخزين APT",
       "rwas": "أصول العالم الحقيقي",
       "rwas_description": "أصول العالم الحقيقي على أبتوس",
-      "liquid_staking": "التخزين السائل",
-      "defi_protocols": "بروتوكولات DeFi"
+      "defi_protocols": "بروتوكولات DeFi",
+      "defi_protocols_description": "بروتوكولات التمويل اللامركزي والتحليلات"
     }
   },
   "page_titles": {
@@ -136,7 +143,8 @@
     "stablecoins": "العملات المستقرة",
     "defi": "التمويل اللامركزي",
     "rwas": "أصول العالم الحقيقي",
-    "whats": "ماذا يوجد"
+    "whats": "ماذا يوجد",
+    "portfolio": "محفظتك"
   },
   "common": {
     "and": "و",

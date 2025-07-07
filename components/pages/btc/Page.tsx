@@ -11,7 +11,6 @@ import { TokenDialog } from '@/components/pages/btc/Dialog';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { ErrorBoundary } from '@/components/errors/ErrorBoundary';
-import { RootErrorBoundary } from '@/components/errors/RootErrorBoundary';
 import { useBitcoinPrice } from '@/hooks/useMarketPrice';
 import { trpc } from '@/lib/trpc/client';
 import Image from 'next/image';
@@ -110,12 +109,17 @@ const TokenCard = memo(function TokenCard({
                 <div className="absolute inset-0 bg-muted animate-pulse rounded-full" />
               )}
               <Image
-                src={tokenData.metadata?.thumbnail || '/icons/bitcoin.png'}
+                src={tokenData.metadata?.thumbnail || '/placeholder.jpg'}
                 alt={`${token.symbol} icon`}
                 width={20}
                 height={20}
                 className={`object-contain rounded-full ${!imageLoaded ? 'opacity-0' : ''}`}
                 onLoad={handleImageLoad}
+                onError={(e) => {
+                  const img = e.target as HTMLImageElement;
+                  img.src = '/placeholder.jpg';
+                  handleImageLoad();
+                }}
               />
             </div>
             <h3 className="text-lg font-semibold text-card-foreground">
@@ -500,9 +504,9 @@ export default function BitcoinPage(): React.ReactElement {
   }, [error, fetchSupplyData]);
 
   return (
-    <RootErrorBoundary>
+    <ErrorBoundary>
       <div
-        className={`min-h-screen bg-background dark:bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjMDAwIj48L3JlY3Q+CjxwYXRoIGQ9Ik0wIDVMNSAwWk02IDRMNCA2Wk0tMSAxTDEgLTFaIiBzdHJva2U9IiMyMjIiIHN0cm9rZS13aWR0aD0iMC41Ij48L3BhdGg+Cjwvc3ZnPg==')] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjZmZmIj48L3JlY3Q+CjxwYXRoIGQ9Ik0wIDVMNSAwWk02IDRMNCA2Wk0tMSAxTDEgLTFaIiBzdHJva2U9IiNlZWUiIHN0cm9rZS13aWR0aD0iMC41Ij48L3BhdGg+Cjwvc3ZnPg==')] ${GeistMono.className}`}
+        className={`min-h-screen flex flex-col bg-background ${GeistMono.className}`}
       >
         <div className="fixed top-0 left-0 right-0 h-1 z-50">
           {refreshing && <div className="h-full bg-muted animate-pulse"></div>}
@@ -510,8 +514,9 @@ export default function BitcoinPage(): React.ReactElement {
 
         <div className="container mx-auto px-4 sm:px-6 py-6">
           <Header />
+        </div>
 
-          <main className="my-6 overflow-visible">
+        <main className="container mx-auto px-4 sm:px-6 py-6 flex-1">
             {loading ? (
               <LoadingState />
             ) : error ? (
@@ -538,6 +543,10 @@ export default function BitcoinPage(): React.ReactElement {
                         width={20}
                         height={20}
                         className="object-contain"
+                        onError={(e) => {
+                          const img = e.target as HTMLImageElement;
+                          img.src = '/placeholder.jpg';
+                        }}
                       />
                     </div>
                     <div className="text-xs text-muted-foreground">
@@ -582,14 +591,12 @@ export default function BitcoinPage(): React.ReactElement {
                 </div>
               </>
             ) : null}
-          </main>
+        </main>
 
-          <div className="mt-6">
-            <Footer />
-          </div>
-        </div>
+        <Footer />
       </div>
-    </RootErrorBoundary>
+      </div>
+    </ErrorBoundary>
   );
 }
 

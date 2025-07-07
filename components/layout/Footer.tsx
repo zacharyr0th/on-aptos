@@ -14,6 +14,8 @@ import { trpc } from '@/lib/trpc/client';
 import { useTheme } from 'next-themes';
 import { useTranslation } from '@/hooks/useTranslation';
 import { DEVELOPER_CONFIG } from '@/lib/config/app';
+import { ThemeToggle } from '@/components/layout/theme-toggle';
+import { LanguageToggle } from '@/components/ui/language-toggle';
 
 interface FooterProps {
   showAptosAttribution?: boolean;
@@ -75,8 +77,6 @@ const AptPrice: FC = memo(function AptPrice(): ReactElement {
     setMounted(true);
   }, []);
 
-  // Determine if we should show white background (dark mode)
-  const isDark = mounted && resolvedTheme === 'dark';
 
   // Use tRPC to fetch APT price instead of direct external API calls
   const {
@@ -102,12 +102,14 @@ const AptPrice: FC = memo(function AptPrice(): ReactElement {
           alt="APT token"
           width={16}
           height={16}
-          className={`w-4 h-4 opacity-50 flex-shrink-0 rounded-full ${
-            isDark ? 'bg-white' : ''
-          }`}
+          className="w-4 h-4 opacity-50 flex-shrink-0 rounded-full dark:invert"
           priority={false}
           quality={90}
           unoptimized={false}
+          onError={(e) => {
+            const img = e.target as HTMLImageElement;
+            img.src = '/placeholder.jpg';
+          }}
         />
         <span>{t('messages.apt_price_loading', 'Loading APT price...')}</span>
       </div>
@@ -122,12 +124,14 @@ const AptPrice: FC = memo(function AptPrice(): ReactElement {
           alt="APT token"
           width={16}
           height={16}
-          className={`w-4 h-4 opacity-50 flex-shrink-0 rounded-full ${
-            isDark ? 'bg-white' : ''
-          }`}
+          className="w-4 h-4 opacity-50 flex-shrink-0 rounded-full dark:invert"
           priority={false}
           quality={90}
           unoptimized={false}
+          onError={(e) => {
+            const img = e.target as HTMLImageElement;
+            img.src = '/placeholder.jpg';
+          }}
         />
         <span>{t('messages.apt_price_unavailable')}</span>
       </div>
@@ -147,14 +151,24 @@ const AptPrice: FC = memo(function AptPrice(): ReactElement {
         alt="APT token"
         width={16}
         height={16}
-        className={`w-4 h-4 flex-shrink-0 rounded-full ${
-          isDark ? 'bg-white' : ''
-        }`}
+        className="w-4 h-4 flex-shrink-0 rounded-full dark:invert"
         priority={false}
         quality={90}
         unoptimized={false}
+        onError={(e) => {
+          const img = e.target as HTMLImageElement;
+          img.src = '/placeholder.jpg';
+        }}
       />
-      <span className="font-medium">APT: ${price.toFixed(2)}</span>
+      <span className={`font-medium ${
+        change24h !== 0 
+          ? isPositive 
+            ? 'text-green-500' 
+            : 'text-red-500'
+          : ''
+      }`}>
+        ${price.toFixed(2)}
+      </span>
       {change24h !== 0 && (
         <span
           className={`font-medium ${
@@ -215,7 +229,7 @@ const SocialLink: FC<{
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="p-2 -m-2 transition-colors duration-200 hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-md"
+      className="p-2 -m-2 text-muted-foreground hover:text-foreground transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-md"
       aria-label={label}
     >
       {icon}
@@ -231,76 +245,94 @@ const FooterComponent: FC<FooterProps> = ({
 
   return (
     <ErrorBoundary>
-      <footer className="pb-6 sm:pb-8 lg:pb-10">
-        <div className="space-y-6">
-          {/* Mobile Layout: Vertical stack */}
-          <div className="flex flex-col items-center gap-4 lg:hidden">
-            {/* 1. Social Icons and APT Price */}
-            <div className="flex items-center gap-4 text-muted-foreground">
+      <footer className="w-full py-4">
+        <div className="container mx-auto px-4 sm:px-6">
+          {/* Desktop Layout */}
+          <div className="hidden lg:flex lg:items-center lg:justify-between">
+            {/* Left: Controls & Live Data */}
+            <div className="flex items-center gap-6">
               <div className="flex items-center gap-3">
-                {DEVELOPER_CONFIG.website && (
-                  <SocialLink
-                    href={DEVELOPER_CONFIG.website}
-                    icon={<FaGlobe className="w-4 h-4" />}
-                    label={t('actions.visit_personal_website')}
-                  />
-                )}
-                {DEVELOPER_CONFIG.twitter && (
-                  <SocialLink
-                    href={`https://x.com/${DEVELOPER_CONFIG.twitter.replace('@', '')}`}
-                    icon={<FaXTwitter className="w-4 h-4" />}
-                    label={t('actions.follow_on_twitter')}
-                  />
-                )}
-                {DEVELOPER_CONFIG.github && (
-                  <SocialLink
-                    href={DEVELOPER_CONFIG.github}
-                    icon={<FaGithub className="w-4 h-4" />}
-                    label={t('actions.view_github')}
-                  />
-                )}
+                <LanguageToggle />
+                <ThemeToggle />
               </div>
               <div className="w-px h-4 bg-border"></div>
               <AptPrice />
             </div>
 
-            {/* 2. Time */}
-            <CurrentUTCTime />
+            {/* Center: Empty for balance */}
+            <div></div>
+
+            {/* Right: Social Links & Time */}
+            <div className="flex items-center gap-6">
+              <CurrentUTCTime />
+              <div className="w-px h-4 bg-border"></div>
+              <div className="flex items-center gap-3">
+                {DEVELOPER_CONFIG.website && (
+                  <SocialLink
+                    href={DEVELOPER_CONFIG.website}
+                    icon={<FaGlobe className="w-5 h-5" />}
+                    label={t('actions.visit_personal_website')}
+                  />
+                )}
+                {DEVELOPER_CONFIG.github && (
+                  <SocialLink
+                    href={DEVELOPER_CONFIG.github}
+                    icon={<FaGithub className="w-5 h-5" />}
+                    label={t('actions.view_github')}
+                  />
+                )}
+                {DEVELOPER_CONFIG.twitter && (
+                  <SocialLink
+                    href={`https://x.com/${DEVELOPER_CONFIG.twitter.replace('@', '')}`}
+                    icon={<FaXTwitter className="w-5 h-5" />}
+                    label={t('actions.follow_on_twitter')}
+                  />
+                )}
+              </div>
+            </div>
           </div>
 
-          {/* Desktop Layout: Two column layout */}
-          <div className="hidden lg:flex lg:justify-between lg:items-center">
-            {/* Left Column: Social Icons and APT Price */}
-            <div className="flex items-center gap-4 text-muted-foreground">
+          {/* Mobile Layout */}
+          <div className="flex flex-col gap-4 lg:hidden">
+            {/* Row 1: Controls & APT Price */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3">
+                  <LanguageToggle />
+                  <ThemeToggle />
+                </div>
+                <div className="w-px h-4 bg-border"></div>
+                <AptPrice />
+              </div>
               <div className="flex items-center gap-3">
                 {DEVELOPER_CONFIG.website && (
                   <SocialLink
                     href={DEVELOPER_CONFIG.website}
-                    icon={<FaGlobe className="w-4 h-4" />}
+                    icon={<FaGlobe className="w-5 h-5" />}
                     label={t('actions.visit_personal_website')}
-                  />
-                )}
-                {DEVELOPER_CONFIG.twitter && (
-                  <SocialLink
-                    href={`https://x.com/${DEVELOPER_CONFIG.twitter.replace('@', '')}`}
-                    icon={<FaXTwitter className="w-4 h-4" />}
-                    label={t('actions.follow_on_twitter')}
                   />
                 )}
                 {DEVELOPER_CONFIG.github && (
                   <SocialLink
                     href={DEVELOPER_CONFIG.github}
-                    icon={<FaGithub className="w-4 h-4" />}
+                    icon={<FaGithub className="w-5 h-5" />}
                     label={t('actions.view_github')}
                   />
                 )}
+                {DEVELOPER_CONFIG.twitter && (
+                  <SocialLink
+                    href={`https://x.com/${DEVELOPER_CONFIG.twitter.replace('@', '')}`}
+                    icon={<FaXTwitter className="w-5 h-5" />}
+                    label={t('actions.follow_on_twitter')}
+                  />
+                )}
               </div>
-              <div className="w-px h-4 bg-border"></div>
-              <AptPrice />
             </div>
-
-            {/* Right Column: Time */}
-            <CurrentUTCTime />
+            
+            {/* Row 2: Time */}
+            <div className="flex items-center justify-center">
+              <CurrentUTCTime />
+            </div>
           </div>
         </div>
       </footer>

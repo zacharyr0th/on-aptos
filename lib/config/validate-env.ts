@@ -4,6 +4,7 @@ const envSchema = z.object({
   // API Keys - optional for local development
   CMC_API_KEY: z.string().optional(),
   RWA_API_KEY: z.string().optional(),
+  PANORA_API_KEY: z.string().optional(),
   APTOS_BUILD_SECRET: z.string().optional(),
   APTOS_BUILD_KEY: z.string().optional(),
 

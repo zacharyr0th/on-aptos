@@ -148,22 +148,18 @@ const TokenCard = React.memo(function TokenCard({
                     <React.Fragment key={component.symbol}>
                       <div className="flex items-center">
                         <div className="w-6 h-6 relative flex-shrink-0 mr-1">
-                          {TOKEN_METADATA[component.symbol]?.thumbnail ? (
-                            <Image
-                              src={TOKEN_METADATA[component.symbol].thumbnail}
-                              alt={`${component.symbol} icon`}
-                              width={24}
-                              height={24}
-                              className="object-contain w-full h-full"
-                              priority
-                            />
-                          ) : (
-                            <div className="w-full h-full bg-muted rounded-full flex items-center justify-center">
-                              <span className="text-xs font-medium text-muted-foreground">
-                                {component.symbol.charAt(0)}
-                              </span>
-                            </div>
-                          )}
+                          <Image
+                            src={TOKEN_METADATA[component.symbol]?.thumbnail || '/placeholder.jpg'}
+                            alt={`${component.symbol} icon`}
+                            width={24}
+                            height={24}
+                            className="object-contain w-full h-full rounded-full"
+                            priority
+                            onError={(e) => {
+                              const img = e.target as HTMLImageElement;
+                              img.src = '/placeholder.jpg';
+                            }}
+                          />
                         </div>
                         <span className="text-sm font-semibold">
                           {component.symbol}
@@ -178,22 +174,18 @@ const TokenCard = React.memo(function TokenCard({
             ) : (
               <>
                 <div className="w-6 h-6 relative flex-shrink-0">
-                  {metadata?.thumbnail ? (
-                    <Image
-                      src={metadata.thumbnail}
-                      alt={`${cardSymbol} icon`}
-                      width={24}
-                      height={24}
-                      className="object-contain w-full h-full"
-                      priority
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-muted rounded-full flex items-center justify-center">
-                      <span className="text-xs font-medium text-muted-foreground">
-                        {cardSymbol.charAt(0)}
-                      </span>
-                    </div>
-                  )}
+                  <Image
+                    src={metadata?.thumbnail || '/placeholder.jpg'}
+                    alt={`${cardSymbol} icon`}
+                    width={24}
+                    height={24}
+                    className="object-contain w-full h-full rounded-full"
+                    priority
+                    onError={(e) => {
+                      const img = e.target as HTMLImageElement;
+                      img.src = '/placeholder.jpg';
+                    }}
+                  />
                 </div>
                 <h3 className="text-lg font-semibold text-card-foreground">
                   {cardSymbol}
@@ -541,7 +533,7 @@ export default function StablesPage(): React.ReactElement {
   return (
     <RootErrorBoundary>
       <div
-        className={`min-h-screen bg-background dark:bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjMDAwIj48L3JlY3Q+CjxwYXRoIGQ9Ik0wIDVMNSAwWk02IDRMNCA2Wk0tMSAxTDEgLTFaIiBzdHJva2U9IiMyMjIiIHN0cm9rZS13aWR0aD0iMC41Ij48L3BhdGg+Cjwvc3ZnPg==')] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjZmZmIj48L3JlY3Q+CjxwYXRoIGQ9Ik0wIDVMNSAwWk02IDRMNCA2Wk0tMSAxTDEgLTFaIiBzdHJva2U9IiNlZWUiIHN0cm9rZS13aWR0aD0iMC41Ij48L3BhdGg+Cjwvc3ZnPg==')] ${GeistMono.className}`}
+        className={`min-h-screen flex flex-col bg-background dark:bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjMDAwIj48L3JlY3Q+CjxwYXRoIGQ9Ik0wIDVMNSAwWk02IDRMNCA2Wk0tMSAxTDEgLTFaIiBzdHJva2U9IiMyMjIiIHN0cm9rZS13aWR0aD0iMC41Ij48L3BhdGg+Cjwvc3ZnPg==')] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjZmZmIj48L3JlY3Q+CjxwYXRoIGQ9Im0wIDVMNSAwWk02IDRMNCA2Wk0tMSAxTDEgLTFaIiBzdHJva2U9IiNlZWUiIHN0cm9rZS13aWR0aD0iMC41Ij48L3BhdGg+Cjwvc3ZnPg==')] ${GeistMono.className}`}
       >
         <div className="fixed top-0 left-0 right-0 h-1 z-50">
           {refreshing && <div className="h-full bg-muted animate-pulse"></div>}
@@ -549,8 +541,9 @@ export default function StablesPage(): React.ReactElement {
 
         <div className="container mx-auto px-4 sm:px-6 py-6">
           <Header />
+        </div>
 
-          <main className="my-6">
+        <main className="container mx-auto px-4 sm:px-6 py-6 flex-1">
             {loading ? (
               <LoadingState />
             ) : error ? (
@@ -609,12 +602,10 @@ export default function StablesPage(): React.ReactElement {
                 </div>
               </>
             ) : null}
-          </main>
+        </main>
 
-          <div className="mt-6">
-            <Footer />
-          </div>
-        </div>
+        <Footer />
+      </div>
       </div>
     </RootErrorBoundary>
   );

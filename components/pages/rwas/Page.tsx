@@ -236,6 +236,11 @@ const TokenCard = memo(function TokenCard({
                 height={20}
                 className={`object-contain rounded-full ${!imageLoaded ? 'opacity-0' : ''}`}
                 onLoad={handleImageLoad}
+                onError={(e) => {
+                  const img = e.target as HTMLImageElement;
+                  img.src = '/placeholder.jpg';
+                  handleImageLoad();
+                }}
               />
             </div>
             <h3
@@ -647,13 +652,14 @@ export default function RWAsPage(): React.ReactElement {
 
   return (
     <RootErrorBoundary>
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen flex flex-col bg-background">
         <div
           className={`container mx-auto ${isMobile ? 'px-3' : 'px-4 sm:px-6'} py-6`}
         >
           <Header />
+        </div>
 
-          <main className="my-6 overflow-visible">
+        <main className={`container mx-auto ${isMobile ? 'px-3' : 'px-4 sm:px-6'} py-6 flex-1`}>
             {loading ? (
               <LoadingState />
             ) : error ? (
@@ -702,6 +708,10 @@ export default function RWAsPage(): React.ReactElement {
                         width={12}
                         height={12}
                         className="inline rounded-full"
+                        onError={(e) => {
+                          const img = e.target as HTMLImageElement;
+                          img.src = '/placeholder.jpg';
+                        }}
                       />
                     </div>
                   </div>
@@ -836,12 +846,10 @@ export default function RWAsPage(): React.ReactElement {
                 </div>
               </>
             ) : null}
-          </main>
+        </main>
 
-          <div className="mt-6">
-            <Footer />
-          </div>
-        </div>
+        <Footer />
+      </div>
       </div>
     </RootErrorBoundary>
   );

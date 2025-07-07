@@ -1,6 +1,15 @@
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '@/hooks/useTranslation';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { 
+  ArrowRight, 
+  Construction,
+  BarChart3,
+  Code
+} from 'lucide-react';
 
 interface Icon {
   name: string;
@@ -28,12 +37,6 @@ export const IconSection = ({
   const router = useRouter();
   const { t } = useTranslation('common');
 
-  // Convert tRPC procedure names to REST API URLs that internally use tRPC
-  const getApiUrl = (endpoint: string) => {
-    // Now we're directly passing API URLs, so just return them as-is
-    return endpoint;
-  };
-
   const handleSectionClick = () => {
     router.push(route);
   };
@@ -41,78 +44,102 @@ export const IconSection = ({
   const handleApiClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!underConstruction) {
-      window.open(getApiUrl(apiEndpoint), '_blank', 'noreferrer');
+      window.open(apiEndpoint, '_blank', 'noreferrer');
     }
   };
 
   return (
-    <div
+    <Card 
+      className="group relative overflow-hidden border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-lg cursor-pointer bg-card/50 backdrop-blur-sm h-[240px] flex flex-col"
       onClick={handleSectionClick}
-      className="block group bg-white/90 dark:bg-black/90 backdrop-blur-sm rounded-3xl p-4 sm:p-6 border border-black/10 dark:border-white/10 hover:bg-white dark:hover:bg-black hover:border-black/20 dark:hover:border-white/20 transition-all duration-500 hover:shadow-xl hover:shadow-black/10 dark:hover:shadow-white/10 hover:-translate-y-1 cursor-pointer h-[280px] w-full flex flex-col relative overflow-hidden"
     >
-      {/* Header */}
-      <div className={`mb-4 ${description ? 'space-y-2' : ''}`}>
-        <h3 className="text-xl sm:text-2xl font-semibold text-black dark:text-white group-hover:text-primary transition-colors duration-300">
-          {title}
-        </h3>
-        {description && (
-          <p className="text-sm sm:text-base text-black/70 dark:text-white/70 leading-relaxed">
-            {description}
-          </p>
-        )}
-      </div>
-
-      {/* Icons grid - flex-grow to take up remaining space */}
-      <div className="flex justify-center items-center mb-4 flex-grow">
-        <div className="grid grid-cols-4 gap-2 sm:gap-4 max-w-fit">
-          {icons.map((icon, iconIndex) => {
-            // Check if icon is SVG data URI (DeFi card icons)
-            const isSvgIcon = icon.src.startsWith('data:image/svg+xml');
-
-            return (
-              <div
-                key={iconIndex}
-                className="flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-white dark:bg-black rounded-xl shadow-sm border border-black/20 dark:border-white/20 group-hover:shadow-md group-hover:scale-105 transition-all duration-300"
-              >
-                <Image
-                  src={icon.src}
-                  alt={icon.name}
-                  width={28}
-                  height={28}
-                  className={`rounded-sm w-7 h-7 sm:w-8 sm:h-8 object-contain ${isSvgIcon ? 'dark:invert' : ''}`}
-                />
-              </div>
-            );
-          })}
+      {/* Status Badge */}
+      {underConstruction && (
+        <div className="absolute top-4 right-4 z-10">
+          <Badge variant="secondary" className="text-xs">
+            <Construction className="w-3 h-3 mr-1" />
+            Coming Soon
+          </Badge>
         </div>
-      </div>
+      )}
 
-      {/* API endpoint or Coming Soon - clickable - fixed at bottom */}
-      <div className="text-xs sm:text-sm text-black/60 dark:text-white/60 bg-white/50 dark:bg-black/50 rounded-xl px-4 py-2 border border-black/10 dark:border-white/10 font-mono group-hover:bg-white/70 dark:group-hover:bg-black/70 transition-colors duration-300 mt-auto">
-        {underConstruction ? (
-          <div className="text-center">
-            <span className="text-black/80 dark:text-white/80 font-medium">
-              {t('labels.coming_soon')}
-            </span>
+      <CardHeader className="pb-3 flex-shrink-0">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2 min-w-0 flex-1">
+            <div className="w-2 h-2 bg-primary rounded-full animate-pulse flex-shrink-0" />
+            <CardTitle className="text-lg font-bold group-hover:text-primary transition-colors truncate">
+              {title}
+            </CardTitle>
+            <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all duration-300 flex-shrink-0" />
           </div>
-        ) : (
-          <>
-            <span className="text-black/40 dark:text-white/40">
-              {t('labels.api')}:
-            </span>{' '}
-            <button
-              onClick={handleApiClick}
-              className="text-black/80 dark:text-white/80 hover:text-primary dark:hover:text-primary underline decoration-dotted underline-offset-2 transition-colors duration-200 bg-transparent border-none p-0 font-mono text-xs sm:text-sm cursor-pointer"
-              aria-label={t(
-                'labels.open_api_endpoint',
-                'Open API endpoint in new tab'
-              )}
-            >
-              {apiEndpoint}
-            </button>
-          </>
+        </div>
+        
+        {description && (
+          <CardDescription className="text-sm leading-relaxed line-clamp-2">
+            {description}
+          </CardDescription>
         )}
-      </div>
-    </div>
+      </CardHeader>
+
+      <CardContent className="flex-1 flex flex-col justify-between space-y-4">
+        {/* Protocol Icons */}
+        <div className="flex justify-center">
+          <div className="grid grid-cols-4 gap-2 max-w-fit">
+            {icons.slice(0, 4).map((icon, iconIndex) => {
+              const isSvgIcon = icon.src.startsWith('data:image/svg+xml');
+
+              return (
+                <div
+                  key={iconIndex}
+                  className="relative group/icon flex items-center justify-center w-10 h-10 bg-background border border-border rounded-lg shadow-sm hover:shadow-md hover:scale-105 transition-all duration-300"
+                >
+                  <Image
+                    src={icon.src}
+                    alt={icon.name}
+                    width={20}
+                    height={20}
+                    className={`w-5 h-5 object-contain transition-transform duration-300 group-hover/icon:scale-110 ${isSvgIcon ? 'dark:invert' : ''}`}
+                  />
+                  
+                  {/* Tooltip */}
+                  <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-popover text-popover-foreground text-xs px-2 py-1 rounded border border-border opacity-0 group-hover/icon:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-10">
+                    {icon.name}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Footer Actions */}
+        <div className="flex items-center gap-2 mt-auto">
+          {/* Dashboard Button */}
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="group/btn flex-1"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleSectionClick();
+            }}
+          >
+            <BarChart3 className="w-4 h-4 mr-2" />
+            Dashboard
+          </Button>
+
+          {/* API Button */}
+          {!underConstruction && (
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="px-3"
+              onClick={handleApiClick}
+            >
+              <Code className="w-4 h-4" />
+            </Button>
+          )}
+        </div>
+      </CardContent>
+    </Card>
   );
 };

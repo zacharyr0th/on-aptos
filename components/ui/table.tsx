@@ -12,7 +12,7 @@ function Table({ className, ...props }: React.ComponentProps<'table'>) {
     >
       <table
         data-slot="table"
-        className={cn('w-full caption-bottom text-sm', className)}
+        className={cn('w-full caption-bottom text-base', className)}
         {...props}
       />
     </div>
@@ -65,16 +65,60 @@ function TableRow({ className, ...props }: React.ComponentProps<'tr'>) {
   );
 }
 
-function TableHead({ className, ...props }: React.ComponentProps<'th'>) {
+function TableHead({
+  className,
+  sortable,
+  onSort,
+  sortDirection,
+  ...props
+}: React.ComponentProps<'th'> & {
+  sortable?: boolean;
+  onSort?: () => void;
+  sortDirection?: 'asc' | 'desc' | null;
+}) {
   return (
     <th
       data-slot="table-head"
       className={cn(
         'text-foreground h-10 px-2 text-left align-middle font-medium whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]',
+        sortable && 'cursor-pointer hover:bg-muted/50 select-none',
         className
       )}
+      onClick={sortable ? onSort : undefined}
       {...props}
-    />
+    >
+      <div className="flex items-center gap-1">
+        {props.children}
+        {sortable && (
+          <div className="flex flex-col">
+            <svg
+              className={cn(
+                'h-3 w-3',
+                sortDirection === 'asc'
+                  ? 'text-foreground'
+                  : 'text-muted-foreground/50'
+              )}
+              fill="currentColor"
+              viewBox="0 0 8 8"
+            >
+              <path d="M0 6l4-4 4 4H0z" />
+            </svg>
+            <svg
+              className={cn(
+                'h-3 w-3 -mt-1',
+                sortDirection === 'desc'
+                  ? 'text-foreground'
+                  : 'text-muted-foreground/50'
+              )}
+              fill="currentColor"
+              viewBox="0 0 8 8"
+            >
+              <path d="M8 2L4 6 0 2h8z" />
+            </svg>
+          </div>
+        )}
+      </div>
+    </th>
   );
 }
 

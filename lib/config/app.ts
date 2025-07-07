@@ -29,9 +29,9 @@ export const APP_CONFIG = {
 export const DEVELOPER_CONFIG = {
   name: process.env.DEVELOPER_NAME || 'Developer',
   email: process.env.DEVELOPER_EMAIL || 'developer@example.com',
-  website: process.env.DEVELOPER_WEBSITE || '',
-  twitter: process.env.DEVELOPER_TWITTER || '',
-  github: process.env.DEVELOPER_GITHUB || '',
+  website: process.env.DEVELOPER_WEBSITE || 'https://onaptos.com',
+  twitter: process.env.DEVELOPER_TWITTER || 'onaptos',
+  github: process.env.DEVELOPER_GITHUB || 'https://github.com/zacharytyhacz',
   linkedin: process.env.DEVELOPER_LINKEDIN || '',
 } as const;
 

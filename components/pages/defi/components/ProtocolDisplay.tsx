@@ -150,30 +150,22 @@ export const ProtocolDisplay = React.memo(function ProtocolDisplay({
               >
                 {/* Protocol Logo */}
                 <div className="flex-shrink-0">
-                  {protocol.logo ? (
-                    <div
-                      className={`relative rounded-full overflow-hidden bg-secondary ${isMobile ? 'w-16 h-16' : 'w-10 h-10'}`}
-                    >
-                      <Image
-                        src={protocol.logo}
-                        alt={`${protocol.title} logo`}
-                        fill
-                        sizes={isMobile ? '64px' : '40px'}
-                        priority={index < 8 || protocol.title === 'Amnis'}
-                        className="object-cover"
-                      />
-                    </div>
-                  ) : (
-                    <div
-                      className={`rounded-full bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center ${isMobile ? 'w-16 h-16' : 'w-10 h-10'}`}
-                    >
-                      <span
-                        className={`font-semibold text-gray-600 dark:text-gray-300 ${isMobile ? 'text-xl' : 'text-sm'}`}
-                      >
-                        {protocol.title.charAt(0)}
-                      </span>
-                    </div>
-                  )}
+                  <div
+                    className={`relative rounded-full overflow-hidden bg-secondary ${isMobile ? 'w-16 h-16' : 'w-10 h-10'}`}
+                  >
+                    <Image
+                      src={protocol.logo || '/placeholder.jpg'}
+                      alt={`${protocol.title} logo`}
+                      fill
+                      sizes={isMobile ? '64px' : '40px'}
+                      priority={index < 8 || protocol.title === 'Amnis'}
+                      className="object-cover"
+                      onError={(e) => {
+                        const img = e.target as HTMLImageElement;
+                        img.src = '/placeholder.jpg';
+                      }}
+                    />
+                  </div>
                 </div>
 
                 {/* Title and Social Links */}

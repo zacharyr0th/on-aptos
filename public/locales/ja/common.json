@@ -10,6 +10,7 @@
     "rwas": "RWA（実世界資産）",
     "lsts": "LST",
     "liquid_staking": "リキッドステーキング",
+    "portfolio": "あなたのポートフォリオ",
     "menu": "メニュー",
     "mobile_menu": "ナビゲーション",
     "close_menu": "ナビゲーションメニューを閉じる",
@@ -122,12 +123,18 @@
       "choose_dashboard": "ダッシュボードを選択"
     },
     "sections": {
+      "portfolio": "あなたのポートフォリオトラッカー",
+      "portfolio_description": "Aptosアセットを監視し、パフォーマンスを追跡し、DeFiポジションを分析",
       "stablecoins": "ステーブルコイン",
+      "stablecoins_description": "Aptos上のステーブルコイン供給量と市場データを追跡",
       "bitcoin_assets": "ビットコイン資産",
+      "bitcoin_assets_description": "ビットコイン担保トークンとAptos上の合成BTC資産",
+      "liquid_staking": "リキッドステーキング",
+      "liquid_staking_description": "リキッドステーキングトークンとAPTステーキング派生商品",
       "rwas": "RWA（実世界資産）",
       "rwas_description": "Aptos上の実世界資産",
-      "liquid_staking": "リキッドステーキング",
-      "defi_protocols": "DeFiプロトコル"
+      "defi_protocols": "DeFiプロトコル",
+      "defi_protocols_description": "分散型金融プロトコルと分析"
     }
   },
   "page_titles": {
@@ -136,7 +143,8 @@
     "stablecoins": "ステーブルコイン",
     "defi": "DeFi",
     "rwas": "RWA",
-    "whats": "今"
+    "whats": "今",
+    "portfolio": "あなたのポートフォリオ"
   },
   "common": {
     "and": "と",
