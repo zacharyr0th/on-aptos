@@ -60,11 +60,12 @@ export function middleware(request: NextRequest) {
   // Content Security Policy - relaxed for development
   const csp = [
     "default-src 'self'",
-    `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live https://va.vercel-scripts.com https://*.vercel-scripts.com`,
+    `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live https://va.vercel-scripts.com https://*.vercel-scripts.com https://www.googletagmanager.com`,
     `style-src 'self' 'unsafe-inline'`,
     "img-src 'self' data: https: blob:",
     "font-src 'self' data: https:",
     "connect-src 'self' https://api.coinmarketcap.com https://api.panora.exchange https: wss: ws:",
+    "frame-src 'self' https://vercel.live",
     "frame-ancestors 'self'",
     "base-uri 'self'",
     "form-action 'self'",

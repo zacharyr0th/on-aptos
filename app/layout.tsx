@@ -226,8 +226,6 @@ export default async function RootLayout({
             __html: JSON.stringify(structuredData),
           }}
         />
-        {/* Explicit manifest link (Next.js also injects) */}
-        <link rel="manifest" href="/manifest.webmanifest" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}
