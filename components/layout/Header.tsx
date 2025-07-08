@@ -3,9 +3,9 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useWallet } from '@aptos-labs/wallet-adapter-react';
 import { ThemeToggle } from '@/components/layout/theme-toggle';
 import { LanguageToggle } from '@/components/ui/language-toggle';
-import { WalletConnectButton } from '@/components/wallet/WalletConnectButton';
 import { ErrorBoundary } from '../errors/ErrorBoundary';
 import {
   Menu,
@@ -15,8 +15,10 @@ import {
   Building2,
   TrendingUp,
   Briefcase,
+  LogOut,
 } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
+import { trpc } from '@/lib/trpc/client';
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -26,18 +28,55 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { defiProtocols } from '@/components/pages/defi/data/protocols';
 import Image from 'next/image';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 const HeaderComponent = (): React.ReactElement | null => {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const isHomePage = pathname === '/';
   const { t } = useTranslation('common');
+  const { account, connected, disconnect } = useWallet();
+
+  const walletAddress = account?.address?.toString();
+
+  // Fetch primary ANS name for the connected wallet
+  const { data: primaryName } =
+    trpc.domains.blockchain.portfolio.getPrimaryName.useQuery(
+      { walletAddress: walletAddress || '' },
+      {
+        enabled: !!walletAddress && connected,
+        refetchInterval: 300000, // 5 minutes
+        staleTime: 180000, // 3 minutes
+      }
+    );
+
+  const truncateAddress = (address: string) => {
+    if (!address) return '';
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  };
+
+  const getPortfolioLabel = () => {
+    if (!connected) return 'Portfolio';
+    if (primaryName)
+      return primaryName.charAt(0).toUpperCase() + primaryName.slice(1);
+    if (walletAddress) return truncateAddress(walletAddress);
+    return 'Portfolio';
+  };
 
   const title = useMemo(() => {
     const pageKeys: Record<string, string> = {
@@ -96,7 +135,7 @@ const HeaderComponent = (): React.ReactElement | null => {
 
   return (
     <ErrorBoundary>
-      <header className="relative mb-4 sm:mb-6 md:mb-8">
+      <header className="relative">
         <div className="flex items-center justify-between w-full">
           {/* Logo */}
           <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold">
@@ -111,7 +150,7 @@ const HeaderComponent = (): React.ReactElement | null => {
             </Link>
           </h1>
 
-          {/* Desktop Navigation */}
+          {/* Desktop Navigation - Show on tablet and up */}
           <div className="hidden md:flex items-center gap-4">
             <div className="relative">
               <NavigationMenu delayDuration={0}>
@@ -122,7 +161,7 @@ const HeaderComponent = (): React.ReactElement | null => {
                       Assets
                     </NavigationMenuTrigger>
                     <NavigationMenuContent>
-                      <ul className="grid w-[280px] gap-2 p-4">
+                      <ul className="grid w-[280px] lg:w-[320px] gap-2 p-4">
                         <ListItem
                           href="/stablecoins"
                           title={t('navigation.stablecoins', 'Stablecoins')}
@@ -169,6 +208,18 @@ const HeaderComponent = (): React.ReactElement | null => {
                       <div className="w-[320px]">
                         <ScrollArea className="h-[450px] rounded-md scroll-smooth">
                           <div className="p-4">
+                            {/* Dashboard Category */}
+                            <div className="relative">
+                              <Link
+                                href="/defi"
+                                className="sticky top-0 bg-popover z-10 text-xs font-semibold text-muted-foreground uppercase tracking-wider py-2 block hover:text-foreground transition-colors flex items-center gap-2"
+                              >
+                                <TrendingUp className="h-4 w-4 flex-shrink-0" />
+                                Dashboard
+                              </Link>
+                              <div className="pb-2"></div>
+                            </div>
+
                             {/* Group protocols by category */}
                             {['Trading', 'Credit', 'Yield', 'Multiple'].map(
                               category => {
@@ -181,14 +232,11 @@ const HeaderComponent = (): React.ReactElement | null => {
                                 if (categoryProtocols.length === 0) return null;
 
                                 return (
-                                  <div
-                                    key={category}
-                                    className="mb-4 last:mb-0"
-                                  >
-                                    <h4 className="sticky top-0 bg-background/95 backdrop-blur-md border-b border-border/50 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 py-2 px-1 rounded-sm shadow-sm">
+                                  <div key={category} className="relative">
+                                    <h4 className="sticky top-0 bg-popover z-10 text-xs font-semibold text-muted-foreground uppercase tracking-wider py-2">
                                       {category}
                                     </h4>
-                                    <div className="grid gap-1">
+                                    <div className="grid gap-1 pb-2">
                                       {categoryProtocols.map(protocol => (
                                         <Link
                                           key={protocol.title}
@@ -209,41 +257,44 @@ const HeaderComponent = (): React.ReactElement | null => {
                                               alt={`${protocol.title} logo`}
                                               fill
                                               className="object-contain rounded"
-                                              onError={(e) => {
-                                                const img = e.target as HTMLImageElement;
+                                              onError={e => {
+                                                const img =
+                                                  e.target as HTMLImageElement;
                                                 img.src = '/placeholder.jpg';
                                               }}
                                             />
                                           </div>
                                           <div className="flex-1 min-w-0">
-                                            <div className="flex items-center gap-2 flex-wrap">
+                                            <div className="flex items-center justify-between gap-2">
                                               <span className="font-medium truncate">
                                                 {protocol.title}
                                               </span>
-                                              {protocol.category ===
-                                                'Multiple' &&
-                                              protocol.subcategory.includes(
-                                                ','
-                                              ) ? (
-                                                protocol.subcategory
-                                                  .split(',')
-                                                  .map((sub, idx) => (
-                                                    <Badge
-                                                      key={idx}
-                                                      variant="outline"
-                                                      className="h-4 px-1 text-[10px] flex-shrink-0"
-                                                    >
-                                                      {sub.trim()}
-                                                    </Badge>
-                                                  ))
-                                              ) : (
-                                                <Badge
-                                                  variant="outline"
-                                                  className="h-4 px-1 text-[10px] flex-shrink-0"
-                                                >
-                                                  {protocol.subcategory}
-                                                </Badge>
-                                              )}
+                                              <div className="flex items-center gap-1 flex-shrink-0">
+                                                {protocol.category ===
+                                                  'Multiple' &&
+                                                protocol.subcategory.includes(
+                                                  ','
+                                                ) ? (
+                                                  protocol.subcategory
+                                                    .split(',')
+                                                    .map((sub, idx) => (
+                                                      <Badge
+                                                        key={idx}
+                                                        variant="outline"
+                                                        className="h-4 px-1 text-[10px] flex-shrink-0"
+                                                      >
+                                                        {sub.trim()}
+                                                      </Badge>
+                                                    ))
+                                                ) : (
+                                                  <Badge
+                                                    variant="outline"
+                                                    className="h-4 px-1 text-[10px] flex-shrink-0"
+                                                  >
+                                                    {protocol.subcategory}
+                                                  </Badge>
+                                                )}
+                                              </div>
                                             </div>
                                           </div>
                                         </Link>
@@ -261,30 +312,57 @@ const HeaderComponent = (): React.ReactElement | null => {
 
                   {/* Portfolio Link */}
                   <NavigationMenuItem>
-                    <NavigationMenuLink asChild>
-                      <Link
-                        href="/portfolio"
-                        className={navigationMenuTriggerStyle()}
-                      >
-                        Your Portfolio
-                      </Link>
-                    </NavigationMenuLink>
+                    {connected ? (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger
+                          className={cn(
+                            navigationMenuTriggerStyle(),
+                            'bg-transparent hover:bg-accent rounded-lg transition-all duration-200 px-3 py-2',
+                            'font-mono text-sm'
+                          )}
+                        >
+                          {getPortfolioLabel()}
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            onClick={() => disconnect()}
+                            className="cursor-pointer text-destructive"
+                          >
+                            <LogOut className="mr-2 h-4 w-4" />
+                            Disconnect
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    ) : (
+                      <NavigationMenuLink asChild>
+                        <Link
+                          href="/portfolio"
+                          className={cn(
+                            navigationMenuTriggerStyle(),
+                            'bg-transparent hover:bg-accent rounded-lg transition-all duration-200 px-3 py-2'
+                          )}
+                        >
+                          {getPortfolioLabel()}
+                        </Link>
+                      </NavigationMenuLink>
+                    )}
                   </NavigationMenuItem>
                 </NavigationMenuList>
               </NavigationMenu>
             </div>
-            <WalletConnectButton />
           </div>
 
           {/* Mobile Controls */}
           <div className="flex items-center gap-2 md:hidden">
-            <WalletConnectButton />
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
                   onClick={toggleMenu}
                   className="p-2 -mr-2 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-md transition-colors hover:bg-muted"
-                  aria-label={t('navigation.toggle_menu', 'Toggle navigation menu')}
+                  aria-label={t(
+                    'navigation.toggle_menu',
+                    'Toggle navigation menu'
+                  )}
                   aria-expanded={mobileMenuOpen}
                   aria-controls="mobile-navigation"
                 >
@@ -313,7 +391,7 @@ const HeaderComponent = (): React.ReactElement | null => {
             />
 
             {/* Mobile Menu */}
-            <nav 
+            <nav
               id="mobile-navigation"
               className="fixed top-0 right-0 h-full w-72 max-w-[85vw] bg-background border-l border-border z-50 md:hidden shadow-xl"
               role="navigation"
@@ -403,7 +481,9 @@ const HeaderComponent = (): React.ReactElement | null => {
                       active={pathname === '/portfolio'}
                       onClick={closeMenu}
                     >
-                      {t('navigation.portfolio', 'Your Portfolio')}
+                      {connected
+                        ? getPortfolioLabel()
+                        : t('navigation.portfolio', 'Portfolio')}
                     </MobileNavLink>
                   </div>
                 </div>

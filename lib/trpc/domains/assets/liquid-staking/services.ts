@@ -1,9 +1,12 @@
 import { LST_TOKENS as TOKENS } from '@/lib/config/data';
 import { SERVICE_CONFIG } from '@/lib/config/cache';
+import { getEnvVar } from '@/lib/config/validate-env';
 import {
   graphQLRequest,
   formatBigIntWithDecimals,
+  batchRequests,
   type FetchOptions,
+  type BatchRequestOptions,
 } from '@/lib/utils';
 import type { LSTSupplyResponse } from './schemas';
 
@@ -46,6 +49,16 @@ async function executeGraphQLQuery(
     'User-Agent': 'Next.js/14 DeFi-Dashboard (LST-Supplies)',
   };
 
+  // Add Aptos API key if available
+  const aptosKey = getEnvVar('APTOS_BUILD_KEY');
+  const aptosSecret = getEnvVar('APTOS_BUILD_SECRET');
+
+  if (aptosKey) {
+    headers['Authorization'] = `Bearer ${aptosKey}`;
+  } else if (aptosSecret) {
+    headers['x-api-key'] = aptosSecret;
+  }
+
   const fetchOptions: FetchOptions = {
     timeout: config.timeout,
     retries: config.retries,
@@ -69,8 +82,17 @@ function formatTokenAmount(amount: bigint, decimals: number): string {
 export async function fetchLSTSuppliesData(): Promise<
   LSTSupplyResponse['data']
 > {
-  // Fetch each token supply individually with direct queries
-  const suppliesPromises = TOKENS.map(async token => {
+  let rateLimitError: Error | null = null;
+  let successfulFetches = 0;
+
+  // Create batch requests with delay to avoid rate limiting
+  const batchOptions: BatchRequestOptions = {
+    concurrency: 2, // Process 2 requests at a time
+    delayBetween: 100, // 100ms delay between batches
+  };
+
+  // Create request functions for batch processing
+  const requestFunctions = TOKENS.map(token => async () => {
     try {
       const result = (await executeGraphQLQuery(DIRECT_QUERY, {
         type: token.asset_type,
@@ -86,6 +108,8 @@ export async function fetchLSTSuppliesData(): Promise<
         }
       }
 
+      successfulFetches++;
+
       return {
         symbol: token.symbol,
         name: token.name,
@@ -95,7 +119,17 @@ export async function fetchLSTSuppliesData(): Promise<
         asset_type: token.asset_type,
       };
     } catch (e) {
-      console.error(`Failed to resolve token ${token.symbol}:`, e);
+      const error = e as Error;
+      console.error(`Failed to resolve token ${token.symbol}:`, error);
+
+      // Check if this is a rate limit error
+      if (
+        error.message?.includes('429') ||
+        error.message?.includes('rate limit')
+      ) {
+        rateLimitError = error;
+      }
+
       return {
         symbol: token.symbol,
         name: token.name,
@@ -107,8 +141,13 @@ export async function fetchLSTSuppliesData(): Promise<
     }
   });
 
-  // Wait for all promises to resolve
-  const supplies = await Promise.all(suppliesPromises);
+  // Execute requests with rate limiting
+  const supplies = await batchRequests(requestFunctions, batchOptions);
+
+  // If we hit rate limits and got no successful fetches, throw the error
+  if (rateLimitError && successfulFetches === 0) {
+    throw rateLimitError;
+  }
 
   const totalRaw = supplies.reduce((sum, t) => sum + BigInt(t.supply), 0n);
   const totalFormatted = formatTokenAmount(totalRaw, 8);
@@ -122,6 +161,8 @@ export async function fetchLSTSuppliesData(): Promise<
       tokenCount: TOKENS.length,
       indexerUrl: INDEXER_URL,
       query: 'direct_balances',
+      successfulFetches,
+      hadRateLimitError: !!rateLimitError,
     },
   };
 }

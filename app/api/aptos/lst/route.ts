@@ -27,8 +27,6 @@ export async function GET() {
       }
     },
     {
-      cacheKey: 'lst-supplies',
-      cacheName: 'lst',
       customHeaders: {
         'Cache-Control': `public, max-age=${Math.floor(SERVICE_CONFIG.lst.ttl / 1000)}, stale-while-revalidate=${Math.floor(SERVICE_CONFIG.lst.ttl / 2000)}`,
         'X-Content-Type': 'application/json',

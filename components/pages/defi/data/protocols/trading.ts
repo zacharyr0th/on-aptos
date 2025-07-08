@@ -122,53 +122,6 @@ export const tradingProtocols: DefiProtocol[] = [
     },
   },
   {
-    title: 'Thetis',
-    href: 'https://thetis.market',
-    description: 'defi:protocol_descriptions.Thetis',
-    category: 'Trading',
-    subcategory: 'DEX Aggregator',
-    categoryBreakdown: undefined,
-    implementation: DexAggregatorImplementation.ROUTE_OPTIMIZATION,
-    status: 'Active',
-    launchDate: undefined,
-    color: 'from-purple-500 to-pink-500',
-    logo: '/icons/protocols/thetis.webp',
-    lastUpdated: undefined,
-    tags: undefined,
-    networks: ['mainnet'],
-    blockchainSupported: undefined,
-    isOpenSource: undefined,
-    security: {
-      auditStatus: 'Unaudited',
-      auditFirms: undefined,
-      metrics: undefined,
-    },
-    tvl: {
-      current: 'N/A',
-      defiLlama: undefined,
-      change7d: undefined,
-      change30d: undefined,
-      lastUpdated: undefined,
-      source: undefined,
-      breakdown: undefined,
-      historical: undefined,
-    },
-    volume: undefined,
-    financials: undefined,
-    yields: undefined,
-    token: undefined,
-    pools: undefined,
-    users: undefined,
-    feeStructure: undefined,
-    integration: undefined,
-    external: {
-      socials: {
-        twitter: 'https://twitter.com/ThetisMarket',
-      },
-      notableBackers: undefined,
-    },
-  },
-  {
     title: 'Anqa',
     href: 'https://anqa.ag',
     description: 'defi:protocol_descriptions.Anqa',
@@ -417,31 +370,6 @@ export const tradingProtocols: DefiProtocol[] = [
     },
     integration: {
       smartContractLinks: ['https://github.com/agdex-io'],
-    },
-  },
-
-  // LAUNCHPAD
-  {
-    title: 'Pump',
-    href: 'https://pump.uptos.xyz',
-    description: 'defi:protocol_descriptions.Pump',
-    category: 'Trading',
-    subcategory: 'Launchpad',
-    implementation: LaunchpadImplementation.FAIR_LAUNCH,
-    status: 'Active',
-    color: 'from-purple-500 to-violet-500',
-    logo: '/icons/protocols/pump-uptos.jpg',
-    networks: ['mainnet'],
-    security: {
-      auditStatus: 'Unaudited',
-    },
-    tvl: {
-      current: 'N/A',
-    },
-    external: {
-      socials: {
-        twitter: 'https://twitter.com/UPTOS_APT',
-      },
     },
   },
 ];

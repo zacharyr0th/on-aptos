@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { Geist } from 'next/font/google';
+import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 
 import { ThemeProvider } from '@/components/layout/theme-provider';
@@ -13,9 +13,14 @@ import Script from 'next/script';
 import { APP_CONFIG, DEVELOPER_CONFIG } from '@/lib/config/app';
 import { headers } from 'next/headers';
 
-// Load font with CSS variable
+// Load fonts with CSS variables
 const geistSans = Geist({
   variable: '--font-geist-sans',
+  subsets: ['latin'],
+});
+
+const geistMono = Geist_Mono({
+  variable: '--font-geist-mono',
   subsets: ['latin'],
 });
 
@@ -147,8 +152,9 @@ export const viewport: Viewport = {
   ],
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
+  maximumScale: 5,
+  userScalable: true,
+  viewportFit: 'cover',
 };
 
 interface RootLayoutProps {
@@ -223,7 +229,9 @@ export default async function RootLayout({
         {/* Explicit manifest link (Next.js also injects) */}
         <link rel="manifest" href="/manifest.webmanifest" />
       </head>
-      <body className={`${geistSans.variable} font-sans antialiased`}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}
+      >
         <TRPCProvider>
           <I18nProvider>
             <ThemeProvider

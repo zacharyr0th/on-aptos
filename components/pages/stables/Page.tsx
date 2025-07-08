@@ -149,13 +149,16 @@ const TokenCard = React.memo(function TokenCard({
                       <div className="flex items-center">
                         <div className="w-6 h-6 relative flex-shrink-0 mr-1">
                           <Image
-                            src={TOKEN_METADATA[component.symbol]?.thumbnail || '/placeholder.jpg'}
+                            src={
+                              TOKEN_METADATA[component.symbol]?.thumbnail ||
+                              '/placeholder.jpg'
+                            }
                             alt={`${component.symbol} icon`}
                             width={24}
                             height={24}
                             className="object-contain w-full h-full rounded-full"
                             priority
-                            onError={(e) => {
+                            onError={e => {
                               const img = e.target as HTMLImageElement;
                               img.src = '/placeholder.jpg';
                             }}
@@ -181,7 +184,7 @@ const TokenCard = React.memo(function TokenCard({
                     height={24}
                     className="object-contain w-full h-full rounded-full"
                     priority
-                    onError={(e) => {
+                    onError={e => {
                       const img = e.target as HTMLImageElement;
                       img.src = '/placeholder.jpg';
                     }}
@@ -195,7 +198,7 @@ const TokenCard = React.memo(function TokenCard({
           </div>
         </div>
         <div className="px-3 pt-1 pb-0">
-          <p className="text-xl font-bold text-card-foreground">
+          <p className="text-xl font-bold text-card-foreground font-mono">
             {formattedDisplaySupply}
           </p>
         </div>
@@ -204,7 +207,7 @@ const TokenCard = React.memo(function TokenCard({
             <span className="text-muted-foreground">
               {t('stables:stats.market_share')}
             </span>
-            <span className="font-medium text-muted-foreground">
+            <span className="font-medium text-muted-foreground font-mono">
               {marketSharePercent}%
             </span>
           </div>
@@ -539,73 +542,72 @@ export default function StablesPage(): React.ReactElement {
           {refreshing && <div className="h-full bg-muted animate-pulse"></div>}
         </div>
 
-        <div className="container mx-auto px-4 sm:px-6 py-6">
+        <div className="container-layout pt-6">
           <Header />
         </div>
 
-        <main className="container mx-auto px-4 sm:px-6 py-6 flex-1">
-            {loading ? (
-              <LoadingState />
-            ) : error ? (
-              <ErrorState error={error} onRetry={fetchSupplyData} t={t} />
-            ) : data ? (
-              <>
-                <div className="flex items-center bg-card border rounded-lg py-3 px-4 mb-6">
-                  <div className="flex-grow">
-                    <h2 className="text-base sm:text-lg font-medium text-card-foreground">
-                      {t('stables:stats.total_stablecoin_value')}
-                    </h2>
-                    <p className="text-xl sm:text-2xl font-bold text-card-foreground">
-                      {formattedTotalSupply}
-                    </p>
-                  </div>
-                  <div className="p-2 rounded-lg bg-secondary">
-                    <DollarSign className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
-                  </div>
+        <main className="container-layout py-6 flex-1">
+          {loading ? (
+            <LoadingState />
+          ) : error ? (
+            <ErrorState error={error} onRetry={fetchSupplyData} t={t} />
+          ) : data ? (
+            <>
+              <div className="flex items-center bg-card border rounded-lg py-3 px-4 mb-6">
+                <div className="flex-grow">
+                  <h2 className="text-base sm:text-lg font-medium text-card-foreground">
+                    {t('stables:stats.total_stablecoin_value')}
+                  </h2>
+                  <p className="text-xl sm:text-2xl font-bold text-card-foreground font-mono">
+                    {formattedTotalSupply}
+                  </p>
+                </div>
+                <div className="p-2 rounded-lg bg-secondary">
+                  <DollarSign className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <div className="lg:col-span-1 space-y-4">
+                  {processedSupplies.slice(0, 3).map(token => (
+                    <TokenCard
+                      key={token.symbol}
+                      token={token}
+                      totalSupply={adjustedTotal}
+                      susdePrice={cmcData?.price}
+                      suppliesData={suppliesDataMap}
+                      t={t}
+                    />
+                  ))}
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                  <div className="lg:col-span-1 space-y-4">
-                    {processedSupplies.slice(0, 3).map(token => (
-                      <TokenCard
-                        key={token.symbol}
-                        token={token}
-                        totalSupply={adjustedTotal}
-                        susdePrice={cmcData?.price}
-                        suppliesData={suppliesDataMap}
-                        t={t}
-                      />
-                    ))}
-                  </div>
-
-                  <div className="lg:col-span-3 bg-card border rounded-lg overflow-hidden min-h-[250px] sm:min-h-[300px]">
-                    <ErrorBoundary
-                      fallback={
-                        <div className="flex items-center justify-center h-full">
-                          <div className="text-center p-4">
-                            <AlertTriangle className="h-8 w-8 mx-auto mb-2 text-destructive" />
-                            <p className="text-sm text-muted-foreground">
-                              {t('stables:error.failed_to_load_chart')}
-                            </p>
-                          </div>
+                <div className="lg:col-span-3 bg-card border rounded-lg overflow-hidden min-h-[250px] sm:min-h-[300px]">
+                  <ErrorBoundary
+                    fallback={
+                      <div className="flex items-center justify-center h-full">
+                        <div className="text-center p-4">
+                          <AlertTriangle className="h-8 w-8 mx-auto mb-2 text-destructive" />
+                          <p className="text-sm text-muted-foreground">
+                            {t('stables:error.failed_to_load_chart')}
+                          </p>
                         </div>
-                      }
-                    >
-                      <MarketShareChart
-                        data={processedSupplies}
-                        totalSupply={adjustedTotal}
-                        tokenMetadata={TOKEN_METADATA}
-                        susdePrice={cmcData?.price}
-                      />
-                    </ErrorBoundary>
-                  </div>
+                      </div>
+                    }
+                  >
+                    <MarketShareChart
+                      data={processedSupplies}
+                      totalSupply={adjustedTotal}
+                      tokenMetadata={TOKEN_METADATA}
+                      susdePrice={cmcData?.price}
+                    />
+                  </ErrorBoundary>
                 </div>
-              </>
-            ) : null}
+              </div>
+            </>
+          ) : null}
         </main>
 
         <Footer />
-      </div>
       </div>
     </RootErrorBoundary>
   );

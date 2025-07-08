@@ -221,7 +221,7 @@ const LST_CONFIGS: Record<string, BaseTokenConfig> = {
     type: 'Liquid Staking Token',
     issuer: 'Kofi Finance',
     assetAddress:
-      '0xb4919b75df13cf0b48ecb7b961a41fb85f9afe43e56865b51e22f0ae1f3936c2::kapt::Kapt',
+      '0x821c94e69bc7ca058c913b7b5e6b0a5c9fd1523d58723a966fb8c1f5ea888105',
     decimals: 8,
     website: 'https://kofi.finance',
     auditLink: 'https://docs.kofi.finance/protocol/security',
@@ -235,7 +235,7 @@ const LST_CONFIGS: Record<string, BaseTokenConfig> = {
     type: 'Liquid Staking Token',
     issuer: 'Kofi Finance',
     assetAddress:
-      '0xb4919b75df13cf0b48ecb7b961a41fb85f9afe43e56865b51e22f0ae1f3936c2::stkapt::StkApt',
+      '0x42556039b88593e768c97ab1a3ab0c6a17230825769304482dff8fdebe4c002b',
     decimals: 8,
     website: 'https://kofi.finance',
     auditLink: 'https://docs.kofi.finance/protocol/security',

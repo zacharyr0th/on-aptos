@@ -1,7 +1,14 @@
 import { graphQLRequest } from '@/lib/utils/fetch-utils';
 import { logger } from '@/lib/utils/logger';
-import { PROTOCOLS, ProtocolType, getProtocolByAddress } from '@/lib/protocol-registry';
+import {
+  PROTOCOLS,
+  ProtocolType,
+  getProtocolByAddress,
+} from '@/lib/protocol-registry';
 import { PROTOCOL_ADDRESSES, PROTOCOLS_BY_TYPE } from '@/lib/aptos-constants';
+import { ComprehensivePositionChecker } from '@/lib/services/comprehensive-position-checker';
+import { convertRawTokenAmount } from '@/lib/utils/format';
+import { getAssetPrices } from './services';
 
 const INDEXER = 'https://indexer.mainnet.aptoslabs.com/v1/graphql';
 const APTOS_API_KEY = process.env.APTOS_BUILD_SECRET;
@@ -155,14 +162,396 @@ const PROTOCOL_RESOURCES_QUERY = `
 
 export class DeFiBalanceService {
   /**
-   * Get all DeFi positions for a wallet address
+   * Get all DeFi positions for a wallet address using comprehensive position checker
    */
-  static async getDeFiPositions(walletAddress: string): Promise<DeFiPosition[]> {
+  static async getDeFiPositions(
+    walletAddress: string
+  ): Promise<DeFiPosition[]> {
     try {
-      logger.info(`Fetching DeFi positions for wallet: ${walletAddress}`);
+      logger.info(`Fetching comprehensive DeFi positions for wallet: ${walletAddress}`);
+
+      // Use comprehensive position checker first
+      const comprehensivePositions = await this.getComprehensiveDeFiPositions(walletAddress);
       
+      // If we have comprehensive positions, use them
+      if (comprehensivePositions.length > 0) {
+        logger.info(
+          `Found ${comprehensivePositions.length} comprehensive DeFi positions for wallet ${walletAddress}`
+        );
+        return comprehensivePositions;
+      }
+
+      // Fallback to legacy method if comprehensive checker fails
+      logger.info(`Falling back to legacy DeFi position detection for wallet: ${walletAddress}`);
+      return await this.getLegacyDeFiPositions(walletAddress);
+    } catch (error) {
+      logger.error('Error fetching DeFi positions:', error);
+      throw new Error(
+        `Failed to fetch DeFi positions: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
+  }
+
+  /**
+   * Get DeFi positions using comprehensive position checker
+   */
+  private static async getComprehensiveDeFiPositions(
+    walletAddress: string
+  ): Promise<DeFiPosition[]> {
+    try {
+      const checker = new ComprehensivePositionChecker(
+        'https://api.mainnet.aptoslabs.com/v1',
+        process.env.APTOS_BUILD_KEY
+      );
+
+      const summary = await checker.getComprehensivePositions(walletAddress);
       const positions: DeFiPosition[] = [];
+
+      logger.info(`Processing ${summary.positions.length} comprehensive positions, ${summary.totalActivePositions} active`);
+
+      // Collect all unique token addresses for price lookup
+      const allTokenAddresses = new Set<string>();
+      for (const position of summary.positions) {
+        if (position.isActive) {
+          // Add token addresses and map them to their underlying assets
+          position.tokens.forEach(token => {
+            if (token.address) {
+              allTokenAddresses.add(token.address);
+              
+              // Map complex DeFi tokens to their underlying assets
+              const underlyingAsset = this.mapDeFiTokenToUnderlyingAsset(token.address, token.symbol);
+              if (underlyingAsset) {
+                allTokenAddresses.add(underlyingAsset);
+              }
+            }
+          });
+          
+          // Add common token addresses based on protocol
+          if (position.protocol.toLowerCase().includes('apt') || 
+              position.protocol.toLowerCase().includes('aptos')) {
+            allTokenAddresses.add('0x1::aptos_coin::AptosCoin');
+          }
+        }
+      }
+
+      // Get real prices for all tokens
+      const priceData = await getAssetPrices(Array.from(allTokenAddresses));
+      const priceMap = new Map(priceData.map(p => [p.assetType, p.price]));
+
+      logger.info(`Fetched prices for ${priceData.length} tokens in DeFi positions`);
+
+      for (const position of summary.positions) {
+        // Only include active positions
+        if (!position.isActive) continue;
+
+        // Convert comprehensive position to DeFi position format with real prices
+        const defiPosition: DeFiPosition = {
+          protocol: position.protocol,
+          protocolLabel: position.description,
+          protocolType: this.mapPositionTypeToProtocolType(position.type),
+          address: position.protocolAddress,
+          position: this.buildPositionDetailsWithPrices(position, priceMap),
+          totalValue: this.calculatePositionValueWithPrices(position, priceMap),
+        };
+
+        // Include ALL active positions - don't filter by value
+        // The comprehensive checker already filters for active positions
+        positions.push(defiPosition);
+        
+        logger.info(`Added position: ${position.protocol} (${position.type}) - Value: $${defiPosition.totalValue.toFixed(2)}`);
+      }
+
+      logger.info(`Returning ${positions.length} comprehensive DeFi positions`);
+      return positions;
+    } catch (error) {
+      logger.warn('Comprehensive position checker failed:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Map position type to protocol type
+   */
+  private static mapPositionTypeToProtocolType(type: string): ProtocolType {
+    switch (type) {
+      case 'liquidity':
+        return ProtocolType.DEX;
+      case 'farming':
+        return ProtocolType.FARMING;
+      case 'lending':
+        return ProtocolType.LENDING;
+      case 'staking':
+        return ProtocolType.LIQUID_STAKING;
+      case 'nft':
+        return ProtocolType.NFT_MARKETPLACE;
+      case 'derivatives':
+        return ProtocolType.DERIVATIVES;
+      default:
+        return ProtocolType.INFRASTRUCTURE;
+    }
+  }
+
+  /**
+   * Map complex DeFi token addresses to their underlying assets for price lookup
+   */
+  private static mapDeFiTokenToUnderlyingAsset(tokenAddress: string, symbol: string): string | null {
+    // Handle wrapped/vault tokens that represent underlying assets
+    
+    // APT variants
+    if (symbol.toLowerCase().includes('apt')) {
+      return '0x1::aptos_coin::AptosCoin';
+    }
+    
+    // USDC variants
+    if (symbol.toLowerCase().includes('usdc')) {
+      return '0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDC';
+    }
+    
+    // USDT variants
+    if (symbol.toLowerCase().includes('usdt')) {
+      return '0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDT';
+    }
+    
+    // Handle specific token patterns
+    if (tokenAddress.includes('::stapt_token::') || tokenAddress.includes('::StakedApt')) {
+      return '0x111ae3e5bc816a5e63c2da97d0aa3886519e0cd5e4b046659fa35796bd11542a::stapt_token::StakedApt';
+    }
+    
+    if (tokenAddress.includes('::amapt_token::') || tokenAddress.includes('::AmnisApt')) {
+      return '0x111ae3e5bc816a5e63c2da97d0aa3886519e0cd5e4b046659fa35796bd11542a::amapt_token::AmnisApt';
+    }
+    
+    if (tokenAddress.includes('::thl_coin::') || tokenAddress.includes('::THL')) {
+      return '0x6f986d146e4a90b828d8c12c14b6f4e003fdff11a8eecceceb63744363eaac01::thl_coin::THL';
+    }
+    
+    if (tokenAddress.includes('::mod_coin::') || tokenAddress.includes('::MOD')) {
+      return '0x6f986d146e4a90b828d8c12c14b6f4e003fdff11a8eecceceb63744363eaac01::mod_coin::MOD';
+    }
+    
+    // Handle Thala liquid staking tokens
+    if (tokenAddress.includes('::staking::ThalaAPT')) {
+      return '0xfaf4e633ae9eb31366c9ca24214231760926576c7b625313b3688b5e900731f6::staking::ThalaAPT';
+    }
+    
+    return null;
+  }
+
+  /**
+   * Get token decimals for proper balance conversion
+   */
+  private static getTokenDecimals(tokenAddress: string, symbol: string): number {
+    // Default to 8 decimals for most Aptos tokens
+    const defaultDecimals = 8;
+    
+    // APT and APT-derived tokens
+    if (symbol.toLowerCase().includes('apt')) {
+      return 8;
+    }
+    
+    // USDC and USDT
+    if (symbol.toLowerCase().includes('usdc') || symbol.toLowerCase().includes('usdt')) {
+      return 6;
+    }
+    
+    // Handle specific token patterns
+    if (tokenAddress.includes('::stapt_token::') || tokenAddress.includes('::StakedApt')) {
+      return 8;
+    }
+    
+    if (tokenAddress.includes('::amapt_token::') || tokenAddress.includes('::AmnisApt')) {
+      return 8;
+    }
+    
+    if (tokenAddress.includes('::aptos_coin::AptosCoin')) {
+      return 8;
+    }
+    
+    return defaultDecimals;
+  }
+
+  /**
+   * Build position details from comprehensive position (legacy - without prices)
+   */
+  private static buildPositionDetails(position: any): DeFiPosition['position'] {
+    return this.buildPositionDetailsWithPrices(position, new Map());
+  }
+
+  /**
+   * Build position details from comprehensive position with real prices
+   */
+  private static buildPositionDetailsWithPrices(position: any, priceMap: Map<string, number>): DeFiPosition['position'] {
+    const details: DeFiPosition['position'] = {};
+
+    // Handle LP tokens as liquidity positions
+    if (position.lpTokens && position.lpTokens.length > 0) {
+      details.liquidity = position.lpTokens
+        .filter((lp: any) => lp.balance && lp.balance !== '0')
+        .map((lp: any) => {
+          const balance = parseFloat(lp.balance || '0');
+          const price = priceMap.get(lp.poolTokens[0]) || 0; // Use first token price as approximation
+          const value = balance * price;
+          
+          return {
+            poolId: `${lp.poolType}-${lp.poolTokens.join('-')}`,
+            token0: {
+              asset: lp.poolTokens[0] || '',
+              symbol: lp.poolTokens[0] || '',
+              amount: lp.balance || '0',
+            },
+            token1: {
+              asset: lp.poolTokens[1] || '',
+              symbol: lp.poolTokens[1] || '',
+              amount: lp.balance || '0',
+            },
+            lpTokens: lp.balance || '0',
+            value: value,
+          };
+        });
+    }
+
+    // Handle regular tokens based on position type
+    if (position.tokens && position.tokens.length > 0) {
+      const nonZeroTokens = position.tokens.filter((token: any) => token.balance && token.balance !== '0');
       
+      if (nonZeroTokens.length > 0) {
+        const tokenDetails = nonZeroTokens.map((token: any) => {
+          const rawBalance = parseFloat(token.balance || '0');
+          const decimals = this.getTokenDecimals(token.address, token.symbol);
+          const balance = rawBalance / Math.pow(10, decimals);
+          
+          // Try to get price from direct address first, then try underlying asset
+          let price = priceMap.get(token.address) || 0;
+          if (price === 0) {
+            const underlyingAsset = this.mapDeFiTokenToUnderlyingAsset(token.address, token.symbol);
+            if (underlyingAsset) {
+              price = priceMap.get(underlyingAsset) || 0;
+            }
+          }
+          
+          const value = balance * price;
+          
+          return {
+            asset: token.address,
+            symbol: token.symbol,
+            amount: balance.toString(),
+            value: value,
+          };
+        });
+
+        if (position.type === 'staking') {
+          details.staked = tokenDetails;
+        } else if (position.type === 'lending') {
+          details.supplied = tokenDetails;
+        } else if (position.type === 'liquidity') {
+          // For DEX positions without explicit LP tokens
+          details.supplied = tokenDetails;
+        } else {
+          // For other position types, add as supplied
+          details.supplied = tokenDetails;
+        }
+      }
+    }
+
+    // If no tokens or LP tokens, but position is active, add a placeholder
+    if (!details.liquidity && !details.staked && !details.supplied && position.isActive) {
+      details.supplied = [{
+        asset: position.protocolAddress,
+        symbol: position.protocol,
+        amount: '1',
+        value: 0.001, // Small value to indicate active position
+      }];
+    }
+
+    return details;
+  }
+
+  /**
+   * Calculate position value (legacy - without prices)
+   */
+  private static calculatePositionValue(position: any): number {
+    return this.calculatePositionValueWithPrices(position, new Map());
+  }
+
+  /**
+   * Calculate position value with real prices
+   */
+  private static calculatePositionValueWithPrices(position: any, priceMap: Map<string, number>): number {
+    let totalValue = 0;
+    
+    // Calculate value from regular tokens
+    if (position.tokens && position.tokens.length > 0) {
+      position.tokens.forEach((token: any) => {
+        const rawBalance = parseFloat(token.balance || '0');
+        const decimals = this.getTokenDecimals(token.address, token.symbol);
+        const balance = rawBalance / Math.pow(10, decimals);
+        
+        // Try to get price from direct address first, then try underlying asset
+        let price = priceMap.get(token.address) || 0;
+        if (price === 0) {
+          const underlyingAsset = this.mapDeFiTokenToUnderlyingAsset(token.address, token.symbol);
+          if (underlyingAsset) {
+            price = priceMap.get(underlyingAsset) || 0;
+          }
+        }
+        
+        if (balance > 0 && price > 0) {
+          totalValue += balance * price;
+        }
+      });
+    }
+    
+    // Calculate value from LP tokens
+    if (position.lpTokens && position.lpTokens.length > 0) {
+      position.lpTokens.forEach((lp: any) => {
+        const balance = parseFloat(lp.balance || '0');
+        if (balance > 0) {
+          // Use first token price as approximation for LP value
+          const price = priceMap.get(lp.poolTokens[0]) || 0;
+          if (price > 0) {
+            totalValue += balance * price;
+          }
+        }
+      });
+    }
+    
+    // If no calculated value but position is active, return small value
+    if (totalValue === 0 && position.isActive) {
+      // Check if position has any meaningful balances or resources
+      const hasTokenBalance = position.tokens.some((t: any) => {
+        const balance = parseFloat(t.balance || '0');
+        return balance > 0;
+      });
+      
+      const hasLPBalance = position.lpTokens.some((lp: any) => {
+        const balance = parseFloat(lp.balance || '0');
+        return balance > 0;
+      });
+      
+      const hasResourceData = position.resources.some((r: any) => {
+        const data = r.data || {};
+        return Object.keys(data).length > 0 && JSON.stringify(data) !== '{}';
+      });
+      
+      if (hasTokenBalance || hasLPBalance || hasResourceData) {
+        return 0.001; // Very small value to indicate active position
+      }
+    }
+    
+    return totalValue;
+  }
+
+  /**
+   * Legacy method for DeFi positions (preserved for fallback)
+   */
+  private static async getLegacyDeFiPositions(
+    walletAddress: string
+  ): Promise<DeFiPosition[]> {
+    try {
+      logger.info(`Fetching legacy DeFi positions for wallet: ${walletAddress}`);
+
+      const positions: DeFiPosition[] = [];
+
       // Get positions from different protocol types
       const [
         liquidStakingPositions,
@@ -170,14 +559,14 @@ export class DeFiBalanceService {
         dexPositions,
         farmingPositions,
         derivativesPositions,
-        bridgePositions
+        bridgePositions,
       ] = await Promise.allSettled([
         this.getLiquidStakingPositions(walletAddress),
         this.getLendingPositions(walletAddress),
         this.getDexPositions(walletAddress),
         this.getFarmingPositions(walletAddress),
         this.getDerivativesPositions(walletAddress),
-        this.getBridgePositions(walletAddress)
+        this.getBridgePositions(walletAddress),
       ]);
 
       // Collect successful results
@@ -187,29 +576,56 @@ export class DeFiBalanceService {
         dexPositions,
         farmingPositions,
         derivativesPositions,
-        bridgePositions
+        bridgePositions,
       ].forEach((result, index) => {
         if (result.status === 'fulfilled') {
           positions.push(...result.value);
         } else {
-          const protocolTypes = ['liquid_staking', 'lending', 'dex', 'farming', 'derivatives', 'bridge'];
-          logger.warn(`Failed to get ${protocolTypes[index]} positions:`, result.reason);
+          const protocolTypes = [
+            'liquid_staking',
+            'lending',
+            'dex',
+            'farming',
+            'derivatives',
+            'bridge',
+          ];
+          logger.warn(
+            `Failed to get ${protocolTypes[index]} positions:`,
+            result.reason
+          );
         }
       });
 
-      logger.info(`Found ${positions.length} DeFi positions for wallet ${walletAddress}`);
-      return positions;
+      // Filter out positions with total value less than $0.10 (dust amounts)
+      const MIN_DEFI_VALUE_THRESHOLD = 0.1;
+      const filteredPositions = positions.filter(position => {
+        if (position.totalValue < MIN_DEFI_VALUE_THRESHOLD) {
+          logger.debug(
+            `Filtering out dust DeFi position in ${position.protocol}: $${position.totalValue.toFixed(4)}`
+          );
+          return false;
+        }
+        return true;
+      });
 
+      logger.info(
+        `Found ${filteredPositions.length} legacy DeFi positions (filtered from ${positions.length}) for wallet ${walletAddress}`
+      );
+      return filteredPositions;
     } catch (error) {
-      logger.error('Error fetching DeFi positions:', error);
-      throw new Error(`Failed to fetch DeFi positions: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      logger.error('Error fetching legacy DeFi positions:', error);
+      throw new Error(
+        `Failed to fetch legacy DeFi positions: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
   /**
    * Get liquid staking positions (thAPT, amAPT, TruFin)
    */
-  private static async getLiquidStakingPositions(walletAddress: string): Promise<DeFiPosition[]> {
+  private static async getLiquidStakingPositions(
+    walletAddress: string
+  ): Promise<DeFiPosition[]> {
     const positions: DeFiPosition[] = [];
     const lsProtocols = PROTOCOLS_BY_TYPE.LIQUID_STAKING;
 
@@ -226,8 +642,10 @@ export class DeFiBalanceService {
             icon_uri?: string;
           };
         }>;
-      }>(INDEXER, {
-        query: `
+      }>(
+        INDEXER,
+        {
+          query: `
           query GetLiquidStakingBalances($ownerAddress: String!) {
             current_fungible_asset_balances(
               where: {
@@ -251,8 +669,16 @@ export class DeFiBalanceService {
             }
           }
         `,
-        variables: { ownerAddress: walletAddress }
-      });
+          variables: { ownerAddress: walletAddress },
+        },
+        APTOS_API_KEY
+          ? {
+              headers: {
+                Authorization: `Bearer ${APTOS_API_KEY}`,
+              },
+            }
+          : {}
+      );
 
       // Process liquid staking positions
       for (const balance of response.current_fungible_asset_balances || []) {
@@ -264,17 +690,18 @@ export class DeFiBalanceService {
             protocolType: protocol.type,
             address: balance.asset_type,
             position: {
-              staked: [{
-                asset: balance.asset_type,
-                symbol: balance.metadata.symbol,
-                amount: balance.amount,
-              }]
+              staked: [
+                {
+                  asset: balance.asset_type,
+                  symbol: balance.metadata.symbol,
+                  amount: balance.amount,
+                },
+              ],
             },
-            totalValue: 0 // Will be calculated with price data
+            totalValue: 0, // Will be calculated with price data
           });
         }
       }
-
     } catch (error) {
       logger.error('Error fetching liquid staking positions:', error);
     }
@@ -285,13 +712,17 @@ export class DeFiBalanceService {
   /**
    * Get lending positions (Aries, Aptin, Thala CDP, etc.)
    */
-  private static async getLendingPositions(walletAddress: string): Promise<DeFiPosition[]> {
+  private static async getLendingPositions(
+    walletAddress: string
+  ): Promise<DeFiPosition[]> {
     const positions: DeFiPosition[] = [];
 
     try {
       // Query for lending protocol balances and table items
       const lendingAddresses = PROTOCOLS_BY_TYPE.LENDING;
-      const addressPattern = lendingAddresses.map(addr => `.*${addr}.*`).join('|');
+      const addressPattern = lendingAddresses
+        .map(addr => `.*${addr}.*`)
+        .join('|');
 
       const response = await graphQLRequest<{
         current_fungible_asset_balances: Array<{
@@ -323,17 +754,19 @@ export class DeFiBalanceService {
             }
           }
         `,
-        variables: { ownerAddress: walletAddress }
+        variables: { ownerAddress: walletAddress },
       });
 
       // Process lending positions
       for (const balance of response.current_fungible_asset_balances || []) {
         const protocol = getProtocolByAddress(balance.asset_type);
         if (protocol && protocol.type === ProtocolType.LENDING) {
-          const isCollateral = balance.metadata.symbol.toLowerCase().includes('a') || 
-                             balance.metadata.symbol.toLowerCase().includes('supply');
-          const isDebt = balance.metadata.symbol.toLowerCase().includes('debt') || 
-                        balance.metadata.symbol.toLowerCase().includes('borrow');
+          const isCollateral =
+            balance.metadata.symbol.toLowerCase().includes('a') ||
+            balance.metadata.symbol.toLowerCase().includes('supply');
+          const isDebt =
+            balance.metadata.symbol.toLowerCase().includes('debt') ||
+            balance.metadata.symbol.toLowerCase().includes('borrow');
 
           const position: DeFiPosition = {
             protocol: protocol.name,
@@ -341,27 +774,30 @@ export class DeFiBalanceService {
             protocolType: protocol.type,
             address: balance.asset_type,
             position: {},
-            totalValue: 0
+            totalValue: 0,
           };
 
           if (isCollateral) {
-            position.position.supplied = [{
-              asset: balance.asset_type,
-              symbol: balance.metadata.symbol,
-              amount: balance.amount,
-            }];
+            position.position.supplied = [
+              {
+                asset: balance.asset_type,
+                symbol: balance.metadata.symbol,
+                amount: balance.amount,
+              },
+            ];
           } else if (isDebt) {
-            position.position.borrowed = [{
-              asset: balance.asset_type,
-              symbol: balance.metadata.symbol,
-              amount: balance.amount,
-            }];
+            position.position.borrowed = [
+              {
+                asset: balance.asset_type,
+                symbol: balance.metadata.symbol,
+                amount: balance.amount,
+              },
+            ];
           }
 
           positions.push(position);
         }
       }
-
     } catch (error) {
       logger.error('Error fetching lending positions:', error);
     }
@@ -372,7 +808,9 @@ export class DeFiBalanceService {
   /**
    * Get DEX liquidity positions (PancakeSwap, LiquidSwap, etc.)
    */
-  private static async getDexPositions(walletAddress: string): Promise<DeFiPosition[]> {
+  private static async getDexPositions(
+    walletAddress: string
+  ): Promise<DeFiPosition[]> {
     const positions: DeFiPosition[] = [];
 
     try {
@@ -409,16 +847,17 @@ export class DeFiBalanceService {
             }
           }
         `,
-        variables: { ownerAddress: walletAddress }
+        variables: { ownerAddress: walletAddress },
       });
 
       // Process DEX positions (LP tokens)
       for (const balance of response.current_fungible_asset_balances || []) {
         const protocol = getProtocolByAddress(balance.asset_type);
         if (protocol && protocol.type === ProtocolType.DEX) {
-          const isLPToken = balance.metadata.symbol.toLowerCase().includes('lp') ||
-                           balance.metadata.symbol.toLowerCase().includes('cake') ||
-                           balance.metadata.name.toLowerCase().includes('liquidity');
+          const isLPToken =
+            balance.metadata.symbol.toLowerCase().includes('lp') ||
+            balance.metadata.symbol.toLowerCase().includes('cake') ||
+            balance.metadata.name.toLowerCase().includes('liquidity');
 
           if (isLPToken) {
             positions.push({
@@ -427,19 +866,20 @@ export class DeFiBalanceService {
               protocolType: protocol.type,
               address: balance.asset_type,
               position: {
-                liquidity: [{
-                  poolId: balance.asset_type,
-                  token0: { asset: '', symbol: '', amount: '0' },
-                  token1: { asset: '', symbol: '', amount: '0' },
-                  lpTokens: balance.amount,
-                }]
+                liquidity: [
+                  {
+                    poolId: balance.asset_type,
+                    token0: { asset: '', symbol: '', amount: '0' },
+                    token1: { asset: '', symbol: '', amount: '0' },
+                    lpTokens: balance.amount,
+                  },
+                ],
               },
-              totalValue: 0
+              totalValue: 0,
             });
           }
         }
       }
-
     } catch (error) {
       logger.error('Error fetching DEX positions:', error);
     }
@@ -450,12 +890,16 @@ export class DeFiBalanceService {
   /**
    * Get farming positions (Thala Farm, etc.)
    */
-  private static async getFarmingPositions(walletAddress: string): Promise<DeFiPosition[]> {
+  private static async getFarmingPositions(
+    walletAddress: string
+  ): Promise<DeFiPosition[]> {
     const positions: DeFiPosition[] = [];
 
     try {
       const farmingAddresses = PROTOCOLS_BY_TYPE.FARMING;
-      const addressPattern = farmingAddresses.map(addr => `.*${addr}.*`).join('|');
+      const addressPattern = farmingAddresses
+        .map(addr => `.*${addr}.*`)
+        .join('|');
 
       const response = await graphQLRequest<{
         current_fungible_asset_balances: Array<{
@@ -487,7 +931,7 @@ export class DeFiBalanceService {
             }
           }
         `,
-        variables: { ownerAddress: walletAddress }
+        variables: { ownerAddress: walletAddress },
       });
 
       // Process farming positions
@@ -500,17 +944,18 @@ export class DeFiBalanceService {
             protocolType: protocol.type,
             address: balance.asset_type,
             position: {
-              staked: [{
-                asset: balance.asset_type,
-                symbol: balance.metadata.symbol,
-                amount: balance.amount,
-              }]
+              staked: [
+                {
+                  asset: balance.asset_type,
+                  symbol: balance.metadata.symbol,
+                  amount: balance.amount,
+                },
+              ],
             },
-            totalValue: 0
+            totalValue: 0,
           });
         }
       }
-
     } catch (error) {
       logger.error('Error fetching farming positions:', error);
     }
@@ -521,12 +966,16 @@ export class DeFiBalanceService {
   /**
    * Get derivatives positions (Merkle Trade, KanaLabs)
    */
-  private static async getDerivativesPositions(walletAddress: string): Promise<DeFiPosition[]> {
+  private static async getDerivativesPositions(
+    walletAddress: string
+  ): Promise<DeFiPosition[]> {
     const positions: DeFiPosition[] = [];
 
     try {
       const derivativesAddresses = PROTOCOLS_BY_TYPE.DERIVATIVES;
-      const addressPattern = derivativesAddresses.map(addr => `.*${addr}.*`).join('|');
+      const addressPattern = derivativesAddresses
+        .map(addr => `.*${addr}.*`)
+        .join('|');
 
       const response = await graphQLRequest<{
         current_fungible_asset_balances: Array<{
@@ -558,7 +1007,7 @@ export class DeFiBalanceService {
             }
           }
         `,
-        variables: { ownerAddress: walletAddress }
+        variables: { ownerAddress: walletAddress },
       });
 
       // Process derivatives positions
@@ -571,18 +1020,19 @@ export class DeFiBalanceService {
             protocolType: protocol.type,
             address: balance.asset_type,
             position: {
-              derivatives: [{
-                asset: balance.asset_type,
-                symbol: balance.metadata.symbol,
-                amount: balance.amount,
-                type: 'long', // Default, would need more analysis to determine
-              }]
+              derivatives: [
+                {
+                  asset: balance.asset_type,
+                  symbol: balance.metadata.symbol,
+                  amount: balance.amount,
+                  type: 'long', // Default, would need more analysis to determine
+                },
+              ],
             },
-            totalValue: 0
+            totalValue: 0,
           });
         }
       }
-
     } catch (error) {
       logger.error('Error fetching derivatives positions:', error);
     }
@@ -593,12 +1043,16 @@ export class DeFiBalanceService {
   /**
    * Get bridge positions (LayerZero, Wormhole, Celer)
    */
-  private static async getBridgePositions(walletAddress: string): Promise<DeFiPosition[]> {
+  private static async getBridgePositions(
+    walletAddress: string
+  ): Promise<DeFiPosition[]> {
     const positions: DeFiPosition[] = [];
 
     try {
       const bridgeAddresses = PROTOCOLS_BY_TYPE.BRIDGE;
-      const addressPattern = bridgeAddresses.map(addr => `.*${addr}.*`).join('|');
+      const addressPattern = bridgeAddresses
+        .map(addr => `.*${addr}.*`)
+        .join('|');
 
       const response = await graphQLRequest<{
         current_fungible_asset_balances: Array<{
@@ -630,7 +1084,7 @@ export class DeFiBalanceService {
             }
           }
         `,
-        variables: { ownerAddress: walletAddress }
+        variables: { ownerAddress: walletAddress },
       });
 
       // Process bridge positions (typically locked/wrapped tokens)
@@ -645,17 +1099,18 @@ export class DeFiBalanceService {
             protocolType: protocol.type,
             address: balance.asset_type,
             position: {
-              supplied: [{
-                asset: balance.asset_type,
-                symbol: balance.metadata.symbol,
-                amount: balance.amount,
-              }]
+              supplied: [
+                {
+                  asset: balance.asset_type,
+                  symbol: balance.metadata.symbol,
+                  amount: balance.amount,
+                },
+              ],
             },
-            totalValue: 0
+            totalValue: 0,
           });
         }
       }
-
     } catch (error) {
       logger.error('Error fetching bridge positions:', error);
     }
@@ -670,16 +1125,27 @@ export class DeFiBalanceService {
     totalPositions: number;
     totalValueLocked: number;
     protocolBreakdown: Record<ProtocolType, number>;
-    topProtocols: Array<{ protocol: string; value: number; percentage: number }>;
+    topProtocols: Array<{
+      protocol: string;
+      value: number;
+      percentage: number;
+    }>;
   }> {
     try {
       const positions = await this.getDeFiPositions(walletAddress);
-      
+
       const stats = {
         totalPositions: positions.length,
-        totalValueLocked: positions.reduce((sum, pos) => sum + pos.totalValue, 0),
+        totalValueLocked: positions.reduce(
+          (sum, pos) => sum + pos.totalValue,
+          0
+        ),
         protocolBreakdown: {} as Record<ProtocolType, number>,
-        topProtocols: [] as Array<{ protocol: string; value: number; percentage: number }>
+        topProtocols: [] as Array<{
+          protocol: string;
+          value: number;
+          percentage: number;
+        }>,
       };
 
       // Calculate protocol breakdown
@@ -701,7 +1167,10 @@ export class DeFiBalanceService {
         .map(([protocol, value]) => ({
           protocol,
           value,
-          percentage: stats.totalValueLocked > 0 ? (value / stats.totalValueLocked) * 100 : 0
+          percentage:
+            stats.totalValueLocked > 0
+              ? (value / stats.totalValueLocked) * 100
+              : 0,
         }))
         .sort((a, b) => b.value - a.value)
         .slice(0, 5);
@@ -713,7 +1182,7 @@ export class DeFiBalanceService {
         totalPositions: 0,
         totalValueLocked: 0,
         protocolBreakdown: {} as Record<ProtocolType, number>,
-        topProtocols: []
+        topProtocols: [],
       };
     }
   }

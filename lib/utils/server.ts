@@ -10,13 +10,8 @@ export {
   generateETag,
 } from './server-api';
 
-export {
-  getCachedData,
-  setCachedData,
-  hasCachedData,
-  isNearingExpiration,
-  type CacheInstanceName,
-} from './cache-manager';
+// Cache utilities removed - TanStack Query handles client-side caching
+// For rate-limited API caching, use simple-cache.ts
 
 export { enhancedFetch, apiRequest, graphQLRequest } from './fetch-utils';
 export * from './types';

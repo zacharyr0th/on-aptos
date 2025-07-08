@@ -37,6 +37,16 @@ export const CMC_SYMBOL_IDS: Record<string, string> = {
   // Add more mappings as needed
 };
 
+// CoinGecko coin ID mapping for historical prices
+export const COINGECKO_IDS: Record<string, string> = {
+  apt: 'aptos',
+  usdc: 'usd-coin',
+  usdt: 'tether',
+  btc: 'bitcoin',
+  eth: 'ethereum',
+  // Add more mappings as needed
+};
+
 // Symbol display names
 export const SYMBOL_DISPLAY_NAMES: Record<string, string> = {
   susde: 'sUSDe',

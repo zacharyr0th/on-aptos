@@ -4,6 +4,7 @@ import {
 } from '@/lib/config/data';
 import { SERVICE_CONFIG } from '@/lib/config/cache';
 import {
+  cmcCache,
   getCachedData,
   setCachedData,
   graphQLRequest,
@@ -118,7 +119,10 @@ export async function fetchAllSuppliesData(): Promise<Record<string, bigint>> {
   // Check for missing tokens and try individual cache lookups
   for (const tokenType of tokenTypes) {
     if (!(tokenType in supplies)) {
-      const cachedValue = getCachedData<string>('stables', tokenType);
+      const cachedValue = getCachedData<string>(
+        cmcCache,
+        `stables:${tokenType}`
+      );
       if (cachedValue) {
         supplies[tokenType] = BigInt(cachedValue);
       } else {
@@ -129,7 +133,7 @@ export async function fetchAllSuppliesData(): Promise<Record<string, bigint>> {
 
   // Also cache individual token supplies for fallback purposes
   for (const [tokenType, supply] of Object.entries(supplies)) {
-    setCachedData('stables', tokenType, supply.toString());
+    setCachedData(cmcCache, `stables:${tokenType}`, supply.toString());
   }
 
   return supplies;
@@ -144,7 +148,7 @@ export function fallbackToCachedValues(
   const fallbackSupplies: Record<string, bigint> = {};
 
   for (const tokenType of tokenTypes) {
-    const cachedValue = getCachedData<string>('stables', tokenType);
+    const cachedValue = getCachedData<string>(cmcCache, `stables:${tokenType}`);
     if (cachedValue) {
       fallbackSupplies[tokenType] = BigInt(cachedValue);
     }
@@ -249,7 +253,7 @@ export async function processStablesSuppliesData() {
     totalSupply += supplyBigInt;
 
     // Check if this came from cache (indicating potential fallback)
-    const cached = getCachedData<string>('stables', assetType);
+    const cached = getCachedData<string>(cmcCache, `stables:${assetType}`);
     if (cached) {
       hasFallback = true;
     }

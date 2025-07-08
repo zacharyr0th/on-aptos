@@ -34,7 +34,22 @@ export const PanoraPricesResponseSchema = createResponseSchema(
   PanoraPricesDataSchema
 );
 
+// Historical Price schemas
+export const CMCHistoricalPriceDataSchema = z.object({
+  price: z.number(),
+  date: z.string(),
+});
+
+export const CMCHistoricalPriceResponseSchema = createResponseSchema(
+  CMCHistoricalPriceDataSchema
+);
+
 // Input schemas
 export const GetCMCPriceInputSchema = z.object({
   symbol: z.string(),
+});
+
+export const GetCMCHistoricalPriceInputSchema = z.object({
+  symbol: z.string(),
+  date: z.string(),
 });

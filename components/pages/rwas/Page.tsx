@@ -15,6 +15,11 @@ import { RootErrorBoundary } from '@/components/errors/RootErrorBoundary';
 import { Skeleton } from '@/components/ui/skeleton';
 import Image from 'next/image';
 import { formatCurrency } from '@/lib/utils';
+import {
+  formatAmount,
+  formatPercentage as formatPercent,
+  formatNumber,
+} from '@/lib/utils/format';
 import { trpc } from '@/lib/trpc/client';
 import { RWA_COLORS } from '@/lib/config/colors';
 import { RWA_TOKEN_BY_TICKER } from './rwa-constants';
@@ -104,29 +109,24 @@ interface ProtocolData {
   protocol: string;
 }
 
-// Format currency for display
+// Format currency for display - using centralized formatAmount
 const formatRWAAmount = (value: number): string => {
-  if (value >= 1_000_000) {
-    return `$${(value / 1_000_000).toFixed(1)}M`;
-  } else if (value >= 1_000) {
-    return `$${(value / 1_000).toFixed(0)}K`;
-  } else {
-    return formatCurrency(value, 'USD');
-  }
+  return formatAmount(value, 'USD');
 };
 
 // Format total value with full amount and 2 decimal places
 const formatTotalRWAAmount = (value: number): string => {
-  return `$${value.toLocaleString('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
+  return formatAmount(value, 'USD', { compact: false, decimals: 2 });
 };
 
-// Format percentage
+// Format percentage - using centralized formatPercent
 const formatPercentage = (value: number): string => {
   if (!Number.isFinite(value)) return '0.0';
-  return value >= 0.1 ? value.toFixed(1) : value.toFixed(2);
+  // formatPercent expects value as percentage (not decimal), so we don't divide by 100
+  return formatPercent(value, {
+    minimumFractionDigits: value >= 0.1 ? 1 : 2,
+    maximumFractionDigits: value >= 0.1 ? 1 : 2,
+  }).replace('%', ''); // Remove % since we add it manually in the component
 };
 
 // Calculate market share
@@ -236,7 +236,7 @@ const TokenCard = memo(function TokenCard({
                 height={20}
                 className={`object-contain rounded-full ${!imageLoaded ? 'opacity-0' : ''}`}
                 onLoad={handleImageLoad}
-                onError={(e) => {
+                onError={e => {
                   const img = e.target as HTMLImageElement;
                   img.src = '/placeholder.jpg';
                   handleImageLoad();
@@ -260,7 +260,7 @@ const TokenCard = memo(function TokenCard({
           className={`${isMobile ? 'px-2 pt-1 pb-0' : 'px-2 sm:px-2.5 pt-1 sm:pt-1.5 pb-0'}`}
         >
           <p
-            className={`${isMobile ? 'text-base font-bold' : 'text-lg sm:text-xl font-bold'} text-card-foreground`}
+            className={`${isMobile ? 'text-base font-bold' : 'text-lg sm:text-xl font-bold'} text-card-foreground font-mono`}
           >
             {tokenData.formattedValue}
           </p>
@@ -279,7 +279,7 @@ const TokenCard = memo(function TokenCard({
             <span className="text-muted-foreground">
               {t('rwas:stats.market_share')}
             </span>
-            <span className="font-medium text-muted-foreground">
+            <span className="font-medium text-muted-foreground font-mono">
               {tokenData.marketSharePercent}%
             </span>
           </div>
@@ -600,7 +600,7 @@ export default function RWAsPage(): React.ReactElement {
       // Log each protocol's data to verify it's real
       protocols.forEach((protocol, index) => {
         console.log(
-          `📊 Protocol ${index + 1}: ${protocol.assetTicker} - $${protocol.totalValue.toLocaleString()} (${protocol.protocol})`
+          `📊 Protocol ${index + 1}: ${protocol.assetTicker} - ${formatAmount(protocol.totalValue, 'USD', { compact: false })} (${protocol.protocol})`
         );
 
         // Validate required fields are present
@@ -653,166 +653,76 @@ export default function RWAsPage(): React.ReactElement {
   return (
     <RootErrorBoundary>
       <div className="min-h-screen flex flex-col bg-background">
-        <div
-          className={`container mx-auto ${isMobile ? 'px-3' : 'px-4 sm:px-6'} py-6`}
-        >
+        <div className="container-layout pt-6">
           <Header />
         </div>
 
-        <main className={`container mx-auto ${isMobile ? 'px-3' : 'px-4 sm:px-6'} py-6 flex-1`}>
-            {loading ? (
-              <LoadingState />
-            ) : error ? (
-              <ErrorState error={error} onRetry={handleRetry} t={t} />
-            ) : processedData ? (
-              <>
-                {/* Total Value Card */}
-                <div
-                  className={`flex items-center bg-card border rounded-lg ${isMobile ? 'py-2.5 px-3' : 'py-3 px-4'} mb-4 sm:mb-6`}
-                >
-                  <div className="flex-grow min-w-0">
-                    <h2
-                      className={`${isMobile ? 'text-sm font-medium' : 'text-sm sm:text-base lg:text-lg font-medium'} text-card-foreground`}
-                    >
-                      {t('rwas:stats.total_rwa_value')}
-                    </h2>
-                    <p
-                      className={`${isMobile ? 'text-lg font-bold' : 'text-lg sm:text-xl lg:text-2xl font-bold'} text-card-foreground`}
-                    >
-                      {isMobile
-                        ? formatRWAAmount(processedData.totalValue)
-                        : processedData.totalFormatted}
-                    </p>
+        <main className="container-layout py-6 flex-1">
+          {loading ? (
+            <LoadingState />
+          ) : error ? (
+            <ErrorState error={error} onRetry={handleRetry} t={t} />
+          ) : processedData ? (
+            <>
+              {/* Total Value Card */}
+              <div
+                className={`flex items-center bg-card border rounded-lg ${isMobile ? 'py-2.5 px-3' : 'py-3 px-4'} mb-4 sm:mb-6`}
+              >
+                <div className="flex-grow min-w-0">
+                  <h2
+                    className={`${isMobile ? 'text-sm font-medium' : 'text-sm sm:text-base lg:text-lg font-medium'} text-card-foreground`}
+                  >
+                    {t('rwas:stats.total_rwa_value')}
+                  </h2>
+                  <p
+                    className={`${isMobile ? 'text-lg font-bold' : 'text-lg sm:text-xl lg:text-2xl font-bold'} text-card-foreground font-mono`}
+                  >
+                    {isMobile
+                      ? formatRWAAmount(processedData.totalValue)
+                      : processedData.totalFormatted}
+                  </p>
+                </div>
+                <div className="flex flex-col items-end flex-shrink-0 space-y-2">
+                  <div
+                    className={`${isMobile ? 'text-xs' : 'text-xs'} text-muted-foreground text-center`}
+                  >
+                    {t('rwas:stats.real_world_assets')}
                   </div>
-                  <div className="flex flex-col items-end flex-shrink-0 space-y-2">
-                    <div
-                      className={`${isMobile ? 'text-xs' : 'text-xs'} text-muted-foreground text-center`}
+                  <div
+                    className={`flex items-center ${isMobile ? 'gap-0.5' : 'gap-1'} text-xs text-muted-foreground`}
+                  >
+                    <span>{t('rwas:stats.data_powered_by_prefix')}</span>
+                    <a
+                      href="https://rwa.xyz"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-muted-foreground hover:text-foreground transition-colors"
                     >
-                      {t('rwas:stats.real_world_assets')}
-                    </div>
-                    <div
-                      className={`flex items-center ${isMobile ? 'gap-0.5' : 'gap-1'} text-xs text-muted-foreground`}
-                    >
-                      <span>{t('rwas:stats.data_powered_by_prefix')}</span>
-                      <a
-                        href="https://rwa.xyz"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-muted-foreground hover:text-foreground transition-colors"
-                      >
-                        RWA.xyz
-                      </a>
-                      <Image
-                        src="/icons/rwas/rwa.png"
-                        alt="RWA.xyz"
-                        width={12}
-                        height={12}
-                        className="inline rounded-full"
-                        onError={(e) => {
-                          const img = e.target as HTMLImageElement;
-                          img.src = '/placeholder.jpg';
-                        }}
-                      />
-                    </div>
+                      RWA.xyz
+                    </a>
+                    <Image
+                      src="/icons/rwas/rwa.png"
+                      alt="RWA.xyz"
+                      width={12}
+                      height={12}
+                      className="inline rounded-full"
+                      onError={e => {
+                        const img = e.target as HTMLImageElement;
+                        img.src = '/placeholder.jpg';
+                      }}
+                    />
                   </div>
                 </div>
+              </div>
 
-                {/* Desktop: Top row with 3 cards + chart, Mobile: All cards then chart */}
-                {/* Desktop Layout */}
-                <div className="hidden lg:block">
-                  {/* Top row: 3 cards + chart */}
-                  <div className="grid grid-cols-4 gap-4 xl:gap-6 mb-4 xl:mb-6 items-start">
-                    {/* First 3 cards */}
-                    <div className="col-span-1 space-y-3 xl:space-y-4">
-                      {processedData.protocols.slice(0, 3).map(protocol => (
-                        <TokenCard
-                          key={protocol.id}
-                          protocol={protocol}
-                          totalValue={processedData.totalValue}
-                          allProtocols={processedData.protocols}
-                          t={t}
-                        />
-                      ))}
-                    </div>
-
-                    {/* Chart - matches height of 3 cards */}
-                    <div className="col-span-3 bg-card border rounded-lg overflow-hidden h-full">
-                      <ErrorBoundary
-                        fallback={
-                          <div className="flex items-center justify-center h-full">
-                            <div className="text-center p-4">
-                              <AlertTriangle className="h-8 w-8 mx-auto mb-2 text-destructive" />
-                              <p className="text-sm text-muted-foreground">
-                                {t('error.failed_to_load_chart')}
-                              </p>
-                            </div>
-                          </div>
-                        }
-                      >
-                        <MarketShareChart
-                          data={processedData.protocols}
-                          totalValue={processedData.totalValue}
-                        />
-                      </ErrorBoundary>
-                    </div>
-                  </div>
-
-                  {/* Two rows of 4 cards */}
-                  {processedData.protocols.length > 3 && (
-                    <>
-                      {/* First row of 4 cards (indices 3-6) */}
-                      <div className="grid grid-cols-4 gap-3 xl:gap-4 mb-4 xl:mb-6">
-                        {processedData.protocols.slice(3, 7).map(protocol => (
-                          <TokenCard
-                            key={protocol.id}
-                            protocol={protocol}
-                            totalValue={processedData.totalValue}
-                            allProtocols={processedData.protocols}
-                            t={t}
-                          />
-                        ))}
-                      </div>
-
-                      {/* Second row of 4 cards (indices 7-10) */}
-                      {processedData.protocols.length > 7 && (
-                        <div className="grid grid-cols-4 gap-3 xl:gap-4 mb-4 xl:mb-6">
-                          {processedData.protocols
-                            .slice(7, 11)
-                            .map(protocol => (
-                              <TokenCard
-                                key={protocol.id}
-                                protocol={protocol}
-                                totalValue={processedData.totalValue}
-                                allProtocols={processedData.protocols}
-                                t={t}
-                              />
-                            ))}
-                        </div>
-                      )}
-
-                      {/* Additional rows if needed (more than 11 assets) */}
-                      {processedData.protocols.length > 11 && (
-                        <div className="grid grid-cols-4 gap-3 xl:gap-4 mb-4 xl:mb-6">
-                          {processedData.protocols.slice(11).map(protocol => (
-                            <TokenCard
-                              key={protocol.id}
-                              protocol={protocol}
-                              totalValue={processedData.totalValue}
-                              allProtocols={processedData.protocols}
-                              t={t}
-                            />
-                          ))}
-                        </div>
-                      )}
-                    </>
-                  )}
-                </div>
-
-                {/* Mobile and Tablet Layout */}
-                <div className="lg:hidden space-y-4 sm:space-y-6">
-                  {/* All individual cards */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                    {processedData.protocols.map(protocol => (
+              {/* Desktop: Top row with 3 cards + chart, Mobile: All cards then chart */}
+              {/* Desktop Layout */}
+              <div className="hidden lg:block">
+                {/* Top row: 3 cards + chart */}
+                <div className="grid grid-cols-4 gap-4 xl:gap-6 mb-4 xl:mb-6 items-start">
+                  {/* First 3 cards */}
+                  <div className="col-span-1 space-y-3 xl:space-y-4">
+                    {processedData.protocols.slice(0, 3).map(protocol => (
                       <TokenCard
                         key={protocol.id}
                         protocol={protocol}
@@ -823,15 +733,15 @@ export default function RWAsPage(): React.ReactElement {
                     ))}
                   </div>
 
-                  {/* Chart */}
-                  <div className="bg-card border rounded-lg overflow-hidden min-h-[250px] sm:min-h-[300px]">
+                  {/* Chart - matches height of 3 cards */}
+                  <div className="col-span-3 bg-card border rounded-lg overflow-hidden h-full">
                     <ErrorBoundary
                       fallback={
                         <div className="flex items-center justify-center h-full">
                           <div className="text-center p-4">
                             <AlertTriangle className="h-8 w-8 mx-auto mb-2 text-destructive" />
                             <p className="text-sm text-muted-foreground">
-                              {t('rwas:error.failed_to_load_chart')}
+                              {t('error.failed_to_load_chart')}
                             </p>
                           </div>
                         </div>
@@ -844,12 +754,97 @@ export default function RWAsPage(): React.ReactElement {
                     </ErrorBoundary>
                   </div>
                 </div>
-              </>
-            ) : null}
+
+                {/* Two rows of 4 cards */}
+                {processedData.protocols.length > 3 && (
+                  <>
+                    {/* First row of 4 cards (indices 3-6) */}
+                    <div className="grid grid-cols-4 gap-3 xl:gap-4 mb-4 xl:mb-6">
+                      {processedData.protocols.slice(3, 7).map(protocol => (
+                        <TokenCard
+                          key={protocol.id}
+                          protocol={protocol}
+                          totalValue={processedData.totalValue}
+                          allProtocols={processedData.protocols}
+                          t={t}
+                        />
+                      ))}
+                    </div>
+
+                    {/* Second row of 4 cards (indices 7-10) */}
+                    {processedData.protocols.length > 7 && (
+                      <div className="grid grid-cols-4 gap-3 xl:gap-4 mb-4 xl:mb-6">
+                        {processedData.protocols.slice(7, 11).map(protocol => (
+                          <TokenCard
+                            key={protocol.id}
+                            protocol={protocol}
+                            totalValue={processedData.totalValue}
+                            allProtocols={processedData.protocols}
+                            t={t}
+                          />
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Additional rows if needed (more than 11 assets) */}
+                    {processedData.protocols.length > 11 && (
+                      <div className="grid grid-cols-4 gap-3 xl:gap-4 mb-4 xl:mb-6">
+                        {processedData.protocols.slice(11).map(protocol => (
+                          <TokenCard
+                            key={protocol.id}
+                            protocol={protocol}
+                            totalValue={processedData.totalValue}
+                            allProtocols={processedData.protocols}
+                            t={t}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+
+              {/* Mobile and Tablet Layout */}
+              <div className="lg:hidden space-y-4 sm:space-y-6">
+                {/* All individual cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                  {processedData.protocols.map(protocol => (
+                    <TokenCard
+                      key={protocol.id}
+                      protocol={protocol}
+                      totalValue={processedData.totalValue}
+                      allProtocols={processedData.protocols}
+                      t={t}
+                    />
+                  ))}
+                </div>
+
+                {/* Chart */}
+                <div className="bg-card border rounded-lg overflow-hidden min-h-[250px] sm:min-h-[300px]">
+                  <ErrorBoundary
+                    fallback={
+                      <div className="flex items-center justify-center h-full">
+                        <div className="text-center p-4">
+                          <AlertTriangle className="h-8 w-8 mx-auto mb-2 text-destructive" />
+                          <p className="text-sm text-muted-foreground">
+                            {t('rwas:error.failed_to_load_chart')}
+                          </p>
+                        </div>
+                      </div>
+                    }
+                  >
+                    <MarketShareChart
+                      data={processedData.protocols}
+                      totalValue={processedData.totalValue}
+                    />
+                  </ErrorBoundary>
+                </div>
+              </div>
+            </>
+          ) : null}
         </main>
 
         <Footer />
-      </div>
       </div>
     </RootErrorBoundary>
   );

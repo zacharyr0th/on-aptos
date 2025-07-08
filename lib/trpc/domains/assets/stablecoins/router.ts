@@ -1,6 +1,11 @@
 import { router, publicProcedure } from '@/lib/trpc/core/server';
 import { ForceRefreshInputSchema } from '@/lib/trpc/shared/schemas';
-import { cacheFirst, withErrorHandling, type ErrorContext } from '@/lib/utils';
+import {
+  cmcCache,
+  cacheFirst,
+  withErrorHandling,
+  type ErrorContext,
+} from '@/lib/utils';
 import { StablesSuppliesResponseSchema } from './schemas';
 import { processStablesSuppliesData } from './services';
 
@@ -25,17 +30,24 @@ export const stablecoinsRouter = router({
         details: { forceRefresh: input.forceRefresh },
       };
 
-      return await withErrorHandling(
-        () =>
-          cacheFirst({
-            namespace: 'stables',
-            cacheKey,
-            fetchFn: processStablesSuppliesData,
-            startTime,
-            forceRefresh: input.forceRefresh,
-            apiCallCount: 2,
-          }),
-        errorContext
-      );
+      return await withErrorHandling(async () => {
+        const data = input.forceRefresh
+          ? await processStablesSuppliesData()
+          : await cacheFirst(cmcCache, cacheKey, processStablesSuppliesData);
+
+        return {
+          timestamp: new Date().toISOString(),
+          performance: {
+            responseTimeMs: Date.now() - startTime,
+            cacheHits: input.forceRefresh ? 0 : 1,
+            cacheMisses: input.forceRefresh ? 1 : 0,
+            apiCalls: 2,
+          },
+          cache: {
+            cached: !input.forceRefresh,
+          },
+          data,
+        };
+      }, errorContext);
     }),
 });

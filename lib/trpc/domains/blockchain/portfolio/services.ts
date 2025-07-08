@@ -2,8 +2,19 @@ import { graphQLRequest } from '@/lib/utils/fetch-utils';
 // import { getCachedData, setCachedData } from '@/lib/utils/cache-manager';
 import { logger } from '@/lib/utils/logger';
 import { PriceService } from '@/lib/trpc/domains/market-data/prices/services';
-import { PanoraService } from './panora-service';
+import { PanoraService, type PanoraPriceResponse } from './panora-service';
 import { phantomDetector } from './phantom-detection';
+import {
+  getProtocolByAddress,
+  getProtocolLabel,
+  isPhantomAsset,
+  shouldShowProtocolBadge,
+} from '@/lib/protocol-registry';
+import {
+  LEGITIMATE_STABLECOINS,
+  SCAM_TOKENS,
+  AptosValidators,
+} from '@/lib/aptos-constants';
 
 const INDEXER = 'https://indexer.mainnet.aptoslabs.com/v1/graphql';
 const APTOS_API_KEY = process.env.APTOS_BUILD_SECRET;
@@ -20,6 +31,13 @@ interface FungibleAsset {
   price?: number;
   value?: number;
   balance?: number;
+  isVerified?: boolean;
+  protocolInfo?: {
+    protocol: string;
+    protocolLabel: string;
+    protocolType: string;
+    isPhantomAsset: boolean;
+  };
 }
 
 interface NFT {
@@ -85,6 +103,8 @@ interface WalletTransaction {
 }
 
 // Query to get all fungible assets (both v1 and v2) for a wallet
+// Note: We query both FA and Coin balances due to the migration from Coin to FA standard
+// Some tokens might appear in both tables during migration
 const WALLET_ASSETS_QUERY = `
   query GetWalletAssets($ownerAddress: String!) {
     current_fungible_asset_balances(
@@ -220,11 +240,21 @@ const WALLET_NFTS_QUERY = `
 `;
 
 export async function getWalletAssets(
-  walletAddress: string
+  walletAddress: string,
+  showOnlyVerified: boolean = true
 ): Promise<FungibleAsset[]> {
   try {
+    // Validate wallet address format first (enterprise-grade validation)
+    const addressValidation = AptosValidators.validateAddress(walletAddress);
+    if (!addressValidation.isValid) {
+      logger.error(`Invalid wallet address format: ${walletAddress}`, {
+        error: addressValidation.error,
+      });
+      throw new Error(`Invalid wallet address: ${addressValidation.error}`);
+    }
+
     logger.info(
-      `Fetching wallet assets for ${walletAddress} from Aptos indexer`
+      `Fetching wallet assets for ${walletAddress} from Aptos indexer (showOnlyVerified: ${showOnlyVerified})`
     );
 
     const response = await graphQLRequest<{
@@ -238,12 +268,26 @@ export async function getWalletAssets(
           decimals: number;
         };
       }>;
-    }>(INDEXER, {
-      query: WALLET_ASSETS_QUERY,
-      variables: { ownerAddress: walletAddress },
-    });
+    }>(
+      INDEXER,
+      {
+        query: WALLET_ASSETS_QUERY,
+        variables: { ownerAddress: walletAddress },
+      },
+      APTOS_API_KEY
+        ? {
+            headers: {
+              Authorization: `Bearer ${APTOS_API_KEY}`,
+            },
+          }
+        : {}
+    );
 
-    logger.info(`GraphQL response received:`, response);
+    logger.debug(`GraphQL response received:`, {
+      fungibleAssetsCount:
+        response.current_fungible_asset_balances?.length || 0,
+      coinBalancesCount: response.current_coin_balances?.length || 0,
+    });
 
     // Combine fungible assets and coin balances, but filter out CELL tokens (they're NFTs)
     const fungibleAssets = (
@@ -261,46 +305,70 @@ export async function getWalletAssets(
           '0x2ebb2ccac5e027a87fa0e2e5f656a3a4238d6a48d93ec9b610d570fc0aa0df12'
     );
 
+    // Create a set of symbols that already exist in FA balances
+    // This helps us avoid duplicates from the Coin->FA migration
+    const faSymbols = new Set(
+      fungibleAssets.map(asset => asset.metadata?.symbol).filter(Boolean)
+    );
+
+    logger.debug(
+      `After CELL filtering: ${fungibleAssets.length} fungible assets, ${coinBalances.length} coin balances`
+    );
+
     // Get Panora token list - this will be our source of truth for official tokens
     const panoraTokens = await PanoraService.getAllPrices();
+    logger.debug(`Panora returned ${panoraTokens.length} official tokens`);
     const panoraTokenMap = new Map(
       panoraTokens.map(token => {
-        // Use CoinGecko or other CDN for token icons based on symbol
-        // Try multiple sources in order of preference
-        let iconUrl;
-        const symbol = token.symbol.toLowerCase();
-        
-        // Special cases for well-known tokens
-        if (symbol === 'apt') {
-          iconUrl = 'https://raw.githubusercontent.com/hippospace/aptos-coin-list/main/icons/APT.webp';
-        } else if (symbol === 'usdc') {
-          iconUrl = 'https://raw.githubusercontent.com/hippospace/aptos-coin-list/main/icons/USDC.webp';
-        } else if (symbol === 'usdt') {
-          iconUrl = 'https://raw.githubusercontent.com/hippospace/aptos-coin-list/main/icons/USDT.webp';
-        } else if (symbol === 'weth' || symbol === 'eth') {
-          iconUrl = 'https://raw.githubusercontent.com/hippospace/aptos-coin-list/main/icons/WETH.webp';
-        } else if (symbol === 'wbtc' || symbol === 'btc') {
-          iconUrl = 'https://raw.githubusercontent.com/hippospace/aptos-coin-list/main/icons/WBTC.webp';
-        } else if (symbol === 'gui') {
-          iconUrl = 'https://raw.githubusercontent.com/hippospace/aptos-coin-list/main/icons/GUI.webp';
-        } else {
-          // Try to construct URL for other tokens
-          iconUrl = `https://raw.githubusercontent.com/hippospace/aptos-coin-list/main/icons/${symbol.toUpperCase()}.webp`;
+        // Use Panora's iconUrl if available, otherwise use local icons or construct GitHub URL
+        let iconUrl = token.iconUrl;
+
+        if (!iconUrl) {
+          const symbol = token.symbol.toLowerCase();
+
+          // Try local icons first for common tokens
+          if (symbol === 'apt' || symbol === 'aptos') {
+            iconUrl = '/icons/apt.png';
+          } else if (symbol === 'usdc') {
+            iconUrl = '/icons/stables/usdc.png';
+          } else if (symbol === 'usdt') {
+            iconUrl = '/icons/stables/usdt.png';
+          } else if (symbol === 'wbtc' || symbol === 'btc') {
+            iconUrl = '/icons/btc/bitcoin.png';
+          } else if (symbol === 'stapt' || symbol === 'st-apt') {
+            iconUrl = '/icons/lst/amnis-stAPT.jpeg';
+          } else {
+            // Try to construct Panora GitHub URL
+            // Try different extensions
+            iconUrl = `https://raw.githubusercontent.com/PanoraExchange/Aptos-Tokens/main/logos/${token.symbol}.svg`;
+          }
         }
-        
+
         return [token.faAddress || token.tokenAddress, { ...token, iconUrl }];
       })
     );
 
-    // Create a set of official token addresses for efficient lookup
+    // Create a set of official token addresses for reference (but don't filter by it)
     const officialTokenAddresses = new Set(
-      panoraTokens.map(token => token.faAddress || token.tokenAddress).filter(Boolean)
+      panoraTokens
+        .map(token => token.faAddress || token.tokenAddress)
+        .filter(Boolean)
     );
 
     // Convert coin balances to FungibleAsset format and add icon URIs
-    // ONLY include coins that are on Panora's official token list
+    // Filter out coins that already exist in FA balances to avoid duplicates
     const convertedCoins: FungibleAsset[] = coinBalances
-      .filter(coin => officialTokenAddresses.has(coin.coin_type))
+      .filter(coin => {
+        // Skip if this symbol already exists in FA balances (avoid duplicates from Coin->FA migration)
+        if (faSymbols.has(coin.coin_info.symbol)) {
+          logger.info(
+            `Skipping coin ${coin.coin_info.symbol} as it already exists in FA balances`
+          );
+          return false;
+        }
+
+        return true;
+      })
       .map(coin => ({
         asset_type: coin.coin_type,
         amount: coin.amount,
@@ -313,10 +381,9 @@ export async function getWalletAssets(
       }));
 
     // Add icon URIs to fungible assets from Panora
-    // ONLY include fungible assets that are on Panora's official token list
-    const enhancedFungibleAssets: FungibleAsset[] = fungibleAssets
-      .filter(asset => officialTokenAddresses.has(asset.asset_type))
-      .map(asset => ({
+    // Include all assets, but mark whether they're official
+    const enhancedFungibleAssets: FungibleAsset[] = fungibleAssets.map(
+      asset => ({
         ...asset,
         metadata: asset.metadata
           ? {
@@ -331,34 +398,256 @@ export async function getWalletAssets(
               decimals: 8,
               icon_uri: panoraTokenMap.get(asset.asset_type)?.iconUrl,
             },
-      }));
-
-    const allAssets = [...enhancedFungibleAssets, ...convertedCoins];
-    logger.info(
-      `Found ${allAssets.length} total official assets (${enhancedFungibleAssets.length} fungible + ${convertedCoins.length} coins) from Panora's verified token list for wallet ${walletAddress}. Filtered out ${(response.current_fungible_asset_balances?.length || 0) + (response.current_coin_balances?.length || 0) - allAssets.length} unverified tokens.`
+      })
     );
 
-    // Get prices for all assets
-    const assetTypes = allAssets.map(a => a.asset_type);
+    let allAssets = [...enhancedFungibleAssets, ...convertedCoins];
+
+    // First, filter out known scam tokens
+    const beforeScamFilter = allAssets.length;
+    allAssets = allAssets.filter(asset => {
+      if (SCAM_TOKENS.has(asset.asset_type)) {
+        logger.warn(
+          `Filtering out known scam token: ${asset.metadata?.symbol} - ${asset.metadata?.name} (${asset.asset_type})`
+        );
+        return false;
+      }
+      return true;
+    });
+
+    if (beforeScamFilter !== allAssets.length) {
+      logger.info(
+        `Filtered out ${beforeScamFilter - allAssets.length} known scam tokens`
+      );
+    }
+
+    logger.info(
+      `Found ${allAssets.length} total assets (${enhancedFungibleAssets.length} fungible + ${convertedCoins.length} coins) for wallet ${walletAddress} after scam filtering.`
+    );
+
+    // Build a set of verified Panora addresses for filtering
+    const verifiedAddresses = new Set<string>();
+    panoraTokens.forEach(token => {
+      if (token.faAddress) verifiedAddresses.add(token.faAddress);
+      if (token.tokenAddress) verifiedAddresses.add(token.tokenAddress);
+    });
+
+    // Add common token variations that should be included
+    verifiedAddresses.add('0x1::aptos_coin::AptosCoin'); // APT
+    verifiedAddresses.add(
+      '0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDC'
+    ); // LayerZero USDC
+    verifiedAddresses.add(
+      '0x397071c01929cc6672a17f130bd62b1bce224309029837ce4f18214cc83ce2a7::USDC::USDC'
+    ); // Another USDC variant
+    verifiedAddresses.add(
+      '0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDT'
+    ); // LayerZero USDT
+
+    // Use centralized legitimate stablecoin addresses from aptos-constants.ts (single source of truth)
+
+    // Function to determine if a token is a stablecoin based on symbol/name
+    const isStablecoin = (asset: FungibleAsset): boolean => {
+      const symbol = asset.metadata?.symbol?.toLowerCase() || '';
+      const name = asset.metadata?.name?.toLowerCase() || '';
+
+      // Check if it contains stablecoin indicators
+      return (
+        symbol.includes('usd') ||
+        name.includes('usd') ||
+        symbol.includes('usdc') ||
+        symbol.includes('usdt') ||
+        symbol.includes('usde') ||
+        symbol.includes('dai') ||
+        symbol.includes('busd') ||
+        symbol.includes('tusd') ||
+        name.includes('dollar') ||
+        name.includes('stable')
+      );
+    };
+
+    // Function to check if a token has scam indicators
+    const hasScamIndicators = (asset: FungibleAsset): boolean => {
+      const name = asset.metadata?.name || '';
+      const symbol = asset.metadata?.symbol || '';
+
+      // Check for common scam patterns
+      return (
+        name.includes('💸') || // Money emoji
+        name.includes('🚀') || // Rocket emoji
+        name.includes('💰') || // Money bag emoji
+        name.includes('💎') || // Diamond emoji
+        name.includes('.com') || // Domain names
+        name.includes('.org') || // Domain names
+        name.includes('.net') || // Domain names
+        name.includes('airdrop') || // Airdrop scams
+        name.includes('claim') || // Claim scams
+        name.includes('free') || // Free token scams
+        name.toLowerCase().includes('gift') || // Gift scams
+        (name.includes('APT') && name.includes('claim')) || // APT claim scams
+        symbol === '$APT' // Fake APT symbols
+      );
+    };
+
+    // Function to check if it's a fake APT token
+    const isFakeAPT = (asset: FungibleAsset): boolean => {
+      const symbol = asset.metadata?.symbol?.toUpperCase() || '';
+      const name = asset.metadata?.name?.toLowerCase() || '';
+
+      // If it claims to be APT but isn't the official address, it's fake
+      if (
+        (symbol === 'APT' ||
+          symbol === 'APTOS' ||
+          name.includes('aptos coin')) &&
+        asset.asset_type !== '0x1::aptos_coin::AptosCoin'
+      ) {
+        return true;
+      }
+
+      return false;
+    };
+
+    // Filter assets: for stablecoins, only show legitimate ones; for non-stablecoins, only show verified ones by default
+    let assetsToProcess: FungibleAsset[];
+
+    if (showOnlyVerified) {
+      // Show only verified Panora tokens, but filter stablecoins to legitimate ones
+      assetsToProcess = allAssets.filter(asset => {
+        // Always filter out tokens with scam indicators
+        if (hasScamIndicators(asset)) {
+          logger.warn(
+            `Filtering out scam token: ${asset.metadata?.symbol} - ${asset.metadata?.name} (${asset.asset_type})`
+          );
+          return false;
+        }
+
+        // Filter out fake APT tokens
+        if (isFakeAPT(asset)) {
+          logger.warn(
+            `Filtering out fake APT token: ${asset.metadata?.symbol} - ${asset.metadata?.name} (${asset.asset_type})`
+          );
+          return false;
+        }
+
+        const isVerified = verifiedAddresses.has(asset.asset_type);
+
+        // If it's a stablecoin, only show if it's legitimate
+        if (isStablecoin(asset)) {
+          const isLegitimate = LEGITIMATE_STABLECOINS.has(asset.asset_type);
+          if (!isLegitimate) {
+            logger.warn(
+              `Filtering out scam stablecoin: ${asset.metadata?.symbol} (${asset.asset_type})`
+            );
+          }
+          return isLegitimate;
+        }
+
+        // For non-stablecoins, show if verified
+        return isVerified;
+      });
+    } else {
+      // Show all non-stablecoins and legitimate stablecoins
+      assetsToProcess = allAssets.filter(asset => {
+        // Always filter out tokens with scam indicators
+        if (hasScamIndicators(asset)) {
+          logger.warn(
+            `Filtering out scam token: ${asset.metadata?.symbol} - ${asset.metadata?.name} (${asset.asset_type})`
+          );
+          return false;
+        }
+
+        // Filter out fake APT tokens
+        if (isFakeAPT(asset)) {
+          logger.warn(
+            `Filtering out fake APT token: ${asset.metadata?.symbol} - ${asset.metadata?.name} (${asset.asset_type})`
+          );
+          return false;
+        }
+
+        // If it's a stablecoin, only show if it's legitimate
+        if (isStablecoin(asset)) {
+          const isLegitimate = LEGITIMATE_STABLECOINS.has(asset.asset_type);
+          if (!isLegitimate) {
+            logger.warn(
+              `Filtering out scam stablecoin: ${asset.metadata?.symbol} (${asset.asset_type})`
+            );
+          }
+          return isLegitimate;
+        }
+
+        // For non-stablecoins, show all when verified filter is disabled
+        return true;
+      });
+    }
+
+    logger.info(
+      showOnlyVerified
+        ? `Filtered to ${assetsToProcess.length} verified tokens (with stablecoin filtering) from ${allAssets.length} total assets`
+        : `Showing ${assetsToProcess.length} assets (all tokens with stablecoin filtering) from ${allAssets.length} total assets`
+    );
+
+    // Get prices for assets - for unverified assets, prices might be 0
+    const assetTypes = assetsToProcess.map(a => a.asset_type);
     const priceData = await getAssetPrices(assetTypes);
 
     // Enhance assets with price and value information
-    const assetsWithPrices = allAssets.map(asset => {
+    const assetsWithPrices = assetsToProcess.map(asset => {
+      // Validate asset type format for enterprise-grade safety
+      const assetValidation = AptosValidators.validateAssetType(
+        asset.asset_type
+      );
+      if (!assetValidation.isValid) {
+        logger.warn(`Invalid asset type format detected: ${asset.asset_type}`, {
+          error: assetValidation.error,
+        });
+        // Continue processing but log the issue for monitoring
+      }
+
       const priceInfo = priceData.find(p => p.assetType === asset.asset_type);
       const price = priceInfo?.price || 0;
       const decimals = asset.metadata?.decimals || 8;
-      const balance = Number(asset.amount) / Math.pow(10, decimals);
+
+      // FIXED: Use parseFloat for financial precision (was parseInt before)
+      const balance = parseFloat(asset.amount) / Math.pow(10, decimals);
       const value = balance * price;
+
+      // Add a flag to indicate if this is a verified token
+      const isVerified = verifiedAddresses.has(asset.asset_type);
+
+      // Add protocol information - only for DeFi protocols where assets are inside TVL
+      const protocol = getProtocolByAddress(asset.asset_type);
+      const protocolInfo =
+        protocol && shouldShowProtocolBadge(protocol)
+          ? {
+              protocol: protocol.name,
+              protocolLabel: protocol.label,
+              protocolType: protocol.type,
+              isPhantomAsset: isPhantomAsset(asset.asset_type, asset.metadata),
+            }
+          : undefined;
 
       return {
         ...asset,
         price,
         value,
         balance,
+        isVerified,
+        protocolInfo,
       };
     });
 
-    return assetsWithPrices;
+    // Sort assets by value (highest first), then by balance if values are equal
+    const sortedAssets = assetsWithPrices.sort((a, b) => {
+      // First sort by USD value (highest first)
+      if (b.value !== a.value) {
+        return b.value - a.value;
+      }
+
+      // If values are equal (both 0 or same value), sort by balance
+      return b.balance - a.balance;
+    });
+
+    return sortedAssets;
   } catch (error) {
     logger.error('Failed to fetch wallet assets - detailed error:', {
       error: error instanceof Error ? error.message : error,
@@ -374,130 +663,178 @@ export async function getWalletAssets(
 
 export async function getPortfolioHistory(
   walletAddress: string,
-  days: number
+  days: number = 30
 ): Promise<PortfolioHistoryPoint[]> {
   try {
     logger.info(
-      `Fetching real portfolio history for ${walletAddress} over ${days} days`
+      `Generating 30-day portfolio history for wallet: ${walletAddress}`
     );
 
-    // Get current assets and calculate current portfolio value first
-    // getWalletAssets already filters to only official Panora tokens
-    const currentAssets = await getWalletAssets(walletAddress);
-    logger.info(`Current official assets: ${currentAssets.length} types`);
-
-    if (currentAssets.length === 0) {
-      logger.warn('No current assets found, returning empty history');
+    // Validate wallet address
+    const addressValidation = AptosValidators.validateAddress(walletAddress);
+    if (!addressValidation.isValid) {
+      logger.error(`Invalid wallet address: ${walletAddress}`);
       return [];
     }
 
-    // Get prices for current assets
-    const allAssetTypes = currentAssets.map(a => a.asset_type);
-    const priceData = await getAssetPrices(allAssetTypes);
-    logger.info(`Fetched prices for ${priceData.length} unique asset types`);
+    // Step 1: Get ALL historical activities for the past 30+ days
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - (days + 5)); // Get a few extra days for safety
+    const startTimestamp = startDate.toISOString();
 
-    // Calculate current portfolio value
-    let currentTotalValue = 0;
-    const currentAssetValues: any[] = [];
+    logger.info(`Fetching transaction history from ${startTimestamp}`);
 
-    for (const asset of currentAssets) {
-      const priceInfo = priceData.find(p => p.assetType === asset.asset_type);
-      const price = priceInfo?.price || 0;
+    const activitiesResponse = await graphQLRequest<{
+      fungible_asset_activities: Array<{
+        transaction_timestamp: string;
+        type: string;
+        amount: string;
+        asset_type: string;
+        is_transaction_success: boolean;
+      }>;
+      coin_activities: Array<{
+        transaction_timestamp: string;
+        activity_type: string;
+        amount: string;
+        coin_type: string;
+        is_transaction_success: boolean;
+      }>;
+    }>(
+      INDEXER,
+      {
+        query: HISTORICAL_ACTIVITIES_QUERY,
+        variables: { ownerAddress: walletAddress, startTime: startTimestamp },
+      },
+      APTOS_API_KEY
+        ? { headers: { Authorization: `Bearer ${APTOS_API_KEY}` } }
+        : {}
+    );
 
-      // Skip phantom assets from portfolio calculations (but keep them in asset list for display)
-      if (phantomDetector.isPhantomAsset(asset.asset_type, asset.metadata)) {
-        const reason = phantomDetector.getPhantomReason(asset.asset_type);
-        logger.info(
-          `Skipping phantom asset ${asset.metadata?.symbol || 'Unknown'} from portfolio calculations - ${reason}`
-        );
-        continue;
-      }
-
-      // Only include assets with real prices - skip assets with no price data
-      if (price === 0 || isNaN(price)) {
-        logger.info(
-          `Skipping asset ${asset.metadata?.symbol || 'Unknown'} - no price data available (price: ${price})`
-        );
-        continue;
-      }
-
-      const decimals = asset.metadata?.decimals || 8;
-      const balance = Number(asset.amount) / Math.pow(10, decimals);
-      const value = balance * price;
-
-      currentTotalValue += value;
-      currentAssetValues.push({
-        assetType: asset.asset_type,
-        symbol: asset.metadata?.symbol || priceInfo?.symbol || 'Unknown',
-        balance,
-        price,
-        value,
-      });
-
-      logger.info(
-        `Asset: ${asset.metadata?.symbol || 'Unknown'}, Balance: ${balance.toFixed(4)}, Price: $${price.toFixed(2)}, Value: $${value.toFixed(2)}, Address: ${asset.asset_type}`
+    // Step 2: Normalize and sort all activities chronologically
+    const allActivities = [
+      ...activitiesResponse.fungible_asset_activities.map(activity => ({
+        timestamp: activity.transaction_timestamp,
+        type: activity.type,
+        amount: BigInt(activity.amount),
+        assetType: activity.asset_type,
+        success: activity.is_transaction_success,
+      })),
+      ...activitiesResponse.coin_activities.map(activity => ({
+        timestamp: activity.transaction_timestamp,
+        type: activity.activity_type,
+        amount: BigInt(activity.amount),
+        assetType: activity.coin_type,
+        success: activity.is_transaction_success,
+      })),
+    ]
+      .filter(activity => activity.success)
+      .sort(
+        (a, b) =>
+          new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
       );
-    }
 
-    logger.info(`Current portfolio value: $${currentTotalValue.toFixed(2)}`);
+    logger.info(`Found ${allActivities.length} successful activities`);
 
-    // Create a realistic trending history based on current portfolio value
+    // Step 3: Get current prices for all unique assets
+    const uniqueAssets = [...new Set(allActivities.map(a => a.assetType))];
+    const priceData = await getAssetPrices(uniqueAssets);
+    const priceMap = new Map(priceData.map(p => [p.assetType, p.price]));
+
+    // Step 4: Generate daily snapshots
     const history: PortfolioHistoryPoint[] = [];
     const now = new Date();
 
-    // If portfolio has no value, create a minimal chart
-    if (currentTotalValue === 0) {
-      for (let i = days - 1; i >= 0; i--) {
-        const targetDate = new Date(now);
-        targetDate.setDate(targetDate.getDate() - i);
+    for (let dayOffset = days - 1; dayOffset >= 0; dayOffset--) {
+      const targetDate = new Date(now);
+      targetDate.setDate(targetDate.getDate() - dayOffset);
+      targetDate.setHours(23, 59, 59, 999); // End of day
 
-        history.push({
-          date: targetDate.toISOString().split('T')[0],
-          totalValue: 0,
-          assets: [],
-        });
-      }
-    } else {
-      // Create a trending history with realistic variations
-      const baseValue = currentTotalValue;
+      const dailyBalances = calculateBalancesAtDate(allActivities, targetDate);
+      const dailyValue = calculatePortfolioValue(dailyBalances, priceMap);
 
-      for (let i = days - 1; i >= 0; i--) {
-        const targetDate = new Date(now);
-        targetDate.setDate(targetDate.getDate() - i);
-
-        // Create a trending pattern - generally upward with daily variations
-        const trendFactor = 0.85 + ((days - 1 - i) / (days - 1)) * 0.3; // 85% to 115% trending upward
-        const dailyVariation = 0.95 + Math.random() * 0.1; // ±5% daily variation
-        const dayValue = Math.max(
-          baseValue * 0.1,
-          baseValue * trendFactor * dailyVariation
-        );
-
-        history.push({
-          date: targetDate.toISOString().split('T')[0],
-          totalValue: dayValue,
-          assets: currentAssetValues.map(asset => ({
-            ...asset,
-            value: asset.value * trendFactor * dailyVariation,
-          })),
-        });
-      }
-
-      // Ensure the last day (today) shows the exact current value
-      if (history.length > 0) {
-        history[history.length - 1].totalValue = currentTotalValue;
-        history[history.length - 1].assets = currentAssetValues;
-      }
+      history.push({
+        date: targetDate.toISOString().split('T')[0],
+        totalValue: dailyValue.totalValue,
+        assets: dailyValue.assets,
+      });
     }
 
-    logger.info(
-      `Generated portfolio history with ${history.length} data points, current value: $${currentTotalValue}`
-    );
+    logger.info(`Generated ${history.length} daily portfolio snapshots`);
     return history;
   } catch (error) {
-    logger.error('Failed to fetch portfolio history:', error);
-    throw new Error('Failed to fetch portfolio history');
+    logger.error('Failed to generate portfolio history:', error);
+    return [];
   }
+}
+
+// Helper function to calculate balances at a specific date
+function calculateBalancesAtDate(
+  activities: Array<{
+    timestamp: string;
+    type: string;
+    amount: bigint;
+    assetType: string;
+  }>,
+  targetDate: Date
+): Map<string, bigint> {
+  const balances = new Map<string, bigint>();
+
+  // Process all activities up to the target date
+  for (const activity of activities) {
+    const activityDate = new Date(activity.timestamp);
+    if (activityDate <= targetDate) {
+      const currentBalance = balances.get(activity.assetType) || BigInt(0);
+
+      // Determine if this is a credit or debit
+      const isCredit =
+        activity.type.includes('deposit') ||
+        activity.type.includes('mint') ||
+        activity.type.includes('receive');
+
+      if (isCredit) {
+        balances.set(activity.assetType, currentBalance + activity.amount);
+      } else {
+        const newBalance = currentBalance - activity.amount;
+        balances.set(
+          activity.assetType,
+          newBalance >= 0 ? newBalance : BigInt(0)
+        );
+      }
+    }
+  }
+
+  return balances;
+}
+
+// Helper function to calculate total portfolio value from balances
+function calculatePortfolioValue(
+  balances: Map<string, bigint>,
+  priceMap: Map<string, number>
+): { totalValue: number; assets: any[] } {
+  let totalValue = 0;
+  const assets: any[] = [];
+
+  for (const [assetType, balance] of balances.entries()) {
+    if (balance <= 0) continue;
+
+    const price = priceMap.get(assetType) || 0;
+    const balanceFormatted = Number(balance) / Math.pow(10, 8); // Assume 8 decimals for now
+    const value = balanceFormatted * price;
+
+    if (value > 0.01) {
+      // Only include assets worth more than 1 cent
+      totalValue += value;
+      assets.push({
+        assetType,
+        symbol: assetType.split('::').pop() || 'Unknown',
+        balance: balanceFormatted,
+        price,
+        value,
+      });
+    }
+  }
+
+  return { totalValue, assets };
 }
 
 // Helper function to reconstruct portfolio state at a specific date
@@ -514,65 +851,181 @@ async function reconstructPortfolioAtDate(
   }>,
   priceData: AssetPrice[]
 ): Promise<{ totalValue: number; assets: any[] }> {
-  // Start with current balances and work backwards
-  const balanceMap = new Map<string, bigint>();
+  try {
+    // Start with current balances and work backwards
+    const balanceMap = new Map<string, bigint>();
 
-  // Initialize with current balances
-  currentAssets.forEach(asset => {
-    balanceMap.set(asset.asset_type, BigInt(asset.amount));
-  });
-
-  // Apply activities in reverse chronological order to reconstruct past state
-  activities
-    .filter(
-      activity =>
-        activity.transaction_timestamp > targetTimestamp &&
-        activity.is_transaction_success
-    )
-    .reverse() // Process in chronological order from target date to now
-    .forEach(activity => {
-      const currentBalance = balanceMap.get(activity.asset_type) || BigInt(0);
-      const activityAmount = BigInt(activity.amount);
-
-      // Reverse the activity to get the state at target date
-      // Use the activity type to determine how to reverse the transaction
-      if (activity.type.includes('Deposit') || activity.type.includes('Mint')) {
-        // If there was a deposit/mint after target date, subtract it to get past state
-        balanceMap.set(activity.asset_type, currentBalance - activityAmount);
-      } else if (
-        activity.type.includes('Withdraw') ||
-        activity.type.includes('Transfer')
-      ) {
-        // If there was a withdrawal/transfer after target date, add it back to get past state
-        balanceMap.set(activity.asset_type, currentBalance + activityAmount);
-      }
+    // Initialize with current balances
+    currentAssets.forEach(asset => {
+      balanceMap.set(asset.asset_type, BigInt(asset.amount));
     });
 
-  // Calculate portfolio value at target date
-  let totalValue = 0;
-  const assets: any[] = [];
+    // Sort activities by timestamp for proper chronological processing
+    const sortedActivities = activities
+      .filter(activity => activity.is_transaction_success)
+      .sort(
+        (a, b) =>
+          new Date(a.transaction_timestamp).getTime() -
+          new Date(b.transaction_timestamp).getTime()
+      );
 
-  for (const [assetType, balance] of balanceMap.entries()) {
-    if (balance <= 0) continue; // Skip assets with zero/negative balance
+    // Apply activities in reverse chronological order to reconstruct past state
+    sortedActivities
+      .filter(activity => activity.transaction_timestamp > targetTimestamp)
+      .reverse() // Process in reverse chronological order (newest to oldest)
+      .forEach(activity => {
+        const currentBalance = balanceMap.get(activity.asset_type) || BigInt(0);
+        const activityAmount = BigInt(activity.amount);
 
-    const asset = currentAssets.find(a => a.asset_type === assetType);
-    const priceInfo = priceData.find(p => p.assetType === assetType);
-    const price = priceInfo?.price || 0;
-    const decimals = asset?.metadata?.decimals || 8;
-    const balanceFormatted = Number(balance) / Math.pow(10, decimals);
-    const value = balanceFormatted * price;
+        // Reverse the activity to get the state at target date
+        // More comprehensive activity type handling
+        if (
+          activity.type.includes('deposit') ||
+          activity.type.includes('mint') ||
+          activity.type.includes('receive') ||
+          activity.type.includes('0x1::coin::deposit') ||
+          activity.type.includes('0x1::fungible_asset::deposit')
+        ) {
+          // If there was a deposit/mint/receive after target date, subtract it to get past state
+          const newBalance = currentBalance - activityAmount;
+          balanceMap.set(
+            activity.asset_type,
+            newBalance >= 0 ? newBalance : BigInt(0)
+          );
+        } else if (
+          activity.type.includes('withdraw') ||
+          activity.type.includes('transfer') ||
+          activity.type.includes('send') ||
+          activity.type.includes('0x1::coin::withdraw') ||
+          activity.type.includes('0x1::fungible_asset::withdraw')
+        ) {
+          // If there was a withdrawal/transfer/send after target date, add it back to get past state
+          balanceMap.set(activity.asset_type, currentBalance + activityAmount);
+        }
+      });
 
-    totalValue += value;
-    assets.push({
-      assetType,
-      symbol: asset?.metadata?.symbol || priceInfo?.symbol || 'Unknown',
-      balance: balanceFormatted,
-      price,
-      value,
-    });
+    // Calculate portfolio value at target date
+    let totalValue = 0;
+    const assets: any[] = [];
+
+    for (const [assetType, balance] of balanceMap.entries()) {
+      if (balance <= 0) continue; // Skip assets with zero/negative balance
+
+      const asset = currentAssets.find(a => a.asset_type === assetType);
+      const priceInfo = priceData.find(p => p.assetType === assetType);
+      const price = priceInfo?.price || 0;
+      const decimals = asset?.metadata?.decimals || 8;
+      const balanceFormatted = Number(balance) / Math.pow(10, decimals);
+      const value = balanceFormatted * price;
+
+      totalValue += value;
+      assets.push({
+        assetType,
+        symbol: asset?.metadata?.symbol || priceInfo?.symbol || 'Unknown',
+        balance: balanceFormatted,
+        price,
+        value,
+      });
+    }
+
+    return { totalValue, assets };
+  } catch (error) {
+    logger.error('Error reconstructing portfolio at date:', error);
+    return { totalValue: 0, assets: [] };
   }
+}
 
-  return { totalValue, assets };
+// Fallback synthetic data generation function
+async function generateSyntheticPortfolioHistory(
+  walletAddress: string,
+  days: number
+): Promise<PortfolioHistoryPoint[]> {
+  try {
+    logger.info('Generating synthetic portfolio history as fallback');
+
+    // Get current assets and calculate current portfolio value
+    const currentAssets = await getWalletAssets(walletAddress, true);
+
+    if (currentAssets.length === 0) {
+      return [];
+    }
+
+    // Get prices for current assets
+    const allAssetTypes = currentAssets.map(a => a.asset_type);
+    const priceData = await getAssetPrices(allAssetTypes);
+
+    // Calculate current portfolio value
+    let currentTotalValue = 0;
+    const currentAssetValues: any[] = [];
+
+    for (const asset of currentAssets) {
+      const priceInfo = priceData.find(p => p.assetType === asset.asset_type);
+      const price = priceInfo?.price || 0;
+      const decimals = asset.metadata?.decimals || 8;
+      const balance = Number(asset.amount) / Math.pow(10, decimals);
+      const value = balance * price;
+
+      currentTotalValue += value;
+      currentAssetValues.push({
+        assetType: asset.asset_type,
+        symbol: asset.metadata?.symbol || priceInfo?.symbol || 'Unknown',
+        balance,
+        price,
+        value,
+      });
+    }
+
+    // Generate synthetic history
+    const history: PortfolioHistoryPoint[] = [];
+    const now = new Date();
+
+    if (currentTotalValue === 0) {
+      // Empty portfolio
+      for (let i = days - 1; i >= 0; i--) {
+        const targetDate = new Date(now);
+        targetDate.setDate(targetDate.getDate() - i);
+        history.push({
+          date: targetDate.toISOString().split('T')[0],
+          totalValue: 0,
+          assets: [],
+        });
+      }
+    } else {
+      // Generate trending synthetic data
+      const baseValue = currentTotalValue;
+      for (let i = days - 1; i >= 0; i--) {
+        const targetDate = new Date(now);
+        targetDate.setDate(targetDate.getDate() - i);
+
+        const trendFactor = 0.85 + ((days - 1 - i) / (days - 1)) * 0.3;
+        const dailyVariation = 0.95 + Math.random() * 0.1;
+        const dayValue = Math.max(
+          baseValue * 0.1,
+          baseValue * trendFactor * dailyVariation
+        );
+
+        history.push({
+          date: targetDate.toISOString().split('T')[0],
+          totalValue: dayValue,
+          assets: currentAssetValues.map(asset => ({
+            ...asset,
+            value: asset.value * trendFactor * dailyVariation,
+          })),
+        });
+      }
+
+      // Ensure the last day shows exact current value
+      if (history.length > 0) {
+        history[history.length - 1].totalValue = currentTotalValue;
+        history[history.length - 1].assets = currentAssetValues;
+      }
+    }
+
+    return history;
+  } catch (error) {
+    logger.error('Failed to generate synthetic portfolio history:', error);
+    return [];
+  }
 }
 
 export async function getAssetPrices(
@@ -591,7 +1044,9 @@ export async function getAssetPrices(
 
     // Create a set of official token addresses for validation
     const officialTokenAddresses = new Set(
-      allPanoraPrices.map(token => token.faAddress || token.tokenAddress).filter(Boolean)
+      allPanoraPrices
+        .map(token => token.faAddress || token.tokenAddress)
+        .filter(Boolean)
     );
 
     // Debug: Log first few Panora addresses to see format
@@ -604,18 +1059,44 @@ export async function getAssetPrices(
       );
     }
 
-    // Match each asset type with Panora data, but only for official tokens
-    for (const assetType of assetTypes) {
-      // Double-check that this asset is on the official list
-      if (!officialTokenAddresses.has(assetType)) {
-        logger.warn(`Asset ${assetType} not on official Panora list, skipping price fetch`);
-        continue;
+    // Build a map of all valid Panora addresses for fast lookup
+    const panoraAddressMap = new Map<string, PanoraPriceResponse>();
+    for (const token of allPanoraPrices) {
+      // Map both faAddress and tokenAddress to the token data
+      if (token.faAddress) {
+        panoraAddressMap.set(token.faAddress, token);
+      }
+      if (token.tokenAddress) {
+        panoraAddressMap.set(token.tokenAddress, token);
       }
 
-      const panoraMatch = allPanoraPrices.find(
-        price =>
-          price.faAddress === assetType || price.tokenAddress === assetType
-      );
+      // Special case for APT - add common variations
+      if (token.symbol === 'APT') {
+        panoraAddressMap.set('0x1::aptos_coin::AptosCoin', token);
+      }
+      // Special case for USDC - add common variations
+      if (token.symbol === 'USDC') {
+        panoraAddressMap.set(
+          '0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDC',
+          token
+        );
+        panoraAddressMap.set(
+          '0x397071c01929cc6672a17f130bd62b1bce224309029837ce4f18214cc83ce2a7::USDC::USDC',
+          token
+        );
+      }
+      // Special case for USDT - add common variations
+      if (token.symbol === 'USDT') {
+        panoraAddressMap.set(
+          '0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDT',
+          token
+        );
+      }
+    }
+
+    // Match each asset type with Panora data
+    for (const assetType of assetTypes) {
+      const panoraMatch = panoraAddressMap.get(assetType);
 
       if (panoraMatch) {
         prices.push({
@@ -630,7 +1111,7 @@ export async function getAssetPrices(
         );
       } else {
         // Debug: Log what we're trying to match
-        logger.info(`No Panora match for asset: ${assetType}`);
+        logger.debug(`No Panora match for asset: ${assetType}`);
 
         // Fallback for assets not found in Panora
         const symbol = PanoraService.getSymbolForAssetType(assetType);
@@ -665,17 +1146,17 @@ export async function getAssetPrices(
             prices.push({
               assetType,
               symbol: symbol,
-              price: NaN, // Use NaN instead of 0 to indicate no price data
+              price: 0, // Use 0 instead of NaN for better handling
               change24h: 0,
               marketCap: 0,
             });
           }
         } else {
-          // For unknown tokens, set price to NaN
+          // For unknown tokens, set price to 0
           prices.push({
             assetType,
             symbol: symbol,
-            price: NaN, // Use NaN instead of 0 to indicate no price data
+            price: 0, // Use 0 for consistent handling
             change24h: 0,
             marketCap: 0,
           });
@@ -689,11 +1170,11 @@ export async function getAssetPrices(
   } catch (error) {
     logger.error('Failed to fetch asset prices:', error);
 
-    // Return NaN prices for all assets on error
+    // Return 0 prices for all assets on error
     return assetTypes.map(assetType => ({
       assetType,
       symbol: PanoraService.getSymbolForAssetType(assetType),
-      price: NaN, // Use NaN to indicate no price data available
+      price: 0, // Use 0 to indicate no price data available
       change24h: 0,
       marketCap: 0,
     }));
@@ -781,7 +1262,7 @@ export async function getWalletNFTs(
       limit,
       offset,
     });
-    
+
     // Throw the original error with more context
     if (error instanceof Error) {
       throw error;
@@ -790,13 +1271,97 @@ export async function getWalletNFTs(
   }
 }
 
+export async function getNFTTransferHistory(
+  tokenDataId: string,
+  limit: number = 20
+): Promise<
+  Array<{
+    transaction_version: string;
+    transaction_timestamp: string;
+    from_address: string;
+    to_address: string;
+    token_amount: string;
+    property_version_v1: number;
+    transfer_type: string;
+    is_transaction_success: boolean;
+  }>
+> {
+  try {
+    logger.info(`Fetching transfer history for NFT: ${tokenDataId}`);
+
+    const response = await graphQLRequest<{
+      token_activities_v2: Array<{
+        transaction_version: string;
+        transaction_timestamp: string;
+        from_address: string;
+        to_address: string;
+        token_amount: string;
+        property_version_v1: number;
+        transfer_type: string;
+        is_transaction_success: boolean;
+      }>;
+    }>(
+      INDEXER,
+      {
+        query: `
+        query GetNFTTransferHistory($tokenDataId: String!, $limit: Int!) {
+          token_activities_v2(
+            where: {
+              token_data_id: { _eq: $tokenDataId }
+              is_transaction_success: { _eq: true }
+            }
+            order_by: { transaction_timestamp: desc }
+            limit: $limit
+          ) {
+            transaction_version
+            transaction_timestamp
+            from_address
+            to_address
+            token_amount
+            property_version_v1
+            transfer_type
+            is_transaction_success
+          }
+        }
+      `,
+        variables: { tokenDataId, limit },
+      },
+      APTOS_API_KEY
+        ? {
+            headers: {
+              Authorization: `Bearer ${APTOS_API_KEY}`,
+            },
+          }
+        : {}
+    );
+
+    const transfers = response.token_activities_v2 || [];
+    logger.info(
+      `Found ${transfers.length} transfer records for NFT ${tokenDataId}`
+    );
+
+    return transfers;
+  } catch (error) {
+    logger.error('Failed to fetch NFT transfer history:', {
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      tokenDataId,
+      limit,
+    });
+
+    // Return empty array on error to avoid breaking the UI
+    return [];
+  }
+}
+
 export async function calculatePortfolioMetrics(
-  walletAddress: string
+  walletAddress: string,
+  showOnlyVerified: boolean = true
 ): Promise<PortfolioMetrics> {
   // Temporarily disable caching to fix configuration issues
   try {
-    // getWalletAssets already filters to only official Panora tokens
-    const assets = await getWalletAssets(walletAddress);
+    // getWalletAssets respects the showOnlyVerified parameter
+    const assets = await getWalletAssets(walletAddress, showOnlyVerified);
     const prices = await getAssetPrices(assets.map(a => a.asset_type));
 
     let totalValue = 0;
@@ -812,12 +1377,15 @@ export async function calculatePortfolioMetrics(
       const priceInfo = prices.find(p => p.assetType === asset.asset_type);
       const price = priceInfo?.price || 0;
 
-      // Skip phantom assets from metrics calculations (but keep them in asset list for display)
-      if (phantomDetector.isPhantomAsset(asset.asset_type, asset.metadata))
-        continue;
+      // Include all assets in metrics calculations
 
-      // Only include assets with real prices - skip assets with no price data
-      if (price === 0 || isNaN(price)) continue;
+      // Include assets even without price data, just skip NaN prices
+      if (isNaN(price)) {
+        logger.info(
+          `Skipping NaN price for ${asset.metadata?.symbol || 'Unknown'} in metrics calculation`
+        );
+        continue;
+      }
 
       const decimals = asset.metadata?.decimals || 8;
       const balance = Number(asset.amount) / Math.pow(10, decimals);
@@ -887,13 +1455,23 @@ export async function getWalletTransactions(
 
     const response = await graphQLRequest<{
       fungible_asset_activities: WalletTransaction[];
-    }>(INDEXER, {
-      query: WALLET_TRANSACTIONS_QUERY,
-      variables: {
-        ownerAddress: walletAddress,
-        limit: limit,
+    }>(
+      INDEXER,
+      {
+        query: WALLET_TRANSACTIONS_QUERY,
+        variables: {
+          ownerAddress: walletAddress,
+          limit: limit,
+        },
       },
-    });
+      APTOS_API_KEY
+        ? {
+            headers: {
+              Authorization: `Bearer ${APTOS_API_KEY}`,
+            },
+          }
+        : {}
+    );
 
     const transactions = response.fungible_asset_activities || [];
     logger.info(
@@ -901,8 +1479,17 @@ export async function getWalletTransactions(
     );
 
     return transactions;
-  } catch (error) {
+  } catch (error: any) {
     logger.error('Failed to fetch wallet transactions:', error);
+
+    // Handle rate limiting gracefully
+    if (error.status === 429) {
+      logger.warn(
+        'API rate limit reached for transactions, returning empty array'
+      );
+      return [];
+    }
+
     throw new Error('Failed to fetch wallet transactions');
   }
 }

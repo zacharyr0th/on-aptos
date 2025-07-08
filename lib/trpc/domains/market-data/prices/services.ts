@@ -1,16 +1,17 @@
-import {
-  ExternalApiService,
-  ApiEndpoints,
-  CacheService,
-  CacheKeys,
-} from '@/lib/trpc/shared/services';
+import { ApiEndpoints, CacheKeys } from '@/lib/config/api-endpoints';
 import { PANORA_TOKENS } from '@/lib/config/data';
 import { SERVICE_CONFIG } from '@/lib/config/cache';
-import { formatNumber, ApiError } from '@/lib/utils';
+import { formatNumber, ApiError, enhancedFetch } from '@/lib/utils';
+import {
+  cmcCache,
+  panoraCache,
+  coinGeckoCache,
+} from '@/lib/utils/simple-cache';
 import {
   CMCPriceData,
   PanoraPricesData,
   CMC_SYMBOL_IDS,
+  COINGECKO_IDS,
   SYMBOL_DISPLAY_NAMES,
   SYMBOL_FULL_NAMES,
 } from './types';
@@ -32,13 +33,63 @@ export class PriceService {
   static async getCMCPrice(symbol: string): Promise<CMCPriceData> {
     const cacheKey = CacheKeys.cmcPrice(symbol);
 
-    const result = await CacheService.getCachedOrFetch(
-      cacheKey,
-      () => this.fetchCMCPriceData(symbol),
-      config.ttl
-    );
+    // Check cache first for rate-limited API
+    const cached = cmcCache.get<CMCPriceData>(cacheKey);
+    if (cached) {
+      return cached;
+    }
 
-    return result.data;
+    const data = await this.fetchCMCPriceData(symbol);
+    cmcCache.set(cacheKey, data);
+    return data;
+  }
+
+  /**
+   * Get historical CMC price for a symbol on a specific date
+   */
+  static async getCMCHistoricalPrice(
+    symbol: string,
+    date: string
+  ): Promise<{ price: number; date: string }> {
+    const cacheKey = `cmc_historical_${symbol}_${date}`;
+
+    // Check cache first for rate-limited API
+    const cached = cmcCache.get<{ price: number; date: string }>(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
+    const data = await this.fetchCMCHistoricalPriceData(symbol, date);
+    cmcCache.set(cacheKey, data);
+    return data;
+  }
+
+  /**
+   * Get historical prices for multiple symbols over a date range
+   */
+  static async getCMCHistoricalPrices(
+    symbols: string[],
+    startDate: string,
+    endDate: string
+  ): Promise<Record<string, Array<{ date: string; price: number }>>> {
+    const results: Record<string, Array<{ date: string; price: number }>> = {};
+
+    // Process symbols in batches to avoid hitting API limits
+    for (const symbol of symbols) {
+      try {
+        const historicalData = await this.fetchCMCHistoricalPriceRange(
+          symbol,
+          startDate,
+          endDate
+        );
+        results[symbol] = historicalData;
+      } catch (error) {
+        console.warn(`Failed to fetch historical prices for ${symbol}:`, error);
+        results[symbol] = [];
+      }
+    }
+
+    return results;
   }
 
   /**
@@ -47,13 +98,15 @@ export class PriceService {
   static async getPanoraPrices(): Promise<PanoraPricesData> {
     const cacheKey = CacheKeys.panoraPrice('all');
 
-    const result = await CacheService.getCachedOrFetch(
-      cacheKey,
-      () => this.fetchAllPanoraPricesData(),
-      config.ttl
-    );
+    // Check cache first for rate-limited API
+    const cached = panoraCache.get<PanoraPricesData>(cacheKey);
+    if (cached) {
+      return cached;
+    }
 
-    return result.data;
+    const data = await this.fetchAllPanoraPricesData();
+    panoraCache.set(cacheKey, data);
+    return data;
   }
 
   /**
@@ -81,7 +134,14 @@ export class PriceService {
 
     const url = `${ApiEndpoints.CMC_BASE}/cryptocurrency/quotes/latest?id=${cmcId}`;
 
-    const response = await ExternalApiService.get<{
+    const response = (await enhancedFetch(url, {
+      headers: {
+        'X-CMC_PRO_API_KEY': CMC_API_KEY,
+        Accept: 'application/json',
+      },
+      timeout: config.timeout,
+      retries: config.retries,
+    }).then(r => r.json())) as {
       data?: Record<
         string,
         {
@@ -92,14 +152,7 @@ export class PriceService {
           };
         }
       >;
-    }>(url, {
-      headers: {
-        'X-CMC_PRO_API_KEY': CMC_API_KEY,
-        Accept: 'application/json',
-      },
-      timeout: config.timeout,
-      retries: config.retries,
-    });
+    };
 
     const price = response?.data?.[cmcId]?.quote?.USD?.price;
 
@@ -134,26 +187,22 @@ export class PriceService {
       );
     }
 
-    const url = ExternalApiService.buildUrl(
-      `${ApiEndpoints.PANORA_BASE}/prices`,
-      {
-        tokenAddress: tokenAddresses.join(','),
-      }
-    );
+    const params = new URLSearchParams({
+      tokenAddress: tokenAddresses.join(','),
+    });
+    const url = `${ApiEndpoints.PANORA_BASE}/prices?${params.toString()}`;
 
-    const data = await ExternalApiService.get<
-      Array<{
-        faAddress?: string;
-        tokenAddress?: string;
-        usdPrice?: string;
-      }>
-    >(url, {
+    const data = (await enhancedFetch(url, {
       headers: {
         'x-api-key': PANORA_API_KEY,
       },
       timeout: 10000,
       retries: 3,
-    });
+    }).then(r => r.json())) as Array<{
+      faAddress?: string;
+      tokenAddress?: string;
+      usdPrice?: string;
+    }>;
 
     const prices: Record<string, number> = {};
 
@@ -166,6 +215,187 @@ export class PriceService {
     }
 
     return prices;
+  }
+
+  /**
+   * Fetch historical price data using CoinGecko + Dexscreener fallback
+   */
+  private static async fetchCMCHistoricalPriceData(
+    symbol: string,
+    date: string
+  ): Promise<{ price: number; date: string }> {
+    const coinGeckoId = COINGECKO_IDS[symbol.toLowerCase()];
+
+    // Try CoinGecko first (free and reliable)
+    if (coinGeckoId) {
+      try {
+        const price = await this.getCoinGeckoHistoricalPrice(coinGeckoId, date);
+        return { price, date };
+      } catch (error) {
+        console.warn(`CoinGecko failed for ${symbol} on ${date}:`, error);
+      }
+    }
+
+    // Fallback to Dexscreener current price (no historical data available)
+    try {
+      const price = await this.getDexscreenerPrice(symbol);
+      console.log(
+        `Using Dexscreener current price for ${symbol} (historical not available)`
+      );
+      return { price, date };
+    } catch (error) {
+      console.warn(`Dexscreener failed for ${symbol}:`, error);
+    }
+
+    throw new ApiError(
+      `No historical price data available for ${symbol} on ${date}`,
+      undefined,
+      'fetchCMCHistoricalPriceData'
+    );
+  }
+
+  /**
+   * Get historical price from CoinGecko
+   */
+  private static async getCoinGeckoHistoricalPrice(
+    coinId: string,
+    date: string
+  ): Promise<number> {
+    // Convert YYYY-MM-DD to DD-MM-YYYY format required by CoinGecko
+    const [year, month, day] = date.split('-');
+    const geckoDate = `${day}-${month}-${year}`;
+
+    const response = await fetch(
+      `https://api.coingecko.com/api/v3/coins/${coinId}/history?date=${geckoDate}`,
+      {
+        headers: {
+          Accept: 'application/json',
+          'User-Agent': 'OnAptos-Historical/1.0',
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `CoinGecko API error: ${response.status} ${response.statusText}`
+      );
+    }
+
+    const data = await response.json();
+
+    if (!data.market_data?.current_price?.usd) {
+      throw new Error(`No price data found for ${coinId} on ${date}`);
+    }
+
+    return parseFloat(data.market_data.current_price.usd.toFixed(6));
+  }
+
+  /**
+   * Get current price from Dexscreener (fallback)
+   */
+  private static async getDexscreenerPrice(symbol: string): Promise<number> {
+    // Map symbols to token addresses for Dexscreener
+    const tokenAddresses: Record<string, string> = {
+      APT: '0x1::aptos_coin::AptosCoin',
+      USDC: '0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDC',
+      USDT: '0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDT',
+    };
+
+    const tokenAddress = tokenAddresses[symbol.toUpperCase()];
+    if (!tokenAddress) {
+      throw new Error(`No Dexscreener mapping for ${symbol}`);
+    }
+
+    const response = await fetch(
+      `https://api.dexscreener.com/latest/dex/tokens/${tokenAddress}`,
+      {
+        headers: {
+          Accept: 'application/json',
+          'User-Agent': 'OnAptos-Fallback/1.0',
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `Dexscreener API error: ${response.status} ${response.statusText}`
+      );
+    }
+
+    const data = await response.json();
+
+    if (!data.pairs?.[0]?.priceUsd) {
+      throw new Error(`No price data found for ${symbol} on Dexscreener`);
+    }
+
+    return parseFloat(parseFloat(data.pairs[0].priceUsd).toFixed(6));
+  }
+
+  /**
+   * Fetch CMC historical price range (private method)
+   */
+  private static async fetchCMCHistoricalPriceRange(
+    symbol: string,
+    startDate: string,
+    endDate: string
+  ): Promise<Array<{ price: number; date: string }>> {
+    const symbolId = CMC_SYMBOL_IDS[symbol.toLowerCase()];
+    if (!symbolId) {
+      throw new ApiError(
+        `CMC ID not found for symbol: ${symbol}`,
+        undefined,
+        'fetchCMCHistoricalPriceRange'
+      );
+    }
+
+    if (!CMC_API_KEY) {
+      throw new ApiError(
+        'CMC API key is required but not configured',
+        undefined,
+        'fetchCMCHistoricalPriceRange'
+      );
+    }
+
+    try {
+      const params = new URLSearchParams({
+        id: symbolId,
+        time_start: new Date(startDate).toISOString(),
+        time_end: new Date(endDate).toISOString(),
+        interval: 'daily',
+      });
+      const url = `${ApiEndpoints.CMC_BASE}/cryptocurrency/quotes/historical?${params.toString()}`;
+
+      const response = await enhancedFetch(url, {
+        method: 'GET',
+        headers: {
+          'X-CMC_PRO_API_KEY': CMC_API_KEY,
+          Accept: 'application/json',
+          'User-Agent': `OnAptos-${symbol}-Historical-Range/1.0`,
+        },
+        timeout: config.timeout,
+        retries: config.retries,
+      }).then(r => r.json());
+
+      const data = (response as any).data[symbolId];
+      if (!data || !data.quotes) {
+        throw new ApiError(
+          `No historical data found for ${symbol} between ${startDate} and ${endDate}`,
+          undefined,
+          'fetchCMCHistoricalPriceRange'
+        );
+      }
+
+      return data.quotes.map((quote: any) => ({
+        price: parseFloat(quote.quote.USD.price.toFixed(6)),
+        date: quote.timestamp.split('T')[0],
+      }));
+    } catch (error) {
+      throw new ApiError(
+        `Failed to fetch CMC historical price range for ${symbol}: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        undefined,
+        'fetchCMCHistoricalPriceRange'
+      );
+    }
   }
 
   /**

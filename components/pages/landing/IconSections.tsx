@@ -16,6 +16,44 @@ interface IconSectionData {
   underConstruction?: boolean;
 }
 
+const getFallbackTitle = (key: string): string => {
+  switch (key) {
+    case 'landing.sections.portfolio':
+      return 'Portfolio';
+    case 'landing.sections.stablecoins':
+      return 'Stablecoins';
+    case 'landing.sections.bitcoin_assets':
+      return 'Bitcoin Assets';
+    case 'landing.sections.liquid_staking':
+      return 'Liquid Staking';
+    case 'landing.sections.rwas':
+      return 'RWAs';
+    case 'landing.sections.defi_protocols':
+      return 'DeFi Protocols';
+    default:
+      return '';
+  }
+};
+
+const getFallbackDescription = (key: string): string => {
+  switch (key) {
+    case 'landing.sections.portfolio_description':
+      return 'Monitor your Aptos assets, track performance, and analyze your DeFi positions';
+    case 'landing.sections.stablecoins_description':
+      return 'Track stablecoin supplies and market data on Aptos';
+    case 'landing.sections.bitcoin_assets_description':
+      return 'Bitcoin-backed tokens and synthetic BTC assets on Aptos';
+    case 'landing.sections.liquid_staking_description':
+      return 'Liquid staking tokens and APT staking derivatives';
+    case 'landing.sections.rwas_description':
+      return 'Real World Assets on Aptos';
+    case 'landing.sections.defi_protocols_description':
+      return 'Decentralized finance protocols and analytics';
+    default:
+      return '';
+  }
+};
+
 export const IconSections = () => {
   const { t } = useTranslation('common');
 
@@ -118,21 +156,26 @@ export const IconSections = () => {
   ];
 
   return (
-    <div id="dashboards" className="w-full">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div id="dashboards" className="w-full overflow-hidden">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {iconSections.map((section, index) => (
           <div
             key={index}
             className="opacity-0 animate-fade-in-up"
             style={{
-              animationDelay: `${index * 100}ms`,
+              animationDelay: `${index * 50}ms`,
               animationFillMode: 'both',
             }}
           >
             <IconSection
-              title={t(section.titleKey)}
+              title={t(section.titleKey, getFallbackTitle(section.titleKey))}
               description={
-                section.descriptionKey ? t(section.descriptionKey) : undefined
+                section.descriptionKey
+                  ? t(
+                      section.descriptionKey,
+                      getFallbackDescription(section.descriptionKey)
+                    )
+                  : undefined
               }
               apiEndpoint={section.apiEndpoint}
               route={section.route}

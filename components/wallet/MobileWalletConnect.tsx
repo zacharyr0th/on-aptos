@@ -18,6 +18,7 @@ interface MobileWalletConnectProps {
 
 export function MobileWalletConnect({ className }: MobileWalletConnectProps) {
   const [isMobile, setIsMobile] = useState(false);
+  const [isConnecting, setIsConnecting] = useState<string | null>(null);
 
   useEffect(() => {
     // Detect if user is on mobile device
@@ -35,16 +36,24 @@ export function MobileWalletConnect({ className }: MobileWalletConnectProps) {
   }, []);
 
   const connectToPetra = useCallback(() => {
-    const currentUrl = window.location.origin;
-    const petraDeepLink = `https://petra.app/explore?link=${encodeURIComponent(currentUrl)}`;
+    setIsConnecting('petra');
 
-    if (isMobile) {
-      // On mobile, try to open the deep link directly
-      window.location.href = petraDeepLink;
-    } else {
-      // On desktop, open in new tab
-      window.open(petraDeepLink, '_blank');
-    }
+    // Add slight delay for visual feedback
+    setTimeout(() => {
+      const currentUrl = window.location.origin;
+      const petraDeepLink = `https://petra.app/explore?link=${encodeURIComponent(currentUrl)}`;
+
+      if (isMobile) {
+        // On mobile, try to open the deep link directly
+        window.location.href = petraDeepLink;
+      } else {
+        // On desktop, open in new tab
+        window.open(petraDeepLink, '_blank');
+      }
+
+      // Reset connecting state after delay
+      setTimeout(() => setIsConnecting(null), 2000);
+    }, 150);
   }, [isMobile]);
 
   const connectToAptosConnect = useCallback(() => {
@@ -80,13 +89,22 @@ export function MobileWalletConnect({ className }: MobileWalletConnectProps) {
           onClick={connectToPetra}
           className="w-full flex items-center justify-between"
           variant="outline"
+          disabled={isConnecting === 'petra'}
         >
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-              <span className="text-white font-bold text-sm">P</span>
-            </div>
+            {isConnecting === 'petra' ? (
+              <div className="w-8 h-8 flex items-center justify-center">
+                <div className="h-4 w-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : (
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                <span className="text-white font-bold text-sm">P</span>
+              </div>
+            )}
             <div className="text-left">
-              <div className="font-medium">Petra Wallet</div>
+              <div className="font-medium">
+                {isConnecting === 'petra' ? 'Opening Petra...' : 'Petra Wallet'}
+              </div>
               <div className="text-sm text-muted-foreground">
                 Mobile & Extension
               </div>

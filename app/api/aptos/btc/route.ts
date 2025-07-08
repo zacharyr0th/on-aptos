@@ -49,8 +49,6 @@ export async function GET(request: NextRequest) {
         }
       }, errorContext),
     {
-      cacheKey: 'btc-supplies-api',
-      cacheName: 'btc',
       customHeaders: {
         'Cache-Control': `public, max-age=${Math.floor(SERVICE_CONFIG.btc.ttl / 1000)}, stale-while-revalidate=${Math.floor(SERVICE_CONFIG.btc.ttl / 2000)}`,
         'X-Content-Type': 'application/json',

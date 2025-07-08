@@ -63,7 +63,7 @@ export function LanguageToggle() {
         aria-label={t('common:actions.switch_language', 'Switch language')}
         disabled
       >
-        <Globe className="h-[1.2rem] w-[1.2rem] transition-all" />
+        <Globe className="h-4 w-4 sm:h-[1.2rem] sm:w-[1.2rem] transition-all" />
         <span className="sr-only">
           {t('common:actions.switch_language', 'Switch language')}
         </span>
@@ -81,7 +81,7 @@ export function LanguageToggle() {
           aria-label={t('common:actions.switch_language', 'Switch language')}
           disabled={!isReady || isChanging}
         >
-          <Globe className="h-[1.2rem] w-[1.2rem] transition-all" />
+          <Globe className="h-4 w-4 sm:h-[1.2rem] sm:w-[1.2rem] transition-all" />
           <span className="sr-only">
             {t('common:actions.switch_language', 'Switch language')}
           </span>
@@ -92,12 +92,14 @@ export function LanguageToggle() {
           <DropdownMenuItem
             key={lang}
             onSelect={() => handleLanguageChange(lang)}
-            className={currentLanguage === lang ? 'font-bold text-primary' : ''}
+            className={`py-2.5 sm:py-2 ${currentLanguage === lang ? 'font-bold text-primary' : ''}`}
             disabled={isChanging || currentLanguage === lang}
           >
             <div className="flex w-full items-center justify-between gap-2">
-              <span>{LANGUAGE_LABELS[lang]}</span>
-              <span className="flex items-center gap-2 min-w-[56px] justify-end">
+              <span className="truncate max-w-[120px] xs:max-w-[140px] sm:max-w-none">
+                {LANGUAGE_LABELS[lang]}
+              </span>
+              <span className="flex items-center gap-1 sm:gap-2 min-w-[56px] justify-end">
                 {lang !== 'en' && (
                   <Badge variant="secondary">
                     {t('common:labels.beta', 'Beta')}

@@ -154,8 +154,9 @@ export function FilterControls({
                 {hasSubcategories &&
                   'subcategories' in categoryDef &&
                   categoryDef.subcategories &&
-                  Object.entries(categoryDef.subcategories).map(
-                    ([subcategory, description]) => (
+                  Object.entries(categoryDef.subcategories)
+                    .sort(([a], [b]) => a.localeCompare(b))
+                    .map(([subcategory, description]) => (
                       <DropdownMenuItem
                         key={`${category}-${subcategory}`}
                         className={`cursor-pointer ml-4 ${selectedSubcategory === subcategory ? 'bg-primary/10 text-primary' : ''}`}
@@ -173,8 +174,7 @@ export function FilterControls({
                           </span>
                         </div>
                       </DropdownMenuItem>
-                    )
-                  )}
+                    ))}
               </div>
             );
           })}
@@ -290,8 +290,9 @@ export function FilterControls({
                       'subcategories' in categoryDef &&
                       categoryDef.subcategories
                     ) {
-                      return Object.entries(categoryDef.subcategories).map(
-                        ([subcategory, description]) => (
+                      return Object.entries(categoryDef.subcategories)
+                        .sort(([a], [b]) => a.localeCompare(b))
+                        .map(([subcategory, description]) => (
                           <Tooltip key={subcategory}>
                             <TooltipTrigger asChild>
                               <button
@@ -319,8 +320,7 @@ export function FilterControls({
                               </p>
                             </TooltipContent>
                           </Tooltip>
-                        )
-                      );
+                        ));
                     }
                     return [];
                   })()}

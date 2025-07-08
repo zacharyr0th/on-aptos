@@ -1,8 +1,9 @@
 import { router, publicProcedure } from '@/lib/trpc/core/server';
-import { buildStandardResponse } from '@/lib/trpc/shared/services';
 import {
   GetCMCPriceInputSchema,
   CMCPriceResponseSchema,
+  GetCMCHistoricalPriceInputSchema,
+  CMCHistoricalPriceResponseSchema,
   PanoraPricesResponseSchema,
 } from './schemas';
 import { PriceService } from './services';
@@ -23,7 +24,52 @@ export const pricesRouter = router({
 
       try {
         const data = await PriceService.getCMCPrice(input.symbol);
-        return buildStandardResponse(data, startTime, false, 1);
+        return {
+          timestamp: new Date().toISOString(),
+          performance: {
+            responseTimeMs: Date.now() - startTime,
+            cacheHits: 0,
+            cacheMisses: 0,
+            apiCalls: 1,
+          },
+          cache: {
+            cached: false,
+          },
+          data,
+        };
+      } catch (error) {
+        // Let tRPC handle the error
+        throw error;
+      }
+    }),
+
+  /**
+   * Get CMC historical price for a specific symbol and date
+   */
+  getCMCHistoricalPrice: publicProcedure
+    .input(GetCMCHistoricalPriceInputSchema)
+    .output(CMCHistoricalPriceResponseSchema)
+    .query(async ({ input }) => {
+      const startTime = Date.now();
+
+      try {
+        const data = await PriceService.getCMCHistoricalPrice(
+          input.symbol,
+          input.date
+        );
+        return {
+          timestamp: new Date().toISOString(),
+          performance: {
+            responseTimeMs: Date.now() - startTime,
+            cacheHits: 0,
+            cacheMisses: 0,
+            apiCalls: 1,
+          },
+          cache: {
+            cached: false,
+          },
+          data,
+        };
       } catch (error) {
         // Let tRPC handle the error
         throw error;
@@ -40,7 +86,19 @@ export const pricesRouter = router({
 
       try {
         const data = await PriceService.getPanoraPrices();
-        return buildStandardResponse(data, startTime, false, 1);
+        return {
+          timestamp: new Date().toISOString(),
+          performance: {
+            responseTimeMs: Date.now() - startTime,
+            cacheHits: 0,
+            cacheMisses: 0,
+            apiCalls: 1,
+          },
+          cache: {
+            cached: false,
+          },
+          data,
+        };
       } catch (error) {
         // Let tRPC handle the error
         throw error;

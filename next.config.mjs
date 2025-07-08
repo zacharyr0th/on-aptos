@@ -8,6 +8,9 @@ const nextConfig = {
   // Optimize for Vercel deployment
   poweredByHeader: false,
   reactStrictMode: true,
+  devIndicators: false,
+  // Enable compression for API routes
+  compress: true,
   // Allow images from RWA CDN, S3 bucket, and DefiLlama icons
   images: {
     remotePatterns: [
@@ -145,6 +148,19 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'api.cellana.finance',
+        port: '',
+        pathname: '/**',
+      },
+      // Aptos Names
+      {
+        protocol: 'https',
+        hostname: 'www.aptosnames.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.aptosnames.com',
         port: '',
         pathname: '/**',
       },

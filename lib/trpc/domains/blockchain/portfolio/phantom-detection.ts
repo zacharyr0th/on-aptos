@@ -1,9 +1,9 @@
 import { logger } from '@/lib/utils/logger';
-import { 
+import {
   isPhantomAsset as isPhantomAssetFromRegistry,
   getPhantomReason as getPhantomReasonFromRegistry,
   getProtocolByAddress,
-  getAllProtocolAddresses
+  getAllProtocolAddresses,
 } from '@/lib/protocol-registry';
 
 interface PhantomAssetDetector {

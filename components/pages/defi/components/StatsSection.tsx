@@ -2,6 +2,11 @@
 
 import React from 'react';
 import { DollarSign, TrendingUp, Building2, Coins, Clock } from 'lucide-react';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { trpc } from '@/lib/trpc/client';
 import { formatCurrency } from '@/lib/utils';
 import { usePageTranslation } from '@/hooks/useTranslation';
@@ -57,109 +62,157 @@ export function StatsSection({ protocolCount }: StatsSectionProps) {
       {/* Primary Metrics Row */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
         {/* TVL Card */}
-        <div className="flex items-center bg-card border rounded-lg py-3 px-3 sm:px-4 shadow-sm">
-          <div className="flex-grow min-w-0">
-            <h2 className="text-sm md:text-lg font-medium text-card-foreground truncate">
-              {t('defi:stats.total_value_locked')}
-            </h2>
-            <p className="text-lg md:text-2xl font-bold text-card-foreground">
-              {isLoading ? (
-                <span className="animate-pulse bg-muted rounded w-16 h-6 inline-block"></span>
-              ) : (
-                formatNumberClean(tvl)
-              )}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="flex items-center bg-card border rounded-lg py-3 px-3 sm:px-4 shadow-sm cursor-help">
+              <div className="flex-grow min-w-0">
+                <h2 className="text-sm md:text-lg font-medium text-card-foreground truncate">
+                  {t('defi:stats.total_value_locked')}
+                </h2>
+                <p className="text-lg md:text-2xl font-bold text-card-foreground font-mono">
+                  {isLoading ? (
+                    <span className="animate-pulse bg-muted rounded w-16 h-6 inline-block"></span>
+                  ) : (
+                    formatNumberClean(tvl)
+                  )}
+                </p>
+                <p className="text-xs text-muted-foreground mt-1 truncate">
+                  {t('defi:stats.live_from_defillama')}
+                </p>
+              </div>
+              <div className="p-2 rounded-lg bg-secondary/50 flex-shrink-0">
+                <DollarSign className="h-4 w-4 md:h-5 md:w-5 text-muted-foreground" />
+              </div>
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>
+              Total value of all assets locked in DeFi protocols across the
+              ecosystem
             </p>
-            <p className="text-xs text-muted-foreground mt-1 truncate">
-              {t('defi:stats.live_from_defillama')}
-            </p>
-          </div>
-          <div className="p-2 rounded-lg bg-secondary/50 flex-shrink-0">
-            <DollarSign className="h-4 w-4 md:h-5 md:w-5 text-muted-foreground" />
-          </div>
-        </div>
+          </TooltipContent>
+        </Tooltip>
 
         {/* Volume Card */}
-        <div className="flex items-center bg-card border rounded-lg py-3 px-3 sm:px-4 shadow-sm">
-          <div className="flex-grow min-w-0">
-            <h2 className="text-sm md:text-lg font-medium text-card-foreground truncate">
-              {t('defi:stats.volume_24h')}
-            </h2>
-            <p className="text-lg md:text-2xl font-bold text-card-foreground">
-              {isLoading ? (
-                <span className="animate-pulse bg-muted rounded w-16 h-6 inline-block"></span>
-              ) : (
-                formatNumberClean(spotVolume)
-              )}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="flex items-center bg-card border rounded-lg py-3 px-3 sm:px-4 shadow-sm cursor-help">
+              <div className="flex-grow min-w-0">
+                <h2 className="text-sm md:text-lg font-medium text-card-foreground truncate">
+                  {t('defi:stats.volume_24h')}
+                </h2>
+                <p className="text-lg md:text-2xl font-bold text-card-foreground font-mono">
+                  {isLoading ? (
+                    <span className="animate-pulse bg-muted rounded w-16 h-6 inline-block"></span>
+                  ) : (
+                    formatNumberClean(spotVolume)
+                  )}
+                </p>
+                <p className="text-xs text-muted-foreground mt-1 truncate">
+                  {t('defi:stats.live_from_defillama')}
+                </p>
+              </div>
+              <div className="p-2 rounded-lg bg-secondary/50 flex-shrink-0">
+                <TrendingUp className="h-4 w-4 md:h-5 md:w-5 text-muted-foreground" />
+              </div>
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>
+              Total trading volume across all DeFi protocols in the last 24
+              hours
             </p>
-            <p className="text-xs text-muted-foreground mt-1 truncate">
-              {t('defi:stats.live_from_defillama')}
-            </p>
-          </div>
-          <div className="p-2 rounded-lg bg-secondary/50 flex-shrink-0">
-            <TrendingUp className="h-4 w-4 md:h-5 md:w-5 text-muted-foreground" />
-          </div>
-        </div>
+          </TooltipContent>
+        </Tooltip>
 
         {/* Protocol Count Card */}
-        <div className="flex items-center bg-card border rounded-lg py-3 px-3 sm:px-4 shadow-sm">
-          <div className="flex-grow min-w-0">
-            <h2 className="text-sm md:text-lg font-medium text-card-foreground truncate">
-              {t('defi:stats.protocols')}
-            </h2>
-            <p className="text-lg md:text-2xl font-bold text-card-foreground">
-              {Math.floor(protocolCount).toString()}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="flex items-center bg-card border rounded-lg py-3 px-3 sm:px-4 shadow-sm cursor-help">
+              <div className="flex-grow min-w-0">
+                <h2 className="text-sm md:text-lg font-medium text-card-foreground truncate">
+                  {t('defi:stats.protocols')}
+                </h2>
+                <p className="text-lg md:text-2xl font-bold text-card-foreground font-mono">
+                  {Math.floor(protocolCount).toString()}
+                </p>
+                <p className="text-xs text-muted-foreground mt-1 truncate">
+                  {t('defi:stats.defi_protocols')}
+                </p>
+              </div>
+              <div className="p-2 rounded-lg bg-secondary/50 flex-shrink-0">
+                <Building2 className="h-4 w-4 md:h-5 md:w-5 text-muted-foreground" />
+              </div>
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>
+              Number of DeFi protocols currently tracked on Aptos blockchain
             </p>
-            <p className="text-xs text-muted-foreground mt-1 truncate">
-              {t('defi:stats.defi_protocols')}
-            </p>
-          </div>
-          <div className="p-2 rounded-lg bg-secondary/50 flex-shrink-0">
-            <Building2 className="h-4 w-4 md:h-5 md:w-5 text-muted-foreground" />
-          </div>
-        </div>
+          </TooltipContent>
+        </Tooltip>
       </div>
 
       {/* Secondary Metrics Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
         {/* Fees Card */}
-        <div className="flex items-center bg-card border rounded-lg py-3 px-3 sm:px-4 shadow-sm">
-          <div className="flex-grow min-w-0">
-            <h2 className="text-sm md:text-lg font-medium text-card-foreground truncate">
-              {t('defi:stats.fees_24h')}
-            </h2>
-            <p className="text-lg md:text-2xl font-bold text-card-foreground">
-              {isLoading ? (
-                <span className="animate-pulse bg-muted rounded w-16 h-6 inline-block"></span>
-              ) : (
-                formatNumberClean(totalFees24h)
-              )}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="flex items-center bg-card border rounded-lg py-3 px-3 sm:px-4 shadow-sm cursor-help">
+              <div className="flex-grow min-w-0">
+                <h2 className="text-sm md:text-lg font-medium text-card-foreground truncate">
+                  {t('defi:stats.fees_24h')}
+                </h2>
+                <p className="text-lg md:text-2xl font-bold text-card-foreground font-mono">
+                  {isLoading ? (
+                    <span className="animate-pulse bg-muted rounded w-16 h-6 inline-block"></span>
+                  ) : (
+                    formatNumberClean(totalFees24h)
+                  )}
+                </p>
+                <p className="text-xs text-muted-foreground mt-1 truncate">
+                  {t('defi:stats.protocol_fees')}
+                </p>
+              </div>
+              <div className="p-2 rounded-lg bg-secondary/50 flex-shrink-0">
+                <Coins className="h-4 w-4 md:h-5 md:w-5 text-muted-foreground" />
+              </div>
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>
+              Total fees generated by all DeFi protocols in the last 24 hours
             </p>
-            <p className="text-xs text-muted-foreground mt-1 truncate">
-              {t('defi:stats.protocol_fees')}
-            </p>
-          </div>
-          <div className="p-2 rounded-lg bg-secondary/50 flex-shrink-0">
-            <Coins className="h-4 w-4 md:h-5 md:w-5 text-muted-foreground" />
-          </div>
-        </div>
+          </TooltipContent>
+        </Tooltip>
 
         {/* Stablecoin Volume Card - Coming Soon */}
-        <div className="flex items-center bg-card border rounded-lg py-3 px-3 sm:px-4 shadow-sm">
-          <div className="flex-grow min-w-0">
-            <h2 className="text-sm md:text-lg font-medium text-card-foreground truncate">
-              {t('defi:stats.stablecoin_volume')}
-            </h2>
-            <p className="text-lg md:text-2xl font-bold text-muted-foreground">
-              {t('defi:stats.coming_soon')}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="flex items-center bg-card border rounded-lg py-3 px-3 sm:px-4 shadow-sm cursor-help">
+              <div className="flex-grow min-w-0">
+                <h2 className="text-sm md:text-lg font-medium text-card-foreground truncate">
+                  {t('defi:stats.stablecoin_volume')}
+                </h2>
+                <p className="text-lg md:text-2xl font-bold text-muted-foreground">
+                  {t('defi:stats.coming_soon')}
+                </p>
+                <p className="text-xs text-muted-foreground mt-1 truncate">
+                  {t('defi:stats.stablecoin_trading')}
+                </p>
+              </div>
+              <div className="p-2 rounded-lg bg-secondary/50 flex-shrink-0">
+                <Clock className="h-4 w-4 md:h-5 md:w-5 text-muted-foreground" />
+              </div>
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>
+              Stablecoin trading volume metrics will be available in a future
+              update
             </p>
-            <p className="text-xs text-muted-foreground mt-1 truncate">
-              {t('defi:stats.stablecoin_trading')}
-            </p>
-          </div>
-          <div className="p-2 rounded-lg bg-secondary/50 flex-shrink-0">
-            <Clock className="h-4 w-4 md:h-5 md:w-5 text-muted-foreground" />
-          </div>
-        </div>
+          </TooltipContent>
+        </Tooltip>
       </div>
     </div>
   );

@@ -25,7 +25,6 @@
     "@aptos-labs/ts-sdk": "^3.1.2",
     "@aptos-labs/wallet-adapter-react": "^7.0.1",
     "@ducanh2912/next-pwa": "^10.2.9",
-    "@identity-connect/wallet-api": "^0.1.2",
     "@radix-ui/react-accordion": "^1.2.10",
     "@radix-ui/react-alert-dialog": "^1.1.13",
     "@radix-ui/react-avatar": "^1.1.9",
@@ -84,6 +83,7 @@
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^15.3.4",
+    "@tailwindcss/line-clamp": "^0.4.4",
     "@tailwindcss/postcss": "^4.1.10",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",

@@ -22,13 +22,25 @@ import {
   DisplayToken,
   SupplyData,
 } from '@/lib/config';
-import { formatQuantityValue, convertRawTokenAmount } from '@/lib/utils';
+import {
+  formatQuantityValue,
+  convertRawTokenAmount,
+  formatNumber,
+  formatAmount,
+  formatAmountFull,
+  formatLargeNumber,
+} from '@/lib/utils';
 import { usePageTranslation } from '@/hooks/useTranslation';
 import { useDataPrefetch } from '@/hooks/useDataPrefetching';
 // Simplified for better compatibility
 
 // Use LST_METADATA from config instead of redefining here
 const TOKEN_METADATA = LST_METADATA;
+
+// Helper function to fix token symbol casing
+const fixTokenSymbolCasing = (symbol: string): string => {
+  return symbol.replace(/apt/gi, 'APT');
+};
 
 // Define token types
 interface LSTToken extends Token {
@@ -73,7 +85,8 @@ const TokenCard = React.memo(function TokenCard({
       const decimals = metadata.decimals;
       const tokens = convertRawTokenAmount(s, decimals);
 
-      return formatQuantityValue(tokens, '');
+      // Format without symbol, just number with M/K
+      return formatLargeNumber(tokens, 1).toUpperCase();
     };
 
     const calcFormattedDisplay = () => {
@@ -102,7 +115,7 @@ const TokenCard = React.memo(function TokenCard({
     };
   }, [token, totalSupply]);
 
-  const cardSymbol = token.symbol;
+  const cardSymbol = fixTokenSymbolCasing(token.symbol);
   const representativeSymbolForColor =
     'isCombined' in token && token.isCombined
       ? token.symbol.split('/')[0].trim()
@@ -148,14 +161,14 @@ const TokenCard = React.memo(function TokenCard({
                             width={16}
                             height={16}
                             className="object-contain rounded-full"
-                            onError={(e) => {
+                            onError={e => {
                               const img = e.target as HTMLImageElement;
                               img.src = '/placeholder.jpg';
                             }}
                           />
                         </div>
                         <span className="text-sm font-semibold">
-                          {component.symbol}
+                          {fixTokenSymbolCasing(component.symbol)}
                         </span>
                       </div>
                       {index === 0 && <span className="mx-1">/</span>}
@@ -171,13 +184,13 @@ const TokenCard = React.memo(function TokenCard({
                     width={20}
                     height={20}
                     className="object-contain"
-                    onError={(e) => {
+                    onError={e => {
                       const img = e.target as HTMLImageElement;
                       img.src = '/placeholder.jpg';
                     }}
                   />
                 </div>
-                <h3 className="text-lg font-semibold text-card-foreground">
+                <h3 className="text-sm font-semibold text-card-foreground">
                   {cardSymbol}
                 </h3>
               </>
@@ -185,7 +198,7 @@ const TokenCard = React.memo(function TokenCard({
           </div>
         </div>
         <div className="px-2.5 pt-1.5 pb-0">
-          <p className="text-xl font-bold text-card-foreground">
+          <p className="text-xl font-bold text-card-foreground font-mono">
             {formattedDisplaySupply}
           </p>
         </div>
@@ -194,7 +207,7 @@ const TokenCard = React.memo(function TokenCard({
             <span className="text-muted-foreground">
               {t('lst:stats.market_share')}
             </span>
-            <span className="font-medium text-muted-foreground">
+            <span className="font-medium text-muted-foreground font-mono">
               {marketSharePercent}%
             </span>
           </div>
@@ -275,6 +288,10 @@ function ErrorState({
   onRetry: () => void;
   t: (key: string) => string;
 }): React.ReactElement {
+  const isRateLimited = error?.includes('429') || error?.includes('rate limit');
+  const statusMatch = error?.match(/HTTP error! Status: (\d+)/);
+  const status = statusMatch ? statusMatch[1] : null;
+
   return (
     <Card className="border-destructive mb-6">
       <CardContent className="p-6 flex items-center">
@@ -283,8 +300,15 @@ function ErrorState({
           <h3 className="font-bold text-lg mb-1 text-card-foreground">
             {t('lst:error.error_loading_lst_data')}
           </h3>
+          {status && (
+            <p className="text-muted-foreground text-sm mb-1">
+              HTTP error! Status: {status}
+            </p>
+          )}
           <p className="text-muted-foreground">
-            {error || t('lst:loading.loading_lst_data')}
+            {isRateLimited
+              ? 'API rate limit reached. Data will refresh automatically.'
+              : error || t('lst:loading.loading_lst_data')}
             <Button
               onClick={onRetry}
               variant="outline"
@@ -342,163 +366,192 @@ export default function LSTPage(): React.ReactElement {
     await refetch();
   }, [refetch]);
 
-  const { formattedTotalSupply, processedSupplies, adjustedTotal } =
-    useMemo(() => {
-      if (!data)
-        return {
-          formattedTotalSupply: '',
-          processedSupplies: [],
-          adjustedTotal: '0',
-        };
+  // Get APT price for USD calculation
+  const { data: aptPriceData } =
+    trpc.domains.marketData.prices.getCMCPrice.useQuery(
+      { symbol: 'apt' },
+      {
+        staleTime: 60 * 1000, // 1 minute
+        gcTime: 5 * 60 * 1000, // 5 minutes
+        refetchInterval: 60 * 1000, // Auto-refetch every minute
+      }
+    );
 
-      // Format total supply in APT
-      const formatTotal = () => {
-        const totalApt = Number(BigInt(data.total)) / 1_000_000_00; // 8 decimals
-        return (
-          new Intl.NumberFormat('en-US', {
-            maximumFractionDigits: 2,
-          }).format(totalApt) + ' APT'
-        );
-      };
-
-      // Group tokens into their pairs
-      const processSupplies = () => {
-        if (!data?.supplies) return [];
-
-        const thalaTokens = data.supplies.filter(
-          t => t.symbol === 'thAPT' || t.symbol === 'sthAPT'
-        );
-        const amnisTokens = data.supplies.filter(
-          t => t.symbol === 'amAPT' || t.symbol === 'stAPT'
-        );
-        const kofiTokens = data.supplies.filter(
-          t => t.symbol === 'kAPT' || t.symbol === 'stkAPT'
-        );
-
-        const displayTokens: DisplayToken[] = [];
-
-        // Add combined tokens
-        if (thalaTokens.length > 0) {
-          displayTokens.push({
-            symbol: 'thAPT/sthAPT',
-            isCombined: true,
-            supply: thalaTokens.reduce(
-              (acc, curr) => (BigInt(acc) + BigInt(curr.supply)).toString(),
-              '0'
-            ),
-            components: thalaTokens,
-          });
-        }
-
-        if (amnisTokens.length > 0) {
-          displayTokens.push({
-            symbol: 'amAPT/stAPT',
-            isCombined: true,
-            supply: amnisTokens.reduce(
-              (acc, curr) => (BigInt(acc) + BigInt(curr.supply)).toString(),
-              '0'
-            ),
-            components: amnisTokens,
-          });
-        }
-
-        if (kofiTokens.length > 0) {
-          displayTokens.push({
-            symbol: 'kAPT/stkAPT',
-            isCombined: true,
-            supply: kofiTokens.reduce(
-              (acc, curr) => (BigInt(acc) + BigInt(curr.supply)).toString(),
-              '0'
-            ),
-            components: kofiTokens,
-          });
-        }
-
-        // Sort by supply in descending order
-        return displayTokens.sort((a, b) => {
-          const supplyA = BigInt(a.supply);
-          const supplyB = BigInt(b.supply);
-          return supplyB > supplyA ? 1 : -1;
-        });
-      };
-
+  const {
+    formattedTotalSupply,
+    formattedTotalUSD,
+    processedSupplies,
+    adjustedTotal,
+  } = useMemo(() => {
+    if (!data)
       return {
-        formattedTotalSupply: formatTotal(),
-        processedSupplies: processSupplies(),
-        adjustedTotal: data.total,
+        formattedTotalSupply: '',
+        formattedTotalUSD: '',
+        processedSupplies: [],
+        adjustedTotal: '0',
       };
-    }, [data]);
+
+    // Format total supply in APT (FULL number)
+    const formatTotal = () => {
+      const totalApt = Number(BigInt(data.total)) / 1_000_000_00; // 8 decimals
+      return formatAmountFull(totalApt, 'APT', { decimals: 2 });
+    };
+
+    // Format total supply in USD
+    const formatTotalUSD = () => {
+      if (!aptPriceData?.data?.price) return '';
+      const totalApt = Number(BigInt(data.total)) / 1_000_000_00; // 8 decimals
+      const totalUSD = totalApt * aptPriceData.data.price;
+      return formatAmountFull(totalUSD, 'USD', { decimals: 2 });
+    };
+
+    // Group tokens into their pairs
+    const processSupplies = () => {
+      if (!data?.supplies) return [];
+
+      const thalaTokens = data.supplies.filter(
+        t =>
+          t.symbol.toLowerCase() === 'thapt' ||
+          t.symbol.toLowerCase() === 'sthapt'
+      );
+      const amnisTokens = data.supplies.filter(
+        t =>
+          t.symbol.toLowerCase() === 'amapt' ||
+          t.symbol.toLowerCase() === 'stapt'
+      );
+      const kofiTokens = data.supplies.filter(
+        t =>
+          t.symbol.toLowerCase() === 'kapt' ||
+          t.symbol.toLowerCase() === 'stkapt'
+      );
+
+      const displayTokens: DisplayToken[] = [];
+
+      // Add combined tokens
+      if (thalaTokens.length > 0) {
+        displayTokens.push({
+          symbol: 'thAPT/sthAPT',
+          isCombined: true,
+          supply: thalaTokens.reduce(
+            (acc, curr) => (BigInt(acc) + BigInt(curr.supply)).toString(),
+            '0'
+          ),
+          components: thalaTokens,
+        });
+      }
+
+      if (amnisTokens.length > 0) {
+        displayTokens.push({
+          symbol: 'amAPT/stAPT',
+          isCombined: true,
+          supply: amnisTokens.reduce(
+            (acc, curr) => (BigInt(acc) + BigInt(curr.supply)).toString(),
+            '0'
+          ),
+          components: amnisTokens,
+        });
+      }
+
+      if (kofiTokens.length > 0) {
+        displayTokens.push({
+          symbol: 'kAPT/stkAPT',
+          isCombined: true,
+          supply: kofiTokens.reduce(
+            (acc, curr) => (BigInt(acc) + BigInt(curr.supply)).toString(),
+            '0'
+          ),
+          components: kofiTokens,
+        });
+      }
+
+      // Sort by supply in descending order
+      return displayTokens.sort((a, b) => {
+        const supplyA = BigInt(a.supply);
+        const supplyB = BigInt(b.supply);
+        return supplyB > supplyA ? 1 : -1;
+      });
+    };
+
+    return {
+      formattedTotalSupply: formatTotal(),
+      formattedTotalUSD: formatTotalUSD(),
+      processedSupplies: processSupplies(),
+      adjustedTotal: data.total,
+    };
+  }, [data, aptPriceData]);
 
   return (
     <RootErrorBoundary>
-      <div
-        className={`min-h-screen flex flex-col bg-background dark:bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjMDAwIj48L3JlY3Q+CjxwYXRoIGQ9Ik0wIDVMNSAwWk02IDRMNCA2Wk0tMSAxTDEgLTFaIiBzdHJva2U9IiMyMjIiIHN0cm9rZS13aWR0aD0iMC41Ij48L3BhdGg+Cjwvc3ZnPg==')] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjZmZmIj48L3JlY3Q+CjxwYXRoIGQ9Ik0wIDVMNSAwWk02IDRMNCA2Wk0tMSAxTDEgLTFaIiBzdHJva2U9IiNlZWUiIHN0cm9rZS13aWR0aD0iMC41Ij48L3BhdGg+Cjwvc3ZnPg==')] ${GeistMono.className}`}
-      >
+      <div className={`min-h-screen flex flex-col ${GeistMono.className}`}>
         <div className="fixed top-0 left-0 right-0 h-1 z-50">
           {refreshing && <div className="h-full bg-muted animate-pulse"></div>}
         </div>
 
-        <div className="container mx-auto px-4 sm:px-6 py-6">
+        <div className="container-layout pt-6">
           <Header />
         </div>
 
-        <main className="container mx-auto px-4 sm:px-6 py-6 flex-1">
-            {loading ? (
-              <LoadingState />
-            ) : error ? (
-              <ErrorState error={error} onRetry={fetchSupplyData} t={t} />
-            ) : data ? (
-              <>
-                <div className="flex items-center bg-card border rounded-lg py-3 px-4 mb-6">
-                  <div className="flex-grow">
-                    <h2 className="text-base sm:text-lg font-medium text-card-foreground">
-                      {t('lst:stats.total_lst_value')}
-                    </h2>
-                    <p className="text-xl sm:text-2xl font-bold text-card-foreground">
-                      {formattedTotalSupply}
-                    </p>
-                  </div>
+        <main className="container-layout py-6 flex-1">
+          {loading ? (
+            <LoadingState />
+          ) : error ? (
+            <ErrorState error={error} onRetry={fetchSupplyData} t={t} />
+          ) : data ? (
+            <>
+              <div className="flex items-center bg-card border rounded-lg py-3 px-4 mb-6">
+                <div className="flex-grow">
+                  <h2 className="text-base sm:text-lg font-medium text-card-foreground">
+                    {t('lst:stats.total_lst_value')}
+                  </h2>
+                  <p className="text-xl sm:text-2xl font-bold text-card-foreground font-mono">
+                    {formattedTotalSupply}
+                    {formattedTotalUSD && (
+                      <span className="text-base font-normal text-muted-foreground ml-2 font-mono">
+                        ≈ {formattedTotalUSD}
+                      </span>
+                    )}
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="md:col-span-1 space-y-4">
+                  {processedSupplies.map(token => (
+                    <TokenCard
+                      key={token.symbol}
+                      token={token}
+                      totalSupply={adjustedTotal}
+                      t={t}
+                    />
+                  ))}
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  <div className="md:col-span-1 space-y-4">
-                    {processedSupplies.map(token => (
-                      <TokenCard
-                        key={token.symbol}
-                        token={token}
-                        totalSupply={adjustedTotal}
-                        t={t}
-                      />
-                    ))}
-                  </div>
-
-                  <div className="md:col-span-1 lg:col-span-3 bg-card border rounded-lg overflow-hidden min-h-[250px] sm:min-h-[300px]">
-                    <ErrorBoundary
-                      fallback={
-                        <div className="flex items-center justify-center h-full">
-                          <div className="text-center p-4">
-                            <AlertTriangle className="h-8 w-8 mx-auto mb-2 text-destructive" />
-                            <p className="text-sm text-muted-foreground">
-                              {t('lst:error.failed_to_load_chart')}
-                            </p>
-                          </div>
+                <div className="md:col-span-1 lg:col-span-3 bg-card border rounded-lg overflow-hidden min-h-[250px] sm:min-h-[300px]">
+                  <ErrorBoundary
+                    fallback={
+                      <div className="flex items-center justify-center h-full">
+                        <div className="text-center p-4">
+                          <AlertTriangle className="h-8 w-8 mx-auto mb-2 text-destructive" />
+                          <p className="text-sm text-muted-foreground">
+                            {t('lst:error.failed_to_load_chart')}
+                          </p>
                         </div>
-                      }
-                    >
-                      <MarketShareChart
-                        data={processedSupplies}
-                        totalSupply={adjustedTotal}
-                        tokenMetadata={TOKEN_METADATA}
-                      />
-                    </ErrorBoundary>
-                  </div>
+                      </div>
+                    }
+                  >
+                    <MarketShareChart
+                      data={processedSupplies}
+                      totalSupply={adjustedTotal}
+                      tokenMetadata={TOKEN_METADATA}
+                    />
+                  </ErrorBoundary>
                 </div>
-              </>
-            ) : null}
+              </div>
+            </>
+          ) : null}
         </main>
 
         <Footer />
-      </div>
       </div>
     </RootErrorBoundary>
   );

@@ -1,5 +1,10 @@
 import { router, publicProcedure } from '../core/server';
-import { getCachedData, setCachedData, enhancedFetch } from '@/lib/utils';
+import {
+  cmcCache,
+  getCachedData,
+  setCachedData,
+  enhancedFetch,
+} from '@/lib/utils';
 import { SERVICE_CONFIG } from '@/lib/config/cache';
 import { API_CONFIG } from '@/lib/config/app';
 
@@ -310,12 +315,12 @@ async function getOrFetchWithSWR<T>(
   fetchFn: () => Promise<T>,
   ttl: number = CACHE_CONFIG.ttl
 ): Promise<{ data: T; cached: boolean; stale?: boolean }> {
-  const cachedData = getCachedData<T>('apiService', cacheKey);
+  const cachedData = getCachedData<T>(cmcCache, cacheKey);
 
   if (cachedData !== null) {
     // Check if data is stale but within max age
     const cacheTimestamp = getCachedData<number>(
-      'apiService',
+      cmcCache,
       `${cacheKey}:timestamp`
     );
     const isStale = cacheTimestamp && Date.now() - cacheTimestamp > ttl;
@@ -324,8 +329,8 @@ async function getOrFetchWithSWR<T>(
       // Return stale data immediately and revalidate in background
       fetchFn()
         .then(freshData => {
-          setCachedData('apiService', cacheKey, freshData);
-          setCachedData('apiService', `${cacheKey}:timestamp`, Date.now());
+          setCachedData(cmcCache, cacheKey, freshData);
+          setCachedData(cmcCache, `${cacheKey}:timestamp`, Date.now());
         })
         .catch(error =>
           console.error('Background revalidation failed:', error)
@@ -339,8 +344,8 @@ async function getOrFetchWithSWR<T>(
 
   // No cached data, fetch fresh
   const freshData = await fetchFn();
-  setCachedData('apiService', cacheKey, freshData);
-  setCachedData('apiService', `${cacheKey}:timestamp`, Date.now());
+  setCachedData(cmcCache, cacheKey, freshData);
+  setCachedData(cmcCache, `${cacheKey}:timestamp`, Date.now());
 
   return { data: freshData, cached: false };
 }
@@ -378,7 +383,7 @@ export const rwaRouter = router({
       console.error('Error in getRealTimeAssets:', error);
 
       // Try to return stale data even if it's very old
-      const staleData = getCachedData<RWAApiResponse>('apiService', cacheKey);
+      const staleData = getCachedData<RWAApiResponse>(cmcCache, cacheKey);
       if (staleData) {
         return {
           timestamp: new Date().toISOString(),
@@ -432,7 +437,7 @@ export const rwaRouter = router({
 
     try {
       // Try to get from cache first
-      const cachedData = getCachedData<unknown>('apiService', cacheKey);
+      const cachedData = getCachedData<unknown>(cmcCache, cacheKey);
       if (cachedData !== null) {
         return {
           timestamp: new Date().toISOString(),
@@ -461,7 +466,7 @@ export const rwaRouter = router({
       const rwaData = await response.json();
 
       // Cache the result for 10 minutes (RWA data changes less frequently)
-      setCachedData('apiService', cacheKey, rwaData);
+      setCachedData(cmcCache, cacheKey, rwaData);
 
       return {
         timestamp: new Date().toISOString(),
@@ -517,7 +522,7 @@ export const rwaRouter = router({
 
     try {
       // Try to get from cache first
-      const cachedData = getCachedData<unknown>('apiService', cacheKey);
+      const cachedData = getCachedData<unknown>(cmcCache, cacheKey);
       if (cachedData !== null) {
         return {
           timestamp: new Date().toISOString(),
@@ -549,7 +554,7 @@ export const rwaRouter = router({
       };
 
       // Cache the result for 5 minutes
-      setCachedData('apiService', cacheKey, metrics);
+      setCachedData(cmcCache, cacheKey, metrics);
 
       return {
         timestamp: new Date().toISOString(),

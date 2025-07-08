@@ -6,6 +6,7 @@ import {
   getPortfolioHistory,
   getAssetPrices,
   getWalletNFTs,
+  getNFTTransferHistory,
   calculatePortfolioMetrics,
   getWalletTransactions,
 } from './services';
@@ -19,13 +20,17 @@ export const portfolioRouter = router({
         walletAddress: z
           .string()
           .regex(/^0x[a-fA-F0-9]{1,64}$/, 'Invalid Aptos address'),
+        showOnlyVerified: z.boolean().optional().default(true),
       })
     )
     .query(async ({ input }) => {
       logger.info(
-        `Portfolio router: fetching assets for wallet ${input.walletAddress}`
+        `Portfolio router: fetching assets for wallet ${input.walletAddress} (showOnlyVerified: ${input.showOnlyVerified}, automatic stablecoin filtering enabled)`
       );
-      const result = await getWalletAssets(input.walletAddress);
+      const result = await getWalletAssets(
+        input.walletAddress,
+        input.showOnlyVerified
+      );
       logger.info(`Portfolio router: returning ${result.length} assets`);
       return result;
     }),
@@ -67,16 +72,41 @@ export const portfolioRouter = router({
       return getWalletNFTs(input.walletAddress, input.limit, input.offset);
     }),
 
+  getNFTTransferHistory: publicProcedure
+    .input(
+      z.object({
+        tokenDataId: z.string().min(1),
+        limit: z.number().min(1).max(50).default(20),
+      })
+    )
+    .query(async ({ input }) => {
+      logger.info(
+        `Portfolio router: fetching transfer history for NFT ${input.tokenDataId}`
+      );
+      const result = await getNFTTransferHistory(
+        input.tokenDataId,
+        input.limit
+      );
+      logger.info(
+        `Portfolio router: returning ${result.length} transfer records`
+      );
+      return result;
+    }),
+
   getPortfolioMetrics: publicProcedure
     .input(
       z.object({
         walletAddress: z
           .string()
           .regex(/^0x[a-fA-F0-9]{1,64}$/, 'Invalid Aptos address'),
+        showOnlyVerified: z.boolean().optional().default(true),
       })
     )
     .query(async ({ input }) => {
-      return calculatePortfolioMetrics(input.walletAddress);
+      return calculatePortfolioMetrics(
+        input.walletAddress,
+        input.showOnlyVerified
+      );
     }),
 
   getWalletTransactions: publicProcedure
@@ -174,7 +204,9 @@ export const portfolioRouter = router({
     .query(async ({ input }) => {
       logger.info(`ANS router: getting details for name ${input.name}`);
       const result = await ansService.getNameDetails(input.name);
-      logger.info(`ANS router: name details result: ${result ? 'found' : 'none'}`);
+      logger.info(
+        `ANS router: name details result: ${result ? 'found' : 'none'}`
+      );
       return result;
     }),
 
@@ -204,7 +236,9 @@ export const portfolioRouter = router({
       logger.info(
         `DeFi router: fetching DeFi positions for wallet ${input.walletAddress}`
       );
-      const result = await DeFiBalanceService.getDeFiPositions(input.walletAddress);
+      const result = await DeFiBalanceService.getDeFiPositions(
+        input.walletAddress
+      );
       logger.info(`DeFi router: found ${result.length} DeFi positions`);
       return result;
     }),

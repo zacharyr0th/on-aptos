@@ -104,8 +104,6 @@ export async function GET(request: NextRequest) {
         }
       }, errorContext),
     {
-      cacheKey: 'btc-price-cmc',
-      cacheName: 'prices',
       customHeaders: {
         'Cache-Control': `public, max-age=${Math.floor(SERVICE_CONFIG.prices.ttl / 1000)}, stale-while-revalidate=${Math.floor(SERVICE_CONFIG.prices.ttl / 2000)}`,
         'X-Content-Type': 'application/json',

@@ -1,24 +1,20 @@
 // Type definitions
 export * from './types';
 
-// Cache management (includes former cache-helpers.ts functionality)
+// Simple cache for rate-limited APIs only
 export {
-  EnhancedLRUCache,
-  cacheInstances,
+  SimpleCache,
+  coinGeckoCache,
+  cmcCache,
+  panoraCache,
+  portfolioCache,
   getCachedData,
   setCachedData,
-  hasCachedData,
-  isNearingExpiration,
-  isStale,
-  getCacheStats,
-  startCacheCleanup,
-  stopCacheCleanup,
-  type CacheInstanceName,
-  // Cache helpers (formerly from cache-helpers.ts)
   cacheFirst,
   cacheFirstWithFallback,
+  type CacheInstanceName,
   type CacheFirstOptions,
-} from './cache-manager';
+} from './simple-cache';
 
 // Response builders and error helpers (combined functionality)
 export {
@@ -68,15 +64,17 @@ export {
   // Currency functions
   formatCurrency,
   formatAmount,
+  formatAmountFull,
+  formatLargeNumber,
   getDecimalPlaces,
   isValidCurrencyCode,
   getSupportedFiatCurrencies,
   isFiatCurrency,
   // Currency conversion functions removed - not implemented
-} from './formatting';
+} from './format';
 
 // Re-export currency types for convenience
-export type { Currency, FiatCurrency } from './types';
+export type { Currency, FiatCurrency } from './format';
 
 // General utilities (includes former constants.ts)
 export {

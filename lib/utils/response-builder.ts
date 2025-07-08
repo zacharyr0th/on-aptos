@@ -1,28 +1,98 @@
-import { BaseResponseSchema } from '@/lib/trpc/schemas';
-import { z } from 'zod';
-import { ApiError, TimeoutError } from './types';
+/**
+ * Unified Response Builder
+ * Provides consistent response formatting across all APIs and tRPC endpoints
+ */
 
+import { z } from 'zod';
+
+// Response schemas
+export const BaseResponseSchema = z.object({
+  timestamp: z.string(),
+  performance: z.object({
+    responseTimeMs: z.number(),
+  }),
+  data: z.any(),
+});
+
+export const SuccessResponseSchema = BaseResponseSchema.extend({
+  success: z.literal(true),
+});
+
+export const ErrorResponseSchema = z.object({
+  error: z.string(),
+  details: z.any().optional(),
+});
+
+// Types
 export interface ResponseMetrics {
   startTime: number;
-  cacheHits?: number;
-  cacheMisses?: number;
-  apiCalls?: number;
   cached?: boolean;
 }
 
+export interface SuccessResponse<T> {
+  success: true;
+  timestamp: string;
+  performance: {
+    responseTimeMs: number;
+  };
+  data: T;
+  meta?: any;
+}
+
+export interface ErrorResponse {
+  error: string;
+  details?: any;
+}
+
 /**
- * Centralized response builder to eliminate redundant response structure patterns
+ * Build a success response
+ */
+export function buildSuccessResponse<T>(
+  data: T,
+  metrics?: ResponseMetrics,
+  meta?: any
+): SuccessResponse<T> {
+  const startTime = metrics?.startTime ?? Date.now();
+
+  return {
+    success: true,
+    timestamp: new Date().toISOString(),
+    performance: {
+      responseTimeMs: Date.now() - startTime,
+    },
+    data,
+    ...(meta && { meta }),
+  };
+}
+
+/**
+ * Build an error response
+ */
+export function buildErrorResponse(
+  message: string,
+  details?: any
+): ErrorResponse {
+  return {
+    error: message,
+    ...(details && { details }),
+  };
+}
+
+/**
+ * Legacy tRPC response builder (for backward compatibility)
  */
 export function buildTRPCResponse<T>(
   data: T,
-  metrics: ResponseMetrics
-): z.infer<typeof BaseResponseSchema> & { data: T } {
-  const responseTimeMs = Date.now() - metrics.startTime;
-
+  metrics: ResponseMetrics & {
+    cacheHits?: number;
+    cacheMisses?: number;
+    apiCalls?: number;
+  }
+): any {
   return {
     timestamp: new Date().toISOString(),
     performance: {
-      responseTimeMs,
+      responseTimeMs: Date.now() - metrics.startTime,
       cacheHits: metrics.cacheHits ?? 0,
       cacheMisses: metrics.cacheMisses ?? 1,
       apiCalls: metrics.apiCalls ?? 1,
@@ -35,12 +105,9 @@ export function buildTRPCResponse<T>(
 }
 
 /**
- * Helper for cached responses
+ * Legacy helper functions for backward compatibility
  */
-export function buildCachedResponse<T>(
-  data: T,
-  startTime: number
-): z.infer<typeof BaseResponseSchema> & { data: T } {
+export function buildCachedResponse<T>(data: T, startTime: number): any {
   return buildTRPCResponse(data, {
     startTime,
     cacheHits: 1,
@@ -50,14 +117,11 @@ export function buildCachedResponse<T>(
   });
 }
 
-/**
- * Helper for fresh API responses
- */
 export function buildFreshResponse<T>(
   data: T,
   startTime: number,
   apiCalls = 1
-): z.infer<typeof BaseResponseSchema> & { data: T } {
+): any {
   return buildTRPCResponse(data, {
     startTime,
     cacheHits: 0,
@@ -67,13 +131,7 @@ export function buildFreshResponse<T>(
   });
 }
 
-/**
- * Helper for fallback responses
- */
-export function buildFallbackResponse<T>(
-  data: T,
-  startTime: number
-): z.infer<typeof BaseResponseSchema> & { data: T } {
+export function buildFallbackResponse<T>(data: T, startTime: number): any {
   return buildTRPCResponse(data, {
     startTime,
     cacheHits: 0,
@@ -83,7 +141,25 @@ export function buildFallbackResponse<T>(
   });
 }
 
-// ===== ERROR HELPERS (formerly from error-helpers.ts) =====
+/**
+ * Simplified response builders for the new pattern
+ */
+export function createSuccessResponse<T>(
+  data: T,
+  meta?: any
+): SuccessResponse<T> {
+  return buildSuccessResponse(data, undefined, meta);
+}
+
+export function createErrorResponse(
+  message: string,
+  status?: number,
+  details?: any
+): ErrorResponse {
+  return buildErrorResponse(message, details);
+}
+
+// ===== ERROR HELPERS =====
 
 export interface ErrorContext {
   operation: string;
@@ -108,18 +184,8 @@ export function formatApiError(error: unknown): string {
  * Centralized error handling for API operations
  */
 export function handleApiError(error: unknown, context: ErrorContext): never {
-  // Re-throw known errors as-is
-  if (error instanceof ApiError || error instanceof TimeoutError) {
-    throw error;
-  }
-
-  // Convert unknown errors to ApiError
   const message = error instanceof Error ? error.message : 'Unknown error';
-  throw new ApiError(
-    `${context.operation} failed: ${message}`,
-    undefined,
-    context.service
-  );
+  throw new Error(`${context.operation} failed: ${message}`);
 }
 
 /**

@@ -252,7 +252,8 @@
       "Ichi": "Ichi",
       "Vibrant X": "Vibrant X",
       "Moar": "Moar",
-      "Thala": "Thala"
+      "Thala": "Thala",
+      "Mirage": "Mirage"
     },
     "short_descriptions": {
       "Panora": "Meta-DEX aggregator",
@@ -282,7 +283,8 @@
       "Ichi": "Automated liquidity manager",
       "Vibrant X": "Yield optimizer",
       "Moar": "Leveraged farming layer",
-      "Thala": "DeFi protocol suite"
+      "Thala": "DeFi protocol suite",
+      "Mirage": "Composable liquidity layer"
     }
   },
   "protocol_descriptions": {
@@ -313,10 +315,21 @@
     "Ichi": "Automated Liquidity Manager vaults let projects seed single-sided liquidity; smart ranges rebalance to cut impermanent loss while treasuries earn swap fees in their native token.",
     "Vibrant X": "Yield-optimizer and portfolio dashboard that reallocates deposits to top-APY Aptos pools.",
     "Moar": "Building leveraged-farm layer with cross-protocol credit accounts enabling users to borrow in one place and deploy in another.",
-    "Thala": "A suite of DeFi apps featuring a multi-pool AMM, the over-collateralized MOD stablecoin, and liquid-staking via sthAPT and thAPT."
+    "Thala": "A suite of DeFi apps featuring a multi-pool AMM, the over-collateralized MOD stablecoin, and liquid-staking via sthAPT and thAPT.",
+    "Mirage": "A composable liquidity layer powering DeFi's next frontier. Deposit collateral and borrow a self-repaying stablecoin loan powered by perpetuals. Features fully on-chain perps with CEX-like experience, instant execution, low fees, and up to 100x leverage."
   },
   "protocol_category_breakdown": {
     "Thala": "Trading • Yield • Credit"
+  },
+  "protocols": {
+    "mirage": {
+      "description": "A composable liquidity layer powering DeFi's next frontier. Deposit collateral and borrow a self-repaying stablecoin loan powered by perpetuals with up to 100x leverage.",
+      "categoryBreakdown": "Trading • Perps",
+      "feeStructure": "Dynamic fee structure based on trading volume and position size. Competitive rates for perpetual futures trading.",
+      "integration": {
+        "description": "Fully on-chain perpetuals with CEX-like experience. All positions, vaults, and orders are tokenized as NFTs for secondary market trading."
+      }
+    }
   },
   "table": {
     "protocol": "Protocol",

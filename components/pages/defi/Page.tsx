@@ -78,72 +78,71 @@ export default function DefiPage(): React.ReactElement {
       <div
         className={`min-h-screen flex flex-col bg-background dark:bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjMDAwIj48L3JlY3Q+CjxwYXRoIGQ9Ik0wIDVMNSAwWk02IDRMNCA2Wk0tMSAxTDEgLTFaIiBzdHJva2U9IiMyMjIiIHN0cm9rZS13aWR0aD0iMC41Ij48L3BhdGg+Cjwvc3ZnPg==')] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjZmZmIj48L3JlY3Q+CjxwYXRoIGQ9Ik0wIDVMNSAwWk02IDRMNCA2Wk0tMSAxTDEgLTFaIiBzdHJva2U9IiNlZWUiIHN0cm9rZS13aWR0aD0iMC41Ij48L3BhdGg+Cjwvc3ZnPg==')] ${GeistMono.className}`}
       >
-        <div className="container mx-auto px-3 sm:px-4 md:px-6 py-3 sm:py-4 md:py-6">
+        <div className="container-layout pt-6">
           <Header />
         </div>
 
-        <main className="container mx-auto px-3 sm:px-4 md:px-6 py-3 sm:py-4 md:py-6 flex-1">
-            <ErrorBoundary
-              fallback={
-                <div className="p-4 rounded-md bg-destructive/10 text-destructive mb-6">
-                  <h3 className="font-semibold mb-2">
-                    {t(
-                      'defi:errors.failed_load_metrics',
-                      'Failed to load DeFi metrics'
-                    )}
-                  </h3>
-                  <p className="text-sm">
-                    {t(
-                      'defi:errors.please_refresh',
-                      'Please refresh the page to try again'
-                    )}
-                  </p>
-                </div>
-              }
-            >
-              <StatsSection
-                protocolCount={defiProtocols.length}
-                filteredCount={filteredProtocols.length}
-                totalCount={defiProtocols.length}
-                selectedCategory={selectedCategory}
-                selectedSubcategory={selectedSubcategory}
-              />
-            </ErrorBoundary>
-
-            <FilterControls
-              categories={categories}
+        <main className="container-layout py-6 flex-1">
+          <ErrorBoundary
+            fallback={
+              <div className="p-4 rounded-md bg-destructive/10 text-destructive mb-6">
+                <h3 className="font-semibold mb-2">
+                  {t(
+                    'defi:errors.failed_load_metrics',
+                    'Failed to load DeFi metrics'
+                  )}
+                </h3>
+                <p className="text-sm">
+                  {t(
+                    'defi:errors.please_refresh',
+                    'Please refresh the page to try again'
+                  )}
+                </p>
+              </div>
+            }
+          >
+            <StatsSection
+              protocolCount={defiProtocols.length}
+              filteredCount={filteredProtocols.length}
+              totalCount={defiProtocols.length}
               selectedCategory={selectedCategory}
               selectedSubcategory={selectedSubcategory}
-              viewMode={viewMode}
-              onCategoryChange={handleCategoryChange}
-              onSubcategoryChange={setSelectedSubcategory}
-              onViewModeChange={setViewMode}
+            />
+          </ErrorBoundary>
+
+          <FilterControls
+            categories={categories}
+            selectedCategory={selectedCategory}
+            selectedSubcategory={selectedSubcategory}
+            viewMode={viewMode}
+            onCategoryChange={handleCategoryChange}
+            onSubcategoryChange={setSelectedSubcategory}
+            onViewModeChange={setViewMode}
+          />
+
+          <div className="mt-4 md:mt-8 space-y-4">
+            <SearchBar
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              filteredCount={filteredProtocols.length}
+              totalCount={defiProtocols.length}
+              selectedCategory={selectedCategory}
+              selectedSubcategory={selectedSubcategory}
+              mobileSearchOpen={mobileSearchOpen}
+              onMobileSearchToggle={() =>
+                setMobileSearchOpen(!mobileSearchOpen)
+              }
             />
 
-            <div className="mt-4 md:mt-8 space-y-4">
-              <SearchBar
-                searchQuery={searchQuery}
-                onSearchChange={setSearchQuery}
-                filteredCount={filteredProtocols.length}
-                totalCount={defiProtocols.length}
-                selectedCategory={selectedCategory}
-                selectedSubcategory={selectedSubcategory}
-                mobileSearchOpen={mobileSearchOpen}
-                onMobileSearchToggle={() =>
-                  setMobileSearchOpen(!mobileSearchOpen)
-                }
-              />
-
-              <ProtocolDisplay
-                viewMode={viewMode}
-                filteredProtocols={filteredProtocols}
-                onClearFilters={handleClearFilters}
-              />
-            </div>
+            <ProtocolDisplay
+              viewMode={viewMode}
+              filteredProtocols={filteredProtocols}
+              onClearFilters={handleClearFilters}
+            />
+          </div>
         </main>
 
         <Footer />
-      </div>
       </div>
     </RootErrorBoundary>
   );

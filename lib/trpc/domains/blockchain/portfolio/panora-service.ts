@@ -4,9 +4,11 @@ import { PriceService } from '@/lib/trpc/domains/market-data/prices/services';
 import { getEnvVar } from '@/lib/config/validate-env';
 
 const PANORA_API_ENDPOINT = 'https://api.panora.exchange/prices';
-const PANORA_API_KEY = getEnvVar('PANORA_API_KEY') || 'a4^KV_EaTf4MW#ZdvgGKX#HUD^3IFEAOV_kzpIE^3BQGA8pDnrkT7JcIy#HNlLGi';
+const PANORA_API_KEY =
+  getEnvVar('PANORA_API_KEY') ||
+  'a4^KV_EaTf4MW#ZdvgGKX#HUD^3IFEAOV_kzpIE^3BQGA8pDnrkT7JcIy#HNlLGi';
 
-interface PanoraPriceResponse {
+export interface PanoraPriceResponse {
   chainId: number;
   tokenAddress: string | null;
   faAddress: string;
@@ -172,6 +174,20 @@ export class PanoraService {
       '0x111ae3e5bc816a5e63c2da97d0aa3886519e0cd5e4b046659fa35796bd11542a::stapt_token::StakedApt':
         'APT',
       '0x7e783b349d3e89cf5931af376ebeadbfab855b3fa239b7ada8f5a92fbea6b387::staking::AMAPT':
+        'APT',
+      // Add more common Aptos token addresses
+      '0x1::coin::CoinStore<0x1::aptos_coin::AptosCoin>': 'APT',
+      '0x3::token::Token': 'APT',
+      // Additional USDC variants
+      '0x397071c01929cc6672a17f130bd62b1bce224309029837ce4f18214cc83ce2a7::USDC::USDC':
+        'USDC',
+      // GUI token
+      '0xe4ccb6d39136469f376242c31b34d10515c8eaaa38092f804db8e08a8f53c5b2::assets_v1::EchoCoin002':
+        'GUI',
+      // More APT variants
+      '0x48327a479bf5c5d2e36d5e9846362cff2d99e0e27ff92859fc247893fded3fbd::APTOS::APTOS':
+        'APT',
+      '0x50788befc1107c0cc4473848a92e5c783c635866ce3c98de71d2eeb7d2a34f85::aptos_coin::AptosCoin':
         'APT',
     };
 

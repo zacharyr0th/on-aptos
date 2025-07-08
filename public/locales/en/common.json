@@ -144,7 +144,7 @@
       "choose_dashboard": "Choose your dashboard"
     },
     "sections": {
-      "portfolio": "Your Portfolio Tracker",
+      "portfolio": "Portfolio",
       "portfolio_description": "Monitor your Aptos assets, track performance, and analyze your DeFi positions",
       "stablecoins": "Stablecoins",
       "stablecoins_description": "Track stablecoin supplies and market data on Aptos",

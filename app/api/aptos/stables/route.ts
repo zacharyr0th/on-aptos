@@ -27,8 +27,6 @@ export async function GET() {
       }
     },
     {
-      cacheKey: 'stables-supplies',
-      cacheName: 'stables',
       customHeaders: {
         'Cache-Control': `public, max-age=${Math.floor(SERVICE_CONFIG.stables.ttl / 1000)}, stale-while-revalidate=${Math.floor(SERVICE_CONFIG.stables.ttl / 2000)}`,
         'X-Content-Type': 'application/json',

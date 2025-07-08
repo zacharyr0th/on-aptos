@@ -27,6 +27,8 @@ export const LSTSupplyResponseSchema = BaseResponseSchema.extend({
         tokenCount: z.number(),
         indexerUrl: z.string(),
         query: z.string(),
+        successfulFetches: z.number().optional(),
+        hadRateLimitError: z.boolean().optional(),
       })
       .optional(),
   }),

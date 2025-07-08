@@ -58,9 +58,12 @@ const CurrentUTCTime: FC = memo(function CurrentUTCTime(): ReactElement {
   }, [currentTime, isClient, t]);
 
   return (
-    <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
+    <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] xs:text-xs sm:text-sm text-muted-foreground">
       <Clock className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-      <span className="font-mono" suppressHydrationWarning>
+      <span
+        className="font-mono truncate max-w-[140px] xs:max-w-[180px] sm:max-w-none"
+        suppressHydrationWarning
+      >
         {formattedTime}
       </span>
     </div>
@@ -76,7 +79,6 @@ const AptPrice: FC = memo(function AptPrice(): ReactElement {
   useEffect(() => {
     setMounted(true);
   }, []);
-
 
   // Use tRPC to fetch APT price instead of direct external API calls
   const {
@@ -96,44 +98,48 @@ const AptPrice: FC = memo(function AptPrice(): ReactElement {
 
   if (loading) {
     return (
-      <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
+      <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] xs:text-xs sm:text-sm text-muted-foreground">
         <Image
           src="/icons/apt.png"
           alt="APT token"
           width={16}
           height={16}
-          className="w-4 h-4 opacity-50 flex-shrink-0 rounded-full dark:invert"
+          className="w-3 h-3 xs:w-3.5 xs:h-3.5 sm:w-4 sm:h-4 opacity-50 flex-shrink-0 rounded-full dark:invert"
           priority={false}
           quality={90}
           unoptimized={false}
-          onError={(e) => {
+          onError={e => {
             const img = e.target as HTMLImageElement;
             img.src = '/placeholder.jpg';
           }}
         />
-        <span>{t('messages.apt_price_loading', 'Loading APT price...')}</span>
+        <span className="truncate">
+          {t('messages.apt_price_loading', 'Loading...')}
+        </span>
       </div>
     );
   }
 
   if (error || !aptPriceData?.data?.price) {
     return (
-      <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
+      <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] xs:text-xs sm:text-sm text-muted-foreground">
         <Image
           src="/icons/apt.png"
           alt="APT token"
           width={16}
           height={16}
-          className="w-4 h-4 opacity-50 flex-shrink-0 rounded-full dark:invert"
+          className="w-3 h-3 xs:w-3.5 xs:h-3.5 sm:w-4 sm:h-4 opacity-50 flex-shrink-0 rounded-full dark:invert"
           priority={false}
           quality={90}
           unoptimized={false}
-          onError={(e) => {
+          onError={e => {
             const img = e.target as HTMLImageElement;
             img.src = '/placeholder.jpg';
           }}
         />
-        <span>{t('messages.apt_price_unavailable')}</span>
+        <span className="truncate">
+          {t('messages.apt_price_unavailable', 'Unavailable')}
+        </span>
       </div>
     );
   }
@@ -145,33 +151,35 @@ const AptPrice: FC = memo(function AptPrice(): ReactElement {
   const isPositive = change24h >= 0;
 
   return (
-    <div className="flex items-center gap-2 text-xs sm:text-sm">
+    <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] xs:text-xs sm:text-sm">
       <Image
         src="/icons/apt.png"
         alt="APT token"
         width={16}
         height={16}
-        className="w-4 h-4 flex-shrink-0 rounded-full dark:invert"
+        className="w-3 h-3 xs:w-3.5 xs:h-3.5 sm:w-4 sm:h-4 flex-shrink-0 rounded-full dark:invert"
         priority={false}
         quality={90}
         unoptimized={false}
-        onError={(e) => {
+        onError={e => {
           const img = e.target as HTMLImageElement;
           img.src = '/placeholder.jpg';
         }}
       />
-      <span className={`font-medium ${
-        change24h !== 0 
-          ? isPositive 
-            ? 'text-green-500' 
-            : 'text-red-500'
-          : ''
-      }`}>
+      <span
+        className={`font-medium whitespace-nowrap ${
+          change24h !== 0
+            ? isPositive
+              ? 'text-green-500'
+              : 'text-red-500'
+            : ''
+        }`}
+      >
         ${price.toFixed(2)}
       </span>
       {change24h !== 0 && (
         <span
-          className={`font-medium ${
+          className={`font-medium whitespace-nowrap ${
             isPositive ? 'text-green-500' : 'text-red-500'
           }`}
         >
@@ -229,7 +237,7 @@ const SocialLink: FC<{
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="p-2 -m-2 text-muted-foreground hover:text-foreground transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-md"
+      className="p-2 sm:p-2.5 -m-2 sm:-m-2.5 text-muted-foreground hover:text-foreground transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-md touch-manipulation"
       aria-label={label}
     >
       {icon}
@@ -245,13 +253,13 @@ const FooterComponent: FC<FooterProps> = ({
 
   return (
     <ErrorBoundary>
-      <footer className="w-full py-4">
-        <div className="container mx-auto px-4 sm:px-6">
+      <footer className="w-full py-3 sm:py-4">
+        <div className="container-layout">
           {/* Desktop Layout */}
           <div className="hidden lg:flex lg:items-center lg:justify-between">
             {/* Left: Controls & Live Data */}
-            <div className="flex items-center gap-6">
-              <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4 xl:gap-6">
+              <div className="flex items-center gap-2 xl:gap-3">
                 <LanguageToggle />
                 <ThemeToggle />
               </div>
@@ -263,28 +271,28 @@ const FooterComponent: FC<FooterProps> = ({
             <div></div>
 
             {/* Right: Social Links & Time */}
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-4 xl:gap-6">
               <CurrentUTCTime />
               <div className="w-px h-4 bg-border"></div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 xl:gap-3">
                 {DEVELOPER_CONFIG.website && (
                   <SocialLink
                     href={DEVELOPER_CONFIG.website}
-                    icon={<FaGlobe className="w-5 h-5" />}
+                    icon={<FaGlobe className="w-4 h-4 sm:w-5 sm:h-5" />}
                     label={t('actions.visit_personal_website')}
                   />
                 )}
                 {DEVELOPER_CONFIG.github && (
                   <SocialLink
                     href={DEVELOPER_CONFIG.github}
-                    icon={<FaGithub className="w-5 h-5" />}
+                    icon={<FaGithub className="w-4 h-4 sm:w-5 sm:h-5" />}
                     label={t('actions.view_github')}
                   />
                 )}
                 {DEVELOPER_CONFIG.twitter && (
                   <SocialLink
                     href={`https://x.com/${DEVELOPER_CONFIG.twitter.replace('@', '')}`}
-                    icon={<FaXTwitter className="w-5 h-5" />}
+                    icon={<FaXTwitter className="w-4 h-4 sm:w-5 sm:h-5" />}
                     label={t('actions.follow_on_twitter')}
                   />
                 )}
@@ -292,44 +300,87 @@ const FooterComponent: FC<FooterProps> = ({
             </div>
           </div>
 
-          {/* Mobile Layout */}
-          <div className="flex flex-col gap-4 lg:hidden">
-            {/* Row 1: Controls & APT Price */}
+          {/* Tablet Layout */}
+          <div className="hidden md:flex md:flex-col md:gap-3 lg:hidden">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
                   <LanguageToggle />
                   <ThemeToggle />
                 </div>
                 <div className="w-px h-4 bg-border"></div>
                 <AptPrice />
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-4">
+                <CurrentUTCTime />
+                <div className="w-px h-4 bg-border"></div>
+                <div className="flex items-center gap-2">
+                  {DEVELOPER_CONFIG.website && (
+                    <SocialLink
+                      href={DEVELOPER_CONFIG.website}
+                      icon={<FaGlobe className="w-4 h-4 sm:w-5 sm:h-5" />}
+                      label={t('actions.visit_personal_website')}
+                    />
+                  )}
+                  {DEVELOPER_CONFIG.github && (
+                    <SocialLink
+                      href={DEVELOPER_CONFIG.github}
+                      icon={<FaGithub className="w-4 h-4 sm:w-5 sm:h-5" />}
+                      label={t('actions.view_github')}
+                    />
+                  )}
+                  {DEVELOPER_CONFIG.twitter && (
+                    <SocialLink
+                      href={`https://x.com/${DEVELOPER_CONFIG.twitter.replace('@', '')}`}
+                      icon={<FaXTwitter className="w-4 h-4 sm:w-5 sm:h-5" />}
+                      label={t('actions.follow_on_twitter')}
+                    />
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile Layout */}
+          <div className="flex flex-col gap-3 md:hidden">
+            {/* Row 1: Controls & APT Price */}
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 xs:gap-3 min-w-0">
+                <div className="flex items-center gap-1.5 xs:gap-2">
+                  <LanguageToggle />
+                  <ThemeToggle />
+                </div>
+                <div className="w-px h-4 bg-border flex-shrink-0"></div>
+                <div className="min-w-0">
+                  <AptPrice />
+                </div>
+              </div>
+              <div className="flex items-center gap-1.5 xs:gap-2 flex-shrink-0">
                 {DEVELOPER_CONFIG.website && (
                   <SocialLink
                     href={DEVELOPER_CONFIG.website}
-                    icon={<FaGlobe className="w-5 h-5" />}
+                    icon={<FaGlobe className="w-4 h-4 sm:w-5 sm:h-5" />}
                     label={t('actions.visit_personal_website')}
                   />
                 )}
                 {DEVELOPER_CONFIG.github && (
                   <SocialLink
                     href={DEVELOPER_CONFIG.github}
-                    icon={<FaGithub className="w-5 h-5" />}
+                    icon={<FaGithub className="w-4 h-4 sm:w-5 sm:h-5" />}
                     label={t('actions.view_github')}
                   />
                 )}
                 {DEVELOPER_CONFIG.twitter && (
                   <SocialLink
                     href={`https://x.com/${DEVELOPER_CONFIG.twitter.replace('@', '')}`}
-                    icon={<FaXTwitter className="w-5 h-5" />}
+                    icon={<FaXTwitter className="w-4 h-4 sm:w-5 sm:h-5" />}
                     label={t('actions.follow_on_twitter')}
                   />
                 )}
               </div>
             </div>
-            
-            {/* Row 2: Time */}
+
+            {/* Row 2: Time - Only on mobile */}
             <div className="flex items-center justify-center">
               <CurrentUTCTime />
             </div>

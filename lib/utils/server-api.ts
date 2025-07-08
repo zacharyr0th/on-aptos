@@ -1,12 +1,6 @@
 import { NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import { CACHE_CONFIG } from '@/lib/config/cache';
-import {
-  getCachedData,
-  setCachedData,
-  isNearingExpiration,
-  type CacheInstanceName,
-} from './cache-manager';
 import { RateLimitInfo, RateLimitError, ApiResponse } from './types';
 import { logger } from './logger';
 
@@ -156,14 +150,11 @@ function scheduleRateLimitCleanup(): void {
 scheduleRateLimitCleanup();
 
 /**
- * Main API wrapper function with rate limiting, caching, and error handling (Server-side only)
+ * Main API wrapper function with rate limiting and error handling (Server-side only)
  */
 export async function withApiEnhancements<T>(
   handler: () => Promise<T>,
   options: {
-    cacheKey?: string;
-    cacheName?: CacheInstanceName;
-    cacheTTL?: number;
     customHeaders?: Record<string, string>;
   } = {}
 ): Promise<NextResponse> {
@@ -174,8 +165,6 @@ export async function withApiEnhancements<T>(
     // Log API request
     logger.debug(
       {
-        cacheKey: options.cacheKey,
-        cacheName: options.cacheName,
         clientIp,
       },
       'API request started'
@@ -199,37 +188,8 @@ export async function withApiEnhancements<T>(
       );
     }
 
-    const cacheName = options.cacheName || 'apiService';
-
-    // Check cache if cacheKey provided
-    if (options.cacheKey) {
-      const cachedData = getCachedData<T>(cacheName, options.cacheKey);
-      if (cachedData && !isNearingExpiration(cacheName, options.cacheKey)) {
-        const responseData: ApiResponse<T> = {
-          data: cachedData,
-          cached: true,
-        };
-
-        const etag = generateETag(responseData as Record<string, unknown>);
-
-        return NextResponse.json(responseData, {
-          headers: {
-            'Cache-Control': 's-maxage=60, stale-while-revalidate=30',
-            ETag: etag,
-            ...getSecurityHeaders(rateLimitResult),
-            ...options.customHeaders,
-          },
-        });
-      }
-    }
-
     // Execute handler
     const data = await handler();
-
-    // Cache the result if cacheKey provided
-    if (options.cacheKey) {
-      setCachedData(cacheName, options.cacheKey, data);
-    }
 
     const responseData: ApiResponse<T> = {
       data,
@@ -237,11 +197,22 @@ export async function withApiEnhancements<T>(
     };
 
     const etag = generateETag(responseData as Record<string, unknown>);
+    const duration = Date.now() - startTime;
+
+    // Log successful request with performance metrics
+    logger.debug(
+      {
+        clientIp,
+        duration,
+      },
+      'API request completed successfully'
+    );
 
     return NextResponse.json(responseData, {
       headers: {
         'Cache-Control': 's-maxage=60, stale-while-revalidate=30',
         ETag: etag,
+        'X-Response-Time': `${duration}ms`,
         ...getSecurityHeaders(rateLimitResult),
         ...options.customHeaders,
       },
@@ -265,27 +236,15 @@ export async function withApiEnhancements<T>(
       );
     }
 
-    // Try to return cached data if available
-    if (options.cacheKey) {
-      const cacheName = options.cacheName || 'apiService';
-      const cachedData = getCachedData<T>(cacheName, options.cacheKey);
-      if (cachedData) {
-        const clientIp = await getClientIp();
-        const rateLimitResult = checkRateLimit(clientIp);
-
-        const responseData: ApiResponse<T> = {
-          data: cachedData,
-          cached: true,
-          stale: true,
-          message: 'Serving cached data due to service unavailability',
-        };
-
-        return NextResponse.json(responseData, {
-          status: 206, // Partial Content
-          headers: getSecurityHeaders(rateLimitResult),
-        });
-      }
-    }
+    // Log error for monitoring
+    logger.error(
+      {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        clientIp,
+        duration: Date.now() - startTime,
+      },
+      'API request failed'
+    );
 
     return NextResponse.json(
       {
@@ -303,11 +262,9 @@ export async function withApiEnhancements<T>(
  */
 export async function withTrpcApiEnhancements<T>(
   trpcCaller: () => Promise<T>,
-  cacheKey: string,
   customHeaders?: Record<string, string>
 ): Promise<NextResponse> {
   return withApiEnhancements(trpcCaller, {
-    cacheKey,
     customHeaders,
   });
 }

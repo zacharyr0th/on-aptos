@@ -11,53 +11,85 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { useState, useEffect } from 'react';
-import {
-  Wallet,
-  LogOut,
-  Copy,
-  Check,
-  Smartphone,
-  ExternalLink,
-} from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import { Wallet, LogOut, Copy, Check, Chrome, Apple, Mail } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
-import { MobileWalletConnect } from './MobileWalletConnect';
 import { trpc } from '@/lib/trpc/client';
 
-export function WalletConnectButton() {
+interface WalletConnectButtonProps {
+  size?: 'sm' | 'default' | 'lg';
+}
+
+export function WalletConnectButton({
+  size = 'sm',
+}: WalletConnectButtonProps = {}) {
   const { connect, account, connected, disconnect, wallets, isLoading } =
     useWallet();
   const [showWalletModal, setShowWalletModal] = useState(false);
   const [copiedAddress, setCopiedAddress] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+  const [connectingWallet, setConnectingWallet] = useState<string | null>(null);
+  const [lastClickTime, setLastClickTime] = useState<number>(0);
 
   const walletAddress = account?.address?.toString();
 
   // Fetch primary ANS name for the connected wallet
-  const { data: primaryName, isLoading: primaryNameLoading } = trpc.domains.blockchain.portfolio.getPrimaryName.useQuery(
-    { walletAddress: walletAddress || '' },
-    { 
-      enabled: !!walletAddress && connected,
-      refetchInterval: 300000, // 5 minutes - ANS names don't change often
-      staleTime: 180000, // 3 minutes
-    }
-  );
+  const { data: primaryName, isLoading: primaryNameLoading } =
+    trpc.domains.blockchain.portfolio.getPrimaryName.useQuery(
+      { walletAddress: walletAddress || '' },
+      {
+        enabled: !!walletAddress && connected,
+        refetchInterval: 300000, // 5 minutes - ANS names don't change often
+        staleTime: 180000, // 3 minutes
+      }
+    );
 
+  // Ensure we only render wallet options on client
   useEffect(() => {
-    const checkMobile = () => {
-      const isMobileDevice =
-        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-          navigator.userAgent
-        );
-      setIsMobile(isMobileDevice);
-    };
-
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    setIsClient(true);
   }, []);
+
+  // Categorize wallets and check device type
+  const {
+    extensionWallets,
+    aptosConnectAvailable,
+    isMobile,
+    aptosConnectWallet,
+  } = useMemo(() => {
+    if (!isClient)
+      return {
+        extensionWallets: [],
+        aptosConnectAvailable: false,
+        isMobile: false,
+      };
+
+    const isMobileDevice =
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        navigator.userAgent
+      ) || window.innerWidth < 768;
+
+    // Filter wallets appropriately
+    const extensionWallets =
+      wallets?.filter(wallet => {
+        // Don't show Aptos Connect in the extension wallets list
+        if (wallet.name === 'Aptos Connect') return false;
+
+        // Filter based on actual availability
+        return wallet.readyState === 'Installed';
+      }) || [];
+
+    // Check if Aptos Connect is available
+    const aptosConnectWallet = wallets?.find(w => w.name === 'Aptos Connect');
+    const aptosConnectAvailable = !!aptosConnectWallet;
+
+    return {
+      extensionWallets,
+      aptosConnectAvailable,
+      isMobile: isMobileDevice,
+      aptosConnectWallet,
+    };
+  }, [wallets, isClient]);
 
   const truncateAddress = (address: string) => {
     if (!address) return '';
@@ -77,31 +109,32 @@ export function WalletConnectButton() {
     setTimeout(() => setCopiedAddress(false), 2000);
   };
 
-  const connectToPetraDeepLink = () => {
-    const currentUrl = window.location.origin;
-    const petraDeepLink = `https://petra.app/explore?link=${encodeURIComponent(currentUrl)}`;
-    window.location.href = petraDeepLink;
-  };
-
-  const connectToNightlyDeepLink = () => {
-    const currentUrl = window.location.origin;
-    const nightlyDeepLink = `https://nightly.app/connect?url=${encodeURIComponent(currentUrl)}`;
-    window.location.href = nightlyDeepLink;
+  // Handle Aptos Connect (Google/Apple login)
+  const handleAptosConnect = async () => {
+    setConnectingWallet('Aptos Connect');
+    try {
+      // Try to connect with Aptos Connect
+      await connect('Aptos Connect' as any);
+      setShowWalletModal(false);
+    } catch (error) {
+      console.warn('Failed to connect with Aptos Connect:', error);
+    } finally {
+      setTimeout(() => setConnectingWallet(null), 500);
+    }
   };
 
   const handleWalletSelect = async (walletName: string) => {
-    try {
-      // For mobile devices and specific wallets, try deep link first
-      if (isMobile && walletName.toLowerCase().includes('petra')) {
-        connectToPetraDeepLink();
-        return;
-      }
-      
-      if (isMobile && walletName.toLowerCase().includes('nightly')) {
-        connectToNightlyDeepLink();
-        return;
-      }
+    // Debounce clicks - prevent spam clicking
+    const now = Date.now();
+    if (now - lastClickTime < 1000) {
+      return;
+    }
+    setLastClickTime(now);
 
+    // Set loading state immediately for visual feedback
+    setConnectingWallet(walletName);
+
+    try {
       await connect(walletName as any);
       setShowWalletModal(false);
     } catch (error: any) {
@@ -116,161 +149,102 @@ export function WalletConnectButton() {
       ) {
         console.warn(`Failed to connect to ${walletName}:`, errorMessage);
       }
-
-      // If regular connection fails on mobile, try deep links
-      if (isMobile && walletName.toLowerCase().includes('petra')) {
-        connectToPetraDeepLink();
-      }
-      
-      if (isMobile && walletName.toLowerCase().includes('nightly')) {
-        connectToNightlyDeepLink();
-      }
+    } finally {
+      // Clear loading state after a short delay
+      setTimeout(() => setConnectingWallet(null), 500);
     }
   };
 
   if (!connected) {
     return (
       <>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="default"
-              size="sm"
-              onClick={() => setShowWalletModal(true)}
-              disabled={isLoading}
-              className="flex items-center gap-2"
-              aria-label="Connect your wallet to access portfolio features"
-            >
-              <Wallet className="h-4 w-4" />
-              Connect Wallet
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Connect your wallet to access portfolio features</p>
-          </TooltipContent>
-        </Tooltip>
+        <Button
+          variant="default"
+          size={size}
+          onClick={() => setShowWalletModal(true)}
+          disabled={isLoading}
+          className={cn(
+            'flex items-center gap-2',
+            size === 'lg' && 'text-lg px-8 py-6'
+          )}
+          aria-label="Connect your wallet to access portfolio features"
+        >
+          <Wallet className={cn('h-4 w-4', size === 'lg' && 'h-6 w-6')} />
+          Connect Wallet
+        </Button>
 
         <Dialog open={showWalletModal} onOpenChange={setShowWalletModal}>
           <DialogContent className="sm:max-w-md">
             <DialogTitle>Connect Wallet</DialogTitle>
             <div className="grid gap-3 py-4">
-
-              {/* Mobile Wallet Options */}
-              {isMobile && (
-                <>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className="justify-start gap-3 h-auto py-3 border-primary/50"
-                        onClick={connectToPetraDeepLink}
-                        aria-label="Open Petra mobile app to connect wallet"
-                      >
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-                          <span className="text-white font-bold text-sm">P</span>
-                        </div>
-                        <div className="flex-1 text-left">
-                          <span className="font-medium">Petra Mobile App</span>
-                          <div className="text-xs text-muted-foreground">
-                            Open in Petra app
-                          </div>
-                        </div>
-                        <ExternalLink className="h-4 w-4" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Opens Petra mobile app for wallet connection</p>
-                    </TooltipContent>
-                  </Tooltip>
-                  
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className="justify-start gap-3 h-auto py-3 border-primary/50"
-                        onClick={connectToNightlyDeepLink}
-                        aria-label="Open Nightly mobile app to connect wallet"
-                      >
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                          <span className="text-white font-bold text-sm">N</span>
-                        </div>
-                        <div className="flex-1 text-left">
-                          <span className="font-medium">Nightly Mobile App</span>
-                          <div className="text-xs text-muted-foreground">
-                            Open in Nightly app
-                          </div>
-                        </div>
-                        <ExternalLink className="h-4 w-4" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Opens Nightly mobile app for wallet connection</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </>
-              )}
-
-              {/* Available Wallets */}
-              {wallets?.map(wallet => (
-                <Tooltip key={wallet.name}>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="justify-start gap-3 h-auto py-3"
-                      onClick={() => handleWalletSelect(wallet.name)}
-                      aria-label={`Connect with ${wallet.name} wallet`}
-                    >
+              {/* Extension Wallets */}
+              {isClient &&
+                extensionWallets.map(wallet => (
+                  <Button
+                    key={wallet.name}
+                    variant="outline"
+                    className="justify-start gap-3 h-auto py-3"
+                    onClick={() => handleWalletSelect(wallet.name)}
+                    disabled={connectingWallet === wallet.name || isLoading}
+                    aria-label={`Connect with ${wallet.name} wallet`}
+                  >
+                    {connectingWallet === wallet.name ? (
+                      <div className="h-8 w-8 flex items-center justify-center">
+                        <div className="h-4 w-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                      </div>
+                    ) : (
                       <Image
                         src={wallet.icon}
                         alt={`${wallet.name} icon`}
                         width={32}
                         height={32}
-                        className="h-8 w-8"
-                        onError={(e) => {
+                        className="h-8 w-8 rounded"
+                        onError={e => {
                           const img = e.target as HTMLImageElement;
                           img.src = '/placeholder.jpg';
                         }}
                       />
-                      <span className="font-medium">{wallet.name}</span>
-                      {isMobile && (wallet.name.toLowerCase().includes('petra') || wallet.name.toLowerCase().includes('nightly')) && (
-                        <span className="text-xs text-muted-foreground ml-auto">
-                          Extension
-                        </span>
+                    )}
+                    <div className="flex-1 text-left">
+                      <span className="font-medium">
+                        {connectingWallet === wallet.name
+                          ? 'Connecting...'
+                          : wallet.name}
+                      </span>
+                      {isMobile && (
+                        <div className="text-xs text-muted-foreground">
+                          {wallet.readyState === 'Installed'
+                            ? 'Installed'
+                            : 'Not detected'}
+                        </div>
                       )}
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Connect with {wallet.name} wallet</p>
-                  </TooltipContent>
-                </Tooltip>
-              ))}
+                    </div>
+                  </Button>
+                ))}
 
-              {/* Add download links for mobile users */}
-              {isMobile && (
-                <div className="pt-2 border-t">
-                  <p className="text-xs text-muted-foreground text-center mb-2">
-                    Don't have a wallet yet?
+              {/* Help text for users without wallets */}
+              {isClient && extensionWallets.length === 0 && (
+                <div className="text-center py-4">
+                  <p className="text-sm text-muted-foreground mb-4">
+                    No wallet extensions detected. Use Google or Apple sign-in
+                    above, or install a wallet extension.
                   </p>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="flex flex-col gap-2">
                     <Button
-                      variant="ghost"
+                      variant="outline"
                       size="sm"
-                      onClick={() =>
-                        window.open('https://petra.app/download', '_blank')
-                      }
+                      onClick={() => window.open('https://petra.app', '_blank')}
                     >
-                      <Smartphone className="h-4 w-4 mr-1" />
-                      Petra
+                      Install Petra Wallet
                     </Button>
                     <Button
-                      variant="ghost"
+                      variant="outline"
                       size="sm"
                       onClick={() =>
-                        window.open('https://nightly.app/download', '_blank')
+                        window.open('https://www.okx.com/web3', '_blank')
                       }
                     >
-                      <Smartphone className="h-4 w-4 mr-1" />
-                      Nightly
+                      Install OKX Wallet
                     </Button>
                   </div>
                 </div>
@@ -284,24 +258,17 @@ export function WalletConnectButton() {
 
   return (
     <DropdownMenu>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <DropdownMenuTrigger asChild>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="flex items-center gap-2"
-              aria-label="Wallet options and account settings"
-            >
-              <Wallet className="h-4 w-4" />
-              {getDisplayName()}
-            </Button>
-          </DropdownMenuTrigger>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>Wallet options and account settings</p>
-        </TooltipContent>
-      </Tooltip>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="outline"
+          size={size}
+          className="flex items-center gap-2"
+          aria-label="Wallet options and account settings"
+        >
+          <Wallet className="h-4 w-4" />
+          {getDisplayName()}
+        </Button>
+      </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
         <DropdownMenuSeparator />
@@ -329,6 +296,24 @@ export function WalletConnectButton() {
           )}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
+        {/* Add link to Aptos Connect for users who connected via Google/Apple */}
+        {connected &&
+          wallets?.find(w => w.name === 'Aptos Connect')?.readyState ===
+            'Installed' && (
+            <>
+              <DropdownMenuItem
+                onClick={() =>
+                  window.open('https://aptosconnect.app', '_blank')
+                }
+                className="flex items-center gap-2 cursor-pointer"
+                aria-label="Open Aptos Connect wallet"
+              >
+                <Wallet className="h-4 w-4" />
+                View Wallet
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+            </>
+          )}
         <DropdownMenuItem
           onClick={() => disconnect()}
           className="flex items-center gap-2 cursor-pointer text-destructive"

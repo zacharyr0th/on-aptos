@@ -160,7 +160,7 @@ export const ProtocolDisplay = React.memo(function ProtocolDisplay({
                       sizes={isMobile ? '64px' : '40px'}
                       priority={index < 8 || protocol.title === 'Amnis'}
                       className="object-cover"
-                      onError={(e) => {
+                      onError={e => {
                         const img = e.target as HTMLImageElement;
                         img.src = '/placeholder.jpg';
                       }}

@@ -1,6 +1,7 @@
 import { router } from '@/lib/trpc/core/server';
 import { aptosRouter } from './aptos/router';
 import { portfolioRouter } from './portfolio/router';
+import { transactionRouter } from './transactions/router';
 
 /**
  * Blockchain Router
@@ -9,4 +10,5 @@ import { portfolioRouter } from './portfolio/router';
 export const blockchainRouter = router({
   aptos: aptosRouter,
   portfolio: portfolioRouter,
+  transactions: transactionRouter,
 });

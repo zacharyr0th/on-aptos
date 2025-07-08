@@ -14,9 +14,12 @@ export function WalletProvider({ children }: WalletProviderProps) {
       autoConnect={false}
       dappConfig={{
         network: Network.MAINNET,
-        aptosConnectDappId: 'your-dapp-id',
+        aptosConnect: {
+          dappName: "What's on Aptos?", // defaults to document's title
+          dappImageURI: '/icons/icon-192x192.png', // defaults to dapp's favicon
+          dappId: 'on-aptos', // Optional: for external wallet pairing
+        },
       }}
-      optInWallets={['Petra', 'Nightly', 'Pontem Wallet', 'Martian Wallet', 'Rise Wallet', 'Fewcha', 'Spika', 'Bitkeep', 'TokenPocket', 'Blocto', 'SafePal', 'FoxWallet', 'Coin98', 'OKX Wallet', 'Bitget Wallet', 'Razor Wallet', 'Trustwallet', 'MSafe']}
       onError={error => {
         // Silently handle wallet connection errors in development
         if (process.env.NODE_ENV === 'development') {

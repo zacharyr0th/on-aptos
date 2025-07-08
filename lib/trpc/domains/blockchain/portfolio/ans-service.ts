@@ -9,8 +9,8 @@ class ANSService {
   private aptos: Aptos;
 
   constructor() {
-    const config = new AptosConfig({ 
-      network: Network.MAINNET 
+    const config = new AptosConfig({
+      network: Network.MAINNET,
     });
     this.aptos = new Aptos(config);
   }
@@ -23,13 +23,15 @@ class ANSService {
   async getPrimaryName(address: string): Promise<string | null> {
     try {
       logger.info(`ANS: Getting primary name for address ${address}`);
-      
+
       const primaryName = await this.aptos.getPrimaryName({
-        address: address as `0x${string}`
+        address: address as `0x${string}`,
       });
 
       if (primaryName) {
-        logger.info(`ANS: Found primary name ${primaryName} for address ${address}`);
+        logger.info(
+          `ANS: Found primary name ${primaryName} for address ${address}`
+        );
         return primaryName;
       }
 
@@ -49,9 +51,9 @@ class ANSService {
   async getAccountNames(address: string): Promise<string[]> {
     try {
       logger.info(`ANS: Getting all names for address ${address}`);
-      
+
       const names = await this.aptos.getAccountNames({
-        accountAddress: address as `0x${string}`
+        accountAddress: address as `0x${string}`,
       });
 
       const nameList = names
@@ -79,16 +81,18 @@ class ANSService {
   async getAccountDomains(address: string): Promise<string[]> {
     try {
       logger.info(`ANS: Getting domains for address ${address}`);
-      
+
       const domains = await this.aptos.getAccountDomains({
-        accountAddress: address as `0x${string}`
+        accountAddress: address as `0x${string}`,
       });
 
       const domainList = domains
         .filter(domain => domain.domain)
         .map(domain => `${domain.domain}.apt`);
 
-      logger.info(`ANS: Found ${domainList.length} domains for address ${address}`);
+      logger.info(
+        `ANS: Found ${domainList.length} domains for address ${address}`
+      );
       return domainList;
     } catch (error) {
       logger.error(`ANS: Error getting account domains for ${address}:`, error);
@@ -105,16 +109,18 @@ class ANSService {
     try {
       // Ensure name has .apt suffix
       const normalizedName = name.endsWith('.apt') ? name : `${name}.apt`;
-      
+
       logger.info(`ANS: Resolving name ${normalizedName} to address`);
-      
+
       const address = await this.aptos.getOwnerAddress({
-        name: normalizedName
+        name: normalizedName,
       });
 
       if (address) {
         const addressString = address.toString();
-        logger.info(`ANS: Resolved ${normalizedName} to address ${addressString}`);
+        logger.info(
+          `ANS: Resolved ${normalizedName} to address ${addressString}`
+        );
         return addressString;
       }
 
@@ -135,11 +141,11 @@ class ANSService {
     try {
       // Ensure name has .apt suffix
       const normalizedName = name.endsWith('.apt') ? name : `${name}.apt`;
-      
+
       logger.info(`ANS: Getting details for name ${normalizedName}`);
-      
+
       const nameInfo = await this.aptos.getName({
-        name: normalizedName
+        name: normalizedName,
       });
 
       if (nameInfo) {
@@ -151,7 +157,7 @@ class ANSService {
           registeredAddress: nameInfo.registered_address,
           isPrimary: nameInfo.is_primary,
           expirationTimestamp: nameInfo.expiration_timestamp,
-          tokenStandard: nameInfo.token_standard
+          tokenStandard: nameInfo.token_standard,
         };
       }
 
@@ -186,7 +192,7 @@ class ANSService {
       if (primaryName) {
         return primaryName;
       }
-      
+
       // Fallback to shortened address format
       return `${address.slice(0, 6)}...${address.slice(-4)}`;
     } catch (error) {

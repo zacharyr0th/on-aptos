@@ -19,6 +19,7 @@ import { BTC_METADATA, Token, SupplyData } from '@/lib/config';
 import {
   formatCurrency,
   formatAmount,
+  formatAmountFull,
   convertRawTokenAmount,
   formatPercentage,
 } from '@/lib/utils';
@@ -115,7 +116,7 @@ const TokenCard = memo(function TokenCard({
                 height={20}
                 className={`object-contain rounded-full ${!imageLoaded ? 'opacity-0' : ''}`}
                 onLoad={handleImageLoad}
-                onError={(e) => {
+                onError={e => {
                   const img = e.target as HTMLImageElement;
                   img.src = '/placeholder.jpg';
                   handleImageLoad();
@@ -128,11 +129,11 @@ const TokenCard = memo(function TokenCard({
           </div>
         </div>
         <div className="px-2.5 pt-1.5 pb-0">
-          <p className="text-xl font-bold text-card-foreground">
+          <p className="text-xl font-bold text-card-foreground font-mono">
             {formatAmount(tokenData.btcValue, 'BTC')}
           </p>
           {bitcoinPrice && (
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground font-mono">
               ≈ {formatCurrency(tokenData.usdValue, 'USD')}
             </p>
           )}
@@ -142,7 +143,7 @@ const TokenCard = memo(function TokenCard({
             <span className="text-muted-foreground">
               {t('btc:stats.market_share')}
             </span>
-            <span className="font-medium text-muted-foreground">
+            <span className="font-medium text-muted-foreground font-mono">
               {tokenData.marketSharePercent}%
             </span>
           </div>
@@ -334,22 +335,6 @@ export default function BitcoinPage(): React.ReactElement {
     }
   );
 
-  // Use tRPC for Echelon data (for MoneyMarkets component)
-  const {
-    data: echelonData,
-    isLoading: echelonLoading,
-    refetch: refetchEchelon,
-    isFetching: echelonFetching,
-  } = trpc.domains.assets.bitcoin.getSupplies.useQuery(
-    { forceRefresh },
-    {
-      staleTime: 2 * 60 * 1000, // 2 minutes
-      gcTime: 5 * 60 * 1000, // 5 minutes
-      refetchInterval: 5 * 60 * 1000, // Auto-refetch every 5 minutes
-      refetchIntervalInBackground: true,
-    }
-  );
-
   // Use our Bitcoin price hook as fallback only
   const {
     data: bitcoinPriceHookData,
@@ -357,23 +342,10 @@ export default function BitcoinPage(): React.ReactElement {
     loading: bitcoinPriceLoading,
   } = useBitcoinPrice();
 
-  // Extract bitcoin price with priority fallbacks for echelon or price hook
+  // Extract bitcoin price from price hook
   const bitcoinPriceData = useMemo(() => {
     return measurePerformance(() => {
-      // First priority: Try to get price from Echelon data
-      if (echelonData?.data?.markets) {
-        const aBTCMarket = echelonData.data.markets.find(
-          (m: { symbol: string }) => m.symbol === 'aBTC'
-        );
-        if (aBTCMarket?.price) {
-          return {
-            price: aBTCMarket.price,
-            updated: echelonData.timestamp || new Date().toISOString(),
-          };
-        }
-      }
-
-      // Second priority: Use bitcoin price hook data
+      // Use bitcoin price hook data
       if (bitcoinPriceHookData?.price) {
         return bitcoinPriceHookData;
       }
@@ -384,7 +356,7 @@ export default function BitcoinPage(): React.ReactElement {
         updated: new Date().toISOString(),
       };
     }, 'Bitcoin price calculation');
-  }, [echelonData, bitcoinPriceHookData]);
+  }, [bitcoinPriceHookData]);
 
   // Extract the actual data from tRPC responses and transform to expected format
   const data: SupplyData | null = useMemo(() => {
@@ -413,7 +385,7 @@ export default function BitcoinPage(): React.ReactElement {
     }, 'Data transformation');
   }, [btcSupplyData]);
 
-  const loading = btcSupplyLoading || (bitcoinPriceLoading && !echelonData);
+  const loading = btcSupplyLoading || bitcoinPriceLoading;
   const isRateLimited =
     btcSupplyError?.message?.includes('Rate limited') ||
     btcSupplyError?.message?.includes('429');
@@ -422,15 +394,13 @@ export default function BitcoinPage(): React.ReactElement {
     : btcSupplyError?.message ||
       (!bitcoinPriceData && bitcoinPriceError) ||
       null;
-  const refreshing =
-    (btcSupplyFetching && !btcSupplyLoading) ||
-    (echelonFetching && !echelonLoading);
+  const refreshing = btcSupplyFetching && !btcSupplyLoading;
 
   // Manual refresh handler
   const fetchSupplyData = useCallback(async (): Promise<void> => {
     setForceRefresh(prev => !prev); // Toggle to force refresh
-    await Promise.all([refetchBtcSupply(), refetchEchelon()]);
-  }, [refetchBtcSupply, refetchEchelon]);
+    await refetchBtcSupply();
+  }, [refetchBtcSupply]);
 
   // Process the supply data for display
   const processedData = useMemo(() => {
@@ -505,96 +475,93 @@ export default function BitcoinPage(): React.ReactElement {
 
   return (
     <ErrorBoundary>
-      <div
-        className={`min-h-screen flex flex-col bg-background ${GeistMono.className}`}
-      >
+      <div className={`min-h-screen flex flex-col ${GeistMono.className}`}>
         <div className="fixed top-0 left-0 right-0 h-1 z-50">
           {refreshing && <div className="h-full bg-muted animate-pulse"></div>}
         </div>
 
-        <div className="container mx-auto px-4 sm:px-6 py-6">
+        <div className="container-layout pt-6">
           <Header />
         </div>
 
-        <main className="container mx-auto px-4 sm:px-6 py-6 flex-1">
-            {loading ? (
-              <LoadingState />
-            ) : error ? (
-              <ErrorState error={error} onRetry={handleRetry} t={t} />
-            ) : processedData && bitcoinPriceData ? (
-              <>
-                <div className="flex items-center bg-card border rounded-lg py-3 px-4 mb-6">
-                  <div className="flex-grow">
-                    <h2 className="text-base sm:text-lg font-medium text-card-foreground">
-                      {t('btc:stats.total_supply')}
-                    </h2>
-                    <p className="text-xl sm:text-2xl font-bold text-card-foreground">
-                      {formatAmount(totalBTC, 'BTC')}
-                      <span className="text-base font-normal text-muted-foreground ml-2">
-                        ≈ {formatCurrency(totalUSD, 'USD')}
-                      </span>
-                    </p>
+        <main className="container-layout py-6 flex-1">
+          {loading ? (
+            <LoadingState />
+          ) : error ? (
+            <ErrorState error={error} onRetry={handleRetry} t={t} />
+          ) : processedData && bitcoinPriceData ? (
+            <>
+              <div className="flex items-center bg-card border rounded-lg py-3 px-4 mb-6">
+                <div className="flex-grow">
+                  <h2 className="text-base sm:text-lg font-medium text-card-foreground">
+                    {t('btc:stats.total_supply')}
+                  </h2>
+                  <p className="text-xl sm:text-2xl font-bold text-card-foreground font-mono">
+                    {formatAmountFull(totalBTC, 'BTC')}
+                    <span className="text-base font-normal text-muted-foreground ml-2 font-mono">
+                      ≈ {formatCurrency(totalUSD, 'USD')}
+                    </span>
+                  </p>
+                </div>
+                <div className="flex flex-col items-end">
+                  <div className="bg-amber-100 dark:bg-amber-950 p-2 mb-1 rounded">
+                    <Image
+                      src="/icons/btc/bitcoin.png"
+                      alt={t('btc:assets.bitcoin')}
+                      width={20}
+                      height={20}
+                      className="object-contain"
+                      onError={e => {
+                        const img = e.target as HTMLImageElement;
+                        img.src = '/placeholder.jpg';
+                      }}
+                    />
                   </div>
-                  <div className="flex flex-col items-end">
-                    <div className="bg-amber-100 dark:bg-amber-950 p-2 mb-1 rounded">
-                      <Image
-                        src="/icons/btc/bitcoin.png"
-                        alt={t('btc:assets.bitcoin')}
-                        width={20}
-                        height={20}
-                        className="object-contain"
-                        onError={(e) => {
-                          const img = e.target as HTMLImageElement;
-                          img.src = '/placeholder.jpg';
-                        }}
-                      />
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      {formatCurrency(bitcoinPriceData.price, 'USD')}
-                    </div>
+                  <div className="text-xs text-muted-foreground font-mono">
+                    {formatCurrency(bitcoinPriceData.price, 'USD')}
                   </div>
                 </div>
+              </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                  <div className="md:col-span-1 space-y-4">
-                    {processedData.supplies.map(token => (
-                      <TokenCard
-                        key={token.symbol}
-                        token={token}
-                        totalBTC={totalBTC}
-                        bitcoinPrice={bitcoinPriceData.price}
-                        t={t}
-                      />
-                    ))}
-                  </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                <div className="md:col-span-1 space-y-4">
+                  {processedData.supplies.map(token => (
+                    <TokenCard
+                      key={token.symbol}
+                      token={token}
+                      totalBTC={totalBTC}
+                      bitcoinPrice={bitcoinPriceData.price}
+                      t={t}
+                    />
+                  ))}
+                </div>
 
-                  <div className="md:col-span-1 lg:col-span-3 bg-card border rounded-lg overflow-hidden min-h-[250px] sm:min-h-[300px]">
-                    <ErrorBoundary
-                      fallback={
-                        <div className="flex items-center justify-center h-full">
-                          <div className="text-center p-4">
-                            <AlertTriangle className="h-8 w-8 mx-auto mb-2 text-destructive" />
-                            <p className="text-sm text-muted-foreground">
-                              {t('btc:loading.chart_error')}
-                            </p>
-                          </div>
+                <div className="md:col-span-1 lg:col-span-3 bg-card border rounded-lg overflow-hidden min-h-[250px] sm:min-h-[300px]">
+                  <ErrorBoundary
+                    fallback={
+                      <div className="flex items-center justify-center h-full">
+                        <div className="text-center p-4">
+                          <AlertTriangle className="h-8 w-8 mx-auto mb-2 text-destructive" />
+                          <p className="text-sm text-muted-foreground">
+                            {t('btc:loading.chart_error')}
+                          </p>
                         </div>
-                      }
-                    >
-                      <MarketShareChart
-                        data={processedData.supplies}
-                        tokenMetadata={TOKEN_METADATA}
-                        bitcoinPrice={bitcoinPriceData.price}
-                      />
-                    </ErrorBoundary>
-                  </div>
+                      </div>
+                    }
+                  >
+                    <MarketShareChart
+                      data={processedData.supplies}
+                      tokenMetadata={TOKEN_METADATA}
+                      bitcoinPrice={bitcoinPriceData.price}
+                    />
+                  </ErrorBoundary>
                 </div>
-              </>
-            ) : null}
+              </div>
+            </>
+          ) : null}
         </main>
 
         <Footer />
-      </div>
       </div>
     </ErrorBoundary>
   );

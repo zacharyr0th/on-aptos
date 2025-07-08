@@ -38,6 +38,7 @@
   --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
   --color-sidebar-ring: var(--sidebar-ring);
   --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
@@ -158,19 +159,39 @@
     -webkit-text-size-adjust: 100%;
     touch-action: manipulation;
     scroll-padding-top: 1rem;
+    -webkit-tap-highlight-color: transparent;
 
     /* Bitcoin page diagonal pattern background */
-    background-image: 
-      url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjZmZmIj48L3JlY3Q+CjxwYXRoIGQ9Ik0wIDVMNSAwWk02IDRMNCA2Wk0tMSAxTDEgLTFaIiBzdHJva2U9IiNlZWUiIHN0cm9rZS13aWR0aD0iMC41Ij48L3BhdGg+Cjwvc3ZnPg==');
+    background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjZmZmIj48L3JlY3Q+CjxwYXRoIGQ9Ik0wIDVMNSAwWk02IDRMNCA2Wk0tMSAxTDEgLTFaIiBzdHJva2U9IiNlZWUiIHN0cm9rZS13aWR0aD0iMC41Ij48L3BhdGg+Cjwvc3ZnPg==');
   }
 
   .dark body {
     /* Bitcoin page diagonal pattern background for dark mode */
-    background-image: 
-      url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjMDAwIj48L3JlY3Q+CjxwYXRoIGQ9Ik0wIDVMNSAwWk02IDRMNCA2Wk0tMSAxTDEgLTFaIiBzdHJva2U9IiMyMjIiIHN0cm9rZS13aWR0aD0iMC41Ij48L3BhdGg+Cjwvc3ZnPg==');
+    background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjMDAwIj48L3JlY3Q+CjxwYXRoIGQ9Ik0wIDVMNSAwWk02IDRMNCA2Wk0tMSAxTDEgLTFaIiBzdHJva2U9IiMyMjIiIHN0cm9rZS13aWR0aD0iMC41Ij48L3BhdGg+Cjwvc3ZnPg==');
   }
 
   /* Removed fixed layout that was causing scrolling issues */
+
+  /* Apply Geist Mono to all numbers */
+  /* Using font-feature-settings to target numeric characters */
+  * {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Target elements that typically contain numbers */
+  .font-mono,
+  .tabular-nums,
+  [data-numeric],
+  .price,
+  .supply,
+  .percentage,
+  .metric-value,
+  .table-cell-numeric,
+  td:has(.text-right),
+  .text-right {
+    font-family: var(--font-mono), monospace;
+    font-variant-numeric: tabular-nums;
+  }
 }
 
 /* === Custom Animations === */
@@ -191,7 +212,7 @@
 
   /* Background grid pattern */
   .bg-grid-pattern {
-    background-image: 
+    background-image:
       linear-gradient(to right, hsl(var(--border)) 1px, transparent 1px),
       linear-gradient(to bottom, hsl(var(--border)) 1px, transparent 1px);
     background-size: 40px 40px;
@@ -209,11 +230,19 @@
 
   /* Professional gradient backgrounds */
   .gradient-primary {
-    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.8) 100%);
+    background: linear-gradient(
+      135deg,
+      hsl(var(--primary)) 0%,
+      hsl(var(--primary) / 0.8) 100%
+    );
   }
 
   .gradient-muted {
-    background: linear-gradient(135deg, hsl(var(--muted)) 0%, hsl(var(--muted) / 0.5) 100%);
+    background: linear-gradient(
+      135deg,
+      hsl(var(--muted)) 0%,
+      hsl(var(--muted) / 0.5) 100%
+    );
   }
 
   /* Line clamp utilities */
@@ -287,5 +316,50 @@
 
   .text-responsive-xl {
     @apply text-xl sm:text-2xl md:text-3xl lg:text-4xl;
+  }
+
+  /* Touch-friendly interactive elements */
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
+
+  /* Prevent text selection on buttons */
+  .no-select {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  /* Safe area padding for mobile devices */
+  .safe-padding-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+
+  /* Responsive container padding - consistent across all components */
+  .container-padding {
+    @apply px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Container with consistent padding for layout components */
+  .container-layout {
+    @apply container mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Apply mono font to numeric content */
+  .font-numeric {
+    font-family: var(--font-mono), monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Common numeric patterns */
+  .amount,
+  .price,
+  .percentage,
+  .supply,
+  .metric,
+  .statistic {
+    font-family: var(--font-mono), monospace;
+    font-variant-numeric: tabular-nums;
   }
 }

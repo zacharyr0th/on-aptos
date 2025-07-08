@@ -1,5 +1,4 @@
 import { publicProcedure, router } from '../../../core/server';
-import { CacheService } from '../../../shared/services';
 import { ProtocolNamesInputSchema } from './schemas';
 import {
   fetchAptosTVL,
@@ -23,24 +22,14 @@ export const defiMetricsRouter = router({
     const startTime = Date.now();
 
     try {
-      const result = await CacheService.getCachedOrFetch(
-        'defi-tvl',
-        fetchAptosTVL,
-        300 // 5 minutes cache
-      );
+      const data = await fetchAptosTVL();
 
       return {
         timestamp: new Date().toISOString(),
         performance: {
           responseTimeMs: Date.now() - startTime,
-          cacheHits: result.cached ? 1 : 0,
-          cacheMisses: result.cached ? 0 : 1,
-          apiCalls: result.cached ? 0 : 1,
         },
-        cache: {
-          cached: result.cached,
-        },
-        data: result.data,
+        data,
       };
     } catch (error) {
       console.error('Error fetching Aptos TVL:', error);
@@ -55,24 +44,14 @@ export const defiMetricsRouter = router({
     const startTime = Date.now();
 
     try {
-      const result = await CacheService.getCachedOrFetch(
-        'defi-spot-volume',
-        fetchAptosSpotVolume,
-        300 // 5 minutes cache
-      );
+      const data = await fetchAptosSpotVolume();
 
       return {
         timestamp: new Date().toISOString(),
         performance: {
           responseTimeMs: Date.now() - startTime,
-          cacheHits: result.cached ? 1 : 0,
-          cacheMisses: result.cached ? 0 : 1,
-          apiCalls: result.cached ? 0 : 1,
         },
-        cache: {
-          cached: result.cached,
-        },
-        data: result.data,
+        data,
       };
     } catch (error) {
       console.error('Error fetching Aptos spot volume:', error);
@@ -84,18 +63,13 @@ export const defiMetricsRouter = router({
    * Get 24h derivatives trading volume for Aptos (placeholder for future implementation)
    */
   getDerivativesVolume: publicProcedure.query(async () => {
+    const startTime = Date.now();
     const data = await fetchAptosDerivativesVolume();
 
     return {
       timestamp: new Date().toISOString(),
       performance: {
-        responseTimeMs: 1,
-        cacheHits: 0,
-        cacheMisses: 0,
-        apiCalls: 0,
-      },
-      cache: {
-        cached: false,
+        responseTimeMs: Date.now() - startTime,
       },
       data,
     };
@@ -108,24 +82,14 @@ export const defiMetricsRouter = router({
     const startTime = Date.now();
 
     try {
-      const result = await CacheService.getCachedOrFetch(
-        'defi-protocols',
-        fetchAptosProtocols,
-        600 // 10 minutes cache
-      );
+      const data = await fetchAptosProtocols();
 
       return {
         timestamp: new Date().toISOString(),
         performance: {
           responseTimeMs: Date.now() - startTime,
-          cacheHits: result.cached ? 1 : 0,
-          cacheMisses: result.cached ? 0 : 1,
-          apiCalls: result.cached ? 0 : 1,
         },
-        cache: {
-          cached: result.cached,
-        },
-        data: result.data,
+        data,
       };
     } catch (error) {
       console.error('Error fetching Aptos protocols:', error);
@@ -140,24 +104,14 @@ export const defiMetricsRouter = router({
     const startTime = Date.now();
 
     try {
-      const result = await CacheService.getCachedOrFetch(
-        'defi-all-metrics',
-        fetchAllAptosMetrics,
-        300 // 5 minutes cache
-      );
+      const data = await fetchAllAptosMetrics();
 
       return {
         timestamp: new Date().toISOString(),
         performance: {
           responseTimeMs: Date.now() - startTime,
-          cacheHits: result.cached ? 1 : 0,
-          cacheMisses: result.cached ? 0 : 1,
-          apiCalls: result.cached ? 0 : 3,
         },
-        cache: {
-          cached: result.cached,
-        },
-        data: result.data,
+        data,
       };
     } catch (error) {
       console.error('Error fetching all DeFi metrics:', error);
@@ -171,18 +125,13 @@ export const defiMetricsRouter = router({
   getProtocolMetrics: publicProcedure
     .input(ProtocolNamesInputSchema)
     .query(async ({ input: protocolNames }) => {
+      const startTime = Date.now();
       const data = await fetchProtocolMetrics(protocolNames);
 
       return {
         timestamp: new Date().toISOString(),
         performance: {
-          responseTimeMs: 1,
-          cacheHits: 0,
-          cacheMisses: 0,
-          apiCalls: 0,
-        },
-        cache: {
-          cached: false,
+          responseTimeMs: Date.now() - startTime,
         },
         data,
       };
@@ -194,18 +143,13 @@ export const defiMetricsRouter = router({
   getProtocolComprehensiveData: publicProcedure
     .input(ProtocolNamesInputSchema)
     .query(async ({ input: protocolNames }) => {
+      const startTime = Date.now();
       const data = await fetchProtocolComprehensiveData(protocolNames);
 
       return {
         timestamp: new Date().toISOString(),
         performance: {
-          responseTimeMs: 1,
-          cacheHits: 0,
-          cacheMisses: 0,
-          apiCalls: 0,
-        },
-        cache: {
-          cached: false,
+          responseTimeMs: Date.now() - startTime,
         },
         data,
       };

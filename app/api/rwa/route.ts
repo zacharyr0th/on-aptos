@@ -476,8 +476,6 @@ export async function GET(request: NextRequest) {
         };
       }, errorContext),
     {
-      cacheKey: 'aptos-rwa-data',
-      cacheName: 'apiService',
       customHeaders: {
         'Cache-Control': `public, max-age=${Math.floor(SERVICE_CONFIG.rwa.ttl / 1000)}, stale-while-revalidate=${Math.floor(SERVICE_CONFIG.rwa.ttl / 2000)}`,
         'X-Content-Type': 'application/json',

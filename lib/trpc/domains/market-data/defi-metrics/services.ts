@@ -1,5 +1,10 @@
 import { SERVICE_CONFIG } from '@/lib/config/cache';
-import { getCachedData, setCachedData, enhancedFetch } from '@/lib/utils';
+import {
+  cmcCache,
+  getCachedData,
+  setCachedData,
+  enhancedFetch,
+} from '@/lib/utils';
 import type {
   RawProtocolData,
   TransformedProtocolData,
@@ -22,7 +27,7 @@ export async function fetchAptosTVL(): Promise<number> {
   const cacheKey = 'defi:aptos:tvl';
 
   // Try to get from cache first
-  const cachedData = getCachedData<number>('apiService', cacheKey);
+  const cachedData = getCachedData<number>(cmcCache, cacheKey);
   if (cachedData !== null) {
     return cachedData;
   }
@@ -38,7 +43,7 @@ export async function fetchAptosTVL(): Promise<number> {
     const tvlValue = tvlData || 0;
 
     // Cache the result for 5 minutes
-    setCachedData('apiService', cacheKey, tvlValue);
+    setCachedData(cmcCache, cacheKey, tvlValue);
 
     return tvlValue;
   } catch (error) {
@@ -54,7 +59,7 @@ export async function fetchAptosSpotVolume(): Promise<VolumeData> {
   const cacheKey = 'defi:aptos:spot-volume';
 
   // Try to get from cache first
-  const cachedData = getCachedData<VolumeData>('apiService', cacheKey);
+  const cachedData = getCachedData<VolumeData>(cmcCache, cacheKey);
   if (cachedData !== null) {
     return cachedData;
   }
@@ -78,7 +83,7 @@ export async function fetchAptosSpotVolume(): Promise<VolumeData> {
     };
 
     // Cache the result for 5 minutes
-    setCachedData('apiService', cacheKey, result);
+    setCachedData(cmcCache, cacheKey, result);
 
     return result;
   } catch (error) {
@@ -97,7 +102,7 @@ export async function fetchAptosProtocols(): Promise<ProtocolsResponse> {
   const cacheKey = 'defi:aptos:protocols';
 
   // Try to get from cache first
-  const cachedData = getCachedData<ProtocolsResponse>('apiService', cacheKey);
+  const cachedData = getCachedData<ProtocolsResponse>(cmcCache, cacheKey);
   if (cachedData !== null) {
     return cachedData;
   }
@@ -134,7 +139,7 @@ export async function fetchAptosProtocols(): Promise<ProtocolsResponse> {
     };
 
     // Cache the result for 10 minutes
-    setCachedData('apiService', cacheKey, result);
+    setCachedData(cmcCache, cacheKey, result);
 
     return result;
   } catch (error) {
@@ -152,7 +157,7 @@ export async function fetchAllAptosMetrics(): Promise<AllMetricsResponse> {
   const cacheKey = 'defi:aptos:all-metrics';
 
   // Try to get from cache first
-  const cachedData = getCachedData<AllMetricsResponse>('apiService', cacheKey);
+  const cachedData = getCachedData<AllMetricsResponse>(cmcCache, cacheKey);
   if (cachedData !== null) {
     return cachedData;
   }
@@ -316,7 +321,7 @@ export async function fetchAllAptosMetrics(): Promise<AllMetricsResponse> {
     };
 
     // Cache the result for 5 minutes
-    setCachedData('apiService', cacheKey, result);
+    setCachedData(cmcCache, cacheKey, result);
 
     return result;
   } catch (error) {
