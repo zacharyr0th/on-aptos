@@ -57,18 +57,19 @@ export function middleware(request: NextRequest) {
     'camera=(), microphone=(), geolocation=()'
   );
 
-  // Content Security Policy - relaxed for development
+  // Content Security Policy - relaxed for development and Vercel
   const csp = [
     "default-src 'self'",
-    `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live https://va.vercel-scripts.com https://*.vercel-scripts.com https://www.googletagmanager.com`,
-    `style-src 'self' 'unsafe-inline'`,
+    `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live https://va.vercel-scripts.com https://*.vercel-scripts.com https://www.googletagmanager.com https://*.vercel.app https://*.vercel.com https://vitals.vercel-insights.com`,
+    `style-src 'self' 'unsafe-inline' https://*.vercel.app https://*.vercel.com`,
     "img-src 'self' data: https: blob:",
     "font-src 'self' data: https:",
-    "connect-src 'self' https://api.coinmarketcap.com https://api.panora.exchange https: wss: ws:",
+    "connect-src 'self' https://api.coinmarketcap.com https://api.panora.exchange https: wss: ws: https://*.vercel.app https://*.vercel.com https://vitals.vercel-insights.com",
     "frame-src 'self' https://vercel.live",
     "frame-ancestors 'self'",
     "base-uri 'self'",
     "form-action 'self'",
+    "worker-src 'self' blob:",
   ].join('; ');
   response.headers.set('Content-Security-Policy', csp);
 
