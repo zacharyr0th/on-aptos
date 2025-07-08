@@ -13,7 +13,12 @@ interface NFTGridProps {
   onNFTSelect: (nft: NFT) => void;
 }
 
-export const NFTGrid = ({ nfts, nftsLoading, selectedNFT, onNFTSelect }: NFTGridProps) => {
+export const NFTGrid = ({
+  nfts,
+  nftsLoading,
+  selectedNFT,
+  onNFTSelect,
+}: NFTGridProps) => {
   return (
     <div className="space-y-4">
       {nftsLoading ? (
@@ -106,10 +111,16 @@ export const NFTGrid = ({ nfts, nftsLoading, selectedNFT, onNFTSelect }: NFTGrid
                   )}
                 </div>
                 <div className="mt-2">
-                  <p className="text-sm font-medium truncate" title={nft.token_name}>
+                  <p
+                    className="text-sm font-medium truncate"
+                    title={nft.token_name}
+                  >
                     {nft.token_name}
                   </p>
-                  <p className="text-xs text-muted-foreground truncate" title={nft.collection_name}>
+                  <p
+                    className="text-xs text-muted-foreground truncate"
+                    title={nft.collection_name}
+                  >
                     {nft.collection_name}
                   </p>
                 </div>

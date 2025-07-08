@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
+import { AlertCircle, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface NFT {
@@ -33,7 +34,21 @@ export function NFTCard({
   showCollection = false,
   className,
 }: NFTCardProps) {
+  const [imageError, setImageError] = useState<string | null>(null);
   const imageUrl = nft.cdn_image_uri || nft.token_uri;
+
+  const getErrorMessage = (error: string) => {
+    if (error.includes('403') || error.includes('Forbidden')) {
+      return 'Image blocked by server permissions';
+    }
+    if (error.includes('ipfs') || error.includes('pinata')) {
+      return 'IPFS content temporarily unavailable';
+    }
+    if (error.includes('svg') || error.includes('dangerouslyAllowSVG')) {
+      return 'SVG images blocked for security';
+    }
+    return 'Image failed to load';
+  };
 
   const renderImage = () => {
     if (!imageUrl) {
@@ -52,6 +67,22 @@ export function NFTCard({
         throw new Error('Invalid protocol');
       }
 
+      if (imageError) {
+        return (
+          <div className="relative w-full h-full bg-gradient-to-br from-muted to-muted/50 flex flex-col items-center justify-center p-4">
+            <AlertCircle className="h-8 w-8 text-muted-foreground/50 mb-2" />
+            <div className="text-center">
+              <div className="text-muted-foreground/70 text-xs font-medium mb-1">
+                {nft.token_name.charAt(0).toUpperCase()}
+              </div>
+              <div className="text-muted-foreground/50 text-[10px] leading-tight">
+                {getErrorMessage(imageError)}
+              </div>
+            </div>
+          </div>
+        );
+      }
+
       return (
         <Image
           src={imageUrl}
@@ -60,20 +91,30 @@ export function NFTCard({
           sizes="(max-width: 768px) 50vw, 25vw"
           className="object-cover group-hover:scale-105 transition-transform duration-300"
           onError={e => {
-            const img = e.currentTarget as HTMLImageElement;
-            img.src = '/placeholder.jpg';
+            const errorMsg = imageUrl.includes('svg')
+              ? 'SVG blocked for security'
+              : imageUrl.includes('ipfs')
+                ? 'IPFS content unavailable'
+                : imageUrl.includes('pinata')
+                  ? 'IPFS gateway error'
+                  : 'Image load failed';
+            setImageError(errorMsg);
           }}
         />
       );
     } catch (error) {
       return (
-        <Image
-          src="/placeholder.jpg"
-          alt={nft.token_name}
-          fill
-          sizes="(max-width: 768px) 50vw, 25vw"
-          className="object-cover"
-        />
+        <div className="relative w-full h-full bg-gradient-to-br from-muted to-muted/50 flex flex-col items-center justify-center p-4">
+          <AlertCircle className="h-8 w-8 text-muted-foreground/50 mb-2" />
+          <div className="text-center">
+            <div className="text-muted-foreground/70 text-xs font-medium mb-1">
+              {nft.token_name.charAt(0).toUpperCase()}
+            </div>
+            <div className="text-muted-foreground/50 text-[10px] leading-tight">
+              Invalid image URL
+            </div>
+          </div>
+        </div>
       );
     }
   };

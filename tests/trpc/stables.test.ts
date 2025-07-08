@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { stablesRouter } from '../../lib/trpc/routers/stables';
+import { stablecoinsRouter } from '../../lib/trpc/domains/assets/stablecoins/router';
 import { createContext } from '../../lib/trpc/core/context';
 
 // Mock the utility functions
@@ -38,7 +38,7 @@ describe('stablesRouter', () => {
       req: {} as any,
       res: {} as any,
     });
-    caller = stablesRouter.createCaller(ctx);
+    caller = stablecoinsRouter.createCaller(ctx);
   });
 
   afterEach(() => {

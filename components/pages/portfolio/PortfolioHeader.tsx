@@ -1,7 +1,12 @@
 'use client';
 
 import { Copy } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+  TooltipProvider,
+} from '@/components/ui/tooltip';
 import { formatCurrency } from '@/lib/utils/format';
 import { copyToClipboard } from './utils';
 
@@ -11,7 +16,11 @@ interface PortfolioHeaderProps {
   accountNames: string[] | null;
 }
 
-export const PortfolioHeader = ({ totalValue, walletAddress, accountNames }: PortfolioHeaderProps) => {
+export const PortfolioHeader = ({
+  totalValue,
+  walletAddress,
+  accountNames,
+}: PortfolioHeaderProps) => {
   return (
     <div className="flex items-center bg-card border rounded-lg py-3 px-4 mb-6">
       <div className="flex-grow">
@@ -23,7 +32,9 @@ export const PortfolioHeader = ({ totalValue, walletAddress, accountNames }: Por
           {walletAddress && (
             <span className="text-base font-normal text-muted-foreground ml-2 font-mono">
               <button
-                onClick={() => copyToClipboard(walletAddress, 'Account address')}
+                onClick={() =>
+                  copyToClipboard(walletAddress, 'Account address')
+                }
                 className="hover:text-muted-foreground transition-all duration-200 flex items-center gap-1 group relative overflow-hidden"
               >
                 <span className="font-mono transition-all duration-200 group-hover:opacity-0 group-hover:absolute">

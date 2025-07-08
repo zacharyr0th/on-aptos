@@ -3,8 +3,20 @@
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from '@/components/ui/table';
-import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableHead,
+  TableRow,
+  TableCell,
+} from '@/components/ui/table';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+  TooltipProvider,
+} from '@/components/ui/tooltip';
 import { TrendingUp, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/utils/format';
@@ -28,7 +40,7 @@ export const DeFiPositionsTable = ({
   defiSortOrder,
   getProtocolLogo,
   onPositionSelect,
-  onSortChange
+  onSortChange,
 }: DeFiPositionsTableProps) => {
   if (defiPositionsLoading) {
     return (
@@ -74,14 +86,14 @@ export const DeFiPositionsTable = ({
   };
 
   let sortedPositions = [...groupedDeFiPositions];
-  
+
   if (defiSortBy === 'type') {
     sortedPositions.sort((a, b) => {
       const typeA = Array.from(a.protocolTypes)[0] as string;
       const typeB = Array.from(b.protocolTypes)[0] as string;
       const displayA = typeA === 'derivatives' ? 'perps' : typeA;
       const displayB = typeB === 'derivatives' ? 'perps' : typeB;
-      
+
       if (defiSortOrder === 'asc') {
         return displayA.localeCompare(displayB);
       } else {
@@ -104,26 +116,31 @@ export const DeFiPositionsTable = ({
         <TableHeader>
           <TableRow>
             <TableHead className="w-[50%]">Protocol</TableHead>
-            <TableHead 
+            <TableHead
               className="w-[30%] cursor-pointer hover:text-primary transition-colors"
               onClick={handleSortByType}
             >
-              Type {defiSortBy === 'type' && (defiSortOrder === 'asc' ? '↑' : '↓')}
+              Type{' '}
+              {defiSortBy === 'type' && (defiSortOrder === 'asc' ? '↑' : '↓')}
             </TableHead>
-            <TableHead 
+            <TableHead
               className="w-[20%] text-right cursor-pointer hover:text-primary transition-colors"
               onClick={handleSortByValue}
             >
-              Value {defiSortBy === 'value' && (defiSortOrder === 'asc' ? '↑' : '↓')}
+              Value{' '}
+              {defiSortBy === 'value' && (defiSortOrder === 'asc' ? '↑' : '↓')}
             </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {sortedPositions.map((groupedPosition, index) => {
             const positionId = `defi-${groupedPosition.protocol}-${index}`;
-            const isSelected = selectedDeFiPosition?.protocol === groupedPosition.protocol;
-            const primaryType = Array.from(groupedPosition.protocolTypes)[0] as string;
-            
+            const isSelected =
+              selectedDeFiPosition?.protocol === groupedPosition.protocol;
+            const primaryType = Array.from(
+              groupedPosition.protocolTypes
+            )[0] as string;
+
             return (
               <TableRow
                 key={positionId}
@@ -160,8 +177,12 @@ export const DeFiPositionsTable = ({
                             </div>
                           </TooltipTrigger>
                           <TooltipContent className="bg-red-500 text-white border-red-600">
-                            <p className="text-sm font-medium">This protocol is deprecated</p>
-                            <p className="text-sm">It&apos;s recommended to remove your assets</p>
+                            <p className="text-sm font-medium">
+                              This protocol is deprecated
+                            </p>
+                            <p className="text-sm">
+                              It&apos;s recommended to remove your assets
+                            </p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
@@ -171,13 +192,18 @@ export const DeFiPositionsTable = ({
                 <TableCell className="py-2">
                   <div className="flex items-center gap-1 flex-wrap">
                     <Badge variant="secondary" className="text-xs px-2 py-0.5">
-                      {groupedPosition.protocolTypes.size > 1 
-                        ? 'Multiple' 
-                        : primaryType === 'derivatives' 
+                      {groupedPosition.protocolTypes.size > 1
+                        ? 'Multiple'
+                        : primaryType === 'derivatives'
                           ? 'Perps'
-                          : primaryType.replace('_', ' ').split(' ').map(word => 
-                              word.charAt(0).toUpperCase() + word.slice(1)
-                            ).join(' ')}
+                          : primaryType
+                              .replace('_', ' ')
+                              .split(' ')
+                              .map(
+                                word =>
+                                  word.charAt(0).toUpperCase() + word.slice(1)
+                              )
+                              .join(' ')}
                     </Badge>
                   </div>
                 </TableCell>

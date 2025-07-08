@@ -56,13 +56,17 @@ export function usePortfolioHistoryV3(
         fields: fields.join(','),
       });
 
-      const baseUrl = typeof window !== 'undefined' ? '' : 'http://localhost:3001';
-      const response = await fetch(`${baseUrl}/api/portfolio/history?${params}`, {
-        headers: {
-          Accept: 'application/json',
-          'Accept-Encoding': 'gzip, deflate, br',
-        },
-      });
+      const baseUrl =
+        typeof window !== 'undefined' ? '' : 'http://localhost:3001';
+      const response = await fetch(
+        `${baseUrl}/api/portfolio/history?${params}`,
+        {
+          headers: {
+            Accept: 'application/json',
+            'Accept-Encoding': 'gzip, deflate, br',
+          },
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();

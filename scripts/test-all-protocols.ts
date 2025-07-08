@@ -10,20 +10,21 @@ import { PROTOCOLS_BY_TYPE, PROTOCOL_ADDRESSES } from '../lib/aptos-constants';
 import { PROTOCOLS } from '../lib/protocol-registry';
 
 async function main() {
-  const walletAddress = '0x6f4b2376e61b7493774d6a4a1c07797622be14f5af6e8c1cd0c11c4cddf7e522';
-  
+  const walletAddress =
+    '0x6f4b2376e61b7493774d6a4a1c07797622be14f5af6e8c1cd0c11c4cddf7e522';
+
   console.log('🔍 Testing ALL DeFi Protocol Coverage');
   console.log('Wallet:', walletAddress);
-  console.log('=' .repeat(80));
+  console.log('='.repeat(80));
 
   // Show all protocols being monitored
   console.log('\n📋 ALL PROTOCOLS BEING MONITORED:');
-  console.log('=' .repeat(50));
-  
+  console.log('='.repeat(50));
+
   const allProtocols = Object.values(PROTOCOLS);
   const protocolsByType = {
     LIQUID_STAKING: allProtocols.filter(p => p.type === 'liquid_staking'),
-    LENDING: allProtocols.filter(p => p.type === 'lending'), 
+    LENDING: allProtocols.filter(p => p.type === 'lending'),
     DEX: allProtocols.filter(p => p.type === 'dex'),
     FARMING: allProtocols.filter(p => p.type === 'farming'),
     DERIVATIVES: allProtocols.filter(p => p.type === 'derivatives'),
@@ -37,20 +38,26 @@ async function main() {
 
   Object.entries(protocolsByType).forEach(([type, protocols]) => {
     if (protocols.length > 0) {
-      console.log(`\n🏷️  ${type.replace('_', ' ')} (${protocols.length} protocols):`);
+      console.log(
+        `\n🏷️  ${type.replace('_', ' ')} (${protocols.length} protocols):`
+      );
       protocols.forEach(protocol => {
-        console.log(`   • ${protocol.name} (${protocol.addresses.length} addresses)`);
+        console.log(
+          `   • ${protocol.name} (${protocol.addresses.length} addresses)`
+        );
         totalAddresses += protocol.addresses.length;
       });
       totalProtocols += protocols.length;
     }
   });
 
-  console.log(`\n📊 TOTAL COVERAGE: ${totalProtocols} protocols, ${totalAddresses} addresses`);
+  console.log(
+    `\n📊 TOTAL COVERAGE: ${totalProtocols} protocols, ${totalAddresses} addresses`
+  );
 
   // Test comprehensive position checker
   console.log('\n🔍 TESTING COMPREHENSIVE POSITION CHECKER:');
-  console.log('=' .repeat(50));
+  console.log('='.repeat(50));
 
   try {
     const checker = new ComprehensivePositionChecker(
@@ -59,7 +66,7 @@ async function main() {
     );
 
     const summary = await checker.getComprehensivePositions(walletAddress);
-    
+
     console.log(`\n📈 RESULTS:`);
     console.log(`Total Active Positions: ${summary.totalActivePositions}`);
     console.log(`Total Protocols Found: ${summary.totalProtocols}`);
@@ -81,7 +88,7 @@ async function main() {
         console.log(`   Description: ${position.description}`);
         console.log(`   Address: ${position.protocolAddress}`);
         console.log(`   Active: ${position.isActive ? '✅' : '❌'}`);
-        
+
         if (position.tokens.length > 0) {
           console.log(`   Tokens: ${position.tokens.length}`);
           position.tokens.forEach(token => {
@@ -90,7 +97,7 @@ async function main() {
             }
           });
         }
-        
+
         if (position.lpTokens.length > 0) {
           console.log(`   LP Tokens: ${position.lpTokens.length}`);
           position.lpTokens.forEach(lp => {
@@ -104,22 +111,25 @@ async function main() {
     // Check coverage
     const detectedProtocols = new Set(summary.positions.map(p => p.protocol));
     const expectedProtocols = new Set(allProtocols.map(p => p.name));
-    
+
     console.log('\n📊 COVERAGE ANALYSIS:');
-    console.log('=' .repeat(50));
+    console.log('='.repeat(50));
     console.log(`Protocols with positions: ${detectedProtocols.size}`);
     console.log(`Total protocols monitored: ${expectedProtocols.size}`);
-    console.log(`Coverage: ${((detectedProtocols.size / expectedProtocols.size) * 100).toFixed(1)}%`);
+    console.log(
+      `Coverage: ${((detectedProtocols.size / expectedProtocols.size) * 100).toFixed(1)}%`
+    );
 
     if (detectedProtocols.size > 0) {
       console.log('\n✅ PROTOCOLS WITH POSITIONS:');
-      Array.from(detectedProtocols).sort().forEach(protocol => {
-        console.log(`   • ${protocol}`);
-      });
+      Array.from(detectedProtocols)
+        .sort()
+        .forEach(protocol => {
+          console.log(`   • ${protocol}`);
+        });
     }
 
     console.log('\n✅ All protocol coverage test completed successfully!');
-    
   } catch (error) {
     console.error('❌ Error testing protocol coverage:', error);
     process.exit(1);

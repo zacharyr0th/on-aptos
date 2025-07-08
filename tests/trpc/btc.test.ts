@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { btcRouter } from '../../lib/trpc/routers/btc';
+import { bitcoinRouter } from '../../lib/trpc/domains/assets/bitcoin/router';
 import { createContext } from '../../lib/trpc/core/context';
 
 // Mock the utility functions
@@ -50,7 +50,7 @@ describe('btcRouter', () => {
       req: {} as any,
       res: {} as any,
     });
-    caller = btcRouter.createCaller(ctx);
+    caller = bitcoinRouter.createCaller(ctx);
   });
 
   afterEach(() => {

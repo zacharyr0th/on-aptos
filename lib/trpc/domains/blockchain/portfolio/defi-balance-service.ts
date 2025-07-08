@@ -168,11 +168,14 @@ export class DeFiBalanceService {
     walletAddress: string
   ): Promise<DeFiPosition[]> {
     try {
-      logger.info(`Fetching comprehensive DeFi positions for wallet: ${walletAddress}`);
+      logger.info(
+        `Fetching comprehensive DeFi positions for wallet: ${walletAddress}`
+      );
 
       // Use comprehensive position checker first
-      const comprehensivePositions = await this.getComprehensiveDeFiPositions(walletAddress);
-      
+      const comprehensivePositions =
+        await this.getComprehensiveDeFiPositions(walletAddress);
+
       // If we have comprehensive positions, use them
       if (comprehensivePositions.length > 0) {
         logger.info(
@@ -182,7 +185,9 @@ export class DeFiBalanceService {
       }
 
       // Fallback to legacy method if comprehensive checker fails
-      logger.info(`Falling back to legacy DeFi position detection for wallet: ${walletAddress}`);
+      logger.info(
+        `Falling back to legacy DeFi position detection for wallet: ${walletAddress}`
+      );
       return await this.getLegacyDeFiPositions(walletAddress);
     } catch (error) {
       logger.error('Error fetching DeFi positions:', error);
@@ -207,7 +212,9 @@ export class DeFiBalanceService {
       const summary = await checker.getComprehensivePositions(walletAddress);
       const positions: DeFiPosition[] = [];
 
-      logger.info(`Processing ${summary.positions.length} comprehensive positions, ${summary.totalActivePositions} active`);
+      logger.info(
+        `Processing ${summary.positions.length} comprehensive positions, ${summary.totalActivePositions} active`
+      );
 
       // Collect all unique token addresses for price lookup
       const allTokenAddresses = new Set<string>();
@@ -217,18 +224,23 @@ export class DeFiBalanceService {
           position.tokens.forEach(token => {
             if (token.address) {
               allTokenAddresses.add(token.address);
-              
+
               // Map complex DeFi tokens to their underlying assets
-              const underlyingAsset = this.mapDeFiTokenToUnderlyingAsset(token.address, token.symbol);
+              const underlyingAsset = this.mapDeFiTokenToUnderlyingAsset(
+                token.address,
+                token.symbol
+              );
               if (underlyingAsset) {
                 allTokenAddresses.add(underlyingAsset);
               }
             }
           });
-          
+
           // Add common token addresses based on protocol
-          if (position.protocol.toLowerCase().includes('apt') || 
-              position.protocol.toLowerCase().includes('aptos')) {
+          if (
+            position.protocol.toLowerCase().includes('apt') ||
+            position.protocol.toLowerCase().includes('aptos')
+          ) {
             allTokenAddresses.add('0x1::aptos_coin::AptosCoin');
           }
         }
@@ -238,7 +250,9 @@ export class DeFiBalanceService {
       const priceData = await getAssetPrices(Array.from(allTokenAddresses));
       const priceMap = new Map(priceData.map(p => [p.assetType, p.price]));
 
-      logger.info(`Fetched prices for ${priceData.length} tokens in DeFi positions`);
+      logger.info(
+        `Fetched prices for ${priceData.length} tokens in DeFi positions`
+      );
 
       for (const position of summary.positions) {
         // Only include active positions
@@ -257,8 +271,10 @@ export class DeFiBalanceService {
         // Include ALL active positions - don't filter by value
         // The comprehensive checker already filters for active positions
         positions.push(defiPosition);
-        
-        logger.info(`Added position: ${position.protocol} (${position.type}) - Value: $${defiPosition.totalValue.toFixed(2)}`);
+
+        logger.info(
+          `Added position: ${position.protocol} (${position.type}) - Value: $${defiPosition.totalValue.toFixed(2)}`
+        );
       }
 
       logger.info(`Returning ${positions.length} comprehensive DeFi positions`);
@@ -294,79 +310,106 @@ export class DeFiBalanceService {
   /**
    * Map complex DeFi token addresses to their underlying assets for price lookup
    */
-  private static mapDeFiTokenToUnderlyingAsset(tokenAddress: string, symbol: string): string | null {
+  private static mapDeFiTokenToUnderlyingAsset(
+    tokenAddress: string,
+    symbol: string
+  ): string | null {
     // Handle wrapped/vault tokens that represent underlying assets
-    
+
     // APT variants
     if (symbol.toLowerCase().includes('apt')) {
       return '0x1::aptos_coin::AptosCoin';
     }
-    
+
     // USDC variants
     if (symbol.toLowerCase().includes('usdc')) {
       return '0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDC';
     }
-    
+
     // USDT variants
     if (symbol.toLowerCase().includes('usdt')) {
       return '0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDT';
     }
-    
+
     // Handle specific token patterns
-    if (tokenAddress.includes('::stapt_token::') || tokenAddress.includes('::StakedApt')) {
+    if (
+      tokenAddress.includes('::stapt_token::') ||
+      tokenAddress.includes('::StakedApt')
+    ) {
       return '0x111ae3e5bc816a5e63c2da97d0aa3886519e0cd5e4b046659fa35796bd11542a::stapt_token::StakedApt';
     }
-    
-    if (tokenAddress.includes('::amapt_token::') || tokenAddress.includes('::AmnisApt')) {
+
+    if (
+      tokenAddress.includes('::amapt_token::') ||
+      tokenAddress.includes('::AmnisApt')
+    ) {
       return '0x111ae3e5bc816a5e63c2da97d0aa3886519e0cd5e4b046659fa35796bd11542a::amapt_token::AmnisApt';
     }
-    
-    if (tokenAddress.includes('::thl_coin::') || tokenAddress.includes('::THL')) {
+
+    if (
+      tokenAddress.includes('::thl_coin::') ||
+      tokenAddress.includes('::THL')
+    ) {
       return '0x6f986d146e4a90b828d8c12c14b6f4e003fdff11a8eecceceb63744363eaac01::thl_coin::THL';
     }
-    
-    if (tokenAddress.includes('::mod_coin::') || tokenAddress.includes('::MOD')) {
+
+    if (
+      tokenAddress.includes('::mod_coin::') ||
+      tokenAddress.includes('::MOD')
+    ) {
       return '0x6f986d146e4a90b828d8c12c14b6f4e003fdff11a8eecceceb63744363eaac01::mod_coin::MOD';
     }
-    
+
     // Handle Thala liquid staking tokens
     if (tokenAddress.includes('::staking::ThalaAPT')) {
       return '0xfaf4e633ae9eb31366c9ca24214231760926576c7b625313b3688b5e900731f6::staking::ThalaAPT';
     }
-    
+
     return null;
   }
 
   /**
    * Get token decimals for proper balance conversion
    */
-  private static getTokenDecimals(tokenAddress: string, symbol: string): number {
+  private static getTokenDecimals(
+    tokenAddress: string,
+    symbol: string
+  ): number {
     // Default to 8 decimals for most Aptos tokens
     const defaultDecimals = 8;
-    
+
     // APT and APT-derived tokens
     if (symbol.toLowerCase().includes('apt')) {
       return 8;
     }
-    
+
     // USDC and USDT
-    if (symbol.toLowerCase().includes('usdc') || symbol.toLowerCase().includes('usdt')) {
+    if (
+      symbol.toLowerCase().includes('usdc') ||
+      symbol.toLowerCase().includes('usdt')
+    ) {
       return 6;
     }
-    
+
     // Handle specific token patterns
-    if (tokenAddress.includes('::stapt_token::') || tokenAddress.includes('::StakedApt')) {
+    if (
+      tokenAddress.includes('::stapt_token::') ||
+      tokenAddress.includes('::StakedApt')
+    ) {
       return 8;
     }
-    
-    if (tokenAddress.includes('::amapt_token::') || tokenAddress.includes('::AmnisApt')) {
+
+    if (
+      tokenAddress.includes('::amapt_token::') ||
+      tokenAddress.includes('::AmnisApt')
+    ) {
       return 8;
     }
-    
+
     if (tokenAddress.includes('::aptos_coin::AptosCoin')) {
       return 8;
     }
-    
+
     return defaultDecimals;
   }
 
@@ -380,7 +423,10 @@ export class DeFiBalanceService {
   /**
    * Build position details from comprehensive position with real prices
    */
-  private static buildPositionDetailsWithPrices(position: any, priceMap: Map<string, number>): DeFiPosition['position'] {
+  private static buildPositionDetailsWithPrices(
+    position: any,
+    priceMap: Map<string, number>
+  ): DeFiPosition['position'] {
     const details: DeFiPosition['position'] = {};
 
     // Handle LP tokens as liquidity positions
@@ -391,7 +437,7 @@ export class DeFiBalanceService {
           const balance = parseFloat(lp.balance || '0');
           const price = priceMap.get(lp.poolTokens[0]) || 0; // Use first token price as approximation
           const value = balance * price;
-          
+
           return {
             poolId: `${lp.poolType}-${lp.poolTokens.join('-')}`,
             token0: {
@@ -412,25 +458,30 @@ export class DeFiBalanceService {
 
     // Handle regular tokens based on position type
     if (position.tokens && position.tokens.length > 0) {
-      const nonZeroTokens = position.tokens.filter((token: any) => token.balance && token.balance !== '0');
-      
+      const nonZeroTokens = position.tokens.filter(
+        (token: any) => token.balance && token.balance !== '0'
+      );
+
       if (nonZeroTokens.length > 0) {
         const tokenDetails = nonZeroTokens.map((token: any) => {
           const rawBalance = parseFloat(token.balance || '0');
           const decimals = this.getTokenDecimals(token.address, token.symbol);
           const balance = rawBalance / Math.pow(10, decimals);
-          
+
           // Try to get price from direct address first, then try underlying asset
           let price = priceMap.get(token.address) || 0;
           if (price === 0) {
-            const underlyingAsset = this.mapDeFiTokenToUnderlyingAsset(token.address, token.symbol);
+            const underlyingAsset = this.mapDeFiTokenToUnderlyingAsset(
+              token.address,
+              token.symbol
+            );
             if (underlyingAsset) {
               price = priceMap.get(underlyingAsset) || 0;
             }
           }
-          
+
           const value = balance * price;
-          
+
           return {
             asset: token.address,
             symbol: token.symbol,
@@ -454,13 +505,20 @@ export class DeFiBalanceService {
     }
 
     // If no tokens or LP tokens, but position is active, add a placeholder
-    if (!details.liquidity && !details.staked && !details.supplied && position.isActive) {
-      details.supplied = [{
-        asset: position.protocolAddress,
-        symbol: position.protocol,
-        amount: '1',
-        value: 0.001, // Small value to indicate active position
-      }];
+    if (
+      !details.liquidity &&
+      !details.staked &&
+      !details.supplied &&
+      position.isActive
+    ) {
+      details.supplied = [
+        {
+          asset: position.protocolAddress,
+          symbol: position.protocol,
+          amount: '1',
+          value: 0.001, // Small value to indicate active position
+        },
+      ];
     }
 
     return details;
@@ -476,31 +534,37 @@ export class DeFiBalanceService {
   /**
    * Calculate position value with real prices
    */
-  private static calculatePositionValueWithPrices(position: any, priceMap: Map<string, number>): number {
+  private static calculatePositionValueWithPrices(
+    position: any,
+    priceMap: Map<string, number>
+  ): number {
     let totalValue = 0;
-    
+
     // Calculate value from regular tokens
     if (position.tokens && position.tokens.length > 0) {
       position.tokens.forEach((token: any) => {
         const rawBalance = parseFloat(token.balance || '0');
         const decimals = this.getTokenDecimals(token.address, token.symbol);
         const balance = rawBalance / Math.pow(10, decimals);
-        
+
         // Try to get price from direct address first, then try underlying asset
         let price = priceMap.get(token.address) || 0;
         if (price === 0) {
-          const underlyingAsset = this.mapDeFiTokenToUnderlyingAsset(token.address, token.symbol);
+          const underlyingAsset = this.mapDeFiTokenToUnderlyingAsset(
+            token.address,
+            token.symbol
+          );
           if (underlyingAsset) {
             price = priceMap.get(underlyingAsset) || 0;
           }
         }
-        
+
         if (balance > 0 && price > 0) {
           totalValue += balance * price;
         }
       });
     }
-    
+
     // Calculate value from LP tokens
     if (position.lpTokens && position.lpTokens.length > 0) {
       position.lpTokens.forEach((lp: any) => {
@@ -514,7 +578,7 @@ export class DeFiBalanceService {
         }
       });
     }
-    
+
     // If no calculated value but position is active, return small value
     if (totalValue === 0 && position.isActive) {
       // Check if position has any meaningful balances or resources
@@ -522,22 +586,22 @@ export class DeFiBalanceService {
         const balance = parseFloat(t.balance || '0');
         return balance > 0;
       });
-      
+
       const hasLPBalance = position.lpTokens.some((lp: any) => {
         const balance = parseFloat(lp.balance || '0');
         return balance > 0;
       });
-      
+
       const hasResourceData = position.resources.some((r: any) => {
         const data = r.data || {};
         return Object.keys(data).length > 0 && JSON.stringify(data) !== '{}';
       });
-      
+
       if (hasTokenBalance || hasLPBalance || hasResourceData) {
         return 0.001; // Very small value to indicate active position
       }
     }
-    
+
     return totalValue;
   }
 
@@ -548,7 +612,9 @@ export class DeFiBalanceService {
     walletAddress: string
   ): Promise<DeFiPosition[]> {
     try {
-      logger.info(`Fetching legacy DeFi positions for wallet: ${walletAddress}`);
+      logger.info(
+        `Fetching legacy DeFi positions for wallet: ${walletAddress}`
+      );
 
       const positions: DeFiPosition[] = [];
 

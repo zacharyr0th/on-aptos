@@ -9,7 +9,7 @@ import { WalletConnectButton } from '@/components/wallet/WalletConnectButton';
 
 export const LandingSection = () => {
   return (
-    <div className={cn("min-h-screen flex flex-col", GeistMono.className)}>
+    <div className={cn('min-h-screen flex flex-col', GeistMono.className)}>
       <div className="container-layout pt-6">
         <Header />
       </div>

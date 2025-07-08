@@ -50,11 +50,7 @@ const HomepageDesign = () => {
       <div className="relative">
         {/* Hero Section */}
         <section className="relative overflow-hidden">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-20 lg:py-24">
-            <div className="flex flex-col items-center text-center space-y-6 sm:space-y-8">
-              <HeroSection />
-            </div>
-          </div>
+          <HeroSection />
         </section>
 
         {/* Value Proposition Section */}

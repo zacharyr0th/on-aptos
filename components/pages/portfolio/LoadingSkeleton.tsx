@@ -10,9 +10,7 @@ export const LoadingSkeleton = () => {
         <div className="flex-grow">
           <div className="flex items-center gap-2 sm:gap-3 mb-2">
             <Briefcase className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
-            <h1 className="text-xl sm:text-2xl font-bold">
-              My Portfolio
-            </h1>
+            <h1 className="text-xl sm:text-2xl font-bold">My Portfolio</h1>
           </div>
           <Skeleton className="h-3 sm:h-4 w-32 sm:w-48" />
         </div>

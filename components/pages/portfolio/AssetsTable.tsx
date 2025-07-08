@@ -2,8 +2,19 @@
 
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
-import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from '@/components/ui/table';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableHead,
+  TableRow,
+  TableCell,
+} from '@/components/ui/table';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { Coins } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatCurrency, formatTokenAmount } from '@/lib/utils/format';
@@ -17,12 +28,12 @@ interface AssetsTableProps {
   onAssetSelect: (asset: any) => void;
 }
 
-export const AssetsTable = ({ 
-  visibleAssets, 
-  selectedAsset, 
-  showOnlyVerified, 
+export const AssetsTable = ({
+  visibleAssets,
+  selectedAsset,
+  showOnlyVerified,
   portfolioAssets,
-  onAssetSelect 
+  onAssetSelect,
 }: AssetsTableProps) => {
   return (
     <div className="space-y-4 asset-table-container">
@@ -30,15 +41,11 @@ export const AssetsTable = ({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[50%] min-w-[140px]">
-                Asset
-              </TableHead>
+              <TableHead className="w-[50%] min-w-[140px]">Asset</TableHead>
               <TableHead className="hidden sm:table-cell w-[25%] min-w-[80px]">
                 Amount
               </TableHead>
-              <TableHead className="w-[25%] min-w-[70px]">
-                Value
-              </TableHead>
+              <TableHead className="w-[25%] min-w-[70px]">Value</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -47,7 +54,8 @@ export const AssetsTable = ({
                 key={`asset-${asset.asset_type}-${asset.amount}-${index}`}
                 className={cn(
                   'cursor-pointer hover:bg-muted/50 transition-colors',
-                  selectedAsset?.asset_type === asset.asset_type && 'bg-muted/50'
+                  selectedAsset?.asset_type === asset.asset_type &&
+                    'bg-muted/50'
                 )}
                 onClick={() => onAssetSelect(asset)}
               >
@@ -55,7 +63,10 @@ export const AssetsTable = ({
                   <div className="flex items-center gap-2">
                     <div className="h-6 w-6 sm:h-8 sm:w-8 rounded-full flex items-center justify-center">
                       <Image
-                        src={getTokenLogoUrlWithFallback(asset.asset_type, asset.metadata)}
+                        src={getTokenLogoUrlWithFallback(
+                          asset.asset_type,
+                          asset.metadata
+                        )}
                         alt={asset.metadata?.symbol || 'Asset'}
                         width={32}
                         height={32}
@@ -101,20 +112,26 @@ export const AssetsTable = ({
                               </Badge>
                             </TooltipTrigger>
                             <TooltipContent>
-                              <p>This token is not verified by Panora Exchange</p>
+                              <p>
+                                This token is not verified by Panora Exchange
+                              </p>
                             </TooltipContent>
                           </Tooltip>
                         )}
                       </div>
                       <div className="text-xs text-muted-foreground sm:hidden font-mono text-left">
-                        {formatTokenAmount(asset.balance || 0, undefined, { showSymbol: false })}
+                        {formatTokenAmount(asset.balance || 0, undefined, {
+                          showSymbol: false,
+                        })}
                       </div>
                     </div>
                   </div>
                 </TableCell>
                 <TableCell className="hidden sm:table-cell w-[25%] min-w-[80px] text-left">
                   <div className="text-sm font-mono">
-                    {formatTokenAmount(asset.balance || 0, undefined, { showSymbol: false })}
+                    {formatTokenAmount(asset.balance || 0, undefined, {
+                      showSymbol: false,
+                    })}
                   </div>
                 </TableCell>
                 <TableCell className="w-[25%] min-w-[70px]">
@@ -132,11 +149,14 @@ export const AssetsTable = ({
           <p>
             {showOnlyVerified ? 'No verified assets found' : 'No assets found'}
           </p>
-          {showOnlyVerified && portfolioAssets && portfolioAssets.length === 0 && (
-            <p className="text-sm mt-2">
-              Try disabling the &quot;Verified tokens only&quot; filter to see all assets
-            </p>
-          )}
+          {showOnlyVerified &&
+            portfolioAssets &&
+            portfolioAssets.length === 0 && (
+              <p className="text-sm mt-2">
+                Try disabling the &quot;Verified tokens only&quot; filter to see
+                all assets
+              </p>
+            )}
         </div>
       )}
     </div>

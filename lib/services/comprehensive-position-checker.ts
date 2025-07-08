@@ -21,7 +21,14 @@ const TOKEN_ADDRESSES = {
 export interface DetailedPosition {
   protocol: string;
   protocolAddress: string;
-  type: 'liquidity' | 'farming' | 'lending' | 'staking' | 'nft' | 'derivatives' | 'other';
+  type:
+    | 'liquidity'
+    | 'farming'
+    | 'lending'
+    | 'staking'
+    | 'nft'
+    | 'derivatives'
+    | 'other';
   description: string;
   tokens: Array<{
     symbol: string;
@@ -194,15 +201,22 @@ export class ComprehensivePositionChecker {
    */
   private identifyProtocol(resourceType: string): {
     protocol: string;
-    type: 'liquidity' | 'farming' | 'lending' | 'staking' | 'nft' | 'derivatives' | 'other';
+    type:
+      | 'liquidity'
+      | 'farming'
+      | 'lending'
+      | 'staking'
+      | 'nft'
+      | 'derivatives'
+      | 'other';
     description: string;
   } {
     // Check all protocol addresses from the registry
     for (const [address, protocolName] of Object.entries(PROTOCOL_ADDRESSES)) {
       if (resourceType.includes(address)) {
         // Find the protocol info from the registry
-        const protocol = Object.values(PROTOCOLS).find(p => 
-          p.name === protocolName || p.addresses.includes(address)
+        const protocol = Object.values(PROTOCOLS).find(
+          p => p.name === protocolName || p.addresses.includes(address)
         );
 
         if (protocol) {
@@ -210,7 +224,8 @@ export class ComprehensivePositionChecker {
           return {
             protocol: protocol.name,
             type,
-            description: protocol.description || this.getDescriptionForType(type),
+            description:
+              protocol.description || this.getDescriptionForType(type),
           };
         }
       }
@@ -224,7 +239,8 @@ export class ComprehensivePositionChecker {
           return {
             protocol: protocol.name,
             type,
-            description: protocol.description || this.getDescriptionForType(type),
+            description:
+              protocol.description || this.getDescriptionForType(type),
           };
         }
       }
@@ -240,7 +256,16 @@ export class ComprehensivePositionChecker {
   /**
    * Map ProtocolType to position type
    */
-  private mapProtocolTypeToPositionType(protocolType: ProtocolType): 'liquidity' | 'farming' | 'lending' | 'staking' | 'nft' | 'derivatives' | 'other' {
+  private mapProtocolTypeToPositionType(
+    protocolType: ProtocolType
+  ):
+    | 'liquidity'
+    | 'farming'
+    | 'lending'
+    | 'staking'
+    | 'nft'
+    | 'derivatives'
+    | 'other' {
     switch (protocolType) {
       case ProtocolType.DEX:
         return 'liquidity';
@@ -262,7 +287,16 @@ export class ComprehensivePositionChecker {
   /**
    * Get description for position type
    */
-  private getDescriptionForType(type: 'liquidity' | 'farming' | 'lending' | 'staking' | 'nft' | 'derivatives' | 'other'): string {
+  private getDescriptionForType(
+    type:
+      | 'liquidity'
+      | 'farming'
+      | 'lending'
+      | 'staking'
+      | 'nft'
+      | 'derivatives'
+      | 'other'
+  ): string {
     switch (type) {
       case 'liquidity':
         return 'DEX/Liquidity Pool';
@@ -369,9 +403,10 @@ export class ComprehensivePositionChecker {
         }
 
         // Find the protocol address from the registry
-        const protocolAddress = Object.keys(PROTOCOL_ADDRESSES).find(addr =>
-          protocolResourceList.some(r => r.type.includes(addr))
-        ) || '';
+        const protocolAddress =
+          Object.keys(PROTOCOL_ADDRESSES).find(addr =>
+            protocolResourceList.some(r => r.type.includes(addr))
+          ) || '';
 
         // Determine if position is active (has non-zero balance)
         const isActive =

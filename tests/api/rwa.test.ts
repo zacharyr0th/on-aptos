@@ -67,7 +67,13 @@ describe('/api/rwa', () => {
       .mockResolvedValueOnce(mockProtocolsResponse)
       .mockResolvedValueOnce(mockProtocolDetailResponse);
 
-    const response = await GET();
+    const mockRequest = {
+      headers: {
+        get: vi.fn(() => 'test-user-agent'),
+      },
+    } as any;
+    
+    const response = await GET(mockRequest);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -80,7 +86,13 @@ describe('/api/rwa', () => {
   it('should handle API errors gracefully', async () => {
     (global.fetch as any).mockRejectedValue(new Error('Network error'));
 
-    const response = await GET();
+    const mockRequest = {
+      headers: {
+        get: vi.fn(() => 'test-user-agent'),
+      },
+    } as any;
+    
+    const response = await GET(mockRequest);
     const data = await response.json();
 
     expect(response.status).toBe(500);
@@ -96,7 +108,13 @@ describe('/api/rwa', () => {
 
     (global.fetch as any).mockResolvedValue(mockEmptyResponse);
 
-    const response = await GET();
+    const mockRequest = {
+      headers: {
+        get: vi.fn(() => 'test-user-agent'),
+      },
+    } as any;
+    
+    const response = await GET(mockRequest);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -120,7 +138,13 @@ describe('/api/rwa', () => {
         ],
       });
 
-    const response = await GET();
+    const mockRequest = {
+      headers: {
+        get: vi.fn(() => 'test-user-agent'),
+      },
+    } as any;
+    
+    const response = await GET(mockRequest);
     const data = await response.json();
 
     expect(response.status).toBe(200);

@@ -13,7 +13,7 @@ export const HeroSection = () => {
   const { t } = useTranslation('common');
 
   return (
-    <div className="min-h-screen w-full max-w-6xl mx-auto text-center flex flex-col justify-center space-y-8 sm:space-y-10 lg:space-y-12 px-4 pt-16 pb-32">
+    <div className="h-screen w-full max-w-6xl mx-auto text-center flex flex-col justify-center items-center space-y-8 sm:space-y-10 lg:space-y-12 px-4">
       {/* Main Title with enhanced design */}
       <div className="relative space-y-6 sm:space-y-8">
         <div className="space-y-4">
