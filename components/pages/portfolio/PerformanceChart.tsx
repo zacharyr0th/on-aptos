@@ -3,7 +3,11 @@ import { useTheme } from 'next-themes';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { TrendingUp, TrendingDown, Clock, Info } from 'lucide-react';
 import { ChartContainer, ChartTooltip } from '@/components/ui/chart';
 import {
@@ -28,7 +32,11 @@ export const PerformanceChart: React.FC<PerformanceChartProps> = React.memo(
     const { resolvedTheme } = useTheme();
 
     // Use working V2 hook
-    const { data: portfolioHistory, isLoading, error } = usePortfolioHistoryV2(walletAddress);
+    const {
+      data: portfolioHistory,
+      isLoading,
+      error,
+    } = usePortfolioHistoryV2(walletAddress || null);
 
     // Memoized calculations
     const performanceMetrics = useMemo(() => {
@@ -36,7 +44,8 @@ export const PerformanceChart: React.FC<PerformanceChartProps> = React.memo(
         return { change: 0, changePercent: 0, isPositive: true };
       }
 
-      const current = portfolioHistory[portfolioHistory.length - 1]?.totalValue || 0;
+      const current =
+        portfolioHistory[portfolioHistory.length - 1]?.totalValue || 0;
       const previous = portfolioHistory[0]?.totalValue || 0;
       const change = current - previous;
       const changePercent = previous > 0 ? (change / previous) * 100 : 0;
@@ -67,7 +76,9 @@ export const PerformanceChart: React.FC<PerformanceChartProps> = React.memo(
       const values = portfolioHistory.map(entry => entry.totalValue);
       const min = Math.min(...values);
       const max = Math.max(...values);
-      const hasRateLimitedData = portfolioHistory.some(entry => entry.rateLimited);
+      const hasRateLimitedData = portfolioHistory.some(
+        entry => entry.rateLimited
+      );
 
       return {
         domain: { min, max },
@@ -146,19 +157,26 @@ export const PerformanceChart: React.FC<PerformanceChartProps> = React.memo(
                   <Info className="h-4 w-4 text-muted-foreground cursor-help" />
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>This currently only includes APT balances, non-APT balances and defi positions are in the works</p>
+                  <p>
+                    Currently only includes APT balances. Non-APT tokens, NFTs,
+                    and DeFi positions coming soon
+                  </p>
                 </TooltipContent>
               </Tooltip>
             </div>
             <div className="flex items-center gap-2 text-sm">
-              <span className={`font-medium ${performanceMetrics.isPositive ? 'text-green-600' : 'text-red-600'}`}>
-                {performanceMetrics.isPositive ? '+' : ''}{formatCurrency(Math.abs(performanceMetrics.change))}
+              <span
+                className={`font-medium ${performanceMetrics.isPositive ? 'text-green-600' : 'text-red-600'}`}
+              >
+                {performanceMetrics.isPositive ? '+' : ''}
+                {formatCurrency(Math.abs(performanceMetrics.change))}
               </span>
               <span className="text-muted-foreground">|</span>
               <span
                 className={`text-xs ${performanceMetrics.isPositive ? 'text-green-600' : 'text-red-600'}`}
               >
-                {performanceMetrics.isPositive ? '+' : ''}{formatPercentage(performanceMetrics.changePercent)}
+                {performanceMetrics.isPositive ? '+' : ''}
+                {formatPercentage(performanceMetrics.changePercent)}
               </span>
             </div>
           </div>
