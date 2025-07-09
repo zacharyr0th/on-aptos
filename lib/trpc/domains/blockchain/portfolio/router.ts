@@ -64,7 +64,7 @@ export const portfolioRouter = router({
         walletAddress: z
           .string()
           .regex(/^0x[a-fA-F0-9]{1,64}$/, 'Invalid Aptos address'),
-        limit: z.number().min(1).max(100).default(50),
+        limit: z.number().min(1).max(50).default(20),
         offset: z.number().min(0).default(0),
       })
     )

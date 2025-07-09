@@ -193,12 +193,12 @@ export const PerformanceChart: React.FC<PerformanceChartProps> = React.memo(
                     <stop
                       offset="5%"
                       stopColor="hsl(var(--chart-1))"
-                      stopOpacity={resolvedTheme === 'dark' ? 0.5 : 0.3}
+                      stopOpacity={resolvedTheme === 'dark' ? 0.4 : 0.3}
                     />
                     <stop
                       offset="95%"
-                      stopColor="hsl(var(--chart-1))"
-                      stopOpacity={0}
+                      stopColor={resolvedTheme === 'dark' ? 'hsl(var(--muted))' : 'hsl(var(--chart-1))'}
+                      stopOpacity={resolvedTheme === 'dark' ? 0.3 : 0}
                     />
                   </linearGradient>
                 </defs>

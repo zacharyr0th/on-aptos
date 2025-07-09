@@ -60,11 +60,11 @@ export function middleware(request: NextRequest) {
   // Content Security Policy - relaxed for development and Vercel
   const csp = [
     "default-src 'self'",
-    `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live https://va.vercel-scripts.com https://*.vercel-scripts.com https://www.googletagmanager.com https://*.vercel.app https://*.vercel.com https://vitals.vercel-insights.com`,
-    `style-src 'self' 'unsafe-inline' https://*.vercel.app https://*.vercel.com`,
+    `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live https://va.vercel-scripts.com https://*.vercel-scripts.com https://www.googletagmanager.com https://*.vercel.app https://*.vercel.com https://vitals.vercel-insights.com https://on-aptos.com https://*.on-aptos.com`,
+    `style-src 'self' 'unsafe-inline' https://*.vercel.app https://*.vercel.com https://on-aptos.com https://*.on-aptos.com`,
     "img-src 'self' data: https: blob:",
     "font-src 'self' data: https:",
-    "connect-src 'self' https://api.coinmarketcap.com https://api.panora.exchange https: wss: ws: https://*.vercel.app https://*.vercel.com https://vitals.vercel-insights.com",
+    "connect-src 'self' https://api.coinmarketcap.com https://api.panora.exchange https: wss: ws: https://*.vercel.app https://*.vercel.com https://vitals.vercel-insights.com https://on-aptos.com https://*.on-aptos.com",
     "frame-src 'self' https://vercel.live",
     "frame-ancestors 'self'",
     "base-uri 'self'",

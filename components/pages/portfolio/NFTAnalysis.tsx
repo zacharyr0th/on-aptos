@@ -95,13 +95,8 @@ export function NFTAnalysis({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Grid3X3 className="h-5 w-5" />
-          {selectedNFT ? 'Selected NFT Details' : 'Featured NFT'}
+          {selectedNFT ? displayNFT.token_name : 'Featured NFT'}
         </CardTitle>
-        <CardDescription>
-          {selectedNFT
-            ? 'Comprehensive details for your selected NFT'
-            : `First NFT alphabetically from your collection of ${totalNFTs} NFT${totalNFTs === 1 ? '' : 's'}`}
-        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* NFT Image */}
@@ -135,7 +130,7 @@ export function NFTAnalysis({
           {/* Basic Info */}
           <div className="text-center space-y-2">
             <h3 className="text-xl font-bold">{displayNFT.token_name}</h3>
-            <p className="text-lg text-muted-foreground">
+            <p className="text-lg text-muted-foreground truncate max-w-[300px] mx-auto" title={displayNFT.collection_name}>
               {displayNFT.collection_name}
             </p>
           </div>

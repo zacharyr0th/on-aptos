@@ -157,7 +157,7 @@ export function NFTCard({
           {nft.token_name}
         </h4>
 
-        <p className="text-xs text-muted-foreground truncate">
+        <p className="text-xs text-muted-foreground truncate max-w-[150px]" title={nft.collection_name}>
           {nft.collection_name}
         </p>
 

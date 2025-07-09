@@ -9,9 +9,10 @@ import { PROTOCOL_ADDRESSES, PROTOCOLS_BY_TYPE } from '@/lib/aptos-constants';
 import { ComprehensivePositionChecker } from '@/lib/services/comprehensive-position-checker';
 import { convertRawTokenAmount } from '@/lib/utils/format';
 import { getAssetPrices } from './services';
+import { getEnvVar } from '@/lib/config/validate-env';
 
 const INDEXER = 'https://indexer.mainnet.aptoslabs.com/v1/graphql';
-const APTOS_API_KEY = process.env.APTOS_BUILD_SECRET;
+const APTOS_API_KEY = getEnvVar('APTOS_BUILD_SECRET');
 
 export interface DeFiPosition {
   protocol: string;
@@ -176,19 +177,37 @@ export class DeFiBalanceService {
       const comprehensivePositions =
         await this.getComprehensiveDeFiPositions(walletAddress);
 
-      // If we have comprehensive positions, use them
-      if (comprehensivePositions.length > 0) {
-        logger.info(
-          `Found ${comprehensivePositions.length} comprehensive DeFi positions for wallet ${walletAddress}`
-        );
-        return comprehensivePositions;
-      }
+      // Also check wallet assets for tokens that match protocol addresses
+      const walletAssetPositions = await this.getWalletAssetDeFiPositions(walletAddress);
 
-      // Fallback to legacy method if comprehensive checker fails
+      // Combine both sets of positions
+      const allPositions = [...comprehensivePositions, ...walletAssetPositions];
+
+      // Filter out positions with total value less than $0.10 (dust amounts)
+      // BUT always include LP tokens regardless of value
+      const MIN_DEFI_VALUE_THRESHOLD = 0.1;
+      const filteredPositions = allPositions.filter(position => {
+        // Always include LP tokens regardless of value
+        if (this.isLPToken(position)) {
+          logger.info(
+            `Including LP token regardless of value: ${position.protocol} - ${position.position.supplied?.[0]?.symbol || 'Unknown'}`
+          );
+          return true;
+        }
+        
+        if (position.totalValue < MIN_DEFI_VALUE_THRESHOLD) {
+          logger.info(
+            `Filtering out dust DeFi position in ${position.protocol}: $${position.totalValue.toFixed(4)}`
+          );
+          return false;
+        }
+        return true;
+      });
+      
       logger.info(
-        `Falling back to legacy DeFi position detection for wallet: ${walletAddress}`
+        `Found ${filteredPositions.length} comprehensive DeFi positions (filtered from ${allPositions.length}) for wallet ${walletAddress}`
       );
-      return await this.getLegacyDeFiPositions(walletAddress);
+      return filteredPositions;
     } catch (error) {
       logger.error('Error fetching DeFi positions:', error);
       throw new Error(
@@ -206,7 +225,7 @@ export class DeFiBalanceService {
     try {
       const checker = new ComprehensivePositionChecker(
         'https://api.mainnet.aptoslabs.com/v1',
-        process.env.APTOS_BUILD_KEY
+        process.env.APTOS_BUILD_SECRET
       );
 
       const summary = await checker.getComprehensivePositions(walletAddress);
@@ -579,30 +598,205 @@ export class DeFiBalanceService {
       });
     }
 
-    // If no calculated value but position is active, return small value
-    if (totalValue === 0 && position.isActive) {
-      // Check if position has any meaningful balances or resources
-      const hasTokenBalance = position.tokens.some((t: any) => {
-        const balance = parseFloat(t.balance || '0');
-        return balance > 0;
-      });
-
-      const hasLPBalance = position.lpTokens.some((lp: any) => {
-        const balance = parseFloat(lp.balance || '0');
-        return balance > 0;
-      });
-
-      const hasResourceData = position.resources.some((r: any) => {
-        const data = r.data || {};
-        return Object.keys(data).length > 0 && JSON.stringify(data) !== '{}';
-      });
-
-      if (hasTokenBalance || hasLPBalance || hasResourceData) {
-        return 0.001; // Very small value to indicate active position
-      }
+    // If no calculated value, return 0 (will be filtered out if below threshold)
+    if (totalValue === 0) {
+      return 0;
     }
 
     return totalValue;
+  }
+
+  /**
+   * Get DeFi positions from wallet assets that match protocol addresses
+   */
+  private static async getWalletAssetDeFiPositions(
+    walletAddress: string
+  ): Promise<DeFiPosition[]> {
+    try {
+      logger.info(
+        `Checking wallet assets for DeFi positions: ${walletAddress}`
+      );
+
+      // Import the getWalletAssets function
+      const { getWalletAssets } = await import('./services');
+      
+      // Get wallet assets (including unverified ones to catch LP tokens)
+      const walletAssets = await getWalletAssets(walletAddress, false);
+      const positions: DeFiPosition[] = [];
+
+      // Check each asset to see if it matches any protocol addresses
+      for (const asset of walletAssets) {
+        const assetType = asset.asset_type;
+        
+        // Check if this asset type matches any protocol address
+        for (const protocol of Object.values(PROTOCOLS)) {
+          for (const address of protocol.addresses) {
+            if (assetType === address || assetType.includes(address)) {
+              // Found a protocol asset
+              logger.info(
+                `Found protocol asset: ${protocol.name} - ${assetType} (${asset.metadata?.symbol || 'UNKNOWN'})`
+              );
+
+              // Create a DeFi position for this asset
+              const position: DeFiPosition = {
+                protocol: protocol.name,
+                protocolLabel: protocol.description || protocol.label,
+                protocolType: this.mapProtocolTypeToDefiType(protocol.type),
+                address: address,
+                position: await this.buildLPTokenPosition(asset, assetType),
+                totalValue: asset.value || 0,
+              };
+
+              positions.push(position);
+              break; // Found a match, no need to check other addresses for this protocol
+            }
+          }
+        }
+      }
+
+      logger.info(
+        `Found ${positions.length} DeFi positions from wallet assets`
+      );
+      return positions;
+    } catch (error) {
+      logger.warn('Error checking wallet assets for DeFi positions:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Map ProtocolType to DeFi position type
+   */
+  private static mapProtocolTypeToDefiType(protocolType: ProtocolType): ProtocolType {
+    return protocolType;
+  }
+
+  /**
+   * Check if a position is an LP token based on symbol or protocol type
+   */
+  private static isLPToken(position: DeFiPosition): boolean {
+    const symbol = position.position.supplied?.[0]?.symbol?.toLowerCase() || '';
+    const protocol = position.protocol.toLowerCase();
+    
+    return (
+      symbol.includes('lp') || 
+      symbol.includes('pool') ||
+      symbol.includes('thala-lp') ||
+      symbol.includes('mklp') ||
+      protocol.includes('farm') ||
+      protocol.includes('liquidity') ||
+      protocol.includes('pool')
+    );
+  }
+
+  /**
+   * Build position details for LP tokens, attempting to extract underlying assets
+   */
+  private static async buildLPTokenPosition(asset: any, assetType: string): Promise<DeFiPosition['position']> {
+    const symbol = asset.metadata?.symbol || 'UNKNOWN';
+    const isLPToken = symbol.toLowerCase().includes('lp') || symbol.toLowerCase().includes('pool');
+    
+    if (isLPToken) {
+      // Try to extract underlying assets from the LP token
+      const underlyingAssets = await this.extractUnderlyingAssets(assetType, asset);
+      
+      if (underlyingAssets.length > 0) {
+        return {
+          liquidity: [{
+            poolId: assetType,
+            token0: underlyingAssets[0] || { asset: 'Unknown', symbol: 'Unknown', amount: '0' },
+            token1: underlyingAssets[1] || { asset: 'Unknown', symbol: 'Unknown', amount: '0' },
+            lpTokens: asset.balance?.toString() || '0',
+            value: asset.value || 0,
+          }],
+        };
+      }
+    }
+    
+    // Fallback to regular supplied position
+    return {
+      supplied: [{
+        asset: assetType,
+        symbol: symbol,
+        amount: asset.balance?.toString() || '0',
+        value: asset.value || 0,
+      }],
+    };
+  }
+
+  /**
+   * Extract underlying assets from LP token (best effort)
+   */
+  private static async extractUnderlyingAssets(assetType: string, asset: any): Promise<Array<{ asset: string; symbol: string; amount: string; }>> {
+    // For Thala LP tokens, we can make educated guesses based on common patterns
+    if (asset.metadata?.symbol === 'THALA-LP') {
+      // Try to get actual amounts from Thala protocol
+      try {
+        const underlyingAmounts = await this.getThalaLPTokenAmounts(assetType, asset.balance);
+        if (underlyingAmounts) {
+          return underlyingAmounts;
+        }
+      } catch (error) {
+        logger.warn('Failed to get Thala LP token amounts:', error);
+      }
+      
+      // Fallback to showing the tokens but with TBD amounts
+      return [
+        { asset: '0x1::aptos_coin::AptosCoin', symbol: 'APT', amount: 'TBD' },
+        { asset: '0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDC', symbol: 'USDC', amount: 'TBD' },
+      ];
+    }
+    
+    // For other LP tokens, we could parse the asset type or make API calls
+    // This is a simplified implementation
+    return [];
+  }
+
+  /**
+   * Get actual underlying token amounts for Thala LP tokens
+   */
+  private static async getThalaLPTokenAmounts(
+    lpTokenAddress: string, 
+    userLPBalance: number
+  ): Promise<Array<{ asset: string; symbol: string; amount: string; }> | null> {
+    try {
+      // Query the Aptos indexer for the LP token's pool information
+      const poolQuery = `
+        query GetThalaPoolInfo($lpTokenAddress: String!) {
+          current_fungible_asset_balances(
+            where: {
+              asset_type: { _eq: $lpTokenAddress }
+              amount: { _gt: "0" }
+            }
+            limit: 1
+          ) {
+            metadata {
+              name
+              symbol
+              decimals
+            }
+          }
+        }
+      `;
+
+      // For now, we'll use a simplified approach since getting exact LP amounts
+      // requires complex protocol-specific calculations involving:
+      // 1. Total LP token supply
+      // 2. Pool reserves for each token
+      // 3. User's share calculation
+      // 4. Proper decimal handling
+      
+      // This would require a more sophisticated implementation with direct
+      // protocol contract queries or specialized APIs
+      
+      logger.info(`Attempting to get Thala LP amounts for ${lpTokenAddress}, user balance: ${userLPBalance}`);
+      
+      // Return null to indicate we couldn't get exact amounts
+      return null;
+    } catch (error) {
+      logger.warn('Error getting Thala LP token amounts:', error);
+      return null;
+    }
   }
 
   /**

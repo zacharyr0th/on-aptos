@@ -18,6 +18,13 @@ import {
   ChevronDown,
   Eye,
   EyeOff,
+  Grid,
+  List,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+  Shuffle,
 } from 'lucide-react';
 import { trpc } from '@/lib/trpc/client';
 import { usePortfolioHistoryV2 } from '@/hooks/usePortfolioHistoryV2';
@@ -26,6 +33,7 @@ import {
   formatPercentage,
   formatTokenAmount,
 } from '@/lib/utils/format';
+import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import { getTokenLogoUrlWithFallback } from '@/lib/utils/token-logos';
 import { cn } from '@/lib/utils';
 import {
@@ -65,7 +73,10 @@ export default function PortfolioPage() {
   const walletAddress = account?.address?.toString();
   const [showAccountSwitcher, setShowAccountSwitcher] = useState(false);
   const [nftPage, setNftPage] = useState(0);
+  const [nftViewMode, setNftViewMode] = useState<'grid' | 'collection'>('grid');
   const [selectedNFT, setSelectedNFT] = useState<NFT | null>(null);
+  const [nftShuffle, setNftShuffle] = useState(0); // Trigger for shuffling NFTs
+  const [hoveredCollection, setHoveredCollection] = useState<string | null>(null);
   const [selectedAsset, setSelectedAsset] = useState<any>(null);
   const [selectedDeFiPosition, setSelectedDeFiPosition] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<'performance' | 'transactions'>(
@@ -87,13 +98,6 @@ export default function PortfolioPage() {
     return false;
   });
 
-  const [showOnlyDeFiTVL, setShowOnlyDeFiTVL] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('portfolio-show-only-defi-tvl');
-      return saved === null ? false : saved === 'true';
-    }
-    return false;
-  });
 
   // Save preferences to localStorage
   React.useEffect(() => {
@@ -105,19 +109,14 @@ export default function PortfolioPage() {
     }
   }, [showAllAssets]);
 
-  React.useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(
-        'portfolio-show-only-defi-tvl',
-        showOnlyDeFiTVL.toString()
-      );
-    }
-  }, [showOnlyDeFiTVL]);
 
   // tRPC queries
   const { data: portfolioAssets, isLoading: portfolioLoading } =
     trpc.domains.blockchain.portfolio.getWalletAssets.useQuery(
-      { walletAddress: walletAddress || '' },
+      { 
+        walletAddress: walletAddress || '',
+        showOnlyVerified: !showAllAssets  // Pass the user's preference
+      },
       { enabled: !!walletAddress }
     );
 
@@ -129,9 +128,26 @@ export default function PortfolioPage() {
 
   const { data: nfts, isLoading: nftsLoading } =
     trpc.domains.blockchain.portfolio.getWalletNFTs.useQuery(
-      { walletAddress: walletAddress || '', offset: nftPage * 50, limit: 50 },
+      { walletAddress: walletAddress || '', offset: nftPage * 30, limit: 30 },
       { enabled: !!walletAddress }
     );
+
+  // Shuffle NFTs when nftShuffle state changes
+  const shuffledNFTs = useMemo(() => {
+    if (!nfts || nftShuffle === 0) return nfts;
+    
+    const shuffled = [...nfts];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  }, [nfts, nftShuffle]);
+
+  // Calculate pagination based on actual NFT data
+  const currentPageNFTs = shuffledNFTs?.length || 0;
+  const hasNextPage = currentPageNFTs === 30; // If we got a full page, there might be more
+  const hasPrevPage = nftPage > 0;
 
   const { data: accountNames } =
     trpc.domains.blockchain.portfolio.getAccountNames.useQuery(
@@ -160,7 +176,7 @@ export default function PortfolioPage() {
     });
   }, [portfolioAssets, showAllAssets]);
 
-  // Group and filter DeFi positions
+  // Group DeFi positions
   const groupedDeFiPositions = useMemo(() => {
     if (!defiPositions) return [];
 
@@ -169,13 +185,13 @@ export default function PortfolioPage() {
 
       if (existingGroup) {
         existingGroup.positions.push(position);
-        existingGroup.totalValue += position.value || 0;
+        existingGroup.totalValue += position.totalValue || 0;
         existingGroup.protocolTypes.add(position.protocolType);
       } else {
         acc.push({
           protocol: position.protocol,
           positions: [position],
-          totalValue: position.value || 0,
+          totalValue: position.totalValue || 0,
           protocolTypes: new Set([position.protocolType]),
           protocolInfo: position.protocolInfo,
         });
@@ -184,16 +200,32 @@ export default function PortfolioPage() {
       return acc;
     }, []);
 
-    if (showOnlyDeFiTVL) {
-      return grouped.filter(group => shouldShowProtocolBadge(group.protocol));
-    }
-
     return grouped;
-  }, [defiPositions, showOnlyDeFiTVL]);
+  }, [defiPositions]);
 
   // Calculate portfolio metrics
   const portfolioMetrics = useMemo(() => {
-    const assetValue = filteredAssets.reduce(
+    // Get all DeFi position addresses to avoid double counting
+    const defiAddresses = new Set<string>();
+    defiPositions?.forEach(position => {
+      if (position.address) {
+        defiAddresses.add(position.address);
+      }
+    });
+
+    // Filter out assets that are already counted in DeFi positions
+    const nonDeFiAssets = filteredAssets.filter(asset => {
+      // Check if this asset type contains any DeFi protocol address
+      for (const defiAddress of defiAddresses) {
+        if (asset.asset_type.includes(defiAddress)) {
+          console.log(`Excluding ${asset.metadata?.symbol} from asset value calculation (already in DeFi)`);
+          return false;
+        }
+      }
+      return true;
+    });
+
+    const assetValue = nonDeFiAssets.reduce(
       (sum, asset) => sum + (asset.value || 0),
       0
     );
@@ -204,7 +236,7 @@ export default function PortfolioPage() {
     const totalValue = assetValue + defiValue;
 
     return { totalValue, assetValue, defiValue };
-  }, [filteredAssets, groupedDeFiPositions]);
+  }, [filteredAssets, groupedDeFiPositions, defiPositions]);
 
   const allDataLoaded =
     !portfolioLoading && !defiPositionsLoading && !nftsLoading;
@@ -265,9 +297,9 @@ export default function PortfolioPage() {
               accountNames={accountNames || null}
             />
 
-            <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 sm:gap-6 lg:gap-8">
+            <div className="grid gap-4 sm:gap-6 lg:gap-8 grid-cols-1 lg:grid-cols-5">
               {/* Sidebar */}
-              <div className="lg:col-span-2 space-y-4 sm:space-y-6">
+              <div className="space-y-4 sm:space-y-6 lg:col-span-2">
                 {/* Sidebar Navigation */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-6 text-base">
@@ -314,24 +346,31 @@ export default function PortfolioPage() {
 
                   {/* Filter Controls */}
                   <div className="flex items-center gap-2">
-                    {sidebarView === 'defi' && (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="outline" size="sm">
-                            <Filter className="h-3 w-3 mr-1" />
-                            <ChevronDown className="h-3 w-3" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-56">
-                          <DropdownMenuCheckboxItem
-                            checked={showOnlyDeFiTVL}
-                            onCheckedChange={setShowOnlyDeFiTVL}
-                          >
-                            <TrendingUp className="h-4 w-4 mr-2" />
-                            High TVL protocols only
-                          </DropdownMenuCheckboxItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                    {sidebarView === 'nfts' && (
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setNftShuffle(prev => prev + 1)}
+                          title="Shuffle NFTs"
+                        >
+                          <Shuffle className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          variant={nftViewMode === 'grid' ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => setNftViewMode('grid')}
+                        >
+                          <Grid className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          variant={nftViewMode === 'collection' ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => setNftViewMode('collection')}
+                        >
+                          <List className="h-3 w-3" />
+                        </Button>
+                      </div>
                     )}
                     {sidebarView === 'assets' && (
                       <Tooltip>
@@ -371,12 +410,68 @@ export default function PortfolioPage() {
                 )}
 
                 {sidebarView === 'nfts' && (
-                  <NFTGrid
-                    nfts={nfts || null}
-                    nftsLoading={nftsLoading}
-                    selectedNFT={selectedNFT}
-                    onNFTSelect={handleNFTSelect}
-                  />
+                  <>
+                    <NFTGrid
+                      nfts={shuffledNFTs || null}
+                      nftsLoading={nftsLoading}
+                      selectedNFT={selectedNFT}
+                      onNFTSelect={handleNFTSelect}
+                      viewMode={nftViewMode}
+                    />
+                    {/* NFT Pagination */}
+                    {shuffledNFTs && shuffledNFTs.length > 0 && (hasPrevPage || hasNextPage) && (
+                      <div className="flex items-center justify-between pt-4">
+                        <div className="text-sm text-muted-foreground">
+                          Page {nftPage + 1} • {currentPageNFTs} NFTs
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            disabled={!hasPrevPage}
+                            onClick={() => setNftPage(0)}
+                            title="First page"
+                          >
+                            <ChevronsLeft className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            disabled={!hasPrevPage}
+                            onClick={() => setNftPage(nftPage - 1)}
+                            title="Previous page"
+                          >
+                            <ChevronLeft className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            disabled={!hasNextPage}
+                            onClick={() => setNftPage(nftPage + 1)}
+                            title="Next page"
+                          >
+                            <ChevronRight className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            disabled={!hasNextPage}
+                            onClick={() => {
+                              // Go to a reasonable "last" page - we'll increment until we hit a page with less than 30 items
+                              let testPage = nftPage + 1;
+                              while (testPage < 50) { // Reasonable upper limit
+                                testPage++;
+                              }
+                              setNftPage(testPage);
+                            }}
+                            title="Last page"
+                          >
+                            <ChevronsRight className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </>
                 )}
 
                 {sidebarView === 'defi' && (
@@ -394,15 +489,16 @@ export default function PortfolioPage() {
               </div>
 
               {/* Main Content */}
-              <div
-                className="lg:col-span-3 tabs-container"
-                onClick={e => {
-                  // Clear selection if clicking outside the details area
-                  if (e.target === e.currentTarget) {
-                    handleClearSelection();
-                  }
-                }}
-              >
+              {(
+                <div
+                  className="lg:col-span-3 tabs-container"
+                  onClick={e => {
+                    // Clear selection if clicking outside the details area
+                    if (e.target === e.currentTarget) {
+                      handleClearSelection();
+                    }
+                  }}
+                >
                 <Tabs
                   value={activeTab}
                   onValueChange={value => setActiveTab(value as any)}
@@ -425,13 +521,14 @@ export default function PortfolioPage() {
                               ? 'NFT Summary'
                               : sidebarView === 'defi'
                                 ? 'DeFi Summary'
-                                : 'Performance'}
+                                : 'Performance (APT only for now)'}
                     </TabsTrigger>
                     <TabsTrigger
                       value="transactions"
                       className="text-xs sm:text-sm"
+                      disabled
                     >
-                      {selectedNFT ? 'NFT Transfers' : 'Transactions'}
+                      {selectedNFT ? 'NFT Transfers' : 'Transactions'} (Coming Soon)
                     </TabsTrigger>
                   </TabsList>
 
@@ -439,7 +536,7 @@ export default function PortfolioPage() {
                     {/* Individual Item Details */}
                     {selectedNFT ? (
                       <NFTAnalysis
-                        nfts={nfts || []}
+                        nfts={shuffledNFTs || []}
                         nftsByCollection={{}}
                         selectedNFT={selectedNFT}
                       />
@@ -496,7 +593,7 @@ export default function PortfolioPage() {
                           </div>
                           <div>
                             <p className="text-sm text-muted-foreground">
-                              Price
+                              Price (Panora)
                             </p>
                             <p className="text-lg font-mono">
                               {formatCurrency(selectedAsset.price || 0)}
@@ -535,8 +632,17 @@ export default function PortfolioPage() {
                             <p className="text-muted-foreground">
                               {Array.from(
                                 selectedDeFiPosition.protocolTypes
-                              ).join(', ')}
+                              ).map((type) => {
+                                const typeStr = type as string;
+                                return typeStr === 'derivatives' ? 'Derivatives' : 
+                                  typeStr.charAt(0).toUpperCase() + typeStr.slice(1)
+                              }).join(', ')}
                             </p>
+                            {selectedDeFiPosition.protocol === 'Thala Farm' && (
+                              <p className="text-xs text-blue-600 mt-1 italic">
+                                Deeper Thala Integration coming soon
+                              </p>
+                            )}
                           </div>
                         </div>
                         <div className="grid grid-cols-2 gap-4">
@@ -544,11 +650,29 @@ export default function PortfolioPage() {
                             <p className="text-sm text-muted-foreground">
                               Total Value
                             </p>
-                            <p className="text-lg font-mono">
-                              {formatCurrency(
-                                selectedDeFiPosition.totalValue || 0
+                            <div className="flex items-center gap-2">
+                              <p className="text-lg font-mono">
+                                {selectedDeFiPosition.protocol === 'Thala Farm' 
+                                  ? 'TBD' 
+                                  : formatCurrency(selectedDeFiPosition.totalValue || 0)}
+                              </p>
+                              {selectedDeFiPosition.protocol === 'Merkle' && (
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <div className="text-xs text-muted-foreground cursor-help">
+                                        ⓘ
+                                      </div>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      <p className="text-sm">
+                                        MKLP price is hardcoded to $1.05 for now
+                                      </p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
                               )}
-                            </p>
+                            </div>
                           </div>
                           <div>
                             <p className="text-sm text-muted-foreground">
@@ -561,10 +685,40 @@ export default function PortfolioPage() {
                         </div>
                         <div className="mt-4">
                           <p className="text-sm text-muted-foreground mb-2">
-                            Individual Positions
+                            Position Details
                           </p>
                           <div className="space-y-2">
-                            {selectedDeFiPosition.positions.map(
+                            {/* Handle LP tokens with liquidity data */}
+                            {selectedDeFiPosition.position?.liquidity && (
+                              selectedDeFiPosition.position.liquidity.map((lp: any, idx: number) => (
+                                <div key={idx} className="p-2 bg-muted/50 rounded">
+                                  <div className="flex justify-between items-center mb-1">
+                                    <span className="text-sm font-medium">LP Token</span>
+                                    <span className="text-sm font-mono">
+                                      {lp.lpTokens} tokens
+                                    </span>
+                                  </div>
+                                  <div className="text-xs text-muted-foreground space-y-1">
+                                    <div className="flex justify-between">
+                                      <span>Token 0: {lp.token0?.symbol || 'Unknown'}</span>
+                                      <span>{lp.token0?.amount || 'TBD'}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                      <span>Token 1: {lp.token1?.symbol || 'Unknown'}</span>
+                                      <span>{lp.token1?.amount || 'TBD'}</span>
+                                    </div>
+                                    {selectedDeFiPosition.protocol === 'Thala Farm' && (
+                                      <div className="text-xs text-blue-600 mt-1 italic">
+                                        Deeper Thala Integration coming soon
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              ))
+                            )}
+                            
+                            {/* Handle regular positions */}
+                            {selectedDeFiPosition.positions && selectedDeFiPosition.positions.map(
                               (pos: any, idx: number) => (
                                 <div
                                   key={idx}
@@ -588,35 +742,35 @@ export default function PortfolioPage() {
                         <h3 className="text-xl font-semibold mb-4">
                           NFT Collection Summary
                         </h3>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-2 gap-6">
                           <div>
                             <p className="text-sm text-muted-foreground">
-                              Total NFTs
+                              Current Page NFTs
                             </p>
-                            <p className="text-lg font-mono">
-                              {nfts?.length || 0}
+                            <p className="text-2xl font-mono">
+                              {currentPageNFTs}
                             </p>
                           </div>
                           <div>
                             <p className="text-sm text-muted-foreground">
                               Collections
                             </p>
-                            <p className="text-lg font-mono">
-                              {nfts
-                                ? new Set(nfts.map(nft => nft.collection_name))
+                            <p className="text-2xl font-mono">
+                              {shuffledNFTs
+                                ? new Set(shuffledNFTs.map(nft => nft.collection_name))
                                     .size
                                 : 0}
                             </p>
                           </div>
                         </div>
-                        <div className="mt-4">
-                          <p className="text-sm text-muted-foreground mb-2">
-                            Top Collections
+                        <div className="mt-6">
+                          <p className="text-sm text-muted-foreground mb-3">
+                            Top Collections (Current Page)
                           </p>
                           <div className="space-y-2">
-                            {nfts &&
+                            {shuffledNFTs &&
                               Object.entries(
-                                nfts.reduce((acc: any, nft) => {
+                                shuffledNFTs.reduce((acc: any, nft) => {
                                   acc[nft.collection_name] =
                                     (acc[nft.collection_name] || 0) + 1;
                                   return acc;
@@ -626,13 +780,13 @@ export default function PortfolioPage() {
                                   ([, a], [, b]) =>
                                     (b as number) - (a as number)
                                 )
-                                .slice(0, 5)
+                                .slice(0, 8)
                                 .map(([collection, count]) => (
                                   <div
                                     key={collection}
-                                    className="flex justify-between items-center p-2 bg-muted/50 rounded"
+                                    className="flex justify-between items-center p-3 bg-muted/50 rounded"
                                   >
-                                    <span className="text-sm truncate">
+                                    <span className="text-sm truncate flex-1 pr-2" title={collection}>
                                       {collection}
                                     </span>
                                     <span className="text-sm font-mono">
@@ -712,7 +866,8 @@ export default function PortfolioPage() {
                     )}
                   </TabsContent>
                 </Tabs>
-              </div>
+                </div>
+              )}
             </div>
           </>
         )}

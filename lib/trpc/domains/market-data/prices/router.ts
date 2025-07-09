@@ -1,4 +1,5 @@
 import { router, publicProcedure } from '@/lib/trpc/core/server';
+import { TRPCError } from '@trpc/server';
 import {
   GetCMCPriceInputSchema,
   CMCPriceResponseSchema,

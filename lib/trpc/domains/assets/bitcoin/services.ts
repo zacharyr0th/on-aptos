@@ -62,27 +62,6 @@ const ASSET_SUPPLY_GQL = `
   }
 `;
 
-// Fallback data for critical scenarios
-const BTC_FALLBACK_DATA: BTCData = {
-  protocol: 'echelon',
-  markets: [],
-  total: {
-    btc: '0',
-    normalized: '0',
-    tvlUsd: 0,
-  },
-};
-
-const COMPREHENSIVE_BTC_FALLBACK: ComprehensiveBTCSupply = {
-  supplies: Object.keys(BTC_TOKENS).map(symbol => ({
-    symbol,
-    supply: '0',
-    formatted_supply: '0.00000000',
-  })),
-  total: '0',
-  total_formatted: '0.0000000000',
-  total_decimals: 10,
-};
 
 export class BitcoinService {
   /**
@@ -101,7 +80,15 @@ export class BitcoinService {
       apiCallCount: 1,
     };
 
-    const result = await cacheFirstWithFallback(options, BTC_FALLBACK_DATA);
+    const result = await cacheFirstWithFallback(options, {
+      protocol: 'echelon',
+      markets: [],
+      total: {
+        btc: '0',
+        normalized: '0',
+        tvlUsd: 0
+      }
+    });
     return result.data;
   }
 
@@ -123,10 +110,12 @@ export class BitcoinService {
       apiCallCount: Object.keys(BTC_TOKENS).length,
     };
 
-    const result = await cacheFirstWithFallback(
-      options,
-      COMPREHENSIVE_BTC_FALLBACK
-    );
+    const result = await cacheFirstWithFallback(options, {
+      supplies: [],
+      total: '0',
+      total_formatted: '0',
+      total_decimals: 10
+    });
     return result.data;
   }
 

@@ -11,9 +11,25 @@ import { dedupeFetch } from '@/lib/utils/request-deduplication';
 
 function getBaseUrl() {
   if (typeof window !== 'undefined') return ''; // browser should use relative url
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`; // SSR should use vercel url
+  
+  // For Vercel deployments
+  if (process.env.VERCEL_URL) {
+    // VERCEL_URL doesn't include protocol, so we add it
+    const url = `https://${process.env.VERCEL_URL}`;
+    console.log('[TRPCProvider] Using VERCEL_URL:', url);
+    return url;
+  }
+  
+  // Use NEXT_PUBLIC_SITE_URL if available (works in all environments)
+  if (process.env.NEXT_PUBLIC_SITE_URL) {
+    console.log('[TRPCProvider] Using NEXT_PUBLIC_SITE_URL:', process.env.NEXT_PUBLIC_SITE_URL);
+    return process.env.NEXT_PUBLIC_SITE_URL;
+  }
+  
   // For development, use the same port as the Next.js app since tRPC API routes are served by the same server
-  return `http://localhost:${APP_CONFIG.port}`;
+  const devUrl = `http://localhost:${APP_CONFIG.port}`;
+  console.log('[TRPCProvider] Using development URL:', devUrl);
+  return devUrl;
 }
 
 export function TRPCProvider({ children }: { children: React.ReactNode }) {

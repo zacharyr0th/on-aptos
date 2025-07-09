@@ -87,6 +87,30 @@ export const DeFiPositionsTable = ({
 
   let sortedPositions = [...groupedDeFiPositions];
 
+  // Filter out positions with value less than $0.10 (dust amounts)
+  // BUT always include LP tokens regardless of value
+  const MIN_DEFI_VALUE_THRESHOLD = 0.1;
+  const isLPToken = (position: any) => {
+    // Check if position has liquidity data (LP token structure)
+    if (position.position && position.position.liquidity) {
+      return true;
+    }
+    
+    // Check if position has LP-related symbols
+    const symbols = position.positions?.map((p: any) => p.protocolType?.toLowerCase() || '').join(' ') || '';
+    const protocol = position.protocol?.toLowerCase() || '';
+    return symbols.includes('lp') || symbols.includes('pool') || protocol.includes('farm') || protocol.includes('liquidity');
+  };
+  
+  sortedPositions = sortedPositions.filter(position => {
+    // Always include LP tokens
+    if (isLPToken(position)) {
+      return true;
+    }
+    // Filter by value threshold for non-LP tokens
+    return position.totalValue >= MIN_DEFI_VALUE_THRESHOLD;
+  });
+
   if (defiSortBy === 'type') {
     sortedPositions.sort((a, b) => {
       const typeA = Array.from(a.protocolTypes)[0] as string;
@@ -208,8 +232,28 @@ export const DeFiPositionsTable = ({
                   </div>
                 </TableCell>
                 <TableCell className="text-right py-2">
-                  <div className="font-medium text-sm font-mono">
-                    {formatCurrency(groupedPosition.totalValue)}
+                  <div className="flex items-center justify-end gap-2">
+                    <div className="font-medium text-sm font-mono">
+                      {groupedPosition.protocol === 'Thala Farm' 
+                        ? 'TBD' 
+                        : formatCurrency(groupedPosition.totalValue)}
+                    </div>
+                    {groupedPosition.protocol === 'Merkle' && (
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div className="text-xs text-muted-foreground cursor-help">
+                              ⓘ
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p className="text-sm">
+                              MKLP price is hardcoded to $1.05 for now
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    )}
                   </div>
                 </TableCell>
               </TableRow>

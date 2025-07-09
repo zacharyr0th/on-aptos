@@ -15,9 +15,10 @@ import {
   SCAM_TOKENS,
   AptosValidators,
 } from '@/lib/aptos-constants';
+import { getEnvVar } from '@/lib/config/validate-env';
 
 const INDEXER = 'https://indexer.mainnet.aptoslabs.com/v1/graphql';
-const APTOS_API_KEY = process.env.APTOS_BUILD_SECRET;
+const APTOS_API_KEY = getEnvVar('APTOS_BUILD_SECRET');
 
 interface FungibleAsset {
   asset_type: string;
@@ -257,6 +258,11 @@ export async function getWalletAssets(
       `Fetching wallet assets for ${walletAddress} from Aptos indexer (showOnlyVerified: ${showOnlyVerified})`
     );
 
+    // Log if API key is missing
+    if (!APTOS_API_KEY) {
+      logger.warn('APTOS_BUILD_SECRET not configured - GraphQL queries may fail');
+    }
+
     const response = await graphQLRequest<{
       current_fungible_asset_balances: FungibleAsset[];
       current_coin_balances: Array<{
@@ -316,8 +322,16 @@ export async function getWalletAssets(
     );
 
     // Get Panora token list - this will be our source of truth for official tokens
-    const panoraTokens = await PanoraService.getAllPrices();
-    logger.debug(`Panora returned ${panoraTokens.length} official tokens`);
+    let panoraTokens: PanoraPriceResponse[] = [];
+    let panoraAvailable = false;
+    try {
+      panoraTokens = await PanoraService.getAllPrices();
+      panoraAvailable = panoraTokens.length > 0;
+      logger.debug(`Panora returned ${panoraTokens.length} official tokens`);
+    } catch (error) {
+      logger.warn('Failed to fetch Panora tokens, continuing without price data', error);
+      panoraAvailable = false;
+    }
     const panoraTokenMap = new Map(
       panoraTokens.map(token => {
         // Use Panora's iconUrl if available, otherwise use local icons or construct GitHub URL
@@ -432,17 +446,16 @@ export async function getWalletAssets(
       if (token.tokenAddress) verifiedAddresses.add(token.tokenAddress);
     });
 
+    // Always include core tokens regardless of Panora availability
+    const coreTokens = new Set([
+      '0x1::aptos_coin::AptosCoin', // APT
+      '0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDC', // LayerZero USDC
+      '0x397071c01929cc6672a17f130bd62b1bce224309029837ce4f18214cc83ce2a7::USDC::USDC', // Another USDC variant
+      '0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDT', // LayerZero USDT
+    ]);
+
     // Add common token variations that should be included
-    verifiedAddresses.add('0x1::aptos_coin::AptosCoin'); // APT
-    verifiedAddresses.add(
-      '0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDC'
-    ); // LayerZero USDC
-    verifiedAddresses.add(
-      '0x397071c01929cc6672a17f130bd62b1bce224309029837ce4f18214cc83ce2a7::USDC::USDC'
-    ); // Another USDC variant
-    verifiedAddresses.add(
-      '0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDT'
-    ); // LayerZero USDT
+    coreTokens.forEach(token => verifiedAddresses.add(token));
 
     // Use centralized legitimate stablecoin addresses from aptos-constants.ts (single source of truth)
 
@@ -529,8 +542,6 @@ export async function getWalletAssets(
           return false;
         }
 
-        const isVerified = verifiedAddresses.has(asset.asset_type);
-
         // If it's a stablecoin, only show if it's legitimate
         if (isStablecoin(asset)) {
           const isLegitimate = LEGITIMATE_STABLECOINS.has(asset.asset_type);
@@ -542,7 +553,19 @@ export async function getWalletAssets(
           return isLegitimate;
         }
 
-        // For non-stablecoins, show if verified
+        // Always include core tokens
+        if (coreTokens.has(asset.asset_type)) {
+          return true;
+        }
+
+        // If Panora is not available, show all non-stablecoin tokens (except scams)
+        if (!panoraAvailable) {
+          logger.debug(`Panora not available, including token: ${asset.metadata?.symbol}`);
+          return true;
+        }
+
+        // For non-stablecoins, show if verified by Panora
+        const isVerified = verifiedAddresses.has(asset.asset_type);
         return isVerified;
       });
     } else {
@@ -935,98 +958,6 @@ async function reconstructPortfolioAtDate(
   }
 }
 
-// Fallback synthetic data generation function
-async function generateSyntheticPortfolioHistory(
-  walletAddress: string,
-  days: number
-): Promise<PortfolioHistoryPoint[]> {
-  try {
-    logger.info('Generating synthetic portfolio history as fallback');
-
-    // Get current assets and calculate current portfolio value
-    const currentAssets = await getWalletAssets(walletAddress, true);
-
-    if (currentAssets.length === 0) {
-      return [];
-    }
-
-    // Get prices for current assets
-    const allAssetTypes = currentAssets.map(a => a.asset_type);
-    const priceData = await getAssetPrices(allAssetTypes);
-
-    // Calculate current portfolio value
-    let currentTotalValue = 0;
-    const currentAssetValues: any[] = [];
-
-    for (const asset of currentAssets) {
-      const priceInfo = priceData.find(p => p.assetType === asset.asset_type);
-      const price = priceInfo?.price || 0;
-      const decimals = asset.metadata?.decimals || 8;
-      const balance = Number(asset.amount) / Math.pow(10, decimals);
-      const value = balance * price;
-
-      currentTotalValue += value;
-      currentAssetValues.push({
-        assetType: asset.asset_type,
-        symbol: asset.metadata?.symbol || priceInfo?.symbol || 'Unknown',
-        balance,
-        price,
-        value,
-      });
-    }
-
-    // Generate synthetic history
-    const history: PortfolioHistoryPoint[] = [];
-    const now = new Date();
-
-    if (currentTotalValue === 0) {
-      // Empty portfolio
-      for (let i = days - 1; i >= 0; i--) {
-        const targetDate = new Date(now);
-        targetDate.setDate(targetDate.getDate() - i);
-        history.push({
-          date: targetDate.toISOString().split('T')[0],
-          totalValue: 0,
-          assets: [],
-        });
-      }
-    } else {
-      // Generate trending synthetic data
-      const baseValue = currentTotalValue;
-      for (let i = days - 1; i >= 0; i--) {
-        const targetDate = new Date(now);
-        targetDate.setDate(targetDate.getDate() - i);
-
-        const trendFactor = 0.85 + ((days - 1 - i) / (days - 1)) * 0.3;
-        const dailyVariation = 0.95 + Math.random() * 0.1;
-        const dayValue = Math.max(
-          baseValue * 0.1,
-          baseValue * trendFactor * dailyVariation
-        );
-
-        history.push({
-          date: targetDate.toISOString().split('T')[0],
-          totalValue: dayValue,
-          assets: currentAssetValues.map(asset => ({
-            ...asset,
-            value: asset.value * trendFactor * dailyVariation,
-          })),
-        });
-      }
-
-      // Ensure the last day shows exact current value
-      if (history.length > 0) {
-        history[history.length - 1].totalValue = currentTotalValue;
-        history[history.length - 1].assets = currentAssetValues;
-      }
-    }
-
-    return history;
-  } catch (error) {
-    logger.error('Failed to generate synthetic portfolio history:', error);
-    return [];
-  }
-}
 
 export async function getAssetPrices(
   assetTypes: string[]
@@ -1096,6 +1027,19 @@ export async function getAssetPrices(
 
     // Match each asset type with Panora data
     for (const assetType of assetTypes) {
+      // Special handling for MKLP (Merkle LP tokens) - hardcoded to $1.05
+      if (assetType.includes('0x5ae6789dd2fec1a9ec9cccfb3acaf12e93d432f0a3a42c92fe1a9d490b7bbc06')) {
+        prices.push({
+          assetType,
+          symbol: 'MKLP',
+          price: 1.05,
+          change24h: 0,
+          marketCap: 0,
+        });
+        logger.info('Using hardcoded price for MKLP: $1.05');
+        continue;
+      }
+
       const panoraMatch = panoraAddressMap.get(assetType);
 
       if (panoraMatch) {
@@ -1142,25 +1086,21 @@ export async function getAssetPrices(
             });
             logger.info(`Found CMC price for ${symbol}: $${cmcData.price}`);
           } catch (cmcError) {
-            logger.warn(`CMC fallback failed for ${symbol}:`, cmcError);
-            prices.push({
-              assetType,
-              symbol: symbol,
-              price: 0, // Use 0 instead of NaN for better handling
-              change24h: 0,
-              marketCap: 0,
-            });
+            logger.error(`CMC fallback failed for ${symbol}:`, cmcError);
+            throw new Error(`Failed to fetch price for ${symbol}`);
           }
         } else {
-          // For unknown tokens, set price to 0
+          // For unknown tokens, skip them instead of failing the entire request
+          logger.warn(
+            `Skipping unknown token ${assetType} (symbol: ${symbol || 'UNKNOWN'}) - no price source available`
+          );
           prices.push({
             assetType,
-            symbol: symbol,
-            price: 0, // Use 0 for consistent handling
+            symbol: symbol || 'UNKNOWN',
+            price: 0,
             change24h: 0,
             marketCap: 0,
           });
-          logger.info(`No price source available for ${symbol || assetType}`);
         }
       }
     }
@@ -1169,15 +1109,7 @@ export async function getAssetPrices(
     return prices;
   } catch (error) {
     logger.error('Failed to fetch asset prices:', error);
-
-    // Return 0 prices for all assets on error
-    return assetTypes.map(assetType => ({
-      assetType,
-      symbol: PanoraService.getSymbolForAssetType(assetType),
-      price: 0, // Use 0 to indicate no price data available
-      change24h: 0,
-      marketCap: 0,
-    }));
+    throw error;
   }
 }
 

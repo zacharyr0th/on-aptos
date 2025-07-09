@@ -117,6 +117,7 @@ export const PROTOCOLS: Record<string, ProtocolInfo> = {
     addresses: [
       '0x6b3720cd988adeaf721ed9d4730da4324d52364871a68eac62b46d21e4d2fa99',
       '0x3c4a58b4a8dffe6d14448072efcdd5a0e0089a22c6837b94f1d7e8bb1552137f',
+      '0xb4a8b8462b4423780d6ee256f3a9a3b9ece5d9440d614f7ab2bfa4556aa4f69d',
     ],
   },
   PANCAKESWAP: {

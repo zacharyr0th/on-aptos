@@ -2,11 +2,11 @@ import { logger } from '@/lib/utils/logger';
 // import { getCachedData, setCachedData } from '@/lib/utils/cache-manager';
 import { PriceService } from '@/lib/trpc/domains/market-data/prices/services';
 import { getEnvVar } from '@/lib/config/validate-env';
+import { TOKEN_REGISTRY, NATIVE_TOKENS, STABLECOINS, LIQUID_STAKING_TOKENS } from '@/lib/aptos-constants';
 
 const PANORA_API_ENDPOINT = 'https://api.panora.exchange/prices';
-const PANORA_API_KEY =
-  getEnvVar('PANORA_API_KEY') ||
-  'a4^KV_EaTf4MW#ZdvgGKX#HUD^3IFEAOV_kzpIE^3BQGA8pDnrkT7JcIy#HNlLGi';
+// Use public API key if none is provided in env
+const PANORA_API_KEY = getEnvVar('PANORA_API_KEY') || 'a4^KV_EaTf4MW#ZdvgGKX#HUD^3IFEAOV_kzpIE^3BQGA8pDnrkT7JcIy#HNlLGi';
 
 export interface PanoraPriceResponse {
   chainId: number;
@@ -32,6 +32,8 @@ export class PanoraService {
    * Fetch prices for all tokens with liquidity
    */
   static async getAllPrices(): Promise<PanoraPriceResponse[]> {
+    // API key will always exist now (either from env or public key)
+
     // Temporarily disable caching to fix configuration issues
     logger.info('Fetching all prices from Panora API');
 
@@ -40,6 +42,7 @@ export class PanoraService {
         method: 'GET',
         headers: {
           'x-api-key': PANORA_API_KEY,
+          'Accept-Encoding': 'gzip',
         },
       });
 
@@ -80,6 +83,7 @@ export class PanoraService {
         method: 'GET',
         headers: {
           'x-api-key': PANORA_API_KEY,
+          'Accept-Encoding': 'gzip',
         },
       });
 
@@ -159,38 +163,50 @@ export class PanoraService {
 
   /**
    * Map asset types to their corresponding symbols for CMC fallback
+   * Uses the comprehensive token registry from aptos-constants.ts
    */
   static getSymbolForAssetType(assetType: string): string {
-    const assetMap: Record<string, string> = {
-      '0x1::aptos_coin::AptosCoin': 'APT',
-      '0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDC':
-        'USDC',
-      '0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDT':
-        'USDT',
-      '0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::WETH':
-        'ETH',
-      '0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::WBTC':
-        'BTC',
-      '0x111ae3e5bc816a5e63c2da97d0aa3886519e0cd5e4b046659fa35796bd11542a::stapt_token::StakedApt':
-        'APT',
-      '0x7e783b349d3e89cf5931af376ebeadbfab855b3fa239b7ada8f5a92fbea6b387::staking::AMAPT':
-        'APT',
-      // Add more common Aptos token addresses
+    // First check native tokens
+    if (assetType === NATIVE_TOKENS.APT || assetType === NATIVE_TOKENS.APT_FA) {
+      return 'APT';
+    }
+
+    // Check stablecoins
+    for (const [symbol, address] of Object.entries(STABLECOINS)) {
+      if (address === assetType) {
+        return symbol;
+      }
+    }
+
+    // Check liquid staking tokens (all map to APT for pricing)
+    for (const address of Object.values(LIQUID_STAKING_TOKENS)) {
+      if (address === assetType) {
+        return 'APT';
+      }
+    }
+
+    // Check token registry
+    for (const [symbol, address] of Object.entries(TOKEN_REGISTRY)) {
+      if (address === assetType) {
+        return symbol;
+      }
+    }
+
+    // Extended asset mapping for common variants
+    const extendedAssetMap: Record<string, string> = {
+      // LayerZero bridged tokens
+      '0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDC': 'USDC',
+      '0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDT': 'USDT',
+      '0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::WETH': 'ETH',
+      '0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::WBTC': 'BTC',
+      
+      // Common coin store formats
       '0x1::coin::CoinStore<0x1::aptos_coin::AptosCoin>': 'APT',
-      '0x3::token::Token': 'APT',
-      // Additional USDC variants
-      '0x397071c01929cc6672a17f130bd62b1bce224309029837ce4f18214cc83ce2a7::USDC::USDC':
-        'USDC',
-      // GUI token
-      '0xe4ccb6d39136469f376242c31b34d10515c8eaaa38092f804db8e08a8f53c5b2::assets_v1::EchoCoin002':
-        'GUI',
-      // More APT variants
-      '0x48327a479bf5c5d2e36d5e9846362cff2d99e0e27ff92859fc247893fded3fbd::APTOS::APTOS':
-        'APT',
-      '0x50788befc1107c0cc4473848a92e5c783c635866ce3c98de71d2eeb7d2a34f85::aptos_coin::AptosCoin':
-        'APT',
+      
+      // Known tokens not in registry
+      '0xe4ccb6d39136469f376242c31b34d10515c8eaaa38092f804db8e08a8f53c5b2::assets_v1::EchoCoin002': 'GUI',
     };
 
-    return assetMap[assetType] || 'UNKNOWN';
+    return extendedAssetMap[assetType] || 'UNKNOWN';
   }
 }

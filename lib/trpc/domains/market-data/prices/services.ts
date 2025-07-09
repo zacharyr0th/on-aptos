@@ -116,13 +116,11 @@ export class PriceService {
     symbol: string
   ): Promise<CMCPriceData> {
     if (!CMC_API_KEY) {
-      // Return fallback data in production to prevent 500 errors
-      return {
-        symbol: SYMBOL_DISPLAY_NAMES[symbol.toLowerCase()] || symbol.toUpperCase(),
-        name: SYMBOL_FULL_NAMES[symbol.toLowerCase()] || symbol,
-        price: 0,
-        updated: new Date().toISOString(),
-      };
+      throw new ApiError(
+        'CMC_API_KEY is not configured',
+        undefined,
+        'CMC-Config'
+      );
     }
 
     const cmcId = CMC_SYMBOL_IDS[symbol.toLowerCase()];
@@ -175,14 +173,11 @@ export class PriceService {
         updated: new Date().toISOString(),
       };
     } catch (error) {
-      // If API call fails, return fallback data instead of throwing
-      console.warn(`CMC API call failed for ${symbol}, using fallback:`, error);
-      return {
-        symbol: SYMBOL_DISPLAY_NAMES[symbol.toLowerCase()] || symbol.toUpperCase(),
-        name: SYMBOL_FULL_NAMES[symbol.toLowerCase()] || symbol,
-        price: 0,
-        updated: new Date().toISOString(),
-      };
+      throw new ApiError(
+        `CMC API call failed for ${symbol}: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        undefined,
+        'CMC-API'
+      );
     }
   }
 
@@ -193,8 +188,11 @@ export class PriceService {
     tokenAddresses: string[]
   ): Promise<Record<string, number>> {
     if (!PANORA_API_KEY) {
-      // Return empty prices to prevent 500 errors
-      return {};
+      throw new ApiError(
+        'PANORA_API_KEY is not configured',
+        undefined,
+        'Panora-Config'
+      );
     }
 
     const params = new URLSearchParams({
@@ -359,8 +357,11 @@ export class PriceService {
     }
 
     if (!CMC_API_KEY) {
-      // Return empty array to prevent 500 errors
-      return [];
+      throw new ApiError(
+        'CMC_API_KEY is not configured',
+        undefined,
+        'CMC-Config'
+      );
     }
 
     try {
@@ -410,12 +411,11 @@ export class PriceService {
    */
   private static async fetchAllPanoraPricesData(): Promise<PanoraPricesData> {
     if (!PANORA_API_KEY) {
-      // Return fallback data to prevent 500 errors
-      return {
-        success: false,
-        prices: [],
-        attribution: 'API key not configured',
-      };
+      throw new ApiError(
+        'PANORA_API_KEY is not configured',
+        undefined,
+        'Panora-Config'
+      );
     }
 
     const tokenAddresses = Object.values(PANORA_TOKENS).map(
