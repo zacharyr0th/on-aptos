@@ -20,6 +20,7 @@ import {
 import { TrendingUp, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/utils/format';
+import { cleanProtocolName } from './utils';
 
 interface DeFiPositionsTableProps {
   groupedDeFiPositions: any[] | null;
@@ -95,13 +96,21 @@ export const DeFiPositionsTable = ({
     if (position.position && position.position.liquidity) {
       return true;
     }
-    
+
     // Check if position has LP-related symbols
-    const symbols = position.positions?.map((p: any) => p.protocolType?.toLowerCase() || '').join(' ') || '';
+    const symbols =
+      position.positions
+        ?.map((p: any) => p.protocolType?.toLowerCase() || '')
+        .join(' ') || '';
     const protocol = position.protocol?.toLowerCase() || '';
-    return symbols.includes('lp') || symbols.includes('pool') || protocol.includes('farm') || protocol.includes('liquidity');
+    return (
+      symbols.includes('lp') ||
+      symbols.includes('pool') ||
+      protocol.includes('farm') ||
+      protocol.includes('liquidity')
+    );
   };
-  
+
   sortedPositions = sortedPositions.filter(position => {
     // Always include LP tokens
     if (isLPToken(position)) {
@@ -139,16 +148,16 @@ export const DeFiPositionsTable = ({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[50%]">Protocol</TableHead>
+            <TableHead className="w-[60%] sm:w-[50%]">Protocol</TableHead>
             <TableHead
-              className="w-[30%] cursor-pointer hover:text-primary transition-colors"
+              className="hidden sm:table-cell w-[30%] cursor-pointer hover:text-primary transition-colors"
               onClick={handleSortByType}
             >
               Type{' '}
               {defiSortBy === 'type' && (defiSortOrder === 'asc' ? '↑' : '↓')}
             </TableHead>
             <TableHead
-              className="w-[20%] text-right cursor-pointer hover:text-primary transition-colors"
+              className="w-[40%] sm:w-[20%] text-right cursor-pointer hover:text-primary transition-colors"
               onClick={handleSortByValue}
             >
               Value{' '}
@@ -176,44 +185,51 @@ export const DeFiPositionsTable = ({
               >
                 <TableCell className="py-2">
                   <div className="flex items-center gap-2">
-                    <div className="relative w-8 h-8 rounded-full overflow-hidden bg-background border flex-shrink-0">
-                      <Image
-                        src={getProtocolLogo(groupedPosition.protocol)}
-                        alt={`${groupedPosition.protocol} logo`}
-                        fill
-                        className="object-cover"
-                        sizes="32px"
-                        onError={e => {
-                          const img = e.target as HTMLImageElement;
-                          img.src = '/placeholder.jpg';
-                        }}
-                      />
+                    <div className="flex-shrink-0">
+                      <div className="relative w-8 h-8 rounded-full overflow-hidden bg-background border">
+                        <Image
+                          src={getProtocolLogo(groupedPosition.protocol)}
+                          alt={`${groupedPosition.protocol} logo`}
+                          fill
+                          className="object-cover"
+                          sizes="32px"
+                          onError={e => {
+                            const img = e.target as HTMLImageElement;
+                            img.src = '/placeholder.jpg';
+                          }}
+                        />
+                      </div>
+                      <div className="text-[10px] text-muted-foreground xs:hidden text-center mt-0.5 max-w-[40px] truncate">
+                        {cleanProtocolName(groupedPosition.protocol).split(' ')[0]}
+                      </div>
                     </div>
-                    <span className="font-medium text-sm truncate">
-                      {groupedPosition.protocol}
+                    <span className="font-medium text-sm truncate hidden xs:block">
+                      {cleanProtocolName(groupedPosition.protocol)}
                     </span>
                     {groupedPosition.protocol.toLowerCase() === 'aptin' && (
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <div className="flex items-center">
-                              <AlertTriangle className="h-4 w-4 text-red-500 ml-1 cursor-help" />
-                            </div>
-                          </TooltipTrigger>
-                          <TooltipContent className="bg-red-500 text-white border-red-600">
-                            <p className="text-sm font-medium">
-                              This protocol is deprecated
-                            </p>
-                            <p className="text-sm">
-                              It&apos;s recommended to remove your assets
-                            </p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
+                      <div className="hidden xs:block">
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <div className="flex items-center">
+                                <AlertTriangle className="h-4 w-4 text-red-500 ml-1 cursor-help" />
+                              </div>
+                            </TooltipTrigger>
+                            <TooltipContent className="bg-red-500 text-white border-red-600">
+                              <p className="text-sm font-medium">
+                                This protocol is deprecated
+                              </p>
+                              <p className="text-sm">
+                                It&apos;s recommended to remove your assets
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
                     )}
                   </div>
                 </TableCell>
-                <TableCell className="py-2">
+                <TableCell className="hidden sm:table-cell py-2">
                   <div className="flex items-center gap-1 flex-wrap">
                     <Badge variant="secondary" className="text-xs px-2 py-0.5">
                       {groupedPosition.protocolTypes.size > 1
@@ -234,8 +250,8 @@ export const DeFiPositionsTable = ({
                 <TableCell className="text-right py-2">
                   <div className="flex items-center justify-end gap-2">
                     <div className="font-medium text-sm font-mono">
-                      {groupedPosition.protocol === 'Thala Farm' 
-                        ? 'TBD' 
+                      {groupedPosition.protocol === 'Thala Farm'
+                        ? 'TBD'
                         : formatCurrency(groupedPosition.totalValue)}
                     </div>
                     {groupedPosition.protocol === 'Merkle' && (

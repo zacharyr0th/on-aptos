@@ -1,4 +1,4 @@
-import { trpc } from '@/lib/trpc/client';
+import { useState, useEffect, useCallback } from 'react';
 
 interface MarketPriceData {
   symbol: string;
@@ -16,33 +16,49 @@ interface UseMarketPriceResult {
 }
 
 export function useMarketPrice(symbol: string): UseMarketPriceResult {
-  const {
-    data: queryData,
-    isLoading: loading,
-    error: queryError,
-    refetch,
-  } = trpc.domains.marketData.prices.getCMCPrice.useQuery(
-    { symbol },
-    {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      gcTime: 10 * 60 * 1000, // 10 minutes
-      refetchInterval: 5 * 60 * 1000, // Auto-refetch every 5 minutes
-      refetchIntervalInBackground: true,
-      retry: (failureCount, error) => {
-        // Don't retry on 4xx errors (like rate limits)
-        if (error?.message?.includes('429')) return false;
-        return failureCount < 3;
-      },
-      retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
+  const [data, setData] = useState<MarketPriceData | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+
+  const fetchPrice = useCallback(async () => {
+    try {
+      setError(null);
+      
+      const response = await fetch(`/api/prices/cmc/${symbol.toLowerCase()}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      
+      const priceData = await response.json();
+      setData(priceData);
+      setLastUpdated(priceData.updated ? new Date(priceData.updated) : new Date());
+      
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setLoading(false);
     }
-  );
+  }, [symbol]);
 
-  // Transform error to match expected format
-  const error = queryError?.message || null;
-  const data = queryData?.data || null;
+  // Auto-refetch every 5 minutes
+  useEffect(() => {
+    fetchPrice();
+    
+    const interval = setInterval(fetchPrice, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [fetchPrice]);
 
-  // Get last updated time from the response
-  const lastUpdated = data?.updated ? new Date(data.updated) : null;
+  const refetch = useCallback(() => {
+    setLoading(true);
+    return fetchPrice();
+  }, [fetchPrice]);
 
   return { data, error, loading, lastUpdated, refetch };
 }

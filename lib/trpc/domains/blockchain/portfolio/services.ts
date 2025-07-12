@@ -260,7 +260,9 @@ export async function getWalletAssets(
 
     // Log if API key is missing
     if (!APTOS_API_KEY) {
-      logger.warn('APTOS_BUILD_SECRET not configured - GraphQL queries may fail');
+      logger.warn(
+        'APTOS_BUILD_SECRET not configured - GraphQL queries may fail'
+      );
     }
 
     const response = await graphQLRequest<{
@@ -329,7 +331,10 @@ export async function getWalletAssets(
       panoraAvailable = panoraTokens.length > 0;
       logger.debug(`Panora returned ${panoraTokens.length} official tokens`);
     } catch (error) {
-      logger.warn('Failed to fetch Panora tokens, continuing without price data', error);
+      logger.warn(
+        'Failed to fetch Panora tokens, continuing without price data',
+        error
+      );
       panoraAvailable = false;
     }
     const panoraTokenMap = new Map(
@@ -560,7 +565,9 @@ export async function getWalletAssets(
 
         // If Panora is not available, show all non-stablecoin tokens (except scams)
         if (!panoraAvailable) {
-          logger.debug(`Panora not available, including token: ${asset.metadata?.symbol}`);
+          logger.debug(
+            `Panora not available, including token: ${asset.metadata?.symbol}`
+          );
           return true;
         }
 
@@ -697,7 +704,7 @@ export async function getPortfolioHistory(
     const addressValidation = AptosValidators.validateAddress(walletAddress);
     if (!addressValidation.isValid) {
       logger.error(`Invalid wallet address: ${walletAddress}`);
-      return [];
+      throw new Error(`Invalid wallet address: ${walletAddress} - ${addressValidation.error}`);
     }
 
     // Step 1: Get ALL historical activities for the past 30+ days
@@ -786,7 +793,7 @@ export async function getPortfolioHistory(
     return history;
   } catch (error) {
     logger.error('Failed to generate portfolio history:', error);
-    return [];
+    throw new Error(`Failed to generate portfolio history: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 
@@ -958,7 +965,6 @@ async function reconstructPortfolioAtDate(
   }
 }
 
-
 export async function getAssetPrices(
   assetTypes: string[]
 ): Promise<AssetPrice[]> {
@@ -1028,7 +1034,11 @@ export async function getAssetPrices(
     // Match each asset type with Panora data
     for (const assetType of assetTypes) {
       // Special handling for MKLP (Merkle LP tokens) - hardcoded to $1.05
-      if (assetType.includes('0x5ae6789dd2fec1a9ec9cccfb3acaf12e93d432f0a3a42c92fe1a9d490b7bbc06')) {
+      if (
+        assetType.includes(
+          '0x5ae6789dd2fec1a9ec9cccfb3acaf12e93d432f0a3a42c92fe1a9d490b7bbc06'
+        )
+      ) {
         prices.push({
           assetType,
           symbol: 'MKLP',
@@ -1281,8 +1291,7 @@ export async function getNFTTransferHistory(
       limit,
     });
 
-    // Return empty array on error to avoid breaking the UI
-    return [];
+    throw new Error(`Failed to fetch NFT transfer history: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 
@@ -1417,9 +1426,9 @@ export async function getWalletTransactions(
     // Handle rate limiting gracefully
     if (error.status === 429) {
       logger.warn(
-        'API rate limit reached for transactions, returning empty array'
+        'API rate limit reached for transactions'
       );
-      return [];
+      throw new Error('API rate limit reached - please try again later');
     }
 
     throw new Error('Failed to fetch wallet transactions');

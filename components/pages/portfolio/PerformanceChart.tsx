@@ -147,7 +147,7 @@ export const PerformanceChart: React.FC<PerformanceChartProps> = React.memo(
     return (
       <Card className={className}>
         <CardHeader className="pb-1">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <div className="flex items-center gap-2">
               <CardTitle className="text-base sm:text-lg">
                 7d Performance
@@ -181,10 +181,10 @@ export const PerformanceChart: React.FC<PerformanceChartProps> = React.memo(
             </div>
           </div>
         </CardHeader>
-        <CardContent className="pt-0">
+        <CardContent className="pt-0 px-2 sm:px-6">
           <ChartContainer
             config={chartConfig}
-            className="h-[250px] lg:h-[300px] w-full"
+            className="h-[200px] sm:h-[250px] lg:h-[300px] w-full -mx-2 sm:mx-0"
           >
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={portfolioHistory}>
@@ -192,20 +192,29 @@ export const PerformanceChart: React.FC<PerformanceChartProps> = React.memo(
                   <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
                     <stop
                       offset="5%"
-                      stopColor="hsl(var(--chart-1))"
-                      stopOpacity={resolvedTheme === 'dark' ? 0.4 : 0.3}
+                      stopColor={
+                        resolvedTheme === 'dark'
+                          ? '#e5e7eb'
+                          : '#1f2937'
+                      }
+                      stopOpacity={resolvedTheme === 'dark' ? 0.3 : 0.4}
                     />
                     <stop
                       offset="95%"
-                      stopColor={resolvedTheme === 'dark' ? 'hsl(var(--muted))' : 'hsl(var(--chart-1))'}
-                      stopOpacity={resolvedTheme === 'dark' ? 0.3 : 0}
+                      stopColor={
+                        resolvedTheme === 'dark'
+                          ? '#f9fafb'
+                          : '#374151'
+                      }
+                      stopOpacity={resolvedTheme === 'dark' ? 0.2 : 0}
                     />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                 <XAxis
                   dataKey="date"
-                  className="text-xs"
+                  className="text-[10px] sm:text-xs"
+                  tick={{ fontSize: 10 }}
                   tickFormatter={value =>
                     new Date(value).toLocaleDateString('en-US', {
                       month: 'short',
@@ -214,7 +223,9 @@ export const PerformanceChart: React.FC<PerformanceChartProps> = React.memo(
                   }
                 />
                 <YAxis
-                  className="text-xs"
+                  className="text-[10px] sm:text-xs"
+                  tick={{ fontSize: 10 }}
+                  width={40}
                   domain={[
                     chartData.domain.min * 0.95,
                     chartData.domain.max * 1.05,
@@ -223,7 +234,7 @@ export const PerformanceChart: React.FC<PerformanceChartProps> = React.memo(
                     if (value === 0) return '$0';
                     if (value >= 1000000)
                       return `$${(value / 1000000).toFixed(1)}M`;
-                    if (value >= 1000) return `$${(value / 1000).toFixed(1)}k`;
+                    if (value >= 1000) return `$${(value / 1000).toFixed(0)}k`;
                     return `$${value.toFixed(0)}`;
                   }}
                 />
@@ -263,10 +274,9 @@ export const PerformanceChart: React.FC<PerformanceChartProps> = React.memo(
                 <Area
                   type="monotone"
                   dataKey="totalValue"
-                  stroke="hsl(var(--chart-1))"
+                  stroke="none"
                   fillOpacity={1}
                   fill="url(#colorValue)"
-                  strokeWidth={2}
                 />
                 {/* Optimized: Only render rate-limited dots if there are any */}
                 {chartData.hasRateLimitedData &&

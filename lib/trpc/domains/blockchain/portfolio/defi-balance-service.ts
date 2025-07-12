@@ -173,15 +173,32 @@ export class DeFiBalanceService {
         `Fetching comprehensive DeFi positions for wallet: ${walletAddress}`
       );
 
-      // Use comprehensive position checker first
+      // Use comprehensive position checker first (higher data quality)
       const comprehensivePositions =
         await this.getComprehensiveDeFiPositions(walletAddress);
 
       // Also check wallet assets for tokens that match protocol addresses
-      const walletAssetPositions = await this.getWalletAssetDeFiPositions(walletAddress);
+      const walletAssetPositions =
+        await this.getWalletAssetDeFiPositions(walletAddress);
 
-      // Combine both sets of positions
-      const allPositions = [...comprehensivePositions, ...walletAssetPositions];
+      // Simple deduplication: comprehensive positions take priority
+      const seenKeys = new Set<string>();
+      const allPositions: DeFiPosition[] = [];
+
+      // Add comprehensive positions first (higher priority)
+      for (const position of comprehensivePositions) {
+        const key = `${position.protocol}-${position.address}`;
+        seenKeys.add(key);
+        allPositions.push(position);
+      }
+
+      // Add wallet asset positions only if not already seen
+      for (const position of walletAssetPositions) {
+        const key = `${position.protocol}-${position.address}`;
+        if (!seenKeys.has(key)) {
+          allPositions.push(position);
+        }
+      }
 
       // Filter out positions with total value less than $0.10 (dust amounts)
       // BUT always include LP tokens regardless of value
@@ -194,7 +211,7 @@ export class DeFiBalanceService {
           );
           return true;
         }
-        
+
         if (position.totalValue < MIN_DEFI_VALUE_THRESHOLD) {
           logger.info(
             `Filtering out dust DeFi position in ${position.protocol}: $${position.totalValue.toFixed(4)}`
@@ -203,7 +220,7 @@ export class DeFiBalanceService {
         }
         return true;
       });
-      
+
       logger.info(
         `Found ${filteredPositions.length} comprehensive DeFi positions (filtered from ${allPositions.length}) for wallet ${walletAddress}`
       );
@@ -299,8 +316,8 @@ export class DeFiBalanceService {
       logger.info(`Returning ${positions.length} comprehensive DeFi positions`);
       return positions;
     } catch (error) {
-      logger.warn('Comprehensive position checker failed:', error);
-      return [];
+      logger.error('Comprehensive position checker failed:', error);
+      throw new Error(`Failed to fetch comprehensive DeFi positions: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
@@ -619,7 +636,7 @@ export class DeFiBalanceService {
 
       // Import the getWalletAssets function
       const { getWalletAssets } = await import('./services');
-      
+
       // Get wallet assets (including unverified ones to catch LP tokens)
       const walletAssets = await getWalletAssets(walletAddress, false);
       const positions: DeFiPosition[] = [];
@@ -627,7 +644,7 @@ export class DeFiBalanceService {
       // Check each asset to see if it matches any protocol addresses
       for (const asset of walletAssets) {
         const assetType = asset.asset_type;
-        
+
         // Check if this asset type matches any protocol address
         for (const protocol of Object.values(PROTOCOLS)) {
           for (const address of protocol.addresses) {
@@ -659,15 +676,17 @@ export class DeFiBalanceService {
       );
       return positions;
     } catch (error) {
-      logger.warn('Error checking wallet assets for DeFi positions:', error);
-      return [];
+      logger.error('Error checking wallet assets for DeFi positions:', error);
+      throw new Error(`Failed to fetch wallet asset DeFi positions: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
   /**
    * Map ProtocolType to DeFi position type
    */
-  private static mapProtocolTypeToDefiType(protocolType: ProtocolType): ProtocolType {
+  private static mapProtocolTypeToDefiType(
+    protocolType: ProtocolType
+  ): ProtocolType {
     return protocolType;
   }
 
@@ -677,9 +696,9 @@ export class DeFiBalanceService {
   private static isLPToken(position: DeFiPosition): boolean {
     const symbol = position.position.supplied?.[0]?.symbol?.toLowerCase() || '';
     const protocol = position.protocol.toLowerCase();
-    
+
     return (
-      symbol.includes('lp') || 
+      symbol.includes('lp') ||
       symbol.includes('pool') ||
       symbol.includes('thala-lp') ||
       symbol.includes('mklp') ||
@@ -692,61 +711,92 @@ export class DeFiBalanceService {
   /**
    * Build position details for LP tokens, attempting to extract underlying assets
    */
-  private static async buildLPTokenPosition(asset: any, assetType: string): Promise<DeFiPosition['position']> {
+  private static async buildLPTokenPosition(
+    asset: any,
+    assetType: string
+  ): Promise<DeFiPosition['position']> {
     const symbol = asset.metadata?.symbol || 'UNKNOWN';
-    const isLPToken = symbol.toLowerCase().includes('lp') || symbol.toLowerCase().includes('pool');
-    
+    const isLPToken =
+      symbol.toLowerCase().includes('lp') ||
+      symbol.toLowerCase().includes('pool');
+
     if (isLPToken) {
       // Try to extract underlying assets from the LP token
-      const underlyingAssets = await this.extractUnderlyingAssets(assetType, asset);
-      
+      const underlyingAssets = await this.extractUnderlyingAssets(
+        assetType,
+        asset
+      );
+
       if (underlyingAssets.length > 0) {
         return {
-          liquidity: [{
-            poolId: assetType,
-            token0: underlyingAssets[0] || { asset: 'Unknown', symbol: 'Unknown', amount: '0' },
-            token1: underlyingAssets[1] || { asset: 'Unknown', symbol: 'Unknown', amount: '0' },
-            lpTokens: asset.balance?.toString() || '0',
-            value: asset.value || 0,
-          }],
+          liquidity: [
+            {
+              poolId: assetType,
+              token0: underlyingAssets[0] || {
+                asset: 'Unknown',
+                symbol: 'Unknown',
+                amount: '0',
+              },
+              token1: underlyingAssets[1] || {
+                asset: 'Unknown',
+                symbol: 'Unknown',
+                amount: '0',
+              },
+              lpTokens: asset.balance?.toString() || '0',
+              value: asset.value || 0,
+            },
+          ],
         };
       }
     }
-    
+
     // Fallback to regular supplied position
     return {
-      supplied: [{
-        asset: assetType,
-        symbol: symbol,
-        amount: asset.balance?.toString() || '0',
-        value: asset.value || 0,
-      }],
+      supplied: [
+        {
+          asset: assetType,
+          symbol: symbol,
+          amount: asset.balance?.toString() || '0',
+          value: asset.value || 0,
+        },
+      ],
     };
   }
 
   /**
    * Extract underlying assets from LP token (best effort)
    */
-  private static async extractUnderlyingAssets(assetType: string, asset: any): Promise<Array<{ asset: string; symbol: string; amount: string; }>> {
+  private static async extractUnderlyingAssets(
+    assetType: string,
+    asset: any
+  ): Promise<Array<{ asset: string; symbol: string; amount: string }>> {
     // For Thala LP tokens, we can make educated guesses based on common patterns
     if (asset.metadata?.symbol === 'THALA-LP') {
       // Try to get actual amounts from Thala protocol
       try {
-        const underlyingAmounts = await this.getThalaLPTokenAmounts(assetType, asset.balance);
+        const underlyingAmounts = await this.getThalaLPTokenAmounts(
+          assetType,
+          asset.balance
+        );
         if (underlyingAmounts) {
           return underlyingAmounts;
         }
       } catch (error) {
         logger.warn('Failed to get Thala LP token amounts:', error);
       }
-      
+
       // Fallback to showing the tokens but with TBD amounts
       return [
         { asset: '0x1::aptos_coin::AptosCoin', symbol: 'APT', amount: 'TBD' },
-        { asset: '0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDC', symbol: 'USDC', amount: 'TBD' },
+        {
+          asset:
+            '0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDC',
+          symbol: 'USDC',
+          amount: 'TBD',
+        },
       ];
     }
-    
+
     // For other LP tokens, we could parse the asset type or make API calls
     // This is a simplified implementation
     return [];
@@ -756,9 +806,9 @@ export class DeFiBalanceService {
    * Get actual underlying token amounts for Thala LP tokens
    */
   private static async getThalaLPTokenAmounts(
-    lpTokenAddress: string, 
+    lpTokenAddress: string,
     userLPBalance: number
-  ): Promise<Array<{ asset: string; symbol: string; amount: string; }> | null> {
+  ): Promise<Array<{ asset: string; symbol: string; amount: string }> | null> {
     try {
       // Query the Aptos indexer for the LP token's pool information
       const poolQuery = `
@@ -785,12 +835,14 @@ export class DeFiBalanceService {
       // 2. Pool reserves for each token
       // 3. User's share calculation
       // 4. Proper decimal handling
-      
+
       // This would require a more sophisticated implementation with direct
       // protocol contract queries or specialized APIs
-      
-      logger.info(`Attempting to get Thala LP amounts for ${lpTokenAddress}, user balance: ${userLPBalance}`);
-      
+
+      logger.info(
+        `Attempting to get Thala LP amounts for ${lpTokenAddress}, user balance: ${userLPBalance}`
+      );
+
       // Return null to indicate we couldn't get exact amounts
       return null;
     } catch (error) {

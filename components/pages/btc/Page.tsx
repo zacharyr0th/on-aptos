@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useCallback, memo } from 'react';
+import React, { useState, useMemo, useCallback, memo, useEffect } from 'react';
 import { AlertTriangle } from 'lucide-react';
 import { GeistMono } from 'geist/font/mono';
 import { Card, CardContent } from '@/components/ui/card';
@@ -12,7 +12,6 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { ErrorBoundary } from '@/components/errors/ErrorBoundary';
 import { useBitcoinPrice } from '@/hooks/useMarketPrice';
-import { trpc } from '@/lib/trpc/client';
 import Image from 'next/image';
 import { Skeleton } from '@/components/ui/skeleton';
 import { BTC_METADATA, Token, SupplyData } from '@/lib/config';
@@ -318,22 +317,46 @@ export default function BitcoinPage(): React.ReactElement {
   // Prefetch related data for this page
   useDataPrefetch('btc');
 
-  // Use tRPC for comprehensive BTC supply data (shows all BTC tokens)
-  const {
-    data: btcSupplyData,
-    isLoading: btcSupplyLoading,
-    error: btcSupplyError,
-    refetch: refetchBtcSupply,
-    isFetching: btcSupplyFetching,
-  } = trpc.domains.assets.bitcoin.getComprehensiveSupplies.useQuery(
-    { forceRefresh },
-    {
-      staleTime: 2 * 60 * 1000, // 2 minutes
-      gcTime: 5 * 60 * 1000, // 5 minutes
-      refetchInterval: 5 * 60 * 1000, // Auto-refetch every 5 minutes
-      refetchIntervalInBackground: true,
+  // Use direct API call for BTC supply data
+  const [btcSupplyData, setBtcSupplyData] = useState<{data: any} | null>(null);
+  const [btcSupplyLoading, setBtcSupplyLoading] = useState(true);
+  const [btcSupplyError, setBtcSupplyError] = useState<Error | null>(null);
+  const [btcSupplyFetching, setBtcSupplyFetching] = useState(false);
+
+  const fetchBtcSupplyData = useCallback(async () => {
+    try {
+      setBtcSupplyFetching(true);
+      setBtcSupplyError(null);
+      
+      const response = await fetch('/api/aptos/btc', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      setBtcSupplyData({ data });
+      
+    } catch (error) {
+      setBtcSupplyError(error instanceof Error ? error : new Error(String(error)));
+    } finally {
+      setBtcSupplyLoading(false);
+      setBtcSupplyFetching(false);
     }
-  );
+  }, []);
+
+  // Auto-refetch every 5 minutes
+  useEffect(() => {
+    fetchBtcSupplyData();
+    
+    const interval = setInterval(fetchBtcSupplyData, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [fetchBtcSupplyData, forceRefresh]);
 
   // Use our Bitcoin price hook as fallback only
   const {
@@ -358,29 +381,21 @@ export default function BitcoinPage(): React.ReactElement {
     }, 'Bitcoin price calculation');
   }, [bitcoinPriceHookData]);
 
-  // Extract the actual data from tRPC responses and transform to expected format
+  // Extract the actual data from REST API responses and transform to expected format
   const data: SupplyData | null = useMemo(() => {
     return measurePerformance(() => {
-      if (!btcSupplyData || !btcSupplyData.data || !btcSupplyData.data.supplies)
+      if (!btcSupplyData || !btcSupplyData.data)
         return null;
 
-      // Transform comprehensive BTC supply data to expected format
-      type SupplyToken = {
-        symbol: string;
-        supply: string;
-        formatted_supply: string;
-      };
-
+      // Transform REST API response to expected format
+      const apiData = btcSupplyData.data;
+      
       return {
-        supplies: btcSupplyData.data.supplies.map((token: SupplyToken) => ({
-          symbol: token.symbol,
-          supply: token.supply,
-          formatted_supply: token.formatted_supply,
-        })),
-        total: btcSupplyData.data.total,
-        total_formatted: btcSupplyData.data.total_formatted,
-        total_decimals: btcSupplyData.data.total_decimals,
-        timestamp: btcSupplyData.timestamp,
+        supplies: apiData.supplies,
+        total: apiData.total,
+        total_formatted: apiData.total_formatted,
+        total_decimals: apiData.total_decimals,
+        timestamp: new Date().toISOString(),
       };
     }, 'Data transformation');
   }, [btcSupplyData]);
@@ -399,13 +414,13 @@ export default function BitcoinPage(): React.ReactElement {
   // Manual refresh handler
   const fetchSupplyData = useCallback(async (): Promise<void> => {
     setForceRefresh(prev => !prev); // Toggle to force refresh
-    await refetchBtcSupply();
-  }, [refetchBtcSupply]);
+    await fetchBtcSupplyData();
+  }, [fetchBtcSupplyData]);
 
   // Process the supply data for display
   const processedData = useMemo(() => {
     return measurePerformance(() => {
-      if (!data) return null;
+      if (!data || !data.supplies || !Array.isArray(data.supplies)) return null;
 
       // Use batch processing for better performance
       const batchItems = data.supplies.map(token => ({
@@ -435,7 +450,7 @@ export default function BitcoinPage(): React.ReactElement {
   // Calculate the total BTC and USD value correctly
   const { totalBTC, totalUSD } = useMemo(() => {
     return measurePerformance(() => {
-      if (!processedData || !processedData.supplies) {
+      if (!processedData || !processedData.supplies || !Array.isArray(processedData.supplies)) {
         return { totalBTC: 0, totalUSD: 0 };
       }
 
@@ -525,7 +540,7 @@ export default function BitcoinPage(): React.ReactElement {
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
                 <div className="md:col-span-1 space-y-4">
-                  {processedData.supplies.map(token => (
+                  {processedData?.supplies?.map(token => (
                     <TokenCard
                       key={token.symbol}
                       token={token}
@@ -533,7 +548,7 @@ export default function BitcoinPage(): React.ReactElement {
                       bitcoinPrice={bitcoinPriceData.price}
                       t={t}
                     />
-                  ))}
+                  )) || []}
                 </div>
 
                 <div className="md:col-span-1 lg:col-span-3 bg-card border rounded-lg overflow-hidden min-h-[250px] sm:min-h-[300px]">

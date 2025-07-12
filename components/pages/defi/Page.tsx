@@ -23,7 +23,6 @@ export default function DefiPage(): React.ReactElement {
     string | undefined
   >(undefined);
   const [searchQuery, setSearchQuery] = useState('');
-  const [viewMode, setViewMode] = useState<'grid' | 'table'>('table');
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const { t, getText } = usePageTranslation('defi');
 
@@ -114,10 +113,8 @@ export default function DefiPage(): React.ReactElement {
             categories={categories}
             selectedCategory={selectedCategory}
             selectedSubcategory={selectedSubcategory}
-            viewMode={viewMode}
             onCategoryChange={handleCategoryChange}
             onSubcategoryChange={setSelectedSubcategory}
-            onViewModeChange={setViewMode}
           />
 
           <div className="mt-4 md:mt-8 space-y-4">
@@ -135,7 +132,6 @@ export default function DefiPage(): React.ReactElement {
             />
 
             <ProtocolDisplay
-              viewMode={viewMode}
               filteredProtocols={filteredProtocols}
               onClearFilters={handleClearFilters}
             />

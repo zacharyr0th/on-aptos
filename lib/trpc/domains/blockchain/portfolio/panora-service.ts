@@ -2,11 +2,18 @@ import { logger } from '@/lib/utils/logger';
 // import { getCachedData, setCachedData } from '@/lib/utils/cache-manager';
 import { PriceService } from '@/lib/trpc/domains/market-data/prices/services';
 import { getEnvVar } from '@/lib/config/validate-env';
-import { TOKEN_REGISTRY, NATIVE_TOKENS, STABLECOINS, LIQUID_STAKING_TOKENS } from '@/lib/aptos-constants';
+import {
+  TOKEN_REGISTRY,
+  NATIVE_TOKENS,
+  STABLECOINS,
+  LIQUID_STAKING_TOKENS,
+} from '@/lib/aptos-constants';
 
 const PANORA_API_ENDPOINT = 'https://api.panora.exchange/prices';
 // Use public API key if none is provided in env
-const PANORA_API_KEY = getEnvVar('PANORA_API_KEY') || 'a4^KV_EaTf4MW#ZdvgGKX#HUD^3IFEAOV_kzpIE^3BQGA8pDnrkT7JcIy#HNlLGi';
+const PANORA_API_KEY =
+  getEnvVar('PANORA_API_KEY') ||
+  'a4^KV_EaTf4MW#ZdvgGKX#HUD^3IFEAOV_kzpIE^3BQGA8pDnrkT7JcIy#HNlLGi';
 
 export interface PanoraPriceResponse {
   chainId: number;
@@ -195,16 +202,21 @@ export class PanoraService {
     // Extended asset mapping for common variants
     const extendedAssetMap: Record<string, string> = {
       // LayerZero bridged tokens
-      '0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDC': 'USDC',
-      '0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDT': 'USDT',
-      '0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::WETH': 'ETH',
-      '0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::WBTC': 'BTC',
-      
+      '0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDC':
+        'USDC',
+      '0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDT':
+        'USDT',
+      '0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::WETH':
+        'ETH',
+      '0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::WBTC':
+        'BTC',
+
       // Common coin store formats
       '0x1::coin::CoinStore<0x1::aptos_coin::AptosCoin>': 'APT',
-      
+
       // Known tokens not in registry
-      '0xe4ccb6d39136469f376242c31b34d10515c8eaaa38092f804db8e08a8f53c5b2::assets_v1::EchoCoin002': 'GUI',
+      '0xe4ccb6d39136469f376242c31b34d10515c8eaaa38092f804db8e08a8f53c5b2::assets_v1::EchoCoin002':
+        'GUI',
     };
 
     return extendedAssetMap[assetType] || 'UNKNOWN';

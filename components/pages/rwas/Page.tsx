@@ -20,7 +20,6 @@ import {
   formatPercentage as formatPercent,
   formatNumber,
 } from '@/lib/utils/format';
-import { trpc } from '@/lib/trpc/client';
 import { RWA_COLORS } from '@/lib/config/colors';
 import { RWA_TOKEN_BY_TICKER } from './rwa-constants';
 import { useResponsive } from '@/hooks/useResponsive';
@@ -517,63 +516,63 @@ export default function RWAsPage(): React.ReactElement {
   // Prefetch related data for this page
   useDataPrefetch('rwas');
 
-  // Fetch real-time RWA data using tRPC with optimized settings
-  const {
-    data: rwaResponse,
-    isLoading,
-    error: rwaError,
-    refetch,
-  } = trpc.domains.assets.rwa.getRealTimeAssets.useQuery(undefined, {
-    // Optimized cache settings
-    staleTime: 10 * 60 * 1000, // 10 minutes - matches server cache
-    gcTime: 30 * 60 * 1000, // 30 minutes - longer retention
-    refetchOnWindowFocus: false, // Prevent unnecessary refetches
-    refetchOnReconnect: true, // Refetch when connection restored
-    refetchInterval: false, // Manual refresh only
-    retry: (failureCount, error) => {
-      // Don't retry on 4xx errors or circuit breaker
-      if (error?.message?.includes('Circuit breaker')) return false;
-      if (error?.message?.includes('4')) return false;
-      return failureCount < 2; // Reduced retry attempts
-    },
-    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 10000), // Faster retries
-  });
+  // Fetch real-time RWA data using direct API call
+  const [rwaResponse, setRwaResponse] = useState<{data: any} | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [rwaError, setRwaError] = useState<Error | null>(null);
 
-  // Preload metrics in parallel for faster navigation
-  trpc.domains.assets.rwa.getMetrics.useQuery(undefined, {
-    staleTime: 10 * 60 * 1000,
-    gcTime: 30 * 60 * 1000,
-    refetchOnWindowFocus: false,
-  });
+  const fetchRwaData = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setRwaError(null);
+      
+      const response = await fetch('/api/rwa', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      setRwaResponse({ data });
+      
+    } catch (error) {
+      setRwaError(error instanceof Error ? error : new Error(String(error)));
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  // Initial fetch
+  useEffect(() => {
+    fetchRwaData();
+  }, [fetchRwaData]);
+
+  // Removed preload metrics - using direct API instead
 
   // Background refresh every 10 minutes
   useEffect(() => {
     const interval = setInterval(
       () => {
-        // Only refresh if user is on the page and data is getting stale
-        if (!document.hidden && rwaResponse?.cache?.cached) {
+        // Only refresh if user is on the page
+        if (!document.hidden) {
           if (process.env.NODE_ENV === 'development') {
             console.log('🔄 Background refresh triggered');
           }
-          refetch();
+          fetchRwaData();
         }
       },
       10 * 60 * 1000
     ); // 10 minutes
 
     return () => clearInterval(interval);
-  }, [refetch, rwaResponse?.cache?.cached]);
+  }, [fetchRwaData]);
 
-  // Prefetch related data for better UX
-  const utils = trpc.useUtils();
-  useEffect(() => {
-    // Prefetch defi TVL data that might be used in comparison
-    const prefetchTimer = setTimeout(() => {
-      void utils.domains.marketData.defiMetrics.getTVL.prefetch();
-    }, 2000); // Prefetch after 2 seconds
-
-    return () => clearTimeout(prefetchTimer);
-  }, [utils]);
+  // Removed prefetch logic - using direct API instead
 
   // Extract protocols from the response
   const protocols = useMemo(
@@ -598,7 +597,7 @@ export default function RWAsPage(): React.ReactElement {
       });
 
       // Log each protocol's data to verify it's real
-      protocols.forEach((protocol, index) => {
+      protocols.forEach((protocol: any, index: number) => {
         console.log(
           `📊 Protocol ${index + 1}: ${protocol.assetTicker} - ${formatAmount(protocol.totalValue, 'USD', { compact: false })} (${protocol.protocol})`
         );
@@ -622,7 +621,7 @@ export default function RWAsPage(): React.ReactElement {
 
     // Calculate unique providers
     const uniqueProviders = new Set<string>();
-    sortedProtocols.forEach(protocol => {
+    sortedProtocols.forEach((protocol: any) => {
       const provider = getActualProvider(
         protocol.assetTicker,
         protocol.protocol
@@ -644,8 +643,8 @@ export default function RWAsPage(): React.ReactElement {
   }, [protocols, totalRWAValue, dataSource, timestamp]);
 
   const handleRetry = useCallback(() => {
-    refetch();
-  }, [refetch]);
+    fetchRwaData();
+  }, [fetchRwaData]);
 
   const loading = isLoading;
   const error = rwaError?.message || null;

@@ -471,7 +471,7 @@ const HeaderComponent = (): React.ReactElement | null => {
                       active={pathname === '/defi'}
                       onClick={closeMenu}
                     >
-                      {t('navigation.defi', 'DeFi')} Overview
+                      Dashboard
                     </MobileNavLink>
                   </div>
 

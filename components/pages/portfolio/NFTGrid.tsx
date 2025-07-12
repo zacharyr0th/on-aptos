@@ -4,7 +4,11 @@ import React, { useState, useMemo } from 'react';
 import Image from 'next/image';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
 import { ImageIcon, ChevronDown, ChevronUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { NFT } from './types';
@@ -24,20 +28,25 @@ export const NFTGrid = ({
   onNFTSelect,
   viewMode,
 }: NFTGridProps) => {
-  const [expandedCollections, setExpandedCollections] = useState<Set<string>>(new Set());
+  const [expandedCollections, setExpandedCollections] = useState<Set<string>>(
+    new Set()
+  );
 
   // Group NFTs by collection for collection view
   const groupedNFTs = useMemo(() => {
     if (!nfts) return {};
-    
-    return nfts.reduce((acc, nft) => {
-      const collection = nft.collection_name;
-      if (!acc[collection]) {
-        acc[collection] = [];
-      }
-      acc[collection].push(nft);
-      return acc;
-    }, {} as Record<string, NFT[]>);
+
+    return nfts.reduce(
+      (acc, nft) => {
+        const collection = nft.collection_name;
+        if (!acc[collection]) {
+          acc[collection] = [];
+        }
+        acc[collection].push(nft);
+        return acc;
+      },
+      {} as Record<string, NFT[]>
+    );
   }, [nfts]);
 
   const toggleCollection = (collection: string) => {
@@ -128,10 +137,7 @@ export const NFTGrid = ({
           )}
         </div>
         <div className="mt-2">
-          <p
-            className="text-sm font-medium truncate"
-            title={nft.token_name}
-          >
+          <p className="text-sm font-medium truncate" title={nft.token_name}>
             {nft.token_name}
           </p>
           <p
@@ -173,8 +179,15 @@ export const NFTGrid = ({
                     onClick={() => toggleCollection(collection)}
                   >
                     <div className="flex items-center gap-3">
-                      <span className="font-medium truncate max-w-[200px]" title={collection}>{collection}</span>
-                      <span className="text-sm text-muted-foreground">({collectionNFTs.length})</span>
+                      <span
+                        className="font-medium truncate max-w-[200px]"
+                        title={collection}
+                      >
+                        {collection}
+                      </span>
+                      <span className="text-sm text-muted-foreground">
+                        ({collectionNFTs.length})
+                      </span>
                     </div>
                     {expandedCollections.has(collection) ? (
                       <ChevronUp className="h-4 w-4" />
@@ -185,7 +198,9 @@ export const NFTGrid = ({
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-3">
-                    {collectionNFTs.map((nft, index) => renderNFTCard(nft, index))}
+                    {collectionNFTs.map((nft, index) =>
+                      renderNFTCard(nft, index)
+                    )}
                   </div>
                 </CollapsibleContent>
               </Collapsible>

@@ -156,12 +156,23 @@ function transformRWAToken(
   if (
     !token.total_asset_value_dollar?.val ||
     token.total_asset_value_dollar.val === 0
-  )
+  ) {
+    console.log('[RWA] Skipping token with no value', {
+      assetId: token.asset_id,
+      address: token.address,
+    });
     return null;
+  }
 
   // Get asset metadata
   const asset = assetMetadata.get(token.asset_id);
-  if (!asset) return null;
+  if (!asset) {
+    console.warn('[RWA] No metadata found for asset', {
+      assetId: token.asset_id,
+      tokenAddress: token.address,
+    });
+    return null;
+  }
 
   // Filter out stablecoins (but keep USDY as it's a yield-bearing RWA token)
   const ticker = token.asset.ticker?.toLowerCase() || '';
@@ -174,7 +185,14 @@ function transformRWAToken(
     name.includes('usd coin') ||
     name.includes('tether');
 
-  if (isStablecoin) return null;
+  if (isStablecoin) {
+    console.log('[RWA] Filtering out stablecoin', {
+      ticker,
+      name,
+      assetId: token.asset_id,
+    });
+    return null;
+  }
 
   const protocol = asset.protocol || 'unknown';
   const assetClass = formatAssetClass(asset.asset_class);
@@ -195,8 +213,18 @@ function transformRWAToken(
 
 // Fetch real-time RWA data from RWA.xyz API with enhanced error handling
 async function fetchRealTimeRWAData(): Promise<RWAApiResponse> {
+  console.log('[RWA] Starting real-time RWA data fetch', {
+    timestamp: new Date().toISOString(),
+    hasApiKey: !!RWA_API_KEY,
+    baseUrl: RWA_BASE_URL,
+  });
+
   // Circuit breaker check
   if (isCircuitBreakerOpen()) {
+    console.error('[RWA] Circuit breaker is open', {
+      failureCount: apiFailureCount,
+      lastFailure: new Date(lastFailureTime).toISOString(),
+    });
     throw new Error('Circuit breaker is open - too many recent API failures');
   }
 
@@ -253,6 +281,12 @@ async function fetchRealTimeRWAData(): Promise<RWAApiResponse> {
     ]);
 
     if (!tokenResponse.ok || !assetResponse.ok) {
+      console.error('[RWA] API response error', {
+        tokenStatus: tokenResponse.status,
+        tokenStatusText: tokenResponse.statusText,
+        assetStatus: assetResponse.status,
+        assetStatusText: assetResponse.statusText,
+      });
       throw new Error(
         `RWA.xyz API error: ${tokenResponse.status} or ${assetResponse.status}`
       );
@@ -270,7 +304,16 @@ async function fetchRealTimeRWAData(): Promise<RWAApiResponse> {
     const assetIds = [
       ...new Set(tokenData.results.map(token => token.asset_id)),
     ];
-    console.log('📈 Found', assetIds.length, 'unique assets on Aptos');
+    console.log('[RWA] API response received', {
+      tokenCount: tokenData.results.length,
+      assetCount: assetData.results.length,
+      uniqueAssetIds: assetIds.length,
+      tokenSample: tokenData.results.slice(0, 3).map(t => ({
+        assetId: t.asset_id,
+        address: t.address,
+        value: t.total_asset_value_dollar?.val || 0,
+      })),
+    });
 
     // 3️⃣ Create asset metadata map (only for assets we actually have tokens for)
     const assetMetadata = new Map<number, RWAXyzAsset>();
@@ -291,6 +334,17 @@ async function fetchRealTimeRWAData(): Promise<RWAApiResponse> {
       0
     );
 
+    console.log('[RWA] RWA data processing complete', {
+      protocolsFound: protocols.length,
+      totalValue,
+      totalValueFormatted: `$${(totalValue / 1000000).toFixed(1)}M`,
+      protocols: protocols.map(p => ({
+        name: p.name,
+        value: p.totalValue,
+        ticker: p.assetTicker,
+      })),
+    });
+
     return {
       success: true,
       totalAptosValue: totalValue,
@@ -302,7 +356,11 @@ async function fetchRealTimeRWAData(): Promise<RWAApiResponse> {
     };
   } catch (error) {
     recordApiFailure();
-    console.error('Error fetching RWA.xyz data:', error);
+    console.error('[RWA] Error fetching RWA.xyz data:', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      failureCount: apiFailureCount,
+    });
     throw new Error(
       `Failed to fetch RWA data: ${error instanceof Error ? error.message : 'Unknown error'}`
     );
@@ -324,16 +382,27 @@ async function getOrFetchWithSWR<T>(
       `${cacheKey}:timestamp`
     );
     const isStale = cacheTimestamp && Date.now() - cacheTimestamp > ttl;
+    const age = cacheTimestamp ? Date.now() - cacheTimestamp : 0;
+
+    console.log('[RWA] Cache hit', {
+      cacheKey,
+      isStale,
+      ageMs: age,
+      ttlMs: ttl,
+      maxAgeMs: CACHE_CONFIG.maxAge,
+    });
 
     if (isStale && Date.now() - cacheTimestamp < CACHE_CONFIG.maxAge) {
+      console.log('[RWA] Returning stale data with background revalidation');
       // Return stale data immediately and revalidate in background
       fetchFn()
         .then(freshData => {
+          console.log('[RWA] Background revalidation successful');
           setCachedData(cmcCache, cacheKey, freshData);
           setCachedData(cmcCache, `${cacheKey}:timestamp`, Date.now());
         })
         .catch(error =>
-          console.error('Background revalidation failed:', error)
+          console.error('[RWA] Background revalidation failed:', error)
         );
 
       return { data: cachedData, cached: true, stale: true };
@@ -341,6 +410,8 @@ async function getOrFetchWithSWR<T>(
 
     return { data: cachedData, cached: true };
   }
+
+  console.log('[RWA] Cache miss, fetching fresh data', { cacheKey });
 
   // No cached data, fetch fresh
   const freshData = await fetchFn();
@@ -358,12 +429,24 @@ export const rwaRouter = router({
     const startTime = Date.now();
     const cacheKey = 'rwa:aptos:realtime-assets';
 
+    console.log('[RWA] getRealTimeAssets called', {
+      timestamp: new Date().toISOString(),
+    });
+
     try {
       const result = await getOrFetchWithSWR(
         cacheKey,
         fetchRealTimeRWAData,
         CACHE_CONFIG.ttl
       );
+
+      console.log('[RWA] getRealTimeAssets result', {
+        cached: result.cached,
+        stale: result.stale,
+        totalValue: result.data.totalAptosValue,
+        assetCount: result.data.assetCount,
+        responseTime: Date.now() - startTime,
+      });
 
       return {
         timestamp: new Date().toISOString(),
@@ -380,11 +463,18 @@ export const rwaRouter = router({
         data: result.data,
       };
     } catch (error) {
-      console.error('Error in getRealTimeAssets:', error);
+      console.error('[RWA] Error in getRealTimeAssets:', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
+      });
 
       // Try to return stale data even if it's very old
       const staleData = getCachedData<RWAApiResponse>(cmcCache, cacheKey);
       if (staleData) {
+        console.log('[RWA] Returning stale cached data as fallback', {
+          totalValue: staleData.totalAptosValue,
+          assetCount: staleData.assetCount,
+        });
         return {
           timestamp: new Date().toISOString(),
           performance: {
@@ -403,6 +493,7 @@ export const rwaRouter = router({
       }
 
       // Last resort fallback
+      console.error('[RWA] Using last resort fallback with empty data');
       return {
         timestamp: new Date().toISOString(),
         performance: {

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { logger } from '@/lib/utils/logger';
-import { API_CONFIG } from '@/lib/config/app';
+import { env } from '@/lib/config/validate-env';
 
 // Simple cache check - just verifying we can create/read from memory
 async function checkCache(): Promise<'healthy' | 'unhealthy'> {
@@ -23,13 +23,14 @@ async function checkCache(): Promise<'healthy' | 'unhealthy'> {
 // Check if external API configurations are present
 function checkExternalAPIs(): 'healthy' | 'degraded' | 'unhealthy' {
   try {
-    // Check if API keys are configured
-    const hasRWAKey = !!API_CONFIG.rwa.apiKey;
-    const hasCMCKey = !!API_CONFIG.cmc.apiKey;
+    // Check if critical API keys are configured
+    const hasCMCKey = !!env.CMC_API_KEY;
+    const hasPanoraKey = !!env.PANORA_API_KEY;
+    const hasAptosKey = !!env.APTOS_BUILD_SECRET;
 
-    if (hasRWAKey && hasCMCKey) {
+    if (hasCMCKey && hasPanoraKey && hasAptosKey) {
       return 'healthy';
-    } else if (hasRWAKey || hasCMCKey) {
+    } else if (hasCMCKey || hasPanoraKey || hasAptosKey) {
       return 'degraded';
     } else {
       return 'unhealthy';
@@ -67,9 +68,10 @@ export async function GET() {
         external_apis: apiStatus,
         environment: process.env.NODE_ENV || 'unknown',
       },
-      services: {
-        rwa_api: !!API_CONFIG.rwa.apiKey ? 'configured' : 'not_configured',
-        cmc_api: !!API_CONFIG.cmc.apiKey ? 'configured' : 'not_configured',
+      services: process.env.NODE_ENV === 'production' ? undefined : {
+        cmc_api: !!env.CMC_API_KEY ? 'configured' : 'not_configured',
+        panora_api: !!env.PANORA_API_KEY ? 'configured' : 'not_configured',
+        aptos_api: !!env.APTOS_BUILD_SECRET ? 'configured' : 'not_configured',
       },
     };
 

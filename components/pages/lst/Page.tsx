@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { AlertTriangle } from 'lucide-react';
 import { GeistMono } from 'geist/font/mono';
 import { Card, CardContent } from '@/components/ui/card';
@@ -13,7 +13,6 @@ import { ErrorBoundary } from '@/components/errors/ErrorBoundary';
 import { RootErrorBoundary } from '@/components/errors/RootErrorBoundary';
 import { TokenDialog } from '@/components/pages/lst/Dialog';
 import { MarketShareChart } from '@/components/pages/lst/Chart';
-import { trpc } from '@/lib/trpc/client';
 import Image from 'next/image';
 import {
   LST_METADATA,
@@ -331,31 +330,49 @@ export default function LSTPage(): React.ReactElement {
   // Prefetch related data for this page
   useDataPrefetch('lst');
 
-  // Use tRPC for LST data
-  const {
-    data: lstData,
-    isLoading,
-    error: lstError,
-    refetch,
-    isFetching,
-  } = trpc.domains.assets.liquidStaking.getSupplies.useQuery(
-    { forceRefresh },
-    {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      gcTime: 10 * 60 * 1000, // 10 minutes
-      refetchInterval: 5 * 60 * 1000, // Auto-refetch every 5 minutes
-      refetchIntervalInBackground: true,
-      retry: (failureCount, error) => {
-        // Don't retry on 4xx errors (like rate limits)
-        if (error?.message?.includes('Status: 4')) return false;
-        return failureCount < 3;
-      },
-      retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
-    }
-  );
+  // Use direct API call for LST data
+  const [lstData, setLstData] = useState<{data: any} | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [lstError, setLstError] = useState<Error | null>(null);
+  const [isFetching, setIsFetching] = useState(false);
 
-  // Extract the actual data from tRPC response
-  const data: SupplyData | null = lstData?.data || null;
+  const fetchLstData = useCallback(async () => {
+    try {
+      setIsFetching(true);
+      setLstError(null);
+      
+      const response = await fetch('/api/aptos/lst', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      setLstData(data);
+      
+    } catch (error) {
+      setLstError(error instanceof Error ? error : new Error(String(error)));
+    } finally {
+      setIsLoading(false);
+      setIsFetching(false);
+    }
+  }, []);
+
+  // Auto-refetch every 5 minutes
+  useEffect(() => {
+    fetchLstData();
+    
+    const interval = setInterval(fetchLstData, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [fetchLstData, forceRefresh]);
+
+  // Extract the actual data from REST API response  
+  const data: SupplyData | null = lstData?.data?.data || null;
   const loading = isLoading;
   const error = lstError?.message || null;
   const refreshing = isFetching && !isLoading;
@@ -363,19 +380,42 @@ export default function LSTPage(): React.ReactElement {
   // Manual refresh handler
   const fetchSupplyData = useCallback(async (): Promise<void> => {
     setForceRefresh(prev => !prev); // Toggle to force refresh
-    await refetch();
-  }, [refetch]);
+    await fetchLstData();
+  }, [fetchLstData]);
 
-  // Get APT price for USD calculation
-  const { data: aptPriceData } =
-    trpc.domains.marketData.prices.getCMCPrice.useQuery(
-      { symbol: 'apt' },
-      {
-        staleTime: 60 * 1000, // 1 minute
-        gcTime: 5 * 60 * 1000, // 5 minutes
-        refetchInterval: 60 * 1000, // Auto-refetch every minute
+  // Get APT price for USD calculation via direct API call
+  const [aptPriceData, setAptPriceData] = useState<{data: any} | null>(null);
+
+  const fetchAptPrice = useCallback(async () => {
+    try {
+      const response = await fetch('/api/prices/cmc/apt', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        // Don't throw for price data - it's non-critical
+        return;
       }
-    );
+      
+      const data = await response.json();
+      setAptPriceData(data);
+      
+    } catch (error) {
+      // Silently fail for price data as it's non-critical
+      console.warn('Failed to fetch APT price:', error);
+    }
+  }, []);
+
+  // Auto-refetch APT price every minute
+  useEffect(() => {
+    fetchAptPrice();
+    
+    const interval = setInterval(fetchAptPrice, 60 * 1000);
+    return () => clearInterval(interval);
+  }, [fetchAptPrice]);
 
   const {
     formattedTotalSupply,
@@ -516,14 +556,14 @@ export default function LSTPage(): React.ReactElement {
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div className="md:col-span-1 space-y-4">
-                  {processedSupplies.map(token => (
+                  {processedSupplies?.map(token => (
                     <TokenCard
                       key={token.symbol}
                       token={token}
                       totalSupply={adjustedTotal}
                       t={t}
                     />
-                  ))}
+                  )) || []}
                 </div>
 
                 <div className="md:col-span-1 lg:col-span-3 bg-card border rounded-lg overflow-hidden min-h-[250px] sm:min-h-[300px]">
@@ -540,7 +580,7 @@ export default function LSTPage(): React.ReactElement {
                     }
                   >
                     <MarketShareChart
-                      data={processedSupplies}
+                      data={processedSupplies || []}
                       totalSupply={adjustedTotal}
                       tokenMetadata={TOKEN_METADATA}
                     />

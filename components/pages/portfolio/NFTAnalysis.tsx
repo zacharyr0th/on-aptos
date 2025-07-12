@@ -38,12 +38,14 @@ interface NFTAnalysisProps {
   nfts: NFT[];
   nftsByCollection: Record<string, NFT[]>;
   selectedNFT: NFT | null;
+  onClearSelection?: () => void;
 }
 
 export function NFTAnalysis({
   nfts,
   nftsByCollection,
   selectedNFT,
+  onClearSelection,
 }: NFTAnalysisProps) {
   const totalNFTs = nfts.length;
 
@@ -91,7 +93,10 @@ export function NFTAnalysis({
   };
 
   return (
-    <Card>
+    <Card 
+      className={selectedNFT && onClearSelection ? "cursor-pointer hover:bg-muted/50 transition-colors" : ""}
+      onClick={selectedNFT && onClearSelection ? onClearSelection : undefined}
+    >
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Grid3X3 className="h-5 w-5" />
@@ -130,7 +135,10 @@ export function NFTAnalysis({
           {/* Basic Info */}
           <div className="text-center space-y-2">
             <h3 className="text-xl font-bold">{displayNFT.token_name}</h3>
-            <p className="text-lg text-muted-foreground truncate max-w-[300px] mx-auto" title={displayNFT.collection_name}>
+            <p
+              className="text-lg text-muted-foreground truncate max-w-[300px] mx-auto"
+              title={displayNFT.collection_name}
+            >
               {displayNFT.collection_name}
             </p>
           </div>

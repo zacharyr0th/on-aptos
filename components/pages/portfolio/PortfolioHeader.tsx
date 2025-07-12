@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/tooltip';
 import { formatCurrency } from '@/lib/utils/format';
 import { copyToClipboard } from './utils';
+import { AptPriceDisplay } from './AptPriceDisplay';
 
 interface PortfolioHeaderProps {
   totalValue: number;
@@ -79,6 +80,7 @@ export const PortfolioHeader = ({
           )}
         </p>
       </div>
+      <AptPriceDisplay />
     </div>
   );
 };

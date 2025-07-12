@@ -133,16 +133,26 @@ export class PriceService {
     }
 
     try {
+      console.log(`[Price] Fetching ${symbol} price from CMC`);
       const url = `${ApiEndpoints.CMC_BASE}/cryptocurrency/quotes/latest?id=${cmcId}`;
 
-      const response = (await enhancedFetch(url, {
+      const response = await enhancedFetch(url, {
         headers: {
           'X-CMC_PRO_API_KEY': CMC_API_KEY,
           Accept: 'application/json',
+          'User-Agent': 'OnAptos-Price-Tracker/1.0',
         },
-        timeout: config.timeout,
-        retries: config.retries,
-      }).then(r => r.json())) as {
+        timeout: Math.min(config.timeout, 6000), // Cap at 6 seconds for production
+        retries: 1, // Reduce retries for faster failure
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          `CMC API error: ${response.status} ${response.statusText}`
+        );
+      }
+
+      const responseData = (await response.json()) as {
         data?: Record<
           string,
           {
@@ -155,15 +165,13 @@ export class PriceService {
         >;
       };
 
-      const price = response?.data?.[cmcId]?.quote?.USD?.price;
+      const price = responseData?.data?.[cmcId]?.quote?.USD?.price;
 
       if (price == null) {
-        throw new ApiError(
-          'Invalid price data received from CMC',
-          undefined,
-          'CMC-Data'
-        );
+        throw new Error('Invalid price data received from CMC');
       }
+
+      console.log(`[Price] ${symbol} price fetched:`, { price });
 
       return {
         symbol:
@@ -173,6 +181,7 @@ export class PriceService {
         updated: new Date().toISOString(),
       };
     } catch (error) {
+      console.error(`[Price] CMC API call failed for ${symbol}:`, error);
       throw new ApiError(
         `CMC API call failed for ${symbol}: ${error instanceof Error ? error.message : 'Unknown error'}`,
         undefined,
@@ -425,7 +434,14 @@ export class PriceService {
 
     const results = Object.entries(PANORA_TOKENS).map(
       ([symbol, { asset_type, description, decimals }]) => {
-        const price = prices[asset_type] || 0;
+        const price = prices[asset_type];
+        if (price === undefined || price === null) {
+          throw new ApiError(
+            `No price found for token ${symbol} (${asset_type})`,
+            undefined,
+            'Panora-Price'
+          );
+        }
 
         return {
           symbol,

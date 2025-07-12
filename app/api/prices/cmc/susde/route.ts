@@ -1,5 +1,6 @@
 import { withApiEnhancements } from '@/lib/utils/server';
 import { SERVICE_CONFIG } from '@/lib/config/cache';
+import { enhancedFetch } from '@/lib/utils/fetch-utils';
 import {
   ApiError,
   formatApiError,
@@ -36,7 +37,7 @@ export async function GET(request: NextRequest) {
 
         try {
           // sUSDe's ID on CMC is 29471
-          const response = await fetch(
+          const response = await enhancedFetch(
             'https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?id=29471',
             {
               headers: {
@@ -44,7 +45,7 @@ export async function GET(request: NextRequest) {
                 Accept: 'application/json',
                 'User-Agent': 'OnAptos-sUSDe-Tracker/1.0',
               },
-              signal: AbortSignal.timeout(SERVICE_CONFIG.prices.timeout),
+              timeout: SERVICE_CONFIG.prices.timeout,
               next: { revalidate },
             }
           );

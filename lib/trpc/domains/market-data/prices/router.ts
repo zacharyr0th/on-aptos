@@ -1,5 +1,6 @@
 import { router, publicProcedure } from '@/lib/trpc/core/server';
 import { TRPCError } from '@trpc/server';
+import { logError } from '@/lib/utils/errors';
 import {
   GetCMCPriceInputSchema,
   CMCPriceResponseSchema,
@@ -39,8 +40,11 @@ export const pricesRouter = router({
           data,
         };
       } catch (error) {
-        // Let tRPC handle the error
-        throw error;
+        logError(error, { symbol: input.symbol, service: 'CMC' });
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to fetch price data',
+        });
       }
     }),
 

@@ -72,7 +72,7 @@ describe('/api/rwa', () => {
         get: vi.fn(() => 'test-user-agent'),
       },
     } as any;
-    
+
     const response = await GET(mockRequest);
     const data = await response.json();
 
@@ -91,7 +91,7 @@ describe('/api/rwa', () => {
         get: vi.fn(() => 'test-user-agent'),
       },
     } as any;
-    
+
     const response = await GET(mockRequest);
     const data = await response.json();
 
@@ -113,7 +113,7 @@ describe('/api/rwa', () => {
         get: vi.fn(() => 'test-user-agent'),
       },
     } as any;
-    
+
     const response = await GET(mockRequest);
     const data = await response.json();
 
@@ -143,7 +143,7 @@ describe('/api/rwa', () => {
         get: vi.fn(() => 'test-user-agent'),
       },
     } as any;
-    
+
     const response = await GET(mockRequest);
     const data = await response.json();
 

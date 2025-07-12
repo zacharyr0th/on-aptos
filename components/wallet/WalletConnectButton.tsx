@@ -174,7 +174,7 @@ export function WalletConnectButton({
         </Button>
 
         <Dialog open={showWalletModal} onOpenChange={setShowWalletModal}>
-          <DialogContent className="sm:max-w-md">
+          <DialogContent className="w-[calc(100%-2rem)] sm:max-w-md max-h-[85vh] overflow-y-auto">
             <DialogTitle>Connect Wallet</DialogTitle>
             <div className="grid gap-3 py-4">
               {/* Extension Wallets */}
@@ -183,7 +183,7 @@ export function WalletConnectButton({
                   <Button
                     key={wallet.name}
                     variant="outline"
-                    className="justify-start gap-3 h-auto py-3"
+                    className="justify-start gap-2 sm:gap-3 h-auto py-2 sm:py-3 px-3 sm:px-4"
                     onClick={() => handleWalletSelect(wallet.name)}
                     disabled={connectingWallet === wallet.name || isLoading}
                     aria-label={`Connect with ${wallet.name} wallet`}
@@ -209,15 +209,12 @@ export function WalletConnectButton({
                       <span className="font-medium">
                         {connectingWallet === wallet.name
                           ? 'Connecting...'
-                          : wallet.name}
+                          : wallet.name.includes('Continue with Google')
+                            ? 'Google'
+                            : wallet.name.includes('Continue with Apple')
+                              ? 'Apple'
+                              : wallet.name}
                       </span>
-                      {isMobile && (
-                        <div className="text-xs text-muted-foreground">
-                          {wallet.readyState === 'Installed'
-                            ? 'Installed'
-                            : 'Not detected'}
-                        </div>
-                      )}
                     </div>
                   </Button>
                 ))}

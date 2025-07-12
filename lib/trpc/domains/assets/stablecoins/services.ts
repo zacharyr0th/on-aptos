@@ -3,6 +3,8 @@ import {
   TETHER_RESERVE_ADDRESS,
 } from '@/lib/config/data';
 import { SERVICE_CONFIG } from '@/lib/config/cache';
+import { FALLBACK_DATA } from '@/lib/config/fallback-data';
+import { getEnvVar } from '@/lib/config/validate-env';
 import {
   cmcCache,
   getCachedData,
@@ -52,13 +54,33 @@ const BALANCE_QUERY = `
  */
 export async function fetchAllSuppliesData(): Promise<Record<string, bigint>> {
   const tokenTypes = Object.values(TOKENS);
+  console.log('[Stablecoins] Querying token types:', tokenTypes);
+
+  const headers: Record<string, string> = {
+    'User-Agent': 'Next.js/14 StableCoin-Dashboard v1.0',
+    'content-type': 'application/json',
+  };
+
+  // Add Aptos API key if available for rate limit protection
+  const aptosKey = getEnvVar('APTOS_BUILD_KEY');
+  const aptosSecret = getEnvVar('APTOS_BUILD_SECRET');
+
+  if (aptosKey) {
+    headers['Authorization'] = `Bearer ${aptosKey}`;
+  } else if (aptosSecret) {
+    headers['x-api-key'] = aptosSecret;
+  }
+
+  console.log('[Stablecoins] Using authentication', {
+    hasAptosKey: !!aptosKey,
+    hasAptosSecret: !!aptosSecret,
+    endpoint: INDEXER,
+  });
 
   const fetchOptions: FetchOptions = {
     timeout: config.timeout,
     retries: config.retries,
-    headers: {
-      'User-Agent': 'Next.js/14 StableCoin-Dashboard v1.0',
-    },
+    headers,
   };
 
   const result = await graphQLRequest(
@@ -70,35 +92,25 @@ export async function fetchAllSuppliesData(): Promise<Record<string, bigint>> {
     fetchOptions
   );
 
-  console.log('GraphQL response:', JSON.stringify(result, null, 2));
+  console.log(
+    '[Stablecoins] GraphQL response:',
+    JSON.stringify(result, null, 2)
+  );
 
   // Handle case where result might be undefined or malformed
-  let validatedData: {
-    data: StablesGraphQLResponse;
-    errors?: Array<{ message: string }>;
-  };
+  let validatedData: StablesGraphQLResponse;
 
-  // The graphQLRequest utility already extracts result.data, so we expect the data directly
+  // The graphQLRequest utility returns the data directly, not wrapped in a data property
   if (
     result &&
     typeof result === 'object' &&
     'fungible_asset_metadata' in result
   ) {
-    validatedData = {
-      data: result as StablesGraphQLResponse,
-      errors: undefined,
-    };
+    validatedData = result as StablesGraphQLResponse;
   } else {
+    console.error('[Stablecoins] Invalid GraphQL response structure:', result);
     throw new ApiError(
       `Invalid GraphQL response structure: expected fungible_asset_metadata but got ${JSON.stringify(result)}`,
-      undefined,
-      'Stables-GraphQL'
-    );
-  }
-
-  if (validatedData.errors && validatedData.errors.length > 0) {
-    throw new ApiError(
-      `GraphQL errors: ${validatedData.errors.map((e: { message: string }) => e.message).join(', ')}`,
       undefined,
       'Stables-GraphQL'
     );
@@ -107,13 +119,19 @@ export async function fetchAllSuppliesData(): Promise<Record<string, bigint>> {
   const supplies: Record<string, bigint> = {};
 
   // Process results
-  for (const item of validatedData.data.fungible_asset_metadata) {
-    const supplyValue = BigInt(
-      typeof item.supply_v2 === 'string'
-        ? item.supply_v2
-        : String(item.supply_v2)
-    );
-    supplies[item.asset_type] = supplyValue;
+  for (const item of validatedData.fungible_asset_metadata) {
+    // Handle null supply_v2 values
+    if (item.supply_v2 === null || item.supply_v2 === undefined) {
+      console.warn(`[Stablecoins] Null supply for token: ${item.asset_type}`);
+      supplies[item.asset_type] = BigInt(0);
+    } else {
+      const supplyValue = BigInt(
+        typeof item.supply_v2 === 'string'
+          ? item.supply_v2
+          : String(item.supply_v2)
+      );
+      supplies[item.asset_type] = supplyValue;
+    }
   }
 
   // Check for missing tokens and try individual cache lookups
@@ -161,12 +179,25 @@ export function fallbackToCachedValues(
  * Fetch Tether reserve balance
  */
 export async function fetchTetherReserveBalanceData(): Promise<bigint> {
+  const headers: Record<string, string> = {
+    'User-Agent': 'Next.js/14 StableCoin-Dashboard v1.0',
+    'content-type': 'application/json',
+  };
+
+  // Add Aptos API key if available for rate limit protection
+  const aptosKey = getEnvVar('APTOS_BUILD_KEY');
+  const aptosSecret = getEnvVar('APTOS_BUILD_SECRET');
+
+  if (aptosKey) {
+    headers['Authorization'] = `Bearer ${aptosKey}`;
+  } else if (aptosSecret) {
+    headers['x-api-key'] = aptosSecret;
+  }
+
   const fetchOptions: FetchOptions = {
     timeout: config.timeout,
     retries: config.retries,
-    headers: {
-      'User-Agent': 'Next.js/14 StableCoin-Dashboard v1.0',
-    },
+    headers,
   };
 
   const result = (await graphQLRequest(
@@ -186,7 +217,7 @@ export async function fetchTetherReserveBalanceData(): Promise<bigint> {
   const balance =
     balances.length > 0 ? BigInt(balances[0].amount || '0') : BigInt(0);
 
-  console.log(`Tether reserve balance: ${balance.toString()}`);
+  console.log(`[Stablecoins] Tether reserve balance: ${balance.toString()}`);
   return balance;
 }
 
@@ -210,22 +241,31 @@ export async function processStablesSuppliesData() {
       try {
         return await fetchAllSuppliesData();
       } catch (error) {
-        console.error('Error fetching supplies:', error);
+        console.error('[Stablecoins] Error fetching supplies:', error);
         // Try to fallback to cached values
         const tokenTypes = Object.values(TOKENS);
         const fallbackSupplies = fallbackToCachedValues(tokenTypes);
         if (Object.keys(fallbackSupplies).length > 0) {
-          console.log('Using fallback cached values');
+          console.log('[Stablecoins] Using fallback cached values');
           return fallbackSupplies;
         }
-        throw error;
+        // Use static fallback data as last resort
+        console.log('[Stablecoins] Using static fallback data');
+        const staticFallback: Record<string, bigint> = {};
+        for (const supply of FALLBACK_DATA.stablecoins.supplies) {
+          staticFallback[supply.asset_type] = BigInt(supply.supply_raw);
+        }
+        return staticFallback;
       }
     }, errorContext),
     withErrorHandling(async () => {
       try {
         return await fetchTetherReserveBalanceData();
       } catch (error) {
-        console.error('Error fetching Tether reserve balance:', error);
+        console.error(
+          '[Stablecoins] Error fetching Tether reserve balance:',
+          error
+        );
         // Return 0 on error to avoid breaking the main supply calculation
         return BigInt(0);
       }
@@ -244,7 +284,7 @@ export async function processStablesSuppliesData() {
     if (symbol === 'USDt' && tetherReserveBalance > 0) {
       supply = supply - tetherReserveBalance;
       console.log(
-        `USDt supply after reserve subtraction: ${supply.toString()} (reserve: ${tetherReserveBalance.toString()})`
+        `[Stablecoins] USDt supply after reserve subtraction: ${supply.toString()} (reserve: ${tetherReserveBalance.toString()})`
       );
     }
 

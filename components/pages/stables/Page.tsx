@@ -17,7 +17,6 @@ import { Footer } from '@/components/layout/Footer';
 import { ErrorBoundary } from '@/components/errors/ErrorBoundary';
 import { RootErrorBoundary } from '@/components/errors/RootErrorBoundary';
 import { useCMCData } from '@/hooks/useMarketPrice';
-import { trpc } from '@/lib/trpc/client';
 import Image from 'next/image';
 import {
   STABLECOIN_METADATA,
@@ -393,34 +392,52 @@ export default function StablesPage(): React.ReactElement {
   // Prefetch related data for this page
   useDataPrefetch('stables');
 
-  // Use tRPC for stables data
-  const {
-    data: stablesData,
-    isLoading,
-    error: stablesError,
-    refetch,
-    isFetching,
-  } = trpc.domains.assets.stablecoins.getSupplies.useQuery(
-    { forceRefresh },
-    {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      gcTime: 10 * 60 * 1000, // 10 minutes
-      refetchInterval: 5 * 60 * 1000, // Auto-refetch every 5 minutes
-      refetchIntervalInBackground: true,
-      retry: (failureCount, error) => {
-        // Don't retry on 4xx errors (like rate limits)
-        if (error?.message?.includes('Status: 4')) return false;
-        return failureCount < 3;
-      },
-      retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
+  // Use direct API call for stables data
+  const [stablesData, setStablesData] = useState<{data: any} | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [stablesError, setStablesError] = useState<Error | null>(null);
+  const [isFetching, setIsFetching] = useState(false);
+
+  const fetchStablesData = useCallback(async () => {
+    try {
+      setIsFetching(true);
+      setStablesError(null);
+      
+      const response = await fetch('/api/aptos/stables', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      setStablesData(data);
+      
+    } catch (error) {
+      setStablesError(error instanceof Error ? error : new Error(String(error)));
+    } finally {
+      setIsLoading(false);
+      setIsFetching(false);
     }
-  );
+  }, []);
+
+  // Auto-refetch every 5 minutes
+  useEffect(() => {
+    fetchStablesData();
+    
+    const interval = setInterval(fetchStablesData, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [fetchStablesData, forceRefresh]);
 
   // Get sUSDe price data from CMC
   const { data: cmcData } = useCMCData();
 
-  // Extract the actual data from tRPC response
-  const data: SupplyData | null = stablesData?.data || null;
+  // Extract the actual data from API response
+  const data: any = stablesData || null;
   const loading = isLoading;
   const error = stablesError?.message || null;
   const refreshing = isFetching && !isLoading;
@@ -428,8 +445,8 @@ export default function StablesPage(): React.ReactElement {
   // Manual refresh handler
   const fetchSupplyData = useCallback(async (): Promise<void> => {
     setForceRefresh(prev => !prev); // Toggle to force refresh
-    await refetch();
-  }, [refetch]);
+    await fetchStablesData();
+  }, [fetchStablesData]);
 
   const {
     formattedTotalSupply,
@@ -437,7 +454,7 @@ export default function StablesPage(): React.ReactElement {
     adjustedTotal,
     suppliesDataMap,
   } = useMemo(() => {
-    if (!data)
+    if (!data || !data.data || !data.data.data || !data.data.data.supplies)
       return {
         formattedTotalSupply: '',
         processedSupplies: [],
@@ -446,23 +463,24 @@ export default function StablesPage(): React.ReactElement {
       };
 
     const susdePrice = cmcData?.price || 1; // Default to 1 if price not available
+    const supplies = data.data.data.supplies;
 
     // Create supplies data map for the dialog
     const suppliesMap: Record<string, string> = {};
-    data.supplies.forEach(supply => {
+    supplies.forEach((supply: any) => {
       suppliesMap[supply.symbol] = supply.supply_raw ?? supply.supply ?? '0';
     });
 
     // Calculate raw total for market share calculations (no price adjustments)
     let rawTotalValue = BigInt(0);
-    for (const token of data.supplies) {
+    for (const token of supplies) {
       const rawSupply = token.supply_raw || token.supply || '0';
       rawTotalValue += BigInt(rawSupply);
     }
 
     // Calculate adjusted total for display purposes (with sUSDe price)
     let adjustedTotalValue = BigInt(0);
-    for (const token of data.supplies) {
+    for (const token of supplies) {
       const rawSupply = token.supply_raw || token.supply || '0';
       let tokenValue = BigInt(rawSupply);
       if (token.symbol === 'sUSDe' && susdePrice !== 1) {
@@ -484,10 +502,10 @@ export default function StablesPage(): React.ReactElement {
     };
 
     const processSupplies = () => {
-      const usdeToken = data.supplies.find(t => t.symbol === 'USDe');
-      const susdeToken = data.supplies.find(t => t.symbol === 'sUSDe');
-      const otherTokens = data.supplies.filter(
-        t => t.symbol !== 'USDe' && t.symbol !== 'sUSDe'
+      const usdeToken = supplies.find((t: any) => t.symbol === 'USDe');
+      const susdeToken = supplies.find((t: any) => t.symbol === 'sUSDe');
+      const otherTokens = supplies.filter(
+        (t: any) => t.symbol !== 'USDe' && t.symbol !== 'sUSDe'
       );
 
       const displayTokens: DisplayToken[] = [...otherTokens];
@@ -569,7 +587,7 @@ export default function StablesPage(): React.ReactElement {
 
               <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                 <div className="lg:col-span-1 space-y-4">
-                  {processedSupplies.slice(0, 3).map(token => (
+                  {processedSupplies?.slice(0, 3)?.map(token => (
                     <TokenCard
                       key={token.symbol}
                       token={token}
@@ -578,7 +596,7 @@ export default function StablesPage(): React.ReactElement {
                       suppliesData={suppliesDataMap}
                       t={t}
                     />
-                  ))}
+                  )) || []}
                 </div>
 
                 <div className="lg:col-span-3 bg-card border rounded-lg overflow-hidden min-h-[250px] sm:min-h-[300px]">
@@ -595,7 +613,7 @@ export default function StablesPage(): React.ReactElement {
                     }
                   >
                     <MarketShareChart
-                      data={processedSupplies}
+                      data={processedSupplies || []}
                       totalSupply={adjustedTotal}
                       tokenMetadata={TOKEN_METADATA}
                       susdePrice={cmcData?.price}

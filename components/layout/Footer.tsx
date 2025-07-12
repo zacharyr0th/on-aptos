@@ -24,18 +24,29 @@ interface FooterProps {
 const CurrentUTCTime: FC = memo(function CurrentUTCTime(): ReactElement {
   const [currentTime, setCurrentTime] = useState<Date | null>(null);
   const [isClient, setIsClient] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(0);
   const { t } = useTranslation('common');
 
   useEffect(() => {
     // Set initial client-side flag and time
     setIsClient(true);
     setCurrentTime(new Date());
+    setWindowWidth(window.innerWidth);
 
     const interval = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
 
-    return () => clearInterval(interval);
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
 
   const formattedTime = useMemo<string>(() => {
@@ -44,6 +55,22 @@ const CurrentUTCTime: FC = memo(function CurrentUTCTime(): ReactElement {
       return t('labels.loading_dots', 'Loading...');
     }
 
+    // Check if we're on a small screen (mobile)
+    const isMobile = windowWidth > 0 && windowWidth < 640;
+
+    if (isMobile) {
+      // Shorter format for mobile: "12 Jul, 16:24 UTC"
+      return new Intl.DateTimeFormat('en-US', {
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+        timeZone: 'UTC',
+      }).format(currentTime) + ' UTC';
+    }
+
+    // Full format for larger screens
     return new Intl.DateTimeFormat('en-US', {
       year: 'numeric',
       month: 'short',
@@ -55,7 +82,7 @@ const CurrentUTCTime: FC = memo(function CurrentUTCTime(): ReactElement {
       timeZone: 'UTC',
       timeZoneName: 'short',
     }).format(currentTime);
-  }, [currentTime, isClient, t]);
+  }, [currentTime, isClient, t, windowWidth]);
 
   return (
     <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] xs:text-xs sm:text-sm text-muted-foreground">
@@ -350,7 +377,7 @@ const FooterComponent: FC<FooterProps> = ({
                   <LanguageToggle />
                   <ThemeToggle />
                 </div>
-                <div className="w-px h-4 bg-border flex-shrink-0"></div>
+                <div className="w-px h-4 bg-border flex-shrink-0 hidden xs:block"></div>
                 <div className="min-w-0">
                   <AptPrice />
                 </div>

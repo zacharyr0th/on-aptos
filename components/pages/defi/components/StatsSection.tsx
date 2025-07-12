@@ -7,9 +7,9 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { trpc } from '@/lib/trpc/client';
 import { formatCurrency } from '@/lib/utils';
 import { usePageTranslation } from '@/hooks/useTranslation';
+import { useState, useEffect, useCallback } from 'react';
 
 interface StatsSectionProps {
   protocolCount: number;
@@ -22,17 +22,12 @@ interface StatsSectionProps {
 export function StatsSection({ protocolCount }: StatsSectionProps) {
   const { t } = usePageTranslation('defi');
 
-  // Fetch DeFi metrics from tRPC - this gets real-time data from DeFiLlama
-  const {
-    data: defiMetrics,
-    isLoading,
-    error,
-  } = trpc.domains.marketData.defiMetrics.getAllMetrics.useQuery(undefined, {
-    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes for real-time data
-    staleTime: 2 * 60 * 1000, // Consider data stale after 2 minutes
-  });
+  // Use static fallback data since DeFi metrics are not critical for main functionality
+  const [defiMetrics, setDefiMetrics] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // Use fetched data or fallback values
+  // Use static fallback values for now - DeFi page works without these metrics
   const tvl = defiMetrics?.data?.tvl ?? 0;
   const spotVolume = defiMetrics?.data?.spotVolume ?? 0;
   const totalFees24h = defiMetrics?.data?.fees?.total24h ?? 0;

@@ -1,6 +1,14 @@
 import { toast } from 'sonner';
 import { isPhantomAsset as isPhantomAssetFromRegistry } from '@/lib/protocol-registry';
 
+// Helper function to clean protocol names for display
+export const cleanProtocolName = (name: string): string => {
+  return name
+    .replace(/\s+Finance$/i, '')
+    .replace(/\s+Markets$/i, '')
+    .trim();
+};
+
 // Protocol logo mapping - Comprehensive coverage for all protocols
 export const getProtocolLogo = (protocol: string): string => {
   const protocolName = protocol.toLowerCase();

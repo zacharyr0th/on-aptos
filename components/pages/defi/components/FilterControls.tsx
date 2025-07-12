@@ -1,11 +1,5 @@
 import { useState } from 'react';
-import {
-  Grid3X3,
-  Table as TableIcon,
-  ChevronDown,
-  ChevronUp,
-  Filter,
-} from 'lucide-react';
+import { ChevronDown, ChevronUp, Filter } from 'lucide-react';
 import {
   Tooltip,
   TooltipTrigger,
@@ -27,20 +21,16 @@ interface FilterControlsProps {
   categories: string[];
   selectedCategory: string;
   selectedSubcategory?: string;
-  viewMode: 'grid' | 'table';
   onCategoryChange: (category: string) => void;
   onSubcategoryChange?: (subcategory: string | undefined) => void;
-  onViewModeChange: (mode: 'grid' | 'table') => void;
 }
 
 export function FilterControls({
   categories,
   selectedCategory,
   selectedSubcategory,
-  viewMode,
   onCategoryChange,
   onSubcategoryChange,
-  onViewModeChange,
 }: FilterControlsProps) {
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const { t, getText } = usePageTranslation('defi');
@@ -334,62 +324,13 @@ export function FilterControls({
 
   return (
     <div className="mb-6 md:mb-8">
-      <div className="flex items-center justify-between gap-4 mb-4 md:mb-6">
-        {/* Category Filter - Left Side */}
-        <div className="flex-1 min-w-0">
-          {/* Mobile dropdown - visible only on mobile */}
-          <div className="block md:hidden">
-            <MobileFilterDropdown />
-          </div>
-          {/* Desktop buttons - visible only on desktop */}
-          <div className="hidden md:block">
-            <DesktopCategoryButtons />
-          </div>
-        </div>
-
-        {/* View Toggle - Right Side */}
-        <div className="flex items-center bg-card border rounded-md p-0.5 shadow-sm flex-shrink-0">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                onClick={() => onViewModeChange('grid')}
-                className={`p-2 rounded transition-all duration-200 ${
-                  viewMode === 'grid'
-                    ? 'bg-primary text-primary-foreground shadow-sm'
-                    : 'hover:bg-secondary/60 text-muted-foreground'
-                }`}
-              >
-                <Grid3X3 className="h-4 w-4" />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent
-              side="bottom"
-              className="bg-popover text-popover-foreground border border-border [&>svg]:hidden"
-            >
-              <p className="text-sm">{t('defi:tooltips.grid_view')}</p>
-            </TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                onClick={() => onViewModeChange('table')}
-                className={`p-2 rounded transition-all duration-200 ${
-                  viewMode === 'table'
-                    ? 'bg-primary text-primary-foreground shadow-sm'
-                    : 'hover:bg-secondary/60 text-muted-foreground'
-                }`}
-              >
-                <TableIcon className="h-4 w-4" />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent
-              side="bottom"
-              className="bg-popover text-popover-foreground border border-border [&>svg]:hidden"
-            >
-              <p className="text-sm">{t('defi:tooltips.table_view')}</p>
-            </TooltipContent>
-          </Tooltip>
-        </div>
+      {/* Mobile dropdown - visible only on mobile */}
+      <div className="block md:hidden">
+        <MobileFilterDropdown />
+      </div>
+      {/* Desktop buttons - visible only on desktop */}
+      <div className="hidden md:block">
+        <DesktopCategoryButtons />
       </div>
     </div>
   );
