@@ -60,9 +60,10 @@ interface BaseTokenConfig {
 }
 
 const STABLECOIN_CONFIGS: Record<string, BaseTokenConfig> = {
-  USDt: {
+  // Native fungible assets
+  USDT: {
     name: 'Tether USD',
-    symbol: 'USDt',
+    symbol: 'USDT',
     thumbnail: '/icons/stables/usdt.png',
     type: 'Native Aptos issuance',
     issuer: 'Tether Operations Ltd.',
@@ -112,6 +113,87 @@ const STABLECOIN_CONFIGS: Record<string, BaseTokenConfig> = {
     website: 'https://ethena.fi',
     auditLink: 'https://www.ethena.fi/transparency',
     tags: ['algorithmic', 'delta-hedged', 'synthetic'],
+  },
+  // LayerZero bridged
+  'USDC.lz': {
+    name: 'LayerZero USDC',
+    symbol: 'USDC.lz',
+    thumbnail: '/icons/stables/usdc.png',
+    type: 'Bridged via LayerZero',
+    issuer: 'Circle (via LayerZero)',
+    assetAddress:
+      '0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDC',
+    decimals: 6,
+    website: 'https://layerzero.network',
+    auditLink: 'https://www.circle.com/en/transparency',
+    tags: ['bridged', 'layerzero'],
+  },
+  'USDT.lz': {
+    name: 'LayerZero USDT',
+    symbol: 'USDT.lz',
+    thumbnail: '/icons/stables/usdt.png',
+    type: 'Bridged via LayerZero',
+    issuer: 'Tether (via LayerZero)',
+    assetAddress:
+      '0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDT',
+    decimals: 6,
+    website: 'https://layerzero.network',
+    auditLink: 'https://tether.to/en/transparency',
+    tags: ['bridged', 'layerzero'],
+  },
+  // Wormhole bridged
+  'USDC.wh': {
+    name: 'Wormhole USDC',
+    symbol: 'USDC.wh',
+    thumbnail: '/icons/stables/usdc.png',
+    type: 'Bridged via Wormhole',
+    issuer: 'Circle (via Wormhole)',
+    assetAddress:
+      '0x5e156f1207d0ebfa19a9eeff00d62a282278fb8719f4fab3a586a0a2c0fffbea::coin::T',
+    decimals: 6,
+    website: 'https://wormhole.com',
+    auditLink: 'https://www.circle.com/en/transparency',
+    tags: ['bridged', 'wormhole'],
+  },
+  'USDT.wh': {
+    name: 'Wormhole USDT',
+    symbol: 'USDT.wh',
+    thumbnail: '/icons/stables/usdt.png',
+    type: 'Bridged via Wormhole',
+    issuer: 'Tether (via Wormhole)',
+    assetAddress:
+      '0xa2eda21a58856fda86451436513b867c97eecb4ba099da5775520e0f7492e852::coin::T',
+    decimals: 6,
+    website: 'https://wormhole.com',
+    auditLink: 'https://tether.to/en/transparency',
+    tags: ['bridged', 'wormhole'],
+  },
+  // Celer bridged
+  'USDC.ce': {
+    name: 'Celer USDC',
+    symbol: 'USDC.ce',
+    thumbnail: '/icons/stables/usdc.png',
+    type: 'Bridged via Celer',
+    issuer: 'Circle (via Celer)',
+    assetAddress:
+      '0x8d87a65ba30e09357fa2edea2c80dbac296e5dec2b18287113500b902942929d::celer_coin_manager::UsdcCoin',
+    decimals: 6,
+    website: 'https://celer.network',
+    auditLink: 'https://www.circle.com/en/transparency',
+    tags: ['bridged', 'celer'],
+  },
+  'USDT.ce': {
+    name: 'Celer USDT',
+    symbol: 'USDT.ce',
+    thumbnail: '/icons/stables/usdt.png',
+    type: 'Bridged via Celer',
+    issuer: 'Tether (via Celer)',
+    assetAddress:
+      '0x8d87a65ba30e09357fa2edea2c80dbac296e5dec2b18287113500b902942929d::celer_coin_manager::UsdtCoin',
+    decimals: 6,
+    website: 'https://celer.network',
+    auditLink: 'https://tether.to/en/transparency',
+    tags: ['bridged', 'celer'],
   },
 };
 

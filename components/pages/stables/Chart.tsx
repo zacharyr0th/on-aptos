@@ -247,6 +247,8 @@ export const MarketShareChart = memo<MarketShareChartProps>(
           const result: ChartDataItem[] = [];
 
           for (const token of data) {
+            // Skip tokens with 0 supply for chart display
+            if (token.supply === '0') continue;
             // Handle combined tokens (like sUSDe/USDe)
             if ('isCombined' in token && token.isCombined && token.components) {
               const combinedSupply = token.components.reduce(

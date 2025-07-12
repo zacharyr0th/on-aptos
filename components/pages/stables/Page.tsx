@@ -454,7 +454,7 @@ export default function StablesPage(): React.ReactElement {
     adjustedTotal,
     suppliesDataMap,
   } = useMemo(() => {
-    if (!data || !data.data || !data.data.data || !data.data.data.supplies)
+    if (!data || !data.data || !data.data.supplies)
       return {
         formattedTotalSupply: '',
         processedSupplies: [],
@@ -463,7 +463,7 @@ export default function StablesPage(): React.ReactElement {
       };
 
     const susdePrice = cmcData?.price || 1; // Default to 1 if price not available
-    const supplies = data.data.data.supplies;
+    const supplies = data.data.supplies;
 
     // Create supplies data map for the dialog
     const suppliesMap: Record<string, string> = {};
@@ -587,7 +587,8 @@ export default function StablesPage(): React.ReactElement {
 
               <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                 <div className="lg:col-span-1 space-y-4">
-                  {processedSupplies?.slice(0, 3)?.map(token => (
+                  {/* Show first 3 cards with non-zero supply */}
+                  {processedSupplies?.filter(token => token.supply !== '0')?.slice(0, 3)?.map(token => (
                     <TokenCard
                       key={token.symbol}
                       token={token}
@@ -621,6 +622,25 @@ export default function StablesPage(): React.ReactElement {
                   </ErrorBoundary>
                 </div>
               </div>
+              
+              {/* Bridged stablecoins below the chart */}
+              {processedSupplies?.filter(token => token.supply !== '0')?.slice(3)?.length > 0 && (
+                <div className="mt-6">
+                  <h3 className="text-lg font-semibold mb-4">Bridged Stablecoins</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {processedSupplies?.filter(token => token.supply !== '0')?.slice(3)?.map(token => (
+                      <TokenCard
+                        key={token.symbol}
+                        token={token}
+                        totalSupply={adjustedTotal}
+                        susdePrice={cmcData?.price}
+                        suppliesData={suppliesDataMap}
+                        t={t}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
             </>
           ) : null}
         </main>

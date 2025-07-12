@@ -8,7 +8,7 @@ import { domainsRouter } from './domains';
  * - ✅ domains.marketData.prices (migrated from legacy prices router)
  * - ✅ domains.marketData.defiMetrics (migrated from legacy defi router)
  * - ✅ domains.assets.bitcoin (migrated from legacy btc router)
- * - ✅ domains.assets.stablecoins (migrated from legacy stables router)
+ * - ❌ domains.assets.stablecoins (removed - using REST API instead)
  * - ✅ domains.assets.liquidStaking (migrated from legacy lst router)
  * - ✅ domains.assets.rwa (migrated from legacy rwa router)
  * - ✅ domains.blockchain.aptos (migrated from legacy aptos router)
@@ -16,7 +16,7 @@ import { domainsRouter } from './domains';
  *
  * Domain structure:
  * - domains.marketData: Market data and analytics (prices, defi metrics)
- * - domains.assets: Asset tracking (bitcoin, stablecoins, LST, RWA)
+ * - domains.assets: Asset tracking (bitcoin, LST, RWA)
  * - domains.blockchain: Blockchain-specific functionality (aptos)
  * - domains.protocols: External protocol integrations
  */

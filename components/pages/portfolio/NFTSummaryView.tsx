@@ -107,7 +107,7 @@ export const NFTSummaryView: React.FC<NFTSummaryViewProps> = ({
             <Grid3X3 className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">No NFTs Found</h3>
             <p className="text-muted-foreground">
-              This wallet doesn't have any NFTs or they haven't been loaded yet.
+              This wallet doesn&apos;t have any NFTs or they haven&apos;t been loaded yet.
             </p>
           </CardContent>
         </Card>
