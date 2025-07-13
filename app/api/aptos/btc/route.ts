@@ -1,13 +1,14 @@
 import { withApiEnhancements } from '@/lib/utils/server';
-import { appRouter } from '@/lib/trpc/root';
 import { SERVICE_CONFIG } from '@/lib/config/cache';
 import {
   ApiError,
   formatApiError,
   withErrorHandling,
   type ErrorContext,
+  buildFreshResponse,
 } from '@/lib/utils';
 import { NextRequest } from 'next/server';
+import { BitcoinService } from '@/lib/services/assets/bitcoin/bitcoin-service';
 
 export async function GET(request: NextRequest) {
   const errorContext: ErrorContext = {
@@ -23,14 +24,15 @@ export async function GET(request: NextRequest) {
     () =>
       withErrorHandling(async () => {
         try {
-          const caller = appRouter.createCaller({});
-          const result =
-            await caller.domains.assets.bitcoin.getComprehensiveSupplies({
-              forceRefresh: false,
-            });
-
-          // Return the data from the tRPC response
-          return result.data;
+          const startTime = Date.now();
+          const data = await BitcoinService.getComprehensiveBTCSupplies(false);
+          
+          // Build response in the same format as tRPC
+          return buildFreshResponse(
+            data,
+            startTime,
+            Object.keys(data.supplies).length
+          );
         } catch (error) {
           console.error('BTC API route error:', formatApiError(error));
 

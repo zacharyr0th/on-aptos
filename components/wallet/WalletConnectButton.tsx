@@ -15,8 +15,6 @@ import { useState, useEffect, useMemo } from 'react';
 import { Wallet, LogOut, Copy, Check, Chrome, Apple, Mail } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
-import { trpc } from '@/lib/trpc/client';
-
 interface WalletConnectButtonProps {
   size?: 'sm' | 'default' | 'lg';
 }
@@ -31,19 +29,44 @@ export function WalletConnectButton({
   const [isClient, setIsClient] = useState(false);
   const [connectingWallet, setConnectingWallet] = useState<string | null>(null);
   const [lastClickTime, setLastClickTime] = useState<number>(0);
+  const [primaryName, setPrimaryName] = useState<string | null>(null);
+  const [primaryNameLoading, setPrimaryNameLoading] = useState(false);
 
   const walletAddress = account?.address?.toString();
 
   // Fetch primary ANS name for the connected wallet
-  const { data: primaryName, isLoading: primaryNameLoading } =
-    trpc.domains.blockchain.portfolio.getPrimaryName.useQuery(
-      { walletAddress: walletAddress || '' },
-      {
-        enabled: !!walletAddress && connected,
-        refetchInterval: 300000, // 5 minutes - ANS names don't change often
-        staleTime: 180000, // 3 minutes
+  useEffect(() => {
+    if (!walletAddress || !connected) {
+      setPrimaryName(null);
+      return;
+    }
+
+    const fetchAnsName = async () => {
+      setPrimaryNameLoading(true);
+      try {
+        const response = await fetch(`/api/wallet/ans?address=${encodeURIComponent(walletAddress)}`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.data) {
+            setPrimaryName(data.data.name);
+          } else {
+            setPrimaryName(null);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching ANS name:', error);
+        setPrimaryName(null);
+      } finally {
+        setPrimaryNameLoading(false);
       }
-    );
+    };
+
+    fetchAnsName();
+    // Refresh every 5 minutes
+    const interval = setInterval(fetchAnsName, 300000);
+    
+    return () => clearInterval(interval);
+  }, [walletAddress, connected]);
 
   // Ensure we only render wallet options on client
   useEffect(() => {

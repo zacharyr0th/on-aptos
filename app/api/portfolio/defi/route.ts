@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { DeFiBalanceService } from '@/lib/trpc/domains/blockchain/portfolio/defi-balance-service';
+import { DeFiBalanceService } from '@/lib/services/blockchain/portfolio/defi-balance-service';
 import {
   validateWalletAddress,
   createErrorResponse,

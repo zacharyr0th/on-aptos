@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import Image from 'next/image';
 import { GeistMono } from 'geist/font/mono';
 import { useWallet } from '@aptos-labs/wallet-adapter-react';
@@ -26,7 +26,6 @@ import {
   ChevronsRight,
   Shuffle,
 } from 'lucide-react';
-import { trpc } from '@/lib/trpc/client';
 import { usePortfolioHistoryV2 } from '@/hooks/usePortfolioHistoryV2';
 import { usePortfolioNFTs } from '@/hooks/usePortfolioNFTs';
 import { usePortfolioDeFi } from '@/hooks/usePortfolioDeFi';
@@ -151,11 +150,31 @@ export default function PortfolioPage() {
   const hasNextPage = currentPageNFTs === 30; // If we got a full page, there might be more
   const hasPrevPage = nftPage > 0;
 
-  const { data: accountNames } =
-    trpc.domains.blockchain.portfolio.getAccountNames.useQuery(
-      { walletAddress: walletAddress || '' },
-      { enabled: !!walletAddress }
-    );
+  const [accountNames, setAccountNames] = useState<string[] | null>(null);
+
+  // Fetch account names
+  useEffect(() => {
+    if (!walletAddress) {
+      setAccountNames(null);
+      return;
+    }
+
+    const fetchAccountNames = async () => {
+      try {
+        const response = await fetch(`/api/wallet/ans/names?address=${encodeURIComponent(walletAddress)}`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.data) {
+            setAccountNames(data.data);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching account names:', error);
+      }
+    };
+
+    fetchAccountNames();
+  }, [walletAddress]);
 
   const { data: portfolioHistory } = usePortfolioHistoryV2(
     walletAddress || null

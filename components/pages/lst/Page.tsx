@@ -30,7 +30,6 @@ import {
   formatLargeNumber,
 } from '@/lib/utils';
 import { usePageTranslation } from '@/hooks/useTranslation';
-import { useDataPrefetch } from '@/hooks/useDataPrefetching';
 // Simplified for better compatibility
 
 // Use LST_METADATA from config instead of redefining here
@@ -327,8 +326,6 @@ export default function LSTPage(): React.ReactElement {
   const { t } = usePageTranslation('lst');
   const [forceRefresh, setForceRefresh] = useState(false);
 
-  // Prefetch related data for this page
-  useDataPrefetch('lst');
 
   // Use direct API call for LST data
   const [lstData, setLstData] = useState<{data: any} | null>(null);

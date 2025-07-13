@@ -14,7 +14,6 @@ import {
 } from './components';
 import { defiProtocols, categories } from './data';
 import { usePageTranslation } from '@/hooks/useTranslation';
-import { useDataPrefetch } from '@/hooks/useDataPrefetching';
 // Simplified for better compatibility
 
 export default function DefiPage(): React.ReactElement {
@@ -26,8 +25,6 @@ export default function DefiPage(): React.ReactElement {
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const { t, getText } = usePageTranslation('defi');
 
-  // Prefetch related data for this page
-  useDataPrefetch('defi');
 
   // Filter protocols based on category, subcategory, and search
   const filteredProtocols = defiProtocols.filter(protocol => {

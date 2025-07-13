@@ -3,7 +3,8 @@ import {
   STABLECOINS, 
   LAYERZERO_STABLECOINS, 
   WORMHOLE_STABLECOINS, 
-  CELER_STABLECOINS 
+  CELER_STABLECOINS,
+  ALGO_STABLECOINS
 } from '@/lib/aptos-constants';
 import { TETHER_RESERVE_ADDRESS } from '@/lib/config/data';
 
@@ -73,13 +74,23 @@ export async function GET() {
     let totalSupply = BigInt(0);
     
     
-    // Map all addresses to symbols
+    // Map all addresses to symbols and decimals
     const addressToSymbol: Record<string, string> = {
       // Native fungible assets
       [STABLECOINS.USDC]: 'USDC',
       [STABLECOINS.USDT]: 'USDT',
       [STABLECOINS.USDE]: 'USDe',
       [STABLECOINS.SUSDE]: 'sUSDe',
+      [STABLECOINS.MUSD]: 'mUSD',
+    };
+    
+    // FA decimals configuration
+    const faDecimals: Record<string, number> = {
+      USDC: 6,
+      USDT: 6,
+      USDe: 6,
+      sUSDe: 6,
+      mUSD: 8, // mUSD has 8 decimals, not 6
     };
 
     // Process fungible assets
@@ -88,6 +99,7 @@ export async function GET() {
         if (item.supply_v2) {
           let supply = BigInt(item.supply_v2);
           const symbol = addressToSymbol[item.asset_type] || 'UNKNOWN';
+          const decimals = faDecimals[symbol] || 6;
           
           // For USDT, subtract the reserve balance
           if (symbol === 'USDT') {
@@ -96,11 +108,21 @@ export async function GET() {
             console.log(`USDT: Total supply ${item.supply_v2}, Reserve ${usdtReserveBalance}, Circulating ${supply.toString()}`);
           }
           
-          totalSupply += supply;
+          // Add to total supply (normalize to 6 decimals for consistency)
+          const normalizedSupply = decimals === 8 ? supply / BigInt(100) : supply;
+          totalSupply += normalizedSupply;
+          
+          // Calculate divisor based on decimals
+          const divisor = BigInt(10 ** decimals);
+          
+          // Log mUSD for debugging
+          if (symbol === 'mUSD') {
+            console.log(`mUSD: Raw supply ${supply.toString()}, Decimals ${decimals}, Formatted ${(supply / divisor).toString()}`);
+          }
           
           supplies.push({
             symbol,
-            supply: (supply / BigInt(1000000)).toString(),
+            supply: (supply / divisor).toString(),
             supply_raw: supply.toString(),
             percentage: 0,
             asset_type: item.asset_type,
@@ -112,12 +134,13 @@ export async function GET() {
     
     // For coins, we need to use the REST API to get supply data
     const bridgedCoins = [
-      { symbol: 'USDC.lz', name: 'LayerZero USDC', asset_type: LAYERZERO_STABLECOINS.LZ_USDC, account: '0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa' },
-      { symbol: 'USDT.lz', name: 'LayerZero USDT', asset_type: LAYERZERO_STABLECOINS.LZ_USDT, account: '0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa' },
-      { symbol: 'USDC.wh', name: 'Wormhole USDC', asset_type: WORMHOLE_STABLECOINS.WH_USDC, account: '0x5e156f1207d0ebfa19a9eeff00d62a282278fb8719f4fab3a586a0a2c0fffbea' },
-      { symbol: 'USDT.wh', name: 'Wormhole USDT', asset_type: WORMHOLE_STABLECOINS.WH_USDT, account: '0xa2eda21a58856fda86451436513b867c97eecb4ba099da5775520e0f7492e852' },
-      { symbol: 'USDC.ce', name: 'Celer USDC', asset_type: CELER_STABLECOINS.CELER_USDC, account: '0x8d87a65ba30e09357fa2edea2c80dbac296e5dec2b18287113500b902942929d' },
-      { symbol: 'USDT.ce', name: 'Celer USDT', asset_type: CELER_STABLECOINS.CELER_USDT, account: '0x8d87a65ba30e09357fa2edea2c80dbac296e5dec2b18287113500b902942929d' },
+      { symbol: 'lzUSDC', name: 'LayerZero USDC', asset_type: LAYERZERO_STABLECOINS.LZ_USDC, account: '0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa', decimals: 6 },
+      { symbol: 'lzUSDT', name: 'LayerZero USDT', asset_type: LAYERZERO_STABLECOINS.LZ_USDT, account: '0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa', decimals: 6 },
+      { symbol: 'whUSDC', name: 'Wormhole USDC', asset_type: WORMHOLE_STABLECOINS.WH_USDC, account: '0x5e156f1207d0ebfa19a9eeff00d62a282278fb8719f4fab3a586a0a2c0fffbea', decimals: 6 },
+      { symbol: 'whUSDT', name: 'Wormhole USDT', asset_type: WORMHOLE_STABLECOINS.WH_USDT, account: '0xa2eda21a58856fda86451436513b867c97eecb4ba099da5775520e0f7492e852', decimals: 6 },
+      { symbol: 'ceUSDC', name: 'Celer USDC', asset_type: CELER_STABLECOINS.CELER_USDC, account: '0x8d87a65ba30e09357fa2edea2c80dbac296e5dec2b18287113500b902942929d', decimals: 6 },
+      { symbol: 'ceUSDT', name: 'Celer USDT', asset_type: CELER_STABLECOINS.CELER_USDT, account: '0x8d87a65ba30e09357fa2edea2c80dbac296e5dec2b18287113500b902942929d', decimals: 6 },
+      { symbol: 'MOD', name: 'MOD', asset_type: ALGO_STABLECOINS.MOD, account: '0x6f986d146e4a90b828d8c12c14b6f4e003fdff11a8eecceceb63744363eaac01', decimals: 8 },
     ];
 
     // Fetch coin supplies from REST API
@@ -150,6 +173,79 @@ export async function GET() {
             supply = BigInt(data.supply);
           }
           
+          
+          // Path 4: For MOD, if supply is 0 or supply.vec is empty, try GraphQL manual aggregation with pagination
+          if (coin.symbol === 'MOD' && (supply === BigInt(0) || (data.data?.supply?.vec && data.data.supply.vec.length === 0))) {
+            try {
+              console.log('MOD supply vector is empty, trying GraphQL manual aggregation with pagination...');
+              let totalSupply = BigInt(0);
+              let offset = 0;
+              const batchSize = 1000;
+              let hasMore = true;
+              
+              while (hasMore) {
+                const graphqlQuery = `
+                  query {
+                    current_coin_balances(where: {
+                      coin_type: {_eq: "${coin.asset_type}"},
+                      amount: {_gt: "0"}
+                    }, limit: ${batchSize}, offset: ${offset}) {
+                      amount
+                    }
+                  }
+                `;
+                
+                const graphqlHeaders: Record<string, string> = {
+                  'Content-Type': 'application/json',
+                };
+                
+                // Add Authorization header if available
+                if (process.env.APTOS_BUILD_SECRET) {
+                  graphqlHeaders['Authorization'] = `Bearer ${process.env.APTOS_BUILD_SECRET}`;
+                }
+                
+                const graphqlResponse = await fetch(INDEXER, {
+                  method: 'POST',
+                  headers: graphqlHeaders,
+                  body: JSON.stringify({ query: graphqlQuery }),
+                });
+                
+                if (graphqlResponse.ok) {
+                  const graphqlResult = await graphqlResponse.json();
+                  if (graphqlResult.data?.current_coin_balances) {
+                    const balances = graphqlResult.data.current_coin_balances;
+                    console.log(`Batch ${Math.floor(offset / batchSize) + 1}: Found ${balances.length} MOD holders`);
+                    
+                    for (const balance of balances) {
+                      totalSupply += BigInt(balance.amount);
+                    }
+                    
+                    // Check if we have more data
+                    if (balances.length < batchSize) {
+                      hasMore = false;
+                    } else {
+                      offset += batchSize;
+                    }
+                  } else {
+                    hasMore = false;
+                  }
+                } else {
+                  console.error(`GraphQL request failed: ${graphqlResponse.status}`);
+                  hasMore = false;
+                }
+              }
+              
+              supply = totalSupply;
+              console.log(`MOD total supply from paginated GraphQL aggregation: ${supply.toString()}`);
+            } catch (e) {
+              console.error('Failed to fetch MOD supply via GraphQL:', e);
+            }
+          }
+          
+          // Log MOD specifically for debugging
+          if (coin.symbol === 'MOD') {
+            console.log(`MOD final supply: ${supply.toString()} (should be ~500k = 50000000000000 raw with 8 decimals)`);
+          }
           console.log(`${coin.symbol} supply:`, supply.toString());
           
           return {
@@ -170,9 +266,11 @@ export async function GET() {
 
     // Process coin supplies
     for (const { coin, supply } of coinSupplies) {
+      // Calculate divisor based on decimals
+      const divisor = BigInt(10 ** coin.decimals);
       supplies.push({
         symbol: coin.symbol,
-        supply: (supply / BigInt(1000000)).toString(), // Convert to millions
+        supply: (supply / divisor).toString(), // Convert based on decimals
         supply_raw: supply.toString(),
         percentage: 0,
         asset_type: coin.asset_type,
@@ -180,8 +278,9 @@ export async function GET() {
         note: supply > 0 ? coin.name : `${coin.name} (no supply found)`,
       });
       
-      // Add to total supply
-      totalSupply += supply;
+      // Add to total supply (normalize to 6 decimals for consistency)
+      const normalizedSupply = coin.decimals === 8 ? supply / BigInt(100) : supply;
+      totalSupply += normalizedSupply;
     }
     
     
@@ -204,7 +303,7 @@ export async function GET() {
       timestamp: new Date().toISOString(),
       data: {
         supplies,
-        total: (totalSupply / BigInt(1000000)).toString(),
+        total: (totalSupply / BigInt(1000000)).toString(), // Total is in 6 decimal units
         total_raw: totalSupply.toString(),
         usdt_reserve: {
           amount: usdtReserveBalance,

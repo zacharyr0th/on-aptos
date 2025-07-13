@@ -10,7 +10,6 @@ import { Clock } from 'lucide-react';
 import { FaGlobe, FaXTwitter, FaGithub } from '@/components/icons/SocialIcons';
 import { ErrorBoundary } from '../errors/ErrorBoundary';
 import Image from 'next/image';
-import { trpc } from '@/lib/trpc/client';
 import { useTheme } from 'next-themes';
 import { useTranslation } from '@/hooks/useTranslation';
 import { DEVELOPER_CONFIG } from '@/lib/config/app';
@@ -107,21 +106,35 @@ const AptPrice: FC = memo(function AptPrice(): ReactElement {
     setMounted(true);
   }, []);
 
-  // Use tRPC to fetch APT price instead of direct external API calls
-  const {
-    data: aptPriceData,
-    isLoading: loading,
-    error,
-  } = trpc.domains.marketData.prices.getCMCPrice.useQuery(
-    { symbol: 'apt' },
-    {
-      staleTime: 60 * 1000, // 1 minute
-      gcTime: 5 * 60 * 1000, // 5 minutes
-      refetchInterval: 60 * 1000, // Auto-refetch every minute
-      refetchIntervalInBackground: true,
-      retry: 3,
-    }
-  );
+  const [aptPriceData, setAptPriceData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<any>(null);
+
+  // Fetch APT price data
+  useEffect(() => {
+    const fetchPrice = async () => {
+      try {
+        const response = await fetch('/api/prices/cmc/apt');
+        if (response.ok) {
+          const data = await response.json();
+          setAptPriceData(data);
+          setError(null);
+        } else {
+          throw new Error('Failed to fetch price');
+        }
+      } catch (err) {
+        setError(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPrice();
+    // Refresh every minute
+    const interval = setInterval(fetchPrice, 60 * 1000);
+    
+    return () => clearInterval(interval);
+  }, []);
 
   if (loading) {
     return (

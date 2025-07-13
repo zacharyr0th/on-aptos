@@ -1,1 +1,0 @@
-export { moarRouter } from './router';

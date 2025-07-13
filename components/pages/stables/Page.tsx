@@ -7,6 +7,12 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Badge } from '@/components/ui/badge';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import {
   MarketShareChart,
   TOKEN_COLORS,
@@ -25,7 +31,6 @@ import {
   SupplyData,
 } from '@/lib/config';
 import { usePageTranslation } from '@/hooks/useTranslation';
-import { useDataPrefetch } from '@/hooks/useDataPrefetching';
 // Simplified for better compatibility
 
 const TOKEN_METADATA = STABLECOIN_METADATA;
@@ -44,6 +49,39 @@ const TokenCard = React.memo(function TokenCard({
 }): React.ReactElement {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
+  // Helper function to check if a token is bridged
+  const isBridged = (symbol: string): boolean => {
+    return symbol.startsWith('lz') || symbol.startsWith('wh') || symbol.startsWith('ce') || 
+           symbol === 'sUSDe' || symbol === 'USDe' || symbol === 'sUSDe / USDe';
+  };
+
+  // Helper function to check if a token is native
+  const isNative = (symbol: string): boolean => {
+    return symbol === 'USDT' || symbol === 'USDC';
+  };
+
+  // Helper function to check if a token is algorithmic
+  const isAlgorithmic = (symbol: string): boolean => {
+    return symbol === 'MOD' || symbol === 'mUSD' || symbol === 'sUSDe' || symbol === 'USDe' || symbol === 'sUSDe / USDe';
+  };
+
+  // Get bridge info for display
+  const getBridgeInfo = (symbol: string): { type: string | null; icon: string | null; isOFT: boolean } => {
+    if (symbol.startsWith('lz')) {
+      return { type: 'LayerZero', icon: '/icons/protocols/lz.png', isOFT: false };
+    }
+    if (symbol.startsWith('wh')) {
+      return { type: 'Wormhole', icon: '/icons/protocols/wormhole.png', isOFT: false };
+    }
+    if (symbol.startsWith('ce')) {
+      return { type: 'Celer', icon: '/icons/protocols/celer.jpg', isOFT: false };
+    }
+    if (symbol === 'sUSDe' || symbol === 'USDe' || symbol === 'sUSDe / USDe') {
+      return { type: 'LayerZero', icon: '/icons/protocols/lz.png', isOFT: true };
+    }
+    return { type: null, icon: null, isOFT: false };
+  };
+
   const { marketSharePercent, formattedDisplaySupply } = useMemo(() => {
     const calcMarketShare = () => {
       if (BigInt(totalSupply) === 0n) return '0';
@@ -59,8 +97,19 @@ const TokenCard = React.memo(function TokenCard({
 
     const formatSingle = (s: string, symbol: string, isRaw: boolean = true) => {
       const supplyVal = BigInt(s);
+      
       // Convert raw units to dollars if dealing with raw supply
-      let dollars = isRaw ? Number(supplyVal) / 1_000_000 : Number(supplyVal);
+      let dollars: number;
+      if (isRaw) {
+        // Use correct decimals for each token
+        if (symbol === 'mUSD' || symbol === 'MOD') {
+          dollars = Number(supplyVal) / 100_000_000; // 8 decimals
+        } else {
+          dollars = Number(supplyVal) / 1_000_000; // 6 decimals (default)
+        }
+      } else {
+        dollars = Number(supplyVal);
+      }
 
       // Apply sUSDe price multiplier if available and token is sUSDe
       if (symbol === 'sUSDe' && susdePrice && susdePrice > 0) {
@@ -121,6 +170,7 @@ const TokenCard = React.memo(function TokenCard({
     TOKEN_COLORS[representativeSymbolForColor as keyof typeof TOKEN_COLORS] ||
     TOKEN_COLORS.default;
   const metadata = TOKEN_METADATA[cardSymbol];
+  const bridgeInfo = getBridgeInfo(cardSymbol);
 
   const handleCardClick = useCallback(() => {
     if (metadata) {
@@ -131,10 +181,48 @@ const TokenCard = React.memo(function TokenCard({
   return (
     <>
       <div
-        className="bg-card border rounded-lg overflow-hidden group cursor-pointer hover:border-primary/50 transition-colors"
+        className="bg-card border rounded-lg overflow-hidden group cursor-pointer hover:border-primary/50 transition-colors relative"
         onClick={handleCardClick}
       >
         <div className="h-1" style={{ backgroundColor: tokenColor }} />
+        <div className="absolute top-2 right-2 flex items-center gap-1">
+          {isNative(cardSymbol) && (
+            <Badge 
+              className="text-[9px] font-medium px-1 py-0 h-4 bg-gray-900 text-white border-gray-900 dark:bg-gray-100 dark:text-gray-900 dark:border-gray-100"
+              variant="default"
+            >
+              Native
+            </Badge>
+          )}
+          {isAlgorithmic(cardSymbol) && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Badge 
+                  className="text-[9px] font-medium px-1 py-0 h-4 bg-gray-900 text-white border-gray-900 dark:bg-gray-100 dark:text-gray-900 dark:border-gray-100 cursor-help"
+                  variant="default"
+                >
+                  Algo
+                </Badge>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="max-w-xs">
+                  This stablecoin maintains its peg through algorithmic mechanisms rather than traditional collateral backing
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          )}
+          {bridgeInfo.icon && (
+            <div className="relative w-6 h-6 rounded-full overflow-hidden bg-white dark:bg-gray-800 p-0.5 shadow-sm">
+              <Image
+                src={bridgeInfo.icon}
+                alt={bridgeInfo.type || 'Bridge'}
+                width={20}
+                height={20}
+                className="object-contain w-full h-full rounded-full"
+              />
+            </div>
+          )}
+        </div>
         <div className="flex justify-between items-center p-3 pb-0">
           <div className="flex items-center gap-2.5">
             {'isCombined' in token && token.isCombined ? (
@@ -389,8 +477,6 @@ export default function StablesPage(): React.ReactElement {
   const { t } = usePageTranslation('stables');
   const [forceRefresh, setForceRefresh] = useState(false);
 
-  // Prefetch related data for this page
-  useDataPrefetch('stables');
 
   // Use direct API call for stables data
   const [stablesData, setStablesData] = useState<{data: any} | null>(null);
@@ -447,6 +533,13 @@ export default function StablesPage(): React.ReactElement {
     setForceRefresh(prev => !prev); // Toggle to force refresh
     await fetchStablesData();
   }, [fetchStablesData]);
+
+  // Helper function to check if a token is bridged
+  const isBridgedToken = (symbol: string): boolean => {
+    // Check for bridge suffixes (.lz, .wh, .ce) or Ethena tokens
+    return symbol.includes('.lz') || symbol.includes('.wh') || symbol.includes('.ce') || 
+           symbol === 'sUSDe' || symbol === 'USDe' || symbol === 'sUSDe / USDe';
+  };
 
   const {
     formattedTotalSupply,
@@ -534,13 +627,16 @@ export default function StablesPage(): React.ReactElement {
         });
       }
 
-      return displayTokens.sort((a, b) => {
-        const rawSupplyA = a.supply_raw || a.supply || '0';
-        const rawSupplyB = b.supply_raw || b.supply || '0';
-        const supplyA = BigInt(rawSupplyA);
-        const supplyB = BigInt(rawSupplyB);
-        return supplyB > supplyA ? 1 : supplyB < supplyA ? -1 : 0;
-      });
+      // Sort all tokens by supply and filter out zero supply
+      return displayTokens
+        .filter(token => token.supply !== '0')
+        .sort((a, b) => {
+          const rawSupplyA = a.supply_raw || a.supply || '0';
+          const rawSupplyB = b.supply_raw || b.supply || '0';
+          const supplyA = BigInt(rawSupplyA);
+          const supplyB = BigInt(rawSupplyB);
+          return supplyB > supplyA ? 1 : supplyB < supplyA ? -1 : 0;
+        });
     };
 
     return {
@@ -587,8 +683,8 @@ export default function StablesPage(): React.ReactElement {
 
               <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                 <div className="lg:col-span-1 space-y-4">
-                  {/* Show first 3 cards with non-zero supply */}
-                  {processedSupplies?.filter(token => token.supply !== '0')?.slice(0, 3)?.map(token => (
+                  {/* Show first 3 cards */}
+                  {processedSupplies.slice(0, 3).map(token => (
                     <TokenCard
                       key={token.symbol}
                       token={token}
@@ -597,7 +693,7 @@ export default function StablesPage(): React.ReactElement {
                       suppliesData={suppliesDataMap}
                       t={t}
                     />
-                  )) || []}
+                  ))}
                 </div>
 
                 <div className="lg:col-span-3 bg-card border rounded-lg overflow-hidden min-h-[250px] sm:min-h-[300px]">
@@ -614,7 +710,7 @@ export default function StablesPage(): React.ReactElement {
                     }
                   >
                     <MarketShareChart
-                      data={processedSupplies || []}
+                      data={processedSupplies}
                       totalSupply={adjustedTotal}
                       tokenMetadata={TOKEN_METADATA}
                       susdePrice={cmcData?.price}
@@ -623,12 +719,11 @@ export default function StablesPage(): React.ReactElement {
                 </div>
               </div>
               
-              {/* Bridged stablecoins below the chart */}
-              {processedSupplies?.filter(token => token.supply !== '0')?.slice(3)?.length > 0 && (
+              {/* Remaining cards below */}
+              {processedSupplies.length > 3 && (
                 <div className="mt-6">
-                  <h3 className="text-lg font-semibold mb-4">Bridged Stablecoins</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {processedSupplies?.filter(token => token.supply !== '0')?.slice(3)?.map(token => (
+                    {processedSupplies.slice(3).map(token => (
                       <TokenCard
                         key={token.symbol}
                         token={token}

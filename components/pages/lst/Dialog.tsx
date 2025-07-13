@@ -1,10 +1,9 @@
 'use client';
 
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Coins } from 'lucide-react';
 import { LST_METADATA } from '@/lib/config';
-import { trpc } from '@/lib/trpc/client';
 import { usePageTranslation } from '@/hooks/useTranslation';
 
 import {
@@ -29,6 +28,8 @@ const TokenDialog: React.FC<BaseTokenDialogProps> = ({
 }) => {
   const [imageLoaded, setImageLoaded] = useState<Record<string, boolean>>({});
   const [sortedTokenSymbols, setSortedTokenSymbols] = useState<string[]>([]);
+  const [supplyResponse, setSupplyResponse] = useState<any>(null);
+  const [isLoadingSupply, setIsLoadingSupply] = useState(false);
   const { t } = usePageTranslation('lst');
 
   const handleCopy = useCallback((text: string, label: string) => {
@@ -40,15 +41,27 @@ const TokenDialog: React.FC<BaseTokenDialogProps> = ({
     onClose();
   }, [onClose]);
 
-  // Use tRPC to fetch supply data when dialog is open
-  const { data: supplyResponse, isLoading: isLoadingSupply } =
-    trpc.domains.assets.liquidStaking.getSupplies.useQuery(
-      { forceRefresh: false },
-      {
-        enabled: isOpen, // Only fetch when dialog is open
-        staleTime: 2 * 60 * 1000, // 2 minutes
+  // Fetch supply data when dialog opens
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const fetchSupplyData = async () => {
+      setIsLoadingSupply(true);
+      try {
+        const response = await fetch('/api/aptos/lst');
+        if (response.ok) {
+          const data = await response.json();
+          setSupplyResponse(data);
+        }
+      } catch (error) {
+        console.error('Error fetching LST supply data:', error);
+      } finally {
+        setIsLoadingSupply(false);
       }
-    );
+    };
+
+    fetchSupplyData();
+  }, [isOpen]);
 
   // Handle combined token sorting when data is received
   React.useEffect(() => {

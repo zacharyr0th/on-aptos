@@ -16,7 +16,6 @@ export { useWebVitals } from './useWebVitals';
 
 // Data hooks
 export { useMarketPrice } from './useMarketPrice';
-export { useDataPrefetch } from './useDataPrefetching';
 
 // Legacy exports for backward compatibility (deprecated)
 export { useResponsive as useWindowSize } from './useResponsive';

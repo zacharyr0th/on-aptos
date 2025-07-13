@@ -10,7 +10,7 @@ import {
 } from '@/lib/utils';
 
 // Define types locally since we removed schemas
-interface LSTSupply {
+export interface LSTSupply {
   symbol: string;
   name: string;
   supply: string;
@@ -19,7 +19,7 @@ interface LSTSupply {
   asset_type: string;
 }
 
-interface LSTSupplyData {
+export interface LSTSupplyData {
   supplies: LSTSupply[];
   total: string;
   total_formatted: string;

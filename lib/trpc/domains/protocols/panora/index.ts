@@ -1,1 +1,0 @@
-export { panoraRouter } from './router';

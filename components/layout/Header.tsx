@@ -18,7 +18,6 @@ import {
   LogOut,
 } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
-import { trpc } from '@/lib/trpc/client';
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -53,17 +52,35 @@ const HeaderComponent = (): React.ReactElement | null => {
   const { account, connected, disconnect } = useWallet();
 
   const walletAddress = account?.address?.toString();
+  const [primaryName, setPrimaryName] = useState<string | null>(null);
 
   // Fetch primary ANS name for the connected wallet
-  const { data: primaryName } =
-    trpc.domains.blockchain.portfolio.getPrimaryName.useQuery(
-      { walletAddress: walletAddress || '' },
-      {
-        enabled: !!walletAddress && connected,
-        refetchInterval: 300000, // 5 minutes
-        staleTime: 180000, // 3 minutes
+  useEffect(() => {
+    if (!walletAddress || !connected) {
+      setPrimaryName(null);
+      return;
+    }
+
+    const fetchAnsName = async () => {
+      try {
+        const response = await fetch(`/api/wallet/ans?address=${encodeURIComponent(walletAddress)}`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.data) {
+            setPrimaryName(data.data.name);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching ANS name:', error);
       }
-    );
+    };
+
+    fetchAnsName();
+    // Refresh every 5 minutes
+    const interval = setInterval(fetchAnsName, 300000);
+    
+    return () => clearInterval(interval);
+  }, [walletAddress, connected]);
 
   const truncateAddress = (address: string) => {
     if (!address) return '';

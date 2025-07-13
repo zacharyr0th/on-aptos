@@ -3,7 +3,6 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 
 import { ThemeProvider } from '@/components/layout/theme-provider';
-import { TRPCProvider } from '@/components/providers/TRPCProvider';
 import { I18nProvider } from '@/components/providers/I18nProvider';
 import { WalletProvider } from '@/components/wallet/WalletProvider';
 import { Toaster } from '@/components/ui/sonner';
@@ -230,22 +229,20 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}
       >
-        <TRPCProvider>
-          <I18nProvider>
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="dark"
-              enableSystem
-              disableTransitionOnChange
-            >
-              <WalletProvider>
-                <main>{children}</main>
-                <Toaster />
-                <Analytics />
-              </WalletProvider>
-            </ThemeProvider>
-          </I18nProvider>
-        </TRPCProvider>
+        <I18nProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <WalletProvider>
+              <main>{children}</main>
+              <Toaster />
+              <Analytics />
+            </WalletProvider>
+          </ThemeProvider>
+        </I18nProvider>
       </body>
     </html>
   );

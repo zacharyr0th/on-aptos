@@ -28,7 +28,6 @@ import {
   calculateMarketShare,
 } from './types';
 import { usePageTranslation } from '@/hooks/useTranslation';
-import { useDataPrefetch } from '@/hooks/useDataPrefetching';
 // Removed complex suspense boundaries for simpler implementation
 
 // Use BTC_METADATA from config instead of redefining here
@@ -313,9 +312,6 @@ const ErrorState = memo(function ErrorState({
 export default function BitcoinPage(): React.ReactElement {
   const { t } = usePageTranslation('btc');
   const [forceRefresh, setForceRefresh] = useState(false);
-
-  // Prefetch related data for this page
-  useDataPrefetch('btc');
 
   // Use direct API call for BTC supply data
   const [btcSupplyData, setBtcSupplyData] = useState<{data: any} | null>(null);

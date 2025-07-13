@@ -13,13 +13,34 @@ const createColorMap = (
   return map;
 };
 
-// Stablecoin colors
+// Stablecoin colors - base colors for each stablecoin type
 export const STABLECOIN_COLORS = createColorMap(
   [
-    [['USDt'], '#90C0A0'], // green-200
-    [['USDC'], '#90B8D9'], // blue-200
-    [['USDe', 'sUSDe/USDe'], '#B0B0C0'], // gray-200
-    [['sUSDe'], '#C0C0D0'], // gray-200
+    // Native USDT - green
+    [['USDT'], '#16a34a'], // green-600
+    
+    // Native USDC - blue  
+    [['USDC'], '#2563eb'], // blue-600
+    
+    // Bridged USDT variants - lighter greens
+    [['lzUSDT'], '#22c55e'], // green-500
+    [['whUSDT'], '#4ade80'], // green-400
+    [['ceUSDT'], '#86efac'], // green-300
+    
+    // Bridged USDC variants - lighter blues
+    [['lzUSDC'], '#3b82f6'], // blue-500
+    [['whUSDC'], '#60a5fa'], // blue-400
+    [['ceUSDC'], '#93c5fd'], // blue-300
+    
+    // Ethena - grays
+    [['USDe', 'sUSDe/USDe'], '#6b7280'], // gray-500
+    [['sUSDe'], '#9ca3af'], // gray-400
+    
+    // Mirage mUSD - purple
+    [['mUSD'], '#9333ea'], // purple-600
+    
+    // MOD - orange
+    [['MOD'], '#ea580c'], // orange-600
   ],
   '#B8BCC2'
 );

@@ -24,7 +24,6 @@ import { RWA_COLORS } from '@/lib/config/colors';
 import { RWA_TOKEN_BY_TICKER } from './rwa-constants';
 import { useResponsive } from '@/hooks/useResponsive';
 import { usePageTranslation } from '@/hooks/useTranslation';
-import { useDataPrefetch } from '@/hooks/useDataPrefetching';
 // Removed complex suspense boundaries for simpler implementation
 
 // Function to darken a hex color based on TVL ranking (higher TVL = darker)
@@ -513,8 +512,6 @@ export default function RWAsPage(): React.ReactElement {
   const { isMobile } = useResponsive();
   const { t } = usePageTranslation('rwas');
 
-  // Prefetch related data for this page
-  useDataPrefetch('rwas');
 
   // Fetch real-time RWA data using direct API call
   const [rwaResponse, setRwaResponse] = useState<{data: any} | null>(null);

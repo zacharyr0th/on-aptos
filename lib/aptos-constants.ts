@@ -98,6 +98,7 @@ export const STABLECOINS = {
   USDT: '0x357b0b74bc833e95a115ad22604854d6b0fca151cecd94111770e5d6ffc9dc2b',
   USDE: '0xf37a8864fe737eb8ec2c2931047047cbaed1beed3fb0e5b7c5526dafd3b9c2e9',
   SUSDE: '0xb30a694a344edee467d9f82330bbe7c3b89f440a1ecd2da1f3bca266560fce69',
+  MUSD: '0xdd84125d1ebac8f1ecb2819801417fc392325e672be111ec03830c34d6ff82dd', // Mirage mUSD
 } as const;
 
 // LayerZero bridged coins (separate because they use coin_info table)
@@ -118,6 +119,11 @@ export const CELER_STABLECOINS = {
   CELER_USDC: '0x8d87a65ba30e09357fa2edea2c80dbac296e5dec2b18287113500b902942929d::celer_coin_manager::UsdcCoin',
 } as const;
 
+// Algorithmic coins
+export const ALGO_STABLECOINS = {
+  MOD: '0x6f986d146e4a90b828d8c12c14b6f4e003fdff11a8eecceceb63744363eaac01::mod_coin::MOD',
+} as const;
+
 /**
  * Set of all legitimate stablecoin addresses for O(1) lookup
  * Used for portfolio filtering to prevent scam tokens
@@ -127,6 +133,7 @@ export const LEGITIMATE_STABLECOINS = new Set([
   ...Object.values(LAYERZERO_STABLECOINS),
   ...Object.values(WORMHOLE_STABLECOINS),
   ...Object.values(CELER_STABLECOINS),
+  ...Object.values(ALGO_STABLECOINS),
 ]) as Set<string>;
 
 /**

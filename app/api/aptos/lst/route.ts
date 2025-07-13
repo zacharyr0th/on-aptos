@@ -1,16 +1,28 @@
 import { withApiEnhancements } from '@/lib/utils/server';
-import { appRouter } from '@/lib/trpc/root';
 import { SERVICE_CONFIG } from '@/lib/config/cache';
 import { ApiError } from '@/lib/utils/types';
+import { fetchLSTSuppliesData } from '@/lib/services/assets/liquid-staking/lst-service';
 
 export async function GET() {
   return withApiEnhancements(
     async () => {
       try {
-        const caller = appRouter.createCaller({});
-        return await caller.domains.assets.liquidStaking.getSupplies({
-          forceRefresh: false,
-        });
+        const startTime = Date.now();
+        const data = await fetchLSTSuppliesData();
+
+        return {
+          timestamp: new Date().toISOString(),
+          performance: {
+            responseTimeMs: Date.now() - startTime,
+            cacheHits: 0,
+            cacheMisses: 0,
+            apiCalls: data.supplies.length,
+          },
+          cache: {
+            cached: false,
+          },
+          data,
+        };
       } catch (error) {
         if (error instanceof Error) {
           throw new ApiError(

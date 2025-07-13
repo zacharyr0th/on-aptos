@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Card,
   CardContent,
@@ -10,21 +10,44 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import { History, ArrowUpRight, ArrowDownRight, Clock } from 'lucide-react';
-import { trpc } from '@/lib/trpc/client';
 
 interface NFTTransferHistoryProps {
   tokenDataId: string;
 }
 
 export function NFTTransferHistory({ tokenDataId }: NFTTransferHistoryProps) {
-  const {
-    data: transfers,
-    isLoading,
-    error,
-  } = trpc.domains.blockchain.portfolio.getNFTTransferHistory.useQuery({
-    tokenDataId,
-    limit: 20,
-  });
+  const [transfers, setTransfers] = useState<any[] | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    const fetchTransferHistory = async () => {
+      try {
+        setIsLoading(true);
+        const response = await fetch(
+          `/api/nft/transfer-history?tokenDataId=${encodeURIComponent(tokenDataId)}&limit=20`
+        );
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch transfer history');
+        }
+
+        const data = await response.json();
+        if (data.success && data.data) {
+          setTransfers(data.data);
+        } else {
+          throw new Error('Invalid response format');
+        }
+      } catch (err) {
+        setError(err as Error);
+        console.error('Error fetching NFT transfer history:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchTransferHistory();
+  }, [tokenDataId]);
 
   const formatAddress = (address: string) => {
     if (!address) return 'Unknown';

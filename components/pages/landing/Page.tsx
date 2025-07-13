@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { useTheme } from 'next-themes';
 import { HeroSection, IconSections, SocialLinks } from './index';
-import { useDataPrefetch } from '@/hooks/useDataPrefetching';
 import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import {
@@ -20,8 +19,6 @@ const HomepageDesign = () => {
   const [mounted, setMounted] = useState(false);
   useTheme();
 
-  // Prefetch data for likely next pages
-  useDataPrefetch();
 
   useEffect(() => {
     setMounted(true);

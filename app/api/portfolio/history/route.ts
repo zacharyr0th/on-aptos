@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { graphQLRequest } from '@/lib/utils/fetch-utils';
-import { PanoraService } from '@/lib/trpc/domains/blockchain/portfolio/panora-service';
+import { PanoraService } from '@/lib/services/blockchain/portfolio/panora-service';
 import {
   generateDailyTimestamps,
   withRetry,

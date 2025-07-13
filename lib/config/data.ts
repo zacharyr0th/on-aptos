@@ -88,11 +88,37 @@ const STABLECOIN_CONFIGS: Record<string, BaseTokenConfig> = {
     auditLink: 'https://www.circle.com/en/transparency',
     tags: ['collateralized', 'fiat-backed'],
   },
+  MOD: {
+    name: 'MOD',
+    symbol: 'MOD',
+    thumbnail: '/icons/stables/mod.png',
+    type: 'Algorithmic Stablecoin',
+    issuer: 'MOD Protocol',
+    assetAddress:
+      '0x6f986d146e4a90b828d8c12c14b6f4e003fdff11a8eecceceb63744363eaac01::mod_coin::MOD',
+    decimals: 8,
+    website: '#',
+    auditLink: '#',
+    tags: ['algorithmic', 'synthetic'],
+  },
+  mUSD: {
+    name: 'Mirage USD',
+    symbol: 'mUSD',
+    thumbnail: '/icons/stables/mUSD.svg',
+    type: 'Algorithmic Stablecoin',
+    issuer: 'Mirage Finance',
+    assetAddress:
+      '0xdd84125d1ebac8f1ecb2819801417fc392325e672be111ec03830c34d6ff82dd',
+    decimals: 8,
+    website: 'https://mirage.money',
+    auditLink: '#',
+    tags: ['algorithmic', 'synthetic', 'collateralized'],
+  },
   sUSDe: {
     name: 'Ethena sUSDe',
     symbol: 'sUSDe',
     thumbnail: '/icons/stables/susde.png',
-    type: 'Bridged via LayerZero OFT',
+    type: 'Algorithmic Stablecoin (LayerZero OFT)',
     issuer: 'Ethena Labs',
     assetAddress:
       '0xb30a694a344edee467d9f82330bbe7c3b89f440a1ecd2da1f3bca266560fce69',
@@ -105,7 +131,7 @@ const STABLECOIN_CONFIGS: Record<string, BaseTokenConfig> = {
     name: 'Ethena USDe',
     symbol: 'USDe',
     thumbnail: '/icons/stables/usde.png',
-    type: 'Bridged via LayerZero OFT',
+    type: 'Algorithmic Stablecoin (LayerZero OFT)',
     issuer: 'Ethena Labs',
     assetAddress:
       '0xf37a8864fe737eb8ec2c2931047047cbaed1beed3fb0e5b7c5526dafd3b9c2e9',
@@ -115,9 +141,9 @@ const STABLECOIN_CONFIGS: Record<string, BaseTokenConfig> = {
     tags: ['algorithmic', 'delta-hedged', 'synthetic'],
   },
   // LayerZero bridged
-  'USDC.lz': {
+  lzUSDC: {
     name: 'LayerZero USDC',
-    symbol: 'USDC.lz',
+    symbol: 'lzUSDC',
     thumbnail: '/icons/stables/usdc.png',
     type: 'Bridged via LayerZero',
     issuer: 'Circle (via LayerZero)',
@@ -128,9 +154,9 @@ const STABLECOIN_CONFIGS: Record<string, BaseTokenConfig> = {
     auditLink: 'https://www.circle.com/en/transparency',
     tags: ['bridged', 'layerzero'],
   },
-  'USDT.lz': {
+  lzUSDT: {
     name: 'LayerZero USDT',
-    symbol: 'USDT.lz',
+    symbol: 'lzUSDT',
     thumbnail: '/icons/stables/usdt.png',
     type: 'Bridged via LayerZero',
     issuer: 'Tether (via LayerZero)',
@@ -142,9 +168,9 @@ const STABLECOIN_CONFIGS: Record<string, BaseTokenConfig> = {
     tags: ['bridged', 'layerzero'],
   },
   // Wormhole bridged
-  'USDC.wh': {
+  whUSDC: {
     name: 'Wormhole USDC',
-    symbol: 'USDC.wh',
+    symbol: 'whUSDC',
     thumbnail: '/icons/stables/usdc.png',
     type: 'Bridged via Wormhole',
     issuer: 'Circle (via Wormhole)',
@@ -155,9 +181,9 @@ const STABLECOIN_CONFIGS: Record<string, BaseTokenConfig> = {
     auditLink: 'https://www.circle.com/en/transparency',
     tags: ['bridged', 'wormhole'],
   },
-  'USDT.wh': {
+  whUSDT: {
     name: 'Wormhole USDT',
-    symbol: 'USDT.wh',
+    symbol: 'whUSDT',
     thumbnail: '/icons/stables/usdt.png',
     type: 'Bridged via Wormhole',
     issuer: 'Tether (via Wormhole)',
@@ -169,9 +195,9 @@ const STABLECOIN_CONFIGS: Record<string, BaseTokenConfig> = {
     tags: ['bridged', 'wormhole'],
   },
   // Celer bridged
-  'USDC.ce': {
+  ceUSDC: {
     name: 'Celer USDC',
-    symbol: 'USDC.ce',
+    symbol: 'ceUSDC',
     thumbnail: '/icons/stables/usdc.png',
     type: 'Bridged via Celer',
     issuer: 'Circle (via Celer)',
@@ -182,9 +208,9 @@ const STABLECOIN_CONFIGS: Record<string, BaseTokenConfig> = {
     auditLink: 'https://www.circle.com/en/transparency',
     tags: ['bridged', 'celer'],
   },
-  'USDT.ce': {
+  ceUSDT: {
     name: 'Celer USDT',
-    symbol: 'USDT.ce',
+    symbol: 'ceUSDT',
     thumbnail: '/icons/stables/usdt.png',
     type: 'Bridged via Celer',
     issuer: 'Tether (via Celer)',

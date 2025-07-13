@@ -1,24 +1,34 @@
 'use client';
 
 import { GeistMono } from 'geist/font/mono';
-import { trpc } from '@/lib/trpc/client';
 import Image from 'next/image';
+import { useState, useEffect } from 'react';
 
 export const AptPriceDisplay = () => {
-  // Use tRPC to fetch APT price
-  const { data: aptPriceData } =
-    trpc.domains.marketData.prices.getCMCPrice.useQuery(
-      { symbol: 'apt' },
-      {
-        staleTime: 60 * 1000, // 1 minute
-        gcTime: 5 * 60 * 1000, // 5 minutes
-        refetchInterval: 60 * 1000, // Auto-refetch every minute
-        refetchIntervalInBackground: true,
-        retry: 3,
-      }
-    );
+  const [price, setPrice] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const price = aptPriceData?.data?.price;
+  useEffect(() => {
+    const fetchPrice = async () => {
+      try {
+        const response = await fetch('/api/prices/cmc/apt');
+        if (response.ok) {
+          const data = await response.json();
+          setPrice(data?.data?.price || null);
+        }
+      } catch (error) {
+        console.error('Error fetching APT price:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPrice();
+    // Refresh every minute
+    const interval = setInterval(fetchPrice, 60 * 1000);
+    
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="hidden sm:flex flex-col items-center gap-1">
@@ -30,10 +40,12 @@ export const AptPriceDisplay = () => {
         className="w-6 h-6 dark:invert"
       />
       <div className={`text-sm text-center ${GeistMono.className}`}>
-        {price ? (
+        {isLoading ? (
+          <span className="text-muted-foreground text-xs">Loading...</span>
+        ) : price ? (
           <span className="font-medium">${price.toFixed(2)}</span>
         ) : (
-          <span className="text-muted-foreground text-xs">Loading...</span>
+          <span className="text-muted-foreground text-xs">--</span>
         )}
       </div>
     </div>
