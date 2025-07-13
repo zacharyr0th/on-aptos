@@ -668,10 +668,16 @@ export default function StablesPage(): React.ReactElement {
     };
 
     // Calculate raw total for TokenCard market share calculations
+    // Need to normalize to 6 decimals for tokens with 8 decimals
     let rawSupplyTotal = BigInt(0);
     for (const token of supplies) {
-      const rawSupply = token.supply_raw || token.supply || '0';
-      rawSupplyTotal += BigInt(rawSupply);
+      const rawSupply = BigInt(token.supply_raw || token.supply || '0');
+      // Normalize 8-decimal tokens to 6 decimals
+      if (token.symbol === 'MOD' || token.symbol === 'mUSD') {
+        rawSupplyTotal += rawSupply / BigInt(100); // Convert from 8 to 6 decimals
+      } else {
+        rawSupplyTotal += rawSupply;
+      }
     }
 
     return {

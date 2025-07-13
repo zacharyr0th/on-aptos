@@ -258,21 +258,18 @@ export const MarketShareChart = memo<MarketShareChartProps>(
             return processingRef.current.lastResult;
           }
 
+          // Use the totalSupply passed from parent which should be the raw total
           const totalSupplyBigInt = BigInt(totalSupply);
           const result: ChartDataItem[] = [];
-          
-          console.log('Chart totalSupply:', totalSupply, 'as BigInt:', totalSupplyBigInt.toString());
 
           for (const token of data) {
             // Skip tokens with 0 supply for chart display
             if (token.supply === '0') continue;
+            
             // Handle combined tokens (like sUSDe/USDe)
             if ('isCombined' in token && token.isCombined && token.components) {
-              const combinedSupply = token.components.reduce(
-                (sum, component) =>
-                  sum + BigInt(component.supply_raw || component.supply),
-                0n
-              );
+              // For combined tokens, sum the supply_raw from components
+              const combinedSupply = BigInt(token.supply_raw || '0');
 
               // Format supply with sUSDe price for combined tokens containing sUSDe
               const hasSUSDe = token.components.some(c => c.symbol === 'sUSDe');
@@ -284,34 +281,36 @@ export const MarketShareChart = memo<MarketShareChartProps>(
               // Calculate USD value properly for combined tokens
               let combinedUsdValue = 0;
               for (const component of token.components) {
-                const componentSupply = BigInt(component.supply_raw || component.supply);
+                const componentSupply = BigInt(component.supply_raw || component.supply || '0');
                 const componentDecimals = (component.symbol === 'MOD' || component.symbol === 'mUSD') ? 8 : 6;
                 const componentDivisor = Math.pow(10, componentDecimals);
                 combinedUsdValue += Number(componentSupply) / componentDivisor;
               }
 
-              const marketShare = calculateMarketShare(combinedSupply, totalSupplyBigInt);
-              console.log(`Chart ${token.symbol}: combinedSupply=${combinedSupply.toString()}, marketShare=${marketShare}%`);
-              
               result.push({
                 name: token.symbol,
                 originalSymbol: token.symbol,
-                value: marketShare,
+                value: calculateMarketShare(combinedSupply, totalSupplyBigInt),
                 formattedSupply,
                 _usdValue: combinedUsdValue,
                 components: token.components,
               });
             } else {
-              // Handle regular tokens
-              const supply = BigInt(token.supply_raw || token.supply || '0');
-              const applyPrice =
-                token.symbol === 'sUSDe' ? susdePrice : undefined;
+              // Handle regular tokens - use supply_raw if available
+              const rawSupply = token.supply_raw || '0';
+              if (rawSupply === '0') continue;
+              
+              const supply = BigInt(rawSupply);
+              const applyPrice = token.symbol === 'sUSDe' ? susdePrice : undefined;
               
               // Check if token has 8 decimals (MOD, mUSD)
               const decimals = (token.symbol === 'MOD' || token.symbol === 'mUSD') ? 8 : 6;
               const divisor = Math.pow(10, decimals);
               
-              // Format supply based on correct decimals
+              // Normalize supply to 6 decimals for market share calculation
+              const normalizedSupply = decimals === 8 ? supply / BigInt(100) : supply;
+              
+              // Format supply based on correct decimals (use original supply)
               const dollarValue = Number(supply) / divisor;
               let formattedSupply: string;
               
@@ -338,13 +337,10 @@ export const MarketShareChart = memo<MarketShareChartProps>(
                 }
               }
 
-              const marketShare = calculateMarketShare(supply, totalSupplyBigInt);
-              console.log(`Chart ${token.symbol}: supply=${supply.toString()}, marketShare=${marketShare}%`);
-              
               result.push({
                 name: token.symbol,
                 originalSymbol: token.symbol,
-                value: marketShare,
+                value: calculateMarketShare(normalizedSupply, totalSupplyBigInt),
                 formattedSupply,
                 _usdValue: dollarValue,
               });
