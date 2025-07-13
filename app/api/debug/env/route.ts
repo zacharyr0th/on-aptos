@@ -6,7 +6,7 @@ export async function GET() {
   if (process.env.NODE_ENV === 'production') {
     return new NextResponse('Not Found', { status: 404 });
   }
-  
+
   return NextResponse.json({
     environment: process.env.NODE_ENV,
     hasRequiredKeys: {
@@ -21,6 +21,6 @@ export async function GET() {
       APTOS_BUILD_SECRET: process.env.APTOS_BUILD_SECRET?.length || 0,
       RWA_API_KEY: process.env.RWA_API_KEY?.length || 0,
     },
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 }

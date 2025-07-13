@@ -63,7 +63,9 @@ const HeaderComponent = (): React.ReactElement | null => {
 
     const fetchAnsName = async () => {
       try {
-        const response = await fetch(`/api/wallet/ans?address=${encodeURIComponent(walletAddress)}`);
+        const response = await fetch(
+          `/api/wallet/ans?address=${encodeURIComponent(walletAddress)}`
+        );
         if (response.ok) {
           const data = await response.json();
           if (data.success && data.data) {
@@ -78,7 +80,7 @@ const HeaderComponent = (): React.ReactElement | null => {
     fetchAnsName();
     // Refresh every 5 minutes
     const interval = setInterval(fetchAnsName, 300000);
-    
+
     return () => clearInterval(interval);
   }, [walletAddress, connected]);
 

@@ -68,11 +68,18 @@ export async function GET() {
         external_apis: apiStatus,
         environment: process.env.NODE_ENV || 'unknown',
       },
-      services: process.env.NODE_ENV === 'production' ? undefined : {
-        cmc_api: !!env.CMC_API_KEY ? 'configured' : 'not_configured',
-        panora_api: !!env.PANORA_API_KEY ? 'configured' : 'not_configured',
-        aptos_api: !!env.APTOS_BUILD_SECRET ? 'configured' : 'not_configured',
-      },
+      services:
+        process.env.NODE_ENV === 'production'
+          ? undefined
+          : {
+              cmc_api: !!env.CMC_API_KEY ? 'configured' : 'not_configured',
+              panora_api: !!env.PANORA_API_KEY
+                ? 'configured'
+                : 'not_configured',
+              aptos_api: !!env.APTOS_BUILD_SECRET
+                ? 'configured'
+                : 'not_configured',
+            },
     };
 
     // Log health check access

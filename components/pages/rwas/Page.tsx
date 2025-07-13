@@ -6,6 +6,14 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { MarketShareChart } from '@/components/pages/rwas/Chart';
 import { RwaTokenDialog } from '@/components/pages/rwas/Dialog';
 import { Header } from '@/components/layout/Header';
@@ -512,9 +520,8 @@ export default function RWAsPage(): React.ReactElement {
   const { isMobile } = useResponsive();
   const { t } = usePageTranslation('rwas');
 
-
   // Fetch real-time RWA data using direct API call
-  const [rwaResponse, setRwaResponse] = useState<{data: any} | null>(null);
+  const [rwaResponse, setRwaResponse] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [rwaError, setRwaError] = useState<Error | null>(null);
 
@@ -522,21 +529,21 @@ export default function RWAsPage(): React.ReactElement {
     try {
       setIsLoading(true);
       setRwaError(null);
-      
+
       const response = await fetch('/api/rwa', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
       });
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
-      
+
       const data = await response.json();
-      setRwaResponse({ data });
-      
+      console.log('[RWA Page] API Response:', data);
+      setRwaResponse(data);
     } catch (error) {
       setRwaError(error instanceof Error ? error : new Error(String(error)));
     } finally {
@@ -571,11 +578,18 @@ export default function RWAsPage(): React.ReactElement {
 
   // Removed prefetch logic - using direct API instead
 
-  // Extract protocols from the response
-  const protocols = useMemo(
-    () => rwaResponse?.data?.protocols || [],
-    [rwaResponse?.data?.protocols]
-  );
+  // Extract protocols from the response and map fields
+  const protocols = useMemo(() => {
+    const assets = rwaResponse?.data?.assets || [];
+    // Map the API response to the expected format
+    return assets.map((asset: any) => ({
+      ...asset,
+      totalValue: asset.aptosTvl || 0,
+      assetTicker: asset.symbol || asset.assetTicker,
+      protocol: asset.name || asset.protocol,
+      tokenAddress: asset.tokenAddress || asset.address || '',
+    }));
+  }, [rwaResponse?.data?.assets]);
   const totalRWAValue = rwaResponse?.data?.totalAptosValue || 0;
   const dataSource = rwaResponse?.data?.dataSource || 'RWA.xyz API';
   const timestamp = rwaResponse?.data?.timestamp;
@@ -654,6 +668,23 @@ export default function RWAsPage(): React.ReactElement {
         </div>
 
         <main className="container-layout py-6 flex-1">
+          {/* Under Construction Notice */}
+          <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-6">
+            <div className="flex items-center gap-3">
+              <div className="text-yellow-600 dark:text-yellow-400">
+                🚧
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+                  Under Construction
+                </h3>
+                <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-1">
+                  The RWA page is currently being updated. Please check again later.
+                </p>
+              </div>
+            </div>
+          </div>
+
           {loading ? (
             <LoadingState />
           ) : error ? (
@@ -834,6 +865,77 @@ export default function RWAsPage(): React.ReactElement {
                       totalValue={processedData.totalValue}
                     />
                   </ErrorBoundary>
+                </div>
+              </div>
+
+              {/* Asset Details Table */}
+              <div className="mt-8 w-full overflow-hidden">
+                <hr className="border-t border-border mb-6" />
+                <div className="w-full overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="min-w-[120px] sm:min-w-[150px]">
+                          Protocol
+                        </TableHead>
+                        <TableHead className="min-w-[100px] sm:min-w-[120px]">
+                          TVL
+                        </TableHead>
+                        <TableHead className="min-w-[50px] sm:min-w-[60px]">
+                          %
+                        </TableHead>
+                        <TableHead className="min-w-[100px] sm:min-w-[140px]">
+                          Category
+                        </TableHead>
+                        <TableHead className="min-w-[80px] sm:min-w-[100px]">
+                          Chain
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {processedData.protocols.map(protocol => {
+                        const marketSharePercent = (
+                          (protocol.tvl / processedData.totalValue) *
+                          100
+                        ).toFixed(2);
+
+                        return (
+                          <TableRow key={protocol.id}>
+                            <TableCell className="whitespace-nowrap">
+                              <div className="flex items-center gap-2">
+                                <Image
+                                  src={protocol.logo || '/placeholder.jpg'}
+                                  alt={protocol.name}
+                                  width={20}
+                                  height={20}
+                                  className="rounded-full flex-shrink-0"
+                                  onError={e => {
+                                    const img = e.target as HTMLImageElement;
+                                    img.src = '/placeholder.jpg';
+                                  }}
+                                />
+                                <span className="font-medium">
+                                  {protocol.name}
+                                </span>
+                              </div>
+                            </TableCell>
+                            <TableCell className="font-mono whitespace-nowrap">
+                              {formatCurrency(protocol.tvl, 'USD')}
+                            </TableCell>
+                            <TableCell className="font-mono whitespace-nowrap">
+                              {marketSharePercent}%
+                            </TableCell>
+                            <TableCell className="text-sm">
+                              {protocol.category || 'RWA'}
+                            </TableCell>
+                            <TableCell className="text-sm">
+                              {protocol.chain || 'Aptos'}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
                 </div>
               </div>
             </>

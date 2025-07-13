@@ -11,12 +11,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
-import {
-  ExternalLink,
-  Grid3X3,
-  Copy,
-  Check,
-} from 'lucide-react';
+import { ExternalLink, Grid3X3, Copy, Check } from 'lucide-react';
 import { toast } from 'sonner';
 import { NFT } from './types';
 
@@ -96,9 +91,11 @@ export const NFTDetailsDialog: React.FC<NFTDetailsDialogProps> = ({
               <div className="bg-muted/30 rounded-lg p-3 space-y-2">
                 <div>
                   <p className="text-xs text-muted-foreground">Collection</p>
-                  <p className="text-sm font-medium truncate">{nft.collection_name}</p>
+                  <p className="text-sm font-medium truncate">
+                    {nft.collection_name}
+                  </p>
                 </div>
-                
+
                 {nft.amount && (
                   <div className="flex justify-between items-center">
                     <p className="text-xs text-muted-foreground">Amount</p>

@@ -6,6 +6,14 @@ import { GeistMono } from 'geist/font/mono';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { MarketShareChart, TOKEN_COLORS } from '@/components/pages/btc/Chart';
 import { TokenDialog } from '@/components/pages/btc/Dialog';
 import { Header } from '@/components/layout/Header';
@@ -314,7 +322,9 @@ export default function BitcoinPage(): React.ReactElement {
   const [forceRefresh, setForceRefresh] = useState(false);
 
   // Use direct API call for BTC supply data
-  const [btcSupplyData, setBtcSupplyData] = useState<{data: any} | null>(null);
+  const [btcSupplyData, setBtcSupplyData] = useState<{ data: any } | null>(
+    null
+  );
   const [btcSupplyLoading, setBtcSupplyLoading] = useState(true);
   const [btcSupplyError, setBtcSupplyError] = useState<Error | null>(null);
   const [btcSupplyFetching, setBtcSupplyFetching] = useState(false);
@@ -323,23 +333,25 @@ export default function BitcoinPage(): React.ReactElement {
     try {
       setBtcSupplyFetching(true);
       setBtcSupplyError(null);
-      
+
       const response = await fetch('/api/aptos/btc', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
       });
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
-      
+
       const data = await response.json();
-      setBtcSupplyData({ data });
-      
+      console.log('[BTC Page] API Response:', data);
+      setBtcSupplyData(data);
     } catch (error) {
-      setBtcSupplyError(error instanceof Error ? error : new Error(String(error)));
+      setBtcSupplyError(
+        error instanceof Error ? error : new Error(String(error))
+      );
     } finally {
       setBtcSupplyLoading(false);
       setBtcSupplyFetching(false);
@@ -349,7 +361,7 @@ export default function BitcoinPage(): React.ReactElement {
   // Auto-refetch every 5 minutes
   useEffect(() => {
     fetchBtcSupplyData();
-    
+
     const interval = setInterval(fetchBtcSupplyData, 5 * 60 * 1000);
     return () => clearInterval(interval);
   }, [fetchBtcSupplyData, forceRefresh]);
@@ -361,31 +373,24 @@ export default function BitcoinPage(): React.ReactElement {
     loading: bitcoinPriceLoading,
   } = useBitcoinPrice();
 
-  // Extract bitcoin price from price hook
+  // Extract bitcoin price from price hook - NO FALLBACK, use real data only
   const bitcoinPriceData = useMemo(() => {
     return measurePerformance(() => {
-      // Use bitcoin price hook data
-      if (bitcoinPriceHookData?.price) {
-        return bitcoinPriceHookData;
-      }
-
-      // Last resort fallback to a reasonable default
-      return {
-        price: 100000, // $100k as reasonable default
-        updated: new Date().toISOString(),
-      };
+      console.log('[BTC Page] bitcoinPriceHookData:', bitcoinPriceHookData);
+      return bitcoinPriceHookData;
     }, 'Bitcoin price calculation');
   }, [bitcoinPriceHookData]);
 
   // Extract the actual data from REST API responses and transform to expected format
   const data: SupplyData | null = useMemo(() => {
     return measurePerformance(() => {
-      if (!btcSupplyData || !btcSupplyData.data)
+      console.log('[BTC Page] btcSupplyData:', btcSupplyData);
+      if (!btcSupplyData || !btcSupplyData.data || !btcSupplyData.data.data)
         return null;
 
       // Transform REST API response to expected format
-      const apiData = btcSupplyData.data;
-      
+      const apiData = btcSupplyData.data.data;
+
       return {
         supplies: apiData.supplies,
         total: apiData.total,
@@ -446,7 +451,11 @@ export default function BitcoinPage(): React.ReactElement {
   // Calculate the total BTC and USD value correctly
   const { totalBTC, totalUSD } = useMemo(() => {
     return measurePerformance(() => {
-      if (!processedData || !processedData.supplies || !Array.isArray(processedData.supplies)) {
+      if (
+        !processedData ||
+        !processedData.supplies ||
+        !Array.isArray(processedData.supplies)
+      ) {
         return { totalBTC: 0, totalUSD: 0 };
       }
 
@@ -458,7 +467,7 @@ export default function BitcoinPage(): React.ReactElement {
 
       const results = batchConvertBTCAmounts(
         batchItems,
-        bitcoinPriceData?.price
+        bitcoinPriceData?.price || 0 // Use 0 if no price data
       );
 
       const totalBTCValue = results.reduce((sum, result) => {
@@ -500,8 +509,15 @@ export default function BitcoinPage(): React.ReactElement {
             <LoadingState />
           ) : error ? (
             <ErrorState error={error} onRetry={handleRetry} t={t} />
-          ) : processedData && bitcoinPriceData ? (
+          ) : processedData ? (
             <>
+              {console.log('[BTC Page] Render check:', {
+                processedData,
+                bitcoinPriceData,
+                data,
+                loading,
+                error,
+              })}
               <div className="flex items-center bg-card border rounded-lg py-3 px-4 mb-6">
                 <div className="flex-grow">
                   <h2 className="text-base sm:text-lg font-medium text-card-foreground">
@@ -514,13 +530,13 @@ export default function BitcoinPage(): React.ReactElement {
                     </span>
                   </p>
                 </div>
-                <div className="flex flex-col items-end">
-                  <div className="bg-amber-100 dark:bg-amber-950 p-2 mb-1 rounded">
+                <div className="flex flex-col items-center">
+                  <div className="mb-1">
                     <Image
                       src="/icons/btc/bitcoin.png"
                       alt={t('btc:assets.bitcoin')}
-                      width={20}
-                      height={20}
+                      width={32}
+                      height={32}
                       className="object-contain"
                       onError={e => {
                         const img = e.target as HTMLImageElement;
@@ -529,7 +545,9 @@ export default function BitcoinPage(): React.ReactElement {
                     />
                   </div>
                   <div className="text-xs text-muted-foreground font-mono">
-                    {formatCurrency(bitcoinPriceData.price, 'USD')}
+                    {bitcoinPriceData?.price
+                      ? formatCurrency(bitcoinPriceData.price, 'USD')
+                      : 'Loading...'}
                   </div>
                 </div>
               </div>
@@ -541,7 +559,7 @@ export default function BitcoinPage(): React.ReactElement {
                       key={token.symbol}
                       token={token}
                       totalBTC={totalBTC}
-                      bitcoinPrice={bitcoinPriceData.price}
+                      bitcoinPrice={bitcoinPriceData?.price}
                       t={t}
                     />
                   )) || []}
@@ -563,9 +581,95 @@ export default function BitcoinPage(): React.ReactElement {
                     <MarketShareChart
                       data={processedData.supplies}
                       tokenMetadata={TOKEN_METADATA}
-                      bitcoinPrice={bitcoinPriceData.price}
+                      bitcoinPrice={bitcoinPriceData?.price}
                     />
                   </ErrorBoundary>
+                </div>
+              </div>
+
+              {/* Asset Details Table */}
+              <div className="mt-8 w-full overflow-hidden">
+                <hr className="border-t border-border mb-6" />
+                <div className="w-full overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="min-w-[120px] sm:min-w-[150px]">
+                          Token
+                        </TableHead>
+                        <TableHead className="min-w-[100px] sm:min-w-[120px]">
+                          Amount
+                        </TableHead>
+                        <TableHead className="min-w-[100px] sm:min-w-[120px]">
+                          Value
+                        </TableHead>
+                        <TableHead className="min-w-[50px] sm:min-w-[60px]">
+                          %
+                        </TableHead>
+                        <TableHead className="min-w-[100px] sm:min-w-[140px]">
+                          Type
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {processedData?.supplies?.map(token => {
+                        const metadata = TOKEN_METADATA[token.symbol];
+                        const decimals = metadata?.decimals || 8;
+                        const btcAmount = convertRawTokenAmount(
+                          token.supply,
+                          decimals
+                        );
+                        const usdValue = bitcoinPriceData?.price
+                          ? btcAmount * bitcoinPriceData.price
+                          : 0;
+                        const marketSharePercent = (
+                          (btcAmount / totalBTC) *
+                          100
+                        ).toFixed(2);
+                        const tokenColor =
+                          TOKEN_COLORS[token.symbol] || TOKEN_COLORS.default;
+
+                        return (
+                          <TableRow key={token.symbol}>
+                            <TableCell className="whitespace-nowrap">
+                              <div className="flex items-center gap-2">
+                                <Image
+                                  src={
+                                    metadata?.thumbnail || '/placeholder.jpg'
+                                  }
+                                  alt={token.symbol}
+                                  width={20}
+                                  height={20}
+                                  className="rounded-full flex-shrink-0"
+                                  onError={e => {
+                                    const img = e.target as HTMLImageElement;
+                                    img.src = '/placeholder.jpg';
+                                  }}
+                                />
+                                <span className="font-medium">
+                                  {token.symbol}
+                                </span>
+                              </div>
+                            </TableCell>
+                            <TableCell className="font-mono whitespace-nowrap">
+                              {formatAmount(btcAmount, 'BTC')}
+                            </TableCell>
+                            <TableCell className="font-mono whitespace-nowrap">
+                              {bitcoinPriceData?.price
+                                ? formatCurrency(usdValue, 'USD')
+                                : '—'}
+                            </TableCell>
+                            <TableCell className="font-mono whitespace-nowrap">
+                              {marketSharePercent}%
+                            </TableCell>
+                            <TableCell className="text-sm">
+                              {metadata?.type || '—'}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
                 </div>
               </div>
             </>

@@ -24,22 +24,26 @@ export function useMarketPrice(symbol: string): UseMarketPriceResult {
   const fetchPrice = useCallback(async () => {
     try {
       setError(null);
-      
+
       const response = await fetch(`/api/prices/cmc/${symbol.toLowerCase()}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
       });
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
-      
-      const priceData = await response.json();
+
+      const result = await response.json();
+      const priceData = result.data || result;
+      console.log('[useMarketPrice] API response:', result);
+      console.log('[useMarketPrice] Price data:', priceData);
       setData(priceData);
-      setLastUpdated(priceData.updated ? new Date(priceData.updated) : new Date());
-      
+      setLastUpdated(
+        priceData.updated ? new Date(priceData.updated) : new Date()
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     } finally {
@@ -50,7 +54,7 @@ export function useMarketPrice(symbol: string): UseMarketPriceResult {
   // Auto-refetch every 5 minutes
   useEffect(() => {
     fetchPrice();
-    
+
     const interval = setInterval(fetchPrice, 5 * 60 * 1000);
     return () => clearInterval(interval);
   }, [fetchPrice]);

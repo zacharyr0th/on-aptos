@@ -26,7 +26,7 @@ export const AptPriceDisplay = () => {
     fetchPrice();
     // Refresh every minute
     const interval = setInterval(fetchPrice, 60 * 1000);
-    
+
     return () => clearInterval(interval);
   }, []);
 

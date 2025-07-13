@@ -6,7 +6,7 @@ export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
     const address = searchParams.get('address');
-    
+
     if (!address) {
       return NextResponse.json(
         { error: 'Address parameter is required' },
@@ -35,11 +35,11 @@ export async function GET(request: NextRequest) {
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
     };
-    
+
     if (process.env.APTOS_BUILD_SECRET) {
       headers['Authorization'] = `Bearer ${process.env.APTOS_BUILD_SECRET}`;
     }
-    
+
     const response = await fetch(INDEXER, {
       method: 'POST',
       headers,
@@ -56,19 +56,19 @@ export async function GET(request: NextRequest) {
     }
 
     const result = await response.json();
-    
+
     if (result.errors) {
       console.error('GraphQL errors:', result.errors);
       throw new Error('GraphQL query failed');
     }
 
     const primaryName = result.data?.current_aptos_names?.[0];
-    
+
     if (primaryName) {
-      const fullName = primaryName.subdomain 
+      const fullName = primaryName.subdomain
         ? `${primaryName.subdomain}.${primaryName.domain}.apt`
         : `${primaryName.domain}.apt`;
-      
+
       return NextResponse.json({
         success: true,
         data: {
@@ -77,23 +77,22 @@ export async function GET(request: NextRequest) {
           subdomain: primaryName.subdomain,
           address: primaryName.registered_address,
           expiration: primaryName.expiration_timestamp,
-        }
+        },
       });
     }
-    
+
     // No primary name found
     return NextResponse.json({
       success: true,
-      data: null
+      data: null,
     });
-    
   } catch (error) {
     console.error('Error fetching ANS name:', error);
     return NextResponse.json(
-      { 
+      {
         success: false,
         error: 'Failed to fetch ANS name',
-        details: error instanceof Error ? error.message : String(error)
+        details: error instanceof Error ? error.message : String(error),
       },
       { status: 500 }
     );

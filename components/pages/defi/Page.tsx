@@ -25,7 +25,6 @@ export default function DefiPage(): React.ReactElement {
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const { t, getText } = usePageTranslation('defi');
 
-
   // Filter protocols based on category, subcategory, and search
   const filteredProtocols = defiProtocols.filter(protocol => {
     const matchesCategory =

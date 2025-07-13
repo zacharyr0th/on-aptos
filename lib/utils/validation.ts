@@ -31,17 +31,21 @@ export const WalletParamsSchema = z.object({
   walletAddress: AptosAddressSchema,
 });
 
-export const PortfolioAssetsQuerySchema = z.object({
-  walletAddress: AptosAddressSchema,
-  showOnlyVerified: BooleanSchema.default(true),
-  forceRefresh: BooleanSchema.default(false),
-}).merge(PaginationSchema.partial());
+export const PortfolioAssetsQuerySchema = z
+  .object({
+    walletAddress: AptosAddressSchema,
+    showOnlyVerified: BooleanSchema.default(true),
+    forceRefresh: BooleanSchema.default(false),
+  })
+  .merge(PaginationSchema.partial());
 
-export const PortfolioNFTsQuerySchema = z.object({
-  walletAddress: AptosAddressSchema,
-  limit: z.coerce.number().int().min(1).max(100).default(30),
-  offset: z.coerce.number().int().min(0).default(0),
-}).merge(PaginationSchema.partial());
+export const PortfolioNFTsQuerySchema = z
+  .object({
+    walletAddress: AptosAddressSchema,
+    limit: z.coerce.number().int().min(1).max(100).default(30),
+    offset: z.coerce.number().int().min(0).default(0),
+  })
+  .merge(PaginationSchema.partial());
 
 export const PortfolioDeFiQuerySchema = z.object({
   walletAddress: AptosAddressSchema,
@@ -55,12 +59,14 @@ export const PriceQuerySchema = z.object({
   forceRefresh: BooleanSchema.default(false),
 });
 
-export const ANSQuerySchema = z.object({
-  address: AptosAddressSchema.optional(),
-  name: z.string().min(1).max(100).optional(),
-}).refine(data => data.address || data.name, {
-  message: 'Either address or name must be provided',
-});
+export const ANSQuerySchema = z
+  .object({
+    address: AptosAddressSchema.optional(),
+    name: z.string().min(1).max(100).optional(),
+  })
+  .refine(data => data.address || data.name, {
+    message: 'Either address or name must be provided',
+  });
 
 export const NFTTransferHistoryQuerySchema = z.object({
   tokenDataId: z.string().min(1),
@@ -83,7 +89,7 @@ export function validateQuery<T>(
   try {
     const searchParams = request.nextUrl.searchParams;
     const params: Record<string, string | string[]> = {};
-    
+
     // Convert URLSearchParams to object
     searchParams.forEach((value, key) => {
       if (params[key]) {
@@ -97,7 +103,7 @@ export function validateQuery<T>(
         params[key] = value;
       }
     });
-    
+
     const parsed = schema.parse(params);
     return { success: true, data: parsed };
   } catch (error) {
@@ -114,12 +120,13 @@ export function validateQuery<T>(
         },
       };
     }
-    
+
     return {
       success: false,
       error: {
         type: 'unknown',
-        message: error instanceof Error ? error.message : 'Unknown validation error',
+        message:
+          error instanceof Error ? error.message : 'Unknown validation error',
       },
     };
   }
@@ -150,7 +157,7 @@ export async function validateBody<T>(
         },
       };
     }
-    
+
     if (error instanceof SyntaxError) {
       return {
         success: false,
@@ -160,12 +167,13 @@ export async function validateBody<T>(
         },
       };
     }
-    
+
     return {
       success: false,
       error: {
         type: 'unknown',
-        message: error instanceof Error ? error.message : 'Unknown validation error',
+        message:
+          error instanceof Error ? error.message : 'Unknown validation error',
       },
     };
   }
@@ -188,7 +196,7 @@ export function withValidation<TQuery = any, TBody = any>(
     return async function (request: NextRequest) {
       let validatedQuery: TQuery | undefined;
       let validatedBody: TBody | undefined;
-      
+
       // Validate query parameters
       if (querySchema) {
         const queryResult = validateQuery(request, querySchema);
@@ -200,7 +208,7 @@ export function withValidation<TQuery = any, TBody = any>(
         }
         validatedQuery = queryResult.data;
       }
-      
+
       // Validate request body (for POST/PUT requests)
       if (bodySchema && ['POST', 'PUT', 'PATCH'].includes(request.method)) {
         const bodyResult = await validateBody(request, bodySchema);
@@ -212,7 +220,7 @@ export function withValidation<TQuery = any, TBody = any>(
         }
         validatedBody = bodyResult.data;
       }
-      
+
       return handler({
         query: validatedQuery,
         body: validatedBody,
@@ -225,7 +233,10 @@ export function withValidation<TQuery = any, TBody = any>(
 /**
  * Sanitize input strings to prevent injection attacks
  */
-export function sanitizeString(input: string, maxLength: number = 1000): string {
+export function sanitizeString(
+  input: string,
+  maxLength: number = 1000
+): string {
   return input
     .trim()
     .slice(0, maxLength)
@@ -238,10 +249,12 @@ export function sanitizeString(input: string, maxLength: number = 1000): string 
  */
 export const FileUploadSchema = z.object({
   filename: z.string().min(1).max(255),
-  mimetype: z.string().refine(
-    type => ['image/png', 'image/jpeg', 'image/gif'].includes(type),
-    'Invalid file type'
-  ),
+  mimetype: z
+    .string()
+    .refine(
+      type => ['image/png', 'image/jpeg', 'image/gif'].includes(type),
+      'Invalid file type'
+    ),
   size: z.number().max(5 * 1024 * 1024), // 5MB max
 });
 

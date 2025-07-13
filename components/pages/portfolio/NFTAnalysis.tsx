@@ -93,8 +93,12 @@ export function NFTAnalysis({
   };
 
   return (
-    <Card 
-      className={selectedNFT && onClearSelection ? "cursor-pointer hover:bg-muted/50 transition-colors" : ""}
+    <Card
+      className={
+        selectedNFT && onClearSelection
+          ? 'cursor-pointer hover:bg-muted/50 transition-colors'
+          : ''
+      }
       onClick={selectedNFT && onClearSelection ? onClearSelection : undefined}
     >
       <CardHeader>

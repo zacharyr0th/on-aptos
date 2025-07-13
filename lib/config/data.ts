@@ -228,7 +228,7 @@ const BTC_CONFIGS: Record<string, BaseTokenConfig> = {
     name: 'OKX wBTC',
     symbol: 'xBTC',
     thumbnail: '/icons/btc/okx.png',
-    type: 'Native Aptos issuance',
+    type: 'Bridged via OKX Bridge',
     issuer: 'OKX',
     assetAddress:
       '0x81214a80d82035a190fcb76b6ff3c0145161c3a9f33d137f2bbaee4cfec8a387',
@@ -241,7 +241,7 @@ const BTC_CONFIGS: Record<string, BaseTokenConfig> = {
     name: 'StakeStone Bitcoin',
     symbol: 'SBTC',
     thumbnail: '/icons/btc/stakestone.png',
-    type: 'Native Aptos issuance (formerly lzSBTC)',
+    type: 'Bridged via LayerZero',
     issuer: 'StakeStone',
     assetAddress:
       '0x5dee1d4b13fae338a1e1780f9ad2709a010e824388efd169171a26e3ea9029bb::stakestone_bitcoin::StakeStoneBitcoin',
@@ -254,8 +254,8 @@ const BTC_CONFIGS: Record<string, BaseTokenConfig> = {
     name: 'Aptos Bitcoin',
     symbol: 'aBTC',
     thumbnail: '/icons/btc/echo.png',
-    type: 'Native Aptos issuance',
-    issuer: 'Aptos',
+    type: 'Bridged via Echo',
+    issuer: 'Echo Protocol',
     assetAddress:
       '0x4e1854f6d332c9525e258fb6e66f84b6af8aba687bbcb832a24768c4e175feec::abtc::ABTC',
     decimals: 10,
@@ -472,11 +472,25 @@ export const LST_TOKENS = [
       '0x111ae3e5bc816a5e63c2da97d0aa3886519e0cd5e4b046659fa35796bd11542a::amapt_token::AmnisApt',
   },
   {
+    symbol: 'amAPT-FA',
+    name: `${LST_CONFIGS.amAPT.name} (FA)`,
+    decimals: LST_CONFIGS.amAPT.decimals,
+    asset_type:
+      '0xa259be733b6a759909f92815927fa213904df6540519568692caf0b068fe8e62',
+  },
+  {
     symbol: 'stAPT',
     name: LST_CONFIGS.stAPT.name,
     decimals: LST_CONFIGS.stAPT.decimals,
     asset_type:
       '0x111ae3e5bc816a5e63c2da97d0aa3886519e0cd5e4b046659fa35796bd11542a::stapt_token::StakedApt',
+  },
+  {
+    symbol: 'stAPT-FA',
+    name: `${LST_CONFIGS.stAPT.name} (FA)`,
+    decimals: LST_CONFIGS.stAPT.decimals,
+    asset_type:
+      '0xb614bfdf9edc39b330bbf9c3c5bcd0473eee2f6d4e21748629cc367869ece627',
   },
   {
     symbol: 'thAPT',

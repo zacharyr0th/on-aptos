@@ -100,6 +100,61 @@ function formatTokenAmount(amount: bigint, decimals: number): string {
 }
 
 /**
+ * Combine Coin and FA versions of amAPT and stAPT
+ */
+function combineTokenSupplies(rawSupplies: LSTSupply[]): LSTSupply[] {
+  const combined: Record<string, LSTSupply> = {};
+
+  for (const supply of rawSupplies) {
+    let baseSymbol = supply.symbol;
+
+    // Handle FA versions - remove -FA suffix and combine with base token
+    if (supply.symbol.endsWith('-FA')) {
+      baseSymbol = supply.symbol.replace('-FA', '');
+    }
+
+    if (combined[baseSymbol]) {
+      // Combine supplies
+      const existingSupply = BigInt(combined[baseSymbol].supply);
+      const newSupply = BigInt(supply.supply);
+      const totalSupply = existingSupply + newSupply;
+
+      combined[baseSymbol] = {
+        ...combined[baseSymbol],
+        supply: totalSupply.toString(),
+        formatted_supply: formatTokenAmount(
+          totalSupply,
+          combined[baseSymbol].decimals
+        ),
+      };
+
+      console.log('[LST] Combined token supplies', {
+        baseSymbol,
+        existingSupply: existingSupply.toString(),
+        newSupply: newSupply.toString(),
+        totalSupply: totalSupply.toString(),
+        formattedTotal: formatTokenAmount(
+          totalSupply,
+          combined[baseSymbol].decimals
+        ),
+      });
+    } else {
+      // First occurrence of this token
+      combined[baseSymbol] = {
+        symbol: baseSymbol,
+        name: supply.name.replace(' (FA)', ''), // Remove FA suffix from name
+        supply: supply.supply,
+        formatted_supply: supply.formatted_supply,
+        decimals: supply.decimals,
+        asset_type: supply.asset_type, // Keep the original asset_type for reference
+      };
+    }
+  }
+
+  return Object.values(combined);
+}
+
+/**
  * Core data fetching logic for LST supplies
  */
 export async function fetchLSTSuppliesData(): Promise<LSTSupplyData> {
@@ -194,7 +249,7 @@ export async function fetchLSTSuppliesData(): Promise<LSTSupplyData> {
   });
 
   // Execute requests with rate limiting
-  const supplies = await batchRequests(requestFunctions, batchOptions);
+  const rawSupplies = await batchRequests(requestFunctions, batchOptions);
 
   console.log('[LST] Batch requests completed', {
     totalRequests: requestFunctions.length,
@@ -207,6 +262,9 @@ export async function fetchLSTSuppliesData(): Promise<LSTSupplyData> {
     console.error('[LST] All requests failed due to rate limiting');
     throw rateLimitError;
   }
+
+  // Combine amAPT and stAPT (Coin + FA versions)
+  const supplies = combineTokenSupplies(rawSupplies);
 
   const totalRaw = supplies.reduce((sum, t) => sum + BigInt(t.supply), 0n);
   const totalFormatted = formatTokenAmount(totalRaw, 8);

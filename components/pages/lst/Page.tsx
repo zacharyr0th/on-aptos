@@ -7,6 +7,14 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { ErrorBoundary } from '@/components/errors/ErrorBoundary';
@@ -28,6 +36,7 @@ import {
   formatAmount,
   formatAmountFull,
   formatLargeNumber,
+  formatCurrency,
 } from '@/lib/utils';
 import { usePageTranslation } from '@/hooks/useTranslation';
 // Simplified for better compatibility
@@ -53,65 +62,80 @@ interface LSTSupplyData extends SupplyData {
 const TokenCard = React.memo(function TokenCard({
   token,
   totalSupply,
+  aptPrice,
   t,
 }: {
   token: DisplayToken;
   totalSupply: string;
+  aptPrice?: number;
   t: (key: string) => string;
 }): React.ReactElement {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const { marketSharePercent, formattedDisplaySupply } = useMemo(() => {
-    const calcMarketShare = () => {
-      if (BigInt(totalSupply) === 0n) return '0';
+  const { marketSharePercent, formattedDisplaySupply, aptValue, usdValue } =
+    useMemo(() => {
+      const calcMarketShare = () => {
+        if (BigInt(totalSupply) === 0n) return '0';
 
-      // Calculate market share with proper precision
-      const tokenSupply = BigInt(token.supply);
-      const total = BigInt(totalSupply);
-      const marketShare = (tokenSupply * 10000n) / total; // Multiply by 10000 for 2 decimal places
+        // Calculate market share with proper precision
+        const tokenSupply = BigInt(token.supply);
+        const total = BigInt(totalSupply);
+        const marketShare = (tokenSupply * 10000n) / total; // Multiply by 10000 for 2 decimal places
 
-      // Convert to string with proper formatting (e.g., "12.34")
-      const integerPart = marketShare / 100n;
-      const decimalPart = marketShare % 100n;
-      const formattedDecimal = decimalPart.toString().padStart(2, '0');
+        // Convert to string with proper formatting (e.g., "12.34")
+        const integerPart = marketShare / 100n;
+        const decimalPart = marketShare % 100n;
+        const formattedDecimal = decimalPart.toString().padStart(2, '0');
 
-      return `${integerPart}.${formattedDecimal}`;
-    };
+        return `${integerPart}.${formattedDecimal}`;
+      };
 
-    const formatSingle = (s: string, symbol: string) => {
-      const metadata = TOKEN_METADATA[symbol] || { decimals: 8 };
-      const decimals = metadata.decimals;
-      const tokens = convertRawTokenAmount(s, decimals);
+      const formatSingle = (s: string, symbol: string) => {
+        const metadata = TOKEN_METADATA[symbol] || { decimals: 8 };
+        const decimals = metadata.decimals;
+        const tokens = convertRawTokenAmount(s, decimals);
 
-      // Format without symbol, just number with M/K
-      return formatLargeNumber(tokens, 1).toUpperCase();
-    };
+        // Format without symbol, just number with M/K
+        return formatLargeNumber(tokens, 1).toUpperCase();
+      };
 
-    const calcFormattedDisplay = () => {
-      if ('isCombined' in token && token.isCombined) {
-        const parts: string[] = [];
+      const calcFormattedDisplay = () => {
+        if ('isCombined' in token && token.isCombined) {
+          const parts: string[] = [];
 
-        // Sort components by supply in descending order
-        const sortedComponents = [...token.components].sort((a, b) => {
-          const supplyA = BigInt(a.supply);
-          const supplyB = BigInt(b.supply);
-          return supplyB > supplyA ? 1 : -1;
-        });
+          // Sort components by supply in descending order
+          const sortedComponents = [...token.components].sort((a, b) => {
+            const supplyA = BigInt(a.supply);
+            const supplyB = BigInt(b.supply);
+            return supplyB > supplyA ? 1 : -1;
+          });
 
-        sortedComponents.forEach(c => {
-          parts.push(formatSingle(c.supply, c.symbol));
-        });
+          sortedComponents.forEach(c => {
+            parts.push(formatSingle(c.supply, c.symbol));
+          });
 
-        return parts.join(' / ');
-      }
-      return formatSingle(token.supply, token.symbol);
-    };
+          return parts.join(' / ');
+        }
+        return formatSingle(token.supply, token.symbol);
+      };
 
-    return {
-      marketSharePercent: calcMarketShare(),
-      formattedDisplaySupply: calcFormattedDisplay(),
-    };
-  }, [token, totalSupply]);
+      // Calculate APT value for USD conversion
+      const calcAptValue = () => {
+        // All LST tokens have 8 decimals
+        const aptAmount = Number(BigInt(token.supply)) / 1_000_000_00;
+        return aptAmount;
+      };
+
+      const aptAmount = calcAptValue();
+      const usdAmount = aptPrice ? aptAmount * aptPrice : 0;
+
+      return {
+        marketSharePercent: calcMarketShare(),
+        formattedDisplaySupply: calcFormattedDisplay(),
+        aptValue: aptAmount,
+        usdValue: usdAmount,
+      };
+    }, [token, totalSupply, aptPrice]);
 
   const cardSymbol = fixTokenSymbolCasing(token.symbol);
   const representativeSymbolForColor =
@@ -199,6 +223,11 @@ const TokenCard = React.memo(function TokenCard({
           <p className="text-xl font-bold text-card-foreground font-mono">
             {formattedDisplaySupply}
           </p>
+          {aptPrice && (
+            <p className="text-xs text-muted-foreground font-mono">
+              ≈ {formatCurrency(usdValue, 'USD')}
+            </p>
+          )}
         </div>
         <div className="p-2.5 pt-1.5">
           <div className="flex justify-between text-xs mb-1.5">
@@ -326,9 +355,8 @@ export default function LSTPage(): React.ReactElement {
   const { t } = usePageTranslation('lst');
   const [forceRefresh, setForceRefresh] = useState(false);
 
-
   // Use direct API call for LST data
-  const [lstData, setLstData] = useState<{data: any} | null>(null);
+  const [lstData, setLstData] = useState<{ data: any } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [lstError, setLstError] = useState<Error | null>(null);
   const [isFetching, setIsFetching] = useState(false);
@@ -337,21 +365,21 @@ export default function LSTPage(): React.ReactElement {
     try {
       setIsFetching(true);
       setLstError(null);
-      
+
       const response = await fetch('/api/aptos/lst', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
       });
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
-      
+
       const data = await response.json();
+      console.log('[LST Page] API Response:', data);
       setLstData(data);
-      
     } catch (error) {
       setLstError(error instanceof Error ? error : new Error(String(error)));
     } finally {
@@ -363,12 +391,12 @@ export default function LSTPage(): React.ReactElement {
   // Auto-refetch every 5 minutes
   useEffect(() => {
     fetchLstData();
-    
+
     const interval = setInterval(fetchLstData, 5 * 60 * 1000);
     return () => clearInterval(interval);
   }, [fetchLstData, forceRefresh]);
 
-  // Extract the actual data from REST API response  
+  // Extract the actual data from REST API response
   const data: SupplyData | null = lstData?.data?.data || null;
   const loading = isLoading;
   const error = lstError?.message || null;
@@ -381,7 +409,7 @@ export default function LSTPage(): React.ReactElement {
   }, [fetchLstData]);
 
   // Get APT price for USD calculation via direct API call
-  const [aptPriceData, setAptPriceData] = useState<{data: any} | null>(null);
+  const [aptPriceData, setAptPriceData] = useState<{ data: any } | null>(null);
 
   const fetchAptPrice = useCallback(async () => {
     try {
@@ -391,15 +419,15 @@ export default function LSTPage(): React.ReactElement {
           'Content-Type': 'application/json',
         },
       });
-      
+
       if (!response.ok) {
         // Don't throw for price data - it's non-critical
         return;
       }
-      
+
       const data = await response.json();
+      console.log('[LST Page] APT Price Response:', data);
       setAptPriceData(data);
-      
     } catch (error) {
       // Silently fail for price data as it's non-critical
       console.warn('Failed to fetch APT price:', error);
@@ -409,7 +437,7 @@ export default function LSTPage(): React.ReactElement {
   // Auto-refetch APT price every minute
   useEffect(() => {
     fetchAptPrice();
-    
+
     const interval = setInterval(fetchAptPrice, 60 * 1000);
     return () => clearInterval(interval);
   }, [fetchAptPrice]);
@@ -420,6 +448,7 @@ export default function LSTPage(): React.ReactElement {
     processedSupplies,
     adjustedTotal,
   } = useMemo(() => {
+    console.log('[LST Page] APT Price Data:', aptPriceData);
     if (!data)
       return {
         formattedTotalSupply: '',
@@ -436,9 +465,13 @@ export default function LSTPage(): React.ReactElement {
 
     // Format total supply in USD
     const formatTotalUSD = () => {
-      if (!aptPriceData?.data?.price) return '';
+      const aptPrice =
+        aptPriceData?.data?.price?.price ||
+        aptPriceData?.data?.price ||
+        (aptPriceData as any)?.price;
+      if (!aptPrice) return '';
       const totalApt = Number(BigInt(data.total)) / 1_000_000_00; // 8 decimals
-      const totalUSD = totalApt * aptPriceData.data.price;
+      const totalUSD = totalApt * aptPrice;
       return formatAmountFull(totalUSD, 'USD', { decimals: 2 });
     };
 
@@ -558,6 +591,11 @@ export default function LSTPage(): React.ReactElement {
                       key={token.symbol}
                       token={token}
                       totalSupply={adjustedTotal}
+                      aptPrice={
+                        aptPriceData?.data?.price?.price ||
+                        aptPriceData?.data?.price ||
+                        (aptPriceData as any)?.price
+                      }
                       t={t}
                     />
                   )) || []}
@@ -582,6 +620,128 @@ export default function LSTPage(): React.ReactElement {
                       tokenMetadata={TOKEN_METADATA}
                     />
                   </ErrorBoundary>
+                </div>
+              </div>
+
+              {/* Asset Details Table */}
+              <div className="mt-8 w-full overflow-hidden">
+                <hr className="border-t border-border mb-6" />
+                <div className="w-full overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="min-w-[120px] sm:min-w-[150px]">
+                          Token
+                        </TableHead>
+                        <TableHead className="min-w-[100px] sm:min-w-[120px]">
+                          Amount
+                        </TableHead>
+                        <TableHead className="min-w-[100px] sm:min-w-[120px]">
+                          Value
+                        </TableHead>
+                        <TableHead className="min-w-[50px] sm:min-w-[60px]">
+                          %
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {processedSupplies?.map(token => {
+                        const aptAmount =
+                          Number(BigInt(token.supply)) / 1_000_000_00; // 8 decimals
+                        const aptPrice =
+                          aptPriceData?.data?.price?.price ||
+                          aptPriceData?.data?.price ||
+                          (aptPriceData as any)?.price;
+                        const usdValue = aptPrice ? aptAmount * aptPrice : 0;
+
+                        // Calculate market share
+                        const totalAptSupply =
+                          Number(BigInt(adjustedTotal)) / 1_000_000_00;
+                        const marketSharePercent = (
+                          (aptAmount / totalAptSupply) *
+                          100
+                        ).toFixed(2);
+
+                        const representativeSymbol =
+                          'isCombined' in token && token.isCombined
+                            ? token.symbol.split('/')[0].trim()
+                            : token.symbol;
+                        const tokenColor =
+                          LST_COLORS[
+                            representativeSymbol as keyof typeof LST_COLORS
+                          ] || LST_COLORS.default;
+
+                        return (
+                          <TableRow key={token.symbol}>
+                            <TableCell className="whitespace-nowrap">
+                              <div className="flex items-center gap-2">
+                                {'isCombined' in token && token.isCombined ? (
+                                  <div className="flex items-center gap-1">
+                                    {token.components.map(
+                                      (component, index) => (
+                                        <Image
+                                          key={component.symbol}
+                                          src={
+                                            TOKEN_METADATA[component.symbol]
+                                              ?.thumbnail || '/placeholder.jpg'
+                                          }
+                                          alt={component.symbol}
+                                          width={20}
+                                          height={20}
+                                          className={`rounded-full flex-shrink-0 ${index > 0 ? '-ml-2' : ''}`}
+                                          onError={e => {
+                                            const img =
+                                              e.target as HTMLImageElement;
+                                            img.src = '/placeholder.jpg';
+                                          }}
+                                        />
+                                      )
+                                    )}
+                                    <span className="font-medium ml-1">
+                                      {token.symbol}
+                                    </span>
+                                  </div>
+                                ) : (
+                                  <>
+                                    <Image
+                                      src={
+                                        TOKEN_METADATA[token.symbol]
+                                          ?.thumbnail || '/placeholder.jpg'
+                                      }
+                                      alt={token.symbol}
+                                      width={20}
+                                      height={20}
+                                      className="rounded-full flex-shrink-0"
+                                      onError={e => {
+                                        const img =
+                                          e.target as HTMLImageElement;
+                                        img.src = '/placeholder.jpg';
+                                      }}
+                                    />
+                                    <span className="font-medium">
+                                      {token.symbol}
+                                    </span>
+                                  </>
+                                )}
+                              </div>
+                            </TableCell>
+                            <TableCell className="font-mono whitespace-nowrap">
+                              ~
+                              {formatAmountFull(aptAmount, 'APT', {
+                                decimals: 0,
+                              })}
+                            </TableCell>
+                            <TableCell className="font-mono whitespace-nowrap">
+                              {aptPrice ? formatCurrency(usdValue, 'USD') : '—'}
+                            </TableCell>
+                            <TableCell className="font-mono whitespace-nowrap">
+                              {marketSharePercent}%
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
                 </div>
               </div>
             </>

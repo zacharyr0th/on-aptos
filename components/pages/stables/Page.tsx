@@ -59,8 +59,14 @@ const TokenCard = React.memo(function TokenCard({
 
   // Helper function to check if a token is bridged
   const isBridged = (symbol: string): boolean => {
-    return symbol.startsWith('lz') || symbol.startsWith('wh') || symbol.startsWith('ce') || 
-           symbol === 'sUSDe' || symbol === 'USDe' || symbol === 'sUSDe/USDe';
+    return (
+      symbol.startsWith('lz') ||
+      symbol.startsWith('wh') ||
+      symbol.startsWith('ce') ||
+      symbol === 'sUSDe' ||
+      symbol === 'USDe' ||
+      symbol === 'sUSDe/USDe'
+    );
   };
 
   // Helper function to check if a token is native
@@ -70,22 +76,46 @@ const TokenCard = React.memo(function TokenCard({
 
   // Helper function to check if a token is algorithmic
   const isAlgorithmic = (symbol: string): boolean => {
-    return symbol === 'MOD' || symbol === 'mUSD' || symbol === 'sUSDe' || symbol === 'USDe' || symbol === 'sUSDe/USDe';
+    return (
+      symbol === 'MOD' ||
+      symbol === 'mUSD' ||
+      symbol === 'sUSDe' ||
+      symbol === 'USDe' ||
+      symbol === 'sUSDe/USDe'
+    );
   };
 
   // Get bridge info for display
-  const getBridgeInfo = (symbol: string): { type: string | null; icon: string | null; isOFT: boolean } => {
+  const getBridgeInfo = (
+    symbol: string
+  ): { type: string | null; icon: string | null; isOFT: boolean } => {
     if (symbol.startsWith('lz')) {
-      return { type: 'LayerZero', icon: '/icons/protocols/lz.png', isOFT: false };
+      return {
+        type: 'LayerZero',
+        icon: '/icons/protocols/lz.png',
+        isOFT: false,
+      };
     }
     if (symbol.startsWith('wh')) {
-      return { type: 'Wormhole', icon: '/icons/protocols/wormhole.png', isOFT: false };
+      return {
+        type: 'Wormhole',
+        icon: '/icons/protocols/wormhole.png',
+        isOFT: false,
+      };
     }
     if (symbol.startsWith('ce')) {
-      return { type: 'Celer', icon: '/icons/protocols/celer.jpg', isOFT: false };
+      return {
+        type: 'Celer',
+        icon: '/icons/protocols/celer.jpg',
+        isOFT: false,
+      };
     }
     if (symbol === 'sUSDe' || symbol === 'USDe' || symbol === 'sUSDe / USDe') {
-      return { type: 'LayerZero', icon: '/icons/protocols/lz.png', isOFT: true };
+      return {
+        type: 'LayerZero',
+        icon: '/icons/protocols/lz.png',
+        isOFT: true,
+      };
     }
     return { type: null, icon: null, isOFT: false };
   };
@@ -106,17 +136,17 @@ const TokenCard = React.memo(function TokenCard({
     const formatSingle = (s: string, symbol: string, isRaw: boolean = true) => {
       // Debug log for MOD to understand the issue
       if (symbol === 'MOD') {
-        console.log('MOD formatSingle:', { 
-          input: s, 
-          isRaw, 
+        console.log('MOD formatSingle:', {
+          input: s,
+          isRaw,
           symbol,
           inputAsBigInt: BigInt(s).toString(),
-          inputAsNumber: Number(s)
+          inputAsNumber: Number(s),
         });
       }
-      
+
       const supplyVal = BigInt(s);
-      
+
       // Convert raw units to dollars if dealing with raw supply
       let dollars: number;
       if (isRaw) {
@@ -127,7 +157,7 @@ const TokenCard = React.memo(function TokenCard({
             console.log('MOD calculation:', {
               supplyVal: supplyVal.toString(),
               divisor: 100_000_000,
-              result: dollars
+              result: dollars,
             });
           }
         } else {
@@ -137,7 +167,7 @@ const TokenCard = React.memo(function TokenCard({
         // If not raw, the value is already in whole units
         dollars = Number(supplyVal);
       }
-      
+
       // Debug log the calculated dollars for MOD
       if (symbol === 'MOD') {
         console.log('MOD final dollars:', dollars);
@@ -152,7 +182,10 @@ const TokenCard = React.memo(function TokenCard({
       if (symbol === 'MOD') {
         console.log('MOD final formatting:', {
           dollars,
-          formatted: dollars >= 1_000 ? `$${(dollars / 1_000).toFixed(1)}k` : `$${dollars.toFixed(0)}`
+          formatted:
+            dollars >= 1_000
+              ? `$${(dollars / 1_000).toFixed(1)}k`
+              : `$${dollars.toFixed(0)}`,
         });
       }
 
@@ -189,17 +222,17 @@ const TokenCard = React.memo(function TokenCard({
 
         return parts.join(' / ');
       }
-      
+
       // Debug log for MOD
       if (token.symbol === 'MOD') {
         console.log('MOD calcFormattedDisplay:', {
           token,
           supply_raw: token.supply_raw,
           supply: token.supply,
-          hasSupplyRaw: !!token.supply_raw
+          hasSupplyRaw: !!token.supply_raw,
         });
       }
-      
+
       // Use supply_raw if available, otherwise use supply
       return formatSingle(
         token.supply_raw || token.supply,
@@ -503,9 +536,8 @@ export default function StablesPage(): React.ReactElement {
   const { t } = usePageTranslation('stables');
   const [forceRefresh, setForceRefresh] = useState(false);
 
-
   // Use direct API call for stables data
-  const [stablesData, setStablesData] = useState<{data: any} | null>(null);
+  const [stablesData, setStablesData] = useState<{ data: any } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [stablesError, setStablesError] = useState<Error | null>(null);
   const [isFetching, setIsFetching] = useState(false);
@@ -514,23 +546,24 @@ export default function StablesPage(): React.ReactElement {
     try {
       setIsFetching(true);
       setStablesError(null);
-      
+
       const response = await fetch('/api/aptos/stables', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
       });
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
-      
+
       const data = await response.json();
       setStablesData(data);
-      
     } catch (error) {
-      setStablesError(error instanceof Error ? error : new Error(String(error)));
+      setStablesError(
+        error instanceof Error ? error : new Error(String(error))
+      );
     } finally {
       setIsLoading(false);
       setIsFetching(false);
@@ -540,7 +573,7 @@ export default function StablesPage(): React.ReactElement {
   // Auto-refetch every 5 minutes
   useEffect(() => {
     fetchStablesData();
-    
+
     const interval = setInterval(fetchStablesData, 5 * 60 * 1000);
     return () => clearInterval(interval);
   }, [fetchStablesData, forceRefresh]);
@@ -563,8 +596,14 @@ export default function StablesPage(): React.ReactElement {
   // Helper function to check if a token is bridged
   const isBridgedToken = (symbol: string): boolean => {
     // Check for bridge suffixes (.lz, .wh, .ce) or Ethena tokens
-    return symbol.includes('.lz') || symbol.includes('.wh') || symbol.includes('.ce') || 
-           symbol === 'sUSDe' || symbol === 'USDe' || symbol === 'sUSDe / USDe';
+    return (
+      symbol.includes('.lz') ||
+      symbol.includes('.wh') ||
+      symbol.includes('.ce') ||
+      symbol === 'sUSDe' ||
+      symbol === 'USDe' ||
+      symbol === 'sUSDe / USDe'
+    );
   };
 
   const {
@@ -759,7 +798,7 @@ export default function StablesPage(): React.ReactElement {
                   </ErrorBoundary>
                 </div>
               </div>
-              
+
               {/* Remaining cards below */}
               {processedSupplies.length > 3 && (
                 <div className="mt-6">
@@ -783,81 +822,119 @@ export default function StablesPage(): React.ReactElement {
                 <hr className="border-t border-border mb-6" />
                 <div className="w-full overflow-x-auto">
                   <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="min-w-[120px] sm:min-w-[150px]">{t('table.token', 'Token')}</TableHead>
-                      <TableHead className="min-w-[100px] sm:min-w-[120px]">{t('table.supply', 'Supply')}</TableHead>
-                      <TableHead className="min-w-[50px] sm:min-w-[60px]">{t('table.market_share', '%')}</TableHead>
-                      <TableHead className="min-w-[100px] sm:min-w-[140px]">{t('table.type', 'Type')}</TableHead>
-                      <TableHead className="min-w-[80px] sm:min-w-[100px]">{t('table.issuer', 'Issuer')}</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {processedSupplies.map((token) => {
-                      const metadata = TOKEN_METADATA[token.symbol] || (token.symbol === 'sUSDe/USDe' ? TOKEN_METADATA['sUSDe'] : null);
-                      // Calculate total supply in dollars for percentage calculation
-                      const totalDollarSupply = processedSupplies.reduce((sum, t) => sum + Number(t.supply), 0);
-                      const marketSharePercent = ((Number(token.supply) / totalDollarSupply) * 100).toFixed(2);
-                      const tokenColor = 'isCombined' in token && token.isCombined 
-                        ? TOKEN_COLORS['USDe'] || TOKEN_COLORS.default
-                        : TOKEN_COLORS[token.symbol] || TOKEN_COLORS.default;
-                      
-                      return (
-                        <TableRow key={token.symbol}>
-                          <TableCell className="whitespace-nowrap">
-                            <div className="flex items-center gap-2">
-                              {'isCombined' in token && token.isCombined ? (
-                                <div className="flex items-center gap-1">
-                                  <Image
-                                    src={TOKEN_METADATA['sUSDe']?.thumbnail || '/placeholder.jpg'}
-                                    alt="sUSDe"
-                                    width={20}
-                                    height={20}
-                                    className="rounded-full flex-shrink-0"
-                                  />
-                                  <Image
-                                    src={TOKEN_METADATA['USDe']?.thumbnail || '/placeholder.jpg'}
-                                    alt="USDe"
-                                    width={20}
-                                    height={20}
-                                    className="rounded-full -ml-2 flex-shrink-0"
-                                  />
-                                  <span className="font-medium ml-1">{token.symbol}</span>
-                                </div>
-                              ) : (
-                                <>
-                                  <Image
-                                    src={metadata?.thumbnail || '/placeholder.jpg'}
-                                    alt={token.symbol}
-                                    width={20}
-                                    height={20}
-                                    className="rounded-full flex-shrink-0"
-                                  />
-                                  <span className="font-medium">{token.symbol}</span>
-                                </>
-                              )}
-                            </div>
-                          </TableCell>
-                          <TableCell className="font-mono whitespace-nowrap">
-                            ${Number(token.supply).toLocaleString('en-US', {
-                              minimumFractionDigits: 0,
-                              maximumFractionDigits: 0,
-                            })}
-                          </TableCell>
-                          <TableCell className="font-mono whitespace-nowrap">
-                            {marketSharePercent}%
-                          </TableCell>
-                          <TableCell className="text-sm">
-                            {metadata?.type?.replace(/\s*\(.*?\)\s*/g, '').trim() || '-'}
-                          </TableCell>
-                          <TableCell className="text-sm">
-                            {metadata?.issuer?.split(' ')[0] || '-'}
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="min-w-[120px] sm:min-w-[150px]">
+                          {t('table.token', 'Token')}
+                        </TableHead>
+                        <TableHead className="min-w-[100px] sm:min-w-[120px]">
+                          {t('table.supply', 'Supply')}
+                        </TableHead>
+                        <TableHead className="min-w-[50px] sm:min-w-[60px]">
+                          {t('table.market_share', '%')}
+                        </TableHead>
+                        <TableHead className="min-w-[100px] sm:min-w-[140px]">
+                          {t('table.type', 'Type')}
+                        </TableHead>
+                        <TableHead className="min-w-[80px] sm:min-w-[100px]">
+                          {t('table.issuer', 'Issuer')}
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {processedSupplies.map(token => {
+                        const metadata =
+                          TOKEN_METADATA[token.symbol] ||
+                          (token.symbol === 'sUSDe/USDe'
+                            ? TOKEN_METADATA['sUSDe']
+                            : null);
+                        // Calculate total supply in dollars for percentage calculation
+                        const totalDollarSupply = processedSupplies.reduce(
+                          (sum, t) => sum + Number(t.supply),
+                          0
+                        );
+                        const marketSharePercent = (
+                          (Number(token.supply) / totalDollarSupply) *
+                          100
+                        ).toFixed(2);
+                        const tokenColor =
+                          'isCombined' in token && token.isCombined
+                            ? TOKEN_COLORS['USDe'] || TOKEN_COLORS.default
+                            : TOKEN_COLORS[token.symbol] ||
+                              TOKEN_COLORS.default;
+
+                        return (
+                          <TableRow key={token.symbol}>
+                            <TableCell className="whitespace-nowrap">
+                              <div className="flex items-center gap-2">
+                                {'isCombined' in token && token.isCombined ? (
+                                  <div className="flex items-center gap-1">
+                                    <Image
+                                      src={
+                                        TOKEN_METADATA['sUSDe']?.thumbnail ||
+                                        '/placeholder.jpg'
+                                      }
+                                      alt="sUSDe"
+                                      width={20}
+                                      height={20}
+                                      className="rounded-full flex-shrink-0"
+                                    />
+                                    <Image
+                                      src={
+                                        TOKEN_METADATA['USDe']?.thumbnail ||
+                                        '/placeholder.jpg'
+                                      }
+                                      alt="USDe"
+                                      width={20}
+                                      height={20}
+                                      className="rounded-full -ml-2 flex-shrink-0"
+                                    />
+                                    <span className="font-medium ml-1">
+                                      {token.symbol}
+                                    </span>
+                                  </div>
+                                ) : (
+                                  <>
+                                    <Image
+                                      src={
+                                        metadata?.thumbnail ||
+                                        '/placeholder.jpg'
+                                      }
+                                      alt={token.symbol}
+                                      width={20}
+                                      height={20}
+                                      className="rounded-full flex-shrink-0"
+                                    />
+                                    <span className="font-medium">
+                                      {token.symbol}
+                                    </span>
+                                  </>
+                                )}
+                              </div>
+                            </TableCell>
+                            <TableCell className="font-mono whitespace-nowrap">
+                              $
+                              {Number(token.supply).toLocaleString('en-US', {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 0,
+                              })}
+                            </TableCell>
+                            <TableCell className="font-mono whitespace-nowrap">
+                              {marketSharePercent}%
+                            </TableCell>
+                            <TableCell className="text-sm">
+                              {metadata?.type
+                                ?.replace(/\s*\(.*?\)\s*/g, '')
+                                .trim() || '-'}
+                            </TableCell>
+                            <TableCell className="text-sm">
+                              {metadata?.issuer?.split(' ')[0] || '-'}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
                 </div>
               </div>
             </>

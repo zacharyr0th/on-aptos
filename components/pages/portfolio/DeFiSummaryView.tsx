@@ -95,69 +95,69 @@ const DeFiSummaryView: React.FC<DeFiSummaryViewProps> = ({
           </CardHeader>
           <CardContent>
             <div className="grid gap-3">
-          {groupedDeFiPositions
-            .sort((a, b) => b.totalValue - a.totalValue)
-            .map((position, index) => {
-              const protocolDetails = getProtocolDetails(position.protocol);
-              const primaryType = Array.from(
-                position.protocolTypes
-              )[0] as string;
+              {groupedDeFiPositions
+                .sort((a, b) => b.totalValue - a.totalValue)
+                .map((position, index) => {
+                  const protocolDetails = getProtocolDetails(position.protocol);
+                  const primaryType = Array.from(
+                    position.protocolTypes
+                  )[0] as string;
 
-              return (
-                <div
-                  key={index}
-                  className="flex items-center justify-between p-3 rounded-lg border bg-muted/30 cursor-pointer hover:bg-muted/50 transition-colors"
-                  onClick={() => onProtocolClick(position)}
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-10 h-10 rounded-lg bg-background border flex items-center justify-center">
-                      <Image
-                        src={getProtocolLogo(position.protocol)}
-                        alt={`${position.protocol} logo`}
-                        width={40}
-                        height={40}
-                        className="w-full h-full object-cover rounded"
-                        onError={e => {
-                          const img = e.target as HTMLImageElement;
-                          img.src = '/placeholder.jpg';
-                        }}
-                      />
-                    </div>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <p className="font-medium truncate">
-                          {cleanProtocolName(position.protocol)}
+                  return (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-3 rounded-lg border bg-muted/30 cursor-pointer hover:bg-muted/50 transition-colors"
+                      onClick={() => onProtocolClick(position)}
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-10 h-10 rounded-lg bg-background border flex items-center justify-center">
+                          <Image
+                            src={getProtocolLogo(position.protocol)}
+                            alt={`${position.protocol} logo`}
+                            width={40}
+                            height={40}
+                            className="w-full h-full object-cover rounded"
+                            onError={e => {
+                              const img = e.target as HTMLImageElement;
+                              img.src = '/placeholder.jpg';
+                            }}
+                          />
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <p className="font-medium truncate">
+                              {cleanProtocolName(position.protocol)}
+                            </p>
+                            {position.protocol.toLowerCase() === 'aptin' && (
+                              <Badge variant="destructive" className="text-xs">
+                                Deprecated
+                              </Badge>
+                            )}
+                          </div>
+                          <Badge variant="secondary" className="text-xs">
+                            {position.protocolTypes.size > 1
+                              ? 'Multiple'
+                              : primaryType === 'derivatives'
+                                ? 'Perps'
+                                : primaryType}
+                          </Badge>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-medium font-mono">
+                          {position.protocol === 'Thala Farm'
+                            ? 'TBD'
+                            : formatCurrency(position.totalValue)}
                         </p>
                         {position.protocol.toLowerCase() === 'aptin' && (
-                          <Badge variant="destructive" className="text-xs">
+                          <p className="text-xs text-red-500 mt-1">
                             Deprecated
-                          </Badge>
+                          </p>
                         )}
                       </div>
-                      <Badge variant="secondary" className="text-xs">
-                        {position.protocolTypes.size > 1
-                          ? 'Multiple'
-                          : primaryType === 'derivatives'
-                            ? 'Perps'
-                            : primaryType}
-                      </Badge>
                     </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-medium font-mono">
-                      {position.protocol === 'Thala Farm'
-                        ? 'TBD'
-                        : formatCurrency(position.totalValue)}
-                    </p>
-                    {position.protocol.toLowerCase() === 'aptin' && (
-                      <p className="text-xs text-red-500 mt-1">
-                        Deprecated
-                      </p>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
+                  );
+                })}
             </div>
           </CardContent>
         </Card>

@@ -180,7 +180,8 @@ export const ProtocolDetailsDialog: React.FC<ProtocolDetailsDialogProps> = ({
                       )}
                     >
                       <span className="hidden xs:inline">
-                        {protocolDetails.security?.auditStatus || 'Unknown'} Audit
+                        {protocolDetails.security?.auditStatus || 'Unknown'}{' '}
+                        Audit
                       </span>
                       <span className="xs:hidden">
                         {protocolDetails.security?.auditStatus || 'Unknown'}

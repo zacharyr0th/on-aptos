@@ -704,7 +704,9 @@ export async function getPortfolioHistory(
     const addressValidation = AptosValidators.validateAddress(walletAddress);
     if (!addressValidation.isValid) {
       logger.error(`Invalid wallet address: ${walletAddress}`);
-      throw new Error(`Invalid wallet address: ${walletAddress} - ${addressValidation.error}`);
+      throw new Error(
+        `Invalid wallet address: ${walletAddress} - ${addressValidation.error}`
+      );
     }
 
     // Step 1: Get ALL historical activities for the past 30+ days
@@ -793,7 +795,9 @@ export async function getPortfolioHistory(
     return history;
   } catch (error) {
     logger.error('Failed to generate portfolio history:', error);
-    throw new Error(`Failed to generate portfolio history: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw new Error(
+      `Failed to generate portfolio history: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
   }
 }
 
@@ -1291,7 +1295,9 @@ export async function getNFTTransferHistory(
       limit,
     });
 
-    throw new Error(`Failed to fetch NFT transfer history: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw new Error(
+      `Failed to fetch NFT transfer history: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
   }
 }
 
@@ -1425,9 +1431,7 @@ export async function getWalletTransactions(
 
     // Handle rate limiting gracefully
     if (error.status === 429) {
-      logger.warn(
-        'API rate limit reached for transactions'
-      );
+      logger.warn('API rate limit reached for transactions');
       throw new Error('API rate limit reached - please try again later');
     }
 

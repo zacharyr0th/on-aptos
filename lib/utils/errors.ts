@@ -45,7 +45,7 @@ export function sanitizeError(error: unknown): {
         statusCode: error.statusCode,
       };
     }
-    
+
     // Generic error for non-operational errors
     return {
       message: 'An unexpected error occurred',
@@ -76,11 +76,14 @@ export function sanitizeError(error: unknown): {
 export function logError(error: unknown, context?: Record<string, any>): void {
   // Always log full details server-side
   console.error('Error occurred:', {
-    error: error instanceof Error ? {
-      message: error.message,
-      stack: error.stack,
-      name: error.name,
-    } : error,
+    error:
+      error instanceof Error
+        ? {
+            message: error.message,
+            stack: error.stack,
+            name: error.name,
+          }
+        : error,
     context,
     timestamp: new Date().toISOString(),
   });

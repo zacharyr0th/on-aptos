@@ -46,15 +46,21 @@ export const NFTSummaryView: React.FC<NFTSummaryViewProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
             <div className="bg-muted/30 rounded-lg p-4 text-center">
               <p className="text-sm text-muted-foreground mb-1">Total NFTs</p>
-              <p className="text-2xl sm:text-3xl font-bold font-mono">{nfts.length}</p>
+              <p className="text-2xl sm:text-3xl font-bold font-mono">
+                {nfts.length}
+              </p>
             </div>
             <div className="bg-muted/30 rounded-lg p-4 text-center">
               <p className="text-sm text-muted-foreground mb-1">Collections</p>
-              <p className="text-2xl sm:text-3xl font-bold font-mono">{totalCollections}</p>
+              <p className="text-2xl sm:text-3xl font-bold font-mono">
+                {totalCollections}
+              </p>
             </div>
             <div className="bg-muted/30 rounded-lg p-4 text-center">
               <p className="text-sm text-muted-foreground mb-1">This Page</p>
-              <p className="text-2xl sm:text-3xl font-bold font-mono">{currentPageNFTs}</p>
+              <p className="text-2xl sm:text-3xl font-bold font-mono">
+                {currentPageNFTs}
+              </p>
             </div>
           </div>
         </CardContent>
@@ -85,7 +91,9 @@ export const NFTSummaryView: React.FC<NFTSummaryViewProps> = ({
                     </div>
                     <div className="min-w-0">
                       <p className="font-medium truncate">{collection}</p>
-                      <p className="text-sm text-muted-foreground">Collection</p>
+                      <p className="text-sm text-muted-foreground">
+                        Collection
+                      </p>
                     </div>
                   </div>
                   <div className="text-right">
@@ -107,7 +115,8 @@ export const NFTSummaryView: React.FC<NFTSummaryViewProps> = ({
             <Grid3X3 className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">No NFTs Found</h3>
             <p className="text-muted-foreground">
-              This wallet doesn&apos;t have any NFTs or they haven&apos;t been loaded yet.
+              This wallet doesn&apos;t have any NFTs or they haven&apos;t been
+              loaded yet.
             </p>
           </CardContent>
         </Card>

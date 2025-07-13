@@ -19,7 +19,6 @@ const HomepageDesign = () => {
   const [mounted, setMounted] = useState(false);
   useTheme();
 
-
   useEffect(() => {
     setMounted(true);
   }, []);

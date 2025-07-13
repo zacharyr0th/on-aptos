@@ -193,18 +193,14 @@ export const PerformanceChart: React.FC<PerformanceChartProps> = React.memo(
                     <stop
                       offset="5%"
                       stopColor={
-                        resolvedTheme === 'dark'
-                          ? '#e5e7eb'
-                          : '#1f2937'
+                        resolvedTheme === 'dark' ? '#e5e7eb' : '#1f2937'
                       }
                       stopOpacity={resolvedTheme === 'dark' ? 0.3 : 0.4}
                     />
                     <stop
                       offset="95%"
                       stopColor={
-                        resolvedTheme === 'dark'
-                          ? '#f9fafb'
-                          : '#374151'
+                        resolvedTheme === 'dark' ? '#f9fafb' : '#374151'
                       }
                       stopOpacity={resolvedTheme === 'dark' ? 0.2 : 0}
                     />

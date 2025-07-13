@@ -161,7 +161,9 @@ export default function PortfolioPage() {
 
     const fetchAccountNames = async () => {
       try {
-        const response = await fetch(`/api/wallet/ans/names?address=${encodeURIComponent(walletAddress)}`);
+        const response = await fetch(
+          `/api/wallet/ans/names?address=${encodeURIComponent(walletAddress)}`
+        );
         if (response.ok) {
           const data = await response.json();
           if (data.success && data.data) {
@@ -333,7 +335,7 @@ export default function PortfolioPage() {
     setSelectedAsset(null);
     setSelectedDeFiPosition(null);
     setActiveTab('performance');
-    
+
     // Open dialog on mobile
     if (typeof window !== 'undefined' && window.innerWidth < 768) {
       setNftDetailsOpen(true);
@@ -372,6 +374,23 @@ export default function PortfolioPage() {
       </div>
 
       <main className="container-layout py-6 flex-1">
+        {/* Under Construction Notice */}
+        <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-6">
+          <div className="flex items-center gap-3">
+            <div className="text-yellow-600 dark:text-yellow-400">
+              🚧
+            </div>
+            <div>
+              <h3 className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+                Under Construction
+              </h3>
+              <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-1">
+                The portfolio page is currently being updated. Please check again later.
+              </p>
+            </div>
+          </div>
+        </div>
+
         {!allDataLoaded ? (
           <LoadingSkeleton />
         ) : (
@@ -616,11 +635,15 @@ export default function PortfolioPage() {
                                     ? 'DeFi Summary'
                                     : 'Performance'}
                         </span>
-                        {!selectedAsset && !selectedNFT && !selectedDeFiPosition && sidebarView !== 'nfts' && sidebarView !== 'defi' && (
-                          <span className="hidden sm:inline text-xs text-muted-foreground ml-1">
-                            (APT only for now)
-                          </span>
-                        )}
+                        {!selectedAsset &&
+                          !selectedNFT &&
+                          !selectedDeFiPosition &&
+                          sidebarView !== 'nfts' &&
+                          sidebarView !== 'defi' && (
+                            <span className="hidden sm:inline text-xs text-muted-foreground ml-1">
+                              (APT only for now)
+                            </span>
+                          )}
                       </TabsTrigger>
                       <TabsTrigger
                         value="transactions"
@@ -735,7 +758,9 @@ export default function PortfolioPage() {
                             </div>
                             <div className="min-w-0">
                               <h3 className="text-lg sm:text-xl font-semibold truncate">
-                                {cleanProtocolName(selectedDeFiPosition.protocol)}
+                                {cleanProtocolName(
+                                  selectedDeFiPosition.protocol
+                                )}
                               </h3>
                               <p className="text-sm sm:text-base text-muted-foreground truncate">
                                 {Array.from(selectedDeFiPosition.protocolTypes)

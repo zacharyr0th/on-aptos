@@ -58,16 +58,16 @@ export const env = validateEnv();
 export function validateProductionEnv() {
   if (process.env.NODE_ENV === 'production' && typeof window === 'undefined') {
     const missingKeys: string[] = [];
-    
+
     // ALL THREE are required for production
     if (!env.CMC_API_KEY) missingKeys.push('CMC_API_KEY');
     if (!env.PANORA_API_KEY) missingKeys.push('PANORA_API_KEY');
     if (!env.APTOS_BUILD_SECRET) missingKeys.push('APTOS_BUILD_SECRET');
-    
+
     if (missingKeys.length > 0) {
       console.error(
         `FATAL: Missing required API keys in production: ${missingKeys.join(', ')}. ` +
-        'Application cannot function properly without these keys.'
+          'Application cannot function properly without these keys.'
       );
       // Don't throw during build, but log the error
       if (process.env.NEXT_PHASE !== 'phase-production-build') {
@@ -80,13 +80,19 @@ export function validateProductionEnv() {
 // Only warn in development
 if (process.env.NODE_ENV !== 'production') {
   if (!env.CMC_API_KEY) {
-    console.warn('⚠️  CMC_API_KEY not configured - CoinMarketCap price data will fail');
+    console.warn(
+      '⚠️  CMC_API_KEY not configured - CoinMarketCap price data will fail'
+    );
   }
   if (!env.PANORA_API_KEY) {
-    console.warn('⚠️  PANORA_API_KEY not configured - Panora Exchange data will fail');
+    console.warn(
+      '⚠️  PANORA_API_KEY not configured - Panora Exchange data will fail'
+    );
   }
   if (!env.APTOS_BUILD_SECRET) {
-    console.warn('⚠️  APTOS_BUILD_SECRET not configured - Aptos Indexer queries may hit rate limits');
+    console.warn(
+      '⚠️  APTOS_BUILD_SECRET not configured - Aptos Indexer queries may hit rate limits'
+    );
   }
 }
 

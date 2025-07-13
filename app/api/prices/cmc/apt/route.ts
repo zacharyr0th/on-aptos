@@ -1,15 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { SERVICE_CONFIG } from '@/lib/config/cache';
 import { enhancedFetch } from '@/lib/utils/fetch-utils';
-import { 
-  withAPIHandler,
-  createCacheHeaders 
-} from '@/lib/utils/api-response';
+import { withAPIHandler, createCacheHeaders } from '@/lib/utils/api-response';
 // Rate limiting removed - not compatible with serverless architecture
-import { 
-  PriceResponse, 
-  StandardAPIResponse 
-} from '@/lib/types/api';
+import { PriceResponse, StandardAPIResponse } from '@/lib/types/api';
 import { logger } from '@/lib/utils/logger';
 
 // Revalidate this route every 1 minute
@@ -17,7 +11,7 @@ export const revalidate = 60;
 
 export async function GET(request: NextRequest) {
   const startTime = Date.now();
-  
+
   return await withAPIHandler(
     async (): Promise<PriceResponse> => {
       // Validate API key
@@ -43,9 +37,7 @@ export async function GET(request: NextRequest) {
       );
 
       if (!response.ok) {
-        const errorBody = await response
-          .text()
-          .catch(() => 'Unknown error');
+        const errorBody = await response.text().catch(() => 'Unknown error');
         throw new Error(`CMC API error: ${response.status} - ${errorBody}`);
       }
 

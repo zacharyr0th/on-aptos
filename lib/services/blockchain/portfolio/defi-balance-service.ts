@@ -317,7 +317,9 @@ export class DeFiBalanceService {
       return positions;
     } catch (error) {
       logger.error('Comprehensive position checker failed:', error);
-      throw new Error(`Failed to fetch comprehensive DeFi positions: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to fetch comprehensive DeFi positions: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
@@ -677,7 +679,9 @@ export class DeFiBalanceService {
       return positions;
     } catch (error) {
       logger.error('Error checking wallet assets for DeFi positions:', error);
-      throw new Error(`Failed to fetch wallet asset DeFi positions: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to fetch wallet asset DeFi positions: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 

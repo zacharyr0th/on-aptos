@@ -27,7 +27,7 @@ export function NFTTransferHistory({ tokenDataId }: NFTTransferHistoryProps) {
         const response = await fetch(
           `/api/nft/transfer-history?tokenDataId=${encodeURIComponent(tokenDataId)}&limit=20`
         );
-        
+
         if (!response.ok) {
           throw new Error('Failed to fetch transfer history');
         }

@@ -70,17 +70,21 @@ const CustomTooltip = memo<TooltipProps<number, string>>(props => {
           Market Share: {formatPercentage(value)}%
         </p>
         <p className="text-muted-foreground">Supply: {formattedSupply}</p>
-        
+
         {/* Show individual tokens if this is the "Other" category */}
         {name === 'Other' && components && components.length > 0 && (
           <div className="mt-2 pt-2 border-t border-border space-y-1">
-            <p className="text-xs font-medium text-muted-foreground">Includes:</p>
+            <p className="text-xs font-medium text-muted-foreground">
+              Includes:
+            </p>
             {components.map((component: any, index: number) => (
               <p key={index} className="text-xs text-muted-foreground ml-2">
-                {component.symbol}: {component.formattedSupply || `$${Number(component.supply).toLocaleString('en-US', {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}`}
+                {component.symbol}:{' '}
+                {component.formattedSupply ||
+                  `$${Number(component.supply).toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}`}
               </p>
             ))}
           </div>
@@ -265,7 +269,7 @@ export const MarketShareChart = memo<MarketShareChartProps>(
           for (const token of data) {
             // Skip tokens with 0 supply for chart display
             if (token.supply === '0') continue;
-            
+
             // Handle combined tokens (like sUSDe/USDe)
             if ('isCombined' in token && token.isCombined && token.components) {
               // For combined tokens, sum the supply_raw from components
@@ -281,8 +285,13 @@ export const MarketShareChart = memo<MarketShareChartProps>(
               // Calculate USD value properly for combined tokens
               let combinedUsdValue = 0;
               for (const component of token.components) {
-                const componentSupply = BigInt(component.supply_raw || component.supply || '0');
-                const componentDecimals = (component.symbol === 'MOD' || component.symbol === 'mUSD') ? 8 : 6;
+                const componentSupply = BigInt(
+                  component.supply_raw || component.supply || '0'
+                );
+                const componentDecimals =
+                  component.symbol === 'MOD' || component.symbol === 'mUSD'
+                    ? 8
+                    : 6;
                 const componentDivisor = Math.pow(10, componentDecimals);
                 combinedUsdValue += Number(componentSupply) / componentDivisor;
               }
@@ -299,21 +308,24 @@ export const MarketShareChart = memo<MarketShareChartProps>(
               // Handle regular tokens - use supply_raw if available
               const rawSupply = token.supply_raw || '0';
               if (rawSupply === '0') continue;
-              
+
               const supply = BigInt(rawSupply);
-              const applyPrice = token.symbol === 'sUSDe' ? susdePrice : undefined;
-              
+              const applyPrice =
+                token.symbol === 'sUSDe' ? susdePrice : undefined;
+
               // Check if token has 8 decimals (MOD, mUSD)
-              const decimals = (token.symbol === 'MOD' || token.symbol === 'mUSD') ? 8 : 6;
+              const decimals =
+                token.symbol === 'MOD' || token.symbol === 'mUSD' ? 8 : 6;
               const divisor = Math.pow(10, decimals);
-              
+
               // Normalize supply to 6 decimals for market share calculation
-              const normalizedSupply = decimals === 8 ? supply / BigInt(100) : supply;
-              
+              const normalizedSupply =
+                decimals === 8 ? supply / BigInt(100) : supply;
+
               // Format supply based on correct decimals (use original supply)
               const dollarValue = Number(supply) / divisor;
               let formattedSupply: string;
-              
+
               if (applyPrice && token.symbol === 'sUSDe') {
                 const adjustedValue = dollarValue * applyPrice;
                 if (adjustedValue >= 1_000_000_000) {
@@ -340,7 +352,10 @@ export const MarketShareChart = memo<MarketShareChartProps>(
               result.push({
                 name: token.symbol,
                 originalSymbol: token.symbol,
-                value: calculateMarketShare(normalizedSupply, totalSupplyBigInt),
+                value: calculateMarketShare(
+                  normalizedSupply,
+                  totalSupplyBigInt
+                ),
                 formattedSupply,
                 _usdValue: dollarValue,
               });
@@ -369,22 +384,28 @@ export const MarketShareChart = memo<MarketShareChartProps>(
 
           // If we have tokens for "Other" category, combine them
           if (otherTokens.length > 0) {
-            const otherValue = otherTokens.reduce((sum, token) => sum + token.value, 0);
-            const otherUsdValue = otherTokens.reduce((sum, token) => sum + token._usdValue, 0);
-            
+            const otherValue = otherTokens.reduce(
+              (sum, token) => sum + token.value,
+              0
+            );
+            const otherUsdValue = otherTokens.reduce(
+              (sum, token) => sum + (token._usdValue ?? 0),
+              0
+            );
+
             finalResult.push({
               name: 'Other',
               originalSymbol: 'Other',
               value: otherValue,
-              formattedSupply: `$${(otherUsdValue).toLocaleString('en-US', {
+              formattedSupply: `$${otherUsdValue.toLocaleString('en-US', {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
               })}`,
               _usdValue: otherUsdValue,
               components: otherTokens.map(token => ({
-                symbol: token.originalSymbol,
-                supply: token._usdValue.toString(),
-                supply_raw: (token._usdValue * 1_000_000).toString(),
+                symbol: token.originalSymbol || 'Unknown',
+                supply: (token._usdValue ?? 0).toString(),
+                supply_raw: ((token._usdValue ?? 0) * 1_000_000).toString(),
                 formattedSupply: token.formattedSupply,
               })),
             });
@@ -471,7 +492,6 @@ export const MarketShareChart = memo<MarketShareChartProps>(
                 </PieChart>
               </ResponsiveContainer>
             </div>
-
           </div>
         </div>
       </div>

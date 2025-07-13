@@ -59,14 +59,16 @@ const CurrentUTCTime: FC = memo(function CurrentUTCTime(): ReactElement {
 
     if (isMobile) {
       // Shorter format for mobile: "12 Jul, 16:24 UTC"
-      return new Intl.DateTimeFormat('en-US', {
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false,
-        timeZone: 'UTC',
-      }).format(currentTime) + ' UTC';
+      return (
+        new Intl.DateTimeFormat('en-US', {
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false,
+          timeZone: 'UTC',
+        }).format(currentTime) + ' UTC'
+      );
     }
 
     // Full format for larger screens
@@ -132,7 +134,7 @@ const AptPrice: FC = memo(function AptPrice(): ReactElement {
     fetchPrice();
     // Refresh every minute
     const interval = setInterval(fetchPrice, 60 * 1000);
-    
+
     return () => clearInterval(interval);
   }, []);
 
@@ -160,7 +162,12 @@ const AptPrice: FC = memo(function AptPrice(): ReactElement {
     );
   }
 
-  if (error || !aptPriceData?.data?.price || (typeof aptPriceData.data.price === 'object' && !aptPriceData.data.price.price)) {
+  if (
+    error ||
+    !aptPriceData?.data?.price ||
+    (typeof aptPriceData.data.price === 'object' &&
+      !aptPriceData.data.price.price)
+  ) {
     return (
       <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] xs:text-xs sm:text-sm text-muted-foreground">
         <Image

@@ -14,9 +14,31 @@ export const LandingSection = () => {
         <Header />
       </div>
 
-      <main className="container-layout py-6 md:py-12 flex-1 flex items-center">
+      <main className="container-layout py-6 md:py-12 flex-1 flex flex-col">
+        {/* Under Construction Notice */}
+        <div className="w-full max-w-2xl mx-auto mb-6">
+          <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+            <div className="flex items-center gap-3">
+              <div className="text-yellow-600 dark:text-yellow-400">
+                🚧
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+                  Under Construction
+                </h3>
+                <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-1">
+                  The portfolio page is currently being updated. Please check again later.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Background gradient */}
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/10 pointer-events-none" />
+        
+        {/* Main content container */}
+        <div className="flex-1 flex items-center">
 
         <div className="relative w-full grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 lg:gap-16 items-center">
           {/* Left Side - Big Text */}
@@ -60,6 +82,7 @@ export const LandingSection = () => {
               </div>
             </div>
           </div>
+        </div>
         </div>
       </main>
 

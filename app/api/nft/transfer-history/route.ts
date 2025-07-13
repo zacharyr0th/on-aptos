@@ -64,7 +64,9 @@ export async function GET(request: NextRequest) {
 
     const transfers = result.data?.token_activities_v2 || [];
 
-    logger.info(`NFT Transfer History: Found ${transfers.length} transfers for token ${tokenDataId}`);
+    logger.info(
+      `NFT Transfer History: Found ${transfers.length} transfers for token ${tokenDataId}`
+    );
 
     return NextResponse.json({
       success: true,

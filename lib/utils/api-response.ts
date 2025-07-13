@@ -5,11 +5,11 @@
 
 import { NextResponse } from 'next/server';
 import { randomUUID } from 'crypto';
-import { 
-  StandardAPIResponse, 
-  APIError, 
-  APIErrorCode, 
-  ResponseMeta 
+import {
+  StandardAPIResponse,
+  APIError,
+  APIErrorCode,
+  ResponseMeta,
 } from '@/lib/types/api';
 import { logger } from '@/lib/utils/logger';
 
@@ -26,7 +26,7 @@ export function buildSuccessResponse<T>(
   } = {}
 ): StandardAPIResponse<T> {
   const { startTime, cacheHit = false, apiCalls, pagination } = options;
-  
+
   return {
     success: true,
     data,
@@ -53,7 +53,7 @@ export function buildErrorResponse(
   httpStatus: number = 500
 ): NextResponse<StandardAPIResponse<never>> {
   const isDev = process.env.NODE_ENV === 'development';
-  
+
   const error: APIError = {
     code,
     message,
@@ -88,15 +88,15 @@ export function buildErrorResponse(
 export const APIResponses = {
   invalidInput: (message: string, details?: Record<string, any>) =>
     buildErrorResponse(APIErrorCode.INVALID_INPUT, message, details, 400),
-    
+
   missingParameter: (parameter: string) =>
     buildErrorResponse(
-      APIErrorCode.MISSING_PARAMETER, 
+      APIErrorCode.MISSING_PARAMETER,
       `Missing required parameter: ${parameter}`,
       { parameter },
       400
     ),
-    
+
   invalidAddress: (address: string) =>
     buildErrorResponse(
       APIErrorCode.INVALID_ADDRESS,
@@ -104,7 +104,7 @@ export const APIResponses = {
       { address },
       400
     ),
-    
+
   rateLimited: (limit: number, windowMs: number) =>
     buildErrorResponse(
       APIErrorCode.RATE_LIMITED,
@@ -112,7 +112,7 @@ export const APIResponses = {
       { limit, windowMs },
       429
     ),
-    
+
   notFound: (resource: string) =>
     buildErrorResponse(
       APIErrorCode.NOT_FOUND,
@@ -120,7 +120,7 @@ export const APIResponses = {
       { resource },
       404
     ),
-    
+
   internalError: (message: string = 'Internal server error', error?: Error) =>
     buildErrorResponse(
       APIErrorCode.INTERNAL_ERROR,
@@ -128,7 +128,7 @@ export const APIResponses = {
       error ? { stack: error.stack, name: error.name } : undefined,
       500
     ),
-    
+
   serviceUnavailable: (service: string) =>
     buildErrorResponse(
       APIErrorCode.SERVICE_UNAVAILABLE,
@@ -136,7 +136,7 @@ export const APIResponses = {
       { service },
       503
     ),
-    
+
   timeout: (operation: string) =>
     buildErrorResponse(
       APIErrorCode.TIMEOUT,
@@ -144,7 +144,7 @@ export const APIResponses = {
       { operation },
       504
     ),
-    
+
   externalAPIError: (service: string, originalError?: string) =>
     buildErrorResponse(
       APIErrorCode.EXTERNAL_API_ERROR,
@@ -167,41 +167,52 @@ export function withAPIHandler<T>(
   } = {}
 ) {
   return async (): Promise<NextResponse<StandardAPIResponse<T>>> => {
-    const { startTime = Date.now(), operation = 'API operation', cacheHit, apiCalls } = options;
-    
+    const {
+      startTime = Date.now(),
+      operation = 'API operation',
+      cacheHit,
+      apiCalls,
+    } = options;
+
     try {
       const data = await handler();
-      
+
       const response = buildSuccessResponse(data, {
         startTime,
         cacheHit,
         apiCalls,
       });
-      
+
       return NextResponse.json(response);
     } catch (error) {
       logger.error(`Error in ${operation}`, {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
       });
-      
+
       if (error instanceof Error) {
         // Handle specific error types
-        if (error.message.includes('rate limit') || error.message.includes('429')) {
+        if (
+          error.message.includes('rate limit') ||
+          error.message.includes('429')
+        ) {
           return APIResponses.rateLimited(100, 60000);
         }
-        
+
         if (error.message.includes('timeout')) {
           return APIResponses.timeout(operation);
         }
-        
-        if (error.message.includes('not found') || error.message.includes('404')) {
+
+        if (
+          error.message.includes('not found') ||
+          error.message.includes('404')
+        ) {
           return APIResponses.notFound(operation);
         }
-        
+
         return APIResponses.internalError(error.message, error);
       }
-      
+
       return APIResponses.internalError();
     }
   };
@@ -217,10 +228,12 @@ export function createCacheHeaders(
 ): Record<string, string> {
   return {
     'Cache-Control': `public, max-age=${maxAge}${
-      staleWhileRevalidate ? `, stale-while-revalidate=${staleWhileRevalidate}` : ''
+      staleWhileRevalidate
+        ? `, stale-while-revalidate=${staleWhileRevalidate}`
+        : ''
     }`,
     'X-Content-Type': 'application/json',
-    'Vary': 'Accept-Encoding',
+    Vary: 'Accept-Encoding',
     ...additionalHeaders,
   };
 }
@@ -234,9 +247,12 @@ export function validatePagination(
   maxLimit: number = 100
 ): { page: number; limit: number; offset: number } {
   const parsedPage = Math.max(1, parseInt(page || '1', 10));
-  const parsedLimit = Math.min(maxLimit, Math.max(1, parseInt(limit || '30', 10)));
+  const parsedLimit = Math.min(
+    maxLimit,
+    Math.max(1, parseInt(limit || '30', 10))
+  );
   const offset = (parsedPage - 1) * parsedLimit;
-  
+
   return {
     page: parsedPage,
     limit: parsedLimit,

@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
         try {
           const startTime = Date.now();
           const data = await BitcoinService.getComprehensiveBTCSupplies(false);
-          
+
           // Build response in the same format as tRPC
           return buildFreshResponse(
             data,

@@ -44,7 +44,9 @@ export function WalletConnectButton({
     const fetchAnsName = async () => {
       setPrimaryNameLoading(true);
       try {
-        const response = await fetch(`/api/wallet/ans?address=${encodeURIComponent(walletAddress)}`);
+        const response = await fetch(
+          `/api/wallet/ans?address=${encodeURIComponent(walletAddress)}`
+        );
         if (response.ok) {
           const data = await response.json();
           if (data.success && data.data) {
@@ -64,7 +66,7 @@ export function WalletConnectButton({
     fetchAnsName();
     // Refresh every 5 minutes
     const interval = setInterval(fetchAnsName, 300000);
-    
+
     return () => clearInterval(interval);
   }, [walletAddress, connected]);
 

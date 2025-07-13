@@ -200,7 +200,11 @@ export const DeFiPositionsTable = ({
                         />
                       </div>
                       <div className="text-[10px] text-muted-foreground xs:hidden text-center mt-0.5 max-w-[40px] truncate">
-                        {cleanProtocolName(groupedPosition.protocol).split(' ')[0]}
+                        {
+                          cleanProtocolName(groupedPosition.protocol).split(
+                            ' '
+                          )[0]
+                        }
                       </div>
                     </div>
                     <span className="font-medium text-sm truncate hidden xs:block">

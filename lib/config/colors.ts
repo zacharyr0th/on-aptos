@@ -18,27 +18,27 @@ export const STABLECOIN_COLORS = createColorMap(
   [
     // Native USDT - darker pastel green
     [['USDT'], '#86efac'], // green-300
-    
-    // Native USDC - darker pastel blue  
+
+    // Native USDC - darker pastel blue
     [['USDC'], '#93c5fd'], // blue-300
-    
+
     // Bridged USDT variants - darker pastel mint greens
     [['lzUSDT'], '#bbf7d0'], // green-200
     [['whUSDT'], '#d1fae5'], // green-100
     [['ceUSDT'], '#6ee7b7'], // emerald-300
-    
+
     // Bridged USDC variants - darker pastel sky blues
     [['lzUSDC'], '#bfdbfe'], // blue-200
     [['whUSDC'], '#dbeafe'], // blue-100
     [['ceUSDC'], '#a5b4fc'], // indigo-300
-    
+
     // Ethena - darker pastel grays
     [['USDe', 'sUSDe/USDe'], '#d1d5db'], // gray-300
     [['sUSDe'], '#e5e7eb'], // gray-200
-    
+
     // Mirage mUSD - darker pastel orange
     [['mUSD'], '#fcd34d'], // amber-300
-    
+
     // MOD - darker pastel purple
     [['MOD'], '#d8b4fe'], // purple-300
   ],
