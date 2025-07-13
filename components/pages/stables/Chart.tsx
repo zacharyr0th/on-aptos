@@ -58,7 +58,7 @@ const CustomTooltip = memo<TooltipProps<number, string>>(props => {
 
   try {
     const data = payload[0].payload as ChartDataItem;
-    const { name, value, formattedSupply } = data;
+    const { name, value, formattedSupply, components } = data;
 
     return (
       <div
@@ -70,6 +70,21 @@ const CustomTooltip = memo<TooltipProps<number, string>>(props => {
           Market Share: {formatPercentage(value)}%
         </p>
         <p className="text-muted-foreground">Supply: {formattedSupply}</p>
+        
+        {/* Show individual tokens if this is the "Other" category */}
+        {name === 'Other' && components && components.length > 0 && (
+          <div className="mt-2 pt-2 border-t border-border space-y-1">
+            <p className="text-xs font-medium text-muted-foreground">Includes:</p>
+            {components.map((component: any, index: number) => (
+              <p key={index} className="text-xs text-muted-foreground ml-2">
+                {component.symbol}: {component.formattedSupply || `$${Number(component.supply).toLocaleString('en-US', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}`}
+              </p>
+            ))}
+          </div>
+        )}
       </div>
     );
   } catch (error) {
@@ -245,6 +260,8 @@ export const MarketShareChart = memo<MarketShareChartProps>(
 
           const totalSupplyBigInt = BigInt(totalSupply);
           const result: ChartDataItem[] = [];
+          
+          console.log('Chart totalSupply:', totalSupply, 'as BigInt:', totalSupplyBigInt.toString());
 
           for (const token of data) {
             // Skip tokens with 0 supply for chart display
@@ -264,12 +281,24 @@ export const MarketShareChart = memo<MarketShareChartProps>(
                 hasSUSDe ? susdePrice : undefined
               );
 
+              // Calculate USD value properly for combined tokens
+              let combinedUsdValue = 0;
+              for (const component of token.components) {
+                const componentSupply = BigInt(component.supply_raw || component.supply);
+                const componentDecimals = (component.symbol === 'MOD' || component.symbol === 'mUSD') ? 8 : 6;
+                const componentDivisor = Math.pow(10, componentDecimals);
+                combinedUsdValue += Number(componentSupply) / componentDivisor;
+              }
+
+              const marketShare = calculateMarketShare(combinedSupply, totalSupplyBigInt);
+              console.log(`Chart ${token.symbol}: combinedSupply=${combinedSupply.toString()}, marketShare=${marketShare}%`);
+              
               result.push({
                 name: token.symbol,
                 originalSymbol: token.symbol,
-                value: calculateMarketShare(combinedSupply, totalSupplyBigInt),
+                value: marketShare,
                 formattedSupply,
-                _usdValue: Number(combinedSupply) / 1_000_000,
+                _usdValue: combinedUsdValue,
                 components: token.components,
               });
             } else {
@@ -277,14 +306,47 @@ export const MarketShareChart = memo<MarketShareChartProps>(
               const supply = BigInt(token.supply_raw || token.supply || '0');
               const applyPrice =
                 token.symbol === 'sUSDe' ? susdePrice : undefined;
-              const formattedSupply = formatUSDValue(supply, applyPrice);
+              
+              // Check if token has 8 decimals (MOD, mUSD)
+              const decimals = (token.symbol === 'MOD' || token.symbol === 'mUSD') ? 8 : 6;
+              const divisor = Math.pow(10, decimals);
+              
+              // Format supply based on correct decimals
+              const dollarValue = Number(supply) / divisor;
+              let formattedSupply: string;
+              
+              if (applyPrice && token.symbol === 'sUSDe') {
+                const adjustedValue = dollarValue * applyPrice;
+                if (adjustedValue >= 1_000_000_000) {
+                  formattedSupply = `$${(adjustedValue / 1_000_000_000).toFixed(1)}b`;
+                } else if (adjustedValue >= 1_000_000) {
+                  formattedSupply = `$${(adjustedValue / 1_000_000).toFixed(1)}m`;
+                } else if (adjustedValue >= 1_000) {
+                  formattedSupply = `$${(adjustedValue / 1_000).toFixed(1)}k`;
+                } else {
+                  formattedSupply = `$${adjustedValue.toFixed(0)}`;
+                }
+              } else {
+                if (dollarValue >= 1_000_000_000) {
+                  formattedSupply = `$${(dollarValue / 1_000_000_000).toFixed(1)}b`;
+                } else if (dollarValue >= 1_000_000) {
+                  formattedSupply = `$${(dollarValue / 1_000_000).toFixed(1)}m`;
+                } else if (dollarValue >= 1_000) {
+                  formattedSupply = `$${(dollarValue / 1_000).toFixed(1)}k`;
+                } else {
+                  formattedSupply = `$${dollarValue.toFixed(0)}`;
+                }
+              }
 
+              const marketShare = calculateMarketShare(supply, totalSupplyBigInt);
+              console.log(`Chart ${token.symbol}: supply=${supply.toString()}, marketShare=${marketShare}%`);
+              
               result.push({
                 name: token.symbol,
                 originalSymbol: token.symbol,
-                value: calculateMarketShare(supply, totalSupplyBigInt),
+                value: marketShare,
                 formattedSupply,
-                _usdValue: Number(supply) / 1_000_000,
+                _usdValue: dollarValue,
               });
             }
           }
@@ -292,11 +354,51 @@ export const MarketShareChart = memo<MarketShareChartProps>(
           // Sort by market share descending
           const sorted = result.sort((a, b) => b.value - a.value);
 
+          // Group small tokens into "Other" category
+          const threshold = 5; // 5% threshold
+          let cumulativePercentage = 0;
+          const finalResult: typeof result = [];
+          const otherTokens: typeof result = [];
+
+          for (const token of sorted) {
+            // Keep adding tokens to main result until we reach ~95%
+            if (cumulativePercentage <= 95 || finalResult.length < 3) {
+              // Always show at least top 3 tokens
+              finalResult.push(token);
+              cumulativePercentage += token.value;
+            } else {
+              otherTokens.push(token);
+            }
+          }
+
+          // If we have tokens for "Other" category, combine them
+          if (otherTokens.length > 0) {
+            const otherValue = otherTokens.reduce((sum, token) => sum + token.value, 0);
+            const otherUsdValue = otherTokens.reduce((sum, token) => sum + token._usdValue, 0);
+            
+            finalResult.push({
+              name: 'Other',
+              originalSymbol: 'Other',
+              value: otherValue,
+              formattedSupply: `$${(otherUsdValue).toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}`,
+              _usdValue: otherUsdValue,
+              components: otherTokens.map(token => ({
+                symbol: token.originalSymbol,
+                supply: token._usdValue.toString(),
+                supply_raw: (token._usdValue * 1_000_000).toString(),
+                formattedSupply: token.formattedSupply,
+              })),
+            });
+          }
+
           // Cache the result
           processingRef.current.lastDataHash = dataHash;
-          processingRef.current.lastResult = sorted;
+          processingRef.current.lastResult = finalResult;
 
-          return sorted;
+          return finalResult;
         } catch (error) {
           console.error('Error processing chart data:', error);
           return [];
@@ -323,6 +425,8 @@ export const MarketShareChart = memo<MarketShareChartProps>(
       let colorKey = entry.name;
       if (entry.name === 'sUSDe/USDe') {
         colorKey = 'USDe'; // Map combined token to USDe color
+      } else if (entry.name === 'Other') {
+        return '#d4d4d8'; // Pastel gray for "Other" category
       }
       return TOKEN_COLORS[colorKey] || TOKEN_COLORS.default;
     }, []);
@@ -372,14 +476,6 @@ export const MarketShareChart = memo<MarketShareChartProps>(
               </ResponsiveContainer>
             </div>
 
-            {isDesktop && (
-              <div className="ml-12">
-                <CustomLegend
-                  chartData={chartData}
-                  tokenMetadata={tokenMetadata}
-                />
-              </div>
-            )}
           </div>
         </div>
       </div>

@@ -160,7 +160,7 @@ const AptPrice: FC = memo(function AptPrice(): ReactElement {
     );
   }
 
-  if (error || !aptPriceData?.data?.price) {
+  if (error || !aptPriceData?.data?.price || (typeof aptPriceData.data.price === 'object' && !aptPriceData.data.price.price)) {
     return (
       <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] xs:text-xs sm:text-sm text-muted-foreground">
         <Image
@@ -184,10 +184,9 @@ const AptPrice: FC = memo(function AptPrice(): ReactElement {
     );
   }
 
-  const price = aptPriceData.data.price;
-  // For 24h change, we'll calculate it from the price data we have
-  // This is a simplified approach - ideally we'd store historical data
-  const change24h: number = 0; // We can enhance this later with historical data
+  const priceData = aptPriceData.data.price;
+  const price = typeof priceData === 'number' ? priceData : priceData.price;
+  const change24h: number = priceData.change24h || 0;
   const isPositive = change24h >= 0;
 
   return (

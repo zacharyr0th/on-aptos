@@ -93,9 +93,9 @@ const STABLECOIN_CONFIGS: Record<string, BaseTokenConfig> = {
     symbol: 'MOD',
     thumbnail: '/icons/stables/mod.png',
     type: 'Algorithmic Stablecoin',
-    issuer: 'MOD Protocol',
+    issuer: 'Thala',
     assetAddress:
-      '0x6f986d146e4a90b828d8c12c14b6f4e003fdff11a8eecceceb63744363eaac01::mod_coin::MOD',
+      '0x94ed76d3d66cb0b6e7a3ab81acf830e3a50b8ae3cfb9edc0abea635a11185ff4',
     decimals: 8,
     website: '#',
     auditLink: '#',
@@ -106,7 +106,7 @@ const STABLECOIN_CONFIGS: Record<string, BaseTokenConfig> = {
     symbol: 'mUSD',
     thumbnail: '/icons/stables/mUSD.svg',
     type: 'Algorithmic Stablecoin',
-    issuer: 'Mirage Finance',
+    issuer: 'Mirage',
     assetAddress:
       '0xdd84125d1ebac8f1ecb2819801417fc392325e672be111ec03830c34d6ff82dd',
     decimals: 8,

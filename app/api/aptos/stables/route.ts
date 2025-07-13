@@ -15,7 +15,8 @@ const INDEXER = 'https://indexer.mainnet.aptoslabs.com/v1/graphql';
 export async function GET() {
   try {
     // Prepare all stablecoin addresses
-    const fungibleAssets = Object.values(STABLECOINS);
+    const fungibleAssets = [...Object.values(STABLECOINS), ALGO_STABLECOINS.MOD];
+    console.log('Querying fungible assets:', fungibleAssets);
 
     // GraphQL query for native fungible assets and USDT reserve
     const query = `
@@ -26,6 +27,7 @@ export async function GET() {
         }) {
           asset_type
           supply_v2
+          decimals
         }
         
         # Get Tether reserve balance
@@ -66,6 +68,8 @@ export async function GET() {
       throw new Error('GraphQL query failed: ' + JSON.stringify(result.errors));
     }
     
+    console.log('GraphQL response:', JSON.stringify(result.data?.fungible_asset_metadata, null, 2));
+    
     // Get USDT reserve balance
     const usdtReserveBalance = result.data?.current_fungible_asset_balances?.[0]?.amount || '0';
     
@@ -82,6 +86,7 @@ export async function GET() {
       [STABLECOINS.USDE]: 'USDe',
       [STABLECOINS.SUSDE]: 'sUSDe',
       [STABLECOINS.MUSD]: 'mUSD',
+      [ALGO_STABLECOINS.MOD]: 'MOD',
     };
     
     // FA decimals configuration
@@ -91,6 +96,7 @@ export async function GET() {
       USDe: 6,
       sUSDe: 6,
       mUSD: 8, // mUSD has 8 decimals, not 6
+      MOD: 8, // MOD has 8 decimals
     };
 
     // Process fungible assets
@@ -115,14 +121,17 @@ export async function GET() {
           // Calculate divisor based on decimals
           const divisor = BigInt(10 ** decimals);
           
-          // Log mUSD for debugging
+          // Log mUSD and MOD for debugging
           if (symbol === 'mUSD') {
             console.log(`mUSD: Raw supply ${supply.toString()}, Decimals ${decimals}, Formatted ${(supply / divisor).toString()}`);
+          }
+          if (symbol === 'MOD') {
+            console.log(`MOD: Raw supply ${supply.toString()}, Decimals ${decimals}, Formatted ${(supply / divisor).toString()}`);
           }
           
           supplies.push({
             symbol,
-            supply: (supply / divisor).toString(),
+            supply: (supply / divisor).toString(), // Convert based on decimals
             supply_raw: supply.toString(),
             percentage: 0,
             asset_type: item.asset_type,
@@ -140,7 +149,6 @@ export async function GET() {
       { symbol: 'whUSDT', name: 'Wormhole USDT', asset_type: WORMHOLE_STABLECOINS.WH_USDT, account: '0xa2eda21a58856fda86451436513b867c97eecb4ba099da5775520e0f7492e852', decimals: 6 },
       { symbol: 'ceUSDC', name: 'Celer USDC', asset_type: CELER_STABLECOINS.CELER_USDC, account: '0x8d87a65ba30e09357fa2edea2c80dbac296e5dec2b18287113500b902942929d', decimals: 6 },
       { symbol: 'ceUSDT', name: 'Celer USDT', asset_type: CELER_STABLECOINS.CELER_USDT, account: '0x8d87a65ba30e09357fa2edea2c80dbac296e5dec2b18287113500b902942929d', decimals: 6 },
-      { symbol: 'MOD', name: 'MOD', asset_type: ALGO_STABLECOINS.MOD, account: '0x6f986d146e4a90b828d8c12c14b6f4e003fdff11a8eecceceb63744363eaac01', decimals: 8 },
     ];
 
     // Fetch coin supplies from REST API
@@ -284,19 +292,37 @@ export async function GET() {
     }
     
     
-    // Sort by supply descending
+    // Sort by dollar supply descending (using the supply field which is already in dollar units)
     supplies.sort((a, b) => {
-      const aSupply = BigInt(a.supply_raw);
-      const bSupply = BigInt(b.supply_raw);
+      const aSupply = BigInt(a.supply);
+      const bSupply = BigInt(b.supply);
       return bSupply > aSupply ? 1 : -1;
     });
     
-    // Calculate percentages
+    console.log('Total supply (normalized to 6 decimals):', totalSupply.toString());
+    
+    // Calculate total dollar value from all supplies
+    let totalDollarValue = BigInt(0);
     for (const item of supplies) {
-      const rawSupply = BigInt(item.supply_raw);
-      item.percentage = totalSupply > 0 
-        ? Number((rawSupply * BigInt(10000)) / totalSupply) / 100 
+      totalDollarValue += BigInt(item.supply);
+    }
+    
+    // Calculate percentages based on dollar values
+    for (const item of supplies) {
+      const dollarSupply = BigInt(item.supply);
+      
+      item.percentage = totalDollarValue > 0 
+        ? Number((dollarSupply * BigInt(10000)) / totalDollarValue) / 100 
         : 0;
+      
+      // Debug log for MOD and mUSD
+      if (item.symbol === 'MOD' || item.symbol === 'mUSD') {
+        console.log(`${item.symbol} percentage calc:`, {
+          supply: item.supply,
+          totalDollarValue: totalDollarValue.toString(),
+          percentage: item.percentage
+        });
+      }
     }
     
     return NextResponse.json({

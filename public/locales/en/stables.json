@@ -11,7 +11,15 @@
     "price": "Price",
     "supply": "Supply",
     "volume_24h": "Volume 24h",
-    "price_change_24h": "Price Change 24h"
+    "price_change_24h": "Price Change 24h",
+    "asset_details": "Asset Details"
+  },
+  "table": {
+    "token": "Token",
+    "supply": "Supply",
+    "market_share": "%",
+    "type": "Type",
+    "issuer": "Issuer"
   },
   "loading": {
     "loading_stablecoin_data": "Loading stablecoin data...",

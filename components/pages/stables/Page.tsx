@@ -14,6 +14,14 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import {
   MarketShareChart,
   TOKEN_COLORS,
 } from '@/components/pages/stables/Chart';
@@ -52,7 +60,7 @@ const TokenCard = React.memo(function TokenCard({
   // Helper function to check if a token is bridged
   const isBridged = (symbol: string): boolean => {
     return symbol.startsWith('lz') || symbol.startsWith('wh') || symbol.startsWith('ce') || 
-           symbol === 'sUSDe' || symbol === 'USDe' || symbol === 'sUSDe / USDe';
+           symbol === 'sUSDe' || symbol === 'USDe' || symbol === 'sUSDe/USDe';
   };
 
   // Helper function to check if a token is native
@@ -62,7 +70,7 @@ const TokenCard = React.memo(function TokenCard({
 
   // Helper function to check if a token is algorithmic
   const isAlgorithmic = (symbol: string): boolean => {
-    return symbol === 'MOD' || symbol === 'mUSD' || symbol === 'sUSDe' || symbol === 'USDe' || symbol === 'sUSDe / USDe';
+    return symbol === 'MOD' || symbol === 'mUSD' || symbol === 'sUSDe' || symbol === 'USDe' || symbol === 'sUSDe/USDe';
   };
 
   // Get bridge info for display
@@ -96,6 +104,17 @@ const TokenCard = React.memo(function TokenCard({
     };
 
     const formatSingle = (s: string, symbol: string, isRaw: boolean = true) => {
+      // Debug log for MOD to understand the issue
+      if (symbol === 'MOD') {
+        console.log('MOD formatSingle:', { 
+          input: s, 
+          isRaw, 
+          symbol,
+          inputAsBigInt: BigInt(s).toString(),
+          inputAsNumber: Number(s)
+        });
+      }
+      
       const supplyVal = BigInt(s);
       
       // Convert raw units to dollars if dealing with raw supply
@@ -104,16 +123,37 @@ const TokenCard = React.memo(function TokenCard({
         // Use correct decimals for each token
         if (symbol === 'mUSD' || symbol === 'MOD') {
           dollars = Number(supplyVal) / 100_000_000; // 8 decimals
+          if (symbol === 'MOD') {
+            console.log('MOD calculation:', {
+              supplyVal: supplyVal.toString(),
+              divisor: 100_000_000,
+              result: dollars
+            });
+          }
         } else {
           dollars = Number(supplyVal) / 1_000_000; // 6 decimals (default)
         }
       } else {
+        // If not raw, the value is already in whole units
         dollars = Number(supplyVal);
+      }
+      
+      // Debug log the calculated dollars for MOD
+      if (symbol === 'MOD') {
+        console.log('MOD final dollars:', dollars);
       }
 
       // Apply sUSDe price multiplier if available and token is sUSDe
       if (symbol === 'sUSDe' && susdePrice && susdePrice > 0) {
         dollars = dollars * susdePrice;
+      }
+
+      // Final debug log for MOD before formatting
+      if (symbol === 'MOD') {
+        console.log('MOD final formatting:', {
+          dollars,
+          formatted: dollars >= 1_000 ? `$${(dollars / 1_000).toFixed(1)}k` : `$${dollars.toFixed(0)}`
+        });
       }
 
       if (dollars >= 1_000_000_000)
@@ -149,6 +189,17 @@ const TokenCard = React.memo(function TokenCard({
 
         return parts.join(' / ');
       }
+      
+      // Debug log for MOD
+      if (token.symbol === 'MOD') {
+        console.log('MOD calcFormattedDisplay:', {
+          token,
+          supply_raw: token.supply_raw,
+          supply: token.supply,
+          hasSupplyRaw: !!token.supply_raw
+        });
+      }
+      
       // Use supply_raw if available, otherwise use supply
       return formatSingle(
         token.supply_raw || token.supply,
@@ -186,31 +237,6 @@ const TokenCard = React.memo(function TokenCard({
       >
         <div className="h-1" style={{ backgroundColor: tokenColor }} />
         <div className="absolute top-2 right-2 flex items-center gap-1">
-          {isNative(cardSymbol) && (
-            <Badge 
-              className="text-[9px] font-medium px-1 py-0 h-4 bg-gray-900 text-white border-gray-900 dark:bg-gray-100 dark:text-gray-900 dark:border-gray-100"
-              variant="default"
-            >
-              Native
-            </Badge>
-          )}
-          {isAlgorithmic(cardSymbol) && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Badge 
-                  className="text-[9px] font-medium px-1 py-0 h-4 bg-gray-900 text-white border-gray-900 dark:bg-gray-100 dark:text-gray-900 dark:border-gray-100 cursor-help"
-                  variant="default"
-                >
-                  Algo
-                </Badge>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className="max-w-xs">
-                  This stablecoin maintains its peg through algorithmic mechanisms rather than traditional collateral backing
-                </p>
-              </TooltipContent>
-            </Tooltip>
-          )}
           {bridgeInfo.icon && (
             <div className="relative w-6 h-6 rounded-full overflow-hidden bg-white dark:bg-gray-800 p-0.5 shadow-sm">
               <Image
@@ -564,18 +590,20 @@ export default function StablesPage(): React.ReactElement {
       suppliesMap[supply.symbol] = supply.supply_raw ?? supply.supply ?? '0';
     });
 
-    // Calculate raw total for market share calculations (no price adjustments)
+    // Calculate raw total for market share calculations (using dollar values)
     let rawTotalValue = BigInt(0);
     for (const token of supplies) {
-      const rawSupply = token.supply_raw || token.supply || '0';
-      rawTotalValue += BigInt(rawSupply);
+      // Use the supply field which is already in dollar units
+      const dollarSupply = token.supply || '0';
+      rawTotalValue += BigInt(dollarSupply);
     }
 
     // Calculate adjusted total for display purposes (with sUSDe price)
     let adjustedTotalValue = BigInt(0);
     for (const token of supplies) {
-      const rawSupply = token.supply_raw || token.supply || '0';
-      let tokenValue = BigInt(rawSupply);
+      // Use the supply field which is already in dollar units
+      const dollarSupply = token.supply || '0';
+      let tokenValue = BigInt(dollarSupply);
       if (token.symbol === 'sUSDe' && susdePrice !== 1) {
         // Convert to a scaled integer value for BigInt math
         const priceScaled = Math.round(susdePrice * 1000000);
@@ -585,8 +613,8 @@ export default function StablesPage(): React.ReactElement {
     }
 
     const formatTotal = () => {
-      // Convert from raw units to dollars and use adjustedTotalValue
-      const dollars = Number(adjustedTotalValue) / 1_000_000;
+      // adjustedTotalValue is already in dollars
+      const dollars = Number(adjustedTotalValue);
       return new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'USD',
@@ -609,12 +637,13 @@ export default function StablesPage(): React.ReactElement {
 
       if (ethenaComponents.length > 0) {
         displayTokens.push({
-          symbol: 'sUSDe / USDe',
+          symbol: 'sUSDe/USDe',
           isCombined: true,
           supply: ethenaComponents
             .reduce((acc, curr) => {
-              const rawSupply = curr.supply_raw || curr.supply || '0';
-              return acc + BigInt(rawSupply);
+              // Use the supply field which is already in dollar units
+              const dollarSupply = curr.supply || '0';
+              return acc + BigInt(dollarSupply);
             }, 0n)
             .toString(),
           supply_raw: ethenaComponents
@@ -627,22 +656,28 @@ export default function StablesPage(): React.ReactElement {
         });
       }
 
-      // Sort all tokens by supply and filter out zero supply
+      // Sort all tokens by dollar supply value and filter out zero supply
       return displayTokens
         .filter(token => token.supply !== '0')
         .sort((a, b) => {
-          const rawSupplyA = a.supply_raw || a.supply || '0';
-          const rawSupplyB = b.supply_raw || b.supply || '0';
-          const supplyA = BigInt(rawSupplyA);
-          const supplyB = BigInt(rawSupplyB);
+          // Use the supply field which contains the dollar value
+          const supplyA = BigInt(a.supply || '0');
+          const supplyB = BigInt(b.supply || '0');
           return supplyB > supplyA ? 1 : supplyB < supplyA ? -1 : 0;
         });
     };
 
+    // Calculate raw total for TokenCard market share calculations
+    let rawSupplyTotal = BigInt(0);
+    for (const token of supplies) {
+      const rawSupply = token.supply_raw || token.supply || '0';
+      rawSupplyTotal += BigInt(rawSupply);
+    }
+
     return {
       formattedTotalSupply: formatTotal(),
       processedSupplies: processSupplies(),
-      adjustedTotal: rawTotalValue.toString(),
+      adjustedTotal: rawSupplyTotal.toString(),
       suppliesDataMap: suppliesMap,
     };
   }, [data, cmcData]);
@@ -736,6 +771,89 @@ export default function StablesPage(): React.ReactElement {
                   </div>
                 </div>
               )}
+
+              {/* Asset Details Table */}
+              <div className="mt-8 w-full overflow-hidden">
+                <hr className="border-t border-border mb-6" />
+                <div className="w-full overflow-x-auto">
+                  <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="min-w-[120px] sm:min-w-[150px]">{t('table.token', 'Token')}</TableHead>
+                      <TableHead className="min-w-[100px] sm:min-w-[120px]">{t('table.supply', 'Supply')}</TableHead>
+                      <TableHead className="min-w-[50px] sm:min-w-[60px]">{t('table.market_share', '%')}</TableHead>
+                      <TableHead className="min-w-[100px] sm:min-w-[140px]">{t('table.type', 'Type')}</TableHead>
+                      <TableHead className="min-w-[80px] sm:min-w-[100px]">{t('table.issuer', 'Issuer')}</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {processedSupplies.map((token) => {
+                      const metadata = TOKEN_METADATA[token.symbol] || (token.symbol === 'sUSDe/USDe' ? TOKEN_METADATA['sUSDe'] : null);
+                      // Calculate total supply in dollars for percentage calculation
+                      const totalDollarSupply = processedSupplies.reduce((sum, t) => sum + Number(t.supply), 0);
+                      const marketSharePercent = ((Number(token.supply) / totalDollarSupply) * 100).toFixed(2);
+                      const tokenColor = 'isCombined' in token && token.isCombined 
+                        ? TOKEN_COLORS['USDe'] || TOKEN_COLORS.default
+                        : TOKEN_COLORS[token.symbol] || TOKEN_COLORS.default;
+                      
+                      return (
+                        <TableRow key={token.symbol}>
+                          <TableCell className="whitespace-nowrap">
+                            <div className="flex items-center gap-2">
+                              {'isCombined' in token && token.isCombined ? (
+                                <div className="flex items-center gap-1">
+                                  <Image
+                                    src={TOKEN_METADATA['sUSDe']?.thumbnail || '/placeholder.jpg'}
+                                    alt="sUSDe"
+                                    width={20}
+                                    height={20}
+                                    className="rounded-full flex-shrink-0"
+                                  />
+                                  <Image
+                                    src={TOKEN_METADATA['USDe']?.thumbnail || '/placeholder.jpg'}
+                                    alt="USDe"
+                                    width={20}
+                                    height={20}
+                                    className="rounded-full -ml-2 flex-shrink-0"
+                                  />
+                                  <span className="font-medium ml-1">{token.symbol}</span>
+                                </div>
+                              ) : (
+                                <>
+                                  <Image
+                                    src={metadata?.thumbnail || '/placeholder.jpg'}
+                                    alt={token.symbol}
+                                    width={20}
+                                    height={20}
+                                    className="rounded-full flex-shrink-0"
+                                  />
+                                  <span className="font-medium">{token.symbol}</span>
+                                </>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell className="font-mono whitespace-nowrap">
+                            ${Number(token.supply).toLocaleString('en-US', {
+                              minimumFractionDigits: 0,
+                              maximumFractionDigits: 0,
+                            })}
+                          </TableCell>
+                          <TableCell className="font-mono whitespace-nowrap">
+                            {marketSharePercent}%
+                          </TableCell>
+                          <TableCell className="text-sm">
+                            {metadata?.type?.replace(/\s*\(.*?\)\s*/g, '').trim() || '-'}
+                          </TableCell>
+                          <TableCell className="text-sm">
+                            {metadata?.issuer?.split(' ')[0] || '-'}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+                </div>
+              </div>
             </>
           ) : null}
         </main>
