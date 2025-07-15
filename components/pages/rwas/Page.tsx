@@ -662,24 +662,26 @@ export default function RWAsPage(): React.ReactElement {
 
   return (
     <RootErrorBoundary>
-      <div className="min-h-screen flex flex-col bg-background">
-        <div className="container-layout pt-6">
+      <div className="min-h-screen flex flex-col bg-background relative">
+        {/* Background gradient - fixed to viewport */}
+        <div className="fixed inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/10 pointer-events-none" />
+
+        <div className="container-layout pt-6 relative z-10">
           <Header />
         </div>
 
-        <main className="container-layout py-6 flex-1">
+        <main className="container-layout py-6 flex-1 relative z-10">
           {/* Under Construction Notice */}
           <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-6">
             <div className="flex items-center gap-3">
-              <div className="text-yellow-600 dark:text-yellow-400">
-                🚧
-              </div>
+              <div className="text-yellow-600 dark:text-yellow-400">🚧</div>
               <div>
                 <h3 className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
                   Under Construction
                 </h3>
                 <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-1">
-                  The RWA page is currently being updated. Please check again later.
+                  The RWA page is currently being updated. Please check again
+                  later.
                 </p>
               </div>
             </div>
@@ -942,7 +944,7 @@ export default function RWAsPage(): React.ReactElement {
           ) : null}
         </main>
 
-        <Footer />
+        <Footer className="relative z-10" />
       </div>
     </RootErrorBoundary>
   );

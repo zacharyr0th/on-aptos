@@ -57,6 +57,7 @@
     "i18next": "^25.2.1",
     "i18next-http-backend": "^3.0.2",
     "input-otp": "^1.4.2",
+    "json-buffer": "^3.0.1",
     "lucide-react": "^0.508.0",
     "next": "15.3.3",
     "next-sitemap": "^4.2.3",

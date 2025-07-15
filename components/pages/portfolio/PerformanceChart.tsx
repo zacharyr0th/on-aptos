@@ -20,40 +20,84 @@ import {
   ReferenceDot,
 } from 'recharts';
 import { formatCurrency, formatPercentage } from '@/lib/utils/format';
-import { usePortfolioHistoryV2 } from '@/hooks/usePortfolioHistoryV2';
+import { usePortfolioHistory } from './hooks/usePortfolioHistory';
+import { cn } from '@/lib/utils';
 
 interface PerformanceChartProps {
   walletAddress: string | undefined;
   className?: string;
+  timeframe?: '1h' | '12h' | '24h' | '7d' | '30d' | '90d' | '1y' | 'all';
+}
+
+interface TimeframeMetrics {
+  change: number;
+  changePercent: number;
+  isPositive: boolean;
+  startValue: number;
+  endValue: number;
+  highValue: number;
+  lowValue: number;
+  volatility: number;
 }
 
 export const PerformanceChart: React.FC<PerformanceChartProps> = React.memo(
-  ({ walletAddress, className }) => {
+  ({ walletAddress, className, timeframe = '7d' }) => {
     const { resolvedTheme } = useTheme();
 
-    // Use working V2 hook
+    // Use V3 hook with timeframe directly - no need to convert to days
     const {
       data: portfolioHistory,
       isLoading,
       error,
-    } = usePortfolioHistoryV2(walletAddress || null);
+    } = usePortfolioHistory(walletAddress, { timeframe });
 
-    // Memoized calculations
-    const performanceMetrics = useMemo(() => {
+    // Memoized calculations with comprehensive metrics
+    const performanceMetrics = useMemo((): TimeframeMetrics => {
       if (!portfolioHistory || portfolioHistory.length === 0) {
-        return { change: 0, changePercent: 0, isPositive: true };
+        return {
+          change: 0,
+          changePercent: 0,
+          isPositive: true,
+          startValue: 0,
+          endValue: 0,
+          highValue: 0,
+          lowValue: 0,
+          volatility: 0,
+        };
       }
 
-      const current =
-        portfolioHistory[portfolioHistory.length - 1]?.totalValue || 0;
-      const previous = portfolioHistory[0]?.totalValue || 0;
-      const change = current - previous;
-      const changePercent = previous > 0 ? (change / previous) * 100 : 0;
+      const values = portfolioHistory.map(entry => entry.totalValue);
+      const startValue = values[0] || 0;
+      const endValue = values[values.length - 1] || 0;
+      const change = endValue - startValue;
+      const changePercent = startValue > 0 ? (change / startValue) * 100 : 0;
+      
+      // Calculate high and low
+      const highValue = Math.max(...values);
+      const lowValue = Math.min(...values);
+      
+      // Calculate volatility (standard deviation of returns)
+      const returns: number[] = [];
+      for (let i = 1; i < values.length; i++) {
+        if (values[i - 1] > 0) {
+          const dailyReturn = (values[i] - values[i - 1]) / values[i - 1];
+          returns.push(dailyReturn);
+        }
+      }
+      
+      const avgReturn = returns.reduce((sum, ret) => sum + ret, 0) / returns.length;
+      const variance = returns.reduce((sum, ret) => sum + Math.pow(ret - avgReturn, 2), 0) / returns.length;
+      const volatility = Math.sqrt(variance) * 100; // Convert to percentage
 
       return {
         change,
         changePercent,
         isPositive: change >= 0,
+        startValue,
+        endValue,
+        highValue,
+        lowValue,
+        volatility,
       };
     }, [portfolioHistory]);
 
@@ -147,37 +191,59 @@ export const PerformanceChart: React.FC<PerformanceChartProps> = React.memo(
     return (
       <Card className={className}>
         <CardHeader className="pb-1">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-            <div className="flex items-center gap-2">
-              <CardTitle className="text-base sm:text-lg">
-                7d Performance
-              </CardTitle>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Info className="h-4 w-4 text-muted-foreground cursor-help" />
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>
-                    Currently only includes APT balances. Non-APT tokens, NFTs,
-                    and DeFi positions coming soon
-                  </p>
-                </TooltipContent>
-              </Tooltip>
+          <div className="flex flex-col gap-3">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <CardTitle className="text-base sm:text-lg">
+                  {timeframe.toUpperCase()} Performance
+                </CardTitle>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>
+                      Currently only includes APT balances. Non-APT tokens, NFTs,
+                      and DeFi positions coming soon
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                <span
+                  className={`font-medium ${performanceMetrics.isPositive ? 'text-green-600' : 'text-red-600'}`}
+                >
+                  {performanceMetrics.isPositive ? '+' : ''}
+                  {formatCurrency(Math.abs(performanceMetrics.change))}
+                </span>
+                <span className="text-muted-foreground">|</span>
+                <span
+                  className={`text-xs ${performanceMetrics.isPositive ? 'text-green-600' : 'text-red-600'}`}
+                >
+                  {performanceMetrics.isPositive ? '+' : ''}
+                  {formatPercentage(performanceMetrics.changePercent)}
+                </span>
+              </div>
             </div>
-            <div className="flex items-center gap-2 text-sm">
-              <span
-                className={`font-medium ${performanceMetrics.isPositive ? 'text-green-600' : 'text-red-600'}`}
-              >
-                {performanceMetrics.isPositive ? '+' : ''}
-                {formatCurrency(Math.abs(performanceMetrics.change))}
-              </span>
-              <span className="text-muted-foreground">|</span>
-              <span
-                className={`text-xs ${performanceMetrics.isPositive ? 'text-green-600' : 'text-red-600'}`}
-              >
-                {performanceMetrics.isPositive ? '+' : ''}
-                {formatPercentage(performanceMetrics.changePercent)}
-              </span>
+            
+            {/* Additional Metrics Row */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
+              <div>
+                <span className="text-muted-foreground">High</span>
+                <p className="font-medium">{formatCurrency(performanceMetrics.highValue)}</p>
+              </div>
+              <div>
+                <span className="text-muted-foreground">Low</span>
+                <p className="font-medium">{formatCurrency(performanceMetrics.lowValue)}</p>
+              </div>
+              <div>
+                <span className="text-muted-foreground">Start</span>
+                <p className="font-medium">{formatCurrency(performanceMetrics.startValue)}</p>
+              </div>
+              <div>
+                <span className="text-muted-foreground">Volatility</span>
+                <p className="font-medium">{performanceMetrics.volatility.toFixed(2)}%</p>
+              </div>
             </div>
           </div>
         </CardHeader>
@@ -211,12 +277,30 @@ export const PerformanceChart: React.FC<PerformanceChartProps> = React.memo(
                   dataKey="date"
                   className="text-[10px] sm:text-xs"
                   tick={{ fontSize: 10 }}
-                  tickFormatter={value =>
-                    new Date(value).toLocaleDateString('en-US', {
+                  tickFormatter={value => {
+                    const date = new Date(value);
+                    if (timeframe === '1h' || timeframe === '12h') {
+                      return date.toLocaleTimeString('en-US', {
+                        hour: 'numeric',
+                        minute: '2-digit',
+                        hour12: true,
+                      });
+                    } else if (timeframe === '24h') {
+                      return date.toLocaleTimeString('en-US', {
+                        hour: 'numeric',
+                        hour12: true,
+                      });
+                    } else if (timeframe === 'all') {
+                      return date.toLocaleDateString('en-US', {
+                        year: '2-digit',
+                        month: 'short',
+                      });
+                    }
+                    return date.toLocaleDateString('en-US', {
                       month: 'short',
                       day: 'numeric',
-                    })
-                  }
+                    });
+                  }}
                 />
                 <YAxis
                   className="text-[10px] sm:text-xs"

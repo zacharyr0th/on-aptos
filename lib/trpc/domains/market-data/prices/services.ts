@@ -116,11 +116,26 @@ export class PriceService {
     symbol: string
   ): Promise<CMCPriceData> {
     if (!CMC_API_KEY) {
-      throw new ApiError(
-        'CMC_API_KEY is not configured',
-        undefined,
-        'CMC-Config'
-      );
+      // Return default data when API key is missing
+      return {
+        symbol: symbol.toUpperCase(),
+        fullName: SYMBOL_FULL_NAMES[symbol.toLowerCase()] || symbol,
+        displayName: SYMBOL_DISPLAY_NAMES[symbol.toLowerCase()] || symbol,
+        price: 0,
+        marketCap: 0,
+        circulatingSupply: 0,
+        totalSupply: 0,
+        maxSupply: 0,
+        volume24h: 0,
+        percentChange1h: 0,
+        percentChange24h: 0,
+        percentChange7d: 0,
+        percentChange30d: 0,
+        percentChange60d: 0,
+        percentChange90d: 0,
+        fullyDilutedMarketCap: 0,
+        lastUpdated: new Date().toISOString(),
+      };
     }
 
     const cmcId = CMC_SYMBOL_IDS[symbol.toLowerCase()];

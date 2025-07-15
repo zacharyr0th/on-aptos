@@ -495,16 +495,21 @@ export default function BitcoinPage(): React.ReactElement {
 
   return (
     <ErrorBoundary>
-      <div className={`min-h-screen flex flex-col ${GeistMono.className}`}>
+      <div
+        className={`min-h-screen flex flex-col relative ${GeistMono.className}`}
+      >
+        {/* Background gradient - fixed to viewport */}
+        <div className="fixed inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/10 pointer-events-none" />
+
         <div className="fixed top-0 left-0 right-0 h-1 z-50">
           {refreshing && <div className="h-full bg-muted animate-pulse"></div>}
         </div>
 
-        <div className="container-layout pt-6">
+        <div className="container-layout pt-6 relative z-10">
           <Header />
         </div>
 
-        <main className="container-layout py-6 flex-1">
+        <main className="container-layout py-6 flex-1 relative z-10">
           {loading ? (
             <LoadingState />
           ) : error ? (
@@ -676,7 +681,7 @@ export default function BitcoinPage(): React.ReactElement {
           ) : null}
         </main>
 
-        <Footer />
+        <Footer className="relative z-10" />
       </div>
     </ErrorBoundary>
   );

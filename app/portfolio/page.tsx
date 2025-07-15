@@ -18,6 +18,9 @@ export const metadata: Metadata = {
   },
 };
 
+// Disable static generation for this page since it requires wallet connection
+export const dynamic = 'force-dynamic';
+
 export default function Page() {
   return <PortfolioPage />;
 }

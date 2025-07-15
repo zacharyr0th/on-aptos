@@ -32,10 +32,10 @@ const handler = withValidation(PortfolioAssetsQuerySchema)(async ({
         `[Assets API] Fetching assets for ${walletAddress}, showOnlyVerified: ${showOnlyVerified}`
       );
 
-      // Call the service directly
+      // Call the service directly - showOnlyVerified is a string from query params
       const assets = await getWalletAssets(
         walletAddress,
-        showOnlyVerified as boolean
+        showOnlyVerified === 'true' || showOnlyVerified === true
       );
 
       logger.info(`[Assets API] Retrieved ${assets.length} assets`);

@@ -12,7 +12,6 @@ import {
 const PANORA_API_ENDPOINT = 'https://api.panora.exchange/prices';
 // Use public API key if none is provided in env
 const PANORA_API_KEY =
-  getEnvVar('PANORA_API_KEY') ||
   'a4^KV_EaTf4MW#ZdvgGKX#HUD^3IFEAOV_kzpIE^3BQGA8pDnrkT7JcIy#HNlLGi';
 
 export interface PanoraPriceResponse {

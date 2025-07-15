@@ -103,16 +103,15 @@ interface WalletTransaction {
   gas_fee_payer_address?: string;
 }
 
-// Query to get all fungible assets (both v1 and v2) for a wallet
-// Note: We query both FA and Coin balances due to the migration from Coin to FA standard
-// Some tokens might appear in both tables during migration
+// Simplified query to get fungible assets using the working format
 const WALLET_ASSETS_QUERY = `
   query GetWalletAssets($ownerAddress: String!) {
     current_fungible_asset_balances(
       where: { 
         owner_address: { _eq: $ownerAddress },
-        amount: { _gt: "0" }
+        amount: { _gt: 0 }
       }
+      limit: 100
     ) {
       amount
       asset_type
@@ -121,20 +120,6 @@ const WALLET_ASSETS_QUERY = `
         symbol
         decimals
         icon_uri
-      }
-    }
-    current_coin_balances(
-      where: { 
-        owner_address: { _eq: $ownerAddress },
-        amount: { _gt: "0" }
-      }
-    ) {
-      amount
-      coin_type
-      coin_info {
-        name
-        symbol
-        decimals
       }
     }
   }
@@ -267,15 +252,6 @@ export async function getWalletAssets(
 
     const response = await graphQLRequest<{
       current_fungible_asset_balances: FungibleAsset[];
-      current_coin_balances: Array<{
-        amount: string;
-        coin_type: string;
-        coin_info: {
-          name: string;
-          symbol: string;
-          decimals: number;
-        };
-      }>;
     }>(
       INDEXER,
       {
@@ -294,10 +270,9 @@ export async function getWalletAssets(
     logger.debug(`GraphQL response received:`, {
       fungibleAssetsCount:
         response.current_fungible_asset_balances?.length || 0,
-      coinBalancesCount: response.current_coin_balances?.length || 0,
     });
 
-    // Combine fungible assets and coin balances, but filter out CELL tokens (they're NFTs)
+    // Filter out CELL tokens (they're NFTs)
     const fungibleAssets = (
       response.current_fungible_asset_balances || []
     ).filter(
@@ -306,21 +281,9 @@ export async function getWalletAssets(
         asset.asset_type !==
           '0x2ebb2ccac5e027a87fa0e2e5f656a3a4238d6a48d93ec9b610d570fc0aa0df12'
     );
-    const coinBalances = (response.current_coin_balances || []).filter(
-      coin =>
-        !coin.coin_info?.symbol?.includes('CELL') &&
-        coin.coin_type !==
-          '0x2ebb2ccac5e027a87fa0e2e5f656a3a4238d6a48d93ec9b610d570fc0aa0df12'
-    );
-
-    // Create a set of symbols that already exist in FA balances
-    // This helps us avoid duplicates from the Coin->FA migration
-    const faSymbols = new Set(
-      fungibleAssets.map(asset => asset.metadata?.symbol).filter(Boolean)
-    );
 
     logger.debug(
-      `After CELL filtering: ${fungibleAssets.length} fungible assets, ${coinBalances.length} coin balances`
+      `After CELL filtering: ${fungibleAssets.length} fungible assets`
     );
 
     // Get Panora token list - this will be our source of truth for official tokens
@@ -336,6 +299,7 @@ export async function getWalletAssets(
         error
       );
       panoraAvailable = false;
+      panoraTokens = [];
     }
     const panoraTokenMap = new Map(
       panoraTokens.map(token => {
@@ -374,30 +338,7 @@ export async function getWalletAssets(
         .filter(Boolean)
     );
 
-    // Convert coin balances to FungibleAsset format and add icon URIs
-    // Filter out coins that already exist in FA balances to avoid duplicates
-    const convertedCoins: FungibleAsset[] = coinBalances
-      .filter(coin => {
-        // Skip if this symbol already exists in FA balances (avoid duplicates from Coin->FA migration)
-        if (faSymbols.has(coin.coin_info.symbol)) {
-          logger.info(
-            `Skipping coin ${coin.coin_info.symbol} as it already exists in FA balances`
-          );
-          return false;
-        }
-
-        return true;
-      })
-      .map(coin => ({
-        asset_type: coin.coin_type,
-        amount: coin.amount,
-        metadata: {
-          name: coin.coin_info.name,
-          symbol: coin.coin_info.symbol,
-          decimals: coin.coin_info.decimals,
-          icon_uri: panoraTokenMap.get(coin.coin_type)?.iconUrl,
-        },
-      }));
+    // No need to convert coin balances anymore as current_fungible_asset_balances includes all tokens
 
     // Add icon URIs to fungible assets from Panora
     // Include all assets, but mark whether they're official
@@ -420,7 +361,7 @@ export async function getWalletAssets(
       })
     );
 
-    let allAssets = [...enhancedFungibleAssets, ...convertedCoins];
+    let allAssets = [...enhancedFungibleAssets];
 
     // First, filter out known scam tokens
     const beforeScamFilter = allAssets.length;
@@ -441,7 +382,7 @@ export async function getWalletAssets(
     }
 
     logger.info(
-      `Found ${allAssets.length} total assets (${enhancedFungibleAssets.length} fungible + ${convertedCoins.length} coins) for wallet ${walletAddress} after scam filtering.`
+      `Found ${allAssets.length} total assets for wallet ${walletAddress} after scam filtering.`
     );
 
     // Build a set of verified Panora addresses for filtering
@@ -565,7 +506,7 @@ export async function getWalletAssets(
 
         // If Panora is not available, show all non-stablecoin tokens (except scams)
         if (!panoraAvailable) {
-          logger.debug(
+          logger.info(
             `Panora not available, including token: ${asset.metadata?.symbol}`
           );
           return true;
@@ -975,13 +916,16 @@ export async function getAssetPrices(
   const prices: AssetPrice[] = [];
 
   try {
-    logger.info(
-      `Fetching prices for ${assetTypes.length} official assets via optimized batch call`
-    );
+    logger.info(`Fetching prices for ${assetTypes.length} assets`);
 
-    // OPTIMIZATION: Make single API call to get all Panora prices instead of individual calls
-    const allPanoraPrices = await PanoraService.getAllPrices();
-    logger.info(`Received ${allPanoraPrices.length} prices from Panora API`);
+    // Try to get Panora prices but don't fail if unavailable
+    let allPanoraPrices: PanoraPriceResponse[] = [];
+    try {
+      allPanoraPrices = await PanoraService.getAllPrices();
+      logger.info(`Received ${allPanoraPrices.length} prices from Panora API`);
+    } catch (error) {
+      logger.warn('Panora API unavailable, using fallback prices');
+    }
 
     // Create a set of official token addresses for validation
     const officialTokenAddresses = new Set(
@@ -1101,13 +1045,16 @@ export async function getAssetPrices(
             logger.info(`Found CMC price for ${symbol}: $${cmcData.price}`);
           } catch (cmcError) {
             logger.error(`CMC fallback failed for ${symbol}:`, cmcError);
-            throw new Error(`Failed to fetch price for ${symbol}`);
+            prices.push({
+              assetType,
+              symbol: symbol,
+              price: 0,
+              change24h: 0,
+              marketCap: 0,
+            });
           }
         } else {
-          // For unknown tokens, skip them instead of failing the entire request
-          logger.warn(
-            `Skipping unknown token ${assetType} (symbol: ${symbol || 'UNKNOWN'}) - no price source available`
-          );
+          // For unknown tokens, use a default price of 0
           prices.push({
             assetType,
             symbol: symbol || 'UNKNOWN',
@@ -1123,7 +1070,14 @@ export async function getAssetPrices(
     return prices;
   } catch (error) {
     logger.error('Failed to fetch asset prices:', error);
-    throw error;
+    // Return empty prices array instead of throwing
+    return assetTypes.map(assetType => ({
+      assetType,
+      symbol: 'UNKNOWN',
+      price: 0,
+      change24h: 0,
+      marketCap: 0,
+    }));
   }
 }
 

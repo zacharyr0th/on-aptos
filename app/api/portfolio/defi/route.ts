@@ -13,7 +13,7 @@ export const maxDuration = 30; // 30 seconds
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const walletAddress = searchParams.get('address');
+    const walletAddress = searchParams.get('walletAddress');
 
     // Validate wallet address
     const validation = validateWalletAddress(walletAddress);

@@ -1,46 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { graphQLRequest } from '@/lib/utils/fetch-utils';
 import { PanoraService } from '@/lib/services/blockchain/portfolio/panora-service';
 import {
-  generateDailyTimestamps,
-  withRetry,
   validateWalletAddress,
   createErrorResponse,
   createSuccessResponse,
 } from '@/lib/utils/portfolio-utils';
-import { coinGeckoCache, portfolioCache } from '@/lib/utils/simple-cache';
+import { portfolioCache } from '@/lib/utils/simple-cache';
+import { logger } from '@/lib/utils/logger';
 
-const INDEXER = 'https://indexer.mainnet.aptoslabs.com/v1/graphql';
-const APTOS_API_KEY = process.env.APTOS_BUILD_SECRET;
+const APTOS_ANALYTICS_API = 'https://api.mainnet.aptoslabs.com/v1/analytics';
 
-// Simplified query to get current balance and recent activities
-const DAILY_BALANCE_QUERY = `
-  query GetDailyBalances($owner_address: String!, $start_time: timestamp!) {
-    current_balance: current_fungible_asset_balances(
-      where: {
-        owner_address: {_eq: $owner_address}
-        asset_type: {_eq: "0x1::aptos_coin::AptosCoin"}
-      }
-    ) {
-      amount
-    }
-    
-    daily_activities: coin_activities(
-      where: {
-        owner_address: {_eq: $owner_address}
-        coin_type: {_eq: "0x1::aptos_coin::AptosCoin"}
-        transaction_timestamp: {_gte: $start_time}
-        is_transaction_success: {_eq: true}
-      }
-      order_by: {transaction_timestamp: desc}
-      limit: 1000
-    ) {
-      transaction_timestamp
-      activity_type
-      amount
-    }
-  }
-`;
+// Map timeframe to lookback parameter for store balances
+// Note: historical_store_balances only accepts 'year' or 'all'
+function getStoreBalanceLookback(days: number): string {
+  if (days <= 365) return 'year';
+  return 'all';
+}
+
+// Map timeframe to lookback parameter for token prices
+// Token price history accepts 'hour', 'day', 'week', 'month'
+function getTokenPriceLookback(days: number): string {
+  if (days <= 1) return 'hour';
+  if (days <= 7) return 'day';
+  if (days <= 30) return 'week';
+  return 'month';
+}
 
 interface PortfolioDataPoint {
   date: string;
@@ -48,6 +32,17 @@ interface PortfolioDataPoint {
   aptPrice: number | null;
   totalValue: number;
   dataSource: string | null;
+}
+
+interface StoreBalanceResponse {
+  hourly_timestamp: string;
+  total_store_balance_usd: number;
+}
+
+interface TokenPriceResponse {
+  asset_address: string;
+  price_hourly_timestamp: string;
+  price_usd: number;
 }
 
 export async function GET(request: NextRequest) {
@@ -85,10 +80,10 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Fetch data in parallel
+    // Fetch data in parallel from new Aptos Analytics APIs
     const [balanceData, priceData] = await Promise.all([
-      fetchOptimizedBalanceHistory(walletAddress, days),
-      fetchOptimizedPriceHistory(days),
+      fetchStoreBalanceHistory(walletAddress, days),
+      fetchTokenPriceHistory(days),
     ]);
 
     // Combine and process data
@@ -122,159 +117,150 @@ export async function GET(request: NextRequest) {
   }
 }
 
-async function fetchOptimizedBalanceHistory(
+async function fetchStoreBalanceHistory(
   walletAddress: string,
   days: number
-) {
-  const startDate = new Date();
-  startDate.setDate(startDate.getDate() - (days + 3)); // Buffer for accuracy
-
-  const response = await withRetry(
-    () =>
-      graphQLRequest<any>(
-        INDEXER,
-        {
-          query: DAILY_BALANCE_QUERY,
-          variables: {
-            owner_address: walletAddress,
-            start_time: startDate.toISOString(),
-          },
-        },
-        APTOS_API_KEY
-          ? { headers: { Authorization: `Bearer ${APTOS_API_KEY}` } }
-          : {}
-      ),
-    {
-      maxAttempts: 3,
-      backoffStrategy: 'exponential',
-      baseDelay: 1000,
-    }
-  );
-
-  // Process balance data
-  const currentBalance = response.current_balance[0]?.amount
-    ? BigInt(response.current_balance[0].amount)
-    : BigInt(0);
-
-  const activities = response.daily_activities;
-
-  return reconstructDailyBalances(currentBalance, activities, days);
-}
-
-async function fetchOptimizedPriceHistory(days: number) {
-  // Try to get from cache first
-  const geckoKey = `aptos-prices-${days}d`;
-  const cachedPrices = coinGeckoCache.get<any>(geckoKey);
-
-  if (cachedPrices) {
-    return processPriceData(cachedPrices);
-  }
-
-  // Fetch current price from Panora
-  let currentPrice = null;
+): Promise<Map<string, number>> {
   try {
-    const panoraPrices = await PanoraService.getAllPrices();
-    const aptToken = panoraPrices.find(token => token.symbol === 'APT');
-    if (aptToken) {
-      currentPrice = parseFloat(aptToken.usdPrice);
-    }
-  } catch (error) {
-    console.warn('[Portfolio History] Panora price fetch failed:', error);
-  }
+    const lookback = getStoreBalanceLookback(days);
+    const url = `${APTOS_ANALYTICS_API}/historical_store_balances?account_address=${walletAddress}&lookback=${lookback}`;
 
-  // Fetch historical prices from CoinGecko
-  try {
-    const response = await fetch(
-      `https://api.coingecko.com/api/v3/coins/aptos/market_chart?vs_currency=usd&days=${days + 1}&interval=daily`,
-      { signal: AbortSignal.timeout(10000) }
+    logger.info(
+      `[Portfolio History] Fetching store balance history from ${url}`
     );
 
-    if (response.ok) {
-      const data = await response.json();
-      coinGeckoCache.set(geckoKey, data, 5 * 60 * 1000); // 5 minutes
-      const processed = processPriceData(data);
+    const headers: HeadersInit = {
+      Accept: 'application/json',
+    };
 
-      // Add current price if available
-      if (currentPrice) {
-        const today = new Date().toISOString().split('T')[0];
-        processed.set(today, { price: currentPrice, source: 'panora' });
+    // Add authorization header if API key is available
+    const apiKey =
+      process.env.APTOS_BUILD_KEY || process.env.APTOS_BUILD_SECRET;
+    if (apiKey) {
+      headers['Authorization'] = `Bearer ${apiKey}`;
+    }
+
+    const response = await fetch(url, {
+      headers,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Store balance API error: ${response.status}`);
+    }
+
+    const result = await response.json();
+
+    if (result.status !== 'success' || !result.data) {
+      throw new Error(result.message || 'Failed to fetch store balances');
+    }
+
+    // Convert to map format
+    const balanceMap = new Map<string, number>();
+
+    for (const item of result.data as any[]) {
+      // Convert timestamp to date string - handle both formats
+      let dateString: string | undefined;
+      if (item.hourly_timestamp) {
+        dateString = item.hourly_timestamp.split(' ')[0]; // Get YYYY-MM-DD part
+      } else if (item.date_day) {
+        dateString = item.date_day; // Already in YYYY-MM-DD format
       }
 
-      return processed;
-    }
-  } catch (error) {
-    console.warn('[Portfolio History] CoinGecko fetch failed:', error);
-  }
+      if (!dateString) {
+        logger.warn('[Portfolio History] Skipping item with missing timestamp');
+        continue;
+      }
 
-  // Return with just current price if available
-  const priceMap = new Map();
-  if (currentPrice) {
-    const today = new Date().toISOString().split('T')[0];
-    priceMap.set(today, { price: currentPrice, source: 'panora' });
+      const balanceValue =
+        item.total_store_balance_usd || item.total_balance_usd || 0;
+      balanceMap.set(dateString, balanceValue);
+    }
+
+    logger.info(
+      `[Portfolio History] Retrieved ${balanceMap.size} balance data points`
+    );
+    return balanceMap;
+  } catch (error) {
+    logger.error('[Portfolio History] Error fetching store balances:', error);
+    throw error;
   }
-  return priceMap;
 }
 
-function reconstructDailyBalances(
-  currentBalance: bigint,
-  activities: any[],
+async function fetchTokenPriceHistory(
   days: number
-): Map<string, number> {
-  const dailyTimestamps = generateDailyTimestamps(days);
-  const balanceMap = new Map<string, number>();
+): Promise<Map<string, { price: number; source: string }>> {
+  try {
+    const lookback = getTokenPriceLookback(days);
+    const url = `${APTOS_ANALYTICS_API}/token/historical_prices?address=0x1::aptos_coin::AptosCoin&lookback=${lookback}`;
 
-  // Sort activities by timestamp
-  const sortedActivities = activities
-    .map(a => ({
-      timestamp: a.transaction_timestamp,
-      activity_type: a.activity_type,
-      amount: BigInt(a.amount),
-    }))
-    .sort(
-      (a, b) =>
-        new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
-    );
+    logger.info(`[Portfolio History] Fetching APT price history from ${url}`);
 
-  let runningBalance = currentBalance;
+    const headers: HeadersInit = {
+      Accept: 'application/json',
+    };
 
-  // Work backwards through days
-  for (let i = dailyTimestamps.length - 1; i >= 0; i--) {
-    const timestamp = dailyTimestamps[i];
-    const date = timestamp.split('T')[0];
-    const snapshotTime = new Date(timestamp).getTime();
-
-    // Reverse transactions that happened after this snapshot
-    for (const activity of sortedActivities) {
-      const activityTime = new Date(activity.timestamp).getTime();
-
-      if (activityTime > snapshotTime && i < dailyTimestamps.length - 1) {
-        const typeStr = activity.activity_type.toLowerCase();
-        if (typeStr.includes('deposit') || typeStr.includes('receive')) {
-          runningBalance -= activity.amount;
-        } else if (typeStr.includes('withdraw') || typeStr.includes('send')) {
-          runningBalance += activity.amount;
-        }
-      }
+    // Add authorization header if API key is available
+    const apiKey =
+      process.env.APTOS_BUILD_KEY || process.env.APTOS_BUILD_SECRET;
+    if (apiKey) {
+      headers['Authorization'] = `Bearer ${apiKey}`;
     }
 
-    balanceMap.set(date, Number(runningBalance) / 1e8);
+    const response = await fetch(url, {
+      headers,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Token price API error: ${response.status}`);
+    }
+
+    const result = await response.json();
+
+    if (result.status !== 'success' || !result.data) {
+      throw new Error(result.message || 'Failed to fetch token prices');
+    }
+
+    // Convert to map format
+    const priceMap = new Map<string, { price: number; source: string }>();
+
+    for (const item of result.data as TokenPriceResponse[]) {
+      // Convert timestamp to date string
+      if (!item.price_hourly_timestamp) {
+        logger.warn(
+          '[Portfolio History] Skipping price item with missing timestamp'
+        );
+        continue;
+      }
+      const date = item.price_hourly_timestamp.split(' ')[0]; // Get YYYY-MM-DD part
+      priceMap.set(date, {
+        price: item.price_usd || 0,
+        source: 'aptos_analytics',
+      });
+    }
+
+    // Try to get current price from Panora for today
+    try {
+      const panoraPrices = await PanoraService.getAllPrices();
+      const aptToken = panoraPrices.find(token => token.symbol === 'APT');
+      if (aptToken) {
+        const today = new Date().toISOString().split('T')[0];
+        priceMap.set(today, {
+          price: parseFloat(aptToken.usdPrice),
+          source: 'panora',
+        });
+      }
+    } catch (error) {
+      logger.warn('[Portfolio History] Panora price fetch failed:', error);
+    }
+
+    logger.info(
+      `[Portfolio History] Retrieved ${priceMap.size} price data points`
+    );
+    return priceMap;
+  } catch (error) {
+    logger.error('[Portfolio History] Error fetching token prices:', error);
+    throw error;
   }
-
-  return balanceMap;
-}
-
-function processPriceData(
-  geckoData: any
-): Map<string, { price: number; source: string }> {
-  const priceMap = new Map();
-  const prices = geckoData.prices || [];
-
-  for (const [timestamp, price] of prices) {
-    const date = new Date(timestamp).toISOString().split('T')[0];
-    priceMap.set(date, { price, source: 'coingecko' });
-  }
-
-  return priceMap;
 }
 
 function processPortfolioData(
@@ -282,19 +268,35 @@ function processPortfolioData(
   prices: Map<string, { price: number; source: string }>,
   days: number
 ): PortfolioDataPoint[] {
-  const dailyTimestamps = generateDailyTimestamps(days);
   const portfolio: PortfolioDataPoint[] = [];
 
-  for (const timestamp of dailyTimestamps) {
-    const date = timestamp.split('T')[0];
-    const balance = balances.get(date) || 0;
+  // Get all unique dates from both balance and price data
+  const allDates = new Set<string>();
+  balances.forEach((_, date) => allDates.add(date));
+  prices.forEach((_, date) => allDates.add(date));
+
+  // Sort dates chronologically
+  const sortedDates = Array.from(allDates).sort();
+
+  // Filter to requested timeframe
+  const cutoffDate = new Date();
+  cutoffDate.setDate(cutoffDate.getDate() - days);
+  const filteredDates = sortedDates.filter(
+    date => new Date(date) >= cutoffDate
+  );
+
+  for (const date of filteredDates) {
+    const totalValueUsd = balances.get(date) || 0;
     const priceData = prices.get(date);
+
+    // Calculate APT balance from USD value if we have price
+    const aptBalance = priceData?.price ? totalValueUsd / priceData.price : 0;
 
     portfolio.push({
       date,
-      aptBalance: balance,
+      aptBalance,
       aptPrice: priceData?.price || null,
-      totalValue: priceData ? balance * priceData.price : 0,
+      totalValue: totalValueUsd, // This is already in USD from the API
       dataSource: priceData?.source || null,
     });
   }

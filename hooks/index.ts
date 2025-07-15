@@ -9,11 +9,6 @@ export {
 // Translation hooks
 export { useTranslation, usePageTranslation } from './useTranslation';
 
-// Performance monitoring hooks
-export { usePerformanceMonitor } from './usePerformanceMonitor';
-export { useWhyDidYouUpdate } from './useWhyDidYouUpdate';
-export { useWebVitals } from './useWebVitals';
-
 // Data hooks
 export { useMarketPrice } from './useMarketPrice';
 

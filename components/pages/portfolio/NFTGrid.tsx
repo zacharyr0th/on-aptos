@@ -152,7 +152,7 @@ export const NFTGrid = ({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 nft-grid-container">
       {nftsLoading ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {Array.from({ length: 6 }).map((_, i) => (

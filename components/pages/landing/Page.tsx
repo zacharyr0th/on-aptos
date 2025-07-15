@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useTheme } from 'next-themes';
+import { GeistMono } from 'geist/font/mono';
 import { HeroSection, IconSections, SocialLinks } from './index';
 import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -11,9 +12,17 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { Badge } from '@/components/ui/badge';
-import { ArrowUpRight, Search, DollarSign, BarChart3 } from 'lucide-react';
+import {
+  ArrowUpRight,
+  Search,
+  DollarSign,
+  BarChart3,
+  TrendingUp,
+  ChevronUp,
+} from 'lucide-react';
 import Image from 'next/image';
 import { SimulatedChart } from './SimulatedChart';
+import { cn } from '@/lib/utils';
 
 const HomepageDesign = () => {
   const [mounted, setMounted] = useState(false);
@@ -21,11 +30,20 @@ const HomepageDesign = () => {
 
   useEffect(() => {
     setMounted(true);
+    // Add smooth scrolling behavior to html element
+    document.documentElement.style.scrollBehavior = 'smooth';
+    return () => {
+      document.documentElement.style.scrollBehavior = 'auto';
+    };
   }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   if (!mounted) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <Card className="p-8 bg-card/50 backdrop-blur-sm border-border/50">
           <div className="flex items-center space-x-3">
             <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
@@ -38,21 +56,21 @@ const HomepageDesign = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Background Pattern */}
-      <div className="fixed inset-0 bg-grid-pattern opacity-5 dark:opacity-10" />
+    <div className={cn('min-h-screen relative', GeistMono.className)}>
+      {/* Background gradient - fixed to viewport */}
+      <div className="fixed inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/10 pointer-events-none" />
 
       {/* Main Content */}
-      <div className="relative">
-        {/* Hero Section */}
-        <section className="relative overflow-hidden">
+      <div className="relative z-10">
+        {/* Hero Section - First Viewport */}
+        <section className="relative overflow-hidden min-h-screen flex items-center">
           <HeroSection />
         </section>
 
-        {/* Value Proposition Section */}
+        {/* Value Proposition Section - Second Viewport */}
         <section
           id="features"
-          className="py-12 sm:py-16 md:py-20 lg:py-24 overflow-hidden"
+          className="py-12 sm:py-16 md:py-20 lg:py-24 overflow-hidden min-h-screen flex items-center"
         >
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid lg:grid-cols-2 gap-8 sm:gap-10 lg:gap-12 items-center">
@@ -205,22 +223,54 @@ const HomepageDesign = () => {
                 </div>
               </div>
             </div>
+
+            {/* View Dashboards CTA */}
+            <div className="mt-12 text-center">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <a
+                    href="#icon-sections"
+                    className="inline-flex items-center justify-center rounded-md bg-primary/10 hover:bg-primary/20 px-6 py-3 text-sm font-medium text-primary shadow-sm transition-all duration-200 hover:shadow-md"
+                    aria-label="View analytics dashboards"
+                  >
+                    View Dashboards
+                    <ArrowUpRight className="ml-2 h-4 w-4" />
+                  </a>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Explore our 6 specialized analytics dashboards</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
           </div>
         </section>
 
-        {/* Secondary Features */}
-        <section className="py-12 sm:py-16 overflow-hidden">
+        {/* Secondary Features - Third Viewport */}
+        <section
+          id="icon-sections"
+          className="py-8 sm:py-12 overflow-hidden min-h-screen flex items-center"
+        >
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-8 sm:mb-12">
-              <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3 sm:mb-4">
-                Everything You Need to Track Aptos DeFi
-              </h2>
-              <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto px-4">
-                Beyond portfolio tracking, explore comprehensive analytics
-                across Aptos
-              </p>
-            </div>
             <IconSections />
+
+            {/* Back to Top Button */}
+            <div className="mt-12 text-center">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={scrollToTop}
+                    className="inline-flex items-center justify-center rounded-md bg-muted hover:bg-muted/80 px-6 py-3 text-sm font-medium text-muted-foreground hover:text-foreground shadow-sm transition-all duration-200 hover:shadow-md"
+                    aria-label="Back to top"
+                  >
+                    <ChevronUp className="mr-2 h-4 w-4" />
+                    Back to Top
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Scroll back to the top of the page</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
           </div>
         </section>
 
@@ -231,14 +281,22 @@ const HomepageDesign = () => {
               <SocialLinks />
               {/* Powered by Aptos */}
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <span>Powered by Aptos</span>
-                <Image
-                  src="/icons/apt.png"
-                  alt="Aptos"
-                  width={20}
-                  height={20}
-                  className="inline-block dark:invert"
-                />
+                <span>Powered by</span>
+                <a
+                  href="https://aptosfoundation.org/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium text-primary hover:text-primary/80 transition-colors inline-flex items-center gap-1"
+                >
+                  Aptos
+                  <Image
+                    src="/icons/apt.png"
+                    alt="Aptos"
+                    width={20}
+                    height={20}
+                    className="inline-block dark:invert"
+                  />
+                </a>
               </div>
               {/* Built by */}
               <div className="flex items-center gap-2 text-sm text-muted-foreground">

@@ -4,9 +4,24 @@
 
 export interface CMCPriceData {
   symbol: string;
-  name: string;
+  name?: string;
+  fullName?: string;
+  displayName?: string;
   price: number;
-  updated: string;
+  marketCap?: number;
+  circulatingSupply?: number;
+  totalSupply?: number;
+  maxSupply?: number;
+  volume24h?: number;
+  percentChange1h?: number;
+  percentChange24h?: number;
+  percentChange7d?: number;
+  percentChange30d?: number;
+  percentChange60d?: number;
+  percentChange90d?: number;
+  fullyDilutedMarketCap?: number;
+  lastUpdated?: string;
+  updated?: string;
 }
 
 export interface PanoraPriceItem {

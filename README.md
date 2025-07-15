@@ -1,20 +1,12 @@
 # On Aptos
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
-A comprehensive API service and frontend that provides real-time information about token supplies, prices, and analytics on the Aptos blockchain.
+A comprehensive analytics platform for tracking token supplies, prices, and DeFi metrics across the Aptos blockchain ecosystem.
 
 ## Overview
 
 On Aptos fetches current circulating supply and pricing data for stablecoins, Bitcoin-wrapped tokens, and Liquid Staking Tokens (LSTs) on Aptos using the Aptos Indexer GraphQL API and multiple price feeds. It handles both token standards (legacy coin standard and newer Fungible-Asset standard).
 
 **Architecture**: The frontend uses **tRPC** for type-safe, end-to-end data fetching, while REST API endpoints remain available for external integrations.
-
-![On Aptos Dashboard](/public/page.png)
-
-You can view detailed information about each token by clicking on its card:
-
-![Detailed token information dialog](/public/dialog.png)
 
 ## Quick Start
 

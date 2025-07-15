@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useWallet } from '@aptos-labs/wallet-adapter-react';
@@ -47,6 +47,7 @@ import {
 const HeaderComponent = (): React.ReactElement | null => {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [navigationValue, setNavigationValue] = useState<string>('');
   const isHomePage = pathname === '/';
   const { t } = useTranslation('common');
   const { account, connected, disconnect } = useWallet();
@@ -89,13 +90,13 @@ const HeaderComponent = (): React.ReactElement | null => {
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
 
-  const getPortfolioLabel = () => {
+  const getPortfolioLabel = useCallback(() => {
     if (!connected) return 'Portfolio';
     if (primaryName)
       return primaryName.charAt(0).toUpperCase() + primaryName.slice(1);
     if (walletAddress) return truncateAddress(walletAddress);
     return 'Portfolio';
-  };
+  }, [connected, primaryName, walletAddress]);
 
   const title = useMemo(() => {
     const pageKeys: Record<string, string> = {
@@ -126,12 +127,24 @@ const HeaderComponent = (): React.ReactElement | null => {
     return translation;
   }, [pathname, t]);
 
-  const toggleMenu = () => setMobileMenuOpen(prev => !prev);
-  const closeMenu = () => setMobileMenuOpen(false);
+  const toggleMenu = useCallback(() => setMobileMenuOpen(prev => !prev), []);
+  const closeMenu = useCallback(() => setMobileMenuOpen(false), []);
 
-  // Close mobile menu when route changes
+  // Memoize protocol categories to prevent re-renders
+  const protocolsByCategory = useMemo(() => {
+    const categories = ['Trading', 'Credit', 'Yield', 'Multiple'];
+    return categories.reduce((acc, category) => {
+      acc[category] = defiProtocols.filter(
+        p => p.status === 'Active' && p.category === category
+      );
+      return acc;
+    }, {} as Record<string, typeof defiProtocols>);
+  }, []);
+
+  // Close mobile menu and reset navigation when route changes
   useEffect(() => {
     setMobileMenuOpen(false);
+    setNavigationValue('');
   }, [pathname]);
 
   // Prevent body scroll when mobile menu is open
@@ -171,8 +184,14 @@ const HeaderComponent = (): React.ReactElement | null => {
 
           {/* Desktop Navigation - Show on tablet and up */}
           <div className="hidden md:flex items-center gap-4">
-            <div className="relative">
-              <NavigationMenu delayDuration={0}>
+            <div className="relative z-50">
+              <NavigationMenu
+                key="desktop-nav"
+                value={navigationValue}
+                onValueChange={setNavigationValue}
+                delayDuration={0}
+                className="[&_[data-slot=navigation-menu-viewport]]:overflow-visible [&_[data-slot=navigation-menu-viewport]]:h-auto"
+              >
                 <NavigationMenuList>
                   {/* Assets Dropdown */}
                   <NavigationMenuItem>
@@ -242,13 +261,9 @@ const HeaderComponent = (): React.ReactElement | null => {
                             {/* Group protocols by category */}
                             {['Trading', 'Credit', 'Yield', 'Multiple'].map(
                               category => {
-                                const categoryProtocols = defiProtocols.filter(
-                                  p =>
-                                    p.status === 'Active' &&
-                                    p.category === category
-                                );
+                                const categoryProtocols = protocolsByCategory[category];
 
-                                if (categoryProtocols.length === 0) return null;
+                                if (!categoryProtocols || categoryProtocols.length === 0) return null;
 
                                 return (
                                   <div key={category} className="relative">
@@ -344,7 +359,10 @@ const HeaderComponent = (): React.ReactElement | null => {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem
-                            onClick={() => disconnect()}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              disconnect();
+                            }}
                             className="cursor-pointer text-destructive"
                           >
                             <LogOut className="mr-2 h-4 w-4" />
@@ -567,7 +585,7 @@ const MobileNavLink = ({
 );
 
 // ListItem component for navigation menu
-const ListItem = React.forwardRef<
+const ListItem = React.memo(React.forwardRef<
   React.ElementRef<'a'>,
   React.ComponentPropsWithoutRef<'a'> & {
     title: string;
@@ -599,7 +617,7 @@ const ListItem = React.forwardRef<
       </NavigationMenuLink>
     </li>
   );
-});
+}));
 ListItem.displayName = 'ListItem';
 
 HeaderComponent.displayName = 'Header';

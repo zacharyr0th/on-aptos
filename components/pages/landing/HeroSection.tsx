@@ -5,7 +5,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { useTranslation } from '@/hooks/useTranslation';
-import { ArrowRight, TrendingUp } from 'lucide-react';
+import { ArrowRight, TrendingUp, LayoutDashboard } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -13,7 +13,7 @@ export const HeroSection = () => {
   const { t } = useTranslation('common');
 
   return (
-    <div className="h-screen w-full max-w-6xl mx-auto text-center flex flex-col justify-center items-center space-y-8 sm:space-y-10 lg:space-y-12 px-4">
+    <div className="w-full max-w-6xl mx-auto text-center flex flex-col justify-center items-center space-y-8 sm:space-y-10 lg:space-y-12 px-4">
       {/* Main Title with enhanced design */}
       <div className="relative space-y-6 sm:space-y-8">
         <div className="space-y-4">
@@ -35,8 +35,8 @@ export const HeroSection = () => {
         </div>
 
         <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed px-4">
-          Real-time portfolio tracking across 25+ protocols. Dedicated analytics
-          for Stablecoins, Bitcoin, RWAs, and Liquid Staking tokens.
+          Real-time portfolio tracking across DeFi protocols. Dedicated
+          analytics for Stablecoins, Bitcoin, RWAs, and LSTs.
         </p>
       </div>
 
@@ -86,6 +86,28 @@ export const HeroSection = () => {
             </TooltipTrigger>
             <TooltipContent>
               <p>Scroll down to see all available tracking features</p>
+            </TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="outline"
+                size="default"
+                className="px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base font-semibold hover:bg-muted/50 transition-all duration-300 w-full sm:w-auto"
+                onClick={() =>
+                  document
+                    .getElementById('icon-sections')
+                    ?.scrollIntoView({ behavior: 'smooth' })
+                }
+                aria-label="Scroll to dashboards section"
+              >
+                <LayoutDashboard className="w-4 h-4 mr-2" />
+                View Dashboards
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Explore our analytics dashboards</p>
             </TooltipContent>
           </Tooltip>
         </div>

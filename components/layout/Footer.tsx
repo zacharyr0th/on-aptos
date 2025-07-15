@@ -18,6 +18,7 @@ import { LanguageToggle } from '@/components/ui/language-toggle';
 
 interface FooterProps {
   showAptosAttribution?: boolean;
+  className?: string;
 }
 
 const CurrentUTCTime: FC = memo(function CurrentUTCTime(): ReactElement {
@@ -294,12 +295,13 @@ SocialLink.displayName = 'SocialLink';
 
 const FooterComponent: FC<FooterProps> = ({
   showAptosAttribution: _showAptosAttribution = true,
+  className,
 }): ReactElement => {
   const { t } = useTranslation('common');
 
   return (
     <ErrorBoundary>
-      <footer className="w-full py-3 sm:py-4">
+      <footer className={`w-full py-3 sm:py-4 ${className || ''}`}>
         <div className="container-layout">
           {/* Desktop Layout */}
           <div className="hidden lg:flex lg:items-center lg:justify-between">

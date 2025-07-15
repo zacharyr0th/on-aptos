@@ -27,11 +27,11 @@ export const APP_CONFIG = {
 } as const;
 
 export const DEVELOPER_CONFIG = {
-  name: process.env.DEVELOPER_NAME || 'Developer',
+  name: process.env.DEVELOPER_NAME || 'zacharyr0th',
   email: process.env.DEVELOPER_EMAIL || 'developer@example.com',
-  website: process.env.DEVELOPER_WEBSITE || 'https://onaptos.com',
-  twitter: process.env.DEVELOPER_TWITTER || 'onaptos',
-  github: process.env.DEVELOPER_GITHUB || 'https://github.com/zacharytyhacz',
+  website: process.env.DEVELOPER_WEBSITE || 'https://www.zacharyr0th.com/',
+  twitter: process.env.DEVELOPER_TWITTER || 'zacharyr0th',
+  github: process.env.DEVELOPER_GITHUB || 'https://github.com/zacharyr0th',
   linkedin: process.env.DEVELOPER_LINKEDIN || '',
 } as const;
 
