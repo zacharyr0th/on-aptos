@@ -42,8 +42,8 @@ export const PortfolioAssetsQuerySchema = z
 export const PortfolioNFTsQuerySchema = z
   .object({
     walletAddress: AptosAddressSchema,
-    limit: z.coerce.number().int().min(1).max(100).default(30),
-    offset: z.coerce.number().int().min(0).default(0),
+    limit: z.coerce.number().int().min(1).max(100).default(30).optional(),
+    offset: z.coerce.number().int().min(0).default(0).optional(),
   })
   .merge(PaginationSchema.partial());
 

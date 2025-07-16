@@ -27,12 +27,8 @@ export async function GET(request: NextRequest) {
           const startTime = Date.now();
           const data = await BitcoinService.getComprehensiveBTCSupplies(false);
 
-          // Build response in the same format as tRPC
-          return buildFreshResponse(
-            data,
-            startTime,
-            Object.keys(data.supplies).length
-          );
+          // Return data directly - withApiEnhancements will wrap it
+          return data;
         } catch (error) {
           console.error('BTC API route error:', formatApiError(error));
 

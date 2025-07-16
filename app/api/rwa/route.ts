@@ -28,7 +28,7 @@ interface RWAXyzAsset {
     symbol: string;
   }>;
   protocol?: string;
-  asset_class?: string;
+  asset_class?: string | { id?: number; name?: string; slug?: string; icon_url?: string; color_hex?: string };
   issuer?: string;
 }
 
@@ -121,8 +121,13 @@ function getProtocolLogoUrl(protocol: string): string {
 }
 
 // Helper function to format asset class
-function formatAssetClass(assetClass?: string): string {
+function formatAssetClass(assetClass?: string | { name?: string; slug?: string }): string {
   if (!assetClass) return 'rwa';
+  
+  // Handle object format from API
+  if (typeof assetClass === 'object') {
+    return assetClass.name || assetClass.slug || 'rwa';
+  }
 
   const classMap: Record<string, string> = {
     'us-treasury-debt': 'us-treasury-debt',
@@ -212,6 +217,10 @@ async function fetchRealTimeRWAData() {
   }
 
   try {
+    // Log the request for debugging
+    console.log('Fetching RWA data from:', RWA_BASE_URL);
+    console.log('API Key configured:', !!RWA_API_KEY);
+
     // Use Promise.all for parallel requests
     const [tokenResponse, assetResponse] = await Promise.all([
       // Token data request
@@ -222,14 +231,14 @@ async function fetchRealTimeRWAData() {
             filter: {
               operator: 'and' as const,
               filters: [
-                { field: 'network_id', operator: 'equals' as const, value: 38 },
+                { field: 'network_id', operator: 'equals' as const, value: 38 }, // 38 is Aptos network ID
               ],
             },
           })
         )}`,
         {
           headers: {
-            Authorization: `Bearer ${RWA_API_KEY}`,
+            ...(RWA_API_KEY ? { Authorization: `Bearer ${RWA_API_KEY}` } : {}),
             'Content-Type': 'application/json',
           },
           signal: AbortSignal.timeout(15000),
@@ -247,7 +256,7 @@ async function fetchRealTimeRWAData() {
                 {
                   field: 'network_ids',
                   operator: 'includes' as const,
-                  value: 38,
+                  value: 38, // 38 is Aptos network ID
                 },
               ],
             },
@@ -255,7 +264,7 @@ async function fetchRealTimeRWAData() {
         )}`,
         {
           headers: {
-            Authorization: `Bearer ${RWA_API_KEY}`,
+            ...(RWA_API_KEY ? { Authorization: `Bearer ${RWA_API_KEY}` } : {}),
             'Content-Type': 'application/json',
           },
           signal: AbortSignal.timeout(15000),
@@ -263,9 +272,16 @@ async function fetchRealTimeRWAData() {
       ),
     ]);
 
+    console.log('Token response status:', tokenResponse.status);
+    console.log('Asset response status:', assetResponse.status);
+
     if (!tokenResponse.ok || !assetResponse.ok) {
+      const tokenError = !tokenResponse.ok ? await tokenResponse.text() : '';
+      const assetError = !assetResponse.ok ? await assetResponse.text() : '';
+      console.error('API Error - Token:', tokenError);
+      console.error('API Error - Asset:', assetError);
       throw new Error(
-        `RWA.xyz API error: ${tokenResponse.status} or ${assetResponse.status}`
+        `RWA.xyz API error: Token ${tokenResponse.status}, Asset ${assetResponse.status}`
       );
     }
 
@@ -273,6 +289,9 @@ async function fetchRealTimeRWAData() {
       tokenResponse.json() as Promise<RWAXyzTokenApiResponse>,
       assetResponse.json() as Promise<RWAXyzApiResponse>,
     ]);
+
+    console.log('Token data results:', tokenData.results?.length || 0);
+    console.log('Asset data results:', assetData.results?.length || 0);
 
     // Reset circuit breaker on success
     resetCircuitBreaker();
@@ -299,6 +318,9 @@ async function fetchRealTimeRWAData() {
       (sum, protocol) => sum + protocol.totalValue,
       0
     );
+
+    console.log('Total protocols found:', protocols.length);
+    console.log('Total RWA value:', totalAptosValue);
 
     return {
       success: true,
@@ -333,13 +355,7 @@ export async function GET(request: NextRequest) {
         // Check cache first
         const cached = getCachedData(cacheKey);
         if (cached) {
-          return {
-            ...cached,
-            cacheInfo: {
-              cached: true,
-              ttl: CACHE_TTL,
-            },
-          };
+          return cached;
         }
 
         try {
@@ -348,15 +364,11 @@ export async function GET(request: NextRequest) {
           // Cache the result
           setCachedData(cacheKey, data, CACHE_TTL);
 
-          return {
-            ...data,
-            cacheInfo: {
-              cached: false,
-              ttl: CACHE_TTL,
-            },
-          };
+          return data;
         } catch (error) {
-          // Return fallback data on error
+          console.error('RWA API error:', error);
+          
+          // Return fallback data on errors
           return {
             success: false,
             totalAptosValue: 0,

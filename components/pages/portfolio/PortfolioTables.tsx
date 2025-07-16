@@ -70,21 +70,26 @@ export const AssetsTable = ({
   portfolioAssets,
   onItemSelect,
 }: AssetsTableProps) => {
+  // Limit to 10 assets and calculate remaining count
+  const displayAssets = visibleAssets.slice(0, 10);
+  const remainingCount = Math.max(0, visibleAssets.length - 10);
+
   return (
     <div className="space-y-4 asset-table-container">
       {visibleAssets.length > 0 ? (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[50%] min-w-[140px]">Asset</TableHead>
-              <TableHead className="hidden sm:table-cell w-[25%] min-w-[80px]">
-                Amount
-              </TableHead>
-              <TableHead className="w-[25%] min-w-[70px]">Value</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {visibleAssets.map((asset, index) => (
+        <>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[50%] min-w-[140px]">Asset</TableHead>
+                <TableHead className="hidden sm:table-cell w-[25%] min-w-[80px]">
+                  Amount
+                </TableHead>
+                <TableHead className="w-[25%] min-w-[70px]">Value</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {displayAssets.map((asset, index) => (
               <TableRow
                 key={`asset-${asset.asset_type}-${asset.amount}-${index}`}
                 className={cn(
@@ -176,6 +181,14 @@ export const AssetsTable = ({
             ))}
           </TableBody>
         </Table>
+        
+        {/* Show remaining count if there are more than 10 assets */}
+        {remainingCount > 0 && (
+          <div className="text-center py-2 text-sm text-muted-foreground">
+            + ({remainingCount}) more
+          </div>
+        )}
+      </>
       ) : (
         <div className="text-center py-8 text-muted-foreground">
           <Coins className="h-12 w-12 mx-auto mb-4 opacity-50" />

@@ -397,7 +397,7 @@ export default function LSTPage(): React.ReactElement {
   }, [fetchLstData, forceRefresh]);
 
   // Extract the actual data from REST API response
-  const data: SupplyData | null = lstData?.data?.data || null;
+  const data: any = lstData?.data || null;
   const loading = isLoading;
   const error = lstError?.message || null;
   const refreshing = isFetching && !isLoading;
@@ -475,64 +475,19 @@ export default function LSTPage(): React.ReactElement {
       return formatAmountFull(totalUSD, 'USD', { decimals: 2 });
     };
 
-    // Group tokens into their pairs
+    // Process tokens - show each token as individual card, grouped by protocol
     const processSupplies = () => {
       if (!data?.supplies) return [];
 
-      const thalaTokens = data.supplies.filter(
-        t =>
-          t.symbol.toLowerCase() === 'thapt' ||
-          t.symbol.toLowerCase() === 'sthapt'
-      );
-      const amnisTokens = data.supplies.filter(
-        t =>
-          t.symbol.toLowerCase() === 'amapt' ||
-          t.symbol.toLowerCase() === 'stapt'
-      );
-      const kofiTokens = data.supplies.filter(
-        t =>
-          t.symbol.toLowerCase() === 'kapt' ||
-          t.symbol.toLowerCase() === 'stkapt'
-      );
-
       const displayTokens: DisplayToken[] = [];
 
-      // Add combined tokens
-      if (thalaTokens.length > 0) {
+      // Add all tokens as individual cards since API returns aggregated data
+      data.supplies.forEach((token: any) => {
         displayTokens.push({
-          symbol: 'thAPT/sthAPT',
-          isCombined: true,
-          supply: thalaTokens.reduce(
-            (acc, curr) => (BigInt(acc) + BigInt(curr.supply)).toString(),
-            '0'
-          ),
-          components: thalaTokens,
+          symbol: token.symbol,
+          supply: token.supply,
         });
-      }
-
-      if (amnisTokens.length > 0) {
-        displayTokens.push({
-          symbol: 'amAPT/stAPT',
-          isCombined: true,
-          supply: amnisTokens.reduce(
-            (acc, curr) => (BigInt(acc) + BigInt(curr.supply)).toString(),
-            '0'
-          ),
-          components: amnisTokens,
-        });
-      }
-
-      if (kofiTokens.length > 0) {
-        displayTokens.push({
-          symbol: 'kAPT/stkAPT',
-          isCombined: true,
-          supply: kofiTokens.reduce(
-            (acc, curr) => (BigInt(acc) + BigInt(curr.supply)).toString(),
-            '0'
-          ),
-          components: kofiTokens,
-        });
-      }
+      });
 
       // Sort by supply in descending order
       return displayTokens.sort((a, b) => {
@@ -558,15 +513,15 @@ export default function LSTPage(): React.ReactElement {
         {/* Background gradient - fixed to viewport */}
         <div className="fixed inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/10 pointer-events-none" />
 
-        <div className="fixed top-0 left-0 right-0 h-1 z-50">
+        <div className="fixed top-0 left-0 right-0 h-1 z-30">
           {refreshing && <div className="h-full bg-muted animate-pulse"></div>}
         </div>
 
-        <div className="container-layout pt-6 relative z-10">
+        <div className="container-layout pt-6 relative">
           <Header />
         </div>
 
-        <main className="container-layout py-6 flex-1 relative z-10">
+        <main className="container-layout py-6 flex-1 relative">
           {loading ? (
             <LoadingState />
           ) : error ? (
@@ -753,7 +708,7 @@ export default function LSTPage(): React.ReactElement {
           ) : null}
         </main>
 
-        <Footer className="relative z-10" />
+        <Footer className="relative" />
       </div>
     </RootErrorBoundary>
   );

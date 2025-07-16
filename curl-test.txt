@@ -1,0 +1,13 @@
+Run this command to test the LST API:
+
+curl -s "http://localhost:3001/api/aptos/lst" | jq '.'
+
+OR if jq is not installed:
+
+curl -s "http://localhost:3001/api/aptos/lst"
+
+OR using the node test script:
+
+node test-lst-quick.js
+
+This will show you the current LST API response and whether it's returning zero values or actual token supplies.

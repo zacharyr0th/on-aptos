@@ -11,20 +11,62 @@ import {
   ExternalLink,
   Grid3X3,
   ImageIcon,
+  DollarSign,
+  Building2,
+  PieChart,
+  Package,
+  Archive,
 } from 'lucide-react';
+import { 
+  PieChart as RechartsPieChart, 
+  Pie, 
+  Cell, 
+  ResponsiveContainer, 
+  Tooltip as RechartsTooltip 
+} from 'recharts';
 import { formatCurrency } from '@/lib/utils/format';
 import { defiProtocols } from '@/components/pages/defi/data';
 import { cleanProtocolName } from './utils';
 import { NFT } from './types';
 
-interface BaseSummaryCardProps {
-  title: string;
-  icon: React.ReactNode;
-  metrics: Array<{
-    label: string;
-    value: string | number;
-  }>;
-}
+const CHART_COLORS = [
+  '#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', 
+  '#06b6d4', '#f43f5e', '#6366f1', '#84cc16', '#f97316'
+];
+
+// Custom tooltip component for the pie charts
+const CustomTooltip = React.memo(({ active, payload }: any) => {
+  if (!active || !payload?.length) return null;
+
+  const data = payload[0].payload;
+  
+  return (
+    <div className="bg-popover/95 backdrop-blur-sm border border-border/50 rounded-md shadow-md p-2 z-10 text-xs space-y-0.5">
+      <div className="flex items-center gap-1.5">
+        <div 
+          className="w-2 h-2 rounded-full" 
+          style={{ backgroundColor: data.color }} 
+        />
+        <p className="font-medium text-popover-foreground">{data.fullName || data.name}</p>
+      </div>
+      {/* Show value for DeFi protocols, count for NFT collections */}
+      {data.value !== undefined && typeof data.value === 'number' && data.value > 100 ? (
+        <p className="text-muted-foreground/80 text-[10px]">
+          Value: {formatCurrency(data.value)}
+        </p>
+      ) : (
+        <p className="text-muted-foreground/80 text-[10px]">
+          Count: {data.value} {data.value === 1 ? 'item' : 'items'}
+        </p>
+      )}
+      <p className="text-muted-foreground/80 text-[10px]">
+        Allocation: {data.percentage.toFixed(1)}%
+      </p>
+    </div>
+  );
+});
+
+CustomTooltip.displayName = 'CustomTooltip';
 
 interface DeFiSummaryViewProps {
   groupedDeFiPositions: any[];
@@ -38,33 +80,6 @@ interface NFTSummaryViewProps {
   currentPageNFTs: number;
   onCollectionClick?: (collection: string) => void;
 }
-
-const SummaryCard: React.FC<BaseSummaryCardProps> = ({
-  title,
-  icon,
-  metrics,
-}) => (
-  <Card>
-    <CardHeader>
-      <CardTitle className="flex items-center gap-2">
-        {icon}
-        {title}
-      </CardTitle>
-    </CardHeader>
-    <CardContent>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
-        {metrics.map((metric, index) => (
-          <div key={index} className="bg-muted/30 rounded-lg p-4 text-center">
-            <p className="text-sm text-muted-foreground mb-1">{metric.label}</p>
-            <p className="text-2xl sm:text-3xl font-bold font-mono">
-              {metric.value}
-            </p>
-          </div>
-        ))}
-      </div>
-    </CardContent>
-  </Card>
-);
 
 const getProtocolDetails = (protocolName: string) => {
   return defiProtocols.find(
@@ -81,153 +96,240 @@ export const DeFiSummaryView: React.FC<DeFiSummaryViewProps> = ({
   getProtocolLogo,
   onProtocolClick,
 }) => {
-  const metrics = [
-    { label: 'Total Value', value: formatCurrency(totalDefiValue) },
-    { label: 'Protocols', value: groupedDeFiPositions.length },
-    {
-      label: 'Positions',
-      value: groupedDeFiPositions.reduce(
-        (sum, pos) => sum + (pos.positions?.length || 1),
-        0
-      ),
-    },
-  ];
+  // Calculate additional metrics
+  const totalPositions = groupedDeFiPositions.reduce(
+    (sum, pos) => sum + (pos.positions?.length || 1),
+    0
+  );
+  
+  const averagePositionValue = groupedDeFiPositions.length > 0 
+    ? totalDefiValue / groupedDeFiPositions.length 
+    : 0;
+
+  // Prepare pie chart data
+  const pieChartData = React.useMemo(() => {
+    return groupedDeFiPositions
+      .filter(position => position.protocol !== 'Thala Farm') // Filter out TBD values
+      .map((position, index) => ({
+        name: cleanProtocolName(position.protocol),
+        value: position.totalValue || 0,
+        percentage: totalDefiValue > 0 ? ((position.totalValue || 0) / totalDefiValue) * 100 : 0,
+        color: CHART_COLORS[index % CHART_COLORS.length],
+        protocol: position.protocol,
+        positions: position.positions?.length || 1
+      }))
+      .sort((a, b) => b.value - a.value);
+  }, [groupedDeFiPositions, totalDefiValue]);
 
   return (
-    <div className="space-y-6">
-      <SummaryCard
-        title="DeFi Portfolio Overview"
-        icon={<TrendingUp className="w-5 h-5" />}
-        metrics={metrics}
-      />
-
-      {groupedDeFiPositions.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Activity className="h-5 w-5" />
-              Your DeFi Positions
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-3">
-              {groupedDeFiPositions
-                .sort((a, b) => b.totalValue - a.totalValue)
-                .map((position, index) => {
-                  const primaryType = Array.from(
-                    position.protocolTypes
-                  )[0] as string;
-
-                  return (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between p-3 rounded-lg border bg-muted/30 cursor-pointer hover:bg-muted/50 transition-colors"
-                      onClick={() => onProtocolClick(position)}
-                    >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-10 h-10 rounded-lg bg-background border flex items-center justify-center">
-                          <Image
-                            src={getProtocolLogo(position.protocol)}
-                            alt={`${position.protocol} logo`}
-                            width={40}
-                            height={40}
-                            className="w-full h-full object-cover rounded"
-                            onError={e => {
-                              const img = e.target as HTMLImageElement;
-                              img.src = '/placeholder.jpg';
-                            }}
-                          />
-                        </div>
-                        <div className="min-w-0">
-                          <div className="flex items-center gap-2">
-                            <p className="font-medium truncate">
-                              {cleanProtocolName(position.protocol)}
-                            </p>
-                            {position.protocol.toLowerCase() === 'aptin' && (
-                              <Badge variant="destructive" className="text-xs">
-                                Deprecated
-                              </Badge>
-                            )}
-                          </div>
-                          <Badge variant="secondary" className="text-xs">
-                            {position.protocolTypes.size > 1
-                              ? 'Multiple'
-                              : primaryType === 'derivatives'
-                                ? 'Perps'
-                                : primaryType}
-                          </Badge>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-medium font-mono">
-                          {position.protocol === 'Thala Farm'
-                            ? 'TBD'
-                            : formatCurrency(position.totalValue)}
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">
-            Portfolio Distribution by Type
+    <div>
+      {/* Combined DeFi Portfolio Card */}
+      <Card className="border border-border/50 bg-card/50 backdrop-blur-sm">
+        <CardHeader className="border-b border-border/30 bg-muted/20 py-3 px-4">
+          <CardTitle className="text-base font-medium tracking-tight">
+            DeFi Portfolio Overview
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {(() => {
-              const categoryBreakdown: Record<
-                string,
-                { value: number; count: number; protocols: string[] }
-              > = {};
+        <CardContent className="p-0">
+          {/* Stats Row */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 border-b border-border/30">
+            <div className="p-3 sm:p-4 border-r border-border/30">
+              <div className="space-y-1">
+                <div className="flex items-center gap-1.5">
+                  <DollarSign className="h-3 w-3 text-muted-foreground/70" />
+                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-medium">
+                    Total Value
+                  </span>
+                </div>
+                <p className="text-lg sm:text-xl font-mono font-semibold tracking-tight">
+                  {formatCurrency(totalDefiValue)}
+                </p>
+              </div>
+            </div>
+            
+            <div className="p-3 sm:p-4 border-r border-border/30 lg:border-r">
+              <div className="space-y-1">
+                <div className="flex items-center gap-1.5">
+                  <Building2 className="h-3 w-3 text-muted-foreground/70" />
+                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-medium">
+                    Protocols
+                  </span>
+                </div>
+                <p className="text-lg sm:text-xl font-mono font-semibold tracking-tight">
+                  {groupedDeFiPositions.length}
+                </p>
+              </div>
+            </div>
+            
+            <div className="p-3 sm:p-4 border-r border-border/30">
+              <div className="space-y-1">
+                <div className="flex items-center gap-1.5">
+                  <PieChart className="h-3 w-3 text-muted-foreground/70" />
+                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-medium">
+                    Positions
+                  </span>
+                </div>
+                <p className="text-lg sm:text-xl font-mono font-semibold tracking-tight">
+                  {totalPositions}
+                </p>
+              </div>
+            </div>
+            
+            <div className="p-3 sm:p-4">
+              <div className="space-y-1">
+                <div className="flex items-center gap-1.5">
+                  <TrendingUp className="h-3 w-3 text-muted-foreground/70" />
+                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-medium">
+                    Avg. Position
+                  </span>
+                </div>
+                <p className="text-lg sm:text-xl font-mono font-semibold tracking-tight">
+                  {formatCurrency(averagePositionValue)}
+                </p>
+              </div>
+            </div>
+          </div>
 
-              groupedDeFiPositions.forEach(position => {
-                const protocolDetails = getProtocolDetails(position.protocol);
-                const category = protocolDetails?.category || 'Unknown';
-
-                if (!categoryBreakdown[category]) {
-                  categoryBreakdown[category] = {
-                    value: 0,
-                    count: 0,
-                    protocols: [],
-                  };
-                }
-
-                categoryBreakdown[category].value += position.totalValue;
-                categoryBreakdown[category].count += 1;
-                categoryBreakdown[category].protocols.push(position.protocol);
-              });
-
-              return Object.entries(categoryBreakdown)
-                .sort(([, a], [, b]) => b.value - a.value)
-                .map(([category, data]) => (
-                  <div
-                    key={category}
-                    className="flex items-center justify-between p-3 bg-muted/30 rounded-lg"
-                  >
-                    <div>
-                      <p className="font-medium">{category}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {data.count} protocol{data.count > 1 ? 's' : ''}:{' '}
-                        {data.protocols.join(', ')}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-mono">{formatCurrency(data.value)}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {((data.value / totalDefiValue) * 100).toFixed(1)}%
-                      </p>
+          {/* Position Holdings with Pie Chart */}
+          {groupedDeFiPositions.length > 0 && (
+            <div className="p-3 sm:p-4">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+                {/* Pie Chart */}
+                {pieChartData.length > 0 && (
+                  <div className="flex flex-col">
+                    <h4 className="text-[10px] font-medium text-muted-foreground/70 mb-2 uppercase tracking-wider">
+                      Protocol Allocation
+                    </h4>
+                    <div className="w-full h-52 sm:h-64 lg:h-72">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <RechartsPieChart>
+                          <Pie
+                            data={pieChartData}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={40}
+                            outerRadius={80}
+                            paddingAngle={1}
+                            dataKey="value"
+                            stroke="hsl(var(--border))"
+                            strokeWidth={0.5}
+                          >
+                            {pieChartData.map((entry, index) => (
+                              <Cell 
+                                key={`cell-${index}`} 
+                                fill={entry.color}
+                                className="hover:opacity-80 transition-opacity"
+                              />
+                            ))}
+                          </Pie>
+                          <RechartsTooltip content={<CustomTooltip />} />
+                        </RechartsPieChart>
+                      </ResponsiveContainer>
                     </div>
                   </div>
-                ));
-            })()}
-          </div>
+                )}
+                
+                {/* Holdings List */}
+                <div className="flex flex-col">
+                  <h4 className="text-[10px] font-medium text-muted-foreground/70 mb-2 uppercase tracking-wider">
+                    Positions
+                  </h4>
+                  <div className="space-y-2 flex-1">
+                    {groupedDeFiPositions
+                      .sort((a, b) => b.totalValue - a.totalValue)
+                      .map((position, index) => {
+                        const primaryType = Array.from(position.protocolTypes)[0] as string;
+                        const protocolDetails = getProtocolDetails(position.protocol);
+                        const positionPercentage = totalDefiValue > 0 ? (position.totalValue / totalDefiValue) * 100 : 0;
+                        const chartEntry = pieChartData.find(entry => entry.protocol === position.protocol);
+
+                        return (
+                          <div
+                            key={index}
+                            className="flex items-center justify-between p-2 sm:p-2.5 border border-border/30 rounded-md bg-muted/10 hover:bg-muted/20 transition-colors cursor-pointer"
+                            onClick={() => onProtocolClick(position)}
+                          >
+                            <div className="flex items-center gap-2 min-w-0 flex-1">
+                              {chartEntry && (
+                                <div 
+                                  className="w-2 h-2 rounded-full flex-shrink-0" 
+                                  style={{ backgroundColor: chartEntry.color }} 
+                                />
+                              )}
+                              <div className="w-6 h-6 sm:w-7 sm:h-7 rounded bg-background/50 border border-border/30 flex items-center justify-center overflow-hidden flex-shrink-0">
+                                <Image
+                                  src={getProtocolLogo(position.protocol)}
+                                  alt={`${position.protocol} logo`}
+                                  width={28}
+                                  height={28}
+                                  className="w-full h-full object-cover"
+                                  onError={e => {
+                                    const img = e.target as HTMLImageElement;
+                                    img.src = '/placeholder.jpg';
+                                  }}
+                                />
+                              </div>
+                              
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center gap-1.5 mb-0.5">
+                                  <h3 className="font-medium tracking-tight truncate text-xs sm:text-sm">
+                                    {cleanProtocolName(position.protocol)}
+                                  </h3>
+                                  {position.protocol.toLowerCase() === 'aptin' && (
+                                    <Badge variant="destructive" className="text-[9px] h-3.5 px-1.5">
+                                      DEPRECATED
+                                    </Badge>
+                                  )}
+                                  {protocolDetails?.security?.auditStatus === 'Audited' && (
+                                    <Badge variant="outline" className="text-[9px] h-3.5 px-1.5 border-green-200/50 text-green-700 dark:border-green-800/50 dark:text-green-400">
+                                      AUDITED
+                                    </Badge>
+                                  )}
+                                </div>
+                                
+                                <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground/70">
+                                  <span className="font-medium uppercase">
+                                    {position.protocolTypes.size > 1
+                                      ? 'MULTI'
+                                      : (primaryType === 'derivatives' ? 'PERP' : primaryType?.toUpperCase() || 'DEFI')}
+                                  </span>
+                                  <span>•</span>
+                                  <span>{position.positions?.length || 1} POS</span>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="text-right flex-shrink-0 ml-3">
+                              <p className="font-mono font-semibold tracking-tight text-xs sm:text-sm">
+                                {position.protocol === 'Thala Farm'
+                                  ? <span className="text-muted-foreground/50">—</span>
+                                  : formatCurrency(position.totalValue)}
+                              </p>
+                              {position.protocol !== 'Thala Farm' && (
+                                <p className="text-[10px] text-muted-foreground/70 font-mono">
+                                  {positionPercentage.toFixed(1)}%
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Empty state for no positions */}
+          {groupedDeFiPositions.length === 0 && (
+            <div className="p-8 sm:p-12 text-center">
+              <Building2 className="h-12 w-12 text-muted-foreground/50 mx-auto mb-3" />
+              <h3 className="text-sm font-medium mb-1 tracking-tight">No DeFi Positions</h3>
+              <p className="text-muted-foreground/70 text-xs">
+                No DeFi positions detected in this wallet
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
@@ -247,26 +349,32 @@ export const NFTSummaryView: React.FC<NFTSummaryViewProps> = ({
 
     return Object.entries(collectionMap)
       .sort(([, a], [, b]) => (b as number) - (a as number))
-      .slice(0, 8);
+      .slice(0, 10);
   }, [nfts]);
 
   const totalCollections = new Set(nfts.map(nft => nft.collection_name)).size;
 
-  const metrics = [
-    { label: 'Total NFTs', value: nfts.length },
-    { label: 'Collections', value: totalCollections },
-    { label: 'This Page', value: currentPageNFTs },
-  ];
+  // Prepare pie chart data for collection distribution
+  const pieChartData = React.useMemo(() => {
+    return collections.map(([collection, count], index) => ({
+      name: (collection || 'Unnamed Collection').length > 20 
+        ? `${(collection || 'Unnamed Collection').substring(0, 20)}...` 
+        : collection || 'Unnamed Collection',
+      value: count as number,
+      percentage: (count as number / nfts.length) * 100,
+      color: CHART_COLORS[index % CHART_COLORS.length],
+      fullName: collection || 'Unnamed Collection'
+    }));
+  }, [collections, nfts.length]);
 
   if (nfts.length === 0) {
     return (
-      <Card>
-        <CardContent className="p-8 text-center">
-          <Grid3X3 className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-lg font-semibold mb-2">No NFTs Found</h3>
-          <p className="text-muted-foreground">
-            This wallet doesn&apos;t have any NFTs or they haven&apos;t been
-            loaded yet.
+      <Card className="border border-border/50 bg-card/50 backdrop-blur-sm">
+        <CardContent className="p-8 sm:p-12 text-center">
+          <Package className="h-12 w-12 text-muted-foreground/50 mx-auto mb-3" />
+          <h3 className="text-sm font-medium mb-1 tracking-tight">No Digital Assets</h3>
+          <p className="text-muted-foreground/70 text-xs">
+            No NFT holdings detected in this wallet
           </p>
         </CardContent>
       </Card>
@@ -274,53 +382,156 @@ export const NFTSummaryView: React.FC<NFTSummaryViewProps> = ({
   }
 
   return (
-    <div className="space-y-6">
-      <SummaryCard
-        title="NFT Collection Overview"
-        icon={<Grid3X3 className="h-5 w-5" />}
-        metrics={metrics}
-      />
+    <div>
+      {/* Combined Digital Asset Holdings Card */}
+      <Card className="border border-border/50 bg-card/50 backdrop-blur-sm">
+        <CardHeader className="border-b border-border/30 bg-muted/20 py-3 px-4">
+          <CardTitle className="text-base font-medium tracking-tight">
+            Digital Asset Holdings
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          {/* Stats Row */}
+          <div className="grid grid-cols-3 border-b border-border/30">
+            <div className="p-3 sm:p-4 border-r border-border/30">
+              <div className="space-y-1">
+                <div className="flex items-center gap-1.5">
+                  <Package className="h-3 w-3 text-muted-foreground/70" />
+                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-medium">
+                    Total Assets
+                  </span>
+                </div>
+                <p className="text-lg sm:text-xl font-mono font-semibold tracking-tight">
+                  {nfts.length.toLocaleString()}
+                </p>
+              </div>
+            </div>
+            
+            <div className="p-3 sm:p-4 border-r border-border/30">
+              <div className="space-y-1">
+                <div className="flex items-center gap-1.5">
+                  <Archive className="h-3 w-3 text-muted-foreground/70" />
+                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-medium">
+                    Collections
+                  </span>
+                </div>
+                <p className="text-lg sm:text-xl font-mono font-semibold tracking-tight">
+                  {totalCollections}
+                </p>
+              </div>
+            </div>
+            
+            <div className="p-3 sm:p-4">
+              <div className="space-y-1">
+                <div className="flex items-center gap-1.5">
+                  <Grid3X3 className="h-3 w-3 text-muted-foreground/70" />
+                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-medium">
+                    Displayed
+                  </span>
+                </div>
+                <p className="text-lg sm:text-xl font-mono font-semibold tracking-tight">
+                  {nfts.length}
+                </p>
+              </div>
+            </div>
+          </div>
 
-      {collections.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <ImageIcon className="h-5 w-5" />
-              Top Collections
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-3">
-              {collections.map(([collection, count]) => (
-                <div
-                  key={collection}
-                  className={`flex items-center justify-between p-3 rounded-lg border bg-muted/30 transition-colors ${
-                    onCollectionClick ? 'cursor-pointer hover:bg-muted/50' : ''
-                  }`}
-                  onClick={() => onCollectionClick?.(collection)}
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-10 h-10 rounded-lg bg-background border flex items-center justify-center">
-                      <Grid3X3 className="h-5 w-5 text-muted-foreground" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="font-medium truncate">{collection}</p>
-                      <p className="text-sm text-muted-foreground">
-                        Collection
-                      </p>
+          {/* Collection Holdings with Pie Chart */}
+          {collections.length > 0 && (
+            <div className="p-3 sm:p-4">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+                {/* Pie Chart */}
+                {pieChartData.length > 0 && (
+                  <div className="flex flex-col">
+                    <h4 className="text-[10px] font-medium text-muted-foreground/70 mb-2 uppercase tracking-wider">
+                      Collection Distribution
+                    </h4>
+                    <div className="w-full h-52 sm:h-64 lg:h-72">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <RechartsPieChart>
+                          <Pie
+                            data={pieChartData}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={40}
+                            outerRadius={80}
+                            paddingAngle={1}
+                            dataKey="value"
+                            stroke="hsl(var(--border))"
+                            strokeWidth={0.5}
+                          >
+                            {pieChartData.map((entry, index) => (
+                              <Cell 
+                                key={`cell-${index}`} 
+                                fill={entry.color}
+                                className="hover:opacity-80 transition-opacity"
+                              />
+                            ))}
+                          </Pie>
+                          <RechartsTooltip content={<CustomTooltip />} />
+                        </RechartsPieChart>
+                      </ResponsiveContainer>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <Badge variant="secondary" className="text-xs">
-                      {count as number} NFT{(count as number) > 1 ? 's' : ''}
-                    </Badge>
+                )}
+                
+                {/* Holdings List */}
+                <div className="flex flex-col">
+                  <h4 className="text-[10px] font-medium text-muted-foreground/70 mb-2 uppercase tracking-wider">
+                    Collections
+                  </h4>
+                  <div className="space-y-2 flex-1">
+                    {collections.map(([collection, count], index) => {
+                      const collectionPercentage = (count as number / nfts.length) * 100;
+                      const chartEntry = pieChartData.find(entry => entry.fullName === collection);
+                      
+                      return (
+                        <div
+                          key={collection}
+                          className={`flex items-center justify-between p-2 sm:p-2.5 border border-border/30 rounded-md bg-muted/10 hover:bg-muted/20 transition-colors ${
+                            onCollectionClick ? 'cursor-pointer' : ''
+                          }`}
+                          onClick={() => onCollectionClick?.(collection)}
+                        >
+                          <div className="flex items-center gap-2 min-w-0 flex-1">
+                            {chartEntry && (
+                              <div 
+                                className="w-2 h-2 rounded-full flex-shrink-0" 
+                                style={{ backgroundColor: chartEntry.color }} 
+                              />
+                            )}
+                            <div className="w-6 h-6 sm:w-7 sm:h-7 rounded bg-background/50 border border-border/30 flex items-center justify-center flex-shrink-0">
+                              <Archive className="h-3 w-3 text-muted-foreground/70" />
+                            </div>
+                            
+                            <div className="min-w-0 flex-1">
+                              <h3 className="font-medium tracking-tight truncate text-xs sm:text-sm">
+                                {collection || 'Unnamed Collection'}
+                              </h3>
+                              <span className="text-[10px] text-muted-foreground/70 uppercase">
+                                COLLECTION
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="text-right flex-shrink-0 ml-3">
+                            <p className="font-mono font-semibold tracking-tight text-xs sm:text-sm">
+                              {count as number}
+                            </p>
+                            <p className="text-[10px] text-muted-foreground/70 font-mono">
+                              {collectionPercentage.toFixed(1)}%
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
-              ))}
+              </div>
             </div>
-          </CardContent>
-        </Card>
-      )}
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };

@@ -102,6 +102,24 @@ const getActualProvider = (
   return protocolToProvider[protocolName] || protocolName;
 };
 
+// Get logo based on actual provider
+const getLogoUrl = (protocolName: string, assetTicker: string): string => {
+  // Get the actual provider first
+  const provider = getActualProvider(assetTicker, protocolName);
+
+  const providerLogos: Record<string, string> = {
+    // Provider-based logos
+    Pact: '/icons/rwas/pact.png',
+    BlackRock: '/icons/rwas/blackrock.png',
+    'Franklin Templeton': '/icons/rwas/ft.jpeg',
+    Securitize: '/icons/rwas/securitize.png',
+    'Libre Capital': '/icons/rwas/libre.png',
+    Ondo: '/icons/rwas/ondo.jpeg',
+  };
+
+  return providerLogos[provider] || '/icons/rwas/pact.png';
+};
+
 // Protocol data interface for RWA protocols
 interface ProtocolData {
   id: string;
@@ -111,7 +129,7 @@ interface ProtocolData {
   description: string;
   tokenAddress: string;
   assetTicker: string;
-  assetClass: string;
+  assetClass: string | { name?: string; slug?: string };
   protocol: string;
 }
 
@@ -199,24 +217,6 @@ const TokenCard = memo(function TokenCard({
   const handleDialogClose = useCallback(() => {
     setIsDialogOpen(false);
   }, []);
-
-  // Get logo based on actual provider
-  const getLogoUrl = (protocolName: string, assetTicker: string): string => {
-    // Get the actual provider first
-    const provider = getActualProvider(assetTicker, protocolName);
-
-    const providerLogos: Record<string, string> = {
-      // Provider-based logos
-      Pact: '/icons/rwas/pact.png',
-      BlackRock: '/icons/rwas/blackrock.png',
-      'Franklin Templeton': '/icons/rwas/ft.jpeg',
-      Securitize: '/icons/rwas/securitize.png',
-      'Libre Capital': '/icons/rwas/libre.png',
-      Ondo: '/icons/rwas/ondo.jpeg',
-    };
-
-    return providerLogos[provider] || '/icons/rwas/pact.png';
-  };
 
   return (
     <>
@@ -316,7 +316,11 @@ const TokenCard = memo(function TokenCard({
             protocolId: parseInt(protocol.id) || 0,
             protocol: protocol.protocol || 'unknown',
             assetClassId: 0,
-            assetClass: protocol.assetClass || 'real-world-asset',
+            assetClass: (typeof protocol.assetClass === 'object' && protocol.assetClass?.name 
+              ? protocol.assetClass.name 
+              : typeof protocol.assetClass === 'string' 
+                ? protocol.assetClass 
+                : 'real-world-asset') as string,
             assetRegulatoryFramework: '',
             assetGoverningBody: '',
             assetIssuerId: 0,
@@ -333,7 +337,11 @@ const TokenCard = memo(function TokenCard({
           assetTicker: protocol.assetTicker || 'N/A',
           address: protocol.tokenAddress || '',
           protocol: protocol.protocol || 'unknown',
-          assetClass: protocol.assetClass || 'real-world-asset',
+          assetClass: (typeof protocol.assetClass === 'object' && protocol.assetClass?.name 
+            ? protocol.assetClass.name 
+            : typeof protocol.assetClass === 'string' 
+              ? protocol.assetClass 
+              : 'real-world-asset') as string,
         }}
         currentValue={protocol.totalValue}
       />
@@ -578,21 +586,25 @@ export default function RWAsPage(): React.ReactElement {
 
   // Removed prefetch logic - using direct API instead
 
+  // Extract data - withApiEnhancements already wraps it in {data: ..., cached: ...}
+  const data: any = rwaResponse?.data || null;
+  
   // Extract protocols from the response and map fields
   const protocols = useMemo(() => {
-    const assets = rwaResponse?.data?.assets || [];
+    if (!data) return [];
+    const protocolsData = data.protocols || [];
     // Map the API response to the expected format
-    return assets.map((asset: any) => ({
-      ...asset,
-      totalValue: asset.aptosTvl || 0,
-      assetTicker: asset.symbol || asset.assetTicker,
-      protocol: asset.name || asset.protocol,
-      tokenAddress: asset.tokenAddress || asset.address || '',
+    return protocolsData.map((protocol: any) => ({
+      ...protocol,
+      totalValue: protocol.totalValue || 0,
+      assetTicker: protocol.assetTicker || protocol.symbol,
+      protocol: protocol.protocol || protocol.name,
+      tokenAddress: protocol.tokenAddress || protocol.address || '',
     }));
-  }, [rwaResponse?.data?.assets]);
-  const totalRWAValue = rwaResponse?.data?.totalAptosValue || 0;
-  const dataSource = rwaResponse?.data?.dataSource || 'RWA.xyz API';
-  const timestamp = rwaResponse?.data?.timestamp;
+  }, [data]);
+  const totalRWAValue = data?.totalAptosValue || 0;
+  const dataSource = data?.dataSource || 'RWA.xyz API';
+  const timestamp = data?.timestamp;
 
   // Process data for display
   const processedData = useMemo(() => {
@@ -666,27 +678,11 @@ export default function RWAsPage(): React.ReactElement {
         {/* Background gradient - fixed to viewport */}
         <div className="fixed inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/10 pointer-events-none" />
 
-        <div className="container-layout pt-6 relative z-10">
+        <div className="container-layout pt-6 relative">
           <Header />
         </div>
 
-        <main className="container-layout py-6 flex-1 relative z-10">
-          {/* Under Construction Notice */}
-          <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-6">
-            <div className="flex items-center gap-3">
-              <div className="text-yellow-600 dark:text-yellow-400">🚧</div>
-              <div>
-                <h3 className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
-                  Under Construction
-                </h3>
-                <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-1">
-                  The RWA page is currently being updated. Please check again
-                  later.
-                </p>
-              </div>
-            </div>
-          </div>
-
+        <main className="container-layout py-6 flex-1 relative">
           {loading ? (
             <LoadingState />
           ) : error ? (
@@ -889,15 +885,12 @@ export default function RWAsPage(): React.ReactElement {
                         <TableHead className="min-w-[100px] sm:min-w-[140px]">
                           Category
                         </TableHead>
-                        <TableHead className="min-w-[80px] sm:min-w-[100px]">
-                          Chain
-                        </TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {processedData.protocols.map(protocol => {
                         const marketSharePercent = (
-                          (protocol.tvl / processedData.totalValue) *
+                          (protocol.totalValue / processedData.totalValue) *
                           100
                         ).toFixed(2);
 
@@ -906,7 +899,7 @@ export default function RWAsPage(): React.ReactElement {
                             <TableCell className="whitespace-nowrap">
                               <div className="flex items-center gap-2">
                                 <Image
-                                  src={protocol.logo || '/placeholder.jpg'}
+                                  src={getLogoUrl(protocol.protocol, protocol.assetTicker)}
                                   alt={protocol.name}
                                   width={20}
                                   height={20}
@@ -922,16 +915,15 @@ export default function RWAsPage(): React.ReactElement {
                               </div>
                             </TableCell>
                             <TableCell className="font-mono whitespace-nowrap">
-                              {formatCurrency(protocol.tvl, 'USD')}
+                              {formatCurrency(protocol.totalValue, 'USD')}
                             </TableCell>
                             <TableCell className="font-mono whitespace-nowrap">
                               {marketSharePercent}%
                             </TableCell>
                             <TableCell className="text-sm">
-                              {protocol.category || 'RWA'}
-                            </TableCell>
-                            <TableCell className="text-sm">
-                              {protocol.chain || 'Aptos'}
+                              {typeof protocol.assetClass === 'object' && protocol.assetClass?.name 
+                                ? protocol.assetClass.name 
+                                : protocol.assetClass || 'RWA'}
                             </TableCell>
                           </TableRow>
                         );
@@ -944,7 +936,7 @@ export default function RWAsPage(): React.ReactElement {
           ) : null}
         </main>
 
-        <Footer className="relative z-10" />
+        <Footer className="relative" />
       </div>
     </RootErrorBoundary>
   );

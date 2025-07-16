@@ -76,11 +76,11 @@ export default function DefiPage(): React.ReactElement {
         {/* Background gradient - fixed to viewport */}
         <div className="fixed inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/10 pointer-events-none" />
 
-        <div className="container-layout pt-6 relative z-10">
+        <div className="container-layout pt-6 relative">
           <Header />
         </div>
 
-        <main className="container-layout py-6 flex-1 relative z-10">
+        <main className="container-layout py-6 flex-1 relative">
           <ErrorBoundary
             fallback={
               <div className="p-4 rounded-md bg-destructive/10 text-destructive mb-6">
@@ -137,7 +137,7 @@ export default function DefiPage(): React.ReactElement {
           </div>
         </main>
 
-        <Footer className="relative z-10" />
+        <Footer className="relative" />
       </div>
     </RootErrorBoundary>
   );

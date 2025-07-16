@@ -284,22 +284,29 @@ export const MarketShareChart = memo<MarketShareChartProps>(
 
               // Calculate USD value properly for combined tokens
               let combinedUsdValue = 0;
+              let normalizedCombinedSupply = BigInt(0);
+              
               for (const component of token.components) {
                 const componentSupply = BigInt(
                   component.supply_raw || component.supply || '0'
                 );
                 const componentDecimals =
-                  component.symbol === 'MOD' || component.symbol === 'mUSD'
+                  component.symbol === 'MOD' || component.symbol === 'mUSD' || component.symbol === 'USDA'
                     ? 8
                     : 6;
                 const componentDivisor = Math.pow(10, componentDecimals);
                 combinedUsdValue += Number(componentSupply) / componentDivisor;
+                
+                // Normalize component supply to 6 decimals for market share calculation
+                const normalizedComponentSupply =
+                  componentDecimals === 8 ? componentSupply / BigInt(100) : componentSupply;
+                normalizedCombinedSupply += normalizedComponentSupply;
               }
 
               result.push({
                 name: token.symbol,
                 originalSymbol: token.symbol,
-                value: calculateMarketShare(combinedSupply, totalSupplyBigInt),
+                value: calculateMarketShare(normalizedCombinedSupply, totalSupplyBigInt),
                 formattedSupply,
                 _usdValue: combinedUsdValue,
                 components: token.components,
@@ -313,9 +320,9 @@ export const MarketShareChart = memo<MarketShareChartProps>(
               const applyPrice =
                 token.symbol === 'sUSDe' ? susdePrice : undefined;
 
-              // Check if token has 8 decimals (MOD, mUSD)
+              // Check if token has 8 decimals (MOD, mUSD, USDA)
               const decimals =
-                token.symbol === 'MOD' || token.symbol === 'mUSD' ? 8 : 6;
+                token.symbol === 'MOD' || token.symbol === 'mUSD' || token.symbol === 'USDA' ? 8 : 6;
               const divisor = Math.pow(10, decimals);
 
               // Normalize supply to 6 decimals for market share calculation

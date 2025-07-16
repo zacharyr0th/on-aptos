@@ -347,8 +347,15 @@ export default function BitcoinPage(): React.ReactElement {
 
       const data = await response.json();
       console.log('[BTC Page] API Response:', data);
+      
+      // Check if the response has an error
+      if (data.error) {
+        throw new Error(data.error);
+      }
+      
       setBtcSupplyData(data);
     } catch (error) {
+      console.error('[BTC Page] Error fetching data:', error);
       setBtcSupplyError(
         error instanceof Error ? error : new Error(String(error))
       );
@@ -381,25 +388,8 @@ export default function BitcoinPage(): React.ReactElement {
     }, 'Bitcoin price calculation');
   }, [bitcoinPriceHookData]);
 
-  // Extract the actual data from REST API responses and transform to expected format
-  const data: SupplyData | null = useMemo(() => {
-    return measurePerformance(() => {
-      console.log('[BTC Page] btcSupplyData:', btcSupplyData);
-      if (!btcSupplyData || !btcSupplyData.data || !btcSupplyData.data.data)
-        return null;
-
-      // Transform REST API response to expected format
-      const apiData = btcSupplyData.data.data;
-
-      return {
-        supplies: apiData.supplies,
-        total: apiData.total,
-        total_formatted: apiData.total_formatted,
-        total_decimals: apiData.total_decimals,
-        timestamp: new Date().toISOString(),
-      };
-    }, 'Data transformation');
-  }, [btcSupplyData]);
+  // Extract the actual data from REST API responses - match stablecoin pattern
+  const data: any = btcSupplyData?.data || null;
 
   const loading = btcSupplyLoading || bitcoinPriceLoading;
   const isRateLimited =
@@ -424,7 +414,7 @@ export default function BitcoinPage(): React.ReactElement {
       if (!data || !data.supplies || !Array.isArray(data.supplies)) return null;
 
       // Use batch processing for better performance
-      const batchItems = data.supplies.map(token => ({
+      const batchItems = data.supplies.map((token: any) => ({
         supply: token.supply,
         decimals: TOKEN_METADATA[token.symbol]?.decimals || 8,
         symbol: token.symbol,
@@ -434,12 +424,12 @@ export default function BitcoinPage(): React.ReactElement {
 
       // Sort by BTC value (largest first)
       const sortedSupplies = data.supplies
-        .map((token, index) => ({
+        .map((token: any, index: number) => ({
           ...token,
           btcValue: results[index].btcValue,
         }))
-        .sort((a, b) => b.btcValue - a.btcValue)
-        .map(({ btcValue: _, ...token }) => token); // Remove btcValue after sorting
+        .sort((a: any, b: any) => b.btcValue - a.btcValue)
+        .map(({ btcValue: _, ...token }: any) => token); // Remove btcValue after sorting
 
       return {
         ...data,
@@ -460,7 +450,7 @@ export default function BitcoinPage(): React.ReactElement {
       }
 
       // Use batch processing for total calculation
-      const batchItems = processedData.supplies.map(token => ({
+      const batchItems = processedData.supplies.map((token: any) => ({
         supply: token.supply,
         decimals: TOKEN_METADATA[token.symbol]?.decimals || 8,
       }));
@@ -501,15 +491,15 @@ export default function BitcoinPage(): React.ReactElement {
         {/* Background gradient - fixed to viewport */}
         <div className="fixed inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/10 pointer-events-none" />
 
-        <div className="fixed top-0 left-0 right-0 h-1 z-50">
+        <div className="fixed top-0 left-0 right-0 h-1 z-30">
           {refreshing && <div className="h-full bg-muted animate-pulse"></div>}
         </div>
 
-        <div className="container-layout pt-6 relative z-10">
+        <div className="container-layout pt-6 relative">
           <Header />
         </div>
 
-        <main className="container-layout py-6 flex-1 relative z-10">
+        <main className="container-layout py-6 flex-1 relative">
           {loading ? (
             <LoadingState />
           ) : error ? (
@@ -559,7 +549,7 @@ export default function BitcoinPage(): React.ReactElement {
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
                 <div className="md:col-span-1 space-y-4">
-                  {processedData?.supplies?.map(token => (
+                  {processedData?.supplies?.map((token: any) => (
                     <TokenCard
                       key={token.symbol}
                       token={token}
@@ -617,7 +607,7 @@ export default function BitcoinPage(): React.ReactElement {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {processedData?.supplies?.map(token => {
+                      {processedData?.supplies?.map((token: any) => {
                         const metadata = TOKEN_METADATA[token.symbol];
                         const decimals = metadata?.decimals || 8;
                         const btcAmount = convertRawTokenAmount(
@@ -681,7 +671,7 @@ export default function BitcoinPage(): React.ReactElement {
           ) : null}
         </main>
 
-        <Footer className="relative z-10" />
+        <Footer className="relative" />
       </div>
     </ErrorBoundary>
   );

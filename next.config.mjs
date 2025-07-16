@@ -11,6 +11,16 @@ const nextConfig = {
   devIndicators: false,
   // Enable compression for API routes
   compress: true,
+  // Redirects
+  async redirects() {
+    return [
+      {
+        source: '/stablecoins',
+        destination: '/stables',
+        permanent: true,
+      },
+    ];
+  },
   // Allow images from RWA CDN, S3 bucket, and DefiLlama icons
   images: {
     remotePatterns: [

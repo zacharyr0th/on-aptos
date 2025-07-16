@@ -92,6 +92,7 @@ export async function GET() {
       [STABLECOINS.USDE]: 'USDe',
       [STABLECOINS.SUSDE]: 'sUSDe',
       [STABLECOINS.MUSD]: 'mUSD',
+      [STABLECOINS.USDA]: 'USDA',
       [ALGO_STABLECOINS.MOD]: 'MOD',
     };
 
@@ -103,6 +104,7 @@ export async function GET() {
       sUSDe: 6,
       mUSD: 8, // mUSD has 8 decimals, not 6
       MOD: 8, // MOD has 8 decimals
+      USDA: 8, // USDA has 8 decimals, not 6
     };
 
     // Process fungible assets

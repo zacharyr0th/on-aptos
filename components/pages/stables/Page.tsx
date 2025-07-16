@@ -71,7 +71,7 @@ const TokenCard = React.memo(function TokenCard({
 
   // Helper function to check if a token is native
   const isNative = (symbol: string): boolean => {
-    return symbol === 'USDT' || symbol === 'USDC';
+    return symbol === 'USDT' || symbol === 'USDC' || symbol === 'USDA';
   };
 
   // Helper function to check if a token is algorithmic
@@ -125,7 +125,13 @@ const TokenCard = React.memo(function TokenCard({
       if (BigInt(totalSupply) === 0n) return '0';
       // Use supply_raw for market share calculation (fallback to supply for compatibility)
       const rawSupply = token.supply_raw || token.supply || '0';
-      const tokenSupply = BigInt(rawSupply);
+      let tokenSupply = BigInt(rawSupply);
+      
+      // Normalize 8-decimal tokens to 6 decimals to match totalSupply normalization
+      if (token.symbol === 'MOD' || token.symbol === 'mUSD' || token.symbol === 'USDA') {
+        tokenSupply = tokenSupply / BigInt(100); // Convert from 8 to 6 decimals
+      }
+      
       const total = BigInt(totalSupply);
 
       // Use more precise calculation to avoid rounding errors
@@ -151,7 +157,7 @@ const TokenCard = React.memo(function TokenCard({
       let dollars: number;
       if (isRaw) {
         // Use correct decimals for each token
-        if (symbol === 'mUSD' || symbol === 'MOD') {
+        if (symbol === 'mUSD' || symbol === 'MOD' || symbol === 'USDA') {
           dollars = Number(supplyVal) / 100_000_000; // 8 decimals
           if (symbol === 'MOD') {
             console.log('MOD calculation:', {
@@ -559,6 +565,8 @@ export default function StablesPage(): React.ReactElement {
       }
 
       const data = await response.json();
+      console.log('[Stables Page] API Response:', data);
+      console.log('[Stables Page] API Response data.data:', data.data);
       setStablesData(data);
     } catch (error) {
       setStablesError(
@@ -582,7 +590,7 @@ export default function StablesPage(): React.ReactElement {
   const { data: cmcData } = useCMCData();
 
   // Extract the actual data from API response
-  const data: any = stablesData || null;
+  const data: any = stablesData?.data || null;
   const loading = isLoading;
   const error = stablesError?.message || null;
   const refreshing = isFetching && !isLoading;
@@ -612,16 +620,20 @@ export default function StablesPage(): React.ReactElement {
     adjustedTotal,
     suppliesDataMap,
   } = useMemo(() => {
-    if (!data || !data.data || !data.data.supplies)
+    console.log('[Stables Page] useMemo data:', data);
+    console.log('[Stables Page] useMemo stablesData:', stablesData);
+    if (!data || !data.supplies) {
+      console.log('[Stables Page] No data or supplies found');
       return {
         formattedTotalSupply: '',
         processedSupplies: [],
         adjustedTotal: '0',
         suppliesDataMap: {},
       };
+    }
 
     const susdePrice = cmcData?.price || 1; // Default to 1 if price not available
-    const supplies = data.data.supplies;
+    const supplies = data.supplies;
 
     // Create supplies data map for the dialog
     const suppliesMap: Record<string, string> = {};
@@ -712,7 +724,7 @@ export default function StablesPage(): React.ReactElement {
     for (const token of supplies) {
       const rawSupply = BigInt(token.supply_raw || token.supply || '0');
       // Normalize 8-decimal tokens to 6 decimals
-      if (token.symbol === 'MOD' || token.symbol === 'mUSD') {
+      if (token.symbol === 'MOD' || token.symbol === 'mUSD' || token.symbol === 'USDA') {
         rawSupplyTotal += rawSupply / BigInt(100); // Convert from 8 to 6 decimals
       } else {
         rawSupplyTotal += rawSupply;
@@ -725,7 +737,7 @@ export default function StablesPage(): React.ReactElement {
       adjustedTotal: rawSupplyTotal.toString(),
       suppliesDataMap: suppliesMap,
     };
-  }, [data, cmcData]);
+  }, [data, cmcData, stablesData]);
 
   return (
     <RootErrorBoundary>
@@ -735,15 +747,15 @@ export default function StablesPage(): React.ReactElement {
         {/* Background gradient - fixed to viewport */}
         <div className="fixed inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/10 pointer-events-none" />
 
-        <div className="fixed top-0 left-0 right-0 h-1 z-50">
+        <div className="fixed top-0 left-0 right-0 h-1 z-30">
           {refreshing && <div className="h-full bg-muted animate-pulse"></div>}
         </div>
 
-        <div className="container-layout pt-6 relative z-10">
+        <div className="container-layout pt-6 relative">
           <Header />
         </div>
 
-        <main className="container-layout py-6 flex-1 relative z-10">
+        <main className="container-layout py-6 flex-1 relative">
           {loading ? (
             <LoadingState />
           ) : error ? (
@@ -944,7 +956,7 @@ export default function StablesPage(): React.ReactElement {
           ) : null}
         </main>
 
-        <Footer className="relative z-10" />
+        <Footer className="relative" />
       </div>
     </RootErrorBoundary>
   );

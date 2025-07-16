@@ -1,0 +1,15 @@
+
+> on-aptos@0.1.0 dev /Users/zacharyr0th/Documents/Projects/on-aptos
+> next dev --port 3001 --turbo
+
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3001
+    at <unknown> (Error: listen EADDRINUSE: address already in use :::3001)
+    at new Promise (<anonymous>) {
+  code: 'EADDRINUSE',
+  errno: -48,
+  syscall: 'listen',
+  address: '::',
+  port: 3001
+}
+[?25h

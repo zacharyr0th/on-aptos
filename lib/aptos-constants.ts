@@ -99,6 +99,7 @@ export const STABLECOINS = {
   USDE: '0xf37a8864fe737eb8ec2c2931047047cbaed1beed3fb0e5b7c5526dafd3b9c2e9',
   SUSDE: '0xb30a694a344edee467d9f82330bbe7c3b89f440a1ecd2da1f3bca266560fce69',
   MUSD: '0xdd84125d1ebac8f1ecb2819801417fc392325e672be111ec03830c34d6ff82dd', // Mirage mUSD
+  USDA: '0x534e4c3dc0f038dab1a8259e89301c4da58779a5d482fb354a41c08147e6b9ec', // USDA fungible asset
 } as const;
 
 // LayerZero bridged coins (separate because they use coin_info table)
@@ -182,6 +183,52 @@ export const LIQUID_STAKING_TOKENS = {
 
   // Vested/Locked APT variants
   VAPT: '0xb7d960e5f0a58cc0817774e611d7e3ae54c6843816521f02d7ced583d6434896::vcoins::V<0x1::aptos_coin::AptosCoin>',
+} as const;
+
+/**
+ * LST Token Addresses - Both coin and FA versions
+ * Comprehensive mapping of all LST tokens and their fungible asset counterparts
+ */
+export const LST_TOKEN_ADDRESSES = {
+  // Amnis tokens
+  AMNIS: {
+    // stAPT - Staked APT
+    STAPT: {
+      coin: '0x111ae3e5bc816a5e63c2da97d0aa3886519e0cd5e4b046659fa35796bd11542a::stapt_token::StakedApt',
+      fa: '0xf0995d360365bad80f9129f32c18bb7e636ed45a5ad96127be7e8e7f033e2ac9',
+    },
+    // amAPT - Auto-compounding APT
+    AMAPT: {
+      coin: '0x111ae3e5bc816a5e63c2da97d0aa3886519e0cd5e4b046659fa35796bd11542a::amapt_token::AmnisApt',
+      fa: '0x111ae3e5bc816a5e63c2da97d0aa3886519e0cd5e4b046659fa35796bd11542a',
+    },
+  },
+  
+  // Thala tokens
+  THALA: {
+    // thAPT - Thala APT
+    THAPT: {
+      coin: '0x7fd500c11216f0fe3095d0c4b8aa4d64a4e2e04f83758462f2b127255643615::thl_coin::THL',
+      fa: '0xfaf4e633ae9eb31366c9ca24214231760926576c7b625313b3688b5e900731f6',
+    },
+    // sthAPT - Staked Thala APT
+    STHAPT: {
+      coin: '0xfaf4e633ae9eb31366c9ca24214231760926576c7b625313b3688b5e900731f6::staking::sthAPT',
+      fa: '0xb854b0367a3c0a014dfb3b4630ad06f8c2cbebd6c87b6b13b4c2b2ca88e0faa3',
+    },
+  },
+  
+  // Kofi tokens (FA only)
+  KOFI: {
+    // kAPT - Kofi APT
+    KAPT: {
+      fa: '0x24c75c96c7b9e6db4fa9a087f60c10bff19c49e96fb5bc0cf7b46b97ae685f49',
+    },
+    // stkAPT - Staked Kofi APT
+    STKAPT: {
+      fa: '0x47c99173e2e2f5528ac6f0cf4ba7c7de0ab2b65b9f2e15fb672ac0933faa0b9b',
+    },
+  },
 } as const;
 
 /**
@@ -472,6 +519,66 @@ export const AptosUtils = {
     return cleaned === '0x' ? '0x0' : cleaned;
   },
 } as const;
+
+/**
+ * DeFi Protocol Name Mappings
+ * Maps common protocol name variations to canonical names for better matching
+ */
+export const DEFI_PROTOCOL_NAME_MAPPINGS: Record<string, string> = {
+  // Thala variations
+  'thala': 'Thala',
+  'thala finance': 'Thala',
+  'thala farm': 'Thala',
+  
+  // Pancake variations
+  'pancake': 'PancakeSwap',
+  'pancakeswap': 'PancakeSwap',
+  'pancake swap': 'PancakeSwap',
+  
+  // Liquid staking variations
+  'amnis': 'Amnis',
+  'amnis finance': 'Amnis',
+  'tortuga': 'Tortuga',
+  'tortuga finance': 'Tortuga',
+  
+  // DEX variations
+  'liquidswap': 'LiquidSwap',
+  'liquid swap': 'LiquidSwap',
+  'cellana': 'Cellana',
+  'cellana finance': 'Cellana',
+  'sushi': 'SushiSwap',
+  'sushiswap': 'SushiSwap',
+  'sushi swap': 'SushiSwap',
+  
+  // Aggregator variations
+  'panora': 'Panora',
+  'panora exchange': 'Panora',
+  'kana': 'Kana',
+  'kanalabs': 'Kana',
+  'kana labs': 'Kana',
+  'anqa': 'Anqa',
+  
+  // Lending variations
+  'aries': 'Aries Markets',
+  'aries markets': 'Aries Markets',
+  'econia': 'Econia',
+  
+  // Other protocols
+  'aptin': 'Aptin Finance',
+  'aptin finance': 'Aptin Finance',
+  'hippo': 'Hippo Labs',
+  'hippo labs': 'Hippo Labs',
+  'aux': 'AUX',
+  'aux exchange': 'AUX',
+} as const;
+
+/**
+ * Utility function to normalize protocol names for better matching
+ */
+export const normalizeProtocolName = (protocolName: string): string => {
+  const normalized = protocolName.toLowerCase().trim();
+  return DEFI_PROTOCOL_NAME_MAPPINGS[normalized] || protocolName;
+};
 
 /**
  * Export protocol registry functions for convenience

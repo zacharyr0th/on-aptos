@@ -13,9 +13,9 @@ export const LandingSection = () => {
       className={cn('min-h-screen flex flex-col relative', GeistMono.className)}
     >
       {/* Background gradient - fixed to viewport */}
-      <div className="fixed inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/10 pointer-events-none" />
+      <div className="fixed inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/10 pointer-events-none z-0" />
 
-      <div className="container-layout pt-6 relative z-10">
+      <div className="container-layout pt-6 relative z-20">
         <Header />
       </div>
 
@@ -68,7 +68,7 @@ export const LandingSection = () => {
         </div>
       </main>
 
-      <Footer className="relative z-10" />
+      <Footer className="relative z-20" />
     </div>
   );
 };

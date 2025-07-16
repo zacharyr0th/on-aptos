@@ -4,7 +4,6 @@ import { NFT } from '../types';
 export interface PortfolioState {
   // View states
   showAccountSwitcher: boolean;
-  nftPage: number;
   nftViewMode: 'grid' | 'collection';
   selectedNFT: NFT | null;
   nftShuffle: number;
@@ -17,8 +16,6 @@ export interface PortfolioState {
   // Sort states
   defiSortBy: 'protocol' | 'type' | 'value';
   defiSortOrder: 'asc' | 'desc';
-  showOnlyVerified: boolean;
-  showAllAssets: boolean;
 
   // Filter states
   filterBySymbol: string[];
@@ -47,7 +44,6 @@ export const usePortfolio = (
 ) => {
   // State management
   const [showAccountSwitcher, setShowAccountSwitcher] = useState(false);
-  const [nftPage, setNftPage] = useState(0);
   const [nftViewMode, setNftViewMode] = useState<'grid' | 'collection'>('grid');
   const [selectedNFT, setSelectedNFT] = useState<NFT | null>(null);
   const [nftShuffle, setNftShuffle] = useState(0);
@@ -56,8 +52,8 @@ export const usePortfolio = (
   );
   const [selectedAsset, setSelectedAsset] = useState<any>(null);
   const [selectedDeFiPosition, setSelectedDeFiPosition] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState<'performance' | 'transactions'>(
-    'performance'
+  const [activeTab, setActiveTab] = useState<'portfolio' | 'transactions'>(
+    'portfolio'
   );
   const [sidebarView, setSidebarView] = useState<'assets' | 'nfts' | 'defi'>(
     'assets'
@@ -66,8 +62,6 @@ export const usePortfolio = (
     'value'
   );
   const [defiSortOrder, setDefiSortOrder] = useState<'asc' | 'desc'>('desc');
-  const [showOnlyVerified, setShowOnlyVerified] = useState(false);
-  const [showAllAssets, setShowAllAssets] = useState(false);
   const [filterBySymbol, setFilterBySymbol] = useState<string[]>([]);
   const [filterByProtocol, setFilterByProtocol] = useState<string[]>([]);
   const [nftSortField, setNftSortField] = useState<string>('name');
@@ -245,7 +239,6 @@ export const usePortfolio = (
   return {
     // States
     showAccountSwitcher,
-    nftPage,
     nftViewMode,
     selectedNFT,
     nftShuffle,
@@ -256,8 +249,6 @@ export const usePortfolio = (
     sidebarView,
     defiSortBy,
     defiSortOrder,
-    showOnlyVerified,
-    showAllAssets,
     filterBySymbol,
     filterByProtocol,
     nftSortField,
@@ -267,7 +258,6 @@ export const usePortfolio = (
 
     // Setters
     setShowAccountSwitcher,
-    setNftPage,
     setNftViewMode,
     setSelectedNFT,
     setNftShuffle,
@@ -278,8 +268,6 @@ export const usePortfolio = (
     setSidebarView,
     setDefiSortBy,
     setDefiSortOrder,
-    setShowOnlyVerified,
-    setShowAllAssets,
     setFilterBySymbol,
     setFilterByProtocol,
     setNftSortField,

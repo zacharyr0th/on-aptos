@@ -83,7 +83,7 @@ export const IconSections = () => {
       titleKey: 'landing.sections.stablecoins',
       descriptionKey: 'landing.sections.stablecoins_description',
       apiEndpoint: '/api/aptos/stables',
-      route: '/stablecoins',
+      route: '/stables',
       icons: [
         { name: 'USDC', src: '/icons/stables/usdc.png' },
         { name: 'USDT', src: '/icons/stables/usdt.png' },

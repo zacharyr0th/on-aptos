@@ -10,19 +10,7 @@ export async function GET() {
         const startTime = Date.now();
         const data = await fetchLSTSuppliesData();
 
-        return {
-          timestamp: new Date().toISOString(),
-          performance: {
-            responseTimeMs: Date.now() - startTime,
-            cacheHits: 0,
-            cacheMisses: 0,
-            apiCalls: data.supplies.length,
-          },
-          cache: {
-            cached: false,
-          },
-          data,
-        };
+        return data;
       } catch (error) {
         if (error instanceof Error) {
           throw new ApiError(

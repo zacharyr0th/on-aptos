@@ -1,12 +1,13 @@
 'use client';
 
-import { Copy } from 'lucide-react';
+import { Copy, Monitor } from 'lucide-react';
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
   TooltipProvider,
 } from '@/components/ui/tooltip';
+import { Button } from '@/components/ui/button';
 import { formatCurrency } from '@/lib/utils/format';
 import { copyToClipboard } from './utils';
 
@@ -14,12 +15,16 @@ interface PortfolioHeaderProps {
   totalValue: number;
   walletAddress: string | undefined;
   accountNames: string[] | null;
+  terminalMode?: boolean;
+  onTerminalToggle?: () => void;
 }
 
 export const PortfolioHeader = ({
   totalValue,
   walletAddress,
   accountNames,
+  terminalMode = false,
+  onTerminalToggle,
 }: PortfolioHeaderProps) => {
   return (
     <div className="flex items-center bg-card border rounded-lg py-3 px-4 mb-6">
@@ -79,6 +84,25 @@ export const PortfolioHeader = ({
           )}
         </p>
       </div>
+      
+      {/* Bloomberg Terminal Toggle */}
+      {onTerminalToggle && (
+        <div className="flex-shrink-0 ml-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onTerminalToggle}
+            className={`text-xs h-8 px-3 font-mono transition-colors ${
+              terminalMode 
+                ? 'bg-muted text-muted-foreground border border-muted-foreground/30' 
+                : 'text-muted-foreground/70 hover:text-muted-foreground hover:bg-muted/50'
+            }`}
+          >
+            <Monitor className="h-3 w-3 mr-1.5" />
+            Bloomberg Theme
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

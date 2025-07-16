@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getWalletNFTs } from '@/lib/services/blockchain/portfolio/portfolio-service';
+import { getAllWalletNFTs } from '@/lib/services/blockchain/portfolio/portfolio-service';
 import {
   withValidation,
   PortfolioNFTsQuerySchema,
@@ -22,21 +22,21 @@ const handler = withValidation(PortfolioNFTsQuerySchema)(async ({
     async (): Promise<NFTsResponse> => {
       if (!query) throw new Error('Missing query parameters');
 
-      const { walletAddress, limit, offset } = query;
+      const { walletAddress } = query;
 
       logger.info(
-        `[NFTs API] Fetching NFTs for ${walletAddress}, limit: ${limit}, offset: ${offset}`
+        `[NFTs API] Fetching ALL NFTs for ${walletAddress}`
       );
 
-      // Call the service directly
-      const nfts = await getWalletNFTs(walletAddress, limit || 30, offset || 0);
+      // Call the service to get all NFTs exhaustively
+      const nfts = await getAllWalletNFTs(walletAddress);
 
       logger.info(`[NFTs API] Retrieved ${nfts.length} NFTs`);
 
       return {
         nfts,
         totalCount: nfts.length,
-        hasMore: nfts.length === (limit || 30),
+        hasMore: false, // We fetched everything
       };
     },
     {

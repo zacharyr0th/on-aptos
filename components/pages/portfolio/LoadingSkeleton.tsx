@@ -8,9 +8,9 @@ export const LoadingSkeleton = () => {
   return (
     <div className="flex flex-col min-h-screen relative">
       {/* Background gradient - fixed to viewport */}
-      <div className="fixed inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/10 pointer-events-none" />
+      <div className="fixed inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/10 pointer-events-none z-0" />
 
-      <div className="container-layout pt-6 relative z-10">
+      <div className="container-layout pt-6 relative z-20">
         <Header />
         {/* Portfolio Header Skeleton */}
         <div className="flex items-center bg-card border rounded-lg py-3 px-4 mb-6 mt-8">
@@ -88,7 +88,7 @@ export const LoadingSkeleton = () => {
           </div>
         </div>
       </div>
-      <Footer className="relative z-10" />
+      <Footer className="relative z-20" />
     </div>
   );
 };
