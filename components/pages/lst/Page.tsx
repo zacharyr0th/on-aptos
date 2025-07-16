@@ -475,14 +475,75 @@ export default function LSTPage(): React.ReactElement {
       return formatAmountFull(totalUSD, 'USD', { decimals: 2 });
     };
 
-    // Process tokens - show each token as individual card, grouped by protocol
+    // Process tokens - group by protocol with combined cards
     const processSupplies = () => {
       if (!data?.supplies) return [];
 
+      const thalaTokens = data.supplies.filter(
+        (t: any) =>
+          t.symbol.toLowerCase() === 'thapt' ||
+          t.symbol.toLowerCase() === 'sthapt'
+      );
+      const amnisTokens = data.supplies.filter(
+        (t: any) =>
+          t.symbol.toLowerCase() === 'amapt' ||
+          t.symbol.toLowerCase() === 'stapt'
+      );
+      const kofiTokens = data.supplies.filter(
+        (t: any) =>
+          t.symbol.toLowerCase() === 'kapt' ||
+          t.symbol.toLowerCase() === 'stkapt'
+      );
+
       const displayTokens: DisplayToken[] = [];
 
-      // Add all tokens as individual cards since API returns aggregated data
-      data.supplies.forEach((token: any) => {
+      // Add combined protocol tokens
+      if (thalaTokens.length > 0) {
+        displayTokens.push({
+          symbol: 'thAPT/sthAPT',
+          isCombined: true,
+          supply: thalaTokens.reduce(
+            (acc: any, curr: any) => (BigInt(acc) + BigInt(curr.supply)).toString(),
+            '0'
+          ),
+          components: thalaTokens,
+        });
+      }
+
+      if (amnisTokens.length > 0) {
+        displayTokens.push({
+          symbol: 'amAPT/stAPT',
+          isCombined: true,
+          supply: amnisTokens.reduce(
+            (acc: any, curr: any) => (BigInt(acc) + BigInt(curr.supply)).toString(),
+            '0'
+          ),
+          components: amnisTokens,
+        });
+      }
+
+      if (kofiTokens.length > 0) {
+        displayTokens.push({
+          symbol: 'kAPT/stkAPT',
+          isCombined: true,
+          supply: kofiTokens.reduce(
+            (acc: any, curr: any) => (BigInt(acc) + BigInt(curr.supply)).toString(),
+            '0'
+          ),
+          components: kofiTokens,
+        });
+      }
+
+      // Add individual tokens that aren't part of protocol pairs
+      const pairedTokenSymbols = new Set([
+        'thapt', 'sthapt', 'amapt', 'stapt', 'kapt', 'stkapt'
+      ]);
+
+      const individualTokens = data.supplies.filter(
+        (t: any) => !pairedTokenSymbols.has(t.symbol.toLowerCase())
+      );
+
+      individualTokens.forEach((token: any) => {
         displayTokens.push({
           symbol: token.symbol,
           supply: token.supply,
