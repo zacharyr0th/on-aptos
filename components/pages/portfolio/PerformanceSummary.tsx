@@ -27,8 +27,8 @@ const timeframes: TimeframeData[] = [
 export const PerformanceSummary: React.FC<PerformanceSummaryProps> = React.memo(
   ({ walletAddress, className }) => {
     // Fetch data for the longest timeframe (1 year) and calculate others from it
-    const { data: yearData, isLoading } = usePortfolioHistory(walletAddress, { 
-      days: 365 
+    const { data: yearData, isLoading } = usePortfolioHistory(walletAddress, {
+      days: 365,
     });
 
     // Calculate metrics for each timeframe
@@ -36,16 +36,15 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = React.memo(
       // Filter data to the specific timeframe
       const cutoffDate = new Date();
       cutoffDate.setDate(cutoffDate.getDate() - tf.days);
-      
-      const filteredData = yearData?.filter(entry => 
-        new Date(entry.date) >= cutoffDate
-      ) || [];
-      
+
+      const filteredData =
+        yearData?.filter(entry => new Date(entry.date) >= cutoffDate) || [];
+
       // Calculate metrics
       let change = 0;
       let changePercent = 0;
       let isPositive = true;
-      
+
       if (filteredData.length > 0) {
         const values = filteredData.map(entry => entry.totalValue);
         const startValue = values[0] || 0;
@@ -54,7 +53,7 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = React.memo(
         changePercent = startValue > 0 ? (change / startValue) * 100 : 0;
         isPositive = change >= 0;
       }
-      
+
       return {
         ...tf,
         change,
@@ -74,7 +73,7 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = React.memo(
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-            {timeframeData.map((tf) => (
+            {timeframeData.map(tf => (
               <div key={tf.timeframe} className="space-y-1">
                 <p className="text-xs text-muted-foreground">{tf.label}</p>
                 {tf.isLoading ? (
@@ -88,11 +87,12 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = React.memo(
                     )}
                     <span
                       className={cn(
-                        "text-sm font-medium",
-                        tf.isPositive ? "text-green-600" : "text-red-600"
+                        'text-sm font-medium',
+                        tf.isPositive ? 'text-green-600' : 'text-red-600'
                       )}
                     >
-                      {tf.isPositive ? '+' : ''}{formatPercentage(tf.changePercent)}
+                      {tf.isPositive ? '+' : ''}
+                      {formatPercentage(tf.changePercent)}
                     </span>
                   </div>
                 ) : (
@@ -101,7 +101,8 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = React.memo(
                 <p className="text-xs text-muted-foreground">
                   {tf.hasData ? (
                     <>
-                      {tf.isPositive ? '+' : ''}{formatCurrency(Math.abs(tf.change))}
+                      {tf.isPositive ? '+' : ''}
+                      {formatCurrency(Math.abs(tf.change))}
                     </>
                   ) : (
                     'No data'

@@ -13,6 +13,7 @@ class GracefulShutdown {
   private handlers: ShutdownHandler[] = [];
   private isShuttingDown = false;
   private shutdownTimeout = 30000; // 30 seconds default
+  private signalHandlersSetup = false;
 
   /**
    * Register a shutdown handler
@@ -126,6 +127,15 @@ class GracefulShutdown {
       return;
     }
 
+    // Prevent duplicate signal handlers
+    if (this.signalHandlersSetup) {
+      logger.info('[GracefulShutdown] Signal handlers already configured');
+      return;
+    }
+
+    // Increase the max listeners to prevent memory leak warnings
+    process.setMaxListeners(15);
+
     // Handle various termination signals
     const signals: NodeJS.Signals[] = ['SIGTERM', 'SIGINT', 'SIGUSR2'];
 
@@ -162,6 +172,7 @@ class GracefulShutdown {
       });
     });
 
+    this.signalHandlersSetup = true;
     logger.info('[GracefulShutdown] Signal handlers configured');
   }
 }

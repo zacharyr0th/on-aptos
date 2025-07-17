@@ -84,7 +84,7 @@ export const PortfolioHeader = ({
           )}
         </p>
       </div>
-      
+
       {/* Bloomberg Terminal Toggle */}
       {onTerminalToggle && (
         <div className="flex-shrink-0 ml-4">
@@ -93,8 +93,8 @@ export const PortfolioHeader = ({
             size="sm"
             onClick={onTerminalToggle}
             className={`text-xs h-8 px-3 font-mono transition-colors ${
-              terminalMode 
-                ? 'bg-muted text-muted-foreground border border-muted-foreground/30' 
+              terminalMode
+                ? 'bg-muted text-muted-foreground border border-muted-foreground/30'
                 : 'text-muted-foreground/70 hover:text-muted-foreground hover:bg-muted/50'
             }`}
           >

@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ThemeToggle } from '@/components/layout/theme-toggle';
 import { LanguageToggle } from '@/components/ui/language-toggle';
-import { WalletConnectButton } from '@/components/wallet/WalletConnectButton';
 import { ErrorBoundary } from '../errors/ErrorBoundary';
 import {
   Menu,
@@ -26,7 +25,11 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -128,7 +131,10 @@ const HeaderComponent = (): React.ReactElement | null => {
                           href="/stables"
                           title={t('navigation.stablecoins', 'Stablecoins')}
                           icon={<Coins className="h-4 w-4" />}
-                          active={pathname === '/stables' || pathname === '/stablecoins'}
+                          active={
+                            pathname === '/stables' ||
+                            pathname === '/stablecoins'
+                          }
                         >
                           Track USDT, USDC, USDe and other stablecoins on Aptos
                         </ListItem>
@@ -182,9 +188,7 @@ const HeaderComponent = (): React.ReactElement | null => {
                                 if (categoryProtocols.length === 0) return null;
 
                                 return (
-                                  <div
-                                    key={category}
-                                  >
+                                  <div key={category}>
                                     <h4 className="sticky top-0 bg-popover z-10 text-xs font-semibold text-muted-foreground uppercase tracking-wider py-2 px-1">
                                       {category}
                                     </h4>
@@ -209,8 +213,9 @@ const HeaderComponent = (): React.ReactElement | null => {
                                               alt={`${protocol.title} logo`}
                                               fill
                                               className="object-contain rounded"
-                                              onError={(e) => {
-                                                const img = e.target as HTMLImageElement;
+                                              onError={e => {
+                                                const img =
+                                                  e.target as HTMLImageElement;
                                                 img.src = '/placeholder.jpg';
                                               }}
                                             />
@@ -273,18 +278,19 @@ const HeaderComponent = (): React.ReactElement | null => {
                 </NavigationMenuList>
               </NavigationMenu>
             </div>
-            <WalletConnectButton />
           </div>
 
           {/* Mobile Controls */}
           <div className="flex items-center gap-2 md:hidden">
-            <WalletConnectButton />
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
                   onClick={toggleMenu}
                   className="p-2 -mr-2 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-md transition-colors hover:bg-muted"
-                  aria-label={t('navigation.toggle_menu', 'Toggle navigation menu')}
+                  aria-label={t(
+                    'navigation.toggle_menu',
+                    'Toggle navigation menu'
+                  )}
                   aria-expanded={mobileMenuOpen}
                   aria-controls="mobile-navigation"
                 >
@@ -313,7 +319,7 @@ const HeaderComponent = (): React.ReactElement | null => {
             />
 
             {/* Mobile Menu */}
-            <nav 
+            <nav
               id="mobile-navigation"
               className="fixed top-0 right-0 h-full w-72 max-w-[85vw] bg-background border-l border-border z-50 md:hidden shadow-xl"
               role="navigation"
@@ -354,7 +360,9 @@ const HeaderComponent = (): React.ReactElement | null => {
                     </div>
                     <MobileNavLink
                       href="/stables"
-                      active={pathname === '/stables' || pathname === '/stablecoins'}
+                      active={
+                        pathname === '/stables' || pathname === '/stablecoins'
+                      }
                       onClick={closeMenu}
                     >
                       {t('navigation.stablecoins', 'Stablecoins')}

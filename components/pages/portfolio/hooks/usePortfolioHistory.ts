@@ -92,20 +92,29 @@ export function usePortfolioHistory(
       // Use different endpoints based on timeframe for better data granularity
       let response;
       let result;
-      
-      if (timeframe && ['1h', '12h', '24h', '7d', '30d', '90d', '1y', 'all'].includes(timeframe)) {
+
+      if (
+        timeframe &&
+        ['1h', '12h', '24h', '7d', '30d', '90d', '1y', 'all'].includes(
+          timeframe
+        )
+      ) {
         // Use the performance endpoint for predefined timeframes
         const queryParams = new URLSearchParams({
           address: walletAddress,
           timeframe: timeframe,
         });
-        response = await fetch(`/api/analytics/portfolio-performance?${queryParams}`);
+        response = await fetch(
+          `/api/analytics/portfolio-performance?${queryParams}`
+        );
         result = await response.json();
-        
+
         // Transform the data to match the expected format
         if (result.success && result.data && result.data.length > 0) {
           const transformedData = result.data.map((item: any) => ({
-            date: item.timestamp.includes('T') ? item.timestamp.split('T')[0] : item.timestamp,
+            date: item.timestamp.includes('T')
+              ? item.timestamp.split('T')[0]
+              : item.timestamp,
             aptBalance: item.balance,
             aptPrice: item.price,
             totalValue: item.value,
@@ -114,11 +123,14 @@ export function usePortfolioHistory(
           setData(transformedData);
           return;
         } else {
-          console.warn('[usePortfolioHistory] Performance API returned no data for', timeframe);
+          console.warn(
+            '[usePortfolioHistory] Performance API returned no data for',
+            timeframe
+          );
           // Fall through to use the history endpoint
         }
       }
-      
+
       // If we get here, either not a standard timeframe or performance API returned no data
       // Fall back to the original history endpoint
       const queryParams = new URLSearchParams({

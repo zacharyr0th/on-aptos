@@ -3,29 +3,34 @@ import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { 
-  Wallet, 
-  TrendingUp, 
-  TrendingDown, 
-  PieChart, 
+import {
+  Wallet,
+  TrendingUp,
+  TrendingDown,
+  PieChart,
   Grid,
   Info,
-  DollarSign
+  DollarSign,
+  Building2,
 } from 'lucide-react';
-import { 
+import {
   Tooltip,
   TooltipContent,
-  TooltipTrigger 
+  TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { 
-  PieChart as RechartsPieChart, 
-  Pie, 
-  Cell, 
-  ResponsiveContainer, 
+import {
+  PieChart as RechartsPieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
   Tooltip as RechartsTooltip,
-  TooltipProps 
+  TooltipProps,
 } from 'recharts';
-import { formatCurrency, formatPercentage, formatTokenAmount } from '@/lib/utils/format';
+import {
+  formatCurrency,
+  formatPercentage,
+  formatTokenAmount,
+} from '@/lib/utils/format';
 import { getTokenLogoUrlWithFallback } from '@/lib/utils/token-logos';
 import { cn } from '@/lib/utils';
 import { getProtocolLogo } from './utils';
@@ -70,11 +75,20 @@ interface AssetAllocation {
   percentage: number;
   color: string;
   logo: string;
+  isDefi?: boolean;
 }
 
 const CHART_COLORS = [
-  '#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', 
-  '#06b6d4', '#f43f5e', '#6366f1', '#84cc16', '#f97316'
+  '#3b82f6',
+  '#8b5cf6',
+  '#ec4899',
+  '#f59e0b',
+  '#10b981',
+  '#06b6d4',
+  '#f43f5e',
+  '#6366f1',
+  '#84cc16',
+  '#f97316',
 ];
 
 // Custom tooltip component for the pie chart
@@ -82,13 +96,13 @@ const CustomTooltip = React.memo(({ active, payload }: any) => {
   if (!active || !payload?.length) return null;
 
   const data = payload[0].payload as AssetAllocation;
-  
+
   return (
     <div className="bg-popover/95 backdrop-blur border rounded-md shadow-lg p-3 z-10 text-sm space-y-1">
       <div className="flex items-center gap-2">
-        <div 
-          className="w-3 h-3 rounded-full" 
-          style={{ backgroundColor: data.color }} 
+        <div
+          className="w-3 h-3 rounded-full"
+          style={{ backgroundColor: data.color }}
         />
         <p className="font-semibold text-popover-foreground">{data.symbol}</p>
       </div>
@@ -112,7 +126,7 @@ export const WalletSummary: React.FC<WalletSummaryProps> = ({
   className,
   isLoading = false,
   pieChartData: providedPieChartData,
-  pieChartColors: providedPieChartColors
+  pieChartColors: providedPieChartColors,
 }) => {
   // Calculate asset allocation for pie chart
   const assetAllocation = useMemo((): AssetAllocation[] => {
@@ -128,14 +142,24 @@ export const WalletSummary: React.FC<WalletSummaryProps> = ({
             symbol: item.symbol,
             value: item.value,
             percentage: item.percentage,
-            color: providedPieChartColors?.[index % (providedPieChartColors.length || 1)] || CHART_COLORS[index % CHART_COLORS.length],
-            logo: asset ? getTokenLogoUrlWithFallback(asset.asset_type, asset.metadata) : '/placeholder.jpg'
+            color:
+              providedPieChartColors?.[
+                index % (providedPieChartColors.length || 1)
+              ] || CHART_COLORS[index % CHART_COLORS.length],
+            logo: asset
+              ? getTokenLogoUrlWithFallback(asset.asset_type, asset.metadata)
+              : '/placeholder.jpg',
           };
         });
     }
 
     // Fallback to original calculation if no provided data
-    if ((!assets || assets.length === 0) && (!defiPositions || defiPositions.length === 0) || totalValue === 0) return [];
+    if (
+      ((!assets || assets.length === 0) &&
+        (!defiPositions || defiPositions.length === 0)) ||
+      totalValue === 0
+    )
+      return [];
 
     // Combine assets and DeFi positions, filtering for value > $0.1
     const allItems: Array<{
@@ -156,28 +180,12 @@ export const WalletSummary: React.FC<WalletSummaryProps> = ({
             symbol: asset.metadata?.symbol || 'UNK',
             value: asset.value || 0,
             logo: getTokenLogoUrlWithFallback(asset.asset_type, asset.metadata),
-            isDefi: false
+            isDefi: false,
           });
         });
     }
 
-    // Add valid DeFi positions (value > $0.1)
-    if (defiPositions) {
-      defiPositions
-        .filter(position => (position.totalValue || 0) > 0.1)
-        .forEach(position => {
-          // Skip Thala Farm positions with 'TBD' value
-          if (position.protocol === 'Thala Farm') return;
-          
-          allItems.push({
-            name: position.protocol,
-            symbol: position.protocol,
-            value: position.totalValue || 0,
-            logo: getProtocolLogo(position.protocol),
-            isDefi: true
-          });
-        });
-    }
+    // Remove DeFi positions - we don't want them in the tokens view anymore
 
     // Sort by value descending
     allItems.sort((a, b) => b.value - a.value);
@@ -193,7 +201,8 @@ export const WalletSummary: React.FC<WalletSummaryProps> = ({
       value: item.value,
       percentage: (item.value / totalValue) * 100,
       color: CHART_COLORS[index % CHART_COLORS.length],
-      logo: item.logo
+      logo: item.logo,
+      isDefi: item.isDefi,
     }));
 
     // Add "Other" if there are remaining items
@@ -204,21 +213,29 @@ export const WalletSummary: React.FC<WalletSummaryProps> = ({
         value: otherValue,
         percentage: (otherValue / totalValue) * 100,
         color: '#94a3b8',
-        logo: '/placeholder.jpg'
+        logo: '/placeholder.jpg',
       });
     }
 
     return allocation;
-  }, [assets, defiPositions, totalValue, providedPieChartData, providedPieChartColors]);
+  }, [
+    assets,
+    defiPositions,
+    totalValue,
+    providedPieChartData,
+    providedPieChartColors,
+  ]);
 
   // Calculate portfolio metrics
   const portfolioMetrics = useMemo(() => {
     const totalAssets = assets.length;
-    const verifiedAssets = assets.filter(asset => asset.isVerified !== false).length;
-    
+    const verifiedAssets = assets.filter(
+      asset => asset.isVerified !== false
+    ).length;
+
     let highestValueAsset: FungibleAsset | null = null;
     let maxValue = 0;
-    
+
     for (const asset of assets) {
       const assetValue = asset.value || 0;
       if (assetValue > maxValue) {
@@ -230,7 +247,7 @@ export const WalletSummary: React.FC<WalletSummaryProps> = ({
     return {
       totalAssets,
       verifiedAssets,
-      highestValueAsset
+      highestValueAsset,
     };
   }, [assets]);
 
@@ -241,7 +258,9 @@ export const WalletSummary: React.FC<WalletSummaryProps> = ({
         <CardHeader>
           <div className="flex items-center gap-2">
             <Wallet className="h-4 w-4" />
-            <CardTitle className="text-base sm:text-lg">Wallet Summary</CardTitle>
+            <CardTitle className="text-base sm:text-lg">
+              Wallet Summary
+            </CardTitle>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -267,7 +286,9 @@ export const WalletSummary: React.FC<WalletSummaryProps> = ({
         <CardHeader>
           <div className="flex items-center gap-2">
             <Wallet className="h-4 w-4" />
-            <CardTitle className="text-base sm:text-lg">Wallet Summary</CardTitle>
+            <CardTitle className="text-base sm:text-lg">
+              Wallet Summary
+            </CardTitle>
           </div>
         </CardHeader>
         <CardContent>
@@ -284,7 +305,7 @@ export const WalletSummary: React.FC<WalletSummaryProps> = ({
 
   return (
     <div className="space-y-8">
-      {/* Professional Portfolio Overview */}
+      {/* Combined Portfolio Overview and Asset Holdings */}
       <Card className="border border-border bg-card">
         <CardHeader className="border-b border-border bg-muted/30">
           <CardTitle className="text-lg font-semibold tracking-tight">
@@ -292,7 +313,8 @@ export const WalletSummary: React.FC<WalletSummaryProps> = ({
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          <div className="grid grid-cols-3">
+          {/* Stats Row */}
+          <div className="grid grid-cols-3 border-b border-border">
             <div className="p-6 border-r border-border">
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
@@ -306,7 +328,7 @@ export const WalletSummary: React.FC<WalletSummaryProps> = ({
                 </p>
               </div>
             </div>
-            
+
             <div className="p-6 border-r border-border">
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
@@ -320,7 +342,7 @@ export const WalletSummary: React.FC<WalletSummaryProps> = ({
                 </p>
               </div>
             </div>
-            
+
             <div className="p-6">
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
@@ -330,23 +352,16 @@ export const WalletSummary: React.FC<WalletSummaryProps> = ({
                   </span>
                 </div>
                 <p className="text-2xl font-mono font-bold tracking-tight">
-                  {portfolioMetrics.verifiedAssets}/{portfolioMetrics.totalAssets}
+                  {portfolioMetrics.verifiedAssets}/
+                  {portfolioMetrics.totalAssets}
                 </p>
               </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
 
-      {/* Asset Holdings with Pie Chart */}
-      {assetAllocation.length > 0 && (
-        <Card className="border border-border bg-card">
-          <CardHeader className="border-b border-border bg-muted/30">
-            <CardTitle className="text-lg font-semibold tracking-tight">
-              Asset Holdings
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-6">
+          {/* Asset Holdings with Pie Chart */}
+          {assetAllocation.length > 0 && (
+            <div className="p-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Pie Chart */}
               <div className="flex flex-col">
@@ -368,8 +383,8 @@ export const WalletSummary: React.FC<WalletSummaryProps> = ({
                         strokeWidth={1}
                       >
                         {assetAllocation.map((entry, index) => (
-                          <Cell 
-                            key={`cell-${index}`} 
+                          <Cell
+                            key={`cell-${index}`}
                             fill={entry.color}
                             className="hover:opacity-80 transition-opacity"
                           />
@@ -380,7 +395,7 @@ export const WalletSummary: React.FC<WalletSummaryProps> = ({
                   </ResponsiveContainer>
                 </div>
               </div>
-              
+
               {/* Holdings List */}
               <div className="flex flex-col">
                 <h4 className="text-sm font-medium text-muted-foreground mb-4 uppercase tracking-wide">
@@ -388,11 +403,17 @@ export const WalletSummary: React.FC<WalletSummaryProps> = ({
                 </h4>
                 <div className="space-y-4 flex-1">
                   {assetAllocation.map((item, index) => (
-                    <div key={index} className="flex items-center justify-between p-4 border border-border rounded-lg bg-muted/20">
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-4 border border-border rounded-lg bg-muted/20"
+                    >
                       <div className="flex items-center gap-3 min-w-0 flex-1">
-                        <div 
-                          className="w-3 h-3 rounded-full flex-shrink-0 border" 
-                          style={{ backgroundColor: item.color, borderColor: item.color }} 
+                        <div
+                          className="w-3 h-3 rounded-full flex-shrink-0 border"
+                          style={{
+                            backgroundColor: item.color,
+                            borderColor: item.color,
+                          }}
                         />
                         <div className="w-8 h-8 rounded-lg bg-background border border-border flex items-center justify-center overflow-hidden flex-shrink-0">
                           {item.symbol !== 'Other' ? (
@@ -402,15 +423,15 @@ export const WalletSummary: React.FC<WalletSummaryProps> = ({
                               width={32}
                               height={32}
                               className={cn(
-                                "w-full h-full object-cover",
-                                item.symbol === 'APT' && "dark:invert"
+                                'w-full h-full object-cover',
+                                item.symbol === 'APT' && 'dark:invert'
                               )}
                             />
                           ) : (
                             <PieChart className="h-4 w-4 text-muted-foreground" />
                           )}
                         </div>
-                        
+
                         <div className="min-w-0 flex-1">
                           <h3 className="font-semibold tracking-tight truncate text-sm">
                             {item.symbol}
@@ -434,16 +455,19 @@ export const WalletSummary: React.FC<WalletSummaryProps> = ({
                 </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
-      )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Empty state */}
       {assets.length === 0 && (
         <Card className="border border-border bg-card">
           <CardContent className="p-12 text-center">
             <Wallet className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2 tracking-tight">No Assets</h3>
+            <h3 className="text-lg font-semibold mb-2 tracking-tight">
+              No Assets
+            </h3>
             <p className="text-muted-foreground text-sm">
               No token holdings detected in this wallet
             </p>

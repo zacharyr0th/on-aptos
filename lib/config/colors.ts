@@ -63,7 +63,7 @@ export const LST_COLORS = createColorMap(
     [['thAPT', 'sthAPT', 'thAPT/sthAPT'], '#A873BB'], // purple-500
     [['amAPT', 'stAPT', 'amAPT/stAPT'], '#5D7F9E'], // blue-500
     [['kAPT', 'stkAPT', 'kAPT/stkAPT'], '#c8f08f'], // green-200
-    [['truAPT'], '#f59e0b'], // amber-500 - distinctive color for TruFin
+    [['truAPT'], '#d97706'], // amber-600 - darker distinctive color for TruFin
   ],
   '#7F56D9'
 );

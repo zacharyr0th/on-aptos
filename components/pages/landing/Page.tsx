@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useTheme } from 'next-themes';
 import { GeistMono } from 'geist/font/mono';
-import { HeroSection, IconSections, SocialLinks } from './index';
+import { HeroSection, IconSections, SocialLinks, PortfolioDistributionChart } from './index';
 import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import {
@@ -91,7 +91,7 @@ const HomepageDesign = () => {
                             Real-Time Balance Detection
                           </h3>
                           <p className="text-muted-foreground text-sm">
-                            Automatically discover your positions across 25+
+                            Automatically discover your positions across all major
                             DeFi protocols including Thala, Amnis, PancakeSwap,
                             and more.
                           </p>
@@ -192,16 +192,30 @@ const HomepageDesign = () => {
                       </TooltipContent>
                     </Tooltip>
 
-                    {/* Stats */}
-                    <div className="grid grid-cols-3 gap-4 pt-4 border-t">
-                      <div className="text-center">
-                        <div className="text-lg font-bold text-foreground">
-                          25+
+                    {/* Portfolio Distribution Chart */}
+                    <div className="mt-6 pt-4 border-t">
+                      <h4 className="text-sm font-semibold text-center mb-4">
+                        Portfolio Distribution
+                      </h4>
+                      <PortfolioDistributionChart />
+                      <div className="grid grid-cols-3 gap-2 mt-4">
+                        <div className="flex items-center justify-center gap-2">
+                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: 'hsl(var(--chart-1))' }} />
+                          <span className="text-xs text-muted-foreground">Tokens</span>
                         </div>
-                        <div className="text-xs text-muted-foreground">
-                          DeFi Protocols Tracked
+                        <div className="flex items-center justify-center gap-2">
+                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: 'hsl(var(--chart-2))' }} />
+                          <span className="text-xs text-muted-foreground">DeFi</span>
+                        </div>
+                        <div className="flex items-center justify-center gap-2">
+                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: 'hsl(var(--chart-3))' }} />
+                          <span className="text-xs text-muted-foreground">NFTs</span>
                         </div>
                       </div>
+                    </div>
+
+                    {/* Stats */}
+                    <div className="grid grid-cols-2 gap-4 pt-4 border-t mt-4">
                       <div className="text-center">
                         <div className="text-lg font-bold text-foreground">
                           Real-time

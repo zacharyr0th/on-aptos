@@ -1,0 +1,413 @@
+
+RWA.xyz Documentation home pagelogo
+
+Search...
+⌘K
+
+Ask AI
+Contact
+Research
+Dashboard
+Home
+Introduction
+Taxonomy of Tokenization
+Taxonomy for Tokenized Assets
+Data Methodology
+Overview
+Sourcing & Validation
+Coverage & Classification
+Updates & Maintenance
+API & Data Schemas
+Overview
+Getting started with the API
+Assets
+Loans
+API & Data Schemas
+Overview
+​
+Common Measures
+Measures are quantitative properties about an entity that are most commonly retrieved on a current or historical time series basis. The following table displays all measures in our data model.
+
+Not all measures apply to all assets. We document this in the “Availability” column:
+
+“All tokens” refers to tokenized assets which conform to a common token standard. Examples of these standards include ERC-{20, 721, 1155}, NEP-141, SPL, TRC-20, and others. Exceptions to this are for tokens on Sui, Noble, and Stellar.
+ID	Name	Definition	Availability
+1	Yield to Maturity	The total return anticipated on a bond if it is held until maturity. YTM is expressed as an annual percentage rate (i.e., yield).	Only credit assets or funds of credit assets
+2	Total Asset Value (Dollar)	The total value of an entity’s assets minus liabilities	All
+3	Net Asset Value (Dollar)	The total value of an entity’s assets minus its liabilities, on a per-share/token basis.	All
+4	Total Supply (Token)	The total number or amount of a particular token that is available and in circulation.	All tokens
+5	Weighted Average Maturity	The average time it takes for securities or loans in a portfolio to mature, weighted in proportion to the dollar amount of each loan or security.	Only credit assets or funds of credit assets
+6	Available Capacity (Dollar)	Capacity amount available for investment.	Only private credit assets
+7	Maximum Capacity (Dollar)	Maximum size of the investment pool.	Only private credit assets
+8	Outstanding Capital (Dollar)	Outstanding Principal amount.	Only private credit assets
+9	Idle Capital (Dollar)	Capital amount that has yet to be invested.	Only private credit assets
+10	Cumulative Issued Amount (Dollar)	total amount issued in the deal, pool or tranche.	Only private credit assets
+11	Cash Drag (Percent)	Percentage of idle capital per asset.	Only private credit assets
+12	Defaulted Loans Amount (percent)	Sum of the value of loans that are in default. A loan is counted as defaulted if: (a) it is marked as so by the protocol or (b) if a repayment is late over 90 days past the due date.	Only private credit assets
+13	Daily Transfer Volume (Token)	The total volume of transfers (excluding mints and burns).	All tokens
+14	Daily Active Addresses (Count)	Daily Active Addresses (DAA).	All tokens
+15	Holding Addresses (Count)	Count of addresses holding an asset.	All tokens
+16	Daily Mints (Token)	Daily mints of an asset in token denomination.	All tokens
+17	Daily Burns (Token)	Daily burns of an asset in token denomination.	All tokens
+18	Daily Mints (Dollar)	Daily mints of an asset in dollar denomination.	All tokens
+19	Daily Burns (Dollar)	Daily burns of an asset in dollar denomination.	All tokens
+20	Daily Transfer Volume (Dollar)	The total volume of transfers (excluding mints and burns).	All tokens
+21	Funded Assets (Token)	Total funded asset token amount for loan asset	Only private credit assets
+22	DrawnDown Assets (Token)	Total funds withdrawn token amount for loan asset	Only private credit assets
+23	Principal Paid (Token)	Total principal repaid token amount for loan asset	Only private credit assets
+24	Interest Paid (Token)	Total interest paid token amount by borrower/loan to lender	Only private credit assets
+25	Written Off Principal (Token)	Total written off principal token amount for a defaulted loan asset	Only private credit assets
+26	Recovered Assets (Token)	Total recovered token amount for a liquidated loan asset	Only private credit assets
+28	Idle Capital (Token)	Capital amount in tokens that has yet to be invested	Only private credit assets
+29	Available Capacity (Token)	Capacity amount in tokens available for investment	Only private credit assets
+30	Total Asset Value (Token)	The total value of an entity’s assets minus liabilities, in tokens	Only private credit assets
+31	Cumulative Issued Amount (Token)	total amount issued in the deal, pool or tranche in tokens	Only private credit assets
+32	Cumulative Repaid Principal (Token)	total principal paid back in the deal, pool or tranche in tokens	Only private credit assets
+33	Cumulative Interest Earned (Token)	Total interest earned in the deal, pool or tranche in tokens	Only private credit assets
+34	Outstanding Principal (Token)	Total outstanding principal amount in tokens	Only private credit assets
+35	Number of Loans Funded	Total number of loans being funded by a pool over lifetime	Only private credit assets
+36	Number of Active Loans	Total number of loans currently active that are funded by the pool	Only private credit assets
+37	Number of Defaulted Loans	Total number of loans marked as defaulted/liquidated that were funded by the pool	Only private credit assets
+38	Defaulted Loans Amount (Dollar)	Total loan value amount of all the defaulted loans in Dollars that were funded by the pool	Only private credit assets
+39	Price (Dollar)	The market price of a share/token	Only for assets that are actively traded on a secondary market. Many other measures are downstream of this; their availability will be indicated with “All assets with prices”
+40	Market Value (Dollar)	Also known as ‘Market Capitalization’. The total market value of an asset, calculated as the product of a share’s market price and number of shares	All assets with prices
+41	Net Asset Value (Token)	The total value of an entity’s assets minus its liabilities, on a per-share basis.	Only private credit assets
+42	Weekly Active Addresses (Count)	Weekly Active Addresses.	All tokens
+43	Monthly Active Addresses (Count)	Monthly Active Addresses.	All tokens
+44	Quarterly Active Addresses (Count)	Quarterly Active Addresses.	All tokens
+45	Annually Active Addresses (Count)	Annually Active Addresses.	All tokens
+46	Number of Daily Transactions (Count)	Daily Transactions (mints, burns and transfers).	All tokens
+47	Funded Assets (Dollar)	Total funded asset token amount for loan asset	Only private credit assets
+48	DrawnDown Assets (Dollar)	Total funds withdrawn token amount for loan asset	Only private credit assets
+49	Principal Paid (Dollar)	Total principal repaid token amount for loan asset	Only private credit assets
+50	Interest Paid (Dollar)	Total interest paid token amount by borrower/loan to lender	Only private credit assets
+51	Written Off Principal (Dollar)	Total written off principal token amount for a defaulted loan asset	Only private credit assets
+52	Recovered Assets (Dollar)	Total recovered token amount for a liquidated loan asset	Only private credit assets
+53	Cumulative Repaid Principal (Dollar)	total principal paid back in the deal, pool or tranche in tokens	Only private credit assets
+54	Cumulative Interest Earned (Dollar)	Total interest earned in the deal, pool or tranche in tokens	Only private credit assets
+55	Outstanding Principal (Dollar)	Total outstanding principal amount in tokens	Only private credit assets
+56	M2 Money Stock	A measure of the money supply that includes cash, checking deposits, and other types of deposits that are readily convertible to cash such as CDs	Only the USD asset
+57	Trailing 7-Day Active Addresses (Count)	Number of addresses that have transferred the token in the last 7 days.	All tokens
+58	Trailing 30-Day Active Addresses (Count)	Number of addresses that have transferred the token in the last 30 days.	All tokens
+59	Trailing 90-Day Active Addresses (Count)	Number of addresses that have transferred the token in the last 90 days.	Not currently available
+60	Trailing 365-Day Active Addresses (Count)	Number of addresses that have transferred the token in the last 365 days.	Not currently available
+61	Circulating Supply (Token)	The supply of a particular token that is in circulation.	All tokens
+62	Circulating Market Value (Dollar)	The total usd amount of a particular token that is in circulation.	All assets with prices
+63	Circulating Asset Value (Dollar)	The circulating value of an entity’s assets minus liabilities	All
+64	Adjusted Holding Addresses (Count)	Count of addresses holding an asset, with adjustments.	All tokens
+65	Asset Status	Status id of an asset.	Only private credit assets
+66	Investment Status	Investment Status id for an asset.	Only private credit assets
+67	Rebase Multiplier	Ratio between a token’s internal share count and external supply/balances	All rebasing tokens
+68	Raw Supply	Token supply before taking into account any rebases	All tokens
+69	Bridged Token Supply (Token)	Circulating token supply after taking into account bridging	All tokens
+70	Bridged Token Market Cap (Dollar)	Circulating token market cap after taking into account bridging	All assets with prices
+71	Bridged Token Value (Dollar)	Circulating token value after taking into account bridging	All
+72	Top holder concentration	Percent of circulating supply held by the top holder	All tokens
+73	Top 5 holder concentration	Percent of circulating supply held by the top 5 holders	All tokens
+74	Top 10 holder concentration	Percent of circulating supply held by the top 10 holders	All tokens
+1000	Weekly Transfer Count	Count of transfers (excluding mints and burns) for a given week	All tokens
+1001	Weekly Transfer Volume (dollar)	Dollar value of transfers (excluding mints and burns) for a given week	All tokens
+1002	Monthly Transfer Count	Count of transfers (excluding mints and burns) for a given month	All tokens
+1003	Monthly Transfer Volume (dollar)	Dollar value of transfers (excluding mints and burns) for a given month	All tokens
+1004	Trailing 7-day Transfer Count	Count of transfers (excluding mints and burns) in the last 7 days	All tokens
+1005	Trailing 7-day Transfer Volume (dollar)	Dollar value of transfers (excluding mints and burns) in the last 7 days	All tokens
+1006	Trailing 30-day Transfer Count	Count of transfers (excluding mints and burns) in the last 30 days	All tokens
+1007	Trailing 30-day Transfer Volume (dollar)	Dollar value of transfers (excluding mints and burns) in the last 30 days	All tokens
+Updates & Maintenance
+Getting started with the API
+x
+Powered by Mintlify
+On this page
+Common Measures
+Overview - RWA.xyz Documentation
+
+RWA.xyz Documentation home pagelogo
+
+Search...
+⌘K
+
+Ask AI
+Contact
+Research
+Dashboard
+Home
+Introduction
+Taxonomy of Tokenization
+Taxonomy for Tokenized Assets
+Data Methodology
+Overview
+Sourcing & Validation
+Coverage & Classification
+Updates & Maintenance
+API & Data Schemas
+Overview
+Getting started with the API
+Assets
+Loans
+API & Data Schemas
+Getting started with the API
+Go from 0 to your first data visualization in 10 minutes.
+
+Our API is designed for maximum flexibilty. Use it to create any arbitrary query against our database. To get started, follow the steps below
+
+​
+1. Create an account
+If you don’t have full access or trial access already, please email adam@rwa.xyz. We will whitelist your requested emails or email domains.
+
+Create an account here: https://app.rwa.xyz/login.
+
+​
+2. Access the API portal
+After you’ve created an account and have been granted permissions by our team, you can now access the API portal: https://app.rwa.xyz/tools/api/api-keys. The portal allows you to:
+
+Create API keys
+Explore our endpoints
+Create custom queries
+image.png
+
+​
+3. Make you first query
+Now that you have access to the API portal, let’s make your first query. Select any of our endpoint tabs to get started.
+
+Overview
+Overview
+x
+Powered by Mintlify
+On this page
+1. Create an account
+2. Access the API portal
+3. Make you first query
+Getting started with the API - RWA.xyz Documentation
+
+RWA.xyz Documentation home pagelogo
+
+Search...
+⌘K
+
+Ask AI
+Contact
+Research
+Dashboard
+Home
+Introduction
+Taxonomy of Tokenization
+Taxonomy for Tokenized Assets
+Data Methodology
+Overview
+Sourcing & Validation
+Coverage & Classification
+Updates & Maintenance
+API & Data Schemas
+Overview
+Getting started with the API
+Assets
+Overview
+Reserves
+Loans
+Assets
+Overview
+This dataset provides detailed information on the reserves backing tokenized assets. It includes comprehensive data on the types and quantities of assets held in reserve, as well as custodians where the assets are held.
+
+​
+API Endpoints
+All available assets: https://api.rwa.xyz/v4/assets/ Individual asset: https://api.rwa.xyz/v4/assets/[assetID]/
+
+​
+Summary Table
+Field Name	Description	Type	Example
+id	Unique identifier for the asset	Integer	123456789
+ticker	Ticker symbol for the asset	String	GOLD
+isin	International Securities Identification Number	String	US1234567890
+cusip	Committee on Uniform Securities Identification Procedures number	String	123456789
+name	Name of the asset	String	Gold Fund
+description	Description of the asset	String	Precious metal fund
+website	Website URL for the asset	String	https://example.com
+asset_class	Asset class details	Object	
+issuer	Issuer details	Object	
+transparency_description	Description of the asset’s transparency	String	Highly transparent
+holder_rights_description	Description of holder rights	String	
+pegged_asset	Pegged asset details	Object	
+asset_to_pegged_asset_ratio	Ratio of asset to pegged asset	Float	
+pegged_maintenance_description	Description of pegged asset maintenance	String	
+total_management_fee_bps	Total management fee in basis points	Integer	100
+total_performance_fee_bps	Total performance fee in basis points	Integer	20
+fee_structure_description	Description of the fee structure	String	1% management fee and 20% performance fee
+other_fees_description	Description of other fees	String	0.5% entry fee
+legal_structure__description	Description of the legal structure	String	Limited Partnership
+legal_structure__country_id	Country ID of the legal structure	Integer	840
+legal_structure__country_name	Country name of the legal structure	String	United States of America
+legal_structure__document_name	Name of the legal document	String	Partnership Agreement
+legal_structure__document_description	Description of the legal document	String	Outlines the rights and responsibilities of the partners
+legal_structure__document_url	URL to the legal document	String	https://example.com/legal.pdf
+regulatory_framework	Regulatory framework governing the asset	String	SEC Regulation D
+governing_body	Governing body for the asset	String	U.S. Securities and Exchange Commission
+jurisdiction_country_id	Country ID of the jurisdiction	Integer	840
+jurisdiction_country_name	Country name of the jurisdiction	String	United States of America
+management_mechanism_type	Type of management mechanism	String	Active
+pool_holdings_are_all_secured	Indicates if all pool holdings are secured	Boolean	true
+pool_holdings_security_description	Description of the security of pool holdings	String	All holdings are backed by physical gold
+underlying_asset_classes	Underlying asset classes	String[]	["Equity", "Debt", "Real Estate"]
+protocol_ids	Protocol IDs	Integer[]	
+network_ids	Network IDs	Integer[]	
+token_count	Token count	Integer	
+tokens	Token details	Object[]	
+primary_market	Primary market details	Object	
+jurisdiction_country	Jurisdiction country details	Object	
+traditional_custodian	Primary custodian details for traditional finance assets	Object	
+ratings	Ratings	Object[]	
+bluechip_rating	Rating from Bluechip	String	D
+Getting started with the API
+Reserves
+x
+Powered by Mintlify
+On this page
+API Endpoints
+Summary Table
+Overview - RWA.xyz Documentation
+
+RWA.xyz Documentation home pagelogo
+
+Search...
+⌘K
+
+Ask AI
+Contact
+Research
+Dashboard
+Home
+Introduction
+Taxonomy of Tokenization
+Taxonomy for Tokenized Assets
+Data Methodology
+Overview
+Sourcing & Validation
+Coverage & Classification
+Updates & Maintenance
+API & Data Schemas
+Overview
+Getting started with the API
+Assets
+Overview
+Reserves
+Loans
+Assets
+Reserves
+This dataset provides detailed information on the reserves backing tokenized assets. It includes comprehensive data on the types and quantities of assets held in reserve, as well as custodians where the assets are held.
+
+​
+API Endpoints
+All available asset reserves: https://api.rwa.xyz/v3/assets/reserves
+
+Reserves for a specific asset: https://api.rwa.xyz/v3/assets/[assetID]/reserves
+
+​
+Summary Table
+Field Name	Description	Type	Example
+date_as_of	Date on which the following data was reported	Date	2024-01-01
+asset_id	Internal ID of the tokenized asset	Integer	123
+reserves	Reserves backing the tokenized asset. See below for definitions of subfields of the constituent objects	Array	
+reserves.amount	Amount of the asset held in reserve. Denominated in face value if the reserve asset is a bond.	Float	500.00
+reserves.usd_value	Dollar value of the reserve asset holdings	Float	500.00
+reserves.reserve_asset	Asset that is held in reserve. See below for definitions of sub-fields	Object	
+reserves.reserve_asset.id	Internal ID of the reserve asset	Integer	123
+reserves.reserve_asset.name	Common name of the reserve asset	String	WisdomTree 7-10 Year Treasury Digital Fund
+reserves.reserve_asset.ticker	Ticker of the reserve asset	String	WTGXX
+reserves.reserve_asset.isin	ISIN of the reserve asset	String	US912797GE19
+reserves.reserve_asset.cusip	CUSIP of the reserve asset	String	313384RG6
+reserves.reserve_asset.interest_rate	Rate of interest coupons, calculated as an annualized percentage of the asset’s face value.	Float	5.3
+reserves.reserve_asset.yield_to_maturity	Total return anticipated if held until maturity, calculated as an annualized percentage.	Float	5.3
+reserves.reserve_asset.maturity_date	Date when principal is due to be repaid	Date	2024-01-01
+reserves.reserve_asset.custodian	Custodian that holds the reserve asset. See below for definitions of sub-fields.	Object	
+reserves.reserve_asset.custodian.name	Common name of the custodian	String	Acme
+reserves.reserve_asset.custodian.legal_name	Legal name of the custodian	String	Acme Corp.
+reserves.reserve_asset.custodian.cik	CIK of the custodian, if applicable	String	1957431
+reserves.reserve_asset.custodian.lei	LEI of the custodian, if applicable	String	529900T8BM49AURSDO55
+reserves.reserve_asset.custodian.incorporated_country	Country where the custodian is incorporated	String	United States of America
+Overview
+Loans
+x
+Powered by Mintlify
+On this page
+API Endpoints
+Summary Table
+Reserves - RWA.xyz Documentation
+
+RWA.xyz Documentation home pagelogo
+
+Search...
+⌘K
+
+Ask AI
+Contact
+Research
+Dashboard
+Home
+Introduction
+Taxonomy of Tokenization
+Taxonomy for Tokenized Assets
+Data Methodology
+Overview
+Sourcing & Validation
+Coverage & Classification
+Updates & Maintenance
+API & Data Schemas
+Overview
+Getting started with the API
+Assets
+Overview
+Reserves
+Loans
+API & Data Schemas
+Loans
+​
+API Endpoints
+All available loans: https://api.rwa.xyz/v3/loans/
+
+​
+Summary Table
+Field Name	Description	Type	Example
+id	Unique identifier for the loan	Integer	1
+token_id	Unique identifier for the associated token	Integer	1
+asset_id	Unique identifier for the associated asset	Integer	1
+status	Status of the loan. Possible values: active, repaid, late, defaulted, liquidated.	String	active
+term_type	Type of loan term. Possible values: OPEN_TERM, CLOSED_TERM	String	CLOSED_TERM
+created_date	Date when the loan was created	Date	2022-01-01
+funding_start_date	Start date of the funding period	Date	2022-01-02
+funding_end_date	End date of the funding period	Date	2022-01-31
+term_start_date	Start date of the loan term	Date	2022-02-01
+term_end_date	End date of the loan term	Date	2023-02-01
+initial_principal_amount	Initial principal amount of the loan	Float	10000.00
+base_asset_id	Unique identifier for the base asset	Integer	123456789
+base_asset	Base asset details	Object	
+collateral_asset_id	Unique identifier for the collateral asset	Integer	987654321
+collateral_asset	Collateral asset details	Object	
+payment_interval_days	How often interest payments are expected, in days	Integer	30
+num_of_payments	Number of interest payments expected	Integer	12
+amortization_type	Type of amortization. Possible values: bullet, balloon, interest_only	String	bullet
+interest_rate	Interest rate of the loan	Float	0.05
+late_fee_rate	Additional interest rate applied for late payments	Float	0.01
+default_interest_rate	Additional interest rate applied for payments beyond the default threshold	Float	0.07
+_updated_at	Timestamp of last update	Timestamp	2022-02-01 12:00:00
+onchain_address	Onchain address of the loan	Text	0x94bd42fa6b5a73d9059db57ee209c7539196f0f3
+protocol	Protocol details	Object	
+network	Network details	Object	>
+issuer	Issuer details	Object	
+funded_assets_dollar	Funded assets in dollars	Float	10000.00
+funded_assets_token	Funded assets in tokens	Float	1000.00
+drawn_down_assets_dollar	Drawn down assets in dollars	Float	5000.00
+drawn_down_assets_token	Drawn down assets in tokens	Float	500.00
+principal_paid_dollar	Principal paid in dollars	Float	2000.00
+principal_paid_token	Principal paid in tokens	Float	200.00
+interest_paid_dollar	Interest paid in dollars	Float	100.00
+interest_paid_token	Interest paid in tokens	Float	10.00
+outstanding_principal_dollar	Outstanding principal in dollars	Float	3000.00
+outstanding_principal_token	Outstanding principal in tokens	Float	300.00
+written_off_principal_dollar	Written off principal in dollars	Float	0.00
+written_off_principal_token	Written off principal in tokens	Float	0.00
+Reserves
+x
+Powered by Mintlify
+On this page
+API Endpoints
+Summary Table
+Loans - RWA.xyz Documentation

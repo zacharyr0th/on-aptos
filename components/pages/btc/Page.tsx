@@ -56,34 +56,27 @@ const TokenCard = memo(function TokenCard({
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
 
-  // Ultra-fast calculations with memoization
+  // Simplified calculations like LST page
   const tokenData = useMemo(() => {
-    return measurePerformance(() => {
-      // Get the token metadata to access decimals
-      const metadata = TOKEN_METADATA[token.symbol];
-      const decimals = metadata?.decimals || 8; // Default to 8 if not specified
+    // Get the token metadata to access decimals
+    const metadata = TOKEN_METADATA[token.symbol];
+    const decimals = metadata?.decimals || 8;
 
-      // Convert raw token amount to actual BTC value and round to whole number
-      const rawBtcValue = convertRawTokenAmount(token.supply, decimals);
-      const btcValue = Math.round(rawBtcValue);
+    // Convert raw token amount to actual BTC value
+    const btcValue = convertRawTokenAmount(token.supply, decimals);
 
-      // Calculate USD value if Bitcoin price is available
-      const usdValue = bitcoinPrice ? btcValue * bitcoinPrice : 0;
+    // Calculate USD value if Bitcoin price is available
+    const usdValue = bitcoinPrice ? btcValue * bitcoinPrice : 0;
 
-      // Pre-calculate all tokens for market share
-      const allTokensForShare = [{ btcValue: totalBTC }];
-      const marketSharePercent = calculateMarketShare(
-        btcValue,
-        allTokensForShare
-      );
+    // Calculate market share percentage
+    const marketSharePercent = totalBTC > 0 ? (btcValue / totalBTC) * 100 : 0;
 
-      return {
-        marketSharePercent: formatPercentage(marketSharePercent),
-        btcValue,
-        usdValue,
-        metadata,
-      };
-    }, `TokenCard-${token.symbol} calculation`);
+    return {
+      marketSharePercent: marketSharePercent.toFixed(2),
+      btcValue,
+      usdValue,
+      metadata,
+    };
   }, [token, totalBTC, bitcoinPrice]);
 
   const tokenColor = TOKEN_COLORS[token.symbol] || TOKEN_COLORS.default;
@@ -329,49 +322,41 @@ export default function BitcoinPage(): React.ReactElement {
   const [btcSupplyError, setBtcSupplyError] = useState<Error | null>(null);
   const [btcSupplyFetching, setBtcSupplyFetching] = useState(false);
 
-  const fetchBtcSupplyData = useCallback(async () => {
+  // Fetch data on mount
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('/api/aptos/btc');
+        const data = await response.json();
+        setBtcSupplyData(data);
+        setBtcSupplyLoading(false);
+      } catch (error) {
+        console.error('[BTC Page] Fetch error:', error);
+        setBtcSupplyError(error as Error);
+        setBtcSupplyLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, [forceRefresh]);
+
+  // Manual refresh handler
+  const fetchSupplyData = useCallback(async (): Promise<void> => {
     try {
       setBtcSupplyFetching(true);
       setBtcSupplyError(null);
-
-      const response = await fetch('/api/aptos/btc', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
+      
+      const response = await fetch('/api/aptos/btc');
       const data = await response.json();
-      console.log('[BTC Page] API Response:', data);
-      
-      // Check if the response has an error
-      if (data.error) {
-        throw new Error(data.error);
-      }
-      
+      console.log('[BTC Page] Manual refresh data:', data);
       setBtcSupplyData(data);
     } catch (error) {
-      console.error('[BTC Page] Error fetching data:', error);
-      setBtcSupplyError(
-        error instanceof Error ? error : new Error(String(error))
-      );
+      console.error('[BTC Page] Manual refresh error:', error);
+      setBtcSupplyError(error as Error);
     } finally {
-      setBtcSupplyLoading(false);
       setBtcSupplyFetching(false);
     }
   }, []);
-
-  // Auto-refetch every 5 minutes
-  useEffect(() => {
-    fetchBtcSupplyData();
-
-    const interval = setInterval(fetchBtcSupplyData, 5 * 60 * 1000);
-    return () => clearInterval(interval);
-  }, [fetchBtcSupplyData, forceRefresh]);
 
   // Use our Bitcoin price hook as fallback only
   const {
@@ -388,7 +373,7 @@ export default function BitcoinPage(): React.ReactElement {
     }, 'Bitcoin price calculation');
   }, [bitcoinPriceHookData]);
 
-  // Extract the actual data from REST API responses - match stablecoin pattern
+  // Extract the actual data from REST API responses
   const data: any = btcSupplyData?.data || null;
 
   const loading = btcSupplyLoading || bitcoinPriceLoading;
@@ -402,77 +387,63 @@ export default function BitcoinPage(): React.ReactElement {
       null;
   const refreshing = btcSupplyFetching && !btcSupplyLoading;
 
-  // Manual refresh handler
-  const fetchSupplyData = useCallback(async (): Promise<void> => {
-    setForceRefresh(prev => !prev); // Toggle to force refresh
-    await fetchBtcSupplyData();
-  }, [fetchBtcSupplyData]);
 
-  // Process the supply data for display
+  // Process the supply data for display - simplified approach like LST page
   const processedData = useMemo(() => {
-    return measurePerformance(() => {
-      if (!data || !data.supplies || !Array.isArray(data.supplies)) return null;
+    console.log('[BTC Page] Processing data:', data);
+    if (!data || !data.supplies || !Array.isArray(data.supplies)) {
+      console.log('[BTC Page] No data to process');
+      return null;
+    }
 
-      // Use batch processing for better performance
-      const batchItems = data.supplies.map((token: any) => ({
-        supply: token.supply,
-        decimals: TOKEN_METADATA[token.symbol]?.decimals || 8,
-        symbol: token.symbol,
-      }));
+    // Sort by BTC value (largest first) - simple approach
+    const sortedSupplies = [...data.supplies].sort((a: any, b: any) => {
+      const aDecimals = TOKEN_METADATA[a.symbol]?.decimals || 8;
+      const bDecimals = TOKEN_METADATA[b.symbol]?.decimals || 8;
+      const aBtc = convertRawTokenAmount(a.supply, aDecimals);
+      const bBtc = convertRawTokenAmount(b.supply, bDecimals);
+      return bBtc - aBtc;
+    });
 
-      const results = batchConvertBTCAmounts(batchItems);
-
-      // Sort by BTC value (largest first)
-      const sortedSupplies = data.supplies
-        .map((token: any, index: number) => ({
-          ...token,
-          btcValue: results[index].btcValue,
-        }))
-        .sort((a: any, b: any) => b.btcValue - a.btcValue)
-        .map(({ btcValue: _, ...token }: any) => token); // Remove btcValue after sorting
-
-      return {
-        ...data,
-        supplies: sortedSupplies,
-      };
-    }, 'Data processing');
+    console.log('[BTC Page] Sorted supplies:', sortedSupplies);
+    return {
+      ...data,
+      supplies: sortedSupplies,
+    };
   }, [data]);
 
-  // Calculate the total BTC and USD value correctly
+  // Calculate the total BTC and USD value - simplified approach
   const { totalBTC, totalUSD } = useMemo(() => {
-    return measurePerformance(() => {
-      if (
-        !processedData ||
-        !processedData.supplies ||
-        !Array.isArray(processedData.supplies)
-      ) {
-        return { totalBTC: 0, totalUSD: 0 };
+    console.log('[BTC Page] Calculating totals, processedData:', processedData);
+    if (
+      !processedData ||
+      !processedData.supplies ||
+      !Array.isArray(processedData.supplies)
+    ) {
+      return { totalBTC: 0, totalUSD: 0 };
+    }
+
+    let totalBTCValue = 0;
+    let totalUSDValue = 0;
+
+    processedData.supplies.forEach((token: any) => {
+      const decimals = TOKEN_METADATA[token.symbol]?.decimals || 8;
+      const btcAmount = convertRawTokenAmount(token.supply, decimals);
+      totalBTCValue += btcAmount;
+
+      if (bitcoinPriceData?.price) {
+        totalUSDValue += btcAmount * bitcoinPriceData.price;
       }
+    });
 
-      // Use batch processing for total calculation
-      const batchItems = processedData.supplies.map((token: any) => ({
-        supply: token.supply,
-        decimals: TOKEN_METADATA[token.symbol]?.decimals || 8,
-      }));
-
-      const results = batchConvertBTCAmounts(
-        batchItems,
-        bitcoinPriceData?.price || 0 // Use 0 if no price data
-      );
-
-      const totalBTCValue = results.reduce((sum, result) => {
-        return sum + Math.round(result.btcValue);
-      }, 0);
-
-      const totalUSDValue = results.reduce((sum, result) => {
-        return sum + (result.usdValue || 0);
-      }, 0);
-
-      return {
-        totalBTC: totalBTCValue,
-        totalUSD: totalUSDValue,
-      };
-    }, 'Total calculation');
+    console.log('[BTC Page] Calculated totals:', {
+      totalBTC: totalBTCValue,
+      totalUSD: totalUSDValue,
+    });
+    return {
+      totalBTC: totalBTCValue,
+      totalUSD: totalUSDValue,
+    };
   }, [processedData, bitcoinPriceData]);
 
   // Function to handle retry for either data source

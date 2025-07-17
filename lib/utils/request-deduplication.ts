@@ -149,15 +149,15 @@ export const dedupeAsyncCall = <T>(
 /**
  * Higher-order function to wrap API calls with deduplication
  */
-export function withDeduplication<T extends (...args: any[]) => Promise<any>>(
-  fn: T,
-  keyGenerator: (...args: Parameters<T>) => string,
+export function withDeduplication<TArgs extends any[], TReturn>(
+  fn: (...args: TArgs) => Promise<TReturn>,
+  keyGenerator: (...args: TArgs) => string,
   ttl?: number
-): T {
-  return ((...args: Parameters<T>) => {
+): (...args: TArgs) => Promise<TReturn> {
+  return (...args: TArgs) => {
     const key = keyGenerator(...args);
     return dedupeAsyncCall(key, () => fn(...args), ttl);
-  }) as T;
+  };
 }
 
 /**

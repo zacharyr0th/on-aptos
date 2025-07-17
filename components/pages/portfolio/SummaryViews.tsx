@@ -17,12 +17,12 @@ import {
   Package,
   Archive,
 } from 'lucide-react';
-import { 
-  PieChart as RechartsPieChart, 
-  Pie, 
-  Cell, 
-  ResponsiveContainer, 
-  Tooltip as RechartsTooltip 
+import {
+  PieChart as RechartsPieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  Tooltip as RechartsTooltip,
 } from 'recharts';
 import { formatCurrency } from '@/lib/utils/format';
 import { defiProtocols } from '@/components/pages/defi/data';
@@ -30,8 +30,16 @@ import { cleanProtocolName } from './utils';
 import { NFT } from './types';
 
 const CHART_COLORS = [
-  '#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', 
-  '#06b6d4', '#f43f5e', '#6366f1', '#84cc16', '#f97316'
+  '#3b82f6',
+  '#8b5cf6',
+  '#ec4899',
+  '#f59e0b',
+  '#10b981',
+  '#06b6d4',
+  '#f43f5e',
+  '#6366f1',
+  '#84cc16',
+  '#f97316',
 ];
 
 // Custom tooltip component for the pie charts
@@ -39,18 +47,22 @@ const CustomTooltip = React.memo(({ active, payload }: any) => {
   if (!active || !payload?.length) return null;
 
   const data = payload[0].payload;
-  
+
   return (
     <div className="bg-popover/95 backdrop-blur-sm border border-border/50 rounded-md shadow-md p-2 z-10 text-xs space-y-0.5">
       <div className="flex items-center gap-1.5">
-        <div 
-          className="w-2 h-2 rounded-full" 
-          style={{ backgroundColor: data.color }} 
+        <div
+          className="w-2 h-2 rounded-full"
+          style={{ backgroundColor: data.color }}
         />
-        <p className="font-medium text-popover-foreground">{data.fullName || data.name}</p>
+        <p className="font-medium text-popover-foreground">
+          {data.fullName || data.name}
+        </p>
       </div>
       {/* Show value for DeFi protocols, count for NFT collections */}
-      {data.value !== undefined && typeof data.value === 'number' && data.value > 100 ? (
+      {data.value !== undefined &&
+      typeof data.value === 'number' &&
+      data.value > 100 ? (
         <p className="text-muted-foreground/80 text-[10px]">
           Value: {formatCurrency(data.value)}
         </p>
@@ -101,10 +113,11 @@ export const DeFiSummaryView: React.FC<DeFiSummaryViewProps> = ({
     (sum, pos) => sum + (pos.positions?.length || 1),
     0
   );
-  
-  const averagePositionValue = groupedDeFiPositions.length > 0 
-    ? totalDefiValue / groupedDeFiPositions.length 
-    : 0;
+
+  const averagePositionValue =
+    groupedDeFiPositions.length > 0
+      ? totalDefiValue / groupedDeFiPositions.length
+      : 0;
 
   // Prepare pie chart data
   const pieChartData = React.useMemo(() => {
@@ -113,10 +126,13 @@ export const DeFiSummaryView: React.FC<DeFiSummaryViewProps> = ({
       .map((position, index) => ({
         name: cleanProtocolName(position.protocol),
         value: position.totalValue || 0,
-        percentage: totalDefiValue > 0 ? ((position.totalValue || 0) / totalDefiValue) * 100 : 0,
+        percentage:
+          totalDefiValue > 0
+            ? ((position.totalValue || 0) / totalDefiValue) * 100
+            : 0,
         color: CHART_COLORS[index % CHART_COLORS.length],
         protocol: position.protocol,
-        positions: position.positions?.length || 1
+        positions: position.positions?.length || 1,
       }))
       .sort((a, b) => b.value - a.value);
   }, [groupedDeFiPositions, totalDefiValue]);
@@ -146,7 +162,7 @@ export const DeFiSummaryView: React.FC<DeFiSummaryViewProps> = ({
                 </p>
               </div>
             </div>
-            
+
             <div className="p-3 sm:p-4 border-r border-border/30 lg:border-r">
               <div className="space-y-1">
                 <div className="flex items-center gap-1.5">
@@ -160,7 +176,7 @@ export const DeFiSummaryView: React.FC<DeFiSummaryViewProps> = ({
                 </p>
               </div>
             </div>
-            
+
             <div className="p-3 sm:p-4 border-r border-border/30">
               <div className="space-y-1">
                 <div className="flex items-center gap-1.5">
@@ -174,7 +190,7 @@ export const DeFiSummaryView: React.FC<DeFiSummaryViewProps> = ({
                 </p>
               </div>
             </div>
-            
+
             <div className="p-3 sm:p-4">
               <div className="space-y-1">
                 <div className="flex items-center gap-1.5">
@@ -215,8 +231,8 @@ export const DeFiSummaryView: React.FC<DeFiSummaryViewProps> = ({
                             strokeWidth={0.5}
                           >
                             {pieChartData.map((entry, index) => (
-                              <Cell 
-                                key={`cell-${index}`} 
+                              <Cell
+                                key={`cell-${index}`}
                                 fill={entry.color}
                                 className="hover:opacity-80 transition-opacity"
                               />
@@ -228,7 +244,7 @@ export const DeFiSummaryView: React.FC<DeFiSummaryViewProps> = ({
                     </div>
                   </div>
                 )}
-                
+
                 {/* Holdings List */}
                 <div className="flex flex-col">
                   <h4 className="text-[10px] font-medium text-muted-foreground/70 mb-2 uppercase tracking-wider">
@@ -238,10 +254,19 @@ export const DeFiSummaryView: React.FC<DeFiSummaryViewProps> = ({
                     {groupedDeFiPositions
                       .sort((a, b) => b.totalValue - a.totalValue)
                       .map((position, index) => {
-                        const primaryType = Array.from(position.protocolTypes)[0] as string;
-                        const protocolDetails = getProtocolDetails(position.protocol);
-                        const positionPercentage = totalDefiValue > 0 ? (position.totalValue / totalDefiValue) * 100 : 0;
-                        const chartEntry = pieChartData.find(entry => entry.protocol === position.protocol);
+                        const primaryType = Array.from(
+                          position.protocolTypes
+                        )[0] as string;
+                        const protocolDetails = getProtocolDetails(
+                          position.protocol
+                        );
+                        const positionPercentage =
+                          totalDefiValue > 0
+                            ? (position.totalValue / totalDefiValue) * 100
+                            : 0;
+                        const chartEntry = pieChartData.find(
+                          entry => entry.protocol === position.protocol
+                        );
 
                         return (
                           <div
@@ -251,9 +276,9 @@ export const DeFiSummaryView: React.FC<DeFiSummaryViewProps> = ({
                           >
                             <div className="flex items-center gap-2 min-w-0 flex-1">
                               {chartEntry && (
-                                <div 
-                                  className="w-2 h-2 rounded-full flex-shrink-0" 
-                                  style={{ backgroundColor: chartEntry.color }} 
+                                <div
+                                  className="w-2 h-2 rounded-full flex-shrink-0"
+                                  style={{ backgroundColor: chartEntry.color }}
                                 />
                               )}
                               <div className="w-6 h-6 sm:w-7 sm:h-7 rounded bg-background/50 border border-border/30 flex items-center justify-center overflow-hidden flex-shrink-0">
@@ -269,41 +294,57 @@ export const DeFiSummaryView: React.FC<DeFiSummaryViewProps> = ({
                                   }}
                                 />
                               </div>
-                              
+
                               <div className="min-w-0 flex-1">
                                 <div className="flex items-center gap-1.5 mb-0.5">
                                   <h3 className="font-medium tracking-tight truncate text-xs sm:text-sm">
                                     {cleanProtocolName(position.protocol)}
                                   </h3>
-                                  {position.protocol.toLowerCase() === 'aptin' && (
-                                    <Badge variant="destructive" className="text-[9px] h-3.5 px-1.5">
+                                  {position.protocol.toLowerCase() ===
+                                    'aptin' && (
+                                    <Badge
+                                      variant="destructive"
+                                      className="text-[9px] h-3.5 px-1.5"
+                                    >
                                       DEPRECATED
                                     </Badge>
                                   )}
-                                  {protocolDetails?.security?.auditStatus === 'Audited' && (
-                                    <Badge variant="outline" className="text-[9px] h-3.5 px-1.5 border-green-200/50 text-green-700 dark:border-green-800/50 dark:text-green-400">
+                                  {protocolDetails?.security?.auditStatus ===
+                                    'Audited' && (
+                                    <Badge
+                                      variant="outline"
+                                      className="text-[9px] h-3.5 px-1.5 border-green-200/50 text-green-700 dark:border-green-800/50 dark:text-green-400"
+                                    >
                                       AUDITED
                                     </Badge>
                                   )}
                                 </div>
-                                
+
                                 <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground/70">
                                   <span className="font-medium uppercase">
                                     {position.protocolTypes.size > 1
                                       ? 'MULTI'
-                                      : (primaryType === 'derivatives' ? 'PERP' : primaryType?.toUpperCase() || 'DEFI')}
+                                      : primaryType === 'derivatives'
+                                        ? 'PERP'
+                                        : primaryType?.toUpperCase() || 'DEFI'}
                                   </span>
                                   <span>•</span>
-                                  <span>{position.positions?.length || 1} POS</span>
+                                  <span>
+                                    {position.positions?.length || 1} POS
+                                  </span>
                                 </div>
                               </div>
                             </div>
 
                             <div className="text-right flex-shrink-0 ml-3">
                               <p className="font-mono font-semibold tracking-tight text-xs sm:text-sm">
-                                {position.protocol === 'Thala Farm'
-                                  ? <span className="text-muted-foreground/50">—</span>
-                                  : formatCurrency(position.totalValue)}
+                                {position.protocol === 'Thala Farm' ? (
+                                  <span className="text-muted-foreground/50">
+                                    —
+                                  </span>
+                                ) : (
+                                  formatCurrency(position.totalValue)
+                                )}
                               </p>
                               {position.protocol !== 'Thala Farm' && (
                                 <p className="text-[10px] text-muted-foreground/70 font-mono">
@@ -324,7 +365,9 @@ export const DeFiSummaryView: React.FC<DeFiSummaryViewProps> = ({
           {groupedDeFiPositions.length === 0 && (
             <div className="p-8 sm:p-12 text-center">
               <Building2 className="h-12 w-12 text-muted-foreground/50 mx-auto mb-3" />
-              <h3 className="text-sm font-medium mb-1 tracking-tight">No DeFi Positions</h3>
+              <h3 className="text-sm font-medium mb-1 tracking-tight">
+                No DeFi Positions
+              </h3>
               <p className="text-muted-foreground/70 text-xs">
                 No DeFi positions detected in this wallet
               </p>
@@ -357,13 +400,14 @@ export const NFTSummaryView: React.FC<NFTSummaryViewProps> = ({
   // Prepare pie chart data for collection distribution
   const pieChartData = React.useMemo(() => {
     return collections.map(([collection, count], index) => ({
-      name: (collection || 'Unnamed Collection').length > 20 
-        ? `${(collection || 'Unnamed Collection').substring(0, 20)}...` 
-        : collection || 'Unnamed Collection',
+      name:
+        (collection || 'Unnamed Collection').length > 20
+          ? `${(collection || 'Unnamed Collection').substring(0, 20)}...`
+          : collection || 'Unnamed Collection',
       value: count as number,
-      percentage: (count as number / nfts.length) * 100,
+      percentage: ((count as number) / nfts.length) * 100,
       color: CHART_COLORS[index % CHART_COLORS.length],
-      fullName: collection || 'Unnamed Collection'
+      fullName: collection || 'Unnamed Collection',
     }));
   }, [collections, nfts.length]);
 
@@ -372,7 +416,9 @@ export const NFTSummaryView: React.FC<NFTSummaryViewProps> = ({
       <Card className="border border-border/50 bg-card/50 backdrop-blur-sm">
         <CardContent className="p-8 sm:p-12 text-center">
           <Package className="h-12 w-12 text-muted-foreground/50 mx-auto mb-3" />
-          <h3 className="text-sm font-medium mb-1 tracking-tight">No Digital Assets</h3>
+          <h3 className="text-sm font-medium mb-1 tracking-tight">
+            No Digital Assets
+          </h3>
           <p className="text-muted-foreground/70 text-xs">
             No NFT holdings detected in this wallet
           </p>
@@ -406,7 +452,7 @@ export const NFTSummaryView: React.FC<NFTSummaryViewProps> = ({
                 </p>
               </div>
             </div>
-            
+
             <div className="p-3 sm:p-4 border-r border-border/30">
               <div className="space-y-1">
                 <div className="flex items-center gap-1.5">
@@ -420,7 +466,7 @@ export const NFTSummaryView: React.FC<NFTSummaryViewProps> = ({
                 </p>
               </div>
             </div>
-            
+
             <div className="p-3 sm:p-4">
               <div className="space-y-1">
                 <div className="flex items-center gap-1.5">
@@ -461,8 +507,8 @@ export const NFTSummaryView: React.FC<NFTSummaryViewProps> = ({
                             strokeWidth={0.5}
                           >
                             {pieChartData.map((entry, index) => (
-                              <Cell 
-                                key={`cell-${index}`} 
+                              <Cell
+                                key={`cell-${index}`}
                                 fill={entry.color}
                                 className="hover:opacity-80 transition-opacity"
                               />
@@ -474,7 +520,7 @@ export const NFTSummaryView: React.FC<NFTSummaryViewProps> = ({
                     </div>
                   </div>
                 )}
-                
+
                 {/* Holdings List */}
                 <div className="flex flex-col">
                   <h4 className="text-[10px] font-medium text-muted-foreground/70 mb-2 uppercase tracking-wider">
@@ -482,9 +528,12 @@ export const NFTSummaryView: React.FC<NFTSummaryViewProps> = ({
                   </h4>
                   <div className="space-y-2 flex-1">
                     {collections.map(([collection, count], index) => {
-                      const collectionPercentage = (count as number / nfts.length) * 100;
-                      const chartEntry = pieChartData.find(entry => entry.fullName === collection);
-                      
+                      const collectionPercentage =
+                        ((count as number) / nfts.length) * 100;
+                      const chartEntry = pieChartData.find(
+                        entry => entry.fullName === collection
+                      );
+
                       return (
                         <div
                           key={collection}
@@ -495,15 +544,15 @@ export const NFTSummaryView: React.FC<NFTSummaryViewProps> = ({
                         >
                           <div className="flex items-center gap-2 min-w-0 flex-1">
                             {chartEntry && (
-                              <div 
-                                className="w-2 h-2 rounded-full flex-shrink-0" 
-                                style={{ backgroundColor: chartEntry.color }} 
+                              <div
+                                className="w-2 h-2 rounded-full flex-shrink-0"
+                                style={{ backgroundColor: chartEntry.color }}
                               />
                             )}
                             <div className="w-6 h-6 sm:w-7 sm:h-7 rounded bg-background/50 border border-border/30 flex items-center justify-center flex-shrink-0">
                               <Archive className="h-3 w-3 text-muted-foreground/70" />
                             </div>
-                            
+
                             <div className="min-w-0 flex-1">
                               <h3 className="font-medium tracking-tight truncate text-xs sm:text-sm">
                                 {collection || 'Unnamed Collection'}

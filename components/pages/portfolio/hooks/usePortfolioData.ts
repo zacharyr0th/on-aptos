@@ -96,10 +96,13 @@ export function usePortfolioData(
         // Check if all responses are ok
         if (!assetsResponse.ok || !nftsResponse.ok || !defiResponse.ok) {
           const errors = [];
-          if (!assetsResponse.ok) errors.push(`Assets: ${assetsResponse.status}`);
+          if (!assetsResponse.ok)
+            errors.push(`Assets: ${assetsResponse.status}`);
           if (!nftsResponse.ok) errors.push(`NFTs: ${nftsResponse.status}`);
           if (!defiResponse.ok) errors.push(`DeFi: ${defiResponse.status}`);
-          throw new Error(`Failed to fetch portfolio data: ${errors.join(', ')}`);
+          throw new Error(
+            `Failed to fetch portfolio data: ${errors.join(', ')}`
+          );
         }
 
         // Parse all responses
@@ -114,7 +117,8 @@ export function usePortfolioData(
         setNfts(nftsData.data?.nfts || nftsData.nfts || []);
         setDefiPositions(defiData.data || defiData.positions || []);
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+        const errorMessage =
+          err instanceof Error ? err.message : 'Unknown error';
         logger.error('Failed to fetch portfolio data:', {
           error: errorMessage,
           walletAddress,
@@ -130,7 +134,7 @@ export function usePortfolioData(
 
   const refetch = useCallback(async () => {
     if (!walletAddress) return;
-    
+
     setIsLoading(true);
     setError(null);
 

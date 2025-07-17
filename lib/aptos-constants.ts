@@ -203,7 +203,7 @@ export const LST_TOKEN_ADDRESSES = {
       fa: '0x111ae3e5bc816a5e63c2da97d0aa3886519e0cd5e4b046659fa35796bd11542a',
     },
   },
-  
+
   // Thala tokens
   THALA: {
     // thAPT - Thala APT
@@ -217,7 +217,7 @@ export const LST_TOKEN_ADDRESSES = {
       fa: '0xb854b0367a3c0a014dfb3b4630ad06f8c2cbebd6c87b6b13b4c2b2ca88e0faa3',
     },
   },
-  
+
   // Kofi tokens (FA only)
   KOFI: {
     // kAPT - Kofi APT
@@ -526,49 +526,49 @@ export const AptosUtils = {
  */
 export const DEFI_PROTOCOL_NAME_MAPPINGS: Record<string, string> = {
   // Thala variations
-  'thala': 'Thala',
+  thala: 'Thala',
   'thala finance': 'Thala',
   'thala farm': 'Thala',
-  
+
   // Pancake variations
-  'pancake': 'PancakeSwap',
-  'pancakeswap': 'PancakeSwap',
+  pancake: 'PancakeSwap',
+  pancakeswap: 'PancakeSwap',
   'pancake swap': 'PancakeSwap',
-  
+
   // Liquid staking variations
-  'amnis': 'Amnis',
+  amnis: 'Amnis',
   'amnis finance': 'Amnis',
-  'tortuga': 'Tortuga',
+  tortuga: 'Tortuga',
   'tortuga finance': 'Tortuga',
-  
+
   // DEX variations
-  'liquidswap': 'LiquidSwap',
+  liquidswap: 'LiquidSwap',
   'liquid swap': 'LiquidSwap',
-  'cellana': 'Cellana',
+  cellana: 'Cellana',
   'cellana finance': 'Cellana',
-  'sushi': 'SushiSwap',
-  'sushiswap': 'SushiSwap',
+  sushi: 'SushiSwap',
+  sushiswap: 'SushiSwap',
   'sushi swap': 'SushiSwap',
-  
+
   // Aggregator variations
-  'panora': 'Panora',
+  panora: 'Panora',
   'panora exchange': 'Panora',
-  'kana': 'Kana',
-  'kanalabs': 'Kana',
+  kana: 'Kana',
+  kanalabs: 'Kana',
   'kana labs': 'Kana',
-  'anqa': 'Anqa',
-  
+  anqa: 'Anqa',
+
   // Lending variations
-  'aries': 'Aries Markets',
+  aries: 'Aries Markets',
   'aries markets': 'Aries Markets',
-  'econia': 'Econia',
-  
+  econia: 'Econia',
+
   // Other protocols
-  'aptin': 'Aptin Finance',
+  aptin: 'Aptin Finance',
   'aptin finance': 'Aptin Finance',
-  'hippo': 'Hippo Labs',
+  hippo: 'Hippo Labs',
   'hippo labs': 'Hippo Labs',
-  'aux': 'AUX',
+  aux: 'AUX',
   'aux exchange': 'AUX',
 } as const;
 

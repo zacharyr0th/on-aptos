@@ -98,7 +98,7 @@ async function executeGraphQLQuery(
   }
 
   const hasAuth = !!headers['Authorization'];
-  
+
   console.log('[LST] Executing GraphQL query', {
     endpoint: INDEXER_URL,
     hasAuth,
@@ -107,15 +107,17 @@ async function executeGraphQLQuery(
     variables: JSON.stringify(variables),
     timestamp: new Date().toISOString(),
   });
-  
+
   // Warn if no auth configured
   if (!hasAuth) {
-    console.warn('[LST] WARNING: No Aptos authentication configured. API may hit rate limits.')
+    console.warn(
+      '[LST] WARNING: No Aptos authentication configured. API may hit rate limits.'
+    );
   }
 
   const fetchOptions: FetchOptions = {
     timeout: Math.min(config.timeout, 15000), // Increase timeout for LST queries
-    retries: 2, // Increase retries for coin queries 
+    retries: 2, // Increase retries for coin queries
     headers,
   };
 
@@ -215,18 +217,23 @@ export async function fetchLSTSuppliesData(): Promise<LSTSupplyData> {
 
       // Kofi and TruFin tokens are FA only, others are mixed
       // Check if it's a coin token (has ::) but exclude FA-only tokens
-      const isFAOnlyToken = token.symbol.includes('kAPT') || token.symbol.includes('stkAPT') || token.symbol.includes('truAPT');
+      const isFAOnlyToken =
+        token.symbol.includes('kAPT') ||
+        token.symbol.includes('stkAPT') ||
+        token.symbol.includes('truAPT');
       const isCoinToken = token.asset_type.includes('::') && !isFAOnlyToken;
       const query = isCoinToken ? COIN_SUPPLY_QUERY : FA_SUPPLY_QUERY;
       const queryType = isCoinToken ? 'coin_type' : 'type';
-      
+
       console.log('[LST] Token type determined', {
         symbol: token.symbol,
         isFAOnlyToken,
         isCoinToken,
         assetType: token.asset_type,
         queryType,
-        tableUsed: isCoinToken ? 'current_coin_balances' : 'current_fungible_asset_balances'
+        tableUsed: isCoinToken
+          ? 'current_coin_balances'
+          : 'current_fungible_asset_balances',
       });
 
       let rawResult;
@@ -237,49 +244,54 @@ export async function fetchLSTSuppliesData(): Promise<LSTSupplyData> {
       } catch (error) {
         // If coin query fails, try as FA query
         if (isCoinToken) {
-          console.warn(`[LST] Coin query failed for ${token.symbol}, trying as FA:`, error);
+          console.warn(
+            `[LST] Coin query failed for ${token.symbol}, trying as FA:`,
+            error
+          );
           try {
             rawResult = await executeGraphQLQuery(FA_SUPPLY_QUERY, {
               type: token.asset_type,
             });
           } catch (faError) {
-            console.error(`[LST] Both coin and FA queries failed for ${token.symbol}`);
+            console.error(
+              `[LST] Both coin and FA queries failed for ${token.symbol}`
+            );
             throw error; // Throw original error
           }
         } else {
           throw error;
         }
       }
-      
+
       // Log the raw result to debug
       console.log('[LST] Raw GraphQL response for', token.symbol, {
         hasData: !!rawResult,
         keys: rawResult ? Object.keys(rawResult) : [],
-        sample: JSON.stringify(rawResult).substring(0, 200)
+        sample: JSON.stringify(rawResult).substring(0, 200),
       });
 
       // Extract supply from metadata
       let totalAmount = 0n;
-      
+
       if (isCoinToken) {
         const coinResult = rawResult as CoinSupplyResponse;
         const coinInfo = coinResult?.coin_infos?.[0];
-        
+
         if (coinInfo) {
           console.log('[LST] Coin info found', {
             symbol: token.symbol,
             coinType: coinInfo.coin_type,
             name: coinInfo.name,
-            symbolFromQuery: coinInfo.symbol
+            symbolFromQuery: coinInfo.symbol,
           });
-          
-          // Fetch coin supply using view function approach  
+
+          // Fetch coin supply using view function approach
           try {
             const viewUrl = `https://api.mainnet.aptoslabs.com/v1/view`;
             const viewPayload = {
-              function: "0x1::coin::supply",
+              function: '0x1::coin::supply',
               type_arguments: [coinInfo.coin_type],
-              arguments: []
+              arguments: [],
             };
 
             const headers: Record<string, string> = {
@@ -288,86 +300,109 @@ export async function fetchLSTSuppliesData(): Promise<LSTSupplyData> {
             };
 
             if (process.env.APTOS_BUILD_SECRET) {
-              headers['Authorization'] = `Bearer ${process.env.APTOS_BUILD_SECRET}`;
+              headers['Authorization'] =
+                `Bearer ${process.env.APTOS_BUILD_SECRET}`;
             }
 
             console.log('[LST] Fetching coin supply via view function', {
               symbol: token.symbol,
               coinType: coinInfo.coin_type,
-              viewUrl
+              viewUrl,
             });
 
             const response = await fetch(viewUrl, {
               method: 'POST',
               headers,
-              body: JSON.stringify(viewPayload)
+              body: JSON.stringify(viewPayload),
             });
 
             if (!response.ok) {
-              throw new Error(`View function failed: ${response.status} ${response.statusText}`);
+              throw new Error(
+                `View function failed: ${response.status} ${response.statusText}`
+              );
             }
 
             const supplyData = await response.json();
             console.log('[LST] View function response', {
               symbol: token.symbol,
-              supplyData: JSON.stringify(supplyData)
+              supplyData: JSON.stringify(supplyData),
             });
 
             // Extract supply value - view function returns [supply_value] or null
-            if (supplyData && Array.isArray(supplyData) && supplyData.length > 0) {
+            if (
+              supplyData &&
+              Array.isArray(supplyData) &&
+              supplyData.length > 0
+            ) {
               const supplyOption = supplyData[0];
-              if (supplyOption && supplyOption.vec && supplyOption.vec.length > 0) {
+              if (
+                supplyOption &&
+                supplyOption.vec &&
+                supplyOption.vec.length > 0
+              ) {
                 totalAmount = BigInt(supplyOption.vec[0]);
-                console.log('[LST] Coin supply fetched successfully via view function', {
-                  symbol: token.symbol,
-                  supply: totalAmount.toString(),
-                  formattedSupply: formatTokenAmount(totalAmount, token.decimals)
-                });
+                console.log(
+                  '[LST] Coin supply fetched successfully via view function',
+                  {
+                    symbol: token.symbol,
+                    supply: totalAmount.toString(),
+                    formattedSupply: formatTokenAmount(
+                      totalAmount,
+                      token.decimals
+                    ),
+                  }
+                );
               } else {
-                console.warn('[LST] Supply option is empty (coin may not exist)', {
-                  symbol: token.symbol,
-                  supplyOption
-                });
+                console.warn(
+                  '[LST] Supply option is empty (coin may not exist)',
+                  {
+                    symbol: token.symbol,
+                    supplyOption,
+                  }
+                );
               }
             } else {
               console.warn('[LST] Invalid view function response structure', {
                 symbol: token.symbol,
-                supplyData
+                supplyData,
               });
             }
           } catch (restError) {
-            console.error('[LST] Failed to fetch coin supply via view function', {
-              symbol: token.symbol,
-              error: (restError as Error).message
-            });
+            console.error(
+              '[LST] Failed to fetch coin supply via view function',
+              {
+                symbol: token.symbol,
+                error: (restError as Error).message,
+              }
+            );
           }
         } else {
           console.warn('[LST] No coin info found', {
             symbol: token.symbol,
-            result: JSON.stringify(rawResult).substring(0, 200)
+            result: JSON.stringify(rawResult).substring(0, 200),
           });
         }
       } else {
         const faResult = rawResult as FASupplyResponse;
         const faMetadata = faResult?.fungible_asset_metadata?.[0];
-        
+
         if (faMetadata && faMetadata.supply_v2) {
           totalAmount = BigInt(faMetadata.supply_v2);
-          
+
           console.log('[LST] FA metadata found', {
             symbol: token.symbol,
             assetType: faMetadata.asset_type,
             name: faMetadata.name,
             symbolFromQuery: faMetadata.symbol,
             supply: totalAmount.toString(),
-            decimals: faMetadata.decimals
+            decimals: faMetadata.decimals,
           });
         } else {
           console.warn('[LST] No FA metadata found or no supply', {
             symbol: token.symbol,
             hasMetadata: !!faMetadata,
             hasSupply: faMetadata ? !!faMetadata.supply_v2 : false,
-            result: JSON.stringify(rawResult).substring(0, 200)
+            result: JSON.stringify(rawResult).substring(0, 200),
           });
         }
       }
@@ -376,7 +411,7 @@ export async function fetchLSTSuppliesData(): Promise<LSTSupplyData> {
       if (rawResult && typeof rawResult === 'object' && 'errors' in rawResult) {
         console.error('[LST] GraphQL errors received', {
           symbol: token.symbol,
-          errors: (rawResult as any).errors
+          errors: (rawResult as any).errors,
         });
       }
 
@@ -456,13 +491,15 @@ export async function fetchLSTSuppliesData(): Promise<LSTSupplyData> {
     supplies: supplies.map(s => ({
       symbol: s.symbol,
       formatted: s.formatted_supply,
-      supply: s.supply
+      supply: s.supply,
     })),
   });
 
   // Debug summary
   console.log('[LST] === FINAL DEBUG SUMMARY ===');
-  console.log(`[LST] ✅ Successfully fetched ${successfulFetches}/${TOKENS.length} tokens`);
+  console.log(
+    `[LST] ✅ Successfully fetched ${successfulFetches}/${TOKENS.length} tokens`
+  );
   console.log(`[LST] 💰 Total LST Value: ${totalFormatted}`);
   console.log('[LST] 🔢 Non-zero supplies:');
   supplies.forEach(s => {

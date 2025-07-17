@@ -22,40 +22,44 @@ export const GasUsageCard: React.FC<GasUsageCardProps> = React.memo(
 
       switch (timeframe) {
         case '1h':
-          start = end - (1 * 60 * 60 * 1000);
+          start = end - 1 * 60 * 60 * 1000;
           bucketGranularity = '5m';
           break;
         case '12h':
-          start = end - (12 * 60 * 60 * 1000);
+          start = end - 12 * 60 * 60 * 1000;
           bucketGranularity = '15m';
           break;
         case '24h':
-          start = end - (24 * 60 * 60 * 1000);
+          start = end - 24 * 60 * 60 * 1000;
           bucketGranularity = '1h';
           break;
         case '7d':
-          start = end - (7 * 24 * 60 * 60 * 1000);
+          start = end - 7 * 24 * 60 * 60 * 1000;
           bucketGranularity = '1d';
           break;
         case '30d':
-          start = end - (30 * 24 * 60 * 60 * 1000);
+          start = end - 30 * 24 * 60 * 60 * 1000;
           bucketGranularity = '1d';
           break;
         case '90d':
-          start = end - (90 * 24 * 60 * 60 * 1000);
+          start = end - 90 * 24 * 60 * 60 * 1000;
           bucketGranularity = '7d';
           break;
         case '1y':
-          start = end - (365 * 24 * 60 * 60 * 1000);
+          start = end - 365 * 24 * 60 * 60 * 1000;
           bucketGranularity = '7d';
           break;
         case 'all':
-          start = end - (365 * 2 * 24 * 60 * 60 * 1000); // 2 years max for gas
+          start = end - 365 * 2 * 24 * 60 * 60 * 1000; // 2 years max for gas
           bucketGranularity = '7d';
           break;
       }
 
-      return { startTimestamp: start, endTimestamp: end, granularity: bucketGranularity };
+      return {
+        startTimestamp: start,
+        endTimestamp: end,
+        granularity: bucketGranularity,
+      };
     }, [timeframe]);
 
     // Create stable Date objects from timestamps

@@ -496,73 +496,84 @@ export const LST_TOKENS = [
     symbol: 'amAPT',
     name: LST_CONFIGS.amAPT.name,
     decimals: LST_CONFIGS.amAPT.decimals,
-    asset_type: '0x111ae3e5bc816a5e63c2da97d0aa3886519e0cd5e4b046659fa35796bd11542a::amapt_token::AmnisApt',
+    asset_type:
+      '0x111ae3e5bc816a5e63c2da97d0aa3886519e0cd5e4b046659fa35796bd11542a::amapt_token::AmnisApt',
   },
   {
     symbol: 'amAPT-FA',
     name: `${LST_CONFIGS.amAPT.name} (FA)`,
     decimals: LST_CONFIGS.amAPT.decimals,
-    asset_type: '0xa259be733b6a759909f92815927fa213904df6540519568692caf0b068fe8e62',
+    asset_type:
+      '0xa259be733b6a759909f92815927fa213904df6540519568692caf0b068fe8e62',
   },
   // Amnis - stAPT
   {
     symbol: 'stAPT',
     name: LST_CONFIGS.stAPT.name,
     decimals: LST_CONFIGS.stAPT.decimals,
-    asset_type: '0x111ae3e5bc816a5e63c2da97d0aa3886519e0cd5e4b046659fa35796bd11542a::stapt_token::StakedApt',
+    asset_type:
+      '0x111ae3e5bc816a5e63c2da97d0aa3886519e0cd5e4b046659fa35796bd11542a::stapt_token::StakedApt',
   },
   {
     symbol: 'stAPT-FA',
     name: `${LST_CONFIGS.stAPT.name} (FA)`,
     decimals: LST_CONFIGS.stAPT.decimals,
-    asset_type: '0xe9c192ff55cffab3963c695cff6dbf9dad6aff2bb5ac19a6415cad26a81860d9::staked_apt::StakedAptosAsset',
+    asset_type:
+      '0xe9c192ff55cffab3963c695cff6dbf9dad6aff2bb5ac19a6415cad26a81860d9::staked_apt::StakedAptosAsset',
   },
   // Thala - thAPT
   {
     symbol: 'thAPT',
     name: LST_CONFIGS.thAPT.name,
     decimals: LST_CONFIGS.thAPT.decimals,
-    asset_type: '0xfaf4e633ae9eb31366c9ca24214231760926576c7b625313b3688b5e900731f6::staking::ThalaAPT',
+    asset_type:
+      '0xfaf4e633ae9eb31366c9ca24214231760926576c7b625313b3688b5e900731f6::staking::ThalaAPT',
   },
   {
     symbol: 'thAPT-FA',
     name: `${LST_CONFIGS.thAPT.name} (FA)`,
     decimals: LST_CONFIGS.thAPT.decimals,
-    asset_type: '0xa0d9d647c5737a5aed08d2cfeb39c31cf901d44bc4aa024eaa7e5e68b804e011',
+    asset_type:
+      '0xa0d9d647c5737a5aed08d2cfeb39c31cf901d44bc4aa024eaa7e5e68b804e011',
   },
   // Thala - sthAPT
   {
     symbol: 'sthAPT',
     name: LST_CONFIGS.sthAPT.name,
     decimals: LST_CONFIGS.sthAPT.decimals,
-    asset_type: '0xfaf4e633ae9eb31366c9ca24214231760926576c7b625313b3688b5e900731f6::staking::StakedThalaAPT',
+    asset_type:
+      '0xfaf4e633ae9eb31366c9ca24214231760926576c7b625313b3688b5e900731f6::staking::StakedThalaAPT',
   },
   {
     symbol: 'sthAPT-FA',
     name: `${LST_CONFIGS.sthAPT.name} (FA)`,
     decimals: LST_CONFIGS.sthAPT.decimals,
-    asset_type: '0x0a9ce1bddf93b074697ec5e483bc5050bc64cff2acd31e1ccfd8ac8cae5e4abe',
+    asset_type:
+      '0x0a9ce1bddf93b074697ec5e483bc5050bc64cff2acd31e1ccfd8ac8cae5e4abe',
   },
   // Kofi - kAPT (FA only)
   {
     symbol: 'kAPT',
     name: LST_CONFIGS.kAPT.name,
     decimals: LST_CONFIGS.kAPT.decimals,
-    asset_type: '0x821c94e69bc7ca058c913b7b5e6b0a5c9fd1523d58723a966fb8c1f5ea888105',
+    asset_type:
+      '0x821c94e69bc7ca058c913b7b5e6b0a5c9fd1523d58723a966fb8c1f5ea888105',
   },
   // Kofi - stkAPT (FA only)
   {
     symbol: 'stkAPT',
     name: LST_CONFIGS.stkAPT.name,
     decimals: LST_CONFIGS.stkAPT.decimals,
-    asset_type: '0x42556039b88593e768c97ab1a3ab0c6a17230825769304482dff8fdebe4c002b',
+    asset_type:
+      '0x42556039b88593e768c97ab1a3ab0c6a17230825769304482dff8fdebe4c002b',
   },
   // TruFin - truAPT (FA only)
   {
     symbol: 'truAPT',
     name: 'TruFin truAPT',
     decimals: 8,
-    asset_type: '0xaef6a8c3182e076db72d64324617114cacf9a52f28325edc10b483f7f05da0e7',
+    asset_type:
+      '0xaef6a8c3182e076db72d64324617114cacf9a52f28325edc10b483f7f05da0e7',
   },
 ];
 

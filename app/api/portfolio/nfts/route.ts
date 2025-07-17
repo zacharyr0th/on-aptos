@@ -24,9 +24,7 @@ const handler = withValidation(PortfolioNFTsQuerySchema)(async ({
 
       const { walletAddress } = query;
 
-      logger.info(
-        `[NFTs API] Fetching ALL NFTs for ${walletAddress}`
-      );
+      logger.info(`[NFTs API] Fetching ALL NFTs for ${walletAddress}`);
 
       // Call the service to get all NFTs exhaustively
       const nfts = await getAllWalletNFTs(walletAddress);

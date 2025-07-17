@@ -503,7 +503,8 @@ export default function LSTPage(): React.ReactElement {
           symbol: 'thAPT/sthAPT',
           isCombined: true,
           supply: thalaTokens.reduce(
-            (acc: any, curr: any) => (BigInt(acc) + BigInt(curr.supply)).toString(),
+            (acc: any, curr: any) =>
+              (BigInt(acc) + BigInt(curr.supply)).toString(),
             '0'
           ),
           components: thalaTokens,
@@ -515,7 +516,8 @@ export default function LSTPage(): React.ReactElement {
           symbol: 'amAPT/stAPT',
           isCombined: true,
           supply: amnisTokens.reduce(
-            (acc: any, curr: any) => (BigInt(acc) + BigInt(curr.supply)).toString(),
+            (acc: any, curr: any) =>
+              (BigInt(acc) + BigInt(curr.supply)).toString(),
             '0'
           ),
           components: amnisTokens,
@@ -527,7 +529,8 @@ export default function LSTPage(): React.ReactElement {
           symbol: 'kAPT/stkAPT',
           isCombined: true,
           supply: kofiTokens.reduce(
-            (acc: any, curr: any) => (BigInt(acc) + BigInt(curr.supply)).toString(),
+            (acc: any, curr: any) =>
+              (BigInt(acc) + BigInt(curr.supply)).toString(),
             '0'
           ),
           components: kofiTokens,
@@ -536,7 +539,12 @@ export default function LSTPage(): React.ReactElement {
 
       // Add individual tokens that aren't part of protocol pairs
       const pairedTokenSymbols = new Set([
-        'thapt', 'sthapt', 'amapt', 'stapt', 'kapt', 'stkapt'
+        'thapt',
+        'sthapt',
+        'amapt',
+        'stapt',
+        'kapt',
+        'stkapt',
       ]);
 
       const individualTokens = data.supplies.filter(

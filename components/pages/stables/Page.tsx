@@ -126,12 +126,16 @@ const TokenCard = React.memo(function TokenCard({
       // Use supply_raw for market share calculation (fallback to supply for compatibility)
       const rawSupply = token.supply_raw || token.supply || '0';
       let tokenSupply = BigInt(rawSupply);
-      
+
       // Normalize 8-decimal tokens to 6 decimals to match totalSupply normalization
-      if (token.symbol === 'MOD' || token.symbol === 'mUSD' || token.symbol === 'USDA') {
+      if (
+        token.symbol === 'MOD' ||
+        token.symbol === 'mUSD' ||
+        token.symbol === 'USDA'
+      ) {
         tokenSupply = tokenSupply / BigInt(100); // Convert from 8 to 6 decimals
       }
-      
+
       const total = BigInt(totalSupply);
 
       // Use more precise calculation to avoid rounding errors
@@ -724,7 +728,11 @@ export default function StablesPage(): React.ReactElement {
     for (const token of supplies) {
       const rawSupply = BigInt(token.supply_raw || token.supply || '0');
       // Normalize 8-decimal tokens to 6 decimals
-      if (token.symbol === 'MOD' || token.symbol === 'mUSD' || token.symbol === 'USDA') {
+      if (
+        token.symbol === 'MOD' ||
+        token.symbol === 'mUSD' ||
+        token.symbol === 'USDA'
+      ) {
         rawSupplyTotal += rawSupply / BigInt(100); // Convert from 8 to 6 decimals
       } else {
         rawSupplyTotal += rawSupply;

@@ -17,36 +17,44 @@ const endpoints = [
 async function testEndpoint(name, url) {
   console.log(`\n📡 Testing ${name} endpoint...`);
   console.log(`   URL: ${url}`);
-  
+
   try {
     const start = Date.now();
     const response = await fetch(url);
     const elapsed = Date.now() - start;
-    
+
     console.log(`   Status: ${response.status} ${response.statusText}`);
     console.log(`   Response time: ${elapsed}ms`);
-    
+
     if (response.ok) {
       const data = await response.json();
-      
+
       // Check if data is properly structured
       if (data.data) {
         console.log(`   ✅ Data structure: Valid (data property exists)`);
-        
+
         // Check specific fields based on endpoint
         if (name === 'Stablecoins' || name === 'Bitcoin' || name === 'LST') {
-          const hasSupplies = data.data.supplies && Array.isArray(data.data.supplies);
-          console.log(`   ✅ Supplies: ${hasSupplies ? data.data.supplies.length + ' items' : 'Missing!'}`);
+          const hasSupplies =
+            data.data.supplies && Array.isArray(data.data.supplies);
+          console.log(
+            `   ✅ Supplies: ${hasSupplies ? data.data.supplies.length + ' items' : 'Missing!'}`
+          );
           console.log(`   ✅ Total: ${data.data.total || 'Missing!'}`);
         } else if (name === 'RWA') {
-          const hasProtocols = data.data.protocols && Array.isArray(data.data.protocols);
-          console.log(`   ✅ Protocols: ${hasProtocols ? data.data.protocols.length + ' items' : 'Missing!'}`);
-          console.log(`   ✅ Total Value: ${data.data.totalAptosValue || 'Missing!'}`);
+          const hasProtocols =
+            data.data.protocols && Array.isArray(data.data.protocols);
+          console.log(
+            `   ✅ Protocols: ${hasProtocols ? data.data.protocols.length + ' items' : 'Missing!'}`
+          );
+          console.log(
+            `   ✅ Total Value: ${data.data.totalAptosValue || 'Missing!'}`
+          );
         }
       } else {
         console.log(`   ❌ Data structure: Invalid (missing data property)`);
       }
-      
+
       return true;
     } else {
       const errorData = await response.text();
@@ -61,18 +69,20 @@ async function testEndpoint(name, url) {
 
 async function main() {
   console.log(`🚀 Testing API endpoints at ${baseUrl}`);
-  console.log('=' .repeat(50));
-  
+  console.log('='.repeat(50));
+
   let successCount = 0;
-  
+
   for (const { name, path } of endpoints) {
     const success = await testEndpoint(name, baseUrl + path);
     if (success) successCount++;
   }
-  
-  console.log('\n' + '=' .repeat(50));
-  console.log(`\n📊 Summary: ${successCount}/${endpoints.length} endpoints working`);
-  
+
+  console.log('\n' + '='.repeat(50));
+  console.log(
+    `\n📊 Summary: ${successCount}/${endpoints.length} endpoints working`
+  );
+
   if (successCount === endpoints.length) {
     console.log('✅ All endpoints are working correctly!');
   } else {

@@ -1,0 +1,507 @@
+[Analytics APIs Design](https://www.notion.so/Analytics-APIs-Design-1758b846eb72807aa743e5a3297a3271?pvs=21) 
+
+## Gas Usage
+
+Grab an account’s transaction history per specified time frame.
+
+```
+https://api.mainnet.aptoslabs.com/v1/analytics/gas/usage?gas_payer_address=<string>&start_unix_secs=<int>&end_unix_secs=<int>
+```
+
+<aside>
+🔗
+
+Try this endpoint in your [browser](https://api.mainnet.aptoslabs.com/v1/analytics/gas/usage?gas_payer_address=0x0000009610c185cf2d3aa4ab7a6e352730b386cc5c9268671c606826253e740c&start_unix_secs=1704067200&end_unix_secs=1735689599)
+
+</aside>
+
+- Request
+    
+    
+    | Query Parameter | Description |
+    | --- | --- |
+    | account_address | the `string` account address. |
+    | start_utc_unix_secs | the (inclusive) start UTC time of the range query `integer` in unix timestamp in seconds  |
+    | end_utc_unix_secs | the (inclusive) end UTC time of the range query `integer` in unix timestamp in seconds  |
+    | bucket_granularity | an optional `string` that aggregates usage into buckets. Uses the previous day’s closing price for usage in USD to be consistent with the non-aggregated query. possible granularities: `1s`, `1m`, `5m`, `15m` , `1h`, `6h`, `1d`, `7d` |
+    | group_by_entry_function` | an optional `bool` that aggregates gas usage into entry function type. |
+- Sample Responses
+    - Successful Response
+        
+        ```json
+        {
+          "data": [
+            {
+              "total_gas_used_octas": 11136916721,
+              "total_gas_used_usd": 1135.890586339156
+            }
+          ],
+          "error": null,
+          "message": "Request completed successfully",
+          "statistics": {
+            "bytes_read": 73796498,
+            "elapsed": 0.087801081,
+            "rows_read": 791375
+          },
+          "status": "success"
+        }
+        ```
+        
+    - Failed Response
+        
+        ```json
+        {
+          "status": "error",
+          "message": "Internal Server Error",
+          "data": null,
+          "error": "Failed to send request to ClickHouse: Timeout"
+        }
+        ```
+        
+
+## Single Token Pricing History
+
+The price history for an individual token.
+
+```
+https://api.mainnet.aptoslabs.com/v1/analytics/token/historical_prices?address=<asset_address>&lookback=<hour|day|week|month>
+```
+
+<aside>
+☝
+
+Some non-major tokens unavailable on CMC or CG only have history starting on 2/11
+
+</aside>
+
+<aside>
+🔗
+
+Try this endpoint in your [browser](https://api.mainnet.aptoslabs.com/v1/analytics/token/historical_prices?address=0x1::aptos_coin::AptosCoin&lookback=month) 
+
+</aside>
+
+- Request
+    
+    
+    | Query Parameter | Description |
+    | --- | --- |
+    | **address** | the `string` representing the contract address for the token/FA. `APT`, `BTC`, `ETH` strings are supported.  |
+    | **lookback** | `string: [day, week, month, year, all]` that determines the lookback window. `day` , `week` , `month` , `year`, `all`, will return 5min, 1hr, 4hr, daily, daily closes respectively.  |
+    | limit | optional pagination parameter |
+    | offset | optional offset parameter |
+    | downsample_to | optional downsample param. If original query returns some `N` datapoints, setting downsample_to= `n` will return `downsampled_data[0]` = `orig_data[0]`, `downsampled_data[n]` = `orig_data[N]` and middle datapoints uniformly distributed based on the ratio of `n` to `N`.  |
+- Sample Responses
+    - Successful Response
+        
+        ```json
+        {
+        	"data":[
+        		{
+        	    "bucketed_timestamp_minutes_utc": "2025-02-11 16:05:00",
+              "price_usd": 94889.0965771
+        		},
+        		{
+              "bucketed_timestamp_minutes_utc": "2025-02-11 16:00:00",
+              "price_usd": 97802.73433672
+        		},
+        		...
+        	],
+        	"error":null,
+        	"message":"Request completed successfully",
+        	"status":"success"
+        }
+        ```
+        
+    - Failed Response
+        
+        ```json
+        {
+          "status": "error",
+          "message": "Internal Server Error",
+          "data": null,
+          "error": "Failed to send request to ClickHouse: Timeout"
+        }
+        ```
+        
+
+## Latest Token Price
+
+Grab the latest price of a token 
+
+```
+https://api.mainnet.aptoslabs.com/v1/analytics/token/latest_price?address=<asset_address>&date_utc=<yyyy-mm-dd>
+```
+
+<aside>
+☝
+
+Optionally add `&date_utc=<yyyy-mm-dd>` to get the opening price for a particular UTC date
+
+Asset symbols are also supported for majors (APT, BTC, ETH)
+
+</aside>
+
+<aside>
+🔗
+
+Try this endpoint in your [browser](https://api.mainnet.aptoslabs.com/v1/analytics/token/latest_price?address=0x1::aptos_coin::AptosCoin&date_utc=2025-02-18)
+
+</aside>
+
+- Request
+    
+    
+    | Query Parameter | Description |
+    | --- | --- |
+    | asset_address | the `string` asset address. |
+    | date_utc | optional, the `YYYY-MM-DD` specify the opening price for a date. If not provided, the endpoint will return the latest price stored.  |
+- Sample Responses
+    - Successful Response
+        
+        ```json
+        {
+          "data": [
+            {
+              "bucketed_timestamp_minutes_utc": "2025-02-18 00:00:00",
+              "price_usd": 5.93442038
+            }
+          ],
+          "error": null,
+          "message": "Request completed successfully",
+          "statistics": {
+            "bytes_read": 1566816,
+            "elapsed": 0.008940159,
+            "rows_read": 16757
+          },
+          "status": "success"
+        }
+        ```
+        
+    - Failed Response
+        
+        ```json
+        {
+          "status": "error",
+          "message": "Internal Server Error",
+          "data": null,
+          "error": "Failed to send request to ClickHouse: Timeout"
+        }
+        ```
+        
+
+## Asset Store Balance History
+
+The daily historical balance in `USD` for a particular account for the last 365 days.
+
+```
+https://api.mainnet.aptoslabs.com/v1/analytics/historical_store_balances?account_address=<string>&lookback=<year|all>
+```
+
+<aside>
+🔗
+
+Try this endpoint in your [browser](https://api.mainnet.aptoslabs.com/v1/analytics/historical_store_balances?account_address=0x7e7eb78505982c052bef6e3baaf3e9bcb65537beb113a5b207782e551f9ced75&lookback=year)
+
+</aside>
+
+- Request
+    
+    
+    | Query Parameter | Description |
+    | --- | --- |
+    | **account_address** | the `string` of the account address. |
+    | lookback | `string` either `year` or `all` for lookback period. |
+- Sample Responses
+    - Successful Response
+        
+        ```json
+        {
+        	"data":[
+        		 {
+                "hourly_timestamp": "2024-12-30 00:00:00",
+                "total_store_balance_usd": 99.192533349
+            },
+            {
+                "hourly_timestamp": "2025-01-01 00:00:00",
+                "total_store_balance_usd": 96.068998872
+            },
+        		...
+        	],
+        	"error":null,
+        	"message":"Request completed successfully",
+        	"status":"success"
+        }
+        ```
+        
+    - Failed Response
+        
+        ```json
+        {
+          "status": "error",
+          "message": "Internal Server Error",
+          "data": null,
+          "error": "Failed to send request to ClickHouse: Timeout"
+        }
+        ```
+        
+
+## Top Price Percentage Changes
+
+Grab the greatest token price percentage changes in the last day/week/month.  
+
+```
+https://api.mainnet.aptoslabs.com/v1/analytics/token/top_price_changes?lookback=<hour|day|week|month>&limit=<int>&only_emoji=<bool>&gainers=<bool>
+```
+
+<aside>
+🔗
+
+Try this endpoint in your [browser](https://api.mainnet.aptoslabs.com/v1/analytics/token/top_price_changes?lookback=day&limit=5)
+
+</aside>
+
+- Request
+    
+    
+    | Query Parameter | Description |
+    | --- | --- |
+    | lookback | the `string: hour, day, week, month` for time horizon on price changes.  |
+    | limit | the `int` limiting how many rows you get |
+    | only_emoji | optional `bool` for if you only want emoji coins in the response. if `false`, the response will include a mix of emoji coins and other FA/coins.
+    defaults to `false`. |
+    | gainers | optional `bool` . if set to `true`, endpoint will return top N percentage price ***gainers*** in the lookback period. `false` will return top N ***losers*** in the same period.
+    defaults to `true`.  |
+- Sample Responses
+    - Successful Response
+        
+        ```json
+        {
+        	"data":[
+        		 {
+                "hourly_timestamp": "2024-12-30 00:00:00",
+                "total_store_balance_usd": 99.192533349
+            },
+            {
+                "hourly_timestamp": "2025-01-01 00:00:00",
+                "total_store_balance_usd": 96.068998872
+            },
+        		...
+        	],
+        	"error":null,
+        	"message":"Request completed successfully",
+        	"status":"success"
+        }
+        ```
+        
+    - Failed Response
+        
+        ```json
+        {
+          "status": "error",
+          "message": "Internal Server Error",
+          "data": null,
+          "error": "Failed to send request to ClickHouse: Timeout"
+        }
+        ```
+        
+
+## Labelled Transaction History per Account Address
+
+Grab an account’s transaction history per specified time frame. Returns the most recent events first.
+
+```
+https://api.mainnet.aptoslabs.com/v1/analytics/historical_transactions?account_address=<string>&date_start=<YYYY-MM-DD>&date_end=<YYYY-MM-DD>
+```
+
+<aside>
+🔗
+
+Try this endpoint in your [browser](https://api.mainnet.aptoslabs.com/v1/analytics/historical_transactions?account_address=0x00000316ad0d0ecc6c4ecf0af0a096159aaa711afa2acd8b398316e263b67163&date_start=2022-01-01&date_end=2025-01-01&asset_symbol=APT)
+
+</aside>
+
+- Request
+    
+    
+    | Query Parameter | Description |
+    | --- | --- |
+    | account_address | the `string` account address. |
+    | date_start | optional, the `YYYY-MM-DD` start of the search window. Defaults to the beginning of the last year, `2024-01-01`. |
+    | date_end | optional, the `YYYY-MM-DD` end of the search window. Defaults to the beginning of the current year, `2025-01-01`. |
+    | asset_symbol | optional, the `string` asset symbol, i.e., “APT” |
+    | limit | optional `int` to limit results |
+    | offset | optional `int` for pagination |
+- Sample Responses
+    - Successful Response
+        
+        ```json
+        {
+        	"data":[
+        		 {
+                    "asset_name": "Aptos Coin",
+                    "asset_symbol": "APT",
+                    "block_timestamp": "2022-10-22 14:01:21.000000000",
+                    "label_type": "framework_transfer",
+                    "storage_id": "0xbdcb5b4e7a0bbdac02d3d5f04c51c088c29a18232fd707e54bfa9da559de6b61",
+                    "txn_label": "coin transfers",
+                    "txn_version": "8152778",
+                    "wallet_balance": "0.5",
+                    "wallet_change": ""
+                },
+                {
+                    "asset_name": "Aptos Coin",
+                    "asset_symbol": "APT",
+                    "block_timestamp": "2022-10-24 16:40:06.000000000",
+                    "label_type": "framework_transfer",
+                    "storage_id": "0xbdcb5b4e7a0bbdac02d3d5f04c51c088c29a18232fd707e54bfa9da559de6b61",
+                    "txn_label": "coin transfers",
+                    "txn_version": "10982162",
+                    "wallet_balance": "3.5",
+                    "wallet_change": "2.999459"
+                },
+        		...
+        	],
+        	"error":null,
+        	"message":"Request completed successfully",
+        	"status":"success"
+        }
+        ```
+        
+    - Failed Response
+        
+        ```json
+        {
+          "status": "error",
+          "message": "Internal Server Error",
+          "data": null,
+          "error": "Failed to send request to ClickHouse: Timeout"
+        }
+        ```
+        
+
+## Aries Rewards
+
+Grab an account/profiles total rewards from aries
+
+```
+https://api.mainnet.aptoslabs.com/v1/analytics/aries/rewards?account_address=<string>&account_profile=<str>
+```
+
+<aside>
+🔗
+
+Try this endpoint in your [browser](https://api.mainnet.aptoslabs.com/v1/analytics/aries/total_rewards?account_address=0x804a03b534243c924c5799ec8769ca34049eccced1d075a0e5c1d4fe028f10a8&profile_address=0x591a4818fc63794b2abd3e028276ae72243228ede20a00ce4a8f555b1709abff)
+
+</aside>
+
+- Request
+    
+    
+    | Query Parameter | Description |
+    | --- | --- |
+    | account_address | the `string` account address. |
+    | profile_address | the `string` aries profile address. |
+    | date_start | optional, the `YYYY-MM-DD` start of the search window. Defaults to the beginning of mainnet year, `2022-10-24`. |
+    | date_end | optional, the `YYYY-MM-DD` end of the search window. Defaults to today |
+- Sample Responses
+    - Successful Response
+        
+        ```json
+        {
+          "data": [
+            {
+              "asset_type": "0x5e156f1207d0ebfa19a9eeff00d62a282278fb8719f4fab3a586a0a2c0fffbea::coin::T",
+              "reward_asset_type": "0x0000000000000000000000000000000000000000000000000000000000000001::aptos_coin::AptosCoin",
+              "total_reward_balance": 0.000888469999999587
+            },
+            {
+              "asset_type": "0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDT",
+              "reward_asset_type": "0x0000000000000000000000000000000000000000000000000000000000000001::aptos_coin::AptosCoin",
+              "total_reward_balance": 0.000888469999999587
+            }
+          ],
+          "error": null,
+          "message": "Request completed successfully",
+          "status": "success"
+        }
+        ```
+        
+    - Failed Response
+        
+        ```json
+        {
+          "status": "error",
+          "message": "Internal Server Error",
+          "data": null,
+          "error": "Failed to send request to ClickHouse: Timeout"
+        }
+        ```
+        
+
+## Aries Pool APRs
+
+Grab an account/profiles total rewards from aries
+
+```
+https://api.mainnet.aptoslabs.com/v1/analytics/aries/daily_pool_apr?reserve_asset_type=<string>&date_start=<YYYY-MM-DD>&date_end=<YYYY-MM-DD>
+```
+
+<aside>
+🔗
+
+Try this endpoint in your [browser](https://api.mainnet.aptoslabs.com/v1/analytics/aries//daily_pool_apr?reserve_asset_type=0x0000000000000000000000000000000000000000000000000000000000000001::aptos_coin::AptosCoin&date_start=2025-04-01&date_end=2025-04-10)
+
+</aside>
+
+- Request
+    
+    
+    | Query Parameter | Description |
+    | --- | --- |
+    | reserve_asset_type | the `string` coin address of the asset type |
+    | date_start | optional, the `YYYY-MM-DD` start of the search window. Defaults to the beginning of mainnet year, `2022-10-24`. |
+    | date_end | optional, the `YYYY-MM-DD` end of the search window. Defaults to today |
+- Sample Responses
+    - Successful Response
+        
+        ```json
+        {
+          "data": [
+            {
+              "borrow_apr": 0.0387762463070972,
+              "date_day": "2023-10-24",
+              "deposit_apr": 0.00018043167332024032,
+              "lp_price_ratio": 1.0069398831870753,
+              "utilization_percentage": 0.005170166174279627
+            }
+          ],
+          "error": null,
+          "message": "Request completed successfully",
+          "statistics": {
+            "bytes_read": 1010748,
+            "elapsed": 0.00537179,
+            "rows_read": 8008
+          },
+          "status": "success"
+        }
+        ```
+        
+    - Failed Response
+        
+        ```json
+        {
+          "status": "error",
+          "message": "Internal Server Error",
+          "data": null,
+          "error": "Failed to send request to ClickHouse: Timeout"
+        }
+        ```
+
+
+eg https://petra-pricing.petra-wallet.workers.dev/prices
+
+{"0x1::aptos_coin::AptosCoin":{"changes":{"usd_24h":0.57407095,"usd_30d":12.26447089,"usd_7d":13.11819097},"market_data":{"fully_diluted_market_cap":5807644004.77,"market_cap":3308605666.8575726,"symbol":"APT","total_supply":1154486050.2827873,"volume_24h":269926533.74392194},"usd":5.030501,"usd_24h_change":0.57407095},"0x357b0b74bc833e95a115ad22604854d6b0fca151cecd94111770e5d6ffc9dc2b":{"usd":1,"usd_24h_change":-0.018193303968258277},"0xbae207659db88bea0cbead6da0ed00aac12edcdda169e591cd41c94180b46f3b":{"usd":0.999882,"usd_24h_change":0.007373127695420603},"0x81214a80d82035a190fcb76b6ff3c0145161c3a9f33d137f2bbaee4cfec8a387":{"usd":120468.17466337},"0xb2c7780f0a255a6137e5b39733f5a4c85fe093c549de5c359c1232deef57d1b7":{"usd":0.01546636},"0x5ae6789dd2fec1a9ec9cccfb3acaf12e93d432f0a3a42c92fe1a9d490b7bbc06::mkl_token::MKL":{"changes":{"usd_24h":0.11690599,"usd_30d":-14.45014651,"usd_7d":-3.2267389},"market_data":{"fully_diluted_market_cap":7798349.67,"market_cap":0,"symbol":"MKL","total_supply":100000000,"volume_24h":4357.04300997},"usd":0.077983,"usd_24h_change":0.11690599},"0x878370592f9129e14b76558689a4b570ad22678111df775befbfcbc9fb3d90ab":{"usd":0.07811389},"0xb36527754eb54d7ff55daf13bcb54b42b88ec484bd6f0e3b2e0d1db169de6451":{"usd":0.12445197},"0x53a30a6e5936c0a4c5140daed34de39d17ca7fcae08f947c02e979cef98a3719::coin::LSD":{"usd":0.243375},"0x02370cc1d995f3aadd337c1c6c63834ad8d2bd0cdc70bc8dff81de463e18b159":{"usd":0.243375},"0x7fd500c11216f0fe3095d0c4b8aa4d64a4e2e04f83758462f2b127255643615::thl_coin::THL":{"changes":{"usd_24h":-1.91919999,"usd_30d":3.86278518,"usd_7d":-3.39729048},"market_data":{"fully_diluted_market_cap":11611067.05,"market_cap":5691208.638621224,"symbol":"THL","total_supply":99811473,"volume_24h":234744.3210469},"usd":0.11611,"usd_24h_change":-1.91919999},"0x377adc4848552eb2ea17259be928001923efe12271fef1667e2b784f04a7cf3a":{"usd":0.11652018},"0x2ebb2ccac5e027a87fa0e2e5f656a3a4238d6a48d93ec9b610d570fc0aa0df12":{"changes":{"usd_24h":-1.47168809,"usd_30d":-38.80710903,"usd_7d":0.80886686},"market_data":{"fully_diluted_market_cap":6641082.32,"market_cap":0,"symbol":"CELL","total_supply":1083370166.05587,"volume_24h":110197.03069024},"usd":0.00613,"usd_24h_change":-1.47168809},"0xeedba439a4ab8987a995cf5cfefebd713000b3365718a29dfbc36bc214445fb8":{"changes":{"usd_24h":4.44974497,"usd_30d":-8.72723801,"usd_7d":5.38164416},"market_data":{"fully_diluted_market_cap":554610.95,"market_cap":0,"symbol":"VIBE","total_supply":1000000000,"volume_24h":0},"usd":0.00055461,"usd_24h_change":4.44974497},"0xe4ccb6d39136469f376242c31b34d10515c8eaaa38092f804db8e08a8f53c5b2::assets_v1::EchoCoin002":{"changes":{"usd_24h":-1.05259764,"usd_30d":-11.63919992,"usd_7d":-1.46454126},"market_data":{"fully_diluted_market_cap":3414763.62,"market_cap":2440607.440087102,"symbol":"GUI","total_supply":777777777776.9,"volume_24h":250617.64248741},"usd":0.0000043904,"usd_24h_change":-1.05259764},"0x0009da434d9b873b5159e8eeed70202ad22dc075867a7793234fbc981b63e119":{"usd":0.00000445},"0xbcff91abababee684b194219ff2113c26e63d57c8872e6fdaf25a41a45fb7197":{"usd":0.00710569},"0x378d5ba871c3d1bdf477a617f997f23d9e0702de97a02f42925b44fa3abc9866":{"usd":0.00757513},"0x9d0595765a31f8d56e1d2aafc4d6c76f283c67a074ef8812d8c31bd8252ac2c3::asset::TOMA":{"usd":6.8e-7},"0x79e8a5ddb82aa53854c1348c2865fd00732a41937dc1c160a4a50205537bd740":{"usd":6.8e-7},"0xd0ab8c2f76cd640455db56ca758a9766a966c88f77920347aac1719edab1df5e":{"usd":0.0084009,"usd_24h_change":-0.5174314438758658},"0x73eb84966be67e4697fc5ae75173ca6c35089e802650f75422ab49a8729704ec::coin::DooDoo":{"usd":0.133742,"usd_24h_change":3.734865508242144},"0xb27b0c6b60772f0fc804ec1cd3339f552badf9bd1e125a7dd700d8eb11248ef1":{"usd":0.1332735},"0x268d4a7a2ad93274edf6116f9f20ad8455223a7ab5fc73154f687e7dbc3e3ec6::LOON::LOON":{"changes":{"usd_24h":-0.56707457,"usd_30d":29.5422689,"usd_7d":-0.74378849},"market_data":{"fully_diluted_market_cap":245865.43,"market_cap":245865.42766512732,"symbol":"LOON","total_supply":1000000000,"volume_24h":49033.86872852},"usd":0.00024586,"usd_24h_change":-0.56707457},"0x41dfe1fb3d33d4d9d0b460f03ce1c0a6af6520dd8bdc0f204583c4987faf81de":{"usd":0.00024441},"0xf37a8864fe737eb8ec2c2931047047cbaed1beed3fb0e5b7c5526dafd3b9c2e9":{"usd":1.0005222},"0x111ae3e5bc816a5e63c2da97d0aa3886519e0cd5e4b046659fa35796bd11542a::amapt_token::AmnisApt":{"usd":5,"usd_24h_change":0.23218552861881597},"0xa259be733b6a759909f92815927fa213904df6540519568692caf0b068fe8e62":{"usd":4.99328068},"0x111ae3e5bc816a5e63c2da97d0aa3886519e0cd5e4b046659fa35796bd11542a::stapt_token::StakedApt":{"usd":5.73,"usd_24h_change":-0.014246786084954482},"0xb614bfdf9edc39b330bbf9c3c5bcd0473eee2f6d4e21748629cc367869ece627":{"usd":5.81293882},"0xfaf4e633ae9eb31366c9ca24214231760926576c7b625313b3688b5e900731f6::staking::ThalaAPT":{"usd":4.99022168},"0xa0d9d647c5737a5aed08d2cfeb39c31cf901d44bc4aa024eaa7e5e68b804e011":{"usd":4.99022168},"0xfaf4e633ae9eb31366c9ca24214231760926576c7b625313b3688b5e900731f6::staking::StakedThalaAPT":{"usd":4.99,"usd_24h_change":0.01586206016362288},"0x0a9ce1bddf93b074697ec5e483bc5050bc64cff2acd31e1ccfd8ac8cae5e4abe":{"usd":5.84118747},"0x821c94e69bc7ca058c913b7b5e6b0a5c9fd1523d58723a966fb8c1f5ea888105":{"usd":5.00976981},"0x42556039b88593e768c97ab1a3ab0c6a17230825769304482dff8fdebe4c002b":{"usd":5.10641087},"0xdd84125d1ebac8f1ecb2819801417fc392325e672be111ec03830c34d6ff82dd":{"usd":0.99698092},"0x6f986d146e4a90b828d8c12c14b6f4e003fdff11a8eecceceb63744363eaac01::mod_coin::MOD":{"usd":0.997259,"usd_24h_change":-0.03595472213008981},"0x94ed76d3d66cb0b6e7a3ab81acf830e3a50b8ae3cfb9edc0abea635a11185ff4":{"usd":0.99726452},"0x534e4c3dc0f038dab1a8259e89301c4da58779a5d482fb354a41c08147e6b9ec":{"usd":0.95632654},"0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDC":{"usd":0.998945,"usd_24h_change":-0.068370185595436},"0x2b3be0a97a73c87ff62cbdd36837a9fb5bbd1d7f06a73b7ed62ec15c5326c1b8":{"usd":0.9998986},"0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDT":{"usd":0.999799,"usd_24h_change":0.009519764940914522},"0xe568e9322107a5c9ba4cbd05a630a5586aa73e744ada246c3efb0f4ce3e295f3":{"usd":1.00017359},"0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::WETH":{"usd":3017.45,"usd_24h_change":1.0876046074007952},"0xae02f68520afd221a5cd6fda6f5500afedab8d0a2e19a916d6d8bc2b36e758db":{"usd":3026.81694272},"0x5e156f1207d0ebfa19a9eeff00d62a282278fb8719f4fab3a586a0a2c0fffbea::coin::T":{"usd":0.99982,"usd_24h_change":0.001636806807933236},"0x54fc0d5fa5ad975ede1bf8b1c892ae018745a1afd4a4da9b70bb6e5448509fc0":{"usd":0.9998986},"0x8a7403ae3d95f181761cf36742680442c698b49e047350b77a8906ec5168bdae":{"usd":5.0617975},"0x4e1854f6d332c9525e258fb6e66f84b6af8aba687bbcb832a24768c4e175feec::abtc::ABTC":{"usd":120432.60866234},"0xf599112bc3a5b6092469890d6a2f353f485a6193c9d36626b480704467d3f4c8":{"usd":120432.60866234},"0x92f0951cecb35dc7613bc0e09f27e2c7aaebdc320f93901c121a1ec06f3aa455":{"usd":0.00051448},"0x4fbed3f8a3fd8a11081c8b6392152a8b0cb14d70d0414586f0c9b858fcd2d6a7::UPTOS::UPTOS":{"changes":{"usd_24h":-0.92458721,"usd_30d":-39.58733919,"usd_7d":5.91775362},"market_data":{"fully_diluted_market_cap":48893.36,"market_cap":0,"symbol":"UPTOS","total_supply":88888888888,"volume_24h":0.27802302},"usd":5.5005e-7,"usd_24h_change":-0.92458721},"0x5915ae0eae3701833fa02e28bf530bc01ca96a5f010ac8deecb14c7a92661368":{"usd":5.5e-7},"0xc26a8eda1c3ab69a157815183ddda88c89d6758ee491dd1647a70af2907ce074::coin::Chewy":{"changes":{"usd_24h":0.07138603,"usd_30d":-16.28568115,"usd_7d":-7.15574576},"market_data":{"fully_diluted_market_cap":502284.16,"market_cap":0,"symbol":"CHEWY","total_supply":1000000000000,"volume_24h":69.6267284},"usd":5.0228e-7,"usd_24h_change":0.07138603},"0x1fe81b3886ff129d42064f7ee934013de7ef968cb8f47adb5f7210192bcd4a23":{"usd":5e-7},"0xc5fbbcc4637aeebb4e732767abee8a21f2b0776f73b73e16ce13e7d31d6700da::MOOMOO::MOOMOO":{"usd":0.00000846},"0xa0fa5918da73235921c6120597db820df0be391d0056dc0a7ee7a80b83f29d64":{"usd":0.00000846},"0x5e975e7f36f2658d4cf146142899c659464a3e0d90f0f4d5f8b2447173c06ef6::EDOG::EDOG":{"usd":0.00001146},"0x1ff8bf54987b665fd0aa8b317a22a60f5927675d35021473a85d720e254ed77e":{"usd":0.00001146},"0x63be1898a424616367e19bbd881f456a78470e123e2770b5b5dcdceb61279c54::movegpt_token::MovegptCoin":{"usd":0.00012836},"0x4c3efb98d8d3662352f331b3465c6df263d1a7e84f002844348519614a5fea30":{"usd":0.00012836},"0xe88ae9670071da40a9a6b1d97aab8f6f1898fdc3b8f1c1038b492dfad738448b::coin::Donk":{"usd":0.00003984,"usd_24h_change":2.859154455606081},"0x41944cf1d4dac152d692644944e2cc49ee81fafdfb37abd541d06388ec3f7eda":{"usd":0.00003906},"0x96baeee6d7a4a8cd712144d1225cfcb6c26d0c6fefd463bd77a878e4526c7411::hair_coin::HairCoin":{"usd":0.00001079},"0xd08a1ab00895c35dd19b356f5747355ebcd58cf5e684c15e6808d760ffd6beff":{"usd":0.00001079},"0x2d4de7378c573dadc2e589892d709ee24f3c26f23b57804f384f4803da2e6f0a::ZIPO::ZIPO":{"usd":0.00001198},"0x76dd1fafe2f28dd1af8e71a02a41fb96d1f63b88bebdc629bbfe76703f5e7a6a":{"usd":0.00001198},"0x159df6b7689437016108a019fd5bef736bac692b6d4a1f10c941f6fbb9a74ca6::oft::CakeOFT":{"changes":{"usd_24h":-0.34879097,"usd_30d":-0.47407002,"usd_7d":6.71632452},"market_data":{"fully_diluted_market_cap":1086993153.39,"market_cap":833595444.3966225,"symbol":"CAKE","total_supply":365801481.1041265,"volume_24h":106448134.07885663},"usd":2.41554,"usd_24h_change":-0.34879097},"0xad18575b0e51dd056e1e082223c0e014cbfe4b13bc55e92f450585884f4cf951":{"usd":2.42109119},"0xaef6a8c3182e076db72d64324617114cacf9a52f28325edc10b483f7f05da0e7":{"usd":5.38629299},"0xe9c6ae7a056ba49901fcc19ab3fcff0938f882cfd7f2cc5a72eea362d29f5b8f":{"usd":0.00003741},"0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::WBTC":{"usd":115881.42259992},"0xa64d2d6f5e26daf6a3552f51d4110343b1a8c8046d0a9e72fa4086a337f3236c":{"usd":115881.42259992},"0x27fafcc4e39daac97556af8a803dbb52bcb03f0821898dc845ac54225b9793eb::move_coin::MoveCoin":{"changes":{"usd_24h":-1.1342024,"usd_30d":2.9341931,"usd_7d":-0.62017697},"market_data":{"fully_diluted_market_cap":1503218109.89,"market_cap":390836708.57216555,"symbol":"MOVE","total_supply":10000000000,"volume_24h":62096824.86827207},"usd":0.15032,"usd_24h_change":-1.1342024},"0x96d1ccca420ebc20fc8af6cacb864e44856ca879c6436d4e9be2b0a4b99bf852":{"usd":0.0108466},"0xe234f0e7c05165cc48f5407c3eb542709a8284fb6b9d66068413a2e13ef423bd::MOVEPUMP::MOVEPUMP":{"usd":2.4e-7},"0xa067de5ce739da1400a92945646f719a0265df6412ddab872cd670052c5cc12f":{"usd":2.4e-7},"0xa2eda21a58856fda86451436513b867c97eecb4ba099da5775520e0f7492e852::coin::T":{"usd":1.00017359},"0x6704464238d73a679486420aab91a8a2a01feb9d700e8ba3332aa3e41d3eab62":{"usd":1.00017359},"0xada35ada7e43e2ee1c39633ffccec38b76ce702b4efc2e60b50f63fbe4f710d8::apetos_token::ApetosCoin":{"usd":0.00450453},"0xfad230e7d9df2baf83a68b6f50217ed3c06da593e766970a885965b43b894a04":{"usd":0.00450453},"0xd6a49762f6e4f7401ee79be6f5d4111e70db1408966ba1aa204e6e10c9d437ca::bubbles::BubblesCoin":{"usd":0.00243222},"0xaca80bdba3a9f58af0c6348f15530e4d891d1c60abca4c2cfb4c1a73bff0f8dd":{"usd":0.00243222},"0xae478ff7d83ed072dbc5e264250e67ef58f57c99d89b447efd8a0a2e8b2be76e::coin::T":{"changes":{"usd_24h":1.19633328,"usd_30d":14.55373421,"usd_7d":10.83147854},"market_data":{"fully_diluted_market_cap":15495826790.75,"market_cap":15495826790.74516,"symbol":"WBTC","total_supply":129018.23968188,"volume_24h":320376839.6913757},"usd":120105.7062,"usd_24h_change":1.19633328},"0x4a884be56ef4c11a27162bf30b32e8e3615dcb3df0fc1777c8eb69c1991f34d0":{"usd":120708.60190775},"0xdcfa079344261bfde45e7f6281df091743b8d3098bf9e26e1c0212fc5b070621::zaaptos_token::ZaaptosCoin":{"usd":0.00001842},"0xcd70630fb90cab716ab01a7884821f86dceb1bbb09a89683b5c22c5462503f51":{"usd":0.00001842},"0x4c71c33b9ec2f263a7f25779bd9a2531165d4da9a963e042a20f288688094a66::APTO_THE_MASCOT::APTO_THE_MASCOT":{"usd":0.00000497},"0x5e438070c801e45c89528d1217e019178a3211036250fed988338f43f891ca31":{"usd":0.00000497},"0x61ed8b048636516b4eaf4c74250fa4f9440d9c3e163d96aeb863fe658a4bdc67::CASH::CASH":{"usd":0.00011038,"usd_24h_change":-0.557895544375565},"0xc692943f7b340f02191c5de8dac2f827e0b66b3ed2206206a3526bcb0cae6e40":{"usd":0.00011086},"0xb30a694a344edee467d9f82330bbe7c3b89f440a1ecd2da1f3bca266560fce69":{"usd":1.18010854},"0xcc8a89c8dce9693d354449f1f73e60e14e347417854f029db5bc8e7454008abb::coin::T":{"changes":{"usd_24h":1.23799948,"usd_30d":19.96623997,"usd_7d":19.18645995},"market_data":{"fully_diluted_market_cap":10235489730.64,"market_cap":10235489730.641598,"symbol":"WETH","total_supply":3375317.5926469,"volume_24h":1908522407.9297607},"usd":3032.45233,"usd_24h_change":1.23799948},"0x92410a41654236295001f06375afbb1786dbd14bc1c42a33bfcf50204c248bb7":{"usd":3026.81694272},"0xef0d49f03e48dbd055c3a369f74a304c366bda148005ddf6bb881ced79da0b09":{"usd":0.00047472},"0x6f446fe32a361c5512863d5e610f7d7eaa54d5cee1cea6a2712f2e56da693f1c::MODENG::MODENG":{"usd":0.00000321},"0x5dd9b0b5eea4d2bec9c8cabed2f1db7062fb6ed16471fd52de491426718b0d95":{"usd":0.00000321},"0x9d4d8a8f1551317276bc2fbf924e7adf82b722b72f4f914dcfb6cc1811bc383f::Sidelined::Sidelined":{"usd":0.00242515},"0x073992b487d517a8fc710acf953248b2045e381e5eb6fd9a92828db64a269530":{"usd":0.00242515},"0x4ef6d6d174ae393cec4c8af0b75638082fe45c92e552b4df8bc679e3a0ddcb13::CAPTOS::CAPTOS":{"usd":0.00001719},"0x7fa78d58cccc849363df4ed1acd373b1f09397d1c322450101e3b0a4a7a14d80":{"usd":0.00001719},"0x24dc0c6bd0a98f31961589e6432a8038833128f7c802ba148172553987c379f::MEOW::MEOW":{"usd":0.00003589},"0xd8b8cd2c1a87374567a0fe48c6c785237921e09395fbbf3f4754a39cc61b3270":{"usd":0.00003589},"0x8d87a65ba30e09357fa2edea2c80dbac296e5dec2b18287113500b902942929d::celer_coin_manager::UsdtCoin":{"usd":1.00017359},"0xc448a48da1ed6f6f378bb82ece996be8b5fc8dd1ea851ea2c023de17714dd747":{"usd":1.00017359},"0x8d87a65ba30e09357fa2edea2c80dbac296e5dec2b18287113500b902942929d::celer_coin_manager::UsdcCoin":{"usd":0.9998986},"0xf92047adba5ec4a21ad076b19a0c8806b195435696d30dc3f43781d1e6d91563":{"usd":0.9998986},"0x8d87a65ba30e09357fa2edea2c80dbac296e5dec2b18287113500b902942929d::celer_coin_manager::WethCoin":{"usd":2588.71,"usd_24h_change":null},"0xfbd6406c12cab2aef728c917a365cdb73883213f74af5e8a46c8fbd77b623ee7":{"usd":2647.22825091},"0x8d87a65ba30e09357fa2edea2c80dbac296e5dec2b18287113500b902942929d::celer_coin_manager::BnbCoin":{"usd":760.61,"usd_24h_change":0.05375151257420921},"0x3fb0cd30095fc85c77eb5cb9edcdbead3cef34e449b1a6f07729282120bc6383":{"usd":611.37917818},"0x4def3d3dee27308886f0a3611dd161ce34f977a9a5de4e80b237225923492a2a::coin::T":{"changes":{"usd_24h":-8.45587922,"usd_30d":-28.20578523,"usd_7d":-5.5809588},"market_data":{"fully_diluted_market_cap":1897331.63,"market_cap":1087782.344864731,"symbol":"GARI","total_supply":979444315.55,"volume_24h":246147.63277653},"usd":0.0019371,"usd_24h_change":-8.45587922},"0xb81588af2f7d291e8e57f673ec74d4a38f0654633ad6bbeb1cfd4bb0550ae0df":{"usd":0.00191077},"0xe561c0aa88ee23f645b68b9aca8eb6142234a3642da4d706ea49f1c8a1532adf::coin_factory::Emojicoin":{"usd":0.00002719},"0x10b9397bd657d8b0d20cd4961350b92be62211fdde220c88cb0c8ef5979ca20a":{"usd":0.00002719},"0x14789d9ef354491bba9ca4efb800224344a3d15d55775d39fad74f66368948bc::coin_factory::Emojicoin":{"usd":0.00004028},"0x582a5c642a65de2586fc64af05242cd6a6ec65efdd694b00fd988bbac63a8662":{"usd":0.00004028},"0xce1d63178cfc4c56ea1e925d24098350b4135b55b4b2e0b07ac89c98a1ab94e6::coin_factory::Emojicoin":{"usd":0.00006914},"0x9ce6b84fb6f9099aa11e518fb24372412bc161e3ca503454182d37015a952438":{"usd":0.00006914},"0x2acee43658eedf3d0197e5a1fefff6b8971577ff5f04324c0e97c9520e8509a7::coin_factory::Emojicoin":{"usd":0.00156},"0xe07a2a4cb27a54f0f7d35e06b53d143701406c0d09bb2ea4d7d02bf756cf5ff3":{"usd":0.00156},"0xc1cd62f4eb42b4940b8c52cd58eb62c3a397fa68733407f4eabe3187c59d45c8::coin_factory::Emojicoin":{"usd":0.00003973},"0xc80adc2fe3f69a7471aa962b58c23c31058f5ec018bcf64859c1b85425f74dda":{"usd":0.00003973},"0x3c6405f0d2fdb58bbe17579f291bbd584f1ef5929bc1784b95251208cf7d5efb::coin_factory::Emojicoin":{"usd":0.00004634},"0x4e4d039859f17a8915ccd1ab7e78fc3c98a52f8b20988072f44d675301780094":{"usd":0.00004634},"0x72a70c925a8260880de81b500ecd743e652cd74797eb1d024f44ea195cbf8bb::coin_factory::Emojicoin":{"usd":0.00232928},"0x56ec18b1968d6faf99e4646eafc8c456eb82eaf92c5647957c62cdda24c73684":{"usd":0.00232928},"0x61f25db9a02862c110c47b11328b598df48e019db9af6abdf57264c967418a3c::coin_factory::Emojicoin":{"usd":0.00024157},"0x1b2b7c24bd430a367da057d15e7f96e2f5b682783f0a6dfe5c39fe27dee703ec":{"usd":0.00024157},"0x4513346d4884b5aa7507e4e9e0f086634a8369367f92854db13c757251cd5d7c::coin_factory::Emojicoin":{"usd":0.00004703},"0xd5295f051ef30ca1b6a8bf71b3f46a5bd5b582d9601950f4fd032d7a4fe584fc":{"usd":0.00004703},"0xd7c7d369337ce0fff71c472a98b1625f5226d00326aea429ba50f7efda9e9d6f::coin_factory::Emojicoin":{"usd":0.00003343},"0x8a9bb233d2d0c16e8361fdfcdef9bcfa0e0b505af924080a9c13956fb1f22cc3":{"usd":0.00003343},"0x1ed734e0d2d555549b5115d8e36fed92813cd4874ea991be582811223e84dfca::coin_factory::Emojicoin":{"usd":0.00009723},"0xef36cb199972a409389ba89e73e02418e47c355c7acffe0d463035c18e832aa9":{"usd":0.00009723},"0x98d919400b8bad3cabe47d0c7c45cf38c0a4caf38798bb85ea7f273d45c930b5::coin_factory::Emojicoin":{"usd":0.00015227},"0x8088b4dca2893451fbdcd0ee030bb406fc6854096ed340a1b06667730a6ff399":{"usd":0.00015227},"0x487da17349ab0d1c5bbcbdd5d60aa66db2888a4998db9162102ea989237ec0c5::coin_factory::Emojicoin":{"usd":0.00015053},"0x8aefbc092cd04b692f21bebf0a741b165c8cae15e898b6645cfa9fffee8d5fad":{"usd":0.00015053},"0xf72a2b739de60869bd36fee47a8db8a170323f51d7e039b58ce26af03fbb3afa::coin_factory::Emojicoin":{"usd":0.00003684},"0xaea22efec825e76e5b24c3dfea41d0e388962334a5bef5fe7145f3ab79a728bc":{"usd":0.00003684},"0x4e6441c17418c48f9c5fb29994eb75945d815ec524885bd4e53c3f722a343e0c::coin_factory::Emojicoin":{"usd":0.00019529},"0xeaab2cb03fc32b9a45b6874dd31a584ace5dd05aa1f6785d9b14c208a6c32dcc":{"usd":0.00019529},"0x4c27a4cca716e25749cc37cf5087b999aed89e09ba93e1936d52af8bb092f8ca::coin_factory::Emojicoin":{"usd":0.00009119},"0xd26ab5ac17cd1444aa4ca88e7ed26a7129581a4d52f84298826472e9bc0eeb8c":{"usd":0.00009119},"0x1b81dc6024e01b9f594ed45724540118dadb974b855d4da8d4c461a3f4475463::coin_factory::Emojicoin":{"usd":0.00013154},"0xd14d46e41eb9951631aa6afc1cb05387bc2a68074a3ac1b17c77284bae273230":{"usd":0.00013154},"0x9734dbda52b35f12dcb88d310ee990010bd98513cfadb80ad80a9dbbeecfc4ae::coin_factory::Emojicoin":{"usd":0.00005097},"0x881d6cc35cbb0eb360b8acf55064d1794ee5be880663144857d6219ff5d579ca":{"usd":0.00005097},"0x6af1d6691f3d2797b5e369dcb95545c1965cd3753cbb4a6302e8d82995ee22bc::coin_factory::Emojicoin":{"usd":0.00008358},"0x365d1520ec4a4e6ef61887a61538e247e5dff8ec58648c6a33e4abf7483bdfcd":{"usd":0.00008358},"0x4f7218b162276efb963b6ed77d19b68dd57d711f822e61e52ab8810376cbcdab::coin_factory::Emojicoin":{"usd":0.00002531},"0x6d29e54cb11a0f57591f3081610a4a010ebabc81e2a63214bf51fac2e7bd1f21":{"usd":0.00002531},"0x9aa8b97d118a0d9d04c45b68fd8924ce58b1b9c8d7f87fad1883ea4af3f00217::coin_factory::Emojicoin":{"usd":0.00002819},"0x9aae68d9e4e7911fe7ea82290d1638226ef5022874808f5a69471fe31bb99357":{"usd":0.00002819},"0x725f23bf4fbcdec217b592c6f6eee255d6bf894c2f09288d4fe7dac78acdab3b::coin_factory::Emojicoin":{"usd":0.00042375},"0x09cf420dacc6723183fadc1f11ed90481232ff2c7c1d7fb1d2d984a8f4efe132":{"usd":0.00042375},"0xadbed322f850f492507ae31d11102aacd6fd0ebd4b806894762e8d05fb57ec42::coin_factory::Emojicoin":{"usd":0.00011658},"0xd123aaec8b94a96e3b6bfd3aeb465de59b7da8461cdad8da78b18d9fbeef2b59":{"usd":0.00011658},"0xad3540dc5c0b9a585a93a224152be1b4d749d8def2e897353b88524fdf847e45::coin_factory::Emojicoin":{"usd":0.00044057},"0xcb8badfe40d266b30622f368cf8190a18aa8e90ba4c69c491cfe06e7efcd45d5":{"usd":0.00044057},"0x46525b3cf96f85b49ca768ffde1299216c282856a023b7c1ee217693bd41132b::coin_factory::Emojicoin":{"usd":0.00004093},"0x34347b22d492eb3c6a6358831ab6e9b9a8056ab7f1f1b9db6d5532fc0ad695ad":{"usd":0.00004093},"0xc44001d1530839143ccda509630c424cae658239d3546e93106e3fac91350b63::coin_factory::Emojicoin":{"usd":0.00030288},"0x6793da41a603ecb5724714418d5c763a1b2b205d295a574785083a7c95765e8f":{"usd":0.00030288},"0x5ea97eab22986dfef7c2de721faf9cd1fc1e108953d2f2688db1e19efd9c8c9a::coin_factory::Emojicoin":{"usd":0.00009131},"0x01cbceca2d98c188780176418140310be7502d886e6badea24b3ed361333fbed":{"usd":0.00009131},"0xd015a71cb609febbc3997aef0306ae0eb7a6840ca7cf3b5f245a4bf03b7f9368::coin_factory::Emojicoin":{"usd":0.00012057},"0x6478e74e884c631b7cd39746a6371a06420edcea0f700857476d5853d3f3900c":{"usd":0.00012057},"0x2aa87a3156a4622e41b1f385637bd0fe0687252f929e9c095a881d70167102cf::coin_factory::Emojicoin":{"usd":0.00028127},"0x5da05b6ef2df03f00ba543acbd756a51525307dcfc5cece2077dfcca8e41f33d":{"usd":0.00028127},"0x7e2dbc168cf304f73478b1114b49c3550ac1d27d7f6c38a2db6294a8700c92a::coin_factory::Emojicoin":{"usd":0.00004423},"0x12adbabcfb8fa6f0449a1a19dcea86031a26d25a227d0bc4d5144805418f0b40":{"usd":0.00004423},"0xdcebf089e7f54e0f74be67ac62423077634bd796c0a182338c221fa01758473::coin_factory::Emojicoin":{"usd":0.00003226},"0xfeaa78744cc70f6d5989775bd04016f3389477c1da3b84c3ecf7d60c4805d095":{"usd":0.00003226},"0x5ab2405869cf304d4f8e0c4654b655dd030a9aea6f4ff401859815dfc32aa9d0::coin_factory::Emojicoin":{"usd":0.00006818},"0x18d33b9887066a9ca1c07ab03a70cf116891715207aed2f978cd168e571c479e":{"usd":0.00006818},"0xba781e459638562ceca00a82781930e4d76833df283c9af4c8ee22811d785f50::coin_factory::Emojicoin":{"usd":0.00002527},"0x7b6349ef9c4bae764e4da012d02486f364bc217ecd1b8cb226b3243a802a121f":{"usd":0.00002527},"0xb2b0e58c54360127ce83d985505044e61f025628ee9b91e7b41158b883eda3ef::coin_factory::Emojicoin":{"usd":0.00540722},"0xff1015179dc65de73cf56dc99c97361367c48de33ab7eca9c5ea12cfa3a37f61":{"usd":0.00540722},"0x4596ec044e27dae10d45796cd8f6aaa6eb58f9f3a6d3555d83ecced6ef9b64b::coin_factory::Emojicoin":{"usd":0.00012202},"0x81d05c0a5eb01f56bfafe98668be70522d288f749feeea34d0dd355917864dea":{"usd":0.00012202},"0x28b7393f763c91e8feaf04a31e8f36e6519cc360c6e25c6b7c5cecd16c725790::coin_factory::Emojicoin":{"usd":0.00002924},"0x1f05eb502cc9b5809663b1f25e2c54e292e066bdc4839de27fb8242ea84ba665":{"usd":0.00002924},"0xa6d709b1ca28351ba89c6a0d7135eb0d63dcb22c9bfcfaac63484f0dcba57bcd::coin_factory::Emojicoin":{"usd":0.00014416},"0xc13873d72475e43d7b33cafa22b8f8123a64315ee999cf41ad1555f26aed5a3a":{"usd":0.00014416},"0x4114e630d8e23b1b233506e16cedab05f9e8db5d548dc8d8a5b1c43de6d1f18c::coin_factory::Emojicoin":{"usd":0.00074259},"0xe5ea307134d8b82bdb83eb6f2b04d9adfdb4318af9fc47c0a7259e53eb2a9958":{"usd":0.00074259},"0xa20d91d4e4e9eeb7ac1523153e4c8f3e895892136ba4af131234094b973ad715::coin_factory::Emojicoin":{"usd":0.00007102},"0xba5e3ec2029643df0defd38d3a4305c4218b28d2edbf2829f0c312b4ed7789b3":{"usd":0.00007102},"0x66fc28ce3024c2ab9af331c358489520830707730a01cce63fe052137a3a69d9::coin_factory::Emojicoin":{"usd":0.00003091},"0xe69ea119aa7cedc0db04bbe9291b7073d3ffb0ee9ab61f7ef0573ae110430e4d":{"usd":0.00003091},"0xc5776ddaf13edb64dc1689bc3aec96b49296ed1addf87a1f3fe8042c96353d0b::coin_factory::Emojicoin":{"usd":0.00002619},"0xd03567fec8bfc3d981b6df6c5d9cf8a6ae475e03f222b96b19cbd7f358a0ae29":{"usd":0.00002619},"0x80a511bfbc393ef4d3c6cd30562ba5376eebc65a9c4af0da8dd083d901d83f53::coin_factory::Emojicoin":{"usd":0.00008451},"0xb19b1a3f212f55d6cf9f9fe7253e725c5c2c79969637b84caf1417bdfd1f41c0":{"usd":0.00008451},"0x173fcd3fda2c89d4702e3d307d4dcc8358b03d9f36189179d2bddd9585e96e27::coin_factory::Emojicoin":{"usd":0.00581843},"0x01932f35165dd0a9038961d5c145ea90544106de39f3f4011a4c681eab249a99":{"usd":0.00581843},"0x50599e9b4572df4ca99df4f5d12c7f6b38472cba221d1e6649b54625e33f6b2d::coin_factory::Emojicoin":{"usd":0.00015974},"0xa28d260e47bb731864e5271e7c21952d93bab2f9fcb5db44bb479d311648fb5e":{"usd":0.00015974},"0xa3ff61bc139a5a757f6c6900648a6f70e49296a986e2382b355e1e11a75ea2f0::coin_factory::Emojicoin":{"usd":0.00119224},"0x3419ca133f1feb41151796435db9959901507cb790e61a74df5e974279042c84":{"usd":0.00119224},"0x4ef3cd524a053d5aa3f47edb4ee665b305ed98500675f41e36940a9fb0df5a2b::coin_factory::Emojicoin":{"usd":0.00043983},"0x57ee41b6ad8d3f015412cb78d90a52620a77f559d7603d281a04e96b23eb3d58":{"usd":0.00043983},"0x50b2b6a315d11cb734c6a67b049a3cbb90c8b743de7fbb5cca8f3807f52e4e34::coin_factory::Emojicoin":{"usd":0.00003016},"0xbf96bb583a803c9a8fb5d2906e63c8c07f7d9f905bdd7ea5c0e234b11a9f7947":{"usd":0.00003016},"0x28657b40cf6b345fb61ac0c8ae0003a5b6e1a5c23d8913d1200648873d3ca333::coin_factory::Emojicoin":{"usd":0.00008035},"0xa399d4cabff8e246a15f84803e5c6a2e93210bdc8048ff5373188db25ad378bd":{"usd":0.00008035},"0xabbb864a492dfdf04df33e41ea18f542e77ee49d6bce160137b09a54adbfc4ce::coin_factory::Emojicoin":{"usd":0.00005302},"0x88d03cd198e672aea2e94501eae55060bc9ba3a5fca6b9f96a4b909238a28b74":{"usd":0.00005302},"0x77ac800760a990b8b454c03728124b66a4c03f0b6deb209b1120438f8d435ef6::coin_factory::Emojicoin":{"usd":0.00011159},"0xe5501b0e9940f6a7026679d4a52dc2e3e95ebc6ca43526b1bb0a6ed69f2e4af2":{"usd":0.00011159},"0x678d0d28ae71f580d04f988b45046c9e5b49d30dab78994fbcdd3132f229ae4e::coin_factory::Emojicoin":{"usd":0.00002538},"0x762602a4d53444cc4c2b2c0bdff9364fc55275372b32ee81627b913076ca4325":{"usd":0.00002538},"0x439b5ab5bf4d76704cb3733b0bb25df671c840f0fa56d374cefb42859b6a44e::coin_factory::Emojicoin":{"usd":0.0000255},"0x68d9277fe9a71b37f514b57475ff9757917d549e27c4af198861b1c26af35653":{"usd":0.0000255},"0xb3c57ffb893c39324604009f4f9079b4e8905bac50184c1a3fea309096a3425b::coin_factory::Emojicoin":{"usd":0.00009715},"0x78b75f8098ccada4f8b655b46bbd3be3004e7e9dead401d73dc15514911d74ca":{"usd":0.00009715},"0x17740e230cb5ac3f6eb16135fa1ce02baf9a07f2acfa884b33b0fb2f1bc2b91d::coin_factory::Emojicoin":{"usd":0.00771724},"0x3be35c307c15290ec13c2294d40129ddd27e5b96050ec8d43b8aa30255957088":{"usd":0.00771724},"0x58d42ba2aafa55ec2e7c3afed1f6ec8d5f5e195a374508d4cf0667985e2e664c::coin_factory::Emojicoin":{"usd":0.00009999},"0x53f8866f2d57a52ce692d5d20d9bd0f95a4aafe4c003f16c5d4c832507269411":{"usd":0.00009999},"0x5de66f08d6f7ce7da7ca4b5bf54087a9477b4a97a25b421aec7a64c337e77740::coin_factory::Emojicoin":{"usd":0.00002851},"0x94d2cefb8cc5e28de977982888664304c6bfeb1e1dccade7993290b94d8b92f7":{"usd":0.00002851},"0x34b89c72bb3c99e6ad8a4fa834fb9027ed22f526489dad13c02f433f968ede63::coin_factory::Emojicoin":{"usd":0.00003825},"0x80cd7b625e9d780b6498c8f0d379ca199c53e3da2cfd0136bdf1fd1a91b12ac2":{"usd":0.00003825},"0xd99d02e42aa3a59aeb4fee6e885b5a6237bffddfa9408ebb8cafab513743e708::coin_factory::Emojicoin":{"usd":0.0003708},"0x2af665daeb7d3358d001811546fbc151404c960c71106510f9011139bd674ebb":{"usd":0.0003708},"0x3e7a7633bd359a5e1a3854b9da9b13a6a42ddc2cb6657780374f37b10b2fc54a::coin_factory::Emojicoin":{"usd":0.00002754},"0x3cb78e50f1b74dfd9294ca2d70d0f780f12424e24fb7da27174208c593c057d1":{"usd":0.00002754},"0xe3dba4e7929370a2a74f50434b95701af9bb72653d5a900c87a3959d05d26415::coin_factory::Emojicoin":{"usd":0.00002968},"0x58feb6a3f5744fca20ea0a396b58ac58928a879ccff1c096fb646583b17d5c0b":{"usd":0.00002968},"0xf0a1333560dc13b02010beaa6bb6541768d5e413df8a75c13ef2c6fb082e2ed3::coin_factory::Emojicoin":{"usd":0.00004534},"0xbd6a9c8d31c24be7659486439b117778d39246ca370fb75dddb02948696a51ef":{"usd":0.00004534},"0xcf8a6a2f3c139c25a8953304402c735703d5039d16b9dac57840c802f3448afc::coin_factory::Emojicoin":{"usd":0.00030616},"0xad1534820a1a54acab0904e87bde5f221ea021350fd1157d2186066e1ebf4740":{"usd":0.00030616},"0xe7a9abb658acb88e9afeb8368dfda346ea16a2115ce7ed97f477248ae0557276::coin_factory::Emojicoin":{"usd":0.00059417},"0xb76bcdc915280737ae5a4ec9f40c966f6d6d3aece6758bad9ea9e0768382b70c":{"usd":0.00059417},"0xfb5e179778bb99fe42bde2ea9607143fca991493991f0152016a2879e44c8b9b::coin_factory::Emojicoin":{"usd":0.00030735},"0xaf20ba5007b634c17017a73eaab5021e3bf934f2b7dff3f7acd1384f5ae65414":{"usd":0.00030735},"0xab5b8927e344d7caa7c63b18c9e117a1a7809457ba8939db1ab5684a17834a70::coin_factory::Emojicoin":{"usd":0.00009243},"0x86c95f0f0ee970176242ce8c9dc779258e85a58da5c5c63230290badd526cde7":{"usd":0.00009243},"0xb7397fc01a0dd28b9ac64b06a35b7c68454f88de5d35bb3dc8a9ffcc16306875::coin_factory::Emojicoin":{"usd":0.00026057},"0x86b86dfae55bc06603b0d636dbb07ed7ce88cdf9f788570bcc6901f866f3b0df":{"usd":0.00026057},"0x20b2ca41eabbe295acf03685ad6d010d744cfcb50d87b163477f8fd24a460616::coin_factory::Emojicoin":{"usd":0.00010396},"0x19690c424ac8c15bc89439acf5b42132e5f8433ce9cec0ca7aae2df779daee0e":{"usd":0.00010396},"0x8179bdc9594337ecc013b37055c534666a570a127d6e10769e20c2f711326fe2::coin_factory::Emojicoin":{"usd":0.00005169},"0xfed66a64ba519accc190d0bb4f860b89d81b93108bee52b6ba3acb0309cf0ca1":{"usd":0.00005169},"0xedf5327e85ac6673fbb7c13184dc1c0421019257e0fda8d828b711c491b81560::coin_factory::Emojicoin":{"usd":0.00003796},"0x9f4027830e2af37dfa961b883a016a11a402f9cef1346140bc10254ab6651138":{"usd":0.00003796},"0x6e1ce3dab0419b98a459c418a15e221b0cc3e9c116c69256f11eb11a758a6be3::coin_factory::Emojicoin":{"usd":0.00058892},"0x4486f01fbaab822d7729685515e58ca8bc3e918e17dd5c647c23454205c8286f":{"usd":0.00058892},"0x4b011d2f3982d03bda1f0acf3e548fdd3d7ebbe629499e65ddf6c0b5bb5aa231::coin_factory::Emojicoin":{"usd":0.00010187},"0x9fb225a377baa8c20b48ef8b2c20a671a7290db3b0f16ca9dc9dde1ae1857721":{"usd":0.00010187},"0x70d431e0ca2cda64108c9e5ef3fa23695012375d013cc4f870b82cd0a1369a2b::coin_factory::Emojicoin":{"usd":0.00008976},"0x67cb0317e6ae2b2dfe1aa799bd371e42c22dbe855e783781d79d7360f3a545a3":{"usd":0.00008976},"0xf20421fc97c4c9f1e65365db13fca3dc86ac01de6aa46add4e55fb33f6597e4d::coin_factory::Emojicoin":{"usd":0.00004461},"0x0ee45ab57afc22fd59847c5e62ee3c9bcd7c1d30585daf2bf40405195caa60a1":{"usd":0.00004461},"0x539384543c8de2e7cbbc45cf4529b496fb85942a329a77c4dca43b4d2dd5ff8c::coin_factory::Emojicoin":{"usd":0.00018072},"0xee97ae6fff3edb7f9f92c3400d7a8d30a9c3870ee30b8d1e322d4e9724de1a28":{"usd":0.00018072},"0xe125c97500a050b255395cdcf791fabbb6009f774311bad79c34ded59bd00d26::coin_factory::Emojicoin":{"usd":0.00008862},"0x0f51f9e81ddd6b774563667faf2558aed546360189399ce675f8955a998092d0":{"usd":0.00008862},"0x663ebe2b31c23425b8d9b4c586e2b7d6bb1260eed9dc81f26c6c46b8893268aa::coin_factory::Emojicoin":{"usd":0.00002551},"0x9d5a2570f499201760b08264a27338736c193dee00eec2d1981e1f9ef0f038c7":{"usd":0.00002551},"0x6b0debd0d80e34b073b1de5f8bfe27983dd604497ac457fb082844894a3e548d::coin_factory::Emojicoin":{"usd":0.00652621},"0x180e877b151107d7d180545c2fdb373578740872a59071f636c62bd60a6b249d":{"usd":0.00652621},"0xc8406cb7b235be85b13b55d8913b643d9c73c45d51d81dbbd1f4b7a47a79dc35::coin_factory::Emojicoin":{"usd":0.00008754},"0x1e3c2ed30b0940408075d16ee10740ec422bc64b623e13ca61f0dbee8d7333e4":{"usd":0.00008754},"0x21b36dd2c45d6f4bcc6593a40810764acbebfacba1a982fdd5a892700e5fd312::coin_factory::Emojicoin":{"usd":0.00094016},"0x6b32bae5b5f54421f09d5c502891b4c7d46f1c335700722030f0f16cee6c6806":{"usd":0.00094016},"0x184d18630ea9991a8bfcc8bef96e47a84b81939fe7dae40d774e83c495873782::coin_factory::Emojicoin":{"usd":0.0002617},"0x569be4d4f7ccb2c2968a54f801174b671324277cebf16b064ffecb78744d1adc":{"usd":0.0002617},"0xa54102296534b7fa0ea3ee1efd8587c30bf3329015a5a924916f08677c9fc260::coin_factory::Emojicoin":{"usd":0.0000288},"0x276f4d3dbc0b1a84c47dcb9c818cfa84e131fbc18ed2b09430834f4c78e416c1":{"usd":0.0000288},"0xbe014ca9170b3ad430c24f74841c1f456da4f8a6a5a479521985af30efdd6ae4::coin_factory::Emojicoin":{"usd":0.00003157},"0x026a48e6a380f816cbff5b8517751465c78d02998c50f01bd9b0babd53b65112":{"usd":0.00003157},"0x954453e432eafc869707a374741ea76c132f32fa66bb737d91453a6bc2eb0a55::coin_factory::Emojicoin":{"usd":0.00003047},"0x74ecdc21ed79ce3345fd3263eb2e03b8f81d709f6bf22238a902a42a625295db":{"usd":0.00003047},"0xf4b9f41020a0b463af486367d250add1bc92a597b1039f812c4dec1fc1e0da37::coin_factory::Emojicoin":{"usd":0.00010294},"0x8f597d72e47065ea05a5fd80131e154c3f81b3abb1e55e70dc8882d38d7b949e":{"usd":0.00010294},"0xd3b19bba996d2f2bf2c20e504fec61bbebeccb2149649e0f80a1d123510c14f0::coin_factory::Emojicoin":{"usd":0.00039409},"0x39d1788b340ef0c2acfaf80719ed889c469dfd07c983b8366d22377510a6354e":{"usd":0.00039409},"0x4382231be9317c9188324199f2e16ae2840a3a5f0fc358aa2fccb82483af484f::coin_factory::Emojicoin":{"usd":0.00234862},"0xf1a46b61a8737fdea75d7b9cfcf7c2e78d80aaa0cf69ecfc400704d8d9adbbc8":{"usd":0.00234862},"0x9f6f9744fa2ec5e07e77b5a87a975413069b0fb8075b37406ecaa1d1db47e527::coin_factory::Emojicoin":{"usd":0.00013837},"0x3acaef8f70911368a02612de925967a319a705cb9120af9eac02aacd203ecfc3":{"usd":0.00013837},"0xead6c6ccf67199c85fdf2350186c2273144859393146bd5de3e8dd460c5e31c::coin_factory::Emojicoin":{"usd":0.00028406},"0xd124f7348dcc627b3aeb5d051dedef447c0ed9ad93d62cfbb77c1022ae3d515c":{"usd":0.00028406},"0x166bb4d28aec9f9b0eadddf54c0eea3bfb081e4eecf71fd1ac94663c85eba0da::coin_factory::Emojicoin":{"usd":0.00003336},"0x1dffcc4a4c8a2bc65913566c193f10e0a63672f89d982da6f098c8e177df842d":{"usd":0.00003336},"0x4d5baf086232716a5aac19ce9675f020bb9e3811643cd5d22870fd5f7382f001::coin_factory::Emojicoin":{"usd":0.00167102},"0x0cfb1b30241998b26ceb21f6dc997d4d5548ddd54dc4027e0f7764cb70ab5c3b":{"usd":0.00167102},"0xc6ee7524ebafc5f3c82c2787bac2224430d0bfabe0b3a60cd636b2bf8a8cb1b2::coin_factory::Emojicoin":{"usd":0.00002708},"0x36c8815e4a5c275d81b123bbd99eec51f75d57b52b2d27f139d3436b94df5735":{"usd":0.00002708},"0xae1a55d6d42ec911229cd901bce25ddde33ddb5cda806ad7c37437f69458a8f9::coin_factory::Emojicoin":{"usd":0.02264973},"0x40af260f7394ef56d6222322fff4bfa70922bb8369f7ee92c1c1ae697260b7d6":{"usd":0.02264973},"0xe56829ac24c6398b4cd60bb6fdc664d59705a520f9b503f42dd5bbc90243e53c::coin_factory::Emojicoin":{"usd":0.00005814},"0x87d654a5b3bb8290f461363f0ef7b91154cec9693337bddef48840bb99adfa0b":{"usd":0.00005814},"0xe50684a338db732d8fb8a3ac71c4b8633878bd0193bca5de2ebc852a83b35099::propbase_coin::PROPS":{"changes":{"usd_24h":4.91909773,"usd_30d":-1.23576685,"usd_7d":-0.12139393},"market_data":{"fully_diluted_market_cap":29899387.34,"market_cap":10447275.609741744,"symbol":"PROPS","total_supply":1200000000,"volume_24h":3653472.33911388},"usd":0.024916,"usd_24h_change":4.91909773},"0x6dba1728c73363be1bdd4d504844c40fbb893e368ccbeff1d1bd83497dbc756d":{"usd":0.02493551},"0x135726730c0e4e71652a6726354f148dec46974d5c152b0042ad58b37ea3c864::FaptOS::FaptOS":{"usd":0.00000204},"0x6ff3ab54e5052a48a9865eb9578ba8eae6640c0f6c263f752cbdee0cc24bd9f3":{"usd":0.00000204},"0x7de3fea83cd5ca0e1def27c3f3803af619882db51f34abf30dd04ad12ee6af31::tapos::Heart":{"usd":0.00019241},"0xd255eeeccd2618ddcbd91fcf3b31518e4b73ee28a740bd5ad4871e72111d9038":{"usd":0.00019241},"0x5c738a5dfa343bee927c39ebe85b0ceb95fdb5ee5b323c95559614f5a77c47cf::Aptoge::Aptoge":{"changes":{"usd_24h":1.57858724,"usd_30d":2.51768679,"usd_7d":11.83127731},"market_data":{"fully_diluted_market_cap":175.63,"market_cap":0,"symbol":"APTOGE","total_supply":1000000,"volume_24h":0},"usd":0.00017563,"usd_24h_change":1.57858724},"0xf7833d21f83a19548c81e8fd17d8bde4a6e8cc3fbb1ffb97973e06e261c75dee":{"usd":0.0001774},"0x33df6ad8f2208d8f575076e59fda6e195ef5c1908f0dae9e461a1aada7c12418::SNZ::SNZ":{"usd":0.00000278},"0x65feece1d9f9f495325404a9b022184040479ffaf00ddba8a17d6f49d0fe8f52":{"usd":0.00000278},"0x1605f6d99b995e8ddb6200fdccccf97a2497fe1f024a46f6c178a501f0d1b60e::ACAT::ACAT":{"usd":0.00000238},"0x559d0c5ae1730bcb6804b8b71e92db5872c4d5e48a8677d3e9379ac0d2de8f9f":{"usd":0.00000238},"0x9a19f4c81f7dc7b8ae6f568d562e6fb056c3894303229c91f73f34c24b0403b0::luffycoin::Luffy":{"usd":7e-8},"0x4a4be4cbbc1b91ebeaaa4790c6eded83896ce52c6241e7e6c05ff2e5fcd2e656":{"usd":7e-8},"0xe9c192ff55cffab3963c695cff6dbf9dad6aff2bb5ac19a6415cad26a81860d9::mee_coin::MeeCoin":{"changes":{"usd_24h":2.74834012,"usd_30d":264.15398042,"usd_7d":11.63876143},"market_data":{"fully_diluted_market_cap":223878.36,"market_cap":0,"symbol":"MEE","total_supply":49200000,"volume_24h":0},"usd":0.0045503,"usd_24h_change":2.74834012},"0x8ad67293fad95a374c7b54f89e8f6dc672bc980a3d6b700900406806ac2c6dd8":{"usd":0.00449064},"0x2eebec013472480cc903cf7f118ccadcf813b4bf5e57aafba250746eff2150d5::BEDOG::BEDOG":{"usd":0.00000168},"0x22b8228d8f128e901bf17b6155f2979acebb26d2a621af61244b8494868bfe4d":{"usd":0.00000168},"0x7c0322595a73b3fc53bb166f5783470afeb1ed9f46d1176db62139991505dc61::abel_coin::AbelCoin":{"changes":{"usd_24h":-0.03591345,"usd_30d":-0.0579744,"usd_7d":-0.01818377},"market_data":{"fully_diluted_market_cap":444439.05,"market_cap":0,"symbol":"ABEL","total_supply":100000000,"volume_24h":16140.53051009},"usd":0.0044443,"usd_24h_change":-0.03591345},"0xb5f9a9ff6f815150af83b96b15e4f85e4e3b9e92e3fd17a414cd755c4aa49513":{"usd":0.00089454},"0x7b7bab2131de3e4f318b4abaa952f7c817b2c3df16c951caca809ac9ca9b650e::APARTMENT::APARTMENT":{"usd":0.00000264},"0x3310b78c7d1eda37dcb1e38aabc6873cddfe371e80ac06888b45c8e2c41c44ba":{"usd":0.00000264},"0xbe3c4b493632b4d776d56e19d91dcfb34f591f759f6b57f8632d455360da503c::dumdum_coin::DumdumCoin":{"usd":0.00008696},"0x0dcee4819a7b45113c6e44a157a11866f3366a7c93f79ba5acdf27f6fb8ce301":{"usd":0.00008696},"0x967adbf2e05fe665ab86a3bf2c4acfa39fbf62097963474ef70a0786dae8cfa2::NRUH::NRUH":{"usd":0.00000239},"0x78d37cff9f42109ce68cd73edb9ef24bb03aad697d7b6449a544701e425befbf":{"usd":0.00000239},"0x541e21bc602730511c0b2de1dbb8e77e5e16031931a955dc988bbed3f600b510::Rice::Rice":{"usd":0.00000147},"0x87cc249672359d7bf6c71d8b8512e45280c086c181c7b3c37fa625b97c6f47b6":{"usd":0.00000147},"0xcc78307c77f1c2c0fdfee17269bfca7876a0b35438c3442417480c0d5c370fbc::AptopadCoin::APD":{"usd":0.0000126},"0x4ddd6e6dfff083e2e4981cf959384e6aec18a9c62cc4694e8aab950c07296208":{"usd":0.0000126},"0x8e36c188da866c4faccb1ace68a33cca40149d942953a6b6a9976e709396ddb8::BEARD::BEARD":{"usd":0.0000018},"0x2fe25d855c687221bb23b5fe83bb2bd703e9e83241c1a554f94128864182a730":{"usd":0.0000018},"0x1fc2f33ab6b624e3e632ba861b755fd8e61d2c2e6cf8292e415880b4c198224d::apt20::APTS":{"usd":0.00001527},"0xd2f2fd4a3df494042cf24c3b8c1316be8bab7ebac228be77cc0f19fcd885c666":{"usd":0.00001527},"0x881ac202b1f1e6ad4efcff7a1d0579411533f2502417a19211cfc49751ddb5f4::coin::MOJO":{"usd":0.00040765},"0x109492c6323a413d605f5768127b11ef28d5805a818b355b0c9ebcb1995fcf81":{"usd":0.00040765},"0x14b0ef0ec69f346bea3dfa0c5a8c3942fb05c08760059948f9f24c02cd0d4fd8::mover_token::Mover":{"usd":0.01287859,"usd_24h_change":null},"0x56998a39007a9b431fa9d98bcc57de14f2f357846723a1ad94dfb4c3c965a3a3":{"usd":0.00007437},"0xc82974034820c34f065f948f1bee473d481bf99fde2d23e981043e5038cb36be::WOOF::Woof":{"usd":0.00000683},"0xa36e2774e4db37934a3e27e2df7b39be5e6fcb4b7840319336fb98ffdf3d613a":{"usd":0.00000683},"0x2dcbc03740a6fa2efee926b9df329184cce357d0573bdab09930f4d48e61a4c8::STOS::STOS":{"usd":0.00000339},"0xeb73df9d3ba3fbc2538d2e7f4a2dac9718b48b07f65596a9c7cc84d978e3d6cd":{"usd":0.00000339},"0x2ac1304f147af6f3e3362c64f1c9c95dd84f67a8d6e300185e22c5a6f8f661af::PUPTOS::PUPTOS":{"usd":0.00001033},"0xe9c9d57c025b6e66defca170be1838516dfb413e44a2902479621f987ea95917":{"usd":0.00001033},"0x198e4a77b72cbcac7465e774e99d2ba552053ca57b0759ea3c008433742b4e4f::PEPE::Pepe":{"changes":{"usd_24h":9.25932268,"usd_30d":-40.78962286,"usd_7d":19.82953343},"market_data":{"fully_diluted_market_cap":286476.87,"market_cap":0,"symbol":"PEPE","total_supply":420690000000000,"volume_24h":7871.58724705},"usd":6.8096e-10,"usd_24h_change":9.25932268},"0x08bbc1e07f934be0862be6df1477dbab54d6ccdf594f1569a64fa2941cbfe368":{"usd":2e-8},"0x3be1b0966a7f400c1ea57e6ddfe5f060282592a1f4df4d45872a7c8bc46b5ba5::zapdos::Zapdos":{"usd":0},"0x70307ba0faf047ad0536fcf1e51de51e30fa47a90e2d96e5b4a3ad332021f5bc":{"usd":0},"0xd0b4efb4be7c3508d9a26a9b5405cf9f860d0b9e5fe2f498b90e68b8d2cedd3e::legendary_meme::LegendaryMEME":{"usd":6.08988e-7,"usd_24h_change":null},"0xa949d32b6ee32e4ad7df96c1e8b7bd4d26e80a246768230d37dab1ab66b1e7c9":{"usd":6.3e-7},"0x8f59ac670c9cdaa22503bfede0be49e6759626b18727fbf8d876e18861ff3986::RAPT::RAPT":{"usd":0.000002},"0x67941a4189ae5f8037d9532526029bf12dec1b1875a8c9b03034686240fdda41":{"usd":0.000002},"0x55987edfab9a57f69bac759674f139ae473b5e09a9283848c1f87faf6fc1e789::shrimp::ShrimpCoin":{"changes":{"usd_24h":-1.74339135,"usd_30d":-9.87243081,"usd_7d":-2.31132461},"market_data":{"fully_diluted_market_cap":47584.89,"market_cap":0,"symbol":"SHRIMP","total_supply":121212121,"volume_24h":0},"usd":0.00039257,"usd_24h_change":-1.74339135},"0xd4c0be6af89a42d78fb728dd57096eda717d7044c2dd635a01417662c33614fc":{"usd":0.0003981},"0x84edd115c901709ef28f3cb66a82264ba91bfd24789500b6fd34ab9e8888e272::coin::DLC":{"usd":0.0000038,"usd_24h_change":null},"0xf5d23515c4454652c38219aec5f1a0720207dc1f5d2e5140b94608f9ce821a36":{"usd":1.8e-7},"0x23906ec47702dfcdb8ca35dc6eab5cb5d567b86ac1ef0d32a53b786c14ed0d98::POLES::POLES":{"usd":0.00000176},"0xa8be44f83eb76f7ddcd58bd69e9d3775246e48b0a981511c610726ed3d25c217":{"usd":0.00000176},"0xa8c3d4ec01aa0bcaa23bac67d0c3e9d5df2d9e8b82a01ad4f8448aebf3d9a961::POK::POK":{"usd":0.00000289},"0x9b23312ac7da341796c574f0e50d5d7ad666d3811b2dfbcb60141a2e346936ba":{"usd":0.00000289},"0xcfea864b32833f157f042618bd845145256b1bf4c0da34a7013b76e42daa53cc::usdy::USDY":{"usd":1.35725677},"0xf0876baf6f8c37723f0e9d9c1bbad1ccb49324c228bcc906e2f1f5a9e139eda1":{"usd":1.35725677},"0x66398cf97d29fd3825f65b37cb2773268e5438d37e20777e6a98261da0cf1f1e::ddos_coin::DDOS_COIN":{"usd":3.2e-7},"0xe0b2734815ddced3850a30034e247db7d44b5ea5933bef1cba216475c64b8015":{"usd":3.2e-7},"0xc71d94c49826b7d81d740d5bfb80b001a356198ed7b8005ae24ccedff82b299c::bridge::APTS":{"usd":0.00016136},"0x788e59db05148d86eebe640f8f215f43c8c1f52938298b3e6ad3c7a6be5cb641":{"usd":0.00016136},"0xce1a44fa48a726258a11a499797bc38befa6bc2ef4019b686c59e0a301b1a1c8::BUBU::BUBU":{"usd":0.00000209},"0x91d2a5e0fa8b93d3317408c877d8c6490b1f4b3baf9a988003ad760a77c1e1e7":{"usd":0.00000209},"0xc32ba5d293577cbb1df390f35b2bc6369a593b736d0865fedec1a2b08565de8e::in_coin::InCoin":{"usd":0.00065011},"0x1c831313508d40df80c4881020e5baa08acb230fc92e21a36bc16934ea08ef78":{"usd":0.00065011},"0xdf3d5eb83df80dfde8ceb1edaa24d8dbc46da6a89ae134a858338e1b86a29e38::coin::Returd":{"usd":1.43722779},"0xc40443d625f94ddec95a76bcf2534eda394bf67713b93f08eb202026e2aaa66a":{"usd":1.43722779},"0xd0b4efb4be7c3508d9a26a9b5405cf9f860d0b9e5fe2f498b90e68b8d2cedd3e::aptos_launch_token::AptosLaunchToken":{"changes":{"usd_24h":-1.87122145,"usd_30d":-31.3036876,"usd_7d":14.93589868},"market_data":{"fully_diluted_market_cap":236784.88,"market_cap":0,"symbol":"ALT","total_supply":100000000,"volume_24h":124645.79325825},"usd":0.0023678,"usd_24h_change":-1.87122145},"0xd1bec63fa44dc3f3f5742c3f3a4afc3baed00505efbe955dfe6e5f9d306c67a5":{"usd":0.0023827},"0x7e19e5790911597559ec6b41c5465ab062be22d6ba5729845bf257a2361d7608::CITADELI::CITADELI":{"usd":0.0015764},"0x845c606c354c1a5742cc5643e45394313c1443855fb5332c5d649cc58e934316":{"usd":0.0015764},"0x6ab093c653bc6eb0237ae73301f9123829f2843a642b96b3ac2a7b15581f9e7d":{"usd":0.00209962},"0x84d7aeef42d38a5ffc3ccef853e1b82e4958659d16a7de736a29c55fbbeb0114::staked_aptos_coin::StakedAptosCoin":{"usd":5.87,"usd_24h_change":0.11566499503885405},"0x1912eb1a5f8f0d4c72c1687eb199b7f9d2df34da5931ec96830c557f7abaa0ad":{"usd":5.77891436},"0xfbab9fb68bd2103925317b6a540baa20087b1e7a7a4eb90badee04abb6b5a16f::blt::Blt":{"usd":0.00011472},"0x4d6f2761961e3a4edd442bd0c3eb692adc256cd5f52f2ebb394a517f3d885c7d":{"usd":0.00011472},"0x68495e47585861928e07e1fc629501b06822b230508bcf05c4fc19bec9a82405::MOTOS::MOTOS":{"usd":0.00000211},"0x7dfa992a2e8f8ff61b3fb4d520bd83b5e0c35e412ec049fb887f5b4e2f6a9b55":{"usd":0.00000211},"0xaf1077397a61aebda08ff61dfebd571ccdf7a777618b8d66832b5ab0656852bd::FOG::FOG":{"usd":0.0000026},"0x297f6d62b7816181dab5e799f86640e51fe03c1e485ce6c72d111142616f4e3a":{"usd":0.0000026},"0x744467880fbc1a723d8ba8437cd6de3de942789fe6611fc992de8574596c9b5c::CMT::CMT":{"usd":0.0000024},"0x60325dce3573382050cdb9da7ab509093013c1c240cc61f63af83bc8f0f0ff19":{"usd":0.0000024},"0x665d06fcd9c94430099f82973f2a5e5f13142e42fa172e72ce14f51a64bd8ad9::coin_mbx::MBX":{"changes":{"usd_24h":0.64182722,"usd_30d":-3.64630281,"usd_7d":0.61295099},"market_data":{"fully_diluted_market_cap":62359209.21,"market_cap":41577752.64644661,"symbol":"MBX","total_supply":321366541,"volume_24h":2830470.06067851},"usd":0.19404,"usd_24h_change":0.64182722},"0xc8e09f0daa8f0143318c965b43cecad55eb1a4f26ea57677fcf44c36975fe28c":{"usd":0.19014984},"0x55c833f3c668dd863d3848d306e426a33eac615bb93be03fe3a2f721701fec1::UPDOG::UPDOG":{"usd":0.0000103},"0x77289675e2cc92b135294281fb232735b654fc6e901781cd8b55a9a69bdaa425":{"usd":0.0000103},"0x389dbbc6884a1d5b1ab4e1df2913a8c1b01251e50aed377554372b2842c5e3ef::chad_coin::ChadCoin":{"usd":1e-8},"0x4998c15818c297d8dd20308b02979d27ab60ff2ba258911806e15b69fe5f1e4a":{"usd":1e-8},"0xbafe0208ba2a3ea2c66a6868f9361a13f4014490e9b77fb0364c5cf55340ffbe::AMAGA::AMAGA":{"usd":0.00000194},"0x08f0221229fce7f51120a02a31bd2a349b349b17d05521f1e2040708a2c054e0":{"usd":0.00000194},"0xc95e07a20f94acb04f1188b51bafbbeec93363760c066f4ced3884a48137da8a::GHO::GHO":{"usd":0.00000207},"0x70740db1fddae309f1a3612091446fc7db1f278a8df30f28c3871a624e14967a":{"usd":0.00000207},"0x8235f05ea1901e682bc09b3be93eba0727e94c020ccb0e57074843315c675521::BLADEEWIFHAT::BLADEEWIFHAT":{"usd":0.00000231},"0xf524e4b28337c297b05a80d37e149d8c2b3542dcc6de25a5c3daba7f2ec922c8":{"usd":0.00000231},"0x8512b34017e087c3707748869ddc317d83f3fe70ab3a162abdc055c761ca9906::OBOT::OBOT":{"changes":{"usd_24h":31.94854047,"usd_30d":29.85600513,"usd_7d":21.08931366},"market_data":{"fully_diluted_market_cap":498611.96,"market_cap":0,"symbol":"OBOT","total_supply":766795981,"volume_24h":2833.91648091},"usd":0.00065025,"usd_24h_change":31.94854047},"0xa491095e3906fbca27b6fb7345d4ea407282c1aecbd50b2d2a42b1fa977bae30":{"usd":0.0000562},"0xbd92f54e3ebf1e80a0efa05f8bbd607fc6dd00ec208c0d743ee6ba3c10f03846::APOP::APOP":{"usd":0.00000224},"0xb3bbb3f4cc3709c46d9599e72a865a63476eac4c990d84d193f82198969c3696":{"usd":0.00000224},"0xe1bfc010d2bdd576036f4c1f3ea7d547f19188f5b78075dd961420d843ee914c::brew_coin::BrewCoin":{"usd":0.00000291},"0xdc5e054538ba5e183d5aa197b01f327cf84aace749dc8fa2fe87bb5ec9bfe35a":{"usd":0.00000291},"0x4ed27736e724e403f9b4645ffef0ae86fd149503f45b37c428ffabd7e46e5b05::core::RenegadeCoin":{"usd":2.72711865},"0x2329a8351b28aa3672329217a949a9ab39d7f24534324c2eeb8b18f69e7a6fb1":{"usd":2.72711865},"0x16fe2df00ea7dde4a63409201f7f4e536bde7bb7335526a35d05111e68aa322c::AnimeCoin::ANI":{"changes":{"usd_24h":-0.45023723,"usd_30d":12.96799371,"usd_7d":11.48160679},"market_data":{"fully_diluted_market_cap":4156.61,"market_cap":0,"symbol":"ANI","total_supply":18000000,"volume_24h":13.21443345},"usd":0.00023092,"usd_24h_change":-0.45023723},"0x9660042a7c01d776938184278381d24c7009ca385d9a59cf9b22691f97615960":{"usd":0.0002313},"0xd2c9cfe8dd64ebdf9b39e1525997cef33bd178161c59410097d3f3e0704a5df3::ROO::ROO":{"usd":7.2e-7},"0x32f56ff5fdb674a7a190a52ea1657b52b01906a35a855f0a9ffeec1d818c7aa8":{"usd":7.2e-7},"0x1fc2f33ab6b624e3e632ba861b755fd8e61d2c2e6cf8292e415880b4c198224d::apt20::EVA":{"usd":5.82310311},"0x5c72816a0a188673f2d457c855226949db1befd062201c03db1ee5b21fdb3383":{"usd":5.82310311},"0x9906c12b3b7a12721b9dddf23e6dd5ff5dfc93c5241dada855780758b01fedd3::DOOT_SKELETON::DOOT_SKELETON":{"usd":0.00000201},"0x78bdcff383cb944cc0ad04868e9b2ae7c3b27844dcea6e92a398d9fee8d0722f":{"usd":0.00000201},"0x2f277e648b3761b65818d92f0a7c151cb38a1d33b1a8b18d4c5748bbcd9fcca5::Netzy::Netzy":{"usd":0.00000164},"0x958886d1500861e49e334be98bad328f977821d3d25ef6eeeb3858a75ad0e1c4":{"usd":0.00000164},"0xf9cd51e1211f467c52d91c96491aae6c7a068e5f23736e2b58f885412346624c::PP1::PP":{"usd":0.00000331},"0x7532610fb3a8bbcac22e42a3d625ec9968746a7600a3001870d32cee4e32e329":{"usd":0.00000331},"0x777821c78442e17d82c3d7a371f42de7189e4248e529fe6eee6bca40ddbb::apcoin::ApCoin":{"usd":0.0048583},"0x7698721233c7ac82a8059aa58ab1e43e4c173819310e3b18ac9bb7ea6550c595":{"usd":0.0048583},"0xd11107bdf0d6d7040c6c0bfbdecb6545191fdf13e8d8d259952f53e1713f61b5::staked_coin::StakedAptos":{"usd":5.56,"usd_24h_change":0.12180628097826285},"0xa743351ed4889845737082ab9fcd42c21270647e2c6f342c509320e974035ed2":{"usd":5.57236136},"0xbafd66d813a51ed6b5d2db99b18b61d2fccbc2e46979690fe84198272c59ca5f::zaptos::Zaptos":{"usd":0.00011742},"0xf0bf190ad68b691f597d00426d0c5fc7d29c5fd2402b3c47b68ba868b06571fb":{"usd":0.00011742},"0x83b619e2d9e6e10d15ed4b714111a4cd9526c1c2ae0eec4b252a619d3e8bdda3::MAU::MAU":{"changes":{"usd_24h":2.8713373,"usd_30d":12.64945576,"usd_7d":13.27184274},"market_data":{"fully_diluted_market_cap":5312.27,"market_cap":0,"symbol":"MAU","total_supply":1000000000,"volume_24h":0},"usd":0.0000053122,"usd_24h_change":2.8713373},"0xccc9620d38c4f3991fa68a03ad98ef3735f18d04717cb75d7a1300dd8a7eed75::coin::T":{"usd":1.093,"usd_24h_change":0.8399759477569109},"0x9aa4c03344444b53f4d9b1bca229ed2ac47504e3ea6cd0683ebdc0c5ecefd693::coin::T":{"changes":{"usd_24h":-3.41740572,"usd_30d":-9.02399378,"usd_7d":0.93639501},"market_data":{"fully_diluted_market_cap":50797534.21,"market_cap":16584390.530356215,"symbol":"SWEAT","total_supply":21018694493.267,"volume_24h":7315405.01231518},"usd":0.0023229,"usd_24h_change":-3.41740572},"0x25a64579760a4c64be0d692327786a6375ec80740152851490cfd0b53604cf95::coin::ETERN":{"usd":0.00068234,"usd_24h_change":null},"0XF22BEDE237A07E121B56D91A491EB7BCDFD1F5907926A9E58338F964A01B17FA::ASSET::WBTC":{"usd":119835,"usd_24h_change":1.7619414747388134},"0xe528f4df568eb9fff6398adc514bc9585fab397f478972bcbebf1e75dee40a88":{"usd":1036.43,"usd_24h_change":-0.003155236818513099},"0x50038be55be5b964cfa32cf128b5cf05f123959f286b4cc02b86cafd48945f89":{"usd":1,"usd_24h_change":0},"0x000000000000000000000000000000000000000000000000000000000000000a":{"changes":{"usd_24h":0.57407095,"usd_30d":12.26447089,"usd_7d":13.11819097},"market_data":{"fully_diluted_market_cap":5807644004.77,"market_cap":3308605666.8575726,"symbol":"APT","total_supply":1154486050.2827873,"volume_24h":269926533.74392194},"usd":5.030501,"usd_24h_change":0.57407095}}
+
+the cg endpoint I used supports most aptos coins. The endpoint just needs a /aptos
+https://api.coingecko.com/api/v3/simple/token_price/aptos?contract_addresses=0x5ae6789dd2fec1a9ec9cccfb3acaf12e93d432f0a3a42c92fe1a9d490b7bbc06::mkl_token::MKL&vs_currencies=usd&include_24hr_change=true

@@ -86,15 +86,7 @@ export class BitcoinService {
       apiCallCount: 1,
     };
 
-    const result = await cacheFirstWithFallback(options, {
-      protocol: 'echelon',
-      markets: [],
-      total: {
-        btc: '0',
-        normalized: '0',
-        tvlUsd: 0,
-      },
-    });
+    const result = await cacheFirstWithFallback(options);
 
     console.log('[Bitcoin] BTC supplies result', {
       totalBtc: result.data.total.btc,
@@ -131,12 +123,7 @@ export class BitcoinService {
       apiCallCount: Object.keys(BTC_TOKENS).length,
     };
 
-    const result = await cacheFirstWithFallback(options, {
-      supplies: [],
-      total: '0',
-      total_formatted: '0',
-      total_decimals: 10,
-    });
+    const result = await cacheFirstWithFallback(options);
 
     console.log('[Bitcoin] Comprehensive BTC supplies result', {
       total: result.data.total_formatted,
@@ -355,12 +342,10 @@ export class BitcoinService {
   }
 
   /**
-   * Enhanced BTC supplies data fetching - INDEXER ONLY for total supply data
+   * Simple BTC supplies data fetching - REST API only
    */
   private static async fetchBTCSuppliesData(): Promise<BTCData> {
-    console.log(
-      '[Bitcoin] Starting fetchBTCSuppliesData - Direct from Indexer Only'
-    );
+    console.log('[Bitcoin] Fetching BTC supplies data');
 
     const btcMarkets = [];
     let totalNormalizedBtc = BigInt(0);
@@ -368,18 +353,19 @@ export class BitcoinService {
 
     // Fetch Bitcoin price for USD calculations
     const bitcoinPrice = await this.fetchBitcoinPrice();
-    console.log('[Bitcoin] Current BTC price:', bitcoinPrice);
 
-    for (const btcAsset of BTC_ASSETS) {
-      try {
-        console.log('[Bitcoin] Fetching supply for', {
-          symbol: btcAsset.symbol,
-          assetType: btcAsset.assetAddress,
-        });
-
-        // Get total supply from indexer
+    // Fetch all BTC assets in parallel
+    const results = await Promise.allSettled(
+      BTC_ASSETS.map(async (btcAsset) => {
         const supply = await this.fetchAssetSupplyData(btcAsset.assetAddress);
+        return { btcAsset, supply };
+      })
+    );
 
+    // Process results
+    for (const result of results) {
+      if (result.status === 'fulfilled') {
+        const { btcAsset, supply } = result.value;
         const decimals = BTC_TOKENS[btcAsset.symbol]?.decimals || 8;
         const formattedBalance = this.formatTokenAmount(supply, decimals);
 
@@ -396,13 +382,13 @@ export class BitcoinService {
 
         btcMarkets.push({
           symbol: btcAsset.symbol,
-          marketAddress: '', // Not needed for direct indexer query
+          marketAddress: '',
           assetType: btcAsset.assetAddress,
           description: btcAsset.description,
           balance: formattedBalance,
           rawBalance: supply.toString(),
           decimals,
-          apyBase: 0, // No market data from direct indexer query
+          apyBase: 0,
           apyReward: 0,
           apyBaseBorrow: 0,
           totalSupply: btcValue,
@@ -412,51 +398,13 @@ export class BitcoinService {
           tvlUsd,
           price: bitcoinPrice,
         });
-
-        console.log('[Bitcoin] Asset supply fetched successfully', {
-          symbol: btcAsset.symbol,
-          supply: formattedBalance,
-          tvlUsd,
-        });
-      } catch (error) {
-        console.error(`[Bitcoin] Failed to fetch ${btcAsset.symbol}:`, error);
-        // Add with zero supply on error
-        btcMarkets.push({
-          symbol: btcAsset.symbol,
-          marketAddress: '',
-          assetType: btcAsset.assetAddress,
-          description: btcAsset.description,
-          balance: '0',
-          rawBalance: '0',
-          decimals: BTC_TOKENS[btcAsset.symbol]?.decimals || 8,
-          apyBase: 0,
-          apyReward: 0,
-          apyBaseBorrow: 0,
-          totalSupply: 0,
-          totalBorrow: 0,
-          totalSupplyUsd: 0,
-          totalBorrowUsd: 0,
-          tvlUsd: 0,
-          price: bitcoinPrice,
-        });
       }
     }
 
     const totalFormatted = this.formatTokenAmount(totalNormalizedBtc, 10);
 
-    console.log('[Bitcoin] BTC supplies data processed', {
-      marketsFound: btcMarkets.length,
-      totalBTC: totalFormatted,
-      totalTvlUsd,
-      processedAssets: btcMarkets.map(m => ({
-        symbol: m.symbol,
-        balance: m.balance,
-        tvlUsd: m.tvlUsd,
-      })),
-    });
-
     return {
-      protocol: 'aptos-indexer',
+      protocol: 'aptos-rest-api',
       markets: btcMarkets,
       total: {
         btc: totalFormatted,
@@ -688,92 +636,6 @@ export class BitcoinService {
     };
   }
 
-  /**
-   * Get fallback BTC data for production reliability
-   */
-  private static getFallbackBTCData(): BTCData {
-    console.log('[Bitcoin] Using fallback BTC data');
-
-    const btcPrice = 100000; // Conservative fallback price
-    const fallbackMarkets = [
-      {
-        symbol: 'xBTC',
-        marketAddress: '',
-        assetType:
-          '0x81214a80d82035a190fcb76b6ff3c0145161c3a9f33d137f2bbaee4cfec8a387',
-        description: 'OKX wBTC',
-        balance: '400.00000000',
-        rawBalance: '40000000000',
-        decimals: 8,
-        apyBase: 0,
-        apyReward: 0,
-        apyBaseBorrow: 0,
-        totalSupply: 400,
-        totalBorrow: 0,
-        totalSupplyUsd: 400 * btcPrice,
-        totalBorrowUsd: 0,
-        tvlUsd: 400 * btcPrice,
-        price: btcPrice,
-      },
-      {
-        symbol: 'SBTC',
-        marketAddress: '',
-        assetType:
-          '0x5dee1d4b13fae338a1e1780f9ad2709a010e824388efd169171a26e3ea9029bb::stakestone_bitcoin::StakeStoneBitcoin',
-        description: 'StakeStone Bitcoin',
-        balance: '800.00000000',
-        rawBalance: '80000000000',
-        decimals: 8,
-        apyBase: 0,
-        apyReward: 0,
-        apyBaseBorrow: 0,
-        totalSupply: 800,
-        totalBorrow: 0,
-        totalSupplyUsd: 800 * btcPrice,
-        totalBorrowUsd: 0,
-        tvlUsd: 800 * btcPrice,
-        price: btcPrice,
-      },
-      {
-        symbol: 'aBTC',
-        marketAddress: '',
-        assetType:
-          '0x4e1854f6d332c9525e258fb6e66f84b6af8aba687bbcb832a24768c4e175feec::abtc::ABTC',
-        description: 'Aptos Bitcoin',
-        balance: '2500.0000000000',
-        rawBalance: '25000000000000',
-        decimals: 10,
-        apyBase: 0,
-        apyReward: 0,
-        apyBaseBorrow: 0,
-        totalSupply: 2500,
-        totalBorrow: 0,
-        totalSupplyUsd: 2500 * btcPrice,
-        totalBorrowUsd: 0,
-        tvlUsd: 2500 * btcPrice,
-        price: btcPrice,
-      },
-    ];
-
-    const totalBtc = fallbackMarkets.reduce(
-      (sum, market) => sum + market.totalSupply,
-      0
-    );
-    const totalTvlUsd = fallbackMarkets.reduce(
-      (sum, market) => sum + market.tvlUsd,
-      0
-    );
-
-    return {
-      protocol: 'fallback',
-      markets: fallbackMarkets,
-      total: {
-        btc: totalBtc.toString(),
-        normalized: (totalBtc * 10000000000).toString(), // Convert to 10 decimals
-        tvlUsd: totalTvlUsd,
-      },
-    };
-  }
 
   /**
    * Fetch current Bitcoin price from Panora or CoinGecko
@@ -846,246 +708,148 @@ export class BitcoinService {
   }
 
   /**
-   * Enhanced asset supply data fetching with GraphQL
+   * Simple asset supply data fetching - REST API only, no fallbacks
    */
   private static async fetchAssetSupplyData(
     assetType: string
   ): Promise<bigint> {
-    const errorContext: ErrorContext = {
-      operation: 'Fetch asset supply via GraphQL',
-      service: 'BTC-GraphQL',
-      details: { assetType, endpoint: INDEXER },
-    };
+    console.log('[Bitcoin] Fetching asset supply', { assetType });
 
-    console.log('[Bitcoin] Fetching asset supply via GraphQL', {
-      assetType,
-      endpoint: INDEXER,
-    });
-
-    return withErrorHandling(async () => {
-      // For xBTC, check if we have supply_v2 in metadata first
-      if (
-        assetType ===
-        '0x81214a80d82035a190fcb76b6ff3c0145161c3a9f33d137f2bbaee4cfec8a387'
-      ) {
-        const metadataQuery = `
-          query AssetMetadata($type: String!) {
-            fungible_asset_metadata(where: { asset_type: { _eq: $type } }) {
-              supply_v2
-            }
-          }
-        `;
-
-        const metadataResponse = await graphQLRequest<{
-          fungible_asset_metadata: Array<{ supply_v2: string | null }>;
-        }>(
-          INDEXER,
+    // xBTC - Fungible Asset
+    if (
+      assetType ===
+      '0x81214a80d82035a190fcb76b6ff3c0145161c3a9f33d137f2bbaee4cfec8a387'
+    ) {
+      try {
+        const response = await enhancedFetch(
+          `https://fullnode.mainnet.aptoslabs.com/v1/accounts/0x81214a80d82035a190fcb76b6ff3c0145161c3a9f33d137f2bbaee4cfec8a387/resource/0x1::fungible_asset::Supply`,
           {
-            query: metadataQuery,
-            variables: { type: assetType },
-          },
-          {
-            timeout: 6000, // Reduced for production
-            retries: 1,
-            headers: {
-              Authorization: `Bearer ${getEnvVar('APTOS_BUILD_KEY') || getEnvVar('APTOS_BUILD_SECRET') || ''}`,
-              'X-Aptos-Client': 'OnAptos-BTC-Tracker',
-            },
+            headers: { Accept: 'application/json' },
+            timeout: 5000,
+            retries: 2,
           }
         );
 
-        const supplyFromMetadata =
-          metadataResponse?.fungible_asset_metadata?.[0]?.supply_v2;
-
-        if (supplyFromMetadata) {
-          console.log('[Bitcoin] Asset supply fetched from metadata', {
-            assetType,
-            amount: supplyFromMetadata,
-          });
-          return BigInt(supplyFromMetadata);
-        }
-      }
-
-      // For aBTC (Coin V1), try REST API for CoinInfo supply
-      if (
-        assetType ===
-        '0x4e1854f6d332c9525e258fb6e66f84b6af8aba687bbcb832a24768c4e175feec::abtc::ABTC'
-      ) {
-        console.log('[Bitcoin] Trying REST API for aBTC CoinInfo supply');
-
-        try {
-          const restResponse = await enhancedFetch(
-            `https://fullnode.mainnet.aptoslabs.com/v1/accounts/0x4e1854f6d332c9525e258fb6e66f84b6af8aba687bbcb832a24768c4e175feec/resource/0x1::coin::CoinInfo%3C0x4e1854f6d332c9525e258fb6e66f84b6af8aba687bbcb832a24768c4e175feec::abtc::ABTC%3E`,
-            {
-              headers: {
-                Authorization: `Bearer ${process.env.APTOS_BUILD_SECRET || ''}`,
-                Accept: 'application/json',
-              },
-              timeout: 6000, // Reduced for production
-              retries: 1,
-            }
-          );
-
-          if (restResponse.ok) {
-            const coinInfo = await restResponse.json();
-            const supply =
-              coinInfo?.data?.supply?.vec?.[0]?.aggregator?.vec?.[0]?.value ||
-              coinInfo?.data?.supply?.vec?.[0]?.integer?.vec?.[0]?.value;
-
-            if (supply) {
-              console.log(
-                '[Bitcoin] aBTC supply fetched from REST API CoinInfo',
-                {
-                  assetType,
-                  amount: supply,
-                }
-              );
-              return BigInt(supply);
-            }
+        if (response.ok) {
+          const data = await response.json();
+          const supply = data?.data?.current?.value;
+          if (supply) {
+            console.log('[Bitcoin] xBTC supply fetched', { supply });
+            return BigInt(supply);
           }
-        } catch (error) {
-          console.warn(
-            '[Bitcoin] REST API failed for aBTC CoinInfo, falling back to aggregate'
-          );
         }
+      } catch (error) {
+        console.error('[Bitcoin] Failed to fetch xBTC supply:', error);
       }
+    }
 
-      // For all other assets, use fungible asset aggregate query
-      console.log(
-        '[Bitcoin] Using fungible asset aggregate query for',
-        assetType
-      );
-
-      const request: GraphQLRequest = {
-        query: ASSET_SUPPLY_GQL,
-        variables: { type: assetType },
-      };
-
-      const response = await graphQLRequest<{
-        current_fungible_asset_balances_aggregate: {
-          aggregate: { sum: { amount: string } };
-        };
-      }>(INDEXER, request, {
-        timeout: 8000, // Production-friendly timeout
-        retries: 1,
-        retryDelay: 500,
-        headers: {
-          Authorization: `Bearer ${getEnvVar('APTOS_BUILD_KEY') || getEnvVar('APTOS_BUILD_SECRET') || ''}`,
-          'X-Aptos-Client': 'OnAptos-BTC-Tracker',
-        },
-      });
-
-      const amount =
-        response?.current_fungible_asset_balances_aggregate?.aggregate?.sum
-          ?.amount;
-
-      if (!amount) {
-        console.warn(
-          `[Bitcoin] No supply data found for asset type: ${assetType}`
+    // aBTC - Coin
+    if (
+      assetType ===
+      '0x4e1854f6d332c9525e258fb6e66f84b6af8aba687bbcb832a24768c4e175feec::abtc::ABTC'
+    ) {
+      try {
+        const response = await enhancedFetch(
+          `https://fullnode.mainnet.aptoslabs.com/v1/accounts/0x4e1854f6d332c9525e258fb6e66f84b6af8aba687bbcb832a24768c4e175feec/resource/0x1::coin::CoinInfo%3C0x4e1854f6d332c9525e258fb6e66f84b6af8aba687bbcb832a24768c4e175feec::abtc::ABTC%3E`,
+          {
+            headers: { Accept: 'application/json' },
+            timeout: 5000,
+            retries: 2,
+          }
         );
-        return BigInt(0);
+
+        if (response.ok) {
+          const data = await response.json();
+          const supply =
+            data?.data?.supply?.vec?.[0]?.aggregator?.vec?.[0]?.value ||
+            data?.data?.supply?.vec?.[0]?.integer?.vec?.[0]?.value;
+          if (supply) {
+            console.log('[Bitcoin] aBTC supply fetched', { supply });
+            return BigInt(supply);
+          }
+        }
+      } catch (error) {
+        console.error('[Bitcoin] Failed to fetch aBTC supply:', error);
       }
+    }
 
-      console.log('[Bitcoin] Asset supply fetched from aggregate', {
-        assetType,
-        amount,
-      });
+    // SBTC - Coin
+    if (
+      assetType ===
+      '0x5dee1d4b13fae338a1e1780f9ad2709a010e824388efd169171a26e3ea9029bb::stakestone_bitcoin::StakeStoneBitcoin'
+    ) {
+      try {
+        const response = await enhancedFetch(
+          `https://fullnode.mainnet.aptoslabs.com/v1/accounts/0x5dee1d4b13fae338a1e1780f9ad2709a010e824388efd169171a26e3ea9029bb/resource/0x1::coin::CoinInfo%3C0x5dee1d4b13fae338a1e1780f9ad2709a010e824388efd169171a26e3ea9029bb::stakestone_bitcoin::StakeStoneBitcoin%3E`,
+          {
+            headers: { Accept: 'application/json' },
+            timeout: 5000,
+            retries: 2,
+          }
+        );
 
-      return BigInt(amount);
-    }, errorContext);
+        if (response.ok) {
+          const data = await response.json();
+          const supply =
+            data?.data?.supply?.vec?.[0]?.aggregator?.vec?.[0]?.value ||
+            data?.data?.supply?.vec?.[0]?.integer?.vec?.[0]?.value;
+          if (supply) {
+            console.log('[Bitcoin] SBTC supply fetched', { supply });
+            return BigInt(supply);
+          }
+        }
+      } catch (error) {
+        console.error('[Bitcoin] Failed to fetch SBTC supply:', error);
+      }
+    }
+
+    // No data found
+    console.warn(`[Bitcoin] No supply data for asset type: ${assetType}`);
+    return BigInt(0);
   }
 
   /**
-   * Enhanced comprehensive BTC supplies fetching with batch processing
+   * Simple comprehensive BTC supplies fetching
    */
   private static async fetchComprehensiveBTCSuppliesData(): Promise<ComprehensiveBTCSupply> {
-    const tokens = Object.entries(BTC_TOKENS);
+    console.log('[Bitcoin] Fetching comprehensive BTC supplies');
 
-    console.log('[Bitcoin] Starting comprehensive BTC supplies fetch', {
-      tokenCount: tokens.length,
-      tokens: tokens.map(([symbol]) => symbol),
-    });
-
-    // Create batch requests for parallel processing
-    const batchOptions: BatchRequestOptions = {
-      concurrency: 3, // Limit concurrent requests to avoid rate limiting
-      delayBetween: 200, // 200ms delay between batches
-    };
-
-    const requests = tokens.map(
-      ([symbol, { asset_type, decimals }]) =>
-        async () => {
-          const errorContext: ErrorContext = {
-            operation: `Asset supply fetch for ${symbol}`,
-            service: 'BTC-AssetSupply',
-            details: { symbol, assetType: asset_type },
-          };
-
-          try {
-            const supply = await withErrorHandling(
-              () => this.fetchAssetSupplyData(asset_type),
-              errorContext
-            );
-            return { symbol, supply, decimals };
-          } catch (error) {
-            console.error(
-              `[Bitcoin] Failed to fetch supply for ${symbol}:`,
-              formatApiError(error)
-            );
-            return { symbol, supply: BigInt(0), decimals };
-          }
-        }
+    // Fetch all supplies in parallel
+    const results = await Promise.allSettled(
+      Object.entries(BTC_TOKENS).map(async ([symbol, { asset_type, decimals }]) => {
+        const supply = await this.fetchAssetSupplyData(asset_type);
+        return { symbol, supply, decimals };
+      })
     );
 
-    // Execute batch requests
-    const results = await batchRequests(requests, batchOptions);
+    // Process results
+    const supplies = [];
+    let totalRaw = BigInt(0);
 
-    // Process results into supplies map
-    const supplies = Object.fromEntries(
-      results.map(result => [
-        result.symbol,
-        { supply: result.supply, decimals: result.decimals },
-      ])
-    );
+    for (const result of results) {
+      if (result.status === 'fulfilled') {
+        const { symbol, supply, decimals } = result.value;
+        const formattedSupply = this.formatTokenAmount(supply, decimals);
 
-    // Generate formatted output
-    const out = Object.entries(BTC_TOKENS).map(([symbol, { decimals }]) => {
-      const rawSupply = supplies[symbol]?.supply ?? BigInt(0);
-      const supply = rawSupply.toString();
-      const formattedSupply = this.formatTokenAmount(rawSupply, decimals);
+        supplies.push({
+          symbol,
+          supply: supply.toString(),
+          formatted_supply: formattedSupply,
+        });
 
-      return {
-        symbol,
-        supply,
-        formatted_supply: formattedSupply,
-      };
-    });
-
-    // Calculate normalized total
-    const totalRaw = out.reduce((sum, token, index) => {
-      const tokenAmount = token.supply ? BigInt(token.supply) : BigInt(0);
-      const decimals = Object.values(BTC_TOKENS)[index].decimals;
-      const normalizedAmount =
-        decimals === 10
-          ? tokenAmount
-          : tokenAmount * BigInt(10 ** (10 - decimals));
-      return sum + normalizedAmount;
-    }, BigInt(0));
+        // Normalize to 10 decimals for total
+        const normalizedAmount =
+          decimals === 10
+            ? supply
+            : supply * BigInt(10 ** (10 - decimals));
+        totalRaw += normalizedAmount;
+      }
+    }
 
     const totalFormatted = this.formatTokenAmount(totalRaw, 10);
 
-    console.log('[Bitcoin] Comprehensive BTC supplies processed', {
-      successfulSupplies: out.filter(s => s.supply !== '0').length,
-      totalSupplies: out.length,
-      totalBTC: totalFormatted,
-      supplies: out.map(s => ({
-        symbol: s.symbol,
-        formatted: s.formatted_supply,
-      })),
-    });
-
     return {
-      supplies: out,
+      supplies,
       total: totalRaw.toString(),
       total_formatted: totalFormatted,
       total_decimals: 10,

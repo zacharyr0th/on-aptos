@@ -13,6 +13,7 @@ export interface NFT {
   collection_uri?: string;
   last_transaction_version?: number;
   last_transaction_timestamp?: string;
+  token_properties?: string | Record<string, any>;
 }
 
 export type SortField = 'timestamp' | 'type' | 'amount' | 'asset';

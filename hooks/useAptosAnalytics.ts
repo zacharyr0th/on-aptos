@@ -141,67 +141,39 @@ export function useBalanceHistory(
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
+  const fetchBalanceHistory = useCallback(async () => {
+    if (!address) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const params = new URLSearchParams({
+        account_address: address,
+        lookback,
+      });
+
+      const response = await fetch(
+        `/api/analytics/balance-history?${params}`
+      );
+      const result = await response.json();
+
+      if (!response.ok) throw new Error(result.error);
+
+      setData(result.data || []);
+    } catch (err) {
+      logger.error('Failed to fetch balance history:', err);
+      setError(err as Error);
+    } finally {
+      setLoading(false);
+    }
+  }, [address, lookback]);
+
   useEffect(() => {
-    if (!address) return;
-
-    const fetchBalanceHistory = async () => {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const params = new URLSearchParams({
-          account_address: address,
-          lookback,
-        });
-
-        const response = await fetch(`/api/analytics/balance-history?${params}`);
-        const result = await response.json();
-
-        if (!response.ok) throw new Error(result.error);
-
-        setData(result.data || []);
-      } catch (err) {
-        logger.error('Failed to fetch balance history:', err);
-        setError(err as Error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchBalanceHistory();
-  }, [address, lookback]);
+  }, [fetchBalanceHistory]);
 
-  const refetch = useCallback(() => {
-    if (!address) return;
-
-    const fetchBalanceHistory = async () => {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const params = new URLSearchParams({
-          account_address: address,
-          lookback,
-        });
-
-        const response = await fetch(`/api/analytics/balance-history?${params}`);
-        const result = await response.json();
-
-        if (!response.ok) throw new Error(result.error);
-
-        setData(result.data || []);
-      } catch (err) {
-        logger.error('Failed to fetch balance history:', err);
-        setError(err as Error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchBalanceHistory();
-  }, [address, lookback]);
-
-  return { data, loading, error, refetch };
+  return { data, loading, error, refetch: fetchBalanceHistory };
 }
 
 export function useTopPriceChanges(

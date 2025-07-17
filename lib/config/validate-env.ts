@@ -99,8 +99,14 @@ if (process.env.NODE_ENV !== 'production') {
 // Type-safe environment variable access
 export function getEnvVar<K extends keyof EnvConfig>(key: K): EnvConfig[K] {
   const value = env[key];
-  if (process.env.NODE_ENV === 'development' && (key === 'APTOS_BUILD_KEY' || key === 'APTOS_BUILD_SECRET')) {
-    console.log(`[ENV] Getting ${key}:`, value ? `${value.substring(0, 10)}...` : 'undefined');
+  if (
+    process.env.NODE_ENV === 'development' &&
+    (key === 'APTOS_BUILD_KEY' || key === 'APTOS_BUILD_SECRET')
+  ) {
+    console.log(
+      `[ENV] Getting ${key}:`,
+      value ? `${value.substring(0, 10)}...` : 'undefined'
+    );
   }
   return value;
 }

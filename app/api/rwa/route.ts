@@ -28,7 +28,15 @@ interface RWAXyzAsset {
     symbol: string;
   }>;
   protocol?: string;
-  asset_class?: string | { id?: number; name?: string; slug?: string; icon_url?: string; color_hex?: string };
+  asset_class?:
+    | string
+    | {
+        id?: number;
+        name?: string;
+        slug?: string;
+        icon_url?: string;
+        color_hex?: string;
+      };
   issuer?: string;
 }
 
@@ -121,9 +129,11 @@ function getProtocolLogoUrl(protocol: string): string {
 }
 
 // Helper function to format asset class
-function formatAssetClass(assetClass?: string | { name?: string; slug?: string }): string {
+function formatAssetClass(
+  assetClass?: string | { name?: string; slug?: string }
+): string {
   if (!assetClass) return 'rwa';
-  
+
   // Handle object format from API
   if (typeof assetClass === 'object') {
     return assetClass.name || assetClass.slug || 'rwa';
@@ -367,7 +377,7 @@ export async function GET(request: NextRequest) {
           return data;
         } catch (error) {
           console.error('RWA API error:', error);
-          
+
           // Return fallback data on errors
           return {
             success: false,

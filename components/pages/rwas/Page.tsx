@@ -316,10 +316,11 @@ const TokenCard = memo(function TokenCard({
             protocolId: parseInt(protocol.id) || 0,
             protocol: protocol.protocol || 'unknown',
             assetClassId: 0,
-            assetClass: (typeof protocol.assetClass === 'object' && protocol.assetClass?.name 
-              ? protocol.assetClass.name 
-              : typeof protocol.assetClass === 'string' 
-                ? protocol.assetClass 
+            assetClass: (typeof protocol.assetClass === 'object' &&
+            protocol.assetClass?.name
+              ? protocol.assetClass.name
+              : typeof protocol.assetClass === 'string'
+                ? protocol.assetClass
                 : 'real-world-asset') as string,
             assetRegulatoryFramework: '',
             assetGoverningBody: '',
@@ -337,10 +338,11 @@ const TokenCard = memo(function TokenCard({
           assetTicker: protocol.assetTicker || 'N/A',
           address: protocol.tokenAddress || '',
           protocol: protocol.protocol || 'unknown',
-          assetClass: (typeof protocol.assetClass === 'object' && protocol.assetClass?.name 
-            ? protocol.assetClass.name 
-            : typeof protocol.assetClass === 'string' 
-              ? protocol.assetClass 
+          assetClass: (typeof protocol.assetClass === 'object' &&
+          protocol.assetClass?.name
+            ? protocol.assetClass.name
+            : typeof protocol.assetClass === 'string'
+              ? protocol.assetClass
               : 'real-world-asset') as string,
         }}
         currentValue={protocol.totalValue}
@@ -588,7 +590,7 @@ export default function RWAsPage(): React.ReactElement {
 
   // Extract data - withApiEnhancements already wraps it in {data: ..., cached: ...}
   const data: any = rwaResponse?.data || null;
-  
+
   // Extract protocols from the response and map fields
   const protocols = useMemo(() => {
     if (!data) return [];
@@ -899,7 +901,10 @@ export default function RWAsPage(): React.ReactElement {
                             <TableCell className="whitespace-nowrap">
                               <div className="flex items-center gap-2">
                                 <Image
-                                  src={getLogoUrl(protocol.protocol, protocol.assetTicker)}
+                                  src={getLogoUrl(
+                                    protocol.protocol,
+                                    protocol.assetTicker
+                                  )}
                                   alt={protocol.name}
                                   width={20}
                                   height={20}
@@ -921,8 +926,9 @@ export default function RWAsPage(): React.ReactElement {
                               {marketSharePercent}%
                             </TableCell>
                             <TableCell className="text-sm">
-                              {typeof protocol.assetClass === 'object' && protocol.assetClass?.name 
-                                ? protocol.assetClass.name 
+                              {typeof protocol.assetClass === 'object' &&
+                              protocol.assetClass?.name
+                                ? protocol.assetClass.name
                                 : protocol.assetClass || 'RWA'}
                             </TableCell>
                           </TableRow>

@@ -1183,11 +1183,11 @@ export async function getAllWalletNFTs(walletAddress: string): Promise<NFT[]> {
 
     while (hasMore) {
       const nfts = await getWalletNFTs(walletAddress, batchSize, offset);
-      
+
       if (nfts.length > 0) {
         allNFTs.push(...nfts);
         offset += batchSize;
-        
+
         // If we got fewer NFTs than the batch size, we've reached the end
         if (nfts.length < batchSize) {
           hasMore = false;
@@ -1198,12 +1198,16 @@ export async function getAllWalletNFTs(walletAddress: string): Promise<NFT[]> {
 
       // Safety check to prevent infinite loops
       if (offset > 10000) {
-        logger.warn(`Stopping NFT fetch at ${offset} offset to prevent infinite loop`);
+        logger.warn(
+          `Stopping NFT fetch at ${offset} offset to prevent infinite loop`
+        );
         hasMore = false;
       }
     }
 
-    logger.info(`Found total of ${allNFTs.length} NFTs for wallet ${walletAddress}`);
+    logger.info(
+      `Found total of ${allNFTs.length} NFTs for wallet ${walletAddress}`
+    );
     return allNFTs;
   } catch (error) {
     logger.error('Failed to fetch all wallet NFTs:', {

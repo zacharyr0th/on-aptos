@@ -11,7 +11,8 @@ export async function GET() {
       PANORA_API_KEY: !!process.env.PANORA_API_KEY,
       RWA_API_KEY: !!process.env.RWA_API_KEY,
       NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL || 'not set',
-      NEXT_PUBLIC_CORS_ORIGINS: process.env.NEXT_PUBLIC_CORS_ORIGINS || 'not set',
+      NEXT_PUBLIC_CORS_ORIGINS:
+        process.env.NEXT_PUBLIC_CORS_ORIGINS || 'not set',
     },
     apiEndpoints: {
       lst: '/api/aptos/lst',

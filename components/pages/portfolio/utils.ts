@@ -1,5 +1,7 @@
 import { toast } from 'sonner';
 import { isPhantomAsset as isPhantomAssetFromRegistry } from '@/lib/protocol-registry';
+import { defiProtocols } from '@/components/pages/defi/data';
+import { normalizeProtocolName } from '@/lib/aptos-constants';
 
 // Helper function to clean protocol names for display
 export const cleanProtocolName = (name: string): string => {
@@ -143,4 +145,15 @@ export const copyToClipboard = async (text: string, label: string) => {
   } catch (err) {
     toast.error(`Failed to copy ${label}`);
   }
+};
+
+// Helper function to get detailed protocol information
+export const getDetailedProtocolInfo = (protocolName: string) => {
+  const normalizedName = normalizeProtocolName(protocolName);
+  return defiProtocols.find(
+    protocol =>
+      protocol.title === normalizedName ||
+      protocol.title.toLowerCase() === protocolName.toLowerCase().trim() ||
+      protocolName.toLowerCase().trim().includes(protocol.title.toLowerCase())
+  );
 };
