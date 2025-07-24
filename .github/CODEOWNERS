@@ -1,0 +1,24 @@
+# Global code owners
+* @zacharyr0th
+
+# Frontend components
+/components/ @zacharyr0th
+/app/ @zacharyr0th
+
+# API routes and backend logic
+/app/api/ @zacharyr0th
+/lib/services/ @zacharyr0th
+
+# Infrastructure and deployment
+/Dockerfile @zacharyr0th
+/docker-compose*.yml @zacharyr0th
+/.github/ @zacharyr0th
+
+# Configuration files
+/next.config.mjs @zacharyr0th
+/package.json @zacharyr0th
+/tsconfig.json @zacharyr0th
+
+# Security and compliance
+/SECURITY.md @zacharyr0th
+/LICENSE @zacharyr0th

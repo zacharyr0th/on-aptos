@@ -24,7 +24,7 @@ Try this endpoint in your [browser](https://api.mainnet.aptoslabs.com/v1/analyti
     | start_utc_unix_secs | the (inclusive) start UTC time of the range query `integer` in unix timestamp in seconds  |
     | end_utc_unix_secs | the (inclusive) end UTC time of the range query `integer` in unix timestamp in seconds  |
     | bucket_granularity | an optional `string` that aggregates usage into buckets. Uses the previous day’s closing price for usage in USD to be consistent with the non-aggregated query. possible granularities: `1s`, `1m`, `5m`, `15m` , `1h`, `6h`, `1d`, `7d` |
-    | group_by_entry_function` | an optional `bool` that aggregates gas usage into entry function type. |
+    | group_by_entry_function | an optional `bool` that aggregates gas usage into entry function type. |
 - Sample Responses
     - Successful Response
         
@@ -279,12 +279,20 @@ Try this endpoint in your [browser](https://api.mainnet.aptoslabs.com/v1/analyti
         {
         	"data":[
         		 {
-                "hourly_timestamp": "2024-12-30 00:00:00",
-                "total_store_balance_usd": 99.192533349
+                "asset_address": "0x1::aptos_coin::AptosCoin",
+                "asset_name": "Aptos Coin",
+                "asset_symbol": "APT",
+                "price_change_percentage": 15.25,
+                "current_price_usd": 5.93,
+                "previous_price_usd": 5.15
             },
             {
-                "hourly_timestamp": "2025-01-01 00:00:00",
-                "total_store_balance_usd": 96.068998872
+                "asset_address": "0xbae207659db88bea0cbead6da0ed00aac12edcdda169e591cd41c94180b46f3b",
+                "asset_name": "USD Coin",
+                "asset_symbol": "USDC",
+                "price_change_percentage": -0.12,
+                "current_price_usd": 0.9998,
+                "previous_price_usd": 1.0010
             },
         		...
         	],
@@ -391,7 +399,7 @@ https://api.mainnet.aptoslabs.com/v1/analytics/aries/rewards?account_address=<st
 <aside>
 🔗
 
-Try this endpoint in your [browser](https://api.mainnet.aptoslabs.com/v1/analytics/aries/total_rewards?account_address=0x804a03b534243c924c5799ec8769ca34049eccced1d075a0e5c1d4fe028f10a8&profile_address=0x591a4818fc63794b2abd3e028276ae72243228ede20a00ce4a8f555b1709abff)
+Try this endpoint in your [browser](https://api.mainnet.aptoslabs.com/v1/analytics/aries/rewards?account_address=0x804a03b534243c924c5799ec8769ca34049eccced1d075a0e5c1d4fe028f10a8&profile_address=0x591a4818fc63794b2abd3e028276ae72243228ede20a00ce4a8f555b1709abff)
 
 </aside>
 
@@ -450,7 +458,7 @@ https://api.mainnet.aptoslabs.com/v1/analytics/aries/daily_pool_apr?reserve_asse
 <aside>
 🔗
 
-Try this endpoint in your [browser](https://api.mainnet.aptoslabs.com/v1/analytics/aries//daily_pool_apr?reserve_asset_type=0x0000000000000000000000000000000000000000000000000000000000000001::aptos_coin::AptosCoin&date_start=2025-04-01&date_end=2025-04-10)
+Try this endpoint in your [browser](https://api.mainnet.aptoslabs.com/v1/analytics/aries/daily_pool_apr?reserve_asset_type=0x0000000000000000000000000000000000000000000000000000000000000001::aptos_coin::AptosCoin&date_start=2025-04-01&date_end=2025-04-10)
 
 </aside>
 

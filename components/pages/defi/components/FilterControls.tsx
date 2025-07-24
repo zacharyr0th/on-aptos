@@ -75,21 +75,30 @@ export function FilterControls({
   const MobileFilterDropdown = () => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="w-full justify-between gap-2 h-10">
-          <div className="flex items-center gap-2 min-w-0">
-            <Filter className="h-4 w-4 flex-shrink-0" />
-            <span className="text-sm truncate">
-              {selectedSubcategory
-                ? `${selectedCategory} • ${selectedSubcategory}`
-                : selectedCategory}
-            </span>
+        <Button
+          variant="outline"
+          className="w-full justify-between gap-2 h-12 px-4 text-left"
+        >
+          <div className="flex items-center gap-3 min-w-0">
+            <Filter className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
+            <div className="min-w-0 flex-1">
+              <span className="text-sm font-medium block truncate">
+                {selectedSubcategory
+                  ? `${selectedCategory} • ${selectedSubcategory}`
+                  : selectedCategory}
+              </span>
+              <span className="text-xs text-muted-foreground">
+                {t('defi:filters.tap_to_filter', 'Tap to filter protocols')}
+              </span>
+            </div>
           </div>
-          <ChevronDown className="h-4 w-4 flex-shrink-0" />
+          <ChevronDown className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
-        className="w-64 max-h-[70vh] overflow-y-auto"
+        className="w-80 max-h-[75vh] overflow-y-auto"
         align="start"
+        sideOffset={4}
       >
         <DropdownMenuLabel className="text-xs text-muted-foreground">
           {t('defi:filters.filter_by_category')}
@@ -98,13 +107,16 @@ export function FilterControls({
 
         {/* All Categories */}
         <DropdownMenuItem
-          className={`cursor-pointer ${selectedCategory === 'All' ? 'bg-primary/10 text-primary' : ''}`}
+          className={`cursor-pointer py-3 px-4 ${selectedCategory === 'All' ? 'bg-primary/10 text-primary' : 'hover:bg-muted/50'}`}
           onClick={() => {
             onCategoryChange('All');
             onSubcategoryChange?.(undefined);
           }}
         >
-          {t('defi:filters.all')}
+          <div className="flex items-center gap-3 w-full">
+            <div className="w-2 h-2 rounded-full bg-primary/60 flex-shrink-0" />
+            <span className="font-medium">{t('defi:filters.all')}</span>
+          </div>
         </DropdownMenuItem>
 
         {/* Categories with their subcategories as indented items */}
@@ -122,21 +134,24 @@ export function FilterControls({
               <div key={category}>
                 {/* Main Category */}
                 <DropdownMenuItem
-                  className={`cursor-pointer font-medium ${selectedCategory === category && !selectedSubcategory ? 'bg-primary/10 text-primary' : ''}`}
+                  className={`cursor-pointer py-3 px-4 ${selectedCategory === category && !selectedSubcategory ? 'bg-primary/10 text-primary' : 'hover:bg-muted/50'}`}
                   onClick={() => {
                     onCategoryChange(category);
                     onSubcategoryChange?.(undefined);
                   }}
                 >
-                  <div className="flex flex-col gap-0.5 w-full">
-                    <span className="font-medium">
-                      {t(`defi:categories.${category}.name`)}
-                    </span>
-                    {categoryDef?.description && (
-                      <span className="text-xs text-muted-foreground leading-tight">
-                        {getText(categoryDef.description)}
+                  <div className="flex items-start gap-3 w-full">
+                    <div className="w-2 h-2 rounded-full bg-primary/60 flex-shrink-0 mt-2" />
+                    <div className="flex flex-col gap-1 flex-1 min-w-0">
+                      <span className="font-medium text-sm">
+                        {t(`defi:categories.${category}.name`)}
                       </span>
-                    )}
+                      {categoryDef?.description && (
+                        <span className="text-xs text-muted-foreground leading-tight">
+                          {getText(categoryDef.description)}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </DropdownMenuItem>
 
@@ -149,19 +164,22 @@ export function FilterControls({
                     .map(([subcategory, description]) => (
                       <DropdownMenuItem
                         key={`${category}-${subcategory}`}
-                        className={`cursor-pointer ml-4 ${selectedSubcategory === subcategory ? 'bg-primary/10 text-primary' : ''}`}
+                        className={`cursor-pointer py-3 px-4 ml-6 ${selectedSubcategory === subcategory ? 'bg-primary/10 text-primary' : 'hover:bg-muted/50'}`}
                         onClick={() => {
                           onCategoryChange(category);
                           onSubcategoryChange?.(subcategory);
                         }}
                       >
-                        <div className="flex flex-col gap-0.5 w-full">
-                          <span className="font-medium text-sm">
-                            → {subcategory}
-                          </span>
-                          <span className="text-xs text-muted-foreground leading-tight">
-                            {getText(description)}
-                          </span>
+                        <div className="flex items-start gap-3 w-full">
+                          <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground flex-shrink-0 mt-2" />
+                          <div className="flex flex-col gap-1 flex-1 min-w-0">
+                            <span className="font-medium text-sm">
+                              {subcategory}
+                            </span>
+                            <span className="text-xs text-muted-foreground leading-tight">
+                              {getText(description)}
+                            </span>
+                          </div>
                         </div>
                       </DropdownMenuItem>
                     ))}
@@ -248,7 +266,7 @@ export function FilterControls({
         })() && (
           <div className="mt-4 overflow-hidden">
             <div className="animate-in slide-in-from-top-2 duration-300 ease-out">
-              <div className="bg-card border border-border rounded-lg p-4 shadow-sm">
+              <div className="p-4">
                 {/* Compact Header */}
                 <div className="mb-3">
                   <div className="flex items-center justify-between">

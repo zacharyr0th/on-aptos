@@ -25,12 +25,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     },
     {
-      url: `${baseUrl}/lst`,
-      lastModified: isoDate,
-      changeFrequency: 'weekly' as const,
-      priority: 0.9,
-    },
-    {
       url: `${baseUrl}/stablecoins`,
       lastModified: isoDate,
       changeFrequency: 'weekly' as const,
@@ -61,12 +55,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const apiPages = [
     {
       url: `${baseUrl}/api/aptos/btc`,
-      lastModified: isoDate,
-      changeFrequency: 'hourly' as const,
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/api/aptos/lst`,
       lastModified: isoDate,
       changeFrequency: 'hourly' as const,
       priority: 0.8,

@@ -64,11 +64,6 @@ export default function manifest(): MetadataRoute.Manifest {
         ],
       },
       {
-        name: 'LST',
-        url: '/lst',
-        icons: [{ src: '/icons/lst.png', sizes: '192x192', type: 'image/png' }],
-      },
-      {
         name: 'RWAs',
         url: '/rwas',
         icons: [

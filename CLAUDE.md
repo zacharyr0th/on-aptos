@@ -2,137 +2,276 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Development Commands
+this is a public good for the aptos ecosystem
+it will eventually become open source but is currently closed source
+it has dashboards for stablecoins, bitcoin, rwas, lsts, and defi as well as a portfolio tool to check out one's wallet
 
-### Common Development Tasks
+use https://aptos.dev/en/build/indexer/indexer-api/indexer-reference and make sure to NEVER USE DEPRECATED TABLES
+use Panora Token list
 
-- `pnpm dev` - Start development server with turbopack on port 3001
-- `pnpm build` - Build production bundle
-- `pnpm start` - Start production server on port 3001
-- `pnpm lint` - Run ESLint
-- `pnpm format` - Format code with Prettier
-- `pnpm format:check` - Check code formatting
+only use the current_token_ownerships_v2 table
+NEVER the deprecated v1 table
+NEVER EVER USE MOCK DATA EVER
 
-### Testing
+panora token list
+Token List
+The Panora Token List is a comprehensive, community-driven collection of tokens. It is designed to provide accurate information and eliminate confusion between similar-looking tokens, providing users with confidence and clarity while trading.
 
-- `pnpm test` - Run Vitest tests
-- `pnpm test:run` - Run tests once
-- `pnpm test:watch` - Run tests in watch mode
-- `pnpm test:ui` - Run tests with UI interface
+Panora Tags
+To enhance token classification and identification, we’ve introduced a field `panoraTags` in token list response. This field combines categories and labels into a single parameter, providing clearer insights and context about each token's status and characteristics. Here’s what they represent:
 
-### Build Analysis
+Categories (Tokens are segregated on Panora UI based on their category):
 
-- `pnpm analyze` - Analyze bundle size
-- `pnpm analyze:server` - Analyze server bundle
-- `pnpm analyze:browser` - Analyze browser bundle
+Native: Tokens that are native to the chain and issued directly on it (excludes emojicoin and meme)
 
-### Maintenance
+Emojicoin: Tokens launched on emojicoin.fun (includes both graduated and non-graduated emojicoins)
 
-- `pnpm clean` - Clean all dependencies and reinstall
-- `pnpm sitemap` - Generate sitemap
-- `pnpm translate-locales` - Translate localization files
+Meme: Tokens primarily driven by community hype, memes, or trends
 
-## Code Architecture
+Bridged: Tokens that originate from another chain and are bridged for use
 
-### High-Level Structure
+Labels:
 
-This is a Next.js 15 application using tRPC for type-safe API communication. The app tracks token supplies, prices, and DeFi analytics for the Aptos blockchain ecosystem.
+Verified
+Tokens with verified logo-to-address mapping to prevent confusion with similar tokens and meet nominal threshold metrics are eligible for Verified label. Verification focuses solely on ensuring accurate identification and does not imply endorsement, financial advice, or guarantee visibility on the Panora UI.
 
-### Key Directories
+Verification and Visibility:
+While we do not currently enforce strict verification metrics criteria, we monitor several key metrics to assess a token's label and/or its visibility on the Panora UI. These metrics are subject to changes and include, but are not limited to, liquidity, market cap, daily trading volume, total holder count, % of supply held by the top 10 holders, and stability of these metrics over a period of time.
 
-- `app/` - Next.js 15 app router pages and API routes
-- `lib/trpc/` - tRPC configuration and domain-based routers
-- `components/` - React components organized by feature
-- `lib/utils/` - Shared utilities and helper functions
-- `lib/config/` - Configuration and environment validation
-- `hooks/` - Custom React hooks
-- `public/` - Static assets including token icons and locales
+Verification Process:
+Projects can apply for the Verified label by submitting a Pull Request (PR) on the Panora Token List GitHub repo and posting an attestation tweet from their official X (Twitter) account. See the following page for a detailed step-by-step guide.
 
-### tRPC Architecture (Domain-Driven Design)
+Note:
 
-The tRPC implementation follows a domain-based structure:
+Not all projects may receive Verified status immediately and may remain as Recognized or Unverified after community review. Additionally, Verified label and/or default visibility of any token on Panora UI may be revoked due to factors such as updated verification criteria, community concerns or lack of transparency from the token project's development team, instability or significant drops in key metrics over a period of time. This is solely to protect the community and you are welcome to re-apply and re-tweet once your project gains more traction and community support. Projects within private Aptos Ecosystem Telegram groups or recognized by other Aptos Ecosystem projects and community members are prioritized for faster verification.
 
-- **domains/assets/** - Asset tracking (bitcoin, stablecoins, LST, RWA)
-- **domains/market-data/** - Market data and analytics (prices, defi metrics)
-- **domains/blockchain/** - Blockchain-specific functionality (aptos)
-- **domains/protocols/** - External protocol integrations
+Emojicoins launched on emojicoin.fun are currently not assigned any labels. All graduated emojicoins are automatically set as panoraUI = true.
 
-All legacy flat routers have been migrated to this domain structure.
+Recognized
+Tokens that have logo-to-address mapping, but may not be tradable or recognized by the community yet, or have had their verified label revoked. Recognized tokens might also include niche or new tokens that are still in the early stages of establishing community support or demonstrating stability.
 
-### Core Technologies
+Unverified
+Tokens that have not yet undergone the verification process but meet the minimum nominal liquidity requirements and have unique metadata. These tokens may or may not be recognized by the community and are hidden by default in the Panora UI. Unverified status is common for new or recently launched tokens and users can choose to trade these tokens at their own discretion.
 
-- **Next.js 15** with App Router
-- **tRPC** for type-safe API layer
-- **TypeScript** for type safety
-- **Tailwind CSS** for styling
-- **Radix UI** for component primitives
-- **Vitest** for testing
-- **React Query** (via tRPC) for data fetching
-- **Zod** for schema validation
+Banned
+Tokens that are restricted due to confirmed malicious behavior or security risks. It is recommended to avoid trading these assets.
 
-### Data Flow
+InternalFA
+Addresses created by certain DEX's before the pairing between Coin and Fungible Asset (FA) standard tokens were established. These may have unique behaviors or limitations.
 
-1. Frontend components use tRPC hooks for data fetching
-2. tRPC routers handle API logic with caching and error handling
-3. External APIs (CoinMarketCap, Panora, Aptos Indexer) provide data sources
-4. LRU caching with TTL manages API response caching
-5. Graceful fallbacks handle API failures
+LP (Liquidity Pool)
+Tokens that represent liquidity pool shares after adding liquidity in trading pairs, indicating the proportion of assets held within a liquidity pool.
 
-### Environment Variables
+Important Reminder: Tokens don’t need to have a Verified or Recognized label to be tradable. All tokens are automatically and instantly available for trading on Panora and all of its integrator partners and can be accessed by using the complete token address.
 
-Required API keys:
+Tokens Visible on Panora UI
+By default, only tokens marked as panoraUI = true are displayed on the Panora UI, along with any other tokens held in the user's wallet, ensuring easy access to owned assets. However, all tokens available on-chain are searchable on Panora UI by name, symbol, emoji, or address.
 
-- `CMC_API_KEY` - CoinMarketCap API key
-- `RWA_API_KEY` - RWA.xyz API key (optional)
-- `PANORA_API_KEY` - Panora Exchange API key (optional)
-- `APTOS_BUILD_KEY` - Aptos Indexer API key (optional)
+Accessing the Panora token list
+The Panora Token List can be accessed via the Token List GitHub Repository or through the public API endpoint
 
-### Testing Strategy
+Public API Key:
 
-- Unit tests for utilities and services
-- Integration tests for tRPC routers
-- API endpoint tests
-- Test setup in `tests/setup.ts`
+Copy
+a4^KV_EaTf4MW#ZdvgGKX#HUD^3IFEAOV_kzpIE^3BQGA8pDnrkT7JcIy#HNlLGi
+Note: This API key's limits should be sufficient for most use cases. For protocols in the Aptos ecosystem, please submit a ticket on Discord to get a dedicated API key.
 
-### Internationalization
+API Usage Example:
 
-- Multi-language support with i18next
-- Localization files in `public/locales/`
-- Supported languages: en, es, fr, de, ja, ko, zh-CN, hi, ar, ha, ru, pt
+GET https://api.panora.exchange/tokenlist
 
-### Deployment
+Copy
+const end_point = "https://api.panora.exchange/tokenlist"
 
-- Configured for Vercel deployment
-- Docker support with standalone output
-- PWA capabilities with caching strategies
-- Bundle analysis for optimization
+const query = {
+isInPanoraTokenList: "true",
+}
 
-## Important Notes
+const headers = {
+"x-api-key":
+"a4^KV_EaTf4MW#ZdvgGKX#HUD^3IFEAOV_kzpIE^3BQGA8pDnrkT7JcIy#HNlLGi",
+}
 
-### When Working with tRPC
+const queryString = new URLSearchParams(query)
+const url = `${end_point}?${queryString}`
 
-- All API logic should use the domain-based router structure
-- New procedures should be added to appropriate domain routers
-- Use Zod schemas for input/output validation
-- Leverage built-in caching and error handling
+const response = await(
+await fetch(url, {
+method: "GET",
+headers: headers,
+})
+).json()
+Query Parameters
 
-### Code Style
+chainId (string, optional): The chain ID associated with the token (Default: 1 for Aptos Mainnet).
 
-- Uses Prettier for formatting
-- ESLint for linting
-- TypeScript strict mode enabled
-- Component props should be typed with interfaces
+tokenAddress (string, optional): Comma-separated list of coin (legacy) and/or FA addresses. The API returns the details for the specified tokens. If not provided, the query will return details of all tokens marked as panoraUI = true.
 
-### Performance Considerations
+panoraUI (boolean, optional): If set to true, only tokens that are visible on the Panora UI are returned. Set as true, false to get all tokens in the list. Default is true.
 
-- LRU caching with configurable TTL
-- Bundle analysis tools available
-- Image optimization configured for external sources
-- PWA caching strategies implemented
+panoraTags (string, optional): Returns tokens based on their associated tags. All available tags are listed under the 'Panora Tags' section at the start of this page.
 
-### Security
+Aptos Token List Response
+The response object contains the following fields:
 
-- Environment validation with Zod
-- Rate limiting on API endpoints
-- CORS configuration
-- No sensitive data in client-side code
+chainId: The chain ID associated with the token (Default: 1 for Aptos Mainnet)
+
+panoraId: A unique id given to all tokens by Panora
+
+tokenAddress: The complete address of the token as per the Aptos Coin Standard (Legacy)
+
+faAddress: The complete address of the token as per the Aptos Fungible Asset (FA) Standard
+
+name: The on-chain registered name of the token
+
+symbol: The on-chain registered symbol of the token
+
+decimals: The number of decimal places of the token
+
+bridge: The bridge associated with the token, if applicable (optional)
+
+panoraSymbol: Similar to symbol, but with prefixes based on the bridge: lz for LayerZero, wh for Wormhole, and ce for Celer
+
+usdPrice: The latest usd price of the token
+
+logoUrl: The URL for the token’s logo(optional)
+
+websiteUrl: The official website URL of the token (optional)
+
+panoraUI: When set to true, displays the token name and logo on the Panora interface.
+
+panoraTags: Lists the tags associated with the token.
+
+panoraIndex: The default sorting order of tokens within the Panora UI
+
+coinGeckoId: The CoinGecko ID of the token (optional)
+
+coinMarketCapId: The CoinMarketCap ID of the token (optional)
+
+Example Response:
+
+Copy
+{
+"chainId": 1,
+"panoraId": "a1-vqom8-USDC",
+"tokenAddress": null,
+"faAddress": "0xbae207659db88bea0cbead6da0ed00aac12edcdda169e591cd41c94180b46f3b",
+"name": "USDC",
+"symbol": "USDC",
+"decimals": 6,
+"bridge": null,
+"panoraSymbol": "USDC",
+"usdPrice": "0.99995004",
+"logoUrl": "https://assets.panora.exchange/tokens/aptos/USDC.svg",
+"websiteUrl": "https://circle.com/usdc",
+"panoraUI": true,
+"panoraTags": [
+"Native",
+"Verified"
+],
+"panoraIndex": 4,
+"coinGeckoId": "usd-coin",
+"coinMarketCapId": 3408,  
+ "isInPanoraTokenList": true, //Do not use. This field will get deprecated.
+"isBanned": false //Do not use. This field will get deprecated.
+}
+
+Panora Prices API
+Token Prices
+The Panora Price API provides real-time price data for tokens on the Aptos chain, making it easy for developers to integrate accurate pricing information into their dApps.
+
+Key Features
+Real-Time Price Feeds: Get up-to-date token prices for accurate trading and analysis.
+
+Wide Token Coverage: Supports all tokens tradable on the Aptos mainnet network.
+
+Accessing the Token Prices
+The Token Prices can be accessed through the public API endpoint
+
+Public API Key:
+
+Copy
+a4^KV_EaTf4MW#ZdvgGKX#HUD^3IFEAOV_kzpIE^3BQGA8pDnrkT7JcIy#HNlLGi
+Note: This API key's limits should be sufficient for most use cases. For protocols in the Aptos ecosystem, please submit a ticket on Discord to get a dedicated API key.
+
+API Usage Example:
+
+GET https://api.panora.exchange/prices
+
+Copy
+const end_point = "https://api.panora.exchange/prices"
+
+const query = {
+tokenAddress: "0xbae207659db88bea0cbead6da0ed00aac12edcdda169e591cd41c94180b46f3b",
+}
+
+const headers = {
+"x-api-key":
+"a4^KV_EaTf4MW#ZdvgGKX#HUD^3IFEAOV_kzpIE^3BQGA8pDnrkT7JcIy#HNlLGi",
+}
+
+const queryString = new URLSearchParams(query)
+const url = `${end_point}?${queryString}`
+
+const response = await(
+await fetch(url, {
+method: "GET",
+headers: headers,
+})
+).json()
+Query Parameter
+chainId (string, optional): The chain ID associated with the token (Default: 1 for Aptos Mainnet).
+
+tokenAddress (string, optional): Comma-separated list of coin (legacy) and / or FA addresses. The API returns the price information for the specified tokens. If not provided, the query will return prices of all tokens having liquidity above a nominal threshold.
+
+Token Price Response
+
+The response object contains the following fields:
+
+chainId: The chain ID associated with the token (Default: 1 for Aptos Mainnet)
+
+tokenAddress: The complete address of the token as per the Aptos Coin Standard (Legacy)
+
+faAddress: The complete address of the token as per the Aptos Fungible Asset (FA) Standard
+
+name: The on-chain registered name of the token
+
+symbol: The on-chain registered symbol of the token
+
+decimals: The number of decimal places of the token
+
+usdPrice: The latest usd price of the token
+
+nativePrice: The latest price of the token relative to the native token
+
+Example Response
+
+Copy
+[
+{
+"chainId": 1,
+"tokenAddress": null,
+"faAddress": "0xbae207659db88bea0cbead6da0ed00aac12edcdda169e591cd41c94180b46f3b",
+"name": "USDC",
+"symbol": "USDC",
+"decimals": 6,
+"usdPrice": "0.99995",
+"nativePrice": "0.18077031"
+}
+]
+
+# logging-requirements
+ALWAYS use the pino logger from lib/utils/logger.ts instead of console.log, console.warn, or console.error.
+Import the logger like: import { logger, apiLogger, serviceLogger } from '@/lib/utils/logger'
+Use appropriate log levels: logger.debug(), logger.info(), logger.warn(), logger.error()
+Use specialized loggers for different modules: apiLogger for API routes, serviceLogger for business logic, etc.
+The CI pipeline will fail if console.* methods are used in source code (excluding tests and scripts).
+For API routes, always use apiLogger to track requests and responses.
+For errors, use logger.error() or errorLogger.error() with proper context.
+Log levels are automatically configured based on NODE_ENV (debug in development, info in production).
+
+# important-instruction-reminders
+Do what has been asked; nothing more, nothing less.
+NEVER create files unless they're absolutely necessary for achieving your goal.
+ALWAYS prefer editing an existing file to creating a new one.
+NEVER proactively create documentation files (*.md) or README files. Only create documentation files if explicitly requested by the User.

@@ -1,0 +1,13 @@
+{
+  "moderate": true,
+  "high": true,
+  "critical": true,
+  "allowlist": [],
+  "skip-dev": false,
+  "package-manager": "pnpm",
+  "report-type": "full",
+  "retry": {
+    "count": 3,
+    "delay": 5000
+  }
+}

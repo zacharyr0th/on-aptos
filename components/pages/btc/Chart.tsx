@@ -9,6 +9,7 @@ import {
 } from 'recharts';
 import { Copy } from 'lucide-react';
 import { toast } from 'sonner';
+import Image from 'next/image';
 import { useResponsive } from '@/hooks/useResponsive';
 import { Button } from '@/components/ui/button';
 import {
@@ -17,7 +18,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { BTC_COLORS, Token } from '@/lib/config';
+import { Token } from '@/lib/config';
+import { BTC_COLORS } from '@/lib/constants/ui/colors';
 import { formatCurrency } from '@/lib/utils';
 import {
   formatBTCAmount,
@@ -39,6 +41,9 @@ export interface MarketShareChartProps {
     { assetAddress: string; name?: string; decimals?: number }
   >;
   bitcoinPrice?: number;
+  totalBTC?: number;
+  totalUSD?: number;
+  showTotalInfo?: boolean;
 }
 
 // Chart configuration constants
@@ -72,8 +77,8 @@ const CustomTooltip = memo<TooltipProps<number, string>>(props => {
         </p>
         <p className="text-muted-foreground">Supply: {formattedSupply}</p>
         {_usdValue && (
-          <p className="text-muted-foreground">
-            Value: {formatCurrency(_usdValue, 'USD')}
+          <p className="text-muted-foreground font-mono">
+            Value: {formatCurrency(_usdValue, 'USD', { decimals: 0 })}
           </p>
         )}
       </div>
@@ -195,9 +200,23 @@ CustomLegend.displayName = 'CustomLegend';
 
 // Enhanced main chart component with comprehensive optimizations
 export const MarketShareChart = memo<MarketShareChartProps>(
-  ({ data, tokenMetadata = {}, bitcoinPrice }) => {
+  ({
+    data,
+    tokenMetadata = {},
+    bitcoinPrice,
+    totalBTC,
+    totalUSD,
+    showTotalInfo = true,
+  }) => {
     const { isMobile, isDesktop } = useResponsive();
     const width = isDesktop ? 1024 : isMobile ? 320 : 768;
+
+    console.log('[MarketShareChart] Props:', {
+      totalBTC,
+      totalUSD,
+      bitcoinPrice,
+      showTotalInfo,
+    });
 
     // Ultra-optimized BTC values calculation with batch processing and caching
     const tokenBtcValues = useMemo(() => {
@@ -274,7 +293,7 @@ export const MarketShareChart = memo<MarketShareChartProps>(
         outerRadius: isMobile
           ? CHART_DIMENSIONS.mobile.outerRadius
           : CHART_DIMENSIONS.desktop.outerRadius,
-        size: isMobile ? 'w-56 h-56' : 'w-64 h-64',
+        size: isMobile ? 'w-56 h-56' : 'w-80 h-80',
       }),
       [isMobile]
     );
@@ -296,9 +315,54 @@ export const MarketShareChart = memo<MarketShareChartProps>(
     }
 
     return (
-      <div className="flex flex-col items-center justify-center w-full h-full">
-        <div className="w-full h-full relative">
-          <div className="flex items-center justify-center h-full">
+      <div className="relative w-full h-full">
+        {/* Total and BTC info in top right corner - only show on desktop or when explicitly enabled */}
+        {(totalBTC || bitcoinPrice) && (showTotalInfo || !isMobile) && (
+          <div className="absolute top-4 right-4 z-10 hidden md:block">
+            {totalBTC && (
+              <div>
+                <div className="flex items-center justify-end gap-3 mb-1">
+                  <h2 className="text-sm text-muted-foreground">
+                    Total Supply
+                  </h2>
+                  {bitcoinPrice && (
+                    <div className="flex items-center gap-1.5">
+                      <Image
+                        src="/icons/btc/bitcoin.png"
+                        alt="Bitcoin"
+                        width={16}
+                        height={16}
+                        className="object-contain"
+                        onError={e => {
+                          const img = e.target as HTMLImageElement;
+                          img.src = '/placeholder.jpg';
+                        }}
+                      />
+                      <span className="text-sm text-muted-foreground font-mono">
+                        {formatCurrency(bitcoinPrice, 'USD', { decimals: 0 })}
+                      </span>
+                    </div>
+                  )}
+                </div>
+                <p className="text-lg font-bold font-mono text-right">
+                  {formatBTCAmount(totalBTC)}
+                  {totalUSD && (
+                    <span className="text-sm font-normal text-muted-foreground ml-2 font-mono">
+                      ≈ {formatCurrency(totalUSD, 'USD', { decimals: 0 })}
+                    </span>
+                  )}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        <div
+          className={`flex items-center justify-center w-full h-full ${isMobile ? 'p-4' : 'p-6'}`}
+        >
+          <div
+            className={`flex ${isMobile ? 'flex-col items-center gap-6' : 'flex-row items-center justify-center gap-12 w-full max-w-5xl'}`}
+          >
             <div className={chartConfig.size}>
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -322,21 +386,17 @@ export const MarketShareChart = memo<MarketShareChartProps>(
                       />
                     ))}
                   </Pie>
-                  {!isMobile && (
-                    <Tooltip content={<CustomTooltip />} cursor={false} />
-                  )}
+                  <Tooltip content={<CustomTooltip />} cursor={false} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
 
-            {isDesktop && (
-              <div className="ml-12">
-                <CustomLegend
-                  chartData={chartData}
-                  tokenMetadata={tokenMetadata}
-                />
-              </div>
-            )}
+            <div className="flex flex-col justify-center">
+              <CustomLegend
+                chartData={chartData}
+                tokenMetadata={tokenMetadata}
+              />
+            </div>
           </div>
         </div>
       </div>

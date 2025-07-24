@@ -29,7 +29,7 @@ const generateStructuredData = () => ({
         '@type': 'EntryPoint',
         urlTemplate: 'https://onaptos.com/api/aptos/{category}',
         description:
-          'Search for token data by category (btc, lst, stables, rwas)',
+          'Search for token data by category (btc, stables, rwas)',
       },
     },
   ],
@@ -63,7 +63,6 @@ const generateStructuredData = () => ({
     'Aptos',
     'Bitcoin',
     'Stablecoins',
-    'Liquid Staking',
     'Real World Assets',
   ],
   keywords: [
@@ -72,7 +71,6 @@ const generateStructuredData = () => ({
     'DeFi analytics',
     'Bitcoin on Aptos',
     'stablecoin tracking',
-    'liquid staking tokens',
     'blockchain data',
     'real-time prices',
     'token supplies',
@@ -123,17 +121,6 @@ const generateStructuredData = () => ({
       },
       {
         '@type': 'Dataset',
-        name: 'Liquid Staking Tokens on Aptos',
-        description:
-          'Supply data for LSTs (amAPT, stAPT, thAPT, sthAPT, kAPT, stkAPT)',
-        distribution: {
-          '@type': 'DataDownload',
-          encodingFormat: 'application/json',
-          contentUrl: 'https://onaptos.com/api/aptos/lst',
-        },
-      },
-      {
-        '@type': 'Dataset',
         name: 'Real World Assets on Aptos',
         description:
           'Supply data for tokenized real world assets on Aptos blockchain',
@@ -163,12 +150,6 @@ const generateStructuredData = () => ({
       '@id': 'https://onaptos.com/stablecoins',
       name: 'Stablecoins Dashboard',
       description: 'Real-time tracking of stablecoins on Aptos',
-    },
-    {
-      '@type': 'WebPage',
-      '@id': 'https://onaptos.com/lst',
-      name: 'LST Dashboard',
-      description: 'Real-time tracking of liquid staking tokens on Aptos',
     },
     {
       '@type': 'WebPage',

@@ -1,66 +1,72 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAllWalletNFTs } from '@/lib/services/blockchain/portfolio/portfolio-service';
-import {
-  withValidation,
-  PortfolioNFTsQuerySchema,
-} from '@/lib/utils/validation';
-import { withAPIHandler, createCacheHeaders } from '@/lib/utils/api-response';
-// Rate limiting removed - not compatible with serverless architecture
-import { NFTsResponse, StandardAPIResponse } from '@/lib/types/api';
 import { logger } from '@/lib/utils/logger';
-
-// Set max duration for Vercel serverless function
-export const maxDuration = 30; // 30 seconds
-
-const handler = withValidation(PortfolioNFTsQuerySchema)(async ({
-  query,
-  request,
-}) => {
-  const startTime = Date.now();
-
-  return await withAPIHandler(
-    async (): Promise<NFTsResponse> => {
-      if (!query) throw new Error('Missing query parameters');
-
-      const { walletAddress } = query;
-
-      logger.info(`[NFTs API] Fetching ALL NFTs for ${walletAddress}`);
-
-      // Call the service to get all NFTs exhaustively
-      const nfts = await getAllWalletNFTs(walletAddress);
-
-      logger.info(`[NFTs API] Retrieved ${nfts.length} NFTs`);
-
-      return {
-        nfts,
-        totalCount: nfts.length,
-        hasMore: false, // We fetched everything
-      };
-    },
-    {
-      startTime,
-      operation: 'Portfolio NFTs Fetch',
-      apiCalls: 1,
-    }
-  )();
-});
+import { NFTService } from '@/lib/services/portfolio/services/nft-service';
 
 export async function GET(request: NextRequest) {
-  const response = await handler(request);
+  try {
+    const { searchParams } = new URL(request.url);
+    const walletAddress = searchParams.get('walletAddress');
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '100');
+    const getAllNFTs = searchParams.get('all') === 'true';
 
-  // Add caching headers for NFT data
-  const cacheHeaders = createCacheHeaders(
-    60, // 1 minute cache (NFTs change less frequently)
-    120, // 2 minutes stale-while-revalidate
-    {
-      'X-Service': 'portfolio-nfts',
-      'X-API-Version': '1.0',
+    if (!walletAddress) {
+      return NextResponse.json(
+        { error: 'Wallet address is required' },
+        { status: 400 }
+      );
     }
-  );
 
-  Object.entries(cacheHeaders).forEach(([key, value]) => {
-    response.headers.set(key, value);
-  });
+    logger.info('[Portfolio NFTs API] Fetching NFTs for:', walletAddress, {
+      page,
+      limit,
+      getAllNFTs,
+    });
 
-  return response;
+    if (getAllNFTs) {
+      // Get all NFTs without pagination
+      const nfts = await NFTService.getAllWalletNFTs(walletAddress);
+      const totalCount = await NFTService.getTotalNFTCount(walletAddress);
+
+      logger.info(`[Portfolio NFTs API] Found ${nfts.length} total NFTs`);
+
+      return NextResponse.json({
+        success: true,
+        data: {
+          nfts,
+          totalCount,
+          hasMore: false,
+        },
+      });
+    } else {
+      // Get paginated NFTs
+      const result = await NFTService.getWalletNFTs(walletAddress, page, limit);
+
+      logger.info(
+        `[Portfolio NFTs API] Found ${result.data.length} NFTs (page ${page})`
+      );
+
+      return NextResponse.json({
+        success: true,
+        data: {
+          nfts: result.data,
+          hasMore: result.hasMore,
+          nextCursor: result.nextCursor,
+          page,
+          limit,
+        },
+      });
+    }
+  } catch (error) {
+    logger.error('Portfolio NFTs API error:', error);
+    logger.error('[Portfolio NFTs API] Error:', error);
+
+    return NextResponse.json(
+      {
+        error: 'Failed to fetch portfolio NFTs',
+        details: error instanceof Error ? error.message : 'Unknown error',
+      },
+      { status: 500 }
+    );
+  }
 }

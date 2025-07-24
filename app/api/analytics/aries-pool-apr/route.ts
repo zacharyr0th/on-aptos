@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
+
 import { aptosAnalytics } from '@/lib/services/aptos-analytics';
+import { logger } from '@/lib/utils/logger';
 
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
 
-    const reserve_asset_type = searchParams.get('reserve_asset_type');
+    const reserve_asset_type =
+      searchParams.get('reserve_asset_type') || searchParams.get('poolAddress');
     const date_start = searchParams.get('date_start');
     const date_end = searchParams.get('date_end');
 
@@ -24,7 +27,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ data });
   } catch (error) {
-    console.error('Aries pool APR API error:', error);
+    logger.error('Aries pool APR API error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch Aries pool APR' },
       { status: 500 }

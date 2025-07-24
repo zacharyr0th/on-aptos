@@ -119,6 +119,7 @@ export interface NFT {
   collection_uri?: string;
   last_transaction_version?: number;
   last_transaction_timestamp?: string;
+  token_standard?: 'v1' | 'v2';
 }
 
 export interface NFTsResponse {

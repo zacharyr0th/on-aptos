@@ -4,6 +4,7 @@
  */
 
 import { z } from 'zod';
+import { serviceLogger } from '@/lib/utils/logger';
 
 // Thala protocol addresses from the protocol list
 const THALA_ADDRESSES = {
@@ -132,7 +133,7 @@ export class ThalaPositionChecker {
       const data = await response.json();
       return Array.isArray(data) ? data : [];
     } catch (error) {
-      console.error('Error fetching account resources:', error);
+      serviceLogger.error('Error fetching account resources:', error);
       return [];
     }
   }
@@ -177,7 +178,7 @@ export class ThalaPositionChecker {
           }))
         : [];
     } catch (error) {
-      console.error('Error fetching account transactions:', error);
+      serviceLogger.error('Error fetching account transactions:', error);
       return [];
     }
   }
@@ -249,7 +250,7 @@ export class ThalaPositionChecker {
     walletAddress: string
   ): Promise<ThalaPositionSummary> {
     try {
-      console.log(`Checking Thala positions for wallet: ${walletAddress}`);
+      serviceLogger.info(`Checking Thala positions for wallet: ${walletAddress}`);
 
       // Fetch account resources and transactions
       const [resources, transactions] = await Promise.all([
@@ -327,7 +328,7 @@ export class ThalaPositionChecker {
         lastUpdated: new Date().toISOString(),
       };
     } catch (error) {
-      console.error('Error checking Thala positions:', error);
+      serviceLogger.error('Error checking Thala positions:', error);
       return {
         walletAddress,
         positions: [],
@@ -373,7 +374,7 @@ export class ThalaPositionChecker {
         type: resource.type,
       }));
     } catch (error) {
-      console.error('Error checking Thala token holdings:', error);
+      serviceLogger.error('Error checking Thala token holdings:', error);
       return [];
     }
   }

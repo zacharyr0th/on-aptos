@@ -50,57 +50,53 @@ export const IconSection = ({
 
   return (
     <Card
-      className="group relative overflow-hidden border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-lg cursor-pointer bg-card/50 backdrop-blur-sm h-[180px] sm:h-[220px] lg:h-[260px] flex flex-col"
+      className="group relative overflow-hidden border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-lg active:scale-95 cursor-pointer bg-card/50 backdrop-blur-sm h-[180px] sm:h-[200px] lg:h-[240px] flex flex-col touch-manipulation rounded-xl"
       onClick={handleSectionClick}
     >
       {/* Status Badge */}
       {underConstruction && (
-        <div className="absolute top-4 right-4 z-10">
-          <Badge variant="secondary" className="text-xs">
+        <div className="absolute top-3 right-3 z-10">
+          <Badge variant="secondary" className="text-xs px-2 py-1">
             <Construction className="w-3 h-3 mr-1" />
             Coming Soon
           </Badge>
         </div>
       )}
 
-      <CardHeader className="pb-2 sm:pb-3 flex-shrink-0 h-[60px] sm:h-[80px] lg:h-[100px] flex flex-col justify-start">
-        <div className="flex items-center justify-between mb-2">
+      <CardHeader className="pb-1 sm:pb-2 flex-shrink-0 h-[45px] sm:h-[50px] lg:h-[60px] flex flex-col justify-center p-3 sm:p-4 lg:p-6">
+        <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2 min-w-0 flex-1">
-            <div className="w-2 h-2 bg-primary rounded-full animate-pulse flex-shrink-0" />
-            <CardTitle className="text-sm sm:text-base lg:text-lg font-bold group-hover:text-primary transition-colors truncate pr-2">
+            <div className="w-2.5 h-2.5 bg-primary rounded-full animate-pulse flex-shrink-0" />
+            <CardTitle className="text-sm sm:text-base lg:text-lg font-bold group-hover:text-primary transition-colors truncate pr-1">
               {title}
             </CardTitle>
             <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all duration-300 flex-shrink-0" />
           </div>
         </div>
-
-        <CardDescription className="hidden sm:block text-sm leading-relaxed line-clamp-3 flex-1">
-          {description || 'Explore comprehensive analytics and tracking tools'}
-        </CardDescription>
       </CardHeader>
 
-      <CardContent className="flex-1 flex flex-col justify-center px-3 sm:px-6 pb-3 sm:pb-6">
+      <CardContent className="flex-1 flex flex-col justify-start px-4 sm:px-5 lg:px-6 pt-2 sm:pt-3 pb-4 sm:pb-5 lg:pb-6">
         {/* Protocol Icons */}
-        <div className="flex justify-center">
-          <div className="grid grid-cols-4 gap-2 max-w-fit">
+        <div className="flex justify-center items-center">
+          <div className="grid grid-cols-4 gap-2 sm:gap-3 lg:gap-4 max-w-fit">
             {icons.slice(0, 4).map((icon, iconIndex) => {
               const isSvgIcon = icon.src.startsWith('data:image/svg+xml');
 
               return (
                 <div
                   key={iconIndex}
-                  className="relative group/icon flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 lg:w-16 lg:h-16 bg-background border border-border rounded-lg shadow-sm hover:shadow-md hover:scale-105 transition-all duration-300"
+                  className="relative group/icon flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 lg:w-18 lg:h-18 bg-background border border-border/60 rounded-xl shadow-sm hover:shadow-md hover:scale-105 active:scale-95 transition-all duration-300 touch-manipulation hover:border-primary/30"
                 >
                   <Image
                     src={icon.src}
                     alt={icon.name}
-                    width={32}
-                    height={32}
-                    className={`w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8 object-contain transition-transform duration-300 group-hover/icon:scale-110 ${isSvgIcon ? 'dark:invert' : ''}`}
+                    width={36}
+                    height={36}
+                    className={`w-7 h-7 sm:w-8 sm:h-8 lg:w-9 lg:h-9 object-contain transition-transform duration-300 group-hover/icon:scale-110 ${isSvgIcon || icon.name === 'APT' ? 'dark:invert' : ''}`}
                   />
 
                   {/* Tooltip - Hidden on mobile */}
-                  <div className="hidden sm:block absolute -top-8 left-1/2 -translate-x-1/2 bg-popover text-popover-foreground text-xs px-2 py-1 rounded border border-border opacity-0 group-hover/icon:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-10">
+                  <div className="hidden lg:block absolute -top-9 left-1/2 -translate-x-1/2 bg-popover text-popover-foreground text-xs px-2 py-1.5 rounded-lg border border-border/60 opacity-0 group-hover/icon:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-10 shadow-md">
                     {icon.name}
                   </div>
                 </div>

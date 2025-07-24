@@ -30,13 +30,12 @@ export const metadata: Metadata = {
     template: '%s | On Aptos - Blockchain Analytics',
   },
   description:
-    'Real-time analytics for Bitcoin, DeFi, LST, and Stablecoins on Aptos blockchain. Track token supplies, prices, and market data with our comprehensive API and dashboards.',
+    'Real-time analytics for Bitcoin, DeFi, and Stablecoins on Aptos blockchain. Track token supplies, prices, and market data with our comprehensive API and dashboards.',
   keywords: [
     'Aptos',
     'blockchain',
     'DeFi',
     'Bitcoin',
-    'LST',
     'Stablecoins',
     'cryptocurrency',
     'blockchain analytics',
@@ -76,7 +75,7 @@ export const metadata: Metadata = {
     url: '/',
     title: 'On Aptos - Real-time Blockchain Analytics',
     description:
-      'Real-time analytics for Bitcoin, DeFi, LST, and Stablecoins on Aptos blockchain. Track token supplies, prices, and market data.',
+      'Real-time analytics for Bitcoin, DeFi, and Stablecoins on Aptos blockchain. Track token supplies, prices, and market data.',
     siteName: 'On Aptos',
     images: [
       {
@@ -91,7 +90,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'On Aptos - Real-time Blockchain Analytics',
     description:
-      'Real-time analytics for Bitcoin, DeFi, LST, and Stablecoins on Aptos blockchain.',
+      'Real-time analytics for Bitcoin, DeFi, and Stablecoins on Aptos blockchain.',
     creator: DEVELOPER_CONFIG.twitter,
     site: '@onaptos',
     images: ['/twitter-image.png'],

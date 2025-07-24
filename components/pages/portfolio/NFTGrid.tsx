@@ -136,17 +136,6 @@ export const NFTGrid = ({
             </div>
           )}
         </div>
-        <div className="mt-2">
-          <p className="text-sm font-medium truncate" title={nft.token_name}>
-            {nft.token_name}
-          </p>
-          <p
-            className="text-xs text-muted-foreground truncate max-w-[150px]"
-            title={nft.collection_name}
-          >
-            {nft.collection_name}
-          </p>
-        </div>
       </div>
     );
   };
@@ -154,7 +143,7 @@ export const NFTGrid = ({
   return (
     <div className="space-y-4 nft-grid-container">
       {nftsLoading ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="space-y-2">
               <Skeleton className="aspect-square rounded-xl" />
@@ -165,7 +154,7 @@ export const NFTGrid = ({
         </div>
       ) : nfts && nfts.length > 0 ? (
         viewMode === 'grid' ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {nfts.map((nft, index) => renderNFTCard(nft, index))}
           </div>
         ) : (
@@ -197,7 +186,7 @@ export const NFTGrid = ({
                   </Button>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-3">
                     {collectionNFTs.map((nft, index) =>
                       renderNFTCard(nft, index)
                     )}

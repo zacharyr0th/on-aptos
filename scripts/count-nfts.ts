@@ -75,7 +75,8 @@ async function countNFTs(walletAddress: string): Promise<number> {
         : {}
     );
 
-    const count = response.current_token_ownerships_v2_aggregate.aggregate.count;
+    const count =
+      response.current_token_ownerships_v2_aggregate.aggregate.count;
     logger.info(`Total NFT count: ${count}`);
     return count;
   } catch (error) {
@@ -108,10 +109,10 @@ async function getNFTDetails(walletAddress: string, limit: number = 10) {
       INDEXER,
       {
         query: GET_NFTS_QUERY,
-        variables: { 
-          ownerAddress: walletAddress, 
+        variables: {
+          ownerAddress: walletAddress,
           limit: limit,
-          offset: 0 
+          offset: 0,
         },
       },
       APTOS_API_KEY
@@ -124,14 +125,18 @@ async function getNFTDetails(walletAddress: string, limit: number = 10) {
     );
 
     const nfts = response.current_token_ownerships_v2;
-    
+
     logger.info(`\nFirst ${Math.min(limit, nfts.length)} NFTs:`);
     nfts.forEach((nft, index) => {
       console.log(`\n${index + 1}. ${nft.current_token_data.token_name}`);
-      console.log(`   Collection: ${nft.current_token_data.current_collection?.collection_name || 'Unknown'}`);
+      console.log(
+        `   Collection: ${nft.current_token_data.current_collection?.collection_name || 'Unknown'}`
+      );
       console.log(`   Amount: ${nft.amount}`);
       if (nft.current_token_data.description) {
-        console.log(`   Description: ${nft.current_token_data.description.substring(0, 100)}...`);
+        console.log(
+          `   Description: ${nft.current_token_data.description.substring(0, 100)}...`
+        );
       }
     });
 
@@ -143,15 +148,16 @@ async function getNFTDetails(walletAddress: string, limit: number = 10) {
 }
 
 async function main() {
-  const walletAddress = '0x6f4b2376e61b7493774d6a4a1c07797622be14f5af6e8c1cd0c11c4cddf7e522';
-  
+  const walletAddress =
+    '0x6f4b2376e61b7493774d6a4a1c07797622be14f5af6e8c1cd0c11c4cddf7e522';
+
   try {
     // First, get the total count
     const totalCount = await countNFTs(walletAddress);
     console.log(`\n===========================================`);
     console.log(`Total NFTs owned by wallet: ${totalCount}`);
     console.log(`===========================================\n`);
-    
+
     // Then, get details of first 10 NFTs as a sample
     if (totalCount > 0) {
       await getNFTDetails(walletAddress, 10);

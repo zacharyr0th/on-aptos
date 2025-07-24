@@ -1,0 +1,205 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '9'
+
+jobs:
+  # Create GitHub Release
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+      tag_name: ${{ steps.get_version.outputs.VERSION }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || echo "")
+          if [ -z "$PREVIOUS_TAG" ]; then
+            CHANGELOG=$(git log --pretty=format:"- %s (%h)" --no-merges)
+          else
+            CHANGELOG=$(git log ${PREVIOUS_TAG}..HEAD --pretty=format:"- %s (%h)" --no-merges)
+          fi
+          echo "CHANGELOG<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGELOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.get_version.outputs.VERSION }}
+          release_name: Release ${{ steps.get_version.outputs.VERSION }}
+          body: |
+            ## Changes in ${{ steps.get_version.outputs.VERSION }}
+            
+            ${{ steps.changelog.outputs.CHANGELOG }}
+            
+            ## Docker Images
+            
+            - `docker pull ${{ secrets.DOCKER_USERNAME }}/on-aptos:${{ steps.get_version.outputs.VERSION }}`
+            - `docker pull ${{ secrets.DOCKER_USERNAME }}/on-aptos:latest`
+            
+            ## Deployment
+            
+            This release has been automatically deployed to production.
+          draft: false
+          prerelease: ${{ contains(steps.get_version.outputs.VERSION, '-') }}
+
+  # Build and test before releasing
+  build:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run tests
+        run: pnpm test:run
+
+      - name: Build application
+        run: pnpm build
+        env:
+          NEXT_PUBLIC_SITE_URL: https://on-aptos.com
+          APTOS_BUILD_SECRET: ${{ secrets.APTOS_BUILD_SECRET }}
+          CMC_API_KEY: ${{ secrets.CMC_API_KEY }}
+          RWA_API_KEY: ${{ secrets.RWA_API_KEY }}
+          PANORA_API_KEY: ${{ secrets.PANORA_API_KEY }}
+
+  # Build and push versioned Docker image
+  docker:
+    name: Build & Push Release Image
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/on-aptos:${{ steps.get_version.outputs.VERSION }}
+            ${{ secrets.DOCKER_USERNAME }}/on-aptos:latest
+          build-args: |
+            NEXT_PUBLIC_SITE_URL=https://on-aptos.com
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64
+
+  # Deploy release to production
+  deploy:
+    name: Deploy Release
+    runs-on: ubuntu-latest
+    needs: [release, docker]
+    environment: production
+    steps:
+      - name: Deploy to production
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.PRODUCTION_HOST }}
+          username: ${{ secrets.PRODUCTION_USER }}
+          key: ${{ secrets.PRODUCTION_SSH_KEY }}
+          script: |
+            cd /opt/on-aptos
+            
+            # Create backup
+            docker-compose -f docker-compose.prod.yml exec -T app tar czf /tmp/backup-$(date +%Y%m%d-%H%M%S).tar.gz /app/.next /app/public || true
+            
+            # Pull new images
+            docker-compose -f docker-compose.prod.yml pull
+            
+            # Deploy with rolling update
+            docker-compose -f docker-compose.prod.yml up -d
+            
+            # Health check
+            sleep 30
+            curl -f http://localhost:3000/ || exit 1
+            
+            # Cleanup
+            docker system prune -f
+
+  # Notify stakeholders
+  notify:
+    name: Send Notifications
+    runs-on: ubuntu-latest
+    needs: [release, deploy]
+    if: always()
+    steps:
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Send Discord notification
+        uses: Ilshidur/action-discord@master
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        with:
+          args: |
+            🎉 **New Release Deployed!**
+            
+            **Version:** ${{ steps.get_version.outputs.VERSION }}
+            **Status:** ${{ job.status }}
+            **Site:** https://on-aptos.com
+            
+            **Release Notes:** https://github.com/${{ github.repository }}/releases/tag/${{ steps.get_version.outputs.VERSION }}
+
+      - name: Send Slack notification
+        if: ${{ secrets.SLACK_WEBHOOK }}
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: |
+            🚀 On Aptos ${{ steps.get_version.outputs.VERSION }} has been deployed!
+            
+            Live at: https://on-aptos.com
+            Release: https://github.com/${{ github.repository }}/releases/tag/${{ steps.get_version.outputs.VERSION }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}

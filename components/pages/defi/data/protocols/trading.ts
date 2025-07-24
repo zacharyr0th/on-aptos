@@ -33,7 +33,6 @@ export const tradingProtocols: DefiProtocol[] = [
     },
     tvl: {
       current: 'N/A',
-      defiLlama: undefined,
       change7d: undefined,
       change30d: undefined,
       lastUpdated: undefined,
@@ -89,7 +88,6 @@ export const tradingProtocols: DefiProtocol[] = [
     },
     tvl: {
       current: 'N/A',
-      defiLlama: undefined,
       change7d: undefined,
       change30d: undefined,
       lastUpdated: undefined,

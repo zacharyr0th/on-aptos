@@ -3,6 +3,13 @@ import withBundleAnalyzer from '@next/bundle-analyzer';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Environment variables configuration
+  env: {
+    APTOS_BUILD_SECRET: process.env.APTOS_BUILD_SECRET,
+    CMC_API_KEY: process.env.CMC_API_KEY,
+    RWA_API_KEY: process.env.RWA_API_KEY,
+    PANORA_API_KEY: process.env.PANORA_API_KEY,
+  },
   // Default port is 3000, we need to change it to 3001
   transpilePackages: ["geist"],
   // Optimize for Vercel deployment
@@ -21,8 +28,64 @@ const nextConfig = {
       },
     ];
   },
+  // Security headers configuration (moved from middleware)
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+          { key: 'X-XSS-Protection', value: '1; mode=block' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+          { key: 'X-Robots-Tag', value: 'index, follow, max-snippet:-1' },
+          { key: 'X-DNS-Prefetch-Control', value: 'on' },
+        ],
+      },
+      // Special caching for static documentation
+      {
+        source: '/llms.txt',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=3600, stale-while-revalidate=86400' },
+        ],
+      },
+      {
+        source: '/humans.txt',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=3600, stale-while-revalidate=86400' },
+        ],
+      },
+      {
+        source: '/.well-known/ai-plugin.json',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=3600, stale-while-revalidate=86400' },
+        ],
+      },
+      // Aggressive caching for translation files
+      {
+        source: '/locales/:path*',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+          { key: 'Content-Type', value: 'application/json; charset=utf-8' },
+        ],
+      },
+      // CORS headers for API routes
+      {
+        source: '/api/:path*',
+        headers: [
+          { key: 'Access-Control-Allow-Methods', value: 'GET, HEAD, OPTIONS' },
+          { key: 'Access-Control-Allow-Headers', value: 'Content-Type, Authorization' },
+          { key: 'Access-Control-Max-Age', value: '86400' },
+          { key: 'Access-Control-Allow-Credentials', value: 'false' },
+        ],
+      },
+    ];
+  },
   // Allow images from RWA CDN, S3 bucket, and DefiLlama icons
   images: {
+    // Disable image optimization to avoid edge requests
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',

@@ -1,6 +1,9 @@
 import DeFiPage from '@/components/pages/defi/Page';
 import { Metadata } from 'next';
 
+// Revalidate every 15 minutes for DeFi TVL and protocol data
+export const revalidate = 900;
+
 export const metadata: Metadata = {
   title: 'DeFi Analytics',
   description:

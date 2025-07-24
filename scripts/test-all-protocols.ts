@@ -1,13 +1,20 @@
 #!/usr/bin/env tsx
 
 /**
+ * @deprecated This script uses the old ComprehensivePositionChecker which has been integrated into DeFiBalanceService
+ * Use test-defi-positions.ts instead for protocol testing
+ *
  * Script to test ALL DeFi protocol coverage
  * Usage: tsx scripts/test-all-protocols.ts
  */
 
+// @ts-ignore - deprecated import
 import { ComprehensivePositionChecker } from '../lib/services/comprehensive-position-checker';
-import { PROTOCOLS_BY_TYPE, PROTOCOL_ADDRESSES } from '../lib/aptos-constants';
-import { PROTOCOLS } from '../lib/protocol-registry';
+import {
+  PROTOCOLS,
+  getProtocolsByType,
+  getAllProtocolAddresses,
+} from '../lib/protocol-registry';
 
 async function main() {
   const walletAddress =

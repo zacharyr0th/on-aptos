@@ -25,7 +25,6 @@ export const TokenDialogContent: React.FC<TokenDialogContentProps> = ({
     'common',
     'btc',
     'stables',
-    'lst',
     'rwas',
   ]);
 

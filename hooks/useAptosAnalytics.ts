@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { logger } from '@/lib/utils/logger';
 
 interface GasUsageData {
@@ -141,7 +141,7 @@ export function useBalanceHistory(
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  const fetchBalanceHistory = useCallback(async () => {
+  const fetchBalanceHistory = async () => {
     if (!address) return;
 
     setLoading(true);
@@ -153,9 +153,7 @@ export function useBalanceHistory(
         lookback,
       });
 
-      const response = await fetch(
-        `/api/analytics/balance-history?${params}`
-      );
+      const response = await fetch(`/api/analytics/balance-history?${params}`);
       const result = await response.json();
 
       if (!response.ok) throw new Error(result.error);
@@ -167,11 +165,11 @@ export function useBalanceHistory(
     } finally {
       setLoading(false);
     }
-  }, [address, lookback]);
+  };
 
   useEffect(() => {
     fetchBalanceHistory();
-  }, [fetchBalanceHistory]);
+  }, [address, lookback]);
 
   return { data, loading, error, refetch: fetchBalanceHistory };
 }

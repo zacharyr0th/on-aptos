@@ -15,7 +15,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import YieldDialog from './YieldDialog';
 import { Market, ProtocolData, formatBTCAmountWithCommas } from './types';
-import { YIELD_COLORS, PROTOCOL_ICONS } from '@/lib/config';
+import { PROTOCOL_ICONS } from '@/lib/config';
+import { YIELD_COLORS } from '@/lib/constants/ui/colors';
 import { formatCurrency, formatBigIntWithDecimals } from '@/lib/utils';
 import { Dialog, DialogTrigger } from '@/components/ui/dialog';
 import { Disclaimer } from '@/components/layout/Disclaimer';
@@ -258,7 +259,7 @@ const ProtocolSection: React.FC<ProtocolSectionProps> = ({
               {data.protocol} Protocol
             </CardTitle>
           </div>
-          <div className="text-xs text-muted-foreground">
+          <div className="text-xs text-muted-foreground font-mono">
             <strong>{data.markets.length}</strong>{' '}
             {data.markets.length === 1 ? 'asset' : 'assets'} •{' '}
             {formatBTCAmountWithCommas(parseFloat(data.total.btc))} BTC

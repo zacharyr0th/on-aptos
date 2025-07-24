@@ -23,29 +23,48 @@ export function useMarketPrice(symbol: string): UseMarketPriceResult {
 
   const fetchPrice = useCallback(async () => {
     try {
+      setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/prices/cmc/${symbol.toLowerCase()}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      // For Bitcoin, use xBTC price from token-latest-price API
+      if (
+        symbol.toLowerCase() === 'btc' ||
+        symbol.toLowerCase() === 'bitcoin'
+      ) {
+        const xBTCAddress =
+          '0x81214a80d82035a190fcb76b6ff3c0145161c3a9f33d137f2bbaee4cfec8a387';
+        const response = await fetch(
+          `/api/analytics/token-latest-price?address=${xBTCAddress}`
+        );
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+
+        if (result.data && result.data.length > 0) {
+          const tokenData = result.data[0];
+          setData({
+            symbol: 'BTC',
+            name: 'Bitcoin',
+            price: tokenData.price_usd,
+            updated:
+              tokenData.bucketed_timestamp_minutes_utc ||
+              new Date().toISOString(),
+          });
+          setLastUpdated(new Date());
+        } else {
+          throw new Error('No price data available');
+        }
+      } else {
+        // For other symbols, price API not available
+        setData(null);
+        setError('Price API not available for this symbol');
       }
-
-      const result = await response.json();
-      const priceData = result.data || result;
-      console.log('[useMarketPrice] API response:', result);
-      console.log('[useMarketPrice] Price data:', priceData);
-      setData(priceData);
-      setLastUpdated(
-        priceData.updated ? new Date(priceData.updated) : new Date()
-      );
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
+      setError(err instanceof Error ? err.message : 'Failed to fetch price');
+      setData(null);
     } finally {
       setLoading(false);
     }
@@ -70,8 +89,4 @@ export function useMarketPrice(symbol: string): UseMarketPriceResult {
 // Convenience hooks for common symbols
 export function useBitcoinPrice(): UseMarketPriceResult {
   return useMarketPrice('btc');
-}
-
-export function useCMCData(): UseMarketPriceResult {
-  return useMarketPrice('susde');
 }

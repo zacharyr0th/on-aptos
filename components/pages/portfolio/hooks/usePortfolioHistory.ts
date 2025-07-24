@@ -75,8 +75,32 @@ export function usePortfolioHistory(
   const [data, setData] = useState<OptimizedPortfolioData[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [accountNames, setAccountNames] = useState<string[] | null>(null);
 
   // We're using the portfolio history endpoint directly
+
+  // Fetch ANS names
+  const fetchAccountNames = useCallback(async () => {
+    if (!walletAddress) {
+      setAccountNames(null);
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `/api/wallet/ans/names?address=${encodeURIComponent(walletAddress)}`
+      );
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success && result.data) {
+          setAccountNames(result.data);
+        }
+      }
+    } catch (error) {
+      logger.error('Failed to fetch ANS names:', error);
+      // Don't set error state as this is not critical
+    }
+  }, [walletAddress]);
 
   const fetchPortfolioHistory = useCallback(async () => {
     if (!walletAddress) {
@@ -228,14 +252,16 @@ export function usePortfolioHistory(
   useEffect(() => {
     // Always use the portfolio history endpoint instead of analytics data
     fetchPortfolioHistory();
+    fetchAccountNames();
 
     if (refetchInterval > 0) {
       const interval = setInterval(() => {
         fetchPortfolioHistory();
+        fetchAccountNames();
       }, refetchInterval);
       return () => clearInterval(interval);
     }
-  }, [fetchPortfolioHistory, refetchInterval]);
+  }, [fetchPortfolioHistory, fetchAccountNames, refetchInterval]);
 
   return {
     data: transformedData,
@@ -247,7 +273,7 @@ export function usePortfolioHistory(
     currentPrice,
     previousPrice,
     averageHistory,
-    accountNames: null, // Not supported in history endpoints
+    accountNames, // Now fetched from the ANS endpoint
   };
 }
 

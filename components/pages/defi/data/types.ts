@@ -177,7 +177,7 @@ interface BaseDefiProtocol {
   // === TVL Data ===
   tvl: {
     current: string;
-    defiLlama?: string;
+    defiLlama?: string; // Optional DeFi Llama TVL value for protocols listed there
     change7d?: string;
     change30d?: string;
     lastUpdated?: ISODateString; // When TVL data was last updated

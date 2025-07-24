@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState } from 'react';
 import { NFT } from '../types';
 
 export interface PortfolioState {
@@ -7,6 +7,7 @@ export interface PortfolioState {
   nftViewMode: 'grid' | 'collection';
   selectedNFT: NFT | null;
   nftShuffle: number;
+  nftPage: number;
   hoveredCollection: string | null;
   selectedAsset: any;
   selectedDeFiPosition: any;
@@ -47,6 +48,7 @@ export const usePortfolio = (
   const [nftViewMode, setNftViewMode] = useState<'grid' | 'collection'>('grid');
   const [selectedNFT, setSelectedNFT] = useState<NFT | null>(null);
   const [nftShuffle, setNftShuffle] = useState(0);
+  const [nftPage, setNftPage] = useState(0);
   const [hoveredCollection, setHoveredCollection] = useState<string | null>(
     null
   );
@@ -74,11 +76,11 @@ export const usePortfolio = (
   >(null);
 
   // NFT Shuffle logic
-  const shuffleNFTs = useCallback(() => {
+  const shuffleNFTs = () => {
     setNftShuffle(prev => prev + 1);
-  }, []);
+  };
 
-  const shuffledNFTs = useMemo(() => {
+  const shuffledNFTs = (() => {
     if (!nfts || nfts.length === 0) return [];
 
     const shuffled = [...nfts];
@@ -95,10 +97,10 @@ export const usePortfolio = (
     }
 
     return shuffled;
-  }, [nfts, nftShuffle]); // eslint-disable-line react-hooks/exhaustive-deps
+  })();
 
   // Portfolio metrics calculations
-  const portfolioMetrics = useMemo(() => {
+  const portfolioMetrics = (() => {
     if (!metricsProps) return null;
 
     const {
@@ -145,9 +147,9 @@ export const usePortfolio = (
       last24hValue,
       firstValue,
     };
-  }, [metricsProps]);
+  })();
 
-  const chartData = useMemo(() => {
+  const chartData = (() => {
     if (
       !metricsProps?.averageHistory ||
       metricsProps.averageHistory.length === 0
@@ -164,9 +166,9 @@ export const usePortfolio = (
         value: item.total_balance,
       }))
       .sort((a, b) => a.timestamp - b.timestamp);
-  }, [metricsProps?.averageHistory]);
+  })();
 
-  const pieChartData = useMemo(() => {
+  const pieChartData = (() => {
     if (
       !metricsProps?.portfolioAssets ||
       metricsProps.portfolioAssets.length === 0
@@ -201,7 +203,7 @@ export const usePortfolio = (
       }))
       .sort((a: any, b: any) => b.value - a.value)
       .slice(0, 8);
-  }, [metricsProps?.portfolioAssets]);
+  })();
 
   const pieChartColors = [
     '#3b82f6',
@@ -242,6 +244,7 @@ export const usePortfolio = (
     nftViewMode,
     selectedNFT,
     nftShuffle,
+    nftPage,
     hoveredCollection,
     selectedAsset,
     selectedDeFiPosition,
@@ -261,6 +264,7 @@ export const usePortfolio = (
     setNftViewMode,
     setSelectedNFT,
     setNftShuffle,
+    setNftPage,
     setHoveredCollection,
     setSelectedAsset,
     setSelectedDeFiPosition,

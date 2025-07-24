@@ -1,10 +1,14 @@
 #!/usr/bin/env tsx
 
 /**
+ * @deprecated This script uses the old ComprehensivePositionChecker which has been integrated into DeFiBalanceService
+ * Use test-defi-positions.ts instead for comprehensive position checking
+ *
  * Script to check comprehensive protocol positions for a specific wallet
  * Usage: tsx scripts/check-comprehensive-positions.ts
  */
 
+// @ts-ignore - deprecated import
 import { ComprehensivePositionChecker } from '../lib/services/comprehensive-position-checker';
 
 async function main() {

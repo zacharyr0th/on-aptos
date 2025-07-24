@@ -18,7 +18,12 @@ export interface ChartDataItem {
   formattedSupply: string;
   _usdValue?: number;
   originalSymbol?: string;
-  components?: Array<{ symbol: string; supply: string }>;
+  components?: Array<{
+    symbol: string;
+    supply: string;
+    supply_raw: string;
+    formattedSupply: string;
+  }>;
 }
 
 // Performance-optimized cache with LRU eviction

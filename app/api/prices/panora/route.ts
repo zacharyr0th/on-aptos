@@ -7,6 +7,7 @@ import {
   withErrorHandling,
   type ErrorContext,
 } from '@/lib/utils';
+import { logger } from '@/lib/utils/logger';
 
 // Revalidate this route every 2 minutes (Panora data is more dynamic)
 export const revalidate = 120;
@@ -73,7 +74,7 @@ export async function GET(request: NextRequest) {
           const prices = Array.isArray(data) ? data : [];
 
           if (prices.length === 0) {
-            console.warn('[Panora API] No price data returned');
+            logger.warn('[Panora API] No price data returned');
           }
 
           // Transform data to consistent format
@@ -97,7 +98,7 @@ export async function GET(request: NextRequest) {
             source: 'Panora Exchange',
           };
         } catch (error) {
-          console.error('Panora price fetch error:', formatApiError(error));
+          logger.error('Panora price fetch error:', formatApiError(error));
 
           if (error instanceof ApiError) {
             throw error;

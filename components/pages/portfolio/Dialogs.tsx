@@ -26,6 +26,7 @@ import { toast } from 'sonner';
 import { formatCurrency } from '@/lib/utils/format';
 import { defiProtocols } from '@/components/pages/defi/data';
 import { NFT } from './types';
+import { GeistMono } from 'geist/font/mono';
 
 interface BaseDialogProps {
   isOpen: boolean;
@@ -144,7 +145,7 @@ export const NFTDetailsDialog: React.FC<NFTDetailsDialogProps> = ({
               </div>
 
               <div className="flex items-center gap-2 bg-muted/30 rounded-lg px-3 py-2">
-                <p className="text-xs font-mono truncate flex-1">
+                <p className={`text-xs truncate flex-1 ${GeistMono.className}`}>
                   {nft.token_data_id}
                 </p>
                 <Button
@@ -236,10 +237,8 @@ export const ProtocolDetailsDialog: React.FC<ProtocolDetailsDialogProps> = ({
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-muted-foreground">Total Value</p>
-                  <p className="text-lg font-mono">
-                    {protocolName === 'Thala Farm'
-                      ? 'TBD'
-                      : formatCurrency(defiPosition.totalValue || 0)}
+                  <p className={`text-lg ${GeistMono.className}`}>
+                    {formatCurrency(defiPosition.totalValue || 0)}
                   </p>
                 </div>
                 <div>
@@ -303,7 +302,7 @@ export const ProtocolDetailsDialog: React.FC<ProtocolDetailsDialogProps> = ({
                       <p className="text-sm text-muted-foreground">
                         Total Value Locked
                       </p>
-                      <p className="text-lg font-mono">
+                      <p className={`text-lg ${GeistMono.className}`}>
                         {protocolDetails.tvl.current}
                       </p>
                     </div>
@@ -313,7 +312,7 @@ export const ProtocolDetailsDialog: React.FC<ProtocolDetailsDialogProps> = ({
                       <p className="text-sm text-muted-foreground">
                         Total Volume
                       </p>
-                      <p className="text-lg font-mono">
+                      <p className={`text-lg ${GeistMono.className}`}>
                         {protocolDetails.volume.total}
                       </p>
                     </div>
@@ -323,7 +322,7 @@ export const ProtocolDetailsDialog: React.FC<ProtocolDetailsDialogProps> = ({
                       <p className="text-sm text-muted-foreground">
                         Current Yield
                       </p>
-                      <p className="text-lg font-mono">
+                      <p className={`text-lg ${GeistMono.className}`}>
                         {protocolDetails.yields.current.join(', ')}
                       </p>
                     </div>

@@ -5,7 +5,7 @@
  * Usage: tsx scripts/test-defi-positions.ts
  */
 
-import { DeFiBalanceService } from '../lib/trpc/domains/blockchain/portfolio/defi-balance-service';
+import { DeFiBalanceService } from '../lib/services/portfolio/defi-balance-service';
 
 async function main() {
   const walletAddress =
