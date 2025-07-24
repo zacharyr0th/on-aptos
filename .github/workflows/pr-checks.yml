@@ -217,7 +217,7 @@ jobs:
           NEXT_PUBLIC_SITE_URL: https://on-aptos.com
 
       - name: Upload bundle analysis
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: bundle-analysis
           path: .next/analyze/
