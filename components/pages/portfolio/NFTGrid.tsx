@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/collapsible';
 import { ImageIcon, ChevronDown, ChevronUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { logger } from '@/lib/utils/logger';
 import { NFT } from './types';
 
 interface NFTGridProps {
@@ -61,7 +62,7 @@ export const NFTGrid = ({
 
   const renderNFTCard = (nft: NFT, index: number) => {
     if (!nft || !nft.token_data_id) {
-      console.warn('Invalid NFT data:', nft);
+      logger.warn('Invalid NFT data:', nft);
       return null;
     }
 
@@ -116,7 +117,7 @@ export const NFTGrid = ({
                 </div>
               );
             } catch (error) {
-              console.warn('Invalid NFT image URL:', imageUrl, error);
+              logger.warn('Invalid NFT image URL:', imageUrl, error);
               return (
                 <div className="relative w-full h-full">
                   <Image

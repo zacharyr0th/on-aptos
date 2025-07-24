@@ -1,5 +1,5 @@
 {
-  "*.{js,jsx,ts,tsx}": ["prettier --write"],
-  "*.{json,css,md,yml,yaml}": ["prettier --write"],
+  "*.{js,jsx,ts,tsx}": ["secretlint", "prettier --write"],
+  "*.{json,css,md,yml,yaml}": ["secretlint", "prettier --write"],
   "package.json": ["sort-package-json"]
 }

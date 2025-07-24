@@ -83,6 +83,7 @@
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^15.3.4",
+    "@secretlint/secretlint-rule-preset-recommend": "^10.2.1",
     "@tailwindcss/line-clamp": "^0.4.4",
     "@tailwindcss/postcss": "^4.1.10",
     "@testing-library/jest-dom": "^6.6.3",
@@ -96,6 +97,7 @@
     "eslint-config-prettier": "^9.1.0",
     "jsdom": "^26.1.0",
     "prettier": "^3.4.2",
+    "secretlint": "^10.2.1",
     "sort-package-json": "^3.4.0",
     "tailwindcss": "^4.1.10",
     "tw-animate-css": "^1.2.9",
