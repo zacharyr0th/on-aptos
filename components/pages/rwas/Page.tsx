@@ -32,6 +32,7 @@ import { RWA_COLORS } from '@/lib/config/colors';
 import { RWA_TOKEN_BY_TICKER } from './rwa-constants';
 import { useResponsive } from '@/hooks/useResponsive';
 import { usePageTranslation } from '@/hooks/useTranslation';
+import { logger } from '@/lib/utils/logger';
 // Removed complex suspense boundaries for simpler implementation
 
 // Function to darken a hex color based on TVL ranking (higher TVL = darker)
@@ -552,7 +553,7 @@ export default function RWAsPage(): React.ReactElement {
       }
 
       const data = await response.json();
-      console.log('[RWA Page] API Response:', data);
+      logger.debug('[RWA Page] API Response:', data);
       setRwaResponse(data);
     } catch (error) {
       setRwaError(error instanceof Error ? error : new Error(String(error)));
@@ -575,7 +576,7 @@ export default function RWAsPage(): React.ReactElement {
         // Only refresh if user is on the page
         if (!document.hidden) {
           if (process.env.NODE_ENV === 'development') {
-            console.log('🔄 Background refresh triggered');
+            logger.debug('🔄 Background refresh triggered');
           }
           fetchRwaData();
         }
@@ -614,7 +615,7 @@ export default function RWAsPage(): React.ReactElement {
 
     if (process.env.NODE_ENV === 'development') {
       // Validate that all data comes from RWA.xyz API
-      console.log('🔍 Processing RWA data from RWA.xyz API:', {
+      logger.debug('🔍 Processing RWA data from RWA.xyz API:', {
         protocolCount: protocols.length,
         totalValue: totalRWAValue,
         dataSource,
@@ -623,18 +624,18 @@ export default function RWAsPage(): React.ReactElement {
 
       // Log each protocol's data to verify it's real
       protocols.forEach((protocol: any, index: number) => {
-        console.log(
+        logger.debug(
           `📊 Protocol ${index + 1}: ${protocol.assetTicker} - ${formatAmount(protocol.totalValue, 'USD', { compact: false })} (${protocol.protocol})`
         );
 
         // Validate required fields are present
         if (!protocol.totalValue || protocol.totalValue <= 0) {
-          console.warn(
+          logger.warn(
             `⚠️ Invalid totalValue for ${protocol.assetTicker}: ${protocol.totalValue}`
           );
         }
         if (!protocol.tokenAddress) {
-          console.warn(`⚠️ Missing tokenAddress for ${protocol.assetTicker}`);
+          logger.warn(`⚠️ Missing tokenAddress for ${protocol.assetTicker}`);
         }
       });
     }
@@ -655,7 +656,9 @@ export default function RWAsPage(): React.ReactElement {
     });
 
     if (process.env.NODE_ENV === 'development') {
-      console.log('✅ All data validated from RWA.xyz API - NO MOCK DATA USED');
+      logger.debug(
+        '✅ All data validated from RWA.xyz API - NO MOCK DATA USED'
+      );
     }
 
     return {

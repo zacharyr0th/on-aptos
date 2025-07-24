@@ -25,6 +25,7 @@ import {
   measurePerformance,
   ChartDataItem,
 } from './types';
+import { logger } from '@/lib/utils/logger';
 
 // Re-export token colors for backward compatibility
 export const TOKEN_COLORS = STABLECOIN_COLORS;
@@ -92,7 +93,7 @@ const CustomTooltip = memo<TooltipProps<number, string>>(props => {
       </div>
     );
   } catch (error) {
-    console.error('Error rendering tooltip:', error);
+    logger.error('Error rendering tooltip:', error);
     return (
       <div className="bg-popover/95 backdrop-blur border rounded-md shadow-lg p-3 z-10 text-sm">
         <p className="text-destructive">Error displaying data</p>
@@ -115,7 +116,7 @@ const TokenNameCopy = memo<{
       await navigator.clipboard.writeText(text);
       toast.success(`Copied ${label} address to clipboard`);
     } catch (error) {
-      console.error('Failed to copy to clipboard:', error);
+      logger.error('Failed to copy to clipboard:', error);
       toast.error('Failed to copy to clipboard');
     }
   }, []);
@@ -435,7 +436,7 @@ export const MarketShareChart = memo<MarketShareChartProps>(
 
           return finalResult;
         } catch (error) {
-          console.error('Error processing chart data:', error);
+          logger.error('Error processing chart data:', error);
           return [];
         }
       }, 'chartData calculation');

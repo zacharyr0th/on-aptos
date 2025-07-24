@@ -36,6 +36,7 @@ import {
   calculateMarketShare,
 } from './types';
 import { usePageTranslation } from '@/hooks/useTranslation';
+import { logger } from '@/lib/utils/logger';
 // Removed complex suspense boundaries for simpler implementation
 
 // Use BTC_METADATA from config instead of redefining here
@@ -331,12 +332,12 @@ export default function BitcoinPage(): React.ReactElement {
         setBtcSupplyData(data);
         setBtcSupplyLoading(false);
       } catch (error) {
-        console.error('[BTC Page] Fetch error:', error);
+        logger.error('[BTC Page] Fetch error:', error);
         setBtcSupplyError(error as Error);
         setBtcSupplyLoading(false);
       }
     };
-    
+
     fetchData();
   }, [forceRefresh]);
 
@@ -345,13 +346,13 @@ export default function BitcoinPage(): React.ReactElement {
     try {
       setBtcSupplyFetching(true);
       setBtcSupplyError(null);
-      
+
       const response = await fetch('/api/aptos/btc');
       const data = await response.json();
-      console.log('[BTC Page] Manual refresh data:', data);
+      logger.debug('[BTC Page] Manual refresh data:', data);
       setBtcSupplyData(data);
     } catch (error) {
-      console.error('[BTC Page] Manual refresh error:', error);
+      logger.error('[BTC Page] Manual refresh error:', error);
       setBtcSupplyError(error as Error);
     } finally {
       setBtcSupplyFetching(false);
@@ -368,7 +369,7 @@ export default function BitcoinPage(): React.ReactElement {
   // Extract bitcoin price from price hook - NO FALLBACK, use real data only
   const bitcoinPriceData = useMemo(() => {
     return measurePerformance(() => {
-      console.log('[BTC Page] bitcoinPriceHookData:', bitcoinPriceHookData);
+      logger.debug('[BTC Page] bitcoinPriceHookData:', bitcoinPriceHookData);
       return bitcoinPriceHookData;
     }, 'Bitcoin price calculation');
   }, [bitcoinPriceHookData]);
@@ -387,12 +388,11 @@ export default function BitcoinPage(): React.ReactElement {
       null;
   const refreshing = btcSupplyFetching && !btcSupplyLoading;
 
-
   // Process the supply data for display - simplified approach like LST page
   const processedData = useMemo(() => {
-    console.log('[BTC Page] Processing data:', data);
+    logger.debug('[BTC Page] Processing data:', data);
     if (!data || !data.supplies || !Array.isArray(data.supplies)) {
-      console.log('[BTC Page] No data to process');
+      logger.debug('[BTC Page] No data to process');
       return null;
     }
 
@@ -405,7 +405,7 @@ export default function BitcoinPage(): React.ReactElement {
       return bBtc - aBtc;
     });
 
-    console.log('[BTC Page] Sorted supplies:', sortedSupplies);
+    logger.debug('[BTC Page] Sorted supplies:', sortedSupplies);
     return {
       ...data,
       supplies: sortedSupplies,
@@ -414,7 +414,10 @@ export default function BitcoinPage(): React.ReactElement {
 
   // Calculate the total BTC and USD value - simplified approach
   const { totalBTC, totalUSD } = useMemo(() => {
-    console.log('[BTC Page] Calculating totals, processedData:', processedData);
+    logger.debug(
+      '[BTC Page] Calculating totals, processedData:',
+      processedData
+    );
     if (
       !processedData ||
       !processedData.supplies ||
@@ -436,7 +439,7 @@ export default function BitcoinPage(): React.ReactElement {
       }
     });
 
-    console.log('[BTC Page] Calculated totals:', {
+    logger.debug('[BTC Page] Calculated totals:', {
       totalBTC: totalBTCValue,
       totalUSD: totalUSDValue,
     });
@@ -477,7 +480,7 @@ export default function BitcoinPage(): React.ReactElement {
             <ErrorState error={error} onRetry={handleRetry} t={t} />
           ) : processedData ? (
             <>
-              {console.log('[BTC Page] Render check:', {
+              {logger.debug('[BTC Page] Render check:', {
                 processedData,
                 bitcoinPriceData,
                 data,

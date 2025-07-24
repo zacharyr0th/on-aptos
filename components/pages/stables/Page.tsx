@@ -39,6 +39,7 @@ import {
   SupplyData,
 } from '@/lib/config';
 import { usePageTranslation } from '@/hooks/useTranslation';
+import { logger } from '@/lib/utils/logger';
 // Simplified for better compatibility
 
 const TOKEN_METADATA = STABLECOIN_METADATA;
@@ -146,7 +147,7 @@ const TokenCard = React.memo(function TokenCard({
     const formatSingle = (s: string, symbol: string, isRaw: boolean = true) => {
       // Debug log for MOD to understand the issue
       if (symbol === 'MOD') {
-        console.log('MOD formatSingle:', {
+        logger.debug('MOD formatSingle:', {
           input: s,
           isRaw,
           symbol,
@@ -164,7 +165,7 @@ const TokenCard = React.memo(function TokenCard({
         if (symbol === 'mUSD' || symbol === 'MOD' || symbol === 'USDA') {
           dollars = Number(supplyVal) / 100_000_000; // 8 decimals
           if (symbol === 'MOD') {
-            console.log('MOD calculation:', {
+            logger.debug('MOD calculation:', {
               supplyVal: supplyVal.toString(),
               divisor: 100_000_000,
               result: dollars,
@@ -180,7 +181,7 @@ const TokenCard = React.memo(function TokenCard({
 
       // Debug log the calculated dollars for MOD
       if (symbol === 'MOD') {
-        console.log('MOD final dollars:', dollars);
+        logger.debug('MOD final dollars:', dollars);
       }
 
       // Apply sUSDe price multiplier if available and token is sUSDe
@@ -190,7 +191,7 @@ const TokenCard = React.memo(function TokenCard({
 
       // Final debug log for MOD before formatting
       if (symbol === 'MOD') {
-        console.log('MOD final formatting:', {
+        logger.debug('MOD final formatting:', {
           dollars,
           formatted:
             dollars >= 1_000
@@ -235,7 +236,7 @@ const TokenCard = React.memo(function TokenCard({
 
       // Debug log for MOD
       if (token.symbol === 'MOD') {
-        console.log('MOD calcFormattedDisplay:', {
+        logger.debug('MOD calcFormattedDisplay:', {
           token,
           supply_raw: token.supply_raw,
           supply: token.supply,
@@ -569,8 +570,8 @@ export default function StablesPage(): React.ReactElement {
       }
 
       const data = await response.json();
-      console.log('[Stables Page] API Response:', data);
-      console.log('[Stables Page] API Response data.data:', data.data);
+      logger.debug('[Stables Page] API Response:', data);
+      logger.debug('[Stables Page] API Response data.data:', data.data);
       setStablesData(data);
     } catch (error) {
       setStablesError(
@@ -624,10 +625,10 @@ export default function StablesPage(): React.ReactElement {
     adjustedTotal,
     suppliesDataMap,
   } = useMemo(() => {
-    console.log('[Stables Page] useMemo data:', data);
-    console.log('[Stables Page] useMemo stablesData:', stablesData);
+    logger.debug('[Stables Page] useMemo data:', data);
+    logger.debug('[Stables Page] useMemo stablesData:', stablesData);
     if (!data || !data.supplies) {
-      console.log('[Stables Page] No data or supplies found');
+      logger.debug('[Stables Page] No data or supplies found');
       return {
         formattedTotalSupply: '',
         processedSupplies: [],
