@@ -8,6 +8,40 @@ import {
   buildPaginationVariables,
 } from '../utils/graphql-helpers';
 
+// Add rate limiting delay
+const RATE_LIMIT_DELAY = 1000; // 1 second between requests
+const MAX_RETRIES = 3;
+const RETRY_DELAY = 2000; // 2 seconds for retry
+
+async function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function fetchWithRetry(
+  url: string,
+  options: RequestInit,
+  retries = MAX_RETRIES
+): Promise<Response> {
+  try {
+    const response = await fetch(url, options);
+    
+    if (response.status === 429 && retries > 0) {
+      logger.warn(`Rate limited, retrying in ${RETRY_DELAY}ms... (${retries} retries left)`);
+      await sleep(RETRY_DELAY);
+      return fetchWithRetry(url, options, retries - 1);
+    }
+    
+    return response;
+  } catch (error) {
+    if (retries > 0) {
+      logger.warn(`Request failed, retrying... (${retries} retries left)`);
+      await sleep(RETRY_DELAY);
+      return fetchWithRetry(url, options, retries - 1);
+    }
+    throw error;
+  }
+}
+
 export class NFTService {
   static async getWalletNFTs(
     address: string,
@@ -23,8 +57,11 @@ export class NFTService {
         limit
       );
 
-      // Use direct fetch like the working script
-      const response = await fetch(
+      // Add rate limiting delay
+      await sleep(RATE_LIMIT_DELAY);
+      
+      // Use direct fetch with retry logic
+      const response = await fetchWithRetry(
         'https://api.mainnet.aptoslabs.com/v1/graphql',
         {
           method: 'POST',
@@ -112,8 +149,11 @@ export class NFTService {
 
   static async getTotalNFTCount(address: string): Promise<number> {
     try {
-      // Use direct fetch like the working script
-      const response = await fetch(
+      // Add rate limiting delay
+      await sleep(RATE_LIMIT_DELAY);
+      
+      // Use direct fetch with retry logic
+      const response = await fetchWithRetry(
         'https://api.mainnet.aptoslabs.com/v1/graphql',
         {
           method: 'POST',
@@ -142,6 +182,7 @@ export class NFTService {
       return result.data.current_token_ownerships_v2_aggregate.aggregate.count;
     } catch (error) {
       logger.error('Failed to get NFT count:', error);
+      // Return 0 on error to allow the app to continue
       return 0;
     }
   }
