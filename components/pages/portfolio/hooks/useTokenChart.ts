@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+
 import { logger } from '@/lib/utils/logger';
 
 interface TokenPriceData {

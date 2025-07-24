@@ -1,4 +1,5 @@
 import { DeFiPosition, AggregatedPositions, AdapterConfig } from '../types';
+
 import { ProtocolAdapter } from './adapter';
 
 export interface DeFiPositionProvider {

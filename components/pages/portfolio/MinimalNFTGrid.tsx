@@ -1,9 +1,12 @@
 'use client';
 
-import React from 'react';
 import Image from 'next/image';
-import { NFT } from './types';
+import React from 'react';
+
 import { cn } from '@/lib/utils';
+
+import { NFT } from './types';
+
 
 interface MinimalNFTGridProps {
   nfts: NFT[] | null;

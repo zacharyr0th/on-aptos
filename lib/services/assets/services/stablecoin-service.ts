@@ -1,14 +1,15 @@
+import { enhancedFetch } from '@/lib/utils/fetch-utils';
 import { logger } from '@/lib/utils/logger';
+
+import { CACHE_TTL, DECIMALS } from '../constants';
+import type { StablecoinSupply } from '../types';
 import { BaseAssetService } from '../utils/base-service';
-import { executeGraphQLQuery } from '../utils/graphql-helpers';
 import {
   formatTokenAmount,
   calculatePercentage,
   sortBySupply,
 } from '../utils/formatting';
-import { CACHE_TTL, DECIMALS } from '../constants';
-import type { StablecoinSupply } from '../types';
-import { enhancedFetch } from '@/lib/utils/fetch-utils';
+import { executeGraphQLQuery } from '../utils/graphql-helpers';
 
 interface StablecoinMetadata {
   name: string;

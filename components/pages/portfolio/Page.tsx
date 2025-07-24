@@ -1,15 +1,7 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
-import Image from 'next/image';
-import { GeistMono } from 'geist/font/mono';
 import { useWallet } from '@aptos-labs/wallet-adapter-react';
-import { useTheme } from 'next-themes';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { PageLayout } from '@/components/layout/PageLayout';
-import { logger } from '@/lib/utils/logger';
+import { GeistMono } from 'geist/font/mono';
 import {
   Briefcase,
   TrendingUp,
@@ -23,46 +15,64 @@ import {
   Github,
   Monitor,
 } from 'lucide-react';
-import { usePortfolio, usePortfolioData, usePortfolioHistory } from './hooks';
-import {
-  formatCurrency,
-  formatPercentage,
-  formatTokenAmount,
-} from '@/lib/utils/format';
+import Image from 'next/image';
+import { useTheme } from 'next-themes';
+import React, { useState, useEffect, useMemo } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
-import { getTokenLogoUrlWithFallback } from '@/lib/utils/token-logos';
-import { cn } from '@/lib/utils';
-import {
-  getProtocolLabel,
-  shouldShowProtocolBadge,
-  PROTOCOLS,
-} from '@/lib/protocol-registry';
-import { NFTAnalysis } from './NFTAnalysis';
-import { NFTTransferHistory } from './NFTTransferHistory';
-import {
-  TooltipProvider,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+
+import { ErrorBoundary } from '@/components/errors/ErrorBoundary';
+import { PageLayout } from '@/components/layout/PageLayout';
+import { defiProtocols } from '@/components/pages/defi/data';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
   DropdownMenuCheckboxItem,
 } from '@/components/ui/dropdown-menu';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  getProtocolLabel,
+  shouldShowProtocolBadge,
+  PROTOCOLS,
+} from '@/lib/protocol-registry';
+import { cn } from '@/lib/utils';
+import {
+  formatCurrency,
+  formatPercentage,
+  formatTokenAmount,
+} from '@/lib/utils/format';
+import { logger } from '@/lib/utils/logger';
+import { getTokenLogoUrlWithFallback } from '@/lib/utils/token-logos';
 
-// Import extracted components
+import { ProtocolDetailsDialog } from './Dialogs';
+import { EnhancedNFTGrid } from './EnhancedNFTGrid';
+import { usePortfolio, usePortfolioData, usePortfolioHistory } from './hooks';
+
+
 import { LandingSection } from './LandingSection';
 import { LoadingSkeleton } from './LoadingSkeleton';
-import { PortfolioHeader } from './PortfolioHeader';
-import { AssetsTable, DeFiPositionsTable } from './PortfolioTables';
-import { NFTGrid } from './NFTGrid';
-import { EnhancedNFTGrid } from './EnhancedNFTGrid';
+import { NFTAnalysis } from './NFTAnalysis';
 import { NFTDetailView } from './NFTDetailView';
-import { WalletSummary } from './WalletSummary';
-import { ProtocolDetailsDialog } from './Dialogs';
+import { NFTGrid } from './NFTGrid';
+import { NFTTransferHistory } from './NFTTransferHistory';
+
+import {
+  TooltipProvider,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+
+// Import extracted components
+import { PerformanceSummary } from './PerformanceSummary';
+import { PortfolioHeader } from './PortfolioHeader';
+import { PortfolioMainContent } from './PortfolioMainContent';
+import { PortfolioSidebar } from './PortfolioSidebar';
+import { AssetsTable, DeFiPositionsTable } from './PortfolioTables';
 import { DeFiSummaryView, NFTSummaryView } from './SummaryViews';
+import { TransactionHistoryTable } from './TransactionHistoryTable';
 import { NFT, SortField, SortDirection } from './types';
 import {
   isPhantomAsset,
@@ -70,14 +80,11 @@ import {
   cleanProtocolName,
   getDetailedProtocolInfo,
 } from './utils';
-import { defiProtocols } from '@/components/pages/defi/data';
+import { WalletSummary } from './WalletSummary';
+
 import { normalizeProtocolName } from '@/lib/constants';
-import { TransactionHistoryTable } from './TransactionHistoryTable';
-import { PerformanceSummary } from './PerformanceSummary';
+
 import { BloombergTerminal } from './BloombergTerminal';
-import { ErrorBoundary } from '@/components/errors/ErrorBoundary';
-import { PortfolioSidebar } from './PortfolioSidebar';
-import { PortfolioMainContent } from './PortfolioMainContent';
 
 export default function PortfolioPage() {
   const { connected, account, wallet } = useWallet();

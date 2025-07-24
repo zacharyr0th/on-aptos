@@ -1,7 +1,10 @@
 'use client';
 
-import React from 'react';
+import { GeistMono } from 'geist/font/mono';
+import { Coins, TrendingUp, AlertTriangle } from 'lucide-react';
 import Image from 'next/image';
+import React from 'react';
+
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -18,12 +21,12 @@ import {
   TooltipTrigger,
   TooltipProvider,
 } from '@/components/ui/tooltip';
-import { Coins, TrendingUp, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatCurrency, formatTokenAmount } from '@/lib/utils/format';
 import { getTokenLogoUrlWithFallback } from '@/lib/utils/token-logos';
+
 import { cleanProtocolName, getDetailedProtocolInfo } from './utils';
-import { GeistMono } from 'geist/font/mono';
+
 
 interface BaseTableProps {
   selectedItem: any;
@@ -307,7 +310,7 @@ export const DeFiPositionsTable = ({
     }
   };
 
-  let sortedPositions = [...groupedDeFiPositions];
+  const sortedPositions = [...groupedDeFiPositions];
 
   // Show all positions - no filtering by value
   // sortedPositions = sortedPositions.filter(position => {

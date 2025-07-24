@@ -1,5 +1,6 @@
-import { IconSection } from './IconSection';
 import { useTranslation } from '@/hooks/useTranslation';
+
+import { IconSection } from './IconSection';
 
 interface Icon {
   name: string;

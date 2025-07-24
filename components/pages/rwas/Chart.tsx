@@ -7,9 +7,10 @@ import {
   Tooltip,
   TooltipProps,
 } from 'recharts';
+
 import { useResponsive } from '@/hooks/useResponsive';
-import { formatCurrency } from '@/lib/utils';
 import { RWA_COLORS } from '@/lib/constants';
+import { formatCurrency } from '@/lib/utils';
 
 // Function to darken a hex color based on TVL ranking (higher TVL = darker)
 const darkenColor = (hexColor: string, darkenFactor: number): string => {

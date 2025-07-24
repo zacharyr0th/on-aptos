@@ -1,6 +1,7 @@
-import { NextResponse } from 'next/server';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
+
+import { NextResponse } from 'next/server';
 
 // Simple plain-text route exposing a concise README for LLMs and search engines.
 // The content is generated from the repository root README.md and trimmed to the first 300 words.

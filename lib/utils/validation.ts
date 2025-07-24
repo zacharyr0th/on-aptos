@@ -3,8 +3,9 @@
  * Using Zod for runtime type checking and validation
  */
 
-import { z } from 'zod';
 import { NextRequest } from 'next/server';
+import { z } from 'zod';
+
 import { APIResponses } from './api-response';
 
 // Base validation schemas

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+
 import { logger } from '@/lib/utils/logger';
 
 interface PortfolioPerformanceData {

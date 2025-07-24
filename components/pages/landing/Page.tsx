@@ -1,22 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useTheme } from 'next-themes';
 import { GeistMono } from 'geist/font/mono';
-import {
-  HeroSection,
-  IconSections,
-  SocialLinks,
-  PortfolioDistributionChart,
-} from './index';
-import { Card } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
-import { Badge } from '@/components/ui/badge';
 import {
   ArrowUpRight,
   Search,
@@ -27,8 +11,27 @@ import {
   ChevronDown,
 } from 'lucide-react';
 import Image from 'next/image';
-import { SimulatedChart } from './SimulatedChart';
+import { useTheme } from 'next-themes';
+import { useEffect, useState } from 'react';
+
+import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
+
+import { SimulatedChart } from './SimulatedChart';
+
+import {
+  HeroSection,
+  IconSections,
+  SocialLinks,
+  PortfolioDistributionChart,
+} from './index';
 
 const HomepageDesign = () => {
   const [mounted, setMounted] = useState(false);

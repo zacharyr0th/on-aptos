@@ -1,10 +1,10 @@
-import { logger } from '@/lib/utils/logger';
 import {
   isPhantomAsset as isPhantomAssetFromRegistry,
   getPhantomReason as getPhantomReasonFromRegistry,
   getProtocolByAddress,
   getAllProtocolAddresses,
 } from '@/lib/protocol-registry';
+import { logger } from '@/lib/utils/logger';
 
 export class PhantomAssetDetectionService {
   /**

@@ -1,9 +1,5 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import {
   TrendingUp,
   TrendingDown,
@@ -13,9 +9,15 @@ import {
   Clock,
   Zap,
 } from 'lucide-react';
-import { useAnalytics } from './hooks/useAnalytics';
-import { formatCurrency, formatPercentage } from '@/lib/utils/format';
+import React, { useState, useEffect } from 'react';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { formatCurrency, formatPercentage } from '@/lib/utils/format';
+
+import { useAnalytics } from './hooks/useAnalytics';
 
 interface RealTimeMetricsProps {
   walletAddress: string;

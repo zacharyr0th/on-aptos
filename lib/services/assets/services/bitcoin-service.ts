@@ -1,15 +1,6 @@
+import { BTC_ASSETS, BTC_TOKENS } from '@/lib/config/data';
 import { logger } from '@/lib/utils/logger';
-import { BaseAssetService } from '../utils/base-service';
-import {
-  executeGraphQLQuery,
-  getCoinSupply,
-  getFungibleAssetSupply,
-} from '../utils/graphql-helpers';
-import {
-  formatTokenAmount,
-  formatNumberWithCommas,
-  calculatePercentage,
-} from '../utils/formatting';
+
 import { CACHE_TTL, DECIMALS, TOKEN_ADDRESSES } from '../constants';
 import type {
   BTCSupply,
@@ -17,7 +8,17 @@ import type {
   FarmingAPR,
   AssetSupply,
 } from '../types';
-import { BTC_ASSETS, BTC_TOKENS } from '@/lib/config/data';
+import { BaseAssetService } from '../utils/base-service';
+import {
+  formatTokenAmount,
+  formatNumberWithCommas,
+  calculatePercentage,
+} from '../utils/formatting';
+import {
+  executeGraphQLQuery,
+  getCoinSupply,
+  getFungibleAssetSupply,
+} from '../utils/graphql-helpers';
 
 export class BitcoinService extends BaseAssetService {
   /**
@@ -220,7 +221,7 @@ export class BitcoinService extends BaseAssetService {
     }>
   ): BTCSupply {
     const sources = [];
-    let total = 0;
+    const total = 0;
     let totalFormatted = 0;
 
     for (const supply of supplies) {

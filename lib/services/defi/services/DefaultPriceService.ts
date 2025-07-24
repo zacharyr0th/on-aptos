@@ -1,6 +1,7 @@
-import { PriceService } from '../interfaces/services';
-import { AssetService } from '../../portfolio/services/asset-service';
 import { serviceLogger } from '@/lib/utils/logger';
+
+import { AssetService } from '../../portfolio/services/asset-service';
+import { PriceService } from '../interfaces/services';
 
 export class DefaultPriceService implements PriceService {
   private priceCache = new Map<string, { price: number; timestamp: number }>();

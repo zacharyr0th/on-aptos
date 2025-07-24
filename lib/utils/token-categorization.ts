@@ -1,11 +1,11 @@
+import { LST_TOKEN_ADDRESSES } from '@/lib/aptos-constants';
+import { PANORA_TOKENS } from '@/lib/config/data';
 import {
   STABLECOINS,
   LAYERZERO_STABLECOINS,
   WORMHOLE_STABLECOINS,
   CELER_STABLECOINS,
 } from '@/lib/constants/tokens/stablecoins';
-import { PANORA_TOKENS } from '@/lib/config/data';
-import { LST_TOKEN_ADDRESSES } from '@/lib/aptos-constants';
 
 export type TokenCategory = 'Stablecoins' | 'LSTs' | 'DeFi' | 'Other';
 

@@ -4,6 +4,7 @@
  */
 
 import { z } from 'zod';
+
 import { serviceLogger } from '@/lib/utils/logger';
 
 // Thala protocol addresses from the protocol list

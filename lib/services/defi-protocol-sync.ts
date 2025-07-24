@@ -3,9 +3,10 @@
  * Updates protocol TVL, volume, and fees with live data
  */
 
-import { defiLlamaService, type DeFiLlamaProtocol } from './defi-llama';
 import { formatCurrency } from '@/lib/utils';
 import { serviceLogger } from '@/lib/utils/logger';
+
+import { defiLlamaService, type DeFiLlamaProtocol } from './defi-llama';
 
 // Protocol mapping between local names and DeFi Llama slugs
 const PROTOCOL_MAPPING: Record<string, string> = {

@@ -1,3 +1,8 @@
+import { serviceLogger } from '@/lib/utils/logger';
+
+import { AssetService } from '../../portfolio/services/asset-service';
+import { GenericTokenAdapter } from '../adapters/GenericTokenAdapter';
+import { ThalaAdapter } from '../adapters/ThalaAdapter';
 import { DeFiPositionProvider } from '../DeFiPositionProvider';
 import {
   AdapterContext,
@@ -6,10 +11,7 @@ import {
   CacheService,
 } from '../interfaces/adapter';
 import { AdapterConfig } from '../types';
-import { ThalaAdapter } from '../adapters/ThalaAdapter';
-import { GenericTokenAdapter } from '../adapters/GenericTokenAdapter';
-import { AssetService } from '../../portfolio/services/asset-service';
-import { serviceLogger } from '@/lib/utils/logger';
+
 
 export interface DeFiProviderConfig {
   indexerUrl?: string;

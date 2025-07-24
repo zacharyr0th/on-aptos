@@ -1,8 +1,10 @@
 'use client';
 
-import React from 'react';
-import Image from 'next/image';
 import { ExternalLink } from 'lucide-react';
+import Image from 'next/image';
+import React from 'react';
+
+import { Market } from '@/components/pages/btc/types';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -12,7 +14,6 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
-import { Market } from '@/components/pages/btc/types';
 import { PROTOCOL_ICONS } from '@/lib/config';
 import {
   YIELD_COLORS,

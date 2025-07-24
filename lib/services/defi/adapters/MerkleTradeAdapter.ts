@@ -227,7 +227,7 @@ export class MerkleTradeAdapter extends BaseProtocolAdapter {
     for (const resource of stakingResources) {
       const data = resource.data as any;
       let amount = 0;
-      let rewardAmount = 0;
+      const rewardAmount = 0;
 
       // VERIFIED: Check actual staking data structure
       if (resource.type.includes('::staking::UserVoteEscrowedMKL')) {

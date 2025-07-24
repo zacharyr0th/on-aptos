@@ -1,23 +1,23 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { useWallet } from '@aptos-labs/wallet-adapter-react';
-import { ThemeToggle } from '@/components/layout/theme-toggle';
-import { LanguageToggle } from '@/components/ui/language-toggle';
-import { ErrorBoundary } from '../errors/ErrorBoundary';
 import {
   Menu,
   X,
   Bitcoin,
   Coins,
   Building2,
-  TrendingUp,
-  Briefcase,
   BarChart,
 } from 'lucide-react';
-import { useTranslation } from '@/hooks/useTranslation';
+import Image from 'next/image';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import React, { useState, useEffect } from 'react';
+
+import { ThemeToggle } from '@/components/layout/theme-toggle';
+import { defiProtocols } from '@/components/pages/defi/data/protocols';
+import { Badge } from '@/components/ui/badge';
+import { LanguageToggle } from '@/components/ui/language-toggle';
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -27,16 +27,17 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Badge } from '@/components/ui/badge';
+import { useTranslation } from '@/hooks/useTranslation';
 import { cn } from '@/lib/utils';
-import { defiProtocols } from '@/components/pages/defi/data/protocols';
-import Image from 'next/image';
+
+import { ErrorBoundary } from '../errors/ErrorBoundary';
+
 
 const HeaderComponent = (): React.ReactElement | null => {
   const pathname = usePathname();
@@ -478,25 +479,6 @@ const HeaderComponent = (): React.ReactElement | null => {
   );
 };
 
-// Desktop Nav Link
-const NavLink = ({
-  href,
-  active,
-  children,
-}: {
-  href: string;
-  active: boolean;
-  children: React.ReactNode;
-}) => (
-  <Link
-    href={href}
-    className={`text-sm font-medium transition-colors duration-200 hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-sm px-1 py-1 ${
-      active ? 'text-primary' : 'text-muted-foreground'
-    }`}
-  >
-    {children}
-  </Link>
-);
 
 // Mobile Nav Link
 const MobileNavLink = ({

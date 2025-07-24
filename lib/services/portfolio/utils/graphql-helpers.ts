@@ -1,6 +1,7 @@
+import { getEnvVar } from '@/lib/config/validate-env';
 import { graphQLRequest } from '@/lib/utils/fetch-utils';
 import { logger } from '@/lib/utils/logger';
-import { getEnvVar } from '@/lib/config/validate-env';
+
 import { APTOS_INDEXER_URL, ERROR_MESSAGES } from '../constants';
 
 // GraphQL query definitions

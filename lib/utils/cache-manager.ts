@@ -1,6 +1,7 @@
 import { PERFORMANCE_THRESHOLDS, SERVICE_CONFIG } from '@/lib/config/cache';
-import { CacheEntry, CacheStats } from './types';
+
 import { logger } from './logger';
+import { CacheEntry, CacheStats } from './types';
 
 export class EnhancedLRUCache<T = unknown> {
   private map = new Map<string, CacheEntry<T>>();

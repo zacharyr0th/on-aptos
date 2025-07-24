@@ -1,25 +1,26 @@
 'use client';
 
-import React, { useMemo, memo, useCallback } from 'react';
-import Image from 'next/image';
 import { ExternalLink, Copy } from 'lucide-react';
-import { useTranslation } from '@/hooks/useTranslation';
+import Image from 'next/image';
+import React, { useMemo, memo, useCallback } from 'react';
 
+import { DialogErrorFallback } from '@/components/errors/DialogErrorFallback';
+import { ErrorBoundary } from '@/components/errors/ErrorBoundary';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { ErrorBoundary } from '@/components/errors/ErrorBoundary';
-import { DialogErrorFallback } from '@/components/errors/DialogErrorFallback';
 import { TokenDialogContent } from '@/components/ui/token-dialog-content';
 import {
   BaseTokenDialogProps,
   TokenMetadata,
 } from '@/components/ui/token-dialog-types';
+import { useTranslation } from '@/hooks/useTranslation';
 import { TETHER_RESERVE_ADDRESS } from '@/lib/config/data';
+
 import { measurePerformance } from './types';
 
 // Enhanced props interface with better typing

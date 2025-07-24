@@ -1,10 +1,5 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Activity,
   TrendingUp,
@@ -15,8 +10,14 @@ import {
   Repeat,
   Zap,
 } from 'lucide-react';
-import { formatTokenAmount } from '@/lib/utils/format';
+import React, { useState, useEffect, useCallback } from 'react';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
+import { formatTokenAmount } from '@/lib/utils/format';
 
 interface TransactionData {
   asset_name: string;

@@ -1,19 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
 import { GeistMono } from 'geist/font/mono';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import {
   TrendingUp,
   TrendingDown,
@@ -54,14 +41,29 @@ import {
   Info,
   ArrowLeft,
 } from 'lucide-react';
+import Image from 'next/image';
+import React, { useState, useMemo } from 'react';
+import { toast } from 'sonner';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { cn } from '@/lib/utils';
 import {
   formatCurrency,
   formatPercentage,
   formatTokenAmount,
 } from '@/lib/utils/format';
-import { cn } from '@/lib/utils';
-import Image from 'next/image';
-import { toast } from 'sonner';
+
 
 interface BloombergTerminalProps {
   totalValue: number;

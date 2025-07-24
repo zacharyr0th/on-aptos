@@ -1,5 +1,7 @@
 'use client';
 
+import { GeistMono } from 'geist/font/mono';
+import { TrendingUp, TrendingDown, Activity } from 'lucide-react';
 import React, { useState } from 'react';
 import {
   AreaChart,
@@ -10,13 +12,14 @@ import {
   Tooltip as RechartsTooltip,
   CartesianGrid,
 } from 'recharts';
+
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { TrendingUp, TrendingDown, Activity } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils/format';
+
 import { useTokenChart } from './hooks/useTokenChart';
-import { GeistMono } from 'geist/font/mono';
+
 
 interface TokenChartProps {
   tokenAddress: string;

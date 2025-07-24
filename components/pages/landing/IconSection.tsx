@@ -1,6 +1,8 @@
+import { ArrowRight, Construction } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useTranslation } from '@/hooks/useTranslation';
+
+import { Badge } from '@/components/ui/badge';
 import {
   Card,
   CardContent,
@@ -8,8 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { ArrowRight, Construction } from 'lucide-react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface Icon {
   name: string;

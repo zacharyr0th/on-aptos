@@ -1,16 +1,17 @@
-import React, { ReactNode } from 'react';
+import { Analytics } from '@vercel/analytics/react';
+import { Metadata, Viewport } from 'next';
+import { headers } from 'next/headers';
 import { Geist, Geist_Mono } from 'next/font/google';
-import './globals.css';
+import Script from 'next/script';
+import React, { ReactNode } from 'react';
 
 import { ThemeProvider } from '@/components/layout/theme-provider';
 import { I18nProvider } from '@/components/providers/I18nProvider';
-import { WalletProvider } from '@/components/wallet/WalletProvider';
 import { Toaster } from '@/components/ui/sonner';
-import { Analytics } from '@vercel/analytics/react';
-import { Metadata, Viewport } from 'next';
-import Script from 'next/script';
+import { WalletProvider } from '@/components/wallet/WalletProvider';
 import { APP_CONFIG, DEVELOPER_CONFIG } from '@/lib/config/app';
-import { headers } from 'next/headers';
+
+import './globals.css';
 
 // Load fonts with CSS variables
 const geistSans = Geist({

@@ -1,6 +1,7 @@
+import { PROTOCOLS, ProtocolInfo } from '@/lib/protocol-registry';
+
 import { BaseProtocolAdapter } from '../base/BaseProtocolAdapter';
 import { DeFiPosition, ProtocolType, PositionType, AssetType } from '../types';
-import { PROTOCOLS, ProtocolInfo } from '@/lib/protocol-registry';
 
 export class GenericTokenAdapter extends BaseProtocolAdapter {
   readonly id = 'generic-token-adapter';

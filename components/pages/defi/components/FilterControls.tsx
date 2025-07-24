@@ -1,10 +1,7 @@
-import { useState } from 'react';
 import { ChevronDown, ChevronUp, Filter } from 'lucide-react';
-import {
-  Tooltip,
-  TooltipTrigger,
-  TooltipContent,
-} from '@/components/ui/tooltip';
+import { useState } from 'react';
+
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,9 +10,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
-import { categoryDefinitions } from '../data/categories';
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from '@/components/ui/tooltip';
 import { usePageTranslation } from '@/hooks/useTranslation';
+
+import { categoryDefinitions } from '../data/categories';
 
 interface FilterControlsProps {
   categories: string[];

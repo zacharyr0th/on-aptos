@@ -1,9 +1,12 @@
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TrendingUp, TrendingDown } from 'lucide-react';
-import { formatCurrency, formatPercentage } from '@/lib/utils/format';
-import { usePortfolioHistory } from './hooks/usePortfolioHistory';
+import React from 'react';
+
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { formatCurrency, formatPercentage } from '@/lib/utils/format';
+
+import { usePortfolioHistory } from './hooks/usePortfolioHistory';
+
 
 interface PerformanceSummaryProps {
   walletAddress: string | undefined;

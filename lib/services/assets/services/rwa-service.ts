@@ -1,10 +1,11 @@
+import { getEnvVar } from '@/lib/config/validate-env';
+import { enhancedFetch } from '@/lib/utils/fetch-utils';
 import { logger } from '@/lib/utils/logger';
-import { BaseAssetService } from '../utils/base-service';
-import { formatTokenAmount, sortBySupply } from '../utils/formatting';
+
 import { CACHE_TTL, API_ENDPOINTS } from '../constants';
 import type { RWAAsset } from '../types';
-import { enhancedFetch } from '@/lib/utils/fetch-utils';
-import { getEnvVar } from '@/lib/config/validate-env';
+import { BaseAssetService } from '../utils/base-service';
+import { formatTokenAmount, sortBySupply } from '../utils/formatting';
 
 interface RWATokenResponse {
   id: string;

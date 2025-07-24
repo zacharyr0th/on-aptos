@@ -1,14 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { withApiEnhancements } from '@/lib/utils/server';
-import { SERVICE_CONFIG } from '@/lib/config/cache';
+
 import { API_CONFIG } from '@/lib/config/app';
 import {
-  ApiError,
-  formatApiError,
   withErrorHandling,
   type ErrorContext,
 } from '@/lib/utils';
 import { logger } from '@/lib/utils/logger';
+import { withApiEnhancements } from '@/lib/utils/server';
 
 // RWA.xyz API configuration
 const RWA_API_KEY = API_CONFIG.rwa.apiKey;

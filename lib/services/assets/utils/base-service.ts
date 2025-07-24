@@ -1,5 +1,6 @@
-import { logger } from '@/lib/utils/logger';
 import { getCachedData, setCachedData } from '@/lib/utils/cache-manager';
+import { logger } from '@/lib/utils/logger';
+
 import { CACHE_TTL, RETRY_CONFIG, SERVICE_DEFAULTS } from '../constants';
 import type { ServiceConfig } from '../types';
 

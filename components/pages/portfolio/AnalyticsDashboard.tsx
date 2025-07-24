@@ -1,9 +1,5 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { logger } from '@/lib/utils/logger';
 import {
   TrendingUp,
   TrendingDown,
@@ -12,6 +8,7 @@ import {
   RefreshCw,
   BarChart3,
 } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   LineChart,
   Line,
@@ -21,8 +18,14 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
-import { formatCurrency, formatPercentage } from '@/lib/utils/format';
+
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { formatCurrency, formatPercentage } from '@/lib/utils/format';
+import { logger } from '@/lib/utils/logger';
+
+
 
 interface AnalyticsDashboardProps {
   walletAddress: string;

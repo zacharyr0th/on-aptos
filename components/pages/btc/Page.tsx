@@ -1,11 +1,21 @@
 'use client';
 
-import React, { useState, useMemo, useCallback, memo, useEffect } from 'react';
-import { AlertTriangle } from 'lucide-react';
 import { GeistMono } from 'geist/font/mono';
+import { AlertTriangle } from 'lucide-react';
+import Image from 'next/image';
+import React, { useState, useMemo, useCallback, memo, useEffect } from 'react';
+
+import { logger } from '@/lib/utils/logger';
+
+import { ErrorBoundary } from '@/components/errors/ErrorBoundary';
+import { Footer } from '@/components/layout/Footer';
+import { Header } from '@/components/layout/Header';
+import { MarketShareChart, TOKEN_COLORS } from '@/components/pages/btc/Chart';
+import { TokenDialog } from '@/components/pages/btc/Dialog';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table,
   TableBody,
@@ -14,14 +24,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { MarketShareChart, TOKEN_COLORS } from '@/components/pages/btc/Chart';
-import { TokenDialog } from '@/components/pages/btc/Dialog';
-import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
-import { ErrorBoundary } from '@/components/errors/ErrorBoundary';
 import { useBitcoinPrice } from '@/hooks/useMarketPrice';
-import Image from 'next/image';
-import { Skeleton } from '@/components/ui/skeleton';
+import { usePageTranslation } from '@/hooks/useTranslation';
 import { BTC_METADATA, Token, SupplyData } from '@/lib/config';
 import {
   formatCurrency,
@@ -30,12 +34,11 @@ import {
   convertRawTokenAmount,
   formatPercentage,
 } from '@/lib/utils';
+
 import {
   measurePerformance,
   batchConvertBTCAmounts,
-  calculateMarketShare,
 } from './types';
-import { usePageTranslation } from '@/hooks/useTranslation';
 // Removed complex suspense boundaries for simpler implementation
 
 // Use BTC_METADATA from config instead of redefining here
@@ -317,7 +320,7 @@ export default function BitcoinPage(): React.ReactElement {
       }
 
       const data = await response.json();
-      console.log('[BTC Page] API Response:', data);
+      logger.log('[BTC Page] API Response:', data);
 
       // Check if the response has an error
       if (data.error) {
@@ -326,7 +329,7 @@ export default function BitcoinPage(): React.ReactElement {
 
       setBtcSupplyData(data);
     } catch (error) {
-      console.error('[BTC Page] Error fetching data:', error);
+      logger.error('[BTC Page] Error fetching data:', error);
       setBtcSupplyError(
         error instanceof Error ? error : new Error(String(error))
       );
@@ -354,7 +357,7 @@ export default function BitcoinPage(): React.ReactElement {
   // Extract bitcoin price from price hook - NO FALLBACK, use real data only
   const bitcoinPriceData = useMemo(() => {
     return measurePerformance(() => {
-      console.log('[BTC Page] bitcoinPriceHookData:', bitcoinPriceHookData);
+      logger.log('[BTC Page] bitcoinPriceHookData:', bitcoinPriceHookData);
       return bitcoinPriceHookData;
     }, 'Bitcoin price calculation');
   }, [bitcoinPriceHookData]);
@@ -477,7 +480,7 @@ export default function BitcoinPage(): React.ReactElement {
             <ErrorState error={error} onRetry={handleRetry} t={t} />
           ) : processedData ? (
             <>
-              {console.log('[BTC Page] Render check:', {
+              {logger.log('[BTC Page] Render check:', {
                 processedData,
                 bitcoinPriceData,
                 data,

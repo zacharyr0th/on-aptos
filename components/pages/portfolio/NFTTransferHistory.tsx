@@ -1,4 +1,7 @@
+import { History, ArrowUpRight, ArrowDownRight, Clock } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
+
+import { Badge } from '@/components/ui/badge';
 import {
   Card,
   CardContent,
@@ -6,10 +9,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
-import { History, ArrowUpRight, ArrowDownRight, Clock } from 'lucide-react';
 
 interface NFTTransferHistoryProps {
   tokenDataId: string;

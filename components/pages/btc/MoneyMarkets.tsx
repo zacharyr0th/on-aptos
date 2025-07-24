@@ -1,7 +1,13 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import { InfoIcon } from 'lucide-react';
 import Image from 'next/image';
+import React, { useMemo, useState } from 'react';
+
+import { Disclaimer } from '@/components/layout/Disclaimer';
+import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Dialog, DialogTrigger } from '@/components/ui/dialog';
 import {
   Table,
   TableBody,
@@ -10,18 +16,14 @@ import {
   TableRow,
   TableCell,
 } from '@/components/ui/table';
-import { InfoIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import YieldDialog from './YieldDialog';
-import { Market, ProtocolData, formatBTCAmountWithCommas } from './types';
+import { usePageTranslation } from '@/hooks/useTranslation';
 import { PROTOCOL_ICONS } from '@/lib/config';
+import { ECHO_PROTOCOL_CONFIG, SupplyData } from '@/lib/config/data';
 import { YIELD_COLORS } from '@/lib/constants/ui/colors';
 import { formatCurrency, formatBigIntWithDecimals } from '@/lib/utils';
-import { Dialog, DialogTrigger } from '@/components/ui/dialog';
-import { Disclaimer } from '@/components/layout/Disclaimer';
-import { ECHO_PROTOCOL_CONFIG, SupplyData } from '@/lib/config/data';
-import { usePageTranslation } from '@/hooks/useTranslation';
+
+import { Market, ProtocolData, formatBTCAmountWithCommas } from './types';
+import YieldDialog from './YieldDialog';
 
 // --- Main Component ---
 interface MoneyMarketsProps {

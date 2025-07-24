@@ -1,7 +1,8 @@
 import { logger } from '@/lib/utils/logger';
-import { executeGraphQLQuery, QUERIES } from '../utils/graphql-helpers';
-import type { WalletTransaction } from '../types';
+
 import { QUERY_LIMITS } from '../constants';
+import type { WalletTransaction } from '../types';
+import { executeGraphQLQuery, QUERIES } from '../utils/graphql-helpers';
 
 export class TransactionService {
   static async getWalletTransactions(

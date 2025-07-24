@@ -1,7 +1,7 @@
 'use client';
 
-import { useMemo } from 'react';
 import { useTheme } from 'next-themes';
+import { useMemo } from 'react';
 import {
   Area,
   AreaChart,
@@ -10,6 +10,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+
 import {
   ChartContainer,
   ChartTooltip,

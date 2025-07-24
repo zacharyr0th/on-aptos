@@ -1,3 +1,7 @@
+import { ArrowRight, TrendingUp, LayoutDashboard } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+
 import { Button } from '@/components/ui/button';
 import {
   Tooltip,
@@ -5,9 +9,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { useTranslation } from '@/hooks/useTranslation';
-import { ArrowRight, TrendingUp, LayoutDashboard } from 'lucide-react';
-import Link from 'next/link';
-import Image from 'next/image';
+
 
 export const HeroSection = () => {
   const { t } = useTranslation('common');

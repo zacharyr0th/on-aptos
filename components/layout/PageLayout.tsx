@@ -1,9 +1,10 @@
 'use client';
 
-import React from 'react';
 import { GeistMono } from 'geist/font/mono';
-import { Header } from '@/components/layout/Header';
+import React from 'react';
+
 import { Footer } from '@/components/layout/Footer';
+import { Header } from '@/components/layout/Header';
 
 interface PageLayoutProps {
   children: React.ReactNode;

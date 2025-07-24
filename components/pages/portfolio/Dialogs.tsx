@@ -1,16 +1,6 @@
 'use client';
 
-import React from 'react';
-import Image from 'next/image';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Separator } from '@/components/ui/separator';
+import { GeistMono } from 'geist/font/mono';
 import {
   ExternalLink,
   Shield,
@@ -22,11 +12,24 @@ import {
   Copy,
   Check,
 } from 'lucide-react';
+import Image from 'next/image';
+import React from 'react';
 import { toast } from 'sonner';
-import { formatCurrency } from '@/lib/utils/format';
+
 import { defiProtocols } from '@/components/pages/defi/data';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Separator } from '@/components/ui/separator';
+import { formatCurrency } from '@/lib/utils/format';
+
 import { NFT } from './types';
-import { GeistMono } from 'geist/font/mono';
+
 
 interface BaseDialogProps {
   isOpen: boolean;

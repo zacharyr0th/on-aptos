@@ -1,5 +1,6 @@
-import { PriceService } from '../interfaces/services';
 import { serviceLogger } from '@/lib/utils/logger';
+
+import { PriceService } from '../interfaces/services';
 
 export interface PoolReserves {
   token0: string;

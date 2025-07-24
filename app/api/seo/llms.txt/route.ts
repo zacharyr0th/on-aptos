@@ -1,6 +1,8 @@
-import { NextResponse } from 'next/server';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
+
+import { NextResponse } from 'next/server';
+
 import { logger } from '@/lib/utils/logger';
 
 // Enterprise-grade headers for maximum LLM and SEO visibility

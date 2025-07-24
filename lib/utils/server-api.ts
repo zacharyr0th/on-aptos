@@ -1,8 +1,10 @@
-import { NextResponse } from 'next/server';
 import { headers } from 'next/headers';
+import { NextResponse } from 'next/server';
+
 import { CACHE_CONFIG } from '@/lib/config/cache';
-import { RateLimitInfo, RateLimitError, ApiResponse } from './types';
+
 import { logger } from './logger';
+import { RateLimitInfo, RateLimitError, ApiResponse } from './types';
 
 // Configuration using centralized config
 const RATE_LIMIT_WINDOW = CACHE_CONFIG.RATE_LIMIT.WINDOW;

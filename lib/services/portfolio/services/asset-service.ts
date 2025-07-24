@@ -1,27 +1,28 @@
-import { logger } from '@/lib/utils/logger';
-import { PanoraService } from '../panora-service';
-import { PhantomAssetDetectionService } from '../phantom-detection';
+import {
+  LEGITIMATE_STABLECOINS,
+  SCAM_TOKENS,
+  AptosValidators,
+} from '@/lib/constants';
 import {
   getProtocolByAddress,
   getProtocolLabel,
   isPhantomAsset,
   shouldShowProtocolBadge,
 } from '@/lib/protocol-registry';
-import {
-  LEGITIMATE_STABLECOINS,
-  SCAM_TOKENS,
-  AptosValidators,
-} from '@/lib/constants';
-import { executeGraphQLQuery, QUERIES } from '../utils/graphql-helpers';
-import { formatBalance, calculateValue } from '../utils/decimal-converter';
+import { logger } from '@/lib/utils/logger';
+
+import { DECIMALS, THRESHOLDS } from '../constants';
+import { PanoraService } from '../panora-service';
+import { PhantomAssetDetectionService } from '../phantom-detection';
+import type { FungibleAsset, AssetPrice } from '../types';
 import {
   isScamToken,
   isLegitimateStablecoin,
   shouldDisplayAsset,
 } from '../utils/asset-validators';
+import { formatBalance, calculateValue } from '../utils/decimal-converter';
+import { executeGraphQLQuery, QUERIES } from '../utils/graphql-helpers';
 import { PriceAggregator } from '../utils/price-aggregator';
-import type { FungibleAsset, AssetPrice } from '../types';
-import { DECIMALS, THRESHOLDS } from '../constants';
 
 export class AssetService {
   static async getWalletAssets(address: string): Promise<FungibleAsset[]> {

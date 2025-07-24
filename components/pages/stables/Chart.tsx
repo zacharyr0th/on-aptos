@@ -1,3 +1,5 @@
+import { Copy } from 'lucide-react';
+import Image from 'next/image';
 import React, { useCallback, useMemo, memo } from 'react';
 import {
   ResponsiveContainer,
@@ -7,10 +9,8 @@ import {
   Tooltip,
   TooltipProps,
 } from 'recharts';
-import { Copy } from 'lucide-react';
 import { toast } from 'sonner';
-import Image from 'next/image';
-import { useResponsive } from '@/hooks/useResponsive';
+
 import { Button } from '@/components/ui/button';
 import {
   Tooltip as UITooltip,
@@ -18,9 +18,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { useResponsive } from '@/hooks/useResponsive';
 import { DisplayToken } from '@/lib/config';
 import { STABLECOIN_COLORS } from '@/lib/constants/ui/colors';
 import { formatCurrency } from '@/lib/utils';
+
 import {
   formatPercentage,
   ChartDataItem,

@@ -1,12 +1,12 @@
+import { PositionAggregator } from './aggregation/PositionAggregator';
+import { ProtocolAdapter, AdapterContext, Logger } from './interfaces/adapter';
 import {
   DeFiPositionProvider as IDeFiPositionProvider,
   ScanOptions,
   ProviderHealthStatus,
 } from './interfaces/provider';
-import { ProtocolAdapter, AdapterContext, Logger } from './interfaces/adapter';
-import { AggregatedPositions, AdapterConfig } from './types';
 import { AdapterRegistry } from './registry/AdapterRegistry';
-import { PositionAggregator } from './aggregation/PositionAggregator';
+import { AggregatedPositions, AdapterConfig } from './types';
 
 export class DeFiPositionProvider implements IDeFiPositionProvider {
   private registry = new AdapterRegistry();
@@ -56,7 +56,7 @@ export class DeFiPositionProvider implements IDeFiPositionProvider {
           : await this.executeSequentialScans(adapters, walletAddress, options);
 
       // Aggregate results
-      let aggregated = this.aggregator.aggregate(results);
+      const aggregated = this.aggregator.aggregate(results);
 
       // Apply filters
       if (options.minValueUSD !== undefined && options.minValueUSD > 0) {

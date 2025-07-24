@@ -1,5 +1,6 @@
 import { LEGITIMATE_STABLECOINS, SCAM_TOKENS } from '@/lib/constants';
 import { isPhantomAsset } from '@/lib/protocol-registry';
+
 import type { FungibleAsset } from '../types';
 
 export function isValidAddress(address: string): boolean {

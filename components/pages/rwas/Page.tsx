@@ -1,11 +1,18 @@
 'use client';
 
-import React, { useState, useMemo, useCallback, memo, useEffect } from 'react';
-import { AlertTriangle } from 'lucide-react';
 import { GeistMono } from 'geist/font/mono';
+import { AlertTriangle } from 'lucide-react';
+import Image from 'next/image';
+import React, { useState, useMemo, useCallback, memo, useEffect } from 'react';
+
+import { ErrorBoundary } from '@/components/errors/ErrorBoundary';
+import { Footer } from '@/components/layout/Footer';
+import { Header } from '@/components/layout/Header';
+import { MarketShareChart } from '@/components/pages/rwas/Chart';
+import { RwaTokenDialog } from '@/components/pages/rwas/Dialog';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table,
@@ -15,21 +22,17 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { MarketShareChart } from '@/components/pages/rwas/Chart';
-import { RwaTokenDialog } from '@/components/pages/rwas/Dialog';
-import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
-import { ErrorBoundary } from '@/components/errors/ErrorBoundary';
-import Image from 'next/image';
+import { usePageTranslation } from '@/hooks/useTranslation';
+import { RWA_COLORS } from '@/lib/constants';
 import {
   formatCurrency,
   formatAmount,
   formatAmountFull,
   formatPercentage,
 } from '@/lib/utils';
-import { RWA_COLORS } from '@/lib/constants';
+
 import { RWA_TOKEN_BY_TICKER } from './rwa-constants';
-import { usePageTranslation } from '@/hooks/useTranslation';
+
 
 // Function to darken a hex color based on TVL ranking (higher TVL = darker)
 const darkenColor = (hexColor: string, darkenFactor: number): string => {

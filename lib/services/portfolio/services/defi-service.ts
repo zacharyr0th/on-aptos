@@ -1,6 +1,7 @@
-import { logger } from '@/lib/utils/logger';
-import { createDeFiProvider } from '@/lib/services/defi/createDeFiProvider';
 import type { DeFiPosition as NewDeFiPosition } from '@/lib/services/defi';
+import { createDeFiProvider } from '@/lib/services/defi/createDeFiProvider';
+import { logger } from '@/lib/utils/logger';
+
 import type { DeFiPosition } from '../types';
 
 // Create singleton provider instance

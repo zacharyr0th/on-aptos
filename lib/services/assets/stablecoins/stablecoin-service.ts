@@ -1,5 +1,5 @@
-import { BaseAssetService } from '../utils/base-service';
-import { logger } from '@/lib/utils/logger';
+import { SERVICE_CONFIG } from '@/lib/config/cache';
+import { TETHER_RESERVE_ADDRESS } from '@/lib/config/data';
 import {
   STABLECOINS,
   LAYERZERO_STABLECOINS,
@@ -7,9 +7,11 @@ import {
   CELER_STABLECOINS,
   ALGO_STABLECOINS,
 } from '@/lib/constants';
-import { TETHER_RESERVE_ADDRESS } from '@/lib/config/data';
-import { SERVICE_CONFIG } from '@/lib/config/cache';
 import { formatBigIntWithDecimals } from '@/lib/utils/format';
+import { logger } from '@/lib/utils/logger';
+
+import { BaseAssetService } from '../utils/base-service';
+
 import type {
   StablecoinSupply,
   StablecoinData,

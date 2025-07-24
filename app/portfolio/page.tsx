@@ -1,5 +1,6 @@
-import PortfolioPage from '@/components/pages/portfolio/Page';
 import { Metadata } from 'next';
+
+import PortfolioPage from '@/components/pages/portfolio/Page';
 
 export const metadata: Metadata = {
   title: 'Portfolio Analytics',

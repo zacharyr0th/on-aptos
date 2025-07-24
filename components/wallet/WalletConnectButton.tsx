@@ -1,7 +1,12 @@
 'use client';
 
 import { useWallet } from '@aptos-labs/wallet-adapter-react';
+import { Wallet, LogOut, Copy, Check, Chrome, Apple, Mail } from 'lucide-react';
+import Image from 'next/image';
+import { useState, useEffect, useMemo } from 'react';
+
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,11 +15,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
-import { useState, useEffect, useMemo } from 'react';
-import { Wallet, LogOut, Copy, Check, Chrome, Apple, Mail } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import Image from 'next/image';
+
 interface WalletConnectButtonProps {
   size?: 'sm' | 'default' | 'lg';
 }

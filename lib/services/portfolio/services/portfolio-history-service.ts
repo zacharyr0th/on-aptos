@@ -1,9 +1,11 @@
 import { logger } from '@/lib/utils/logger';
-import { TransactionService } from './transaction-service';
-import { AssetService } from './asset-service';
-import { formatBalance } from '../utils/decimal-converter';
-import type { PortfolioHistoryPoint, FungibleAsset } from '../types';
+
 import { DECIMALS } from '../constants';
+import type { PortfolioHistoryPoint, FungibleAsset } from '../types';
+import { formatBalance } from '../utils/decimal-converter';
+
+import { AssetService } from './asset-service';
+import { TransactionService } from './transaction-service';
 
 export class PortfolioHistoryService {
   static async getPortfolioHistory(

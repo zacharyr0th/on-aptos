@@ -1,25 +1,6 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
-import { cn } from '@/lib/utils';
-import { AssetsTable, DeFiPositionsTable } from './PortfolioTables';
-import { MinimalNFTGrid } from './MinimalNFTGrid';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { AspectRatio } from '@/components/ui/aspect-ratio';
-import { Button } from '@/components/ui/button';
 import { X, Eye, EyeOff } from 'lucide-react';
-import {
-  PieChart as RechartsPieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-  Tooltip as RechartsTooltip,
-} from 'recharts';
-import { formatCurrency, formatPercentage } from '@/lib/utils/format';
 import {
   DollarSign,
   Activity,
@@ -28,6 +9,27 @@ import {
   Layers,
   PieChart,
 } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import {
+  PieChart as RechartsPieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  Tooltip as RechartsTooltip,
+} from 'recharts';
+
+import { AspectRatio } from '@/components/ui/aspect-ratio';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { cn } from '@/lib/utils';
+import { AssetsTable, DeFiPositionsTable } from './PortfolioTables';
+import { MinimalNFTGrid } from './MinimalNFTGrid';
+import { formatCurrency, formatPercentage } from '@/lib/utils/format';
+
 
 interface PortfolioSidebarProps {
   sidebarView: 'assets' | 'nfts' | 'defi';

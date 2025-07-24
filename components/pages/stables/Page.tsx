@@ -1,11 +1,21 @@
 'use client';
 
-import React, { useState, useEffect, useMemo, useCallback, memo } from 'react';
-import { AlertTriangle } from 'lucide-react';
 import { GeistMono } from 'geist/font/mono';
+import { AlertTriangle } from 'lucide-react';
+import Image from 'next/image';
+import React, { useState, useEffect, useMemo, useCallback, memo } from 'react';
+
+import { ErrorBoundary } from '@/components/errors/ErrorBoundary';
+import { Footer } from '@/components/layout/Footer';
+import { Header } from '@/components/layout/Header';
+import {
+  MarketShareChart,
+  TOKEN_COLORS,
+} from '@/components/pages/stables/Chart';
+import { TokenDialog } from '@/components/pages/stables/Dialog';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table,
@@ -15,15 +25,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {
-  MarketShareChart,
-  TOKEN_COLORS,
-} from '@/components/pages/stables/Chart';
-import { TokenDialog } from '@/components/pages/stables/Dialog';
-import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
-import { ErrorBoundary } from '@/components/errors/ErrorBoundary';
-import Image from 'next/image';
+import { usePageTranslation } from '@/hooks/useTranslation';
 import {
   STABLECOIN_METADATA,
   Token,
@@ -37,7 +39,6 @@ import {
   convertRawTokenAmount,
   formatPercentage,
 } from '@/lib/utils';
-import { usePageTranslation } from '@/hooks/useTranslation';
 
 const TOKEN_METADATA = STABLECOIN_METADATA;
 

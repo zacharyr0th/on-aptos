@@ -1,6 +1,6 @@
+import { ADAPTER_REGISTRY } from './adapters';
 import { DeFiPositionProvider } from './DeFiPositionProvider';
 import { AdapterContext } from './interfaces/adapter';
-import { ADAPTER_REGISTRY } from './adapters';
 import { DefaultPriceService } from './services/DefaultPriceService';
 
 interface CreateDeFiProviderOptions {

@@ -1,5 +1,7 @@
 'use client';
 
+import { GeistMono } from 'geist/font/mono';
+import { TrendingUp, TrendingDown, Activity, Info } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import {
   AreaChart,
@@ -10,6 +12,7 @@ import {
   Tooltip as RechartsTooltip,
   CartesianGrid,
 } from 'recharts';
+
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -18,10 +21,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { TrendingUp, TrendingDown, Activity, Info } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils/format';
+
 import { usePortfolioPerformance } from './hooks/usePortfolioPerformance';
-import { GeistMono } from 'geist/font/mono';
+
 
 interface PortfolioPerformanceChartProps {
   walletAddress: string;

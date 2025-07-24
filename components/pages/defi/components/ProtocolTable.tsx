@@ -1,6 +1,9 @@
-import React from 'react';
-import Link from 'next/link';
+import { Github, Globe } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
+import React from 'react';
+import { FaXTwitter } from 'react-icons/fa6';
+
 import {
   Table,
   TableBody,
@@ -15,12 +18,11 @@ import {
   TooltipContent,
 } from '@/components/ui/tooltip';
 import { useResponsive } from '@/hooks/useResponsive';
-import { defiProtocols } from '../data';
 import { usePageTranslation } from '@/hooks/useTranslation';
+
+import { defiProtocols } from '../data';
 // DISABLED - DefiProtocol import removed since we no longer handle protocol click events
 // import { defiProtocols, protocolLogos, categoryDefinitions, DefiProtocol } from '../data';
-import { Github, Globe } from 'lucide-react';
-import { FaXTwitter } from 'react-icons/fa6';
 
 interface ProtocolTableProps {
   filteredProtocols: typeof defiProtocols;

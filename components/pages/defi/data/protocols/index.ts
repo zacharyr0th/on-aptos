@@ -7,12 +7,12 @@ export { launchpadProtocols } from './launchpad';
 export { multipleProtocols } from './multiple';
 
 // Combined export for backward compatibility
-import { tradingProtocols } from './trading';
-import { lendingProtocols } from './lending';
-import { yieldProtocols } from './yield';
 import { derivativesProtocols } from './derivatives';
 import { launchpadProtocols } from './launchpad';
+import { lendingProtocols } from './lending';
 import { multipleProtocols } from './multiple';
+import { tradingProtocols } from './trading';
+import { yieldProtocols } from './yield';
 
 export const defiProtocols = [
   ...tradingProtocols,

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+
 import { env } from '@/lib/config/validate-env';
 
 export async function GET() {

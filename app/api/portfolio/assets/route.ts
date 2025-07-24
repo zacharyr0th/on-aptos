@@ -4,9 +4,10 @@ import { AssetService } from '@/lib/services/portfolio/services/asset-service';
 import { logger } from '@/lib/utils/logger';
 
 export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const walletAddress = searchParams.get('walletAddress');
+  
   try {
-    const { searchParams } = new URL(request.url);
-    const walletAddress = searchParams.get('walletAddress');
 
     if (!walletAddress) {
       return NextResponse.json(

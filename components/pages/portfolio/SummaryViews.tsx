@@ -1,9 +1,5 @@
 'use client';
 
-import React from 'react';
-import Image from 'next/image';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   TrendingUp,
   Shield,
@@ -17,16 +13,22 @@ import {
   Package,
   Archive,
 } from 'lucide-react';
+import Image from 'next/image';
+import React from 'react';
 import {
   ResponsiveContainer,
   Tooltip as RechartsTooltip,
   Treemap,
 } from 'recharts';
-import { formatCurrency } from '@/lib/utils/format';
+
 import { defiProtocols } from '@/components/pages/defi/data';
-import { cleanProtocolName } from './utils';
-import { NFT } from './types';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { formatCurrency } from '@/lib/utils/format';
+
+import { NFT } from './types';
+import { cleanProtocolName } from './utils';
 
 const CHART_COLORS = [
   '#3b82f6',

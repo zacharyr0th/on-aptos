@@ -1,15 +1,16 @@
 'use client';
 
-import React from 'react';
 import { DollarSign, TrendingUp, Building2, Coins } from 'lucide-react';
+import React from 'react';
+
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { formatCurrency } from '@/lib/utils';
-import { usePageTranslation } from '@/hooks/useTranslation';
 import { useDefiMetrics } from '@/hooks/useDefiMetrics';
+import { usePageTranslation } from '@/hooks/useTranslation';
+import { formatCurrency } from '@/lib/utils';
 
 interface StatsSectionProps {
   protocolCount: number;

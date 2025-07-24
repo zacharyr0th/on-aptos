@@ -1,12 +1,14 @@
 import { logger } from '@/lib/utils/logger';
-import { AssetService } from './asset-service';
-import { DeFiService } from './defi-service';
+
 import type {
   FungibleAsset,
   PortfolioMetrics,
   AssetPrice,
   DeFiPosition,
 } from '../types';
+
+import { AssetService } from './asset-service';
+import { DeFiService } from './defi-service';
 
 export class MetricsService {
   static async calculatePortfolioMetrics(

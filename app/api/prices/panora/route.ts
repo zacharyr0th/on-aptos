@@ -1,13 +1,14 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { withApiEnhancements } from '@/lib/utils/server';
-import { enhancedFetch } from '@/lib/utils/fetch-utils';
+import { NextRequest } from 'next/server';
+
 import {
   ApiError,
   formatApiError,
   withErrorHandling,
   type ErrorContext,
 } from '@/lib/utils';
+import { enhancedFetch } from '@/lib/utils/fetch-utils';
 import { logger } from '@/lib/utils/logger';
+import { withApiEnhancements } from '@/lib/utils/server';
 
 // Revalidate this route every 2 minutes (Panora data is more dynamic)
 export const revalidate = 120;

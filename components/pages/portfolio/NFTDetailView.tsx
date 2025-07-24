@@ -1,16 +1,3 @@
-import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Separator } from '@/components/ui/separator';
-import {
-  TooltipProvider,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
 import {
   ExternalLink,
   Copy,
@@ -27,9 +14,24 @@ import {
   Calendar,
   Info,
 } from 'lucide-react';
+import Image from 'next/image';
+import React, { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { NFTTransferHistory } from './NFTTransferHistory';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  TooltipProvider,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
+
+import { NFTTransferHistory } from './NFTTransferHistory';
 import type { NFT } from './types';
 
 interface NFTDetailViewProps {

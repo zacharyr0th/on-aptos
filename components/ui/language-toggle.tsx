@@ -1,8 +1,8 @@
 'use client';
 
-import * as React from 'react';
 import { Globe } from 'lucide-react';
-import { useTranslation } from '@/hooks/useTranslation';
+import * as React from 'react';
+
 import { Badge } from '@/components/ui/badge';
 import {
   DropdownMenu,
@@ -10,6 +10,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from '@/components/ui/dropdown-menu';
+import { useTranslation } from '@/hooks/useTranslation';
 import { supportedLanguages, type SupportedLanguage } from '@/lib/i18n';
 
 // Language labels for all supported languages

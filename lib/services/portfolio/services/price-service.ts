@@ -1,6 +1,7 @@
-import { logger } from '@/lib/utils/logger';
-import { PanoraService } from '../panora-service';
 import { aptosAnalytics } from '@/lib/services/aptos-analytics';
+import { logger } from '@/lib/utils/logger';
+
+import { PanoraService } from '../panora-service';
 import type { AssetPrice } from '../types';
 
 export class PriceService {

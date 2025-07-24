@@ -1,3 +1,6 @@
+import { Clock } from 'lucide-react';
+import Image from 'next/image';
+import { useTheme } from 'next-themes';
 import React, {
   FC,
   memo,
@@ -6,15 +9,14 @@ import React, {
   useState,
   useEffect,
 } from 'react';
-import { Clock } from 'lucide-react';
+
 import { FaGlobe, FaGithub, FaXTwitter } from '@/components/icons/SocialIcons';
-import { ErrorBoundary } from '../errors/ErrorBoundary';
-import Image from 'next/image';
-import { useTheme } from 'next-themes';
-import { useTranslation } from '@/hooks/useTranslation';
-import { DEVELOPER_CONFIG } from '@/lib/config/app';
 import { ThemeToggle } from '@/components/layout/theme-toggle';
 import { LanguageToggle } from '@/components/ui/language-toggle';
+import { useTranslation } from '@/hooks/useTranslation';
+import { DEVELOPER_CONFIG } from '@/lib/config/app';
+
+import { ErrorBoundary } from '../errors/ErrorBoundary';
 
 interface FooterProps {
   showAptosAttribution?: boolean;
@@ -102,12 +104,6 @@ CurrentUTCTime.displayName = 'CurrentUTCTime';
 
 const AptPrice: FC = memo(function AptPrice(): ReactElement {
   const { t } = useTranslation('common');
-  const { resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const [currentPrice, setCurrentPrice] = useState<number | null>(null);
   const [change24h, setChange24h] = useState<number>(0);
@@ -214,7 +210,6 @@ const AptPrice: FC = memo(function AptPrice(): ReactElement {
     );
   }
 
-  const isPositive = change24h >= 0;
 
   return (
     <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] xs:text-xs sm:text-sm">

@@ -1,5 +1,5 @@
-import { AdapterRegistry as IAdapterRegistry } from '../interfaces/provider';
 import { ProtocolAdapter } from '../interfaces/adapter';
+import { AdapterRegistry as IAdapterRegistry } from '../interfaces/provider';
 import { AdapterConfig } from '../types';
 
 export class AdapterRegistry implements IAdapterRegistry {

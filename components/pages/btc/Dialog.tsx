@@ -1,22 +1,26 @@
 'use client';
 
-import React, { useMemo, memo, useCallback } from 'react';
-import Image from 'next/image';
 import { Bitcoin, Copy } from 'lucide-react';
-import { convertRawTokenAmount } from '@/lib/utils';
-import { usePageTranslation } from '@/hooks/useTranslation';
+import Image from 'next/image';
+import React, { useMemo, memo, useCallback } from 'react';
 
+import { logger } from '@/lib/utils/logger';
+
+
+import { DialogErrorFallback } from '@/components/errors/DialogErrorFallback';
+import { ErrorBoundary } from '@/components/errors/ErrorBoundary';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { ErrorBoundary } from '@/components/errors/ErrorBoundary';
-import { DialogErrorFallback } from '@/components/errors/DialogErrorFallback';
 import { TokenDialogContent } from '@/components/ui/token-dialog-content';
 import { BaseTokenDialogProps } from '@/components/ui/token-dialog-types';
+import { usePageTranslation } from '@/hooks/useTranslation';
+import { convertRawTokenAmount } from '@/lib/utils';
+
 import {
   BTCFormattingError,
   BTC_DECIMAL_PLACES,
@@ -107,7 +111,7 @@ const SupplyCalculator = memo<{
           success: true,
         };
       } catch (error) {
-        console.error('Error calculating BTC values:', error);
+        logger.error('Error calculating BTC values:', error);
         return {
           btcAmount: t(
             'btc:error.error_calculating_supply',
@@ -192,7 +196,7 @@ const TokenIcon = memo<{
 }>(({ src, alt, fallbackSrc = '/icons/bitcoin.png' }) => {
   const handleError = useCallback(
     (e: React.SyntheticEvent<HTMLImageElement>) => {
-      console.error('Failed to load token image:', src);
+      logger.error('Failed to load token image:', src);
       e.currentTarget.src = fallbackSrc;
     },
     [src, fallbackSrc]
@@ -220,7 +224,7 @@ const TokenDialog = memo<BtcTokenDialogProps>(
   ({ isOpen, onClose, metadata, supply, bitcoinPrice = 0 }) => {
     const { t } = usePageTranslation('btc');
 
-    const handleCopy = useCallback((text: string, label: string) => {
+    const handleCopy = useCallback((text: string, _label: string) => {
       navigator.clipboard.writeText(text);
       // Could add toast notification here
     }, []);

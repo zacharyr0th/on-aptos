@@ -1,9 +1,9 @@
+import { PANORA_TOKENS } from '@/lib/config/data';
+import { getEnvVar } from '@/lib/config/validate-env';
+import { TOKEN_REGISTRY, NATIVE_TOKENS, STABLECOINS } from '@/lib/constants';
 import { logger } from '@/lib/utils/logger';
 // import { getCachedData, setCachedData } from '@/lib/utils/cache-manager';
 // import { PriceService } from '@/lib/trpc/domains/market-data/prices/services'; // TODO: Move PriceService to /lib/services/
-import { getEnvVar } from '@/lib/config/validate-env';
-import { TOKEN_REGISTRY, NATIVE_TOKENS, STABLECOINS } from '@/lib/constants';
-import { PANORA_TOKENS } from '@/lib/config/data';
 
 const PANORA_API_ENDPOINT = 'https://api.panora.exchange/prices';
 // Use public API key if none is provided in env

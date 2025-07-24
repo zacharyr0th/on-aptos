@@ -1,7 +1,7 @@
 'use client';
 
-import { AptosWalletAdapterProvider } from '@aptos-labs/wallet-adapter-react';
 import { Network } from '@aptos-labs/ts-sdk';
+import { AptosWalletAdapterProvider } from '@aptos-labs/wallet-adapter-react';
 import { ReactNode } from 'react';
 
 interface WalletProviderProps {

@@ -1,5 +1,6 @@
-import StablesPage from '@/components/pages/stables/Page';
 import { Metadata } from 'next';
+
+import StablesPage from '@/components/pages/stables/Page';
 
 // Revalidate daily for stablecoin supply data (maximum cost savings)
 export const revalidate = 86400;

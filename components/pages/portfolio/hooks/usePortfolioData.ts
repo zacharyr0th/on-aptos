@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
-import { logger } from '@/lib/utils/logger';
-import { NFT } from '../types';
+
 import {
   enhancedFetch,
   isRateLimited,
   getRetryDelay,
 } from '@/lib/utils/fetch-utils';
+import { logger } from '@/lib/utils/logger';
+
+import { NFT } from '../types';
 
 interface FungibleAsset {
   asset_type: string;

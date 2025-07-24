@@ -1,11 +1,12 @@
 import { logger } from '@/lib/utils/logger';
+
+import { QUERY_LIMITS } from '../constants';
+import type { NFT, PaginatedResponse } from '../types';
 import {
   executeGraphQLQuery,
   QUERIES,
   buildPaginationVariables,
 } from '../utils/graphql-helpers';
-import type { NFT, PaginatedResponse } from '../types';
-import { QUERY_LIMITS } from '../constants';
 
 export class NFTService {
   static async getWalletNFTs(

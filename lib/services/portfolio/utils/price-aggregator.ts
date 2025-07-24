@@ -1,4 +1,5 @@
 import { logger } from '@/lib/utils/logger';
+
 import { PriceService } from '../services/price-service';
 import type { AssetPrice } from '../types';
 

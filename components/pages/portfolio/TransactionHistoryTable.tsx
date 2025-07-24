@@ -1,7 +1,9 @@
-import React from 'react';
 import { GeistMono } from 'geist/font/mono';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ArrowUpRight, ArrowDownRight, History, Clock } from 'lucide-react';
+import React from 'react';
+
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table,
@@ -11,9 +13,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { ArrowUpRight, ArrowDownRight, History, Clock } from 'lucide-react';
-import { formatCurrency } from '@/lib/utils/format';
 import { useTransactionHistory } from '@/hooks/useAptosAnalytics';
+import { formatCurrency } from '@/lib/utils/format';
 
 interface TransactionHistoryTableProps {
   walletAddress: string | undefined;

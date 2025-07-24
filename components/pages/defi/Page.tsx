@@ -1,10 +1,13 @@
 'use client';
 
-import React, { useState } from 'react';
 import { GeistMono } from 'geist/font/mono';
-import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
+import React, { useState } from 'react';
+
 import { ErrorBoundary } from '@/components/errors/ErrorBoundary';
+import { Footer } from '@/components/layout/Footer';
+import { Header } from '@/components/layout/Header';
+import { usePageTranslation } from '@/hooks/useTranslation';
+
 import {
   StatsSection,
   FilterControls,
@@ -12,7 +15,6 @@ import {
   ProtocolDisplay,
 } from './components';
 import { defiProtocols, categories } from './data';
-import { usePageTranslation } from '@/hooks/useTranslation';
 
 export default function DefiPage(): React.ReactElement {
   const [selectedCategory, setSelectedCategory] = useState('All');

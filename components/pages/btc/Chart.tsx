@@ -1,4 +1,8 @@
+import { Copy } from 'lucide-react';
+import Image from 'next/image';
 import React, { useCallback, useMemo, memo } from 'react';
+
+import { logger } from '@/lib/utils/logger';
 import {
   ResponsiveContainer,
   PieChart,
@@ -7,10 +11,8 @@ import {
   Tooltip,
   TooltipProps,
 } from 'recharts';
-import { Copy } from 'lucide-react';
 import { toast } from 'sonner';
-import Image from 'next/image';
-import { useResponsive } from '@/hooks/useResponsive';
+
 import { Button } from '@/components/ui/button';
 import {
   Tooltip as UITooltip,
@@ -18,9 +20,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { useResponsive } from '@/hooks/useResponsive';
 import { Token } from '@/lib/config';
 import { BTC_COLORS } from '@/lib/constants/ui/colors';
 import { formatCurrency } from '@/lib/utils';
+
 import {
   formatBTCAmount,
   formatPercentage,
@@ -52,10 +56,6 @@ const CHART_DIMENSIONS = {
   desktop: { innerRadius: '63%', outerRadius: '99%' },
 } as const;
 
-const BREAKPOINTS = {
-  mobile: 640,
-  desktop: 1024,
-} as const;
 
 // Optimized custom tooltip with memoization and reduced DOM operations
 const CustomTooltip = memo<TooltipProps<number, string>>(props => {
@@ -84,7 +84,7 @@ const CustomTooltip = memo<TooltipProps<number, string>>(props => {
       </div>
     );
   } catch (error) {
-    console.error('Error rendering tooltip:', error);
+    logger.error('Error rendering tooltip:', error);
     return (
       <div className="bg-popover/95 backdrop-blur border rounded-md shadow-lg p-3 z-10 text-sm">
         <p className="text-destructive">Error displaying data</p>
@@ -107,7 +107,7 @@ const TokenNameCopy = memo<{
       await navigator.clipboard.writeText(text);
       toast.success(`Copied ${label} address to clipboard`);
     } catch (error) {
-      console.error('Failed to copy to clipboard:', error);
+      logger.error('Failed to copy to clipboard:', error);
       toast.error('Failed to copy to clipboard');
     }
   }, []);
@@ -209,9 +209,8 @@ export const MarketShareChart = memo<MarketShareChartProps>(
     showTotalInfo = true,
   }) => {
     const { isMobile, isDesktop } = useResponsive();
-    const width = isDesktop ? 1024 : isMobile ? 320 : 768;
 
-    console.log('[MarketShareChart] Props:', {
+    logger.log('[MarketShareChart] Props:', {
       totalBTC,
       totalUSD,
       bitcoinPrice,
@@ -238,7 +237,7 @@ export const MarketShareChart = memo<MarketShareChartProps>(
 
           return values;
         } catch (error) {
-          console.error('Error calculating token BTC values:', error);
+          logger.error('Error calculating token BTC values:', error);
           return [];
         }
       }, 'tokenBtcValues calculation');
@@ -278,7 +277,7 @@ export const MarketShareChart = memo<MarketShareChartProps>(
 
           return result.sort((a, b) => b._btcValue - a._btcValue);
         } catch (error) {
-          console.error('Error processing chart data:', error);
+          logger.error('Error processing chart data:', error);
           return [];
         }
       }, 'chartData calculation');

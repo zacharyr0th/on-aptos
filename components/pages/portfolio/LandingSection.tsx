@@ -2,10 +2,11 @@
 
 import { GeistMono } from 'geist/font/mono';
 import Image from 'next/image';
-import { cn } from '@/lib/utils';
-import { Header } from '@/components/layout/Header';
+
 import { Footer } from '@/components/layout/Footer';
+import { Header } from '@/components/layout/Header';
 import { WalletConnectButton } from '@/components/wallet/WalletConnectButton';
+import { cn } from '@/lib/utils';
 
 export const LandingSection = () => {
   return (

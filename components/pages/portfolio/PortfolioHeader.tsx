@@ -1,14 +1,16 @@
 'use client';
 
 import { Copy, ChevronDown } from 'lucide-react';
+import Image from 'next/image';
+
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import Image from 'next/image';
 import { formatCurrency } from '@/lib/utils/format';
+
 import { copyToClipboard } from './utils';
 
 interface PortfolioHeaderProps {

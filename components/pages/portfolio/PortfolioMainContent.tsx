@@ -1,32 +1,36 @@
 'use client';
 
-import React, { useRef, useEffect } from 'react';
-import Image from 'next/image';
 import { GeistMono } from 'geist/font/mono';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ArrowLeft } from 'lucide-react';
+import Image from 'next/image';
+import React, { useRef, useEffect } from 'react';
+
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { formatCurrency, formatTokenAmount } from '@/lib/utils/format';
 import { getTokenLogoUrlWithFallback } from '@/lib/utils/token-logos';
+
+import { AnalyticsDashboard } from './AnalyticsDashboard';
+import { DeFiSummaryView, NFTSummaryView } from './SummaryViews';
+import { TokenChart } from './TokenChart';
+import { TransactionHistoryTable } from './TransactionHistoryTable';
 import {
   cleanProtocolName,
   getProtocolLogo,
   getDetailedProtocolInfo,
 } from './utils';
-import { DeFiSummaryView, NFTSummaryView } from './SummaryViews';
 import { WalletSummary } from './WalletSummary';
-import { TransactionHistoryTable } from './TransactionHistoryTable';
-import { AnalyticsDashboard } from './AnalyticsDashboard';
-import { TokenChart } from './TokenChart';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { ArrowLeft } from 'lucide-react';
+
+
 
 interface PortfolioMainContentProps {
   activeTab: string;

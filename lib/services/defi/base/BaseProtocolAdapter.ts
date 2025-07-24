@@ -1,4 +1,5 @@
 import { ProtocolAdapter, AdapterContext, Logger } from '../interfaces/adapter';
+import { LPTokenPriceService } from '../services/LPTokenPriceService';
 import {
   DeFiPosition,
   AdapterConfig,
@@ -6,7 +7,6 @@ import {
   PositionScanResult,
   ProtocolType,
 } from '../types';
-import { LPTokenPriceService } from '../services/LPTokenPriceService';
 
 export abstract class BaseProtocolAdapter implements ProtocolAdapter {
   abstract readonly id: string;

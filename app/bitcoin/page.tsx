@@ -1,4 +1,5 @@
 import BitcoinPage from '@/components/pages/btc/Page';
+import { logger } from '@/lib/utils/logger';
 
 // Revalidate daily for Bitcoin supply data (maximum cost savings)
 export const revalidate = 86400;
@@ -46,14 +47,14 @@ async function fetchBitcoinPrice() {
       }
     }
   } catch (error) {
-    console.error('Failed to fetch Bitcoin price from token API:', error);
+    logger.error('Failed to fetch Bitcoin price from token API:', error);
   }
   return null;
 }
 
 async function fetchBTCData() {
-  console.log('[BTC Page] Starting data fetch...');
-  console.log(
+  logger.info('[BTC Page] Starting data fetch...');
+  logger.info(
     '[BTC Page] APTOS_BUILD_SECRET available:',
     !!process.env.APTOS_BUILD_SECRET
   );
@@ -111,7 +112,7 @@ async function fetchBTCData() {
     }
   `;
 
-  console.log('[BTC Page] Making GraphQL request...');
+  logger.info('[BTC Page] Making GraphQL request...');
   const response = await fetch('https://api.mainnet.aptoslabs.com/v1/graphql', {
     method: 'POST',
     headers: {
@@ -121,16 +122,16 @@ async function fetchBTCData() {
     body: JSON.stringify({ query }),
   });
 
-  console.log('[BTC Page] Response status:', response.status);
+  logger.info('[BTC Page] Response status:', response.status);
 
   if (!response.ok) {
     const errorText = await response.text();
-    console.log('[BTC Page] Response error:', errorText);
+    logger.error('[BTC Page] Response error:', errorText);
     throw new Error(`GraphQL error: ${response.status} - ${errorText}`);
   }
 
   const result = await response.json();
-  console.log('[BTC Page] GraphQL result:', JSON.stringify(result, null, 2));
+  logger.info('[BTC Page] GraphQL result:', JSON.stringify(result, null, 2));
 
   const supplies: any[] = [];
 
@@ -162,10 +163,10 @@ async function fetchBTCData() {
 export default async function Page() {
   try {
     const data = await fetchBTCData();
-    console.log('[BTC Page] Passing data to component:', data);
+    logger.info('[BTC Page] Passing data to component:', data);
     return <BitcoinPage />;
   } catch (error) {
-    console.error('Failed to fetch BTC data:', error);
+    logger.error('Failed to fetch BTC data:', error);
     // Return page with empty data
     return <BitcoinPage />;
   }

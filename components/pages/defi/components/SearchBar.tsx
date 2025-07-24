@@ -1,5 +1,5 @@
 import { Search } from 'lucide-react';
-import { Input } from '@/components/ui/input';
+
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -7,6 +7,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
+import { Input } from '@/components/ui/input';
 import { usePageTranslation } from '@/hooks/useTranslation';
 
 interface SearchBarProps {

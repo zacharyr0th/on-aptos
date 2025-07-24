@@ -1,5 +1,6 @@
-import DeFiPage from '@/components/pages/defi/Page';
 import { Metadata } from 'next';
+
+import DeFiPage from '@/components/pages/defi/Page';
 
 // Revalidate every 15 minutes for DeFi TVL and protocol data
 export const revalidate = 900;

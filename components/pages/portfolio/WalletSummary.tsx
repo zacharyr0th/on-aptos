@@ -1,9 +1,3 @@
-import React, { useMemo, useState } from 'react';
-import Image from 'next/image';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Wallet,
   TrendingUp,
@@ -22,11 +16,8 @@ import {
   Image as ImageIcon,
   Layers,
 } from 'lucide-react';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+import Image from 'next/image';
+import React, { useMemo, useState } from 'react';
 import {
   PieChart as RechartsPieChart,
   Pie,
@@ -35,15 +26,27 @@ import {
   Tooltip as RechartsTooltip,
   TooltipProps,
 } from 'recharts';
+
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { cn } from '@/lib/utils';
 import {
   formatCurrency,
   formatPercentage,
   formatTokenAmount,
 } from '@/lib/utils/format';
-import { getTokenLogoUrlWithFallback } from '@/lib/utils/token-logos';
-import { cn } from '@/lib/utils';
-import { getProtocolLogo } from './utils';
 import { processAllocationData } from '@/lib/utils/token-categorization';
+import { getTokenLogoUrlWithFallback } from '@/lib/utils/token-logos';
+
+import { getProtocolLogo } from './utils';
+
 
 interface FungibleAsset {
   asset_type: string;
