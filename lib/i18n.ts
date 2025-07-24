@@ -1,6 +1,6 @@
 import i18n from 'i18next';
-import { initReactI18next } from 'react-i18next';
 import HttpApi from 'i18next-http-backend';
+import { initReactI18next } from 'react-i18next';
 
 // Only import English translations for SSR - other languages load on demand
 import commonEn from '../public/locales/en/common.json';

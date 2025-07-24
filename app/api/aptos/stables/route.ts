@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+
 import {
   STABLECOINS,
   LAYERZERO_STABLECOINS,
@@ -7,6 +8,7 @@ import {
   ALGO_STABLECOINS,
 } from '@/lib/aptos-constants';
 import { TETHER_RESERVE_ADDRESS } from '@/lib/config/data';
+import { logger } from '@/lib/utils/logger';
 
 const INDEXER = 'https://indexer.mainnet.aptoslabs.com/v1/graphql';
 
@@ -19,7 +21,7 @@ export async function GET() {
       ...Object.values(STABLECOINS),
       ALGO_STABLECOINS.MOD,
     ];
-    console.log('Querying fungible assets:', fungibleAssets);
+    logger.info('Querying fungible assets:', fungibleAssets);
 
     // GraphQL query for native fungible assets and USDT reserve
     const query = `
@@ -67,11 +69,11 @@ export async function GET() {
 
     // Check for GraphQL errors
     if (result.errors) {
-      console.error('GraphQL errors:', result.errors);
+      logger.error('GraphQL errors:', result.errors);
       throw new Error('GraphQL query failed: ' + JSON.stringify(result.errors));
     }
 
-    console.log(
+    logger.info(
       'GraphQL response:',
       JSON.stringify(result.data?.fungible_asset_metadata, null, 2)
     );
@@ -119,7 +121,7 @@ export async function GET() {
           if (symbol === 'USDT') {
             const reserveAmount = BigInt(usdtReserveBalance);
             supply = supply - reserveAmount;
-            console.log(
+            logger.info(
               `USDT: Total supply ${item.supply_v2}, Reserve ${usdtReserveBalance}, Circulating ${supply.toString()}`
             );
           }
@@ -134,12 +136,12 @@ export async function GET() {
 
           // Log mUSD and MOD for debugging
           if (symbol === 'mUSD') {
-            console.log(
+            logger.info(
               `mUSD: Raw supply ${supply.toString()}, Decimals ${decimals}, Formatted ${(supply / divisor).toString()}`
             );
           }
           if (symbol === 'MOD') {
-            console.log(
+            logger.info(
               `MOD: Raw supply ${supply.toString()}, Decimals ${decimals}, Formatted ${(supply / divisor).toString()}`
             );
           }
@@ -220,7 +222,7 @@ export async function GET() {
           const data = await response.json();
 
           // Log the response to understand the structure
-          console.log(
+          logger.info(
             `Response for ${coin.symbol}:`,
             JSON.stringify(data, null, 2)
           );
@@ -248,7 +250,7 @@ export async function GET() {
               (data.data?.supply?.vec && data.data.supply.vec.length === 0))
           ) {
             try {
-              console.log(
+              logger.info(
                 'MOD supply vector is empty, trying GraphQL manual aggregation with pagination...'
               );
               let totalSupply = BigInt(0);
@@ -288,7 +290,7 @@ export async function GET() {
                   const graphqlResult = await graphqlResponse.json();
                   if (graphqlResult.data?.current_coin_balances) {
                     const balances = graphqlResult.data.current_coin_balances;
-                    console.log(
+                    logger.info(
                       `Batch ${Math.floor(offset / batchSize) + 1}: Found ${balances.length} MOD holders`
                     );
 
@@ -306,7 +308,7 @@ export async function GET() {
                     hasMore = false;
                   }
                 } else {
-                  console.error(
+                  logger.error(
                     `GraphQL request failed: ${graphqlResponse.status}`
                   );
                   hasMore = false;
@@ -314,34 +316,34 @@ export async function GET() {
               }
 
               supply = totalSupply;
-              console.log(
+              logger.info(
                 `MOD total supply from paginated GraphQL aggregation: ${supply.toString()}`
               );
             } catch (e) {
-              console.error('Failed to fetch MOD supply via GraphQL:', e);
+              logger.error('Failed to fetch MOD supply via GraphQL:', e);
             }
           }
 
           // Log MOD specifically for debugging
           if (coin.symbol === 'MOD') {
-            console.log(
+            logger.info(
               `MOD final supply: ${supply.toString()} (should be ~500k = 50000000000000 raw with 8 decimals)`
             );
           }
-          console.log(`${coin.symbol} supply:`, supply.toString());
+          logger.info(`${coin.symbol} supply:`, supply.toString());
 
           return {
             coin,
             supply,
           };
         } else {
-          console.error(
+          logger.error(
             `Failed to fetch ${coin.symbol}: HTTP ${response.status}`
           );
         }
         return { coin, supply: BigInt(0) };
       } catch (e) {
-        console.error(`Failed to fetch supply for ${coin.symbol}:`, e);
+        logger.error(`Failed to fetch supply for ${coin.symbol}:`, e);
         return { coin, supply: BigInt(0) };
       }
     });
@@ -375,7 +377,7 @@ export async function GET() {
       return bSupply > aSupply ? 1 : -1;
     });
 
-    console.log(
+    logger.info(
       'Total supply (normalized to 6 decimals):',
       totalSupply.toString()
     );
@@ -397,7 +399,7 @@ export async function GET() {
 
       // Debug log for MOD and mUSD
       if (item.symbol === 'MOD' || item.symbol === 'mUSD') {
-        console.log(`${item.symbol} percentage calc:`, {
+        logger.info(`${item.symbol} percentage calc:`, {
           supply: item.supply,
           totalDollarValue: totalDollarValue.toString(),
           percentage: item.percentage,
@@ -419,9 +421,14 @@ export async function GET() {
           address: TETHER_RESERVE_ADDRESS,
         },
       },
+    }, {
+      headers: {
+        'Cache-Control': 'public, max-age=86400, stale-while-revalidate=43200',
+        'CDN-Cache-Control': 'public, max-age=86400',
+      }
     });
   } catch (error) {
-    console.error('Error fetching stablecoin data:', error);
+    logger.error('Error fetching stablecoin data:', error);
     return NextResponse.json(
       {
         error: 'Failed to fetch stablecoin data',

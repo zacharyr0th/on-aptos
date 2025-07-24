@@ -1,6 +1,8 @@
 'use client';
 
+import { Smartphone, ExternalLink } from 'lucide-react';
 import { useState, useCallback, useEffect } from 'react';
+
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -9,7 +11,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Smartphone, ExternalLink } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface MobileWalletConnectProps {

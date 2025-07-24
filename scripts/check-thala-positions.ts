@@ -1,10 +1,14 @@
 #!/usr/bin/env tsx
 
 /**
+ * @deprecated This script uses the old ThalaPositionChecker which has been replaced by DeFiBalanceService
+ * Use test-defi-positions.ts instead for checking Thala positions
+ *
  * Script to check Thala protocol positions for a specific wallet
  * Usage: tsx scripts/check-thala-positions.ts
  */
 
+// @ts-ignore - deprecated import
 import { ThalaPositionChecker } from '../lib/services/thala-position-checker';
 
 async function main() {

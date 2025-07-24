@@ -1,52 +1,67 @@
-// Production-safe logging utility using Pino
-// Provides structured logging with proper log levels
+import pino from 'pino'
 
-import pino from 'pino';
+const isDevelopment = process.env.NODE_ENV === 'development'
+const isTest = process.env.NODE_ENV === 'test'
+const isProduction = process.env.NODE_ENV === 'production'
 
-const isProduction = process.env.NODE_ENV === 'production';
-const isDevelopment = process.env.NODE_ENV === 'development';
-
-// Create the base logger
-const pinoLogger = pino({
-  level: process.env.LOG_LEVEL || (isProduction ? 'info' : 'debug'),
-
-  // Disable pretty transport for now due to Turbopack compatibility issues
-  // TODO: Re-enable when Turbopack supports worker scripts properly
-
+// Create pino logger instance
+export const logger = pino({
+  level: process.env.LOG_LEVEL || (isTest ? 'silent' : isDevelopment ? 'debug' : 'info'),
+  // Disable pretty transport due to Next.js/Turbopack compatibility issues
+  // transport: isDevelopment ? {
+  //   target: 'pino-pretty',
+  //   options: {
+  //     colorize: true,
+  //     ignore: 'pid,hostname',
+  //     translateTime: 'SYS:standard',
+  //   },
+  // } : undefined,
+  formatters: {
+    level: (label) => {
+      return { level: label }
+    },
+  },
+  timestamp: () => `,"time":"${new Date(Date.now()).toISOString()}"`,
+  base: {
+    env: process.env.NODE_ENV,
+    ...(process.env.VERCEL_ENV && { vercelEnv: process.env.VERCEL_ENV }),
+  },
   // Redact sensitive information
   redact: {
     paths: ['*.password', '*.apiKey', '*.api_key', '*.token', '*.secret'],
     remove: true,
   },
-});
+})
 
-// Wrapper for backward compatibility with existing code
-export const logger = {
-  log: (...args: any[]) => {
-    pinoLogger.info(args.length === 1 ? args[0] : args);
-  },
-  warn: (...args: any[]) => {
-    pinoLogger.warn(args.length === 1 ? args[0] : args);
-  },
-  error: (...args: any[]) => {
-    if (args[0] instanceof Error) {
-      pinoLogger.error(args[0]);
-    } else {
-      pinoLogger.error(args.length === 1 ? args[0] : args);
-    }
-  },
-  info: (...args: any[]) => {
-    pinoLogger.info(args.length === 1 ? args[0] : args);
-  },
-  debug: (...args: any[]) => {
-    pinoLogger.debug(args.length === 1 ? args[0] : args);
-  },
-};
+// Create child loggers for different modules
+export const createLogger = (module: string) => {
+  return logger.child({ module })
+}
 
-// For backward compatibility and easy migration
-export const log = logger.log;
-export const warn = logger.warn;
-export const error = logger.error;
+// Specialized loggers for different parts of the application
+export const apiLogger = createLogger('api')
+export const serviceLogger = createLogger('service')
+export const dbLogger = createLogger('database')
+export const utilLogger = createLogger('util')
+export const errorLogger = createLogger('error')
+export const perfLogger = createLogger('performance')
 
-// Export the pino logger for direct use when needed
-export const pinoInstance = pinoLogger;
+// Backward compatibility exports
+export const log = (...args: any[]) => {
+  logger.info(args.length === 1 ? args[0] : args.join(' '))
+}
+
+export const warn = (...args: any[]) => {
+  logger.warn(args.length === 1 ? args[0] : args.join(' '))
+}
+
+export const error = (...args: any[]) => {
+  if (args[0] instanceof Error) {
+    logger.error(args[0])
+  } else {
+    logger.error(args.length === 1 ? args[0] : args.join(' '))
+  }
+}
+
+// Default export
+export default logger

@@ -1,5 +1,6 @@
 'use client';
 
+import { useTheme } from 'next-themes';
 import { useMemo } from 'react';
 import {
   Area,
@@ -9,6 +10,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+
 import {
   ChartContainer,
   ChartTooltip,
@@ -16,6 +18,8 @@ import {
 } from '@/components/ui/chart';
 
 export const SimulatedChart = () => {
+  const { theme } = useTheme();
+
   // Generate simulated portfolio data
   const chartData = useMemo(() => {
     const baseValue = 100000;
@@ -48,22 +52,14 @@ export const SimulatedChart = () => {
           color: 'hsl(var(--chart-1))',
         },
       }}
-      className="h-[150px] sm:h-[180px] md:h-[200px] w-full"
+      className="h-full w-full min-h-[200px]"
     >
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={chartData}>
           <defs>
             <linearGradient id="colorValueDemo" x1="0" y1="0" x2="0" y2="1">
-              <stop
-                offset="5%"
-                stopColor="hsl(var(--chart-1))"
-                stopOpacity={0.3}
-              />
-              <stop
-                offset="95%"
-                stopColor="hsl(var(--chart-1))"
-                stopOpacity={0}
-              />
+              <stop offset="5%" stopColor="currentColor" stopOpacity={0.2} />
+              <stop offset="95%" stopColor="currentColor" stopOpacity={0} />
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
@@ -77,7 +73,7 @@ export const SimulatedChart = () => {
                 day: 'numeric',
               });
             }}
-            interval="preserveStartEnd"
+            interval={Math.floor(chartData.length / 4)}
             tick={{ fontSize: 10 }}
           />
           <YAxis

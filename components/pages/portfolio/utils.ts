@@ -1,7 +1,8 @@
 import { toast } from 'sonner';
-import { isPhantomAsset as isPhantomAssetFromRegistry } from '@/lib/protocol-registry';
+
 import { defiProtocols } from '@/components/pages/defi/data';
-import { normalizeProtocolName } from '@/lib/aptos-constants';
+import { normalizeProtocolName } from '@/lib/constants';
+import { isPhantomAsset as isPhantomAssetFromRegistry } from '@/lib/protocol-registry';
 
 // Helper function to clean protocol names for display
 export const cleanProtocolName = (name: string): string => {

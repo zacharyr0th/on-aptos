@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+
 import { logger } from '@/lib/utils/logger';
 
 const APTOS_ANALYTICS_API = 'https://api.mainnet.aptoslabs.com/v1/analytics';
@@ -32,6 +33,69 @@ export async function GET(request: NextRequest) {
       fetchPriceHistory(lookbackConfig),
     ]);
 
+    // If we're getting flat data, try the balance-history API directly
+    if (balanceData && balanceData.length > 1) {
+      const uniqueValues = [
+        ...new Set(
+          balanceData.map(
+            (item: any) =>
+              item.total_store_balance_usd ||
+              item.total_balance_usd ||
+              item.balance_usd ||
+              0
+          )
+        ),
+      ];
+
+      if (uniqueValues.length <= 1) {
+        logger.warn(
+          '[Portfolio Performance] Detected flat balance data, trying alternative approach'
+        );
+
+        // Try fetching via the internal balance-history API
+        try {
+          const balanceHistoryUrl = `${request.nextUrl.origin}/api/analytics/balance-history?address=${walletAddress}&lookback=${lookbackConfig.balanceLookback}`;
+          const balanceHistoryResponse = await fetch(balanceHistoryUrl);
+
+          if (balanceHistoryResponse.ok) {
+            const balanceHistoryResult = await balanceHistoryResponse.json();
+            if (
+              balanceHistoryResult.data &&
+              balanceHistoryResult.data.length > 0
+            ) {
+              logger.info(
+                '[Portfolio Performance] Using balance-history API data'
+              );
+              const alternativeData = balanceHistoryResult.data;
+
+              // Check if this data is also flat
+              const altUniqueValues = [
+                ...new Set(
+                  alternativeData.map(
+                    (item: any) =>
+                      item.total_store_balance_usd ||
+                      item.total_balance_usd ||
+                      item.balance_usd ||
+                      0
+                  )
+                ),
+              ];
+
+              if (altUniqueValues.length > 1) {
+                // Use the alternative data since it has variation
+                balanceData.splice(0, balanceData.length, ...alternativeData);
+              }
+            }
+          }
+        } catch (altError) {
+          logger.warn(
+            '[Portfolio Performance] Alternative balance fetch failed:',
+            altError
+          );
+        }
+      }
+    }
+
     // Check if we have any data
     if (!balanceData || balanceData.length === 0) {
       logger.warn(
@@ -60,6 +124,38 @@ export async function GET(request: NextRequest) {
 
     // Combine and interpolate data
     const performanceData = combineData(balanceData, priceData, lookbackConfig);
+
+    // If we have flat data, just return it as-is (real data only)
+    if (performanceData.length > 1) {
+      const uniqueValues = [
+        ...new Set(performanceData.map(item => item.value)),
+      ];
+
+      if (uniqueValues.length <= 1) {
+        logger.info(
+          '[Portfolio Performance] Wallet has flat balance history - returning real data'
+        );
+      }
+    }
+
+    // Debug the combined data
+    logger.info('[Portfolio Performance] Combined data sample:', {
+      firstItem: performanceData[0],
+      lastItem: performanceData[performanceData.length - 1],
+      totalItems: performanceData.length,
+      allValuesSame:
+        performanceData.length > 1
+          ? performanceData.every(
+              item => item.value === performanceData[0].value
+            )
+          : false,
+      uniqueValues: [...new Set(performanceData.map(item => item.value))]
+        .length,
+      valueRange: {
+        min: Math.min(...performanceData.map(item => item.value)),
+        max: Math.max(...performanceData.map(item => item.value)),
+      },
+    });
 
     return NextResponse.json({
       success: true,

@@ -1,24 +1,26 @@
 'use client';
 
-import React, { useMemo, memo, useCallback } from 'react';
-import Image from 'next/image';
 import { Copy, ExternalLink } from 'lucide-react';
-import { formatCurrency } from '@/lib/utils';
-import { useResponsive } from '@/hooks/useResponsive';
-import { useTranslation } from '@/hooks/useTranslation';
+import Image from 'next/image';
+import React, { useMemo, memo, useCallback } from 'react';
+import { toast } from 'sonner';
 
+import { DialogErrorFallback } from '@/components/errors/DialogErrorFallback';
+import { ErrorBoundary } from '@/components/errors/ErrorBoundary';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { ErrorBoundary } from '@/components/errors/ErrorBoundary';
-import { DialogErrorFallback } from '@/components/errors/DialogErrorFallback';
+import { useResponsive } from '@/hooks/useResponsive';
+import { useTranslation } from '@/hooks/useTranslation';
+import { formatCurrency } from '@/lib/utils';
+
 import { RWAToken } from './rwa-constants';
-import { toast } from 'sonner';
+
 
 interface RwaTokenDialogProps {
   isOpen: boolean;

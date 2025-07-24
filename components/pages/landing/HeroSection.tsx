@@ -1,3 +1,7 @@
+import { ArrowRight, TrendingUp, LayoutDashboard } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+
 import { Button } from '@/components/ui/button';
 import {
   Tooltip,
@@ -5,53 +9,51 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { useTranslation } from '@/hooks/useTranslation';
-import { ArrowRight, TrendingUp, LayoutDashboard } from 'lucide-react';
-import Link from 'next/link';
-import Image from 'next/image';
+
 
 export const HeroSection = () => {
   const { t } = useTranslation('common');
 
   return (
-    <div className="w-full max-w-6xl mx-auto text-center flex flex-col justify-center items-center space-y-8 sm:space-y-10 lg:space-y-12 px-4">
+    <div className="w-full max-w-6xl mx-auto text-center flex flex-col justify-center items-center space-y-6 sm:space-y-8 lg:space-y-10 px-4">
       {/* Main Title with enhanced design */}
-      <div className="relative space-y-6 sm:space-y-8">
-        <div className="space-y-4">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight leading-tight">
-            <span className="block text-foreground mb-2">
+      <div className="relative space-y-4 sm:space-y-6 lg:space-y-8">
+        <div className="space-y-2 sm:space-y-3">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] sm:leading-tight">
+            <span className="block text-foreground mb-1 sm:mb-2">
               Track Your Portfolio
             </span>
-            <span className="block flex items-center justify-center flex-wrap gap-2 sm:gap-4">
+            <span className="block flex items-center justify-center flex-wrap gap-2 sm:gap-3">
               <span className="text-muted-foreground">on Aptos</span>
               <Image
                 src="/icons/apt.png"
                 alt="Aptos"
-                width={48}
-                height={48}
-                className="inline-block align-middle w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 dark:invert"
+                width={40}
+                height={40}
+                className="inline-block align-middle w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 dark:invert"
               />
             </span>
           </h1>
         </div>
 
-        <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed px-4">
+        <p className="text-sm sm:text-base md:text-lg lg:text-xl text-muted-foreground max-w-2xl lg:max-w-3xl mx-auto leading-relaxed px-2 sm:px-4">
           Real-time portfolio tracking across DeFi protocols. Dedicated
-          analytics for Stablecoins, Bitcoin, RWAs, and LSTs.
+          analytics for Stablecoins, Bitcoin, and RWAs.
         </p>
       </div>
 
       {/* Primary CTA */}
-      <div className="space-y-4 sm:space-y-6">
-        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center px-4">
+      <div className="space-y-3 sm:space-y-4 w-full">
+        <div className="flex flex-col sm:flex-row gap-3 justify-center items-stretch sm:items-center px-2 max-w-2xl mx-auto">
           <Tooltip>
             <TooltipTrigger asChild>
-              <Link href="/portfolio">
+              <Link href="/portfolio" className="w-full sm:w-auto">
                 <Button
                   size="default"
-                  className="group relative overflow-hidden px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base font-semibold bg-gradient-to-r from-primary to-primary/90 hover:from-primary/95 hover:to-primary/85 transition-all duration-300 shadow-lg hover:shadow-xl w-full sm:w-auto"
+                  className="group relative overflow-hidden px-6 py-3.5 text-base font-semibold bg-gradient-to-r from-primary to-primary/90 hover:from-primary/95 hover:to-primary/85 transition-all duration-300 shadow-lg hover:shadow-xl active:scale-95 w-full min-h-[48px] touch-manipulation rounded-xl"
                   aria-label="Go to portfolio page to track your Aptos assets"
                 >
-                  <span className="relative z-10 flex items-center">
+                  <span className="relative z-10 flex items-center justify-center">
                     Track Your Portfolio
                     <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
                   </span>
@@ -72,7 +74,7 @@ export const HeroSection = () => {
               <Button
                 variant="outline"
                 size="default"
-                className="px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base font-semibold hover:bg-muted/50 transition-all duration-300 w-full sm:w-auto"
+                className="px-4 py-3 text-sm font-semibold hover:bg-muted/50 transition-all duration-300 active:scale-95 w-full sm:w-auto min-h-[44px] touch-manipulation rounded-xl"
                 onClick={() =>
                   document
                     .getElementById('features')
@@ -94,7 +96,7 @@ export const HeroSection = () => {
               <Button
                 variant="outline"
                 size="default"
-                className="px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base font-semibold hover:bg-muted/50 transition-all duration-300 w-full sm:w-auto"
+                className="px-4 py-3 text-sm font-semibold hover:bg-muted/50 transition-all duration-300 active:scale-95 w-full sm:w-auto min-h-[44px] touch-manipulation rounded-xl"
                 onClick={() =>
                   document
                     .getElementById('icon-sections')

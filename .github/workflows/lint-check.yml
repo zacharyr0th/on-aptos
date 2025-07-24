@@ -1,0 +1,97 @@
+name: Logging Standards Check
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main, develop]
+
+jobs:
+  check-logging:
+    name: Check Logging Standards
+    runs-on: ubuntu-latest
+    if: false
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check for console.log usage
+        run: |
+          # Check for console.log in TypeScript/JavaScript files (excluding test files and scripts)
+          CONSOLE_LOG_FILES=$(grep -r "console\.log" --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" \
+            --exclude-dir=node_modules \
+            --exclude-dir=.next \
+            --exclude-dir=tests \
+            --exclude-dir=__tests__ \
+            --exclude="*.test.*" \
+            --exclude="*.spec.*" \
+            . | grep -v "scripts/" || true)
+          
+          if [ ! -z "$CONSOLE_LOG_FILES" ]; then
+            echo "Error: console.log found in source files. Use pino logger instead:"
+            echo "$CONSOLE_LOG_FILES"
+            echo ""
+            echo "Import the logger: import { logger } from '@/lib/utils/logger'"
+            echo "Use logger.info() instead of console.log()"
+            exit 1
+          fi
+
+      - name: Check for console.warn usage
+        run: |
+          # Check for console.warn in TypeScript/JavaScript files (excluding test files and scripts)
+          CONSOLE_WARN_FILES=$(grep -r "console\.warn" --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" \
+            --exclude-dir=node_modules \
+            --exclude-dir=.next \
+            --exclude-dir=tests \
+            --exclude-dir=__tests__ \
+            --exclude="*.test.*" \
+            --exclude="*.spec.*" \
+            . | grep -v "scripts/" || true)
+          
+          if [ ! -z "$CONSOLE_WARN_FILES" ]; then
+            echo "Error: console.warn found in source files. Use pino logger instead:"
+            echo "$CONSOLE_WARN_FILES"
+            echo ""
+            echo "Import the logger: import { logger } from '@/lib/utils/logger'"
+            echo "Use logger.warn() instead of console.warn()"
+            exit 1
+          fi
+
+      - name: Check for console.error usage
+        run: |
+          # Check for console.error in TypeScript/JavaScript files (excluding test files and scripts)
+          CONSOLE_ERROR_FILES=$(grep -r "console\.error" --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" \
+            --exclude-dir=node_modules \
+            --exclude-dir=.next \
+            --exclude-dir=tests \
+            --exclude-dir=__tests__ \
+            --exclude="*.test.*" \
+            --exclude="*.spec.*" \
+            . | grep -v "scripts/" || true)
+          
+          if [ ! -z "$CONSOLE_ERROR_FILES" ]; then
+            echo "Error: console.error found in source files. Use pino logger instead:"
+            echo "$CONSOLE_ERROR_FILES"
+            echo ""
+            echo "Import the logger: import { logger } from '@/lib/utils/logger'"
+            echo "Use logger.error() instead of console.error()"
+            exit 1
+          fi
+
+      - name: Check logger import patterns
+        run: |
+          # Check for proper logger imports
+          IMPROPER_IMPORTS=$(grep -r "import.*console" --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" \
+            --exclude-dir=node_modules \
+            --exclude-dir=.next \
+            . || true)
+          
+          if [ ! -z "$IMPROPER_IMPORTS" ]; then
+            echo "Warning: Direct console imports found. Use pino logger instead:"
+            echo "$IMPROPER_IMPORTS"
+          fi
+
+      - name: Success message
+        run: |
+          echo "Logging standards check passed!"
+          echo "All console.* calls should use the pino logger from @/lib/utils/logger"

@@ -1,5 +1,9 @@
-import RWAsPageComponent from '@/components/pages/rwas/Page';
 import { Metadata } from 'next';
+
+import RWAsPageComponent from '@/components/pages/rwas/Page';
+
+// Revalidate daily for RWA data (maximum cost savings)
+export const revalidate = 86400;
 
 export const metadata: Metadata = {
   title: 'Real World Assets Analytics',

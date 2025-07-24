@@ -1,8 +1,9 @@
-import React from 'react';
 import { ExternalLink, Copy } from 'lucide-react';
+import React from 'react';
+
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 import { InfoRow } from '@/components/ui/info-row';
+import { Separator } from '@/components/ui/separator';
 import { TokenMetadata } from '@/components/ui/token-dialog-types';
 import { useTranslation } from '@/hooks/useTranslation';
 
@@ -25,7 +26,6 @@ export const TokenDialogContent: React.FC<TokenDialogContentProps> = ({
     'common',
     'btc',
     'stables',
-    'lst',
     'rwas',
   ]);
 

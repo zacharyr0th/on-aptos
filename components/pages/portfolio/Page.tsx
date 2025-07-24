@@ -1,15 +1,7 @@
 'use client';
 
-import React, { useMemo, useState, useEffect } from 'react';
-import Image from 'next/image';
-import { GeistMono } from 'geist/font/mono';
 import { useWallet } from '@aptos-labs/wallet-adapter-react';
-import { useTheme } from 'next-themes';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
+import { GeistMono } from 'geist/font/mono';
 import {
   Briefcase,
   TrendingUp,
@@ -23,57 +15,76 @@ import {
   Github,
   Monitor,
 } from 'lucide-react';
-import { usePortfolio, usePortfolioData, usePortfolioHistory } from './hooks';
-import {
-  formatCurrency,
-  formatPercentage,
-  formatTokenAmount,
-} from '@/lib/utils/format';
+import Image from 'next/image';
+import { useTheme } from 'next-themes';
+import React, { useState, useEffect, useMemo } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
-import { getTokenLogoUrlWithFallback } from '@/lib/utils/token-logos';
-import { cn } from '@/lib/utils';
-import {
-  getProtocolLabel,
-  shouldShowProtocolBadge,
-  PROTOCOLS,
-} from '@/lib/protocol-registry';
-import { NFTAnalysis } from './NFTAnalysis';
-import { NFTTransferHistory } from './NFTTransferHistory';
-import {
-  TooltipProvider,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+
+import { ErrorBoundary } from '@/components/errors/ErrorBoundary';
+import { PageLayout } from '@/components/layout/PageLayout';
+import { defiProtocols } from '@/components/pages/defi/data';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
   DropdownMenuCheckboxItem,
 } from '@/components/ui/dropdown-menu';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  getProtocolLabel,
+  shouldShowProtocolBadge,
+  PROTOCOLS,
+} from '@/lib/protocol-registry';
+import { cn } from '@/lib/utils';
+import {
+  formatCurrency,
+  formatPercentage,
+  formatTokenAmount,
+} from '@/lib/utils/format';
+import { logger } from '@/lib/utils/logger';
+import { getTokenLogoUrlWithFallback } from '@/lib/utils/token-logos';
 
-// Import extracted components
+import { ProtocolDetailsDialog } from './Dialogs';
+import { EnhancedNFTGrid } from './EnhancedNFTGrid';
+import { usePortfolio, usePortfolioData, usePortfolioHistory } from './hooks';
+
+
 import { LandingSection } from './LandingSection';
 import { LoadingSkeleton } from './LoadingSkeleton';
-import { PortfolioHeader } from './PortfolioHeader';
-import { AssetsTable, DeFiPositionsTable } from './PortfolioTables';
-import { NFTGrid } from './NFTGrid';
-import { EnhancedNFTGrid } from './EnhancedNFTGrid';
+import { NFTAnalysis } from './NFTAnalysis';
 import { NFTDetailView } from './NFTDetailView';
-import { WalletSummary } from './WalletSummary';
-import { ProtocolDetailsDialog } from './Dialogs';
-import { DeFiSummaryView, NFTSummaryView } from './SummaryViews';
-import { NFT, SortField, SortDirection } from './types';
-import { isPhantomAsset, getProtocolLogo, cleanProtocolName } from './utils';
-import { defiProtocols } from '@/components/pages/defi/data';
-import { normalizeProtocolName } from '@/lib/aptos-constants';
-import { TransactionHistoryTable } from './TransactionHistoryTable';
-import { PerformanceSummary } from './PerformanceSummary';
-import { BloombergTerminal } from './BloombergTerminal';
-import { ErrorBoundary } from '@/components/errors/ErrorBoundary';
-import { PortfolioSidebar } from './PortfolioSidebar';
-import { PortfolioMainContent } from './PortfolioMainContent';
+import { NFTGrid } from './NFTGrid';
+import { NFTTransferHistory } from './NFTTransferHistory';
 
+import {
+  TooltipProvider,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+
+// Import extracted components
+import { PerformanceSummary } from './PerformanceSummary';
+import { PortfolioHeader } from './PortfolioHeader';
+import { PortfolioMainContent } from './PortfolioMainContent';
+import { PortfolioSidebar } from './PortfolioSidebar';
+import { AssetsTable, DeFiPositionsTable } from './PortfolioTables';
+import { DeFiSummaryView, NFTSummaryView } from './SummaryViews';
+import { TransactionHistoryTable } from './TransactionHistoryTable';
+import { NFT, SortField, SortDirection } from './types';
+import {
+  isPhantomAsset,
+  getProtocolLogo,
+  cleanProtocolName,
+  getDetailedProtocolInfo,
+} from './utils';
+import { WalletSummary } from './WalletSummary';
+
+import { normalizeProtocolName } from '@/lib/constants';
+
+import { BloombergTerminal } from './BloombergTerminal';
 
 export default function PortfolioPage() {
   const { connected, account, wallet } = useWallet();
@@ -82,12 +93,24 @@ export default function PortfolioPage() {
   // Normalize wallet address to ensure proper format
   const walletAddress = account?.address?.toString();
 
+  // For development/testing: use test wallet if no wallet connected
+  const testWalletAddress =
+    '0x6f4b2376e61b7493774d6a4a1c07797622be14f5af6e8c1cd0c11c4cddf7e522';
+
   // Ensure the address is in the correct format (66 characters, 0x prefixed)
   const normalizedAddress = walletAddress
     ? walletAddress.startsWith('0x')
       ? walletAddress
       : `0x${walletAddress}`
-    : undefined;
+    : testWalletAddress;
+
+  logger.debug('[PortfolioPage] Wallet info:', {
+    connected,
+    account: account?.address,
+    walletAddress,
+    normalizedAddress,
+    accountObject: account,
+  });
 
   // State for modals
   const [protocolDetailsOpen, setProtocolDetailsOpen] = useState(false);
@@ -106,6 +129,17 @@ export default function PortfolioPage() {
     refetch: refetchData,
   } = usePortfolioData(normalizedAddress, false);
 
+  // Debug logging for portfolio data
+  logger.debug('[PortfolioPage] Portfolio data:', {
+    assetsCount: assets?.length || 0,
+    nftsCount: nfts?.length || 0,
+    defiCount: defiPositions?.length || 0,
+    dataLoading,
+    dataError,
+    assets: assets?.slice(0, 3), // Show first 3 assets for debugging
+    nfts: nfts?.slice(0, 3), // Show first 3 NFTs for debugging
+  });
+
   const {
     data: history,
     isLoading: historyLoading,
@@ -117,8 +151,8 @@ export default function PortfolioPage() {
   } = usePortfolioHistory(normalizedAddress, { timeframe: selectedTimeframe });
 
   // Group DeFi positions
-  const groupedDeFiPositions = useMemo(() => {
-    if (!defiPositions) return null;
+  const groupedDeFiPositions = (() => {
+    if (!defiPositions || !Array.isArray(defiPositions)) return [];
 
     const grouped = defiPositions.reduce(
       (acc, position) => {
@@ -133,7 +167,10 @@ export default function PortfolioPage() {
         }
         acc[protocol].positions.push(position);
         acc[protocol].totalValue +=
-          position.totalValue || position.tvl_usd || 0;
+          position.totalValueUSD ||
+          position.totalValue ||
+          position.tvl_usd ||
+          0;
         acc[protocol].protocolTypes.add(
           position.protocolType || position.protocol_type
         );
@@ -143,7 +180,33 @@ export default function PortfolioPage() {
     );
 
     return Object.values(grouped);
-  }, [defiPositions]);
+  })();
+
+  // Filter assets to exclude CELL tokens, MKLP tokens, and dust
+  const FILTERED_ADDRESSES = useMemo(() => [
+    '0x2ebb2ccac5e027a87fa0e2e5f656a3a4238d6a48d93ec9b610d570fc0aa0df12', // CELL token
+    '0x5ae6789dd2fec1a9ec9cccfb3acaf12e93d432f0a3a42c92fe1a9d490b7bbc06::house_lp::MKLP', // MKLP tokens
+  ], []);
+
+  const visibleAssets = useMemo(() => {
+    if (!assets) return [];
+
+    return assets.filter(asset => {
+      // Always include APT regardless of value
+      if (asset.asset_type === '0x1::aptos_coin::AptosCoin') return true;
+
+      // Filter out hardcoded addresses (like CELL) and MKLP tokens
+      if (FILTERED_ADDRESSES.includes(asset.asset_type)) return false;
+      if (
+        asset.asset_type.includes('::house_lp::MKLP') ||
+        asset.asset_type.includes('::mklp::MKLP')
+      )
+        return false;
+
+      // Filter out assets under $0.1
+      return (asset.value || 0) >= 0.1;
+    });
+  }, [assets, FILTERED_ADDRESSES]);
 
   // Use consolidated state management hook
   const {
@@ -190,7 +253,7 @@ export default function PortfolioPage() {
     pieChartData,
     pieChartColors,
   } = usePortfolio(nfts || undefined, {
-    portfolioAssets: assets || undefined,
+    portfolioAssets: visibleAssets || undefined,
     defiPositions: defiPositions || undefined,
     groupedDeFiPositions: groupedDeFiPositions || undefined,
     history: history || undefined,
@@ -240,34 +303,9 @@ export default function PortfolioPage() {
   ]);
 
   // Show all NFTs (no pagination limit)
-  const currentNFTs = useMemo(() => {
-    return shuffledNFTs || [];
-  }, [shuffledNFTs]);
+  const currentNFTs = shuffledNFTs || [];
 
   const totalNFTPages = 1; // Always 1 page since we show all NFTs
-
-  // Filter assets - show only tokens with balance > $0.1
-  const filteredAssets = useMemo(() => {
-    if (!assets) return [];
-    return assets.filter(asset => {
-      // Filter by minimum balance value ($0.1)
-      if ((asset.value || 0) <= 0.1) return false;
-      if (
-        filterBySymbol.length > 0 &&
-        !filterBySymbol.includes(asset.metadata?.symbol || '')
-      )
-        return false;
-      if (
-        filterByProtocol.length > 0 &&
-        asset.protocolInfo &&
-        !filterByProtocol.includes(asset.protocolInfo.protocol)
-      )
-        return false;
-      return true;
-    });
-  }, [assets, filterBySymbol, filterByProtocol]);
-
-  const visibleAssets = filteredAssets;
 
   // Get detailed protocol info for selected DeFi position
   const detailedProtocolInfo = selectedDeFiPosition
@@ -277,9 +315,10 @@ export default function PortfolioPage() {
   // Loading state
   const isLoading = dataLoading || historyLoading;
 
-  if (!connected) {
-    return <LandingSection />;
-  }
+  // For testing: show portfolio even if not connected (using test wallet)
+  // if (!connected) {
+  //   return <LandingSection />;
+  // }
 
   if (isLoading) {
     return <LoadingSkeleton />;
@@ -291,7 +330,7 @@ export default function PortfolioPage() {
       <BloombergTerminal
         totalValue={portfolioMetrics?.totalPortfolioValue || 0}
         walletAddress={normalizedAddress}
-        assets={assets || []}
+        assets={visibleAssets}
         defiPositions={defiPositions || []}
         nfts={nfts || []}
         performanceData={history}
@@ -302,24 +341,22 @@ export default function PortfolioPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen">
-      {/* Background gradient - fixed to viewport */}
-      <div className="fixed inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/10 pointer-events-none z-0" />
-      
-      <div className="container-layout pt-6 relative">
-        <Header />
-      </div>
-      
-      <main className="container-layout py-6 flex-1 relative">
-        <PortfolioHeader
-          totalValue={portfolioMetrics?.totalPortfolioValue || 0}
-          walletAddress={normalizedAddress}
-          accountNames={accountNames || null}
-          terminalMode={terminalMode}
-          onTerminalToggle={() => setTerminalMode(!terminalMode)}
-        />
-        
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 mt-6">
+    <PageLayout>
+      <div className="space-y-12">
+        {/* Total Portfolio Value Header - Mobile Only */}
+        <div className="lg:hidden mb-6">
+          {/* Mobile: Total value at top */}
+          <div className="text-center">
+            <p className="text-sm text-muted-foreground mb-1">
+              Total Portfolio Value
+            </p>
+            <p className="text-3xl font-bold font-mono">
+              {formatCurrency(portfolioMetrics?.totalPortfolioValue || 0)}
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
           <PortfolioSidebar
             sidebarView={sidebarView}
             setSidebarView={setSidebarView}
@@ -331,6 +368,7 @@ export default function PortfolioPage() {
             dataLoading={dataLoading}
             selectedNFT={selectedNFT}
             setSelectedNFT={setSelectedNFT}
+            accountNames={accountNames}
             groupedDeFiPositions={groupedDeFiPositions || []}
             selectedDeFiPosition={selectedDeFiPosition}
             defiSortBy={defiSortBy}
@@ -338,30 +376,37 @@ export default function PortfolioPage() {
             getProtocolLogo={getProtocolLogo}
             handleDeFiPositionSelect={handleDeFiPositionSelect}
             handleDeFiSort={handleDeFiSort}
+            totalValue={portfolioMetrics?.totalPortfolioValue || 0}
+            walletAddress={normalizedAddress}
           />
 
           <PortfolioMainContent
             activeTab={activeTab}
-            setActiveTab={setActiveTab}
+            setActiveTab={(tab: string) =>
+              setActiveTab(tab as 'portfolio' | 'transactions')
+            }
             selectedAsset={selectedAsset}
+            handleAssetSelect={handleAssetSelect}
             selectedDeFiPosition={selectedDeFiPosition}
+            handleDeFiPositionSelect={handleDeFiPositionSelect}
             selectedNFT={selectedNFT}
+            setSelectedNFT={setSelectedNFT}
             sidebarView={sidebarView}
             nfts={nfts || []}
             currentNFTs={currentNFTs}
-            normalizedAddress={normalizedAddress}
-            assets={assets || []}
+            normalizedAddress={normalizedAddress || ''}
+            assets={visibleAssets}
             groupedDeFiPositions={groupedDeFiPositions || []}
             portfolioMetrics={portfolioMetrics}
             dataLoading={dataLoading}
             pieChartData={pieChartData}
             pieChartColors={pieChartColors}
+            accountNames={accountNames}
             setHoveredCollection={setHoveredCollection}
             setProtocolDetailsOpen={setProtocolDetailsOpen}
           />
         </div>
-      </main>
-
+      </div>
       {/* Dialogs */}
       {selectedDeFiPosition && (
         <ProtocolDetailsDialog
@@ -372,8 +417,6 @@ export default function PortfolioPage() {
           defiPosition={selectedDeFiPosition}
         />
       )}
-
-      <Footer className="relative z-10" />
-    </div>
+    </PageLayout>
   );
 }

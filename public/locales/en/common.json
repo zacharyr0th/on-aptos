@@ -145,17 +145,17 @@
     },
     "sections": {
       "portfolio": "Portfolio",
-      "portfolio_description": "Monitor your Aptos assets, track performance, and analyze your DeFi positions",
+      "portfolio_description": "Monitor your Aptos assets",
       "stablecoins": "Stablecoins",
-      "stablecoins_description": "Track stablecoin supplies and market data on Aptos",
+      "stablecoins_description": "Track stablecoin supplies",
       "bitcoin_assets": "Bitcoin Assets",
-      "bitcoin_assets_description": "Bitcoin-backed tokens and synthetic BTC assets on Aptos",
+      "bitcoin_assets_description": "Track Bitcoin assets",
       "liquid_staking": "Liquid Staking",
-      "liquid_staking_description": "Liquid staking tokens and APT staking derivatives",
-      "rwas": "RWAs",
-      "rwas_description": "Real World Assets on Aptos",
+      "liquid_staking_description": "Track LST derivatives",
+      "rwas": "Real World Assets",
+      "rwas_description": "Track RWAs on Aptos",
       "defi_protocols": "DeFi Protocols",
-      "defi_protocols_description": "Decentralized finance protocols and analytics"
+      "defi_protocols_description": "Track DeFi on Aptos"
     }
   },
   "page_titles": {

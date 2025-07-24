@@ -1,17 +1,18 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import { ImageIcon, ChevronDown, ChevronUp } from 'lucide-react';
 import Image from 'next/image';
-import { Skeleton } from '@/components/ui/skeleton';
+import React, { useState, useMemo } from 'react';
+
 import { Button } from '@/components/ui/button';
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
-import { ImageIcon, ChevronDown, ChevronUp } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
-import { logger } from '@/lib/utils/logger';
+
 import { NFT } from './types';
 
 interface NFTGridProps {
@@ -62,7 +63,7 @@ export const NFTGrid = ({
 
   const renderNFTCard = (nft: NFT, index: number) => {
     if (!nft || !nft.token_data_id) {
-      logger.warn('Invalid NFT data:', nft);
+      console.warn('Invalid NFT data:', nft);
       return null;
     }
 
@@ -117,7 +118,7 @@ export const NFTGrid = ({
                 </div>
               );
             } catch (error) {
-              logger.warn('Invalid NFT image URL:', imageUrl, error);
+              console.warn('Invalid NFT image URL:', imageUrl, error);
               return (
                 <div className="relative w-full h-full">
                   <Image
@@ -137,17 +138,6 @@ export const NFTGrid = ({
             </div>
           )}
         </div>
-        <div className="mt-2">
-          <p className="text-sm font-medium truncate" title={nft.token_name}>
-            {nft.token_name}
-          </p>
-          <p
-            className="text-xs text-muted-foreground truncate max-w-[150px]"
-            title={nft.collection_name}
-          >
-            {nft.collection_name}
-          </p>
-        </div>
       </div>
     );
   };
@@ -155,7 +145,7 @@ export const NFTGrid = ({
   return (
     <div className="space-y-4 nft-grid-container">
       {nftsLoading ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="space-y-2">
               <Skeleton className="aspect-square rounded-xl" />
@@ -166,7 +156,7 @@ export const NFTGrid = ({
         </div>
       ) : nfts && nfts.length > 0 ? (
         viewMode === 'grid' ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {nfts.map((nft, index) => renderNFTCard(nft, index))}
           </div>
         ) : (
@@ -198,7 +188,7 @@ export const NFTGrid = ({
                   </Button>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-3">
                     {collectionNFTs.map((nft, index) =>
                       renderNFTCard(nft, index)
                     )}

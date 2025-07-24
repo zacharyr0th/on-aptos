@@ -1,14 +1,16 @@
 'use client';
 
-import { Copy, Monitor } from 'lucide-react';
+import { Copy, ChevronDown } from 'lucide-react';
+import Image from 'next/image';
+
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-  TooltipProvider,
-} from '@/components/ui/tooltip';
-import { Button } from '@/components/ui/button';
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { formatCurrency } from '@/lib/utils/format';
+
 import { copyToClipboard } from './utils';
 
 interface PortfolioHeaderProps {
@@ -27,82 +29,66 @@ export const PortfolioHeader = ({
   onTerminalToggle,
 }: PortfolioHeaderProps) => {
   return (
-    <div className="flex items-center bg-card border rounded-lg py-3 px-4 mb-6">
-      <div className="flex-grow">
-        <h2 className="text-base sm:text-lg font-medium text-card-foreground">
-          Portfolio Value
-        </h2>
+    <div className="flex items-center py-4 px-4 mb-6">
+      <div className="flex items-center gap-6">
         <p className="text-xl sm:text-2xl font-bold text-card-foreground font-mono">
           {formatCurrency(totalValue)}
-          {walletAddress && (
-            <span className="text-base font-normal text-muted-foreground ml-2 font-mono">
-              <button
-                onClick={() =>
-                  copyToClipboard(walletAddress, 'Account address')
-                }
-                className="hover:text-muted-foreground transition-all duration-200 flex items-center gap-1 group relative overflow-hidden"
-              >
-                <span className="font-mono transition-all duration-200 group-hover:opacity-0 group-hover:absolute">
-                  {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
-                </span>
-                <span className="font-mono transition-all duration-200 opacity-0 group-hover:opacity-100 absolute group-hover:relative whitespace-nowrap">
-                  {walletAddress}
-                </span>
-                <Copy className="h-3 w-3 sm:h-4 sm:w-4 ml-1 flex-shrink-0" />
-              </button>
-              {accountNames && accountNames.length > 0 && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div className="flex items-center gap-1 px-2 py-1 bg-primary/10 rounded text-xs text-primary ml-1">
-                        <span>{accountNames.length} ANS</span>
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <div className="max-w-xs">
-                        <p className="font-medium mb-1">
-                          ANS Names ({accountNames.length}):
-                        </p>
-                        <div className="space-y-1">
-                          {accountNames.slice(0, 5).map((name, index) => (
-                            <p key={index} className="text-xs font-mono">
-                              {name}
-                            </p>
-                          ))}
-                          {accountNames.length > 5 && (
-                            <p className="text-xs text-muted-foreground">
-                              ...and {accountNames.length - 5} more
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
-            </span>
-          )}
         </p>
-      </div>
-
-      {/* Bloomberg Terminal Toggle */}
-      {onTerminalToggle && (
-        <div className="flex-shrink-0 ml-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onTerminalToggle}
-            className={`text-xs h-8 px-3 font-mono transition-colors ${
-              terminalMode
-                ? 'bg-muted text-muted-foreground border border-muted-foreground/30'
-                : 'text-muted-foreground/70 hover:text-muted-foreground hover:bg-muted/50'
-            }`}
+        {walletAddress && (
+          <button
+            onClick={() => copyToClipboard(walletAddress, 'Account address')}
+            className="text-base sm:text-lg font-medium text-muted-foreground font-mono hover:text-muted-foreground/80 transition-all duration-200 inline-flex items-center gap-1 group relative overflow-hidden"
           >
-            <Monitor className="h-3 w-3 mr-1.5" />
-            Bloomberg Theme
-          </Button>
-        </div>
-      )}
+            <span className="font-mono transition-all duration-200 group-hover:opacity-0 group-hover:absolute">
+              {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
+            </span>
+            <span className="font-mono transition-all duration-200 opacity-0 group-hover:opacity-100 absolute group-hover:relative whitespace-nowrap">
+              {walletAddress}
+            </span>
+            <Copy className="h-3 w-3 sm:h-4 sm:w-4 ml-1 flex-shrink-0" />
+          </button>
+        )}
+        {accountNames && accountNames.length > 0 && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="inline-flex items-center gap-1 px-3 py-1.5 bg-primary/10 hover:bg-primary/20 rounded text-xs text-primary transition-colors">
+                <span>{accountNames.length} ANS</span>
+                <ChevronDown className="h-3 w-3" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-64">
+              <div className="p-2">
+                <p className="font-medium mb-2 text-sm">
+                  ANS Names ({accountNames.length})
+                </p>
+                {accountNames.map((name, index) => (
+                  <DropdownMenuItem
+                    key={index}
+                    className="text-xs font-mono cursor-pointer"
+                    onClick={() => copyToClipboard(name, 'ANS name')}
+                  >
+                    {name}
+                  </DropdownMenuItem>
+                ))}
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+        <Image
+          src="/icons/apt.png"
+          alt="APT token"
+          width={16}
+          height={16}
+          className="w-5 h-5 opacity-50 flex-shrink-0 rounded-full dark:invert"
+          priority={false}
+          quality={90}
+          unoptimized={false}
+          onError={e => {
+            const img = e.target as HTMLImageElement;
+            img.src = '/placeholder.jpg';
+          }}
+        />
+      </div>
     </div>
   );
 };

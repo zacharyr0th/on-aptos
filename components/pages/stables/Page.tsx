@@ -1,18 +1,22 @@
 'use client';
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { DollarSign, AlertTriangle } from 'lucide-react';
 import { GeistMono } from 'geist/font/mono';
+import { AlertTriangle } from 'lucide-react';
+import Image from 'next/image';
+import React, { useState, useEffect, useMemo, useCallback, memo } from 'react';
+
+import { ErrorBoundary } from '@/components/errors/ErrorBoundary';
+import { Footer } from '@/components/layout/Footer';
+import { Header } from '@/components/layout/Header';
+import {
+  MarketShareChart,
+  TOKEN_COLORS,
+} from '@/components/pages/stables/Chart';
+import { TokenDialog } from '@/components/pages/stables/Dialog';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Badge } from '@/components/ui/badge';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
 import {
   Table,
   TableBody,
@@ -21,29 +25,24 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {
-  MarketShareChart,
-  TOKEN_COLORS,
-} from '@/components/pages/stables/Chart';
-import { TokenDialog } from '@/components/pages/stables/Dialog';
-import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
-import { ErrorBoundary } from '@/components/errors/ErrorBoundary';
-import { RootErrorBoundary } from '@/components/errors/RootErrorBoundary';
-import { useCMCData } from '@/hooks/useMarketPrice';
-import Image from 'next/image';
+import { usePageTranslation } from '@/hooks/useTranslation';
 import {
   STABLECOIN_METADATA,
   Token,
   DisplayToken,
   SupplyData,
 } from '@/lib/config';
-import { usePageTranslation } from '@/hooks/useTranslation';
-import { logger } from '@/lib/utils/logger';
-// Simplified for better compatibility
+import {
+  formatCurrency,
+  formatAmount,
+  formatAmountFull,
+  convertRawTokenAmount,
+  formatPercentage,
+} from '@/lib/utils';
 
 const TOKEN_METADATA = STABLECOIN_METADATA;
-const TokenCard = React.memo(function TokenCard({
+
+const TokenCard = memo(function TokenCard({
   token,
   totalSupply,
   susdePrice,
@@ -147,7 +146,7 @@ const TokenCard = React.memo(function TokenCard({
     const formatSingle = (s: string, symbol: string, isRaw: boolean = true) => {
       // Debug log for MOD to understand the issue
       if (symbol === 'MOD') {
-        logger.debug('MOD formatSingle:', {
+        console.log('MOD formatSingle:', {
           input: s,
           isRaw,
           symbol,
@@ -165,7 +164,7 @@ const TokenCard = React.memo(function TokenCard({
         if (symbol === 'mUSD' || symbol === 'MOD' || symbol === 'USDA') {
           dollars = Number(supplyVal) / 100_000_000; // 8 decimals
           if (symbol === 'MOD') {
-            logger.debug('MOD calculation:', {
+            console.log('MOD calculation:', {
               supplyVal: supplyVal.toString(),
               divisor: 100_000_000,
               result: dollars,
@@ -181,7 +180,7 @@ const TokenCard = React.memo(function TokenCard({
 
       // Debug log the calculated dollars for MOD
       if (symbol === 'MOD') {
-        logger.debug('MOD final dollars:', dollars);
+        console.log('MOD final dollars:', dollars);
       }
 
       // Apply sUSDe price multiplier if available and token is sUSDe
@@ -191,7 +190,7 @@ const TokenCard = React.memo(function TokenCard({
 
       // Final debug log for MOD before formatting
       if (symbol === 'MOD') {
-        logger.debug('MOD final formatting:', {
+        console.log('MOD final formatting:', {
           dollars,
           formatted:
             dollars >= 1_000
@@ -236,7 +235,7 @@ const TokenCard = React.memo(function TokenCard({
 
       // Debug log for MOD
       if (token.symbol === 'MOD') {
-        logger.debug('MOD calcFormattedDisplay:', {
+        console.log('MOD calcFormattedDisplay:', {
           token,
           supply_raw: token.supply_raw,
           supply: token.supply,
@@ -275,106 +274,72 @@ const TokenCard = React.memo(function TokenCard({
 
   return (
     <>
-      <div
-        className="bg-card border rounded-lg overflow-hidden group cursor-pointer hover:border-primary/50 transition-colors relative"
-        onClick={handleCardClick}
-      >
-        <div className="h-1" style={{ backgroundColor: tokenColor }} />
-        <div className="absolute top-2 right-2 flex items-center gap-1">
-          {bridgeInfo.icon && (
-            <div className="relative w-6 h-6 rounded-full overflow-hidden bg-white dark:bg-gray-800 p-0.5 shadow-sm">
+      <div className="group cursor-pointer" onClick={handleCardClick}>
+        <div className="flex items-center gap-2 mb-2">
+          {'isCombined' in token && token.isCombined ? (
+            <div className="flex items-center">
+              {[...token.components]
+                .sort((a, b) => (BigInt(b.supply) > BigInt(a.supply) ? 1 : -1))
+                .map((component, index) => (
+                  <React.Fragment key={component.symbol}>
+                    <div className="flex items-center">
+                      <div className="w-5 h-5 relative flex-shrink-0 mr-1">
+                        <Image
+                          src={
+                            TOKEN_METADATA[component.symbol]?.thumbnail ||
+                            '/placeholder.jpg'
+                          }
+                          alt={`${component.symbol} icon`}
+                          width={20}
+                          height={20}
+                          className="object-contain rounded-full"
+                          onError={e => {
+                            const img = e.target as HTMLImageElement;
+                            img.src = '/placeholder.jpg';
+                          }}
+                        />
+                      </div>
+                    </div>
+                    {index === 0 && (
+                      <span className="mx-1 text-muted-foreground">/</span>
+                    )}
+                  </React.Fragment>
+                ))}
+            </div>
+          ) : (
+            <div className="w-5 h-5 relative">
               <Image
-                src={bridgeInfo.icon}
-                alt={bridgeInfo.type || 'Bridge'}
+                src={metadata?.thumbnail || '/placeholder.jpg'}
+                alt={`${cardSymbol} icon`}
                 width={20}
                 height={20}
-                className="object-contain w-full h-full rounded-full"
+                className="object-contain rounded-full"
+                onError={e => {
+                  const img = e.target as HTMLImageElement;
+                  img.src = '/placeholder.jpg';
+                }}
               />
             </div>
           )}
+          <h3 className="text-base font-semibold">{cardSymbol}</h3>
         </div>
-        <div className="flex justify-between items-center p-3 pb-0">
-          <div className="flex items-center gap-2.5">
-            {'isCombined' in token && token.isCombined ? (
-              <div className="flex items-center">
-                {[...token.components]
-                  .sort((a, b) =>
-                    BigInt(b.supply) > BigInt(a.supply) ? 1 : -1
-                  )
-                  .map((component, index) => (
-                    <React.Fragment key={component.symbol}>
-                      <div className="flex items-center">
-                        <div className="w-6 h-6 relative flex-shrink-0 mr-1">
-                          <Image
-                            src={
-                              TOKEN_METADATA[component.symbol]?.thumbnail ||
-                              '/placeholder.jpg'
-                            }
-                            alt={`${component.symbol} icon`}
-                            width={24}
-                            height={24}
-                            className="object-contain w-full h-full rounded-full"
-                            priority
-                            onError={e => {
-                              const img = e.target as HTMLImageElement;
-                              img.src = '/placeholder.jpg';
-                            }}
-                          />
-                        </div>
-                        <span className="text-sm font-semibold">
-                          {component.symbol}
-                        </span>
-                      </div>
-                      {index === 0 && (
-                        <span className="mx-1 text-muted-foreground">/</span>
-                      )}
-                    </React.Fragment>
-                  ))}
-              </div>
-            ) : (
-              <>
-                <div className="w-6 h-6 relative flex-shrink-0">
-                  <Image
-                    src={metadata?.thumbnail || '/placeholder.jpg'}
-                    alt={`${cardSymbol} icon`}
-                    width={24}
-                    height={24}
-                    className="object-contain w-full h-full rounded-full"
-                    priority
-                    onError={e => {
-                      const img = e.target as HTMLImageElement;
-                      img.src = '/placeholder.jpg';
-                    }}
-                  />
-                </div>
-                <h3 className="text-lg font-semibold text-card-foreground">
-                  {cardSymbol}
-                </h3>
-              </>
-            )}
-          </div>
+        <p className="text-lg font-bold font-mono mb-0.5">
+          {formattedDisplaySupply}
+        </p>
+        <div className="flex items-baseline justify-between mb-1">
+          <span className="text-xs text-muted-foreground">
+            {t('stables:stats.market_share')}
+          </span>
+          <span className="text-xs text-muted-foreground font-mono">
+            {marketSharePercent}%
+          </span>
         </div>
-        <div className="px-3 pt-1 pb-0">
-          <p className="text-xl font-bold text-card-foreground font-mono">
-            {formattedDisplaySupply}
-          </p>
-        </div>
-        <div className="p-3 pt-1.5">
-          <div className="flex justify-between text-xs mb-1.5">
-            <span className="text-muted-foreground">
-              {t('stables:stats.market_share')}
-            </span>
-            <span className="font-medium text-muted-foreground font-mono">
-              {marketSharePercent}%
-            </span>
-          </div>
-          <Progress
-            className="h-1"
-            value={Number(marketSharePercent)}
-            trackColor={`${tokenColor}20`}
-            indicatorColor={tokenColor}
-          />
-        </div>
+        <Progress
+          className="h-1"
+          value={Number(marketSharePercent)}
+          trackColor={`${tokenColor}20`}
+          indicatorColor={tokenColor}
+        />
       </div>
 
       {metadata && (
@@ -400,58 +365,39 @@ const TokenCard = React.memo(function TokenCard({
   );
 });
 
-// Loading state component
-function LoadingState(): React.ReactElement {
+const LoadingState = memo(function LoadingState(): React.ReactElement {
   return (
     <div className="space-y-6">
-      {/* Skeleton for total supply card */}
-      <Card className="border rounded-lg p-4 mb-6">
-        <div className="flex items-center">
-          <div className="flex-grow">
-            <Skeleton className="h-6 w-32 mb-2" />
-            <Skeleton className="h-8 w-60" />
-          </div>
-          <div className="flex flex-col items-end">
-            <Skeleton className="h-10 w-10 rounded mb-1" />
-            <Skeleton className="h-4 w-16" />
-          </div>
-        </div>
-      </Card>
-
-      {/* Grid skeleton */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Token cards skeleton */}
-        <div className="lg:col-span-1 space-y-4">
-          {[1, 2, 3].map(i => (
-            <div key={i} className="bg-card border rounded-lg overflow-hidden">
-              <Skeleton className="h-1 w-full" />
-              <div className="p-3">
-                <div className="flex items-center gap-2 mb-2">
-                  <Skeleton className="h-6 w-6 rounded-full" />
-                  <Skeleton className="h-6 w-16" />
-                </div>
-                <Skeleton className="h-7 w-32 mb-1" />
-                <div className="flex justify-between text-xs mb-1.5">
-                  <Skeleton className="h-3 w-20" />
-                  <Skeleton className="h-3 w-8" />
-                </div>
-                <Skeleton className="h-1 w-full" />
+        <div className="md:col-span-1 space-y-6">
+          {[1, 2, 3, 4].map(i => (
+            <div key={i}>
+              <div className="flex items-center gap-2 mb-2">
+                <Skeleton className="h-5 w-5 rounded-full" />
+                <Skeleton className="h-5 w-16" />
               </div>
+              <Skeleton className="h-6 w-32 mb-1" />
+              <Skeleton className="h-3 w-24 mb-2" />
+              <div className="flex justify-between mb-1">
+                <Skeleton className="h-3 w-20" />
+                <Skeleton className="h-3 w-8" />
+              </div>
+              <Skeleton className="h-1 w-full" />
             </div>
           ))}
         </div>
 
         {/* Chart skeleton */}
-        <div className="lg:col-span-3 bg-card border rounded-lg p-6">
-          <Skeleton className="h-[250px] sm:h-[300px] w-full" />
+        <div className="md:col-span-1 lg:col-span-3 min-h-[250px] sm:min-h-[300px] relative">
+          <Skeleton className="absolute inset-0" />
         </div>
       </div>
     </div>
   );
-}
+});
 
-// Error state component
-function ErrorState({
+const ErrorState = memo(function ErrorState({
   error,
   onRetry,
   t,
@@ -469,7 +415,7 @@ function ErrorState({
   const initialSeconds = secondsMatch ? parseInt(secondsMatch[1], 10) : 0;
   const [countdown, setCountdown] = useState(initialSeconds);
 
-  useEffect(() => {
+  React.useEffect(() => {
     // Only start countdown if we have seconds to count down from
     if (initialSeconds <= 0) return;
 
@@ -494,7 +440,7 @@ function ErrorState({
         <AlertTriangle className="h-10 w-10 mr-4 flex-shrink-0 text-destructive" />
         <div>
           <h3 className="font-bold text-lg mb-1 text-card-foreground">
-            {t('stables:error.error_loading_stablecoin_data')}
+            {t('stables:loading.error_title')}
           </h3>
           {status && (
             <p className="text-muted-foreground text-sm mb-1">
@@ -541,7 +487,7 @@ function ErrorState({
       </CardContent>
     </Card>
   );
-}
+});
 
 export default function StablesPage(): React.ReactElement {
   const { t } = usePageTranslation('stables');
@@ -570,8 +516,8 @@ export default function StablesPage(): React.ReactElement {
       }
 
       const data = await response.json();
-      logger.debug('[Stables Page] API Response:', data);
-      logger.debug('[Stables Page] API Response data.data:', data.data);
+      console.log('[Stables Page] API Response:', data);
+      console.log('[Stables Page] API Response data.data:', data.data);
       setStablesData(data);
     } catch (error) {
       setStablesError(
@@ -591,8 +537,8 @@ export default function StablesPage(): React.ReactElement {
     return () => clearInterval(interval);
   }, [fetchStablesData, forceRefresh]);
 
-  // Get sUSDe price data from CMC
-  const { data: cmcData } = useCMCData();
+  // sUSDe price - default to 1 since CMC API is removed
+  const susdePrice = 1;
 
   // Extract the actual data from API response
   const data: any = stablesData?.data || null;
@@ -619,25 +565,61 @@ export default function StablesPage(): React.ReactElement {
     );
   };
 
+  // Helper function to get token type description
+  const getTokenType = (symbol: string): string => {
+    // Check for native stablecoins
+    if (symbol === 'USDT' || symbol === 'USDC' || symbol === 'USDA') {
+      return 'Native Stablecoin';
+    }
+
+    // Check for algorithmic stablecoins
+    if (symbol === 'MOD' || symbol === 'mUSD') {
+      return 'Algorithmic Stablecoin';
+    }
+
+    // Check for bridged tokens
+    if (
+      symbol.includes('.lz') ||
+      symbol === 'sUSDe' ||
+      symbol === 'USDe' ||
+      symbol === 'sUSDe/USDe'
+    ) {
+      return 'Bridged via LayerZero';
+    }
+
+    if (symbol.includes('.wh')) {
+      return 'Bridged via Wormhole';
+    }
+
+    if (symbol.includes('.ce')) {
+      return 'Bridged via Celer';
+    }
+
+    // Default fallback
+    return 'Stablecoin';
+  };
+
   const {
     formattedTotalSupply,
     processedSupplies,
+    processedSuppliesForTable,
     adjustedTotal,
     suppliesDataMap,
   } = useMemo(() => {
-    logger.debug('[Stables Page] useMemo data:', data);
-    logger.debug('[Stables Page] useMemo stablesData:', stablesData);
+    console.log('[Stables Page] useMemo data:', data);
+    console.log('[Stables Page] useMemo stablesData:', stablesData);
     if (!data || !data.supplies) {
-      logger.debug('[Stables Page] No data or supplies found');
+      console.log('[Stables Page] No data or supplies found');
       return {
         formattedTotalSupply: '',
         processedSupplies: [],
+        processedSuppliesForTable: [],
         adjustedTotal: '0',
         suppliesDataMap: {},
       };
     }
 
-    const susdePrice = cmcData?.price || 1; // Default to 1 if price not available
+    // Use the susdePrice variable defined above
     const supplies = data.supplies;
 
     // Create supplies data map for the dialog
@@ -678,7 +660,7 @@ export default function StablesPage(): React.ReactElement {
       }).format(dollars);
     };
 
-    const processSupplies = () => {
+    const processSuppliesForCards = () => {
       const usdeToken = supplies.find((t: any) => t.symbol === 'USDe');
       const susdeToken = supplies.find((t: any) => t.symbol === 'sUSDe');
       const otherTokens = supplies.filter(
@@ -723,6 +705,21 @@ export default function StablesPage(): React.ReactElement {
         });
     };
 
+    const processSuppliesForTable = () => {
+      // Include ALL tokens in the table - don't filter out any
+      const displayTokens: DisplayToken[] = [...supplies];
+
+      // Sort all tokens by dollar supply value and filter out zero supply
+      return displayTokens
+        .filter(token => token.supply !== '0')
+        .sort((a, b) => {
+          // Use the supply field which contains the dollar value
+          const supplyA = BigInt(a.supply || '0');
+          const supplyB = BigInt(b.supply || '0');
+          return supplyB > supplyA ? 1 : supplyB < supplyA ? -1 : 0;
+        });
+    };
+
     // Calculate raw total for TokenCard market share calculations
     // Need to normalize to 6 decimals for tokens with 8 decimals
     let rawSupplyTotal = BigInt(0);
@@ -742,16 +739,17 @@ export default function StablesPage(): React.ReactElement {
 
     return {
       formattedTotalSupply: formatTotal(),
-      processedSupplies: processSupplies(),
+      processedSupplies: processSuppliesForCards(),
+      processedSuppliesForTable: processSuppliesForTable(),
       adjustedTotal: rawSupplyTotal.toString(),
       suppliesDataMap: suppliesMap,
     };
-  }, [data, cmcData, stablesData]);
+  }, [data, stablesData]);
 
   return (
-    <RootErrorBoundary>
+    <ErrorBoundary>
       <div
-        className={`min-h-screen flex flex-col bg-background dark:bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjMDAwIj48L3JlY3Q+CjxwYXRoIGQ9Ik0wIDVMNSAwWk02IDRMNCA2Wk0tMSAxTDEgLTFaIiBzdHJva2U9IiMyMjIiIHN0cm9rZS13aWR0aD0iMC41Ij48L3BhdGg+Cjwvc3ZnPg==')] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjZmZmIj48L3JlY3Q+CjxwYXRoIGQ9Im0wIDVMNSAwWk02IDRMNCA2Wk0tMSAxTDEgLTFaIiBzdHJva2U9IiNlZWUiIHN0cm9rZS13aWR0aD0iMC41Ij48L3BhdGg+Cjwvc3ZnPg==')] relative ${GeistMono.className}`}
+        className={`min-h-screen flex flex-col relative ${GeistMono.className}`}
       >
         {/* Background gradient - fixed to viewport */}
         <div className="fixed inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/10 pointer-events-none" />
@@ -764,50 +762,51 @@ export default function StablesPage(): React.ReactElement {
           <Header />
         </div>
 
-        <main className="container-layout py-6 flex-1 relative">
+        <main className="container-layout py-3 flex-1 relative">
           {loading ? (
             <LoadingState />
           ) : error ? (
             <ErrorState error={error} onRetry={fetchSupplyData} t={t} />
           ) : data ? (
             <>
-              <div className="flex items-center bg-card border rounded-lg py-3 px-4 mb-6">
-                <div className="flex-grow">
-                  <h2 className="text-base sm:text-lg font-medium text-card-foreground">
-                    {t('stables:stats.total_stablecoin_value')}
+              {/* Mobile: Show total supply at top */}
+              <div className="md:hidden mb-6">
+                <div className="flex items-center justify-between mb-1">
+                  <h2 className="text-sm text-muted-foreground">
+                    Total Supply
                   </h2>
-                  <p className="text-xl sm:text-2xl font-bold text-card-foreground font-mono">
-                    {formattedTotalSupply}
-                  </p>
                 </div>
-                <div className="p-2 rounded-lg bg-secondary">
-                  <DollarSign className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
-                </div>
+                <p className="text-xl font-bold font-mono">
+                  {formattedTotalSupply}
+                </p>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                <div className="lg:col-span-1 space-y-4">
-                  {/* Show first 3 cards */}
-                  {processedSupplies.slice(0, 3).map(token => (
-                    <TokenCard
-                      key={token.symbol}
-                      token={token}
-                      totalSupply={adjustedTotal}
-                      susdePrice={cmcData?.price}
-                      suppliesData={suppliesDataMap}
-                      t={t}
-                    />
-                  ))}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                {/* Mobile: Show cards in 2 columns, Desktop: Show in 1 column on left */}
+                <div className="grid grid-cols-2 gap-4 md:grid-cols-1 md:col-span-1 md:space-y-4">
+                  {processedSupplies
+                    ?.slice(0, 4)
+                    .map((token: any) => (
+                      <TokenCard
+                        key={token.symbol}
+                        token={token}
+                        totalSupply={adjustedTotal}
+                        susdePrice={susdePrice}
+                        suppliesData={suppliesDataMap}
+                        t={t}
+                      />
+                    )) || []}
                 </div>
 
-                <div className="lg:col-span-3 bg-card border rounded-lg overflow-hidden min-h-[250px] sm:min-h-[300px]">
+                {/* Chart takes full width on mobile */}
+                <div className="col-span-2 md:col-span-1 lg:col-span-3 min-h-[250px] sm:min-h-[300px] relative">
                   <ErrorBoundary
                     fallback={
                       <div className="flex items-center justify-center h-full">
                         <div className="text-center p-4">
                           <AlertTriangle className="h-8 w-8 mx-auto mb-2 text-destructive" />
                           <p className="text-sm text-muted-foreground">
-                            {t('stables:error.failed_to_load_chart')}
+                            {t('stables:loading.chart_error')}
                           </p>
                         </div>
                       </div>
@@ -817,22 +816,22 @@ export default function StablesPage(): React.ReactElement {
                       data={processedSupplies}
                       totalSupply={adjustedTotal}
                       tokenMetadata={TOKEN_METADATA}
-                      susdePrice={cmcData?.price}
+                      susdePrice={susdePrice}
                     />
                   </ErrorBoundary>
                 </div>
               </div>
 
-              {/* Remaining cards below */}
-              {processedSupplies.length > 3 && (
-                <div className="mt-6">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {processedSupplies.slice(3).map(token => (
+              {/* Remaining cards below the chart */}
+              {processedSupplies && processedSupplies.length > 4 && (
+                <div className="mb-6">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {processedSupplies.slice(4).map((token: any) => (
                       <TokenCard
                         key={token.symbol}
                         token={token}
                         totalSupply={adjustedTotal}
-                        susdePrice={cmcData?.price}
+                        susdePrice={susdePrice}
                         suppliesData={suppliesDataMap}
                         t={t}
                       />
@@ -849,110 +848,73 @@ export default function StablesPage(): React.ReactElement {
                     <TableHeader>
                       <TableRow>
                         <TableHead className="min-w-[120px] sm:min-w-[150px]">
-                          {t('table.token', 'Token')}
+                          Token
+                        </TableHead>
+                        <TableHead className="min-w-[140px] sm:min-w-[160px]">
+                          Type
                         </TableHead>
                         <TableHead className="min-w-[100px] sm:min-w-[120px]">
-                          {t('table.supply', 'Supply')}
+                          Supply
                         </TableHead>
-                        <TableHead className="min-w-[50px] sm:min-w-[60px]">
-                          {t('table.market_share', '%')}
-                        </TableHead>
-                        <TableHead className="min-w-[100px] sm:min-w-[140px]">
-                          {t('table.type', 'Type')}
-                        </TableHead>
-                        <TableHead className="min-w-[80px] sm:min-w-[100px]">
-                          {t('table.issuer', 'Issuer')}
+                        <TableHead className="min-w-[100px] sm:min-w-[120px]">
+                          %
                         </TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {processedSupplies.map(token => {
-                        const metadata =
-                          TOKEN_METADATA[token.symbol] ||
-                          (token.symbol === 'sUSDe/USDe'
-                            ? TOKEN_METADATA['sUSDe']
-                            : null);
-                        // Calculate total supply in dollars for percentage calculation
-                        const totalDollarSupply = processedSupplies.reduce(
-                          (sum, t) => sum + Number(t.supply),
-                          0
-                        );
+                      {processedSuppliesForTable?.map((token: any) => {
+                        const metadata = TOKEN_METADATA[token.symbol];
+                        const totalDollarSupply =
+                          processedSuppliesForTable.reduce(
+                            (sum: number, t: any) => sum + Number(t.supply),
+                            0
+                          );
                         const marketSharePercent = (
                           (Number(token.supply) / totalDollarSupply) *
                           100
                         ).toFixed(2);
-                        const tokenColor =
-                          'isCombined' in token && token.isCombined
-                            ? TOKEN_COLORS['USDe'] || TOKEN_COLORS.default
-                            : TOKEN_COLORS[token.symbol] ||
-                              TOKEN_COLORS.default;
 
                         return (
                           <TableRow key={token.symbol}>
                             <TableCell className="whitespace-nowrap">
                               <div className="flex items-center gap-2">
-                                {'isCombined' in token && token.isCombined ? (
-                                  <div className="flex items-center gap-1">
-                                    <Image
-                                      src={
-                                        TOKEN_METADATA['sUSDe']?.thumbnail ||
-                                        '/placeholder.jpg'
-                                      }
-                                      alt="sUSDe"
-                                      width={20}
-                                      height={20}
-                                      className="rounded-full flex-shrink-0"
-                                    />
-                                    <Image
-                                      src={
-                                        TOKEN_METADATA['USDe']?.thumbnail ||
-                                        '/placeholder.jpg'
-                                      }
-                                      alt="USDe"
-                                      width={20}
-                                      height={20}
-                                      className="rounded-full -ml-2 flex-shrink-0"
-                                    />
-                                    <span className="font-medium ml-1">
-                                      {token.symbol}
-                                    </span>
-                                  </div>
-                                ) : (
-                                  <>
-                                    <Image
-                                      src={
-                                        metadata?.thumbnail ||
-                                        '/placeholder.jpg'
-                                      }
-                                      alt={token.symbol}
-                                      width={20}
-                                      height={20}
-                                      className="rounded-full flex-shrink-0"
-                                    />
-                                    <span className="font-medium">
-                                      {token.symbol}
-                                    </span>
-                                  </>
-                                )}
+                                <Image
+                                  src={
+                                    metadata?.thumbnail || '/placeholder.jpg'
+                                  }
+                                  alt={token.symbol}
+                                  width={20}
+                                  height={20}
+                                  className="rounded-full flex-shrink-0"
+                                  onError={e => {
+                                    const img = e.target as HTMLImageElement;
+                                    img.src = '/placeholder.jpg';
+                                  }}
+                                />
+                                <span className="font-medium">
+                                  {token.symbol}
+                                </span>
                               </div>
                             </TableCell>
+                            <TableCell className="whitespace-nowrap">
+                              <span className="text-sm text-muted-foreground">
+                                {getTokenType(token.symbol)}
+                              </span>
+                            </TableCell>
                             <TableCell className="font-mono whitespace-nowrap">
-                              $
-                              {Number(token.supply).toLocaleString('en-US', {
-                                minimumFractionDigits: 0,
-                                maximumFractionDigits: 0,
-                              })}
+                              {(() => {
+                                const value = Number(token.supply);
+                                if (value >= 1_000_000_000)
+                                  return `$${(value / 1_000_000_000).toFixed(1)}b`;
+                                if (value >= 1_000_000)
+                                  return `$${(value / 1_000_000).toFixed(1)}m`;
+                                if (value >= 1_000)
+                                  return `$${(value / 1_000).toFixed(1)}k`;
+                                return `$${value.toFixed(0)}`;
+                              })()}
                             </TableCell>
                             <TableCell className="font-mono whitespace-nowrap">
                               {marketSharePercent}%
-                            </TableCell>
-                            <TableCell className="text-sm">
-                              {metadata?.type
-                                ?.replace(/\s*\(.*?\)\s*/g, '')
-                                .trim() || '-'}
-                            </TableCell>
-                            <TableCell className="text-sm">
-                              {metadata?.issuer?.split(' ')[0] || '-'}
                             </TableCell>
                           </TableRow>
                         );
@@ -967,7 +929,7 @@ export default function StablesPage(): React.ReactElement {
 
         <Footer className="relative" />
       </div>
-    </RootErrorBoundary>
+    </ErrorBoundary>
   );
 }
 

@@ -5,3 +5,6 @@ export {
   usePortfolioHistory,
   usePortfolioChartData,
 } from './usePortfolioHistory';
+export { useAnalytics } from './useAnalytics';
+export { useTokenChart } from './useTokenChart';
+export { usePortfolioPerformance } from './usePortfolioPerformance';

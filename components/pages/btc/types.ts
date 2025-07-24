@@ -133,11 +133,11 @@ const formatCache = new LRUCache<string>(2000, 300000); // 5 min TTL
 export const formatBTCAmount = (value: number): string => {
   if (!Number.isFinite(value)) return '0';
 
-  const cacheKey = `btc:${value.toFixed(8)}`;
+  const cacheKey = `btc:${value.toFixed(0)}`;
   const cached = formatCache.get(cacheKey);
   if (cached) return cached;
 
-  const result = formatAmount(value, 'BTC');
+  const result = formatAmount(value, 'BTC', { decimals: 0 });
   formatCache.set(cacheKey, result);
   return result;
 };
@@ -169,10 +169,10 @@ const commonPercentages = new Map([
 ]);
 
 export const formatPercentage = (value: number): string => {
-  if (!Number.isFinite(value)) return '0.0';
+  if (!Number.isFinite(value)) return '0.00';
 
   // Check common values first for ultra-fast lookup
-  const rounded = Math.round(value * 10) / 10;
+  const rounded = Math.round(value * 100) / 100;
   if (commonPercentages.has(rounded)) {
     return commonPercentages.get(rounded)!;
   }
@@ -181,7 +181,7 @@ export const formatPercentage = (value: number): string => {
   const cached = formatCache.get(cacheKey);
   if (cached) return cached;
 
-  const result = utilFormatPercentage(value, { decimals: 1 });
+  const result = utilFormatPercentage(value, { decimals: 2 });
   formatCache.set(cacheKey, result);
   return result;
 };
@@ -202,7 +202,7 @@ export const formatBTCSupply = (
     if (!Number.isFinite(btcAmount)) throw new Error('Invalid BTC amount');
 
     const result = formatNumber(btcAmount, {
-      decimals: Math.min(decimals, 8),
+      decimals: 0,
       useGrouping: true,
     });
     formatCache.set(cacheKey, result);
@@ -261,10 +261,67 @@ export const batchConvertBTCAmounts = (
 // Market share calculation with memoization
 const marketShareCache = new Map<string, number>();
 
+// Calculate market shares for all tokens that always sum to 100%
+export const calculateAllMarketShares = (
+  tokens: Array<{ btcValue: number; symbol?: string }>
+): Map<string, number> => {
+  const result = new Map<string, number>();
+
+  if (!tokens.length) return result;
+
+  const totalBtc = tokens.reduce((sum, token) => {
+    const value = Number.isFinite(token.btcValue) ? token.btcValue : 0;
+    return sum + value;
+  }, 0);
+
+  if (totalBtc === 0) {
+    tokens.forEach((token, index) => {
+      result.set(token.symbol || index.toString(), 0);
+    });
+    return result;
+  }
+
+  // Calculate exact percentages first
+  const exactPercentages = tokens.map(
+    token => (token.btcValue / totalBtc) * 100
+  );
+
+  // Round to whole numbers
+  const roundedPercentages = exactPercentages.map(p => Math.round(p));
+
+  // Calculate the difference from 100%
+  const sum = roundedPercentages.reduce((a, b) => a + b, 0);
+  const diff = 100 - sum;
+
+  // Distribute the difference to the tokens with the largest rounding errors
+  if (diff !== 0) {
+    const errors = exactPercentages.map((exact, i) => ({
+      index: i,
+      error: exact - roundedPercentages[i],
+    }));
+
+    // Sort by error magnitude (descending for positive diff, ascending for negative)
+    errors.sort((a, b) => (diff > 0 ? b.error - a.error : a.error - b.error));
+
+    // Adjust the percentages
+    for (let i = 0; i < Math.abs(diff); i++) {
+      const index = errors[i % errors.length].index;
+      roundedPercentages[index] += diff > 0 ? 1 : -1;
+    }
+  }
+
+  // Store results
+  tokens.forEach((token, index) => {
+    result.set(token.symbol || index.toString(), roundedPercentages[index]);
+  });
+
+  return result;
+};
+
 export const calculateMarketShare = (
   btcValue: number,
   allTokens: Array<{ btcValue: number }>,
-  precision = 1
+  precision = 2 // Back to 2 decimal places
 ): number => {
   if (!Number.isFinite(btcValue) || btcValue < 0) return 0;
 
@@ -275,17 +332,11 @@ export const calculateMarketShare = (
 
   if (totalBtc === 0) return 0;
 
-  const cacheKey = `ms:${btcValue}:${totalBtc}:${precision}`;
-  if (marketShareCache.has(cacheKey)) {
-    return marketShareCache.get(cacheKey)!;
-  }
-
   const percentage = (btcValue / totalBtc) * 100;
   const rounded =
     Math.round(percentage * Math.pow(10, precision)) / Math.pow(10, precision);
   const result = Number.isFinite(rounded) ? rounded : 0;
 
-  marketShareCache.set(cacheKey, result);
   return result;
 };
 

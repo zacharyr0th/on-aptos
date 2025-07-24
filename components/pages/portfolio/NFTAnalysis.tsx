@@ -1,4 +1,9 @@
+import { Grid3X3, ExternalLink } from 'lucide-react';
+import Image from 'next/image';
 import React from 'react';
+import { toast } from 'sonner';
+
+import { Badge } from '@/components/ui/badge';
 import {
   Card,
   CardContent,
@@ -6,16 +11,13 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Grid3X3, ExternalLink } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import Image from 'next/image';
-import { toast } from 'sonner';
+
 
 interface NFT {
   token_data_id: string;
@@ -67,16 +69,14 @@ export function NFTAnalysis({
 
   if (totalNFTs === 0 || !displayNFT) {
     return (
-      <Card>
-        <CardContent className="p-8 text-center">
-          <Grid3X3 className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-lg font-semibold mb-2">No NFTs Found</h3>
-          <p className="text-muted-foreground">
-            This wallet doesn&apos;t have any NFTs or they haven&apos;t been
-            loaded yet.
-          </p>
-        </CardContent>
-      </Card>
+      <div className="p-8 text-center">
+        <Grid3X3 className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+        <h3 className="text-lg font-semibold mb-2">No NFTs Found</h3>
+        <p className="text-muted-foreground">
+          This wallet doesn&apos;t have any NFTs or they haven&apos;t been
+          loaded yet.
+        </p>
+      </div>
     );
   }
 

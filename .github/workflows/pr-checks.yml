@@ -1,0 +1,342 @@
+name: PR Quality Checks
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '9'
+
+jobs:
+  changes:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    if: false
+    outputs:
+      frontend: ${{ steps.changes.outputs.frontend }}
+      docker: ${{ steps.changes.outputs.docker }}
+      config: ${{ steps.changes.outputs.config }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Detect changes
+        uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            frontend:
+              - 'app/**'
+              - 'components/**'
+              - 'lib/**'
+              - 'hooks/**'
+              - 'public/**'
+              - 'package.json'
+              - 'pnpm-lock.yaml'
+              - 'next.config.mjs'
+              - 'tailwind.config.js'
+              - 'tsconfig.json'
+            docker:
+              - 'Dockerfile'
+              - 'docker-compose*.yml'
+              - '.dockerignore'
+            config:
+              - '.github/**'
+              - 'scripts/**'
+              - 'vitest.config.mjs'
+
+  lint-and-format:
+    name: Lint & Format Check
+    runs-on: ubuntu-latest
+    needs: changes
+    if: false
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run ESLint
+        run: pnpm lint
+
+      - name: Check Prettier formatting
+        run: pnpm format:check
+
+      - name: TypeScript check
+        run: pnpm tsc --noEmit
+
+      - name: Check logging standards
+        run: |
+          # Check for console.log/warn/error usage in source files
+          CONSOLE_USAGE=$(grep -r "console\.\(log\|warn\|error\)" --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" \
+            --exclude-dir=node_modules \
+            --exclude-dir=.next \
+            --exclude-dir=tests \
+            --exclude-dir=__tests__ \
+            --exclude="*.test.*" \
+            --exclude="*.spec.*" \
+            . | grep -v "scripts/" || true)
+          
+          if [ ! -z "$CONSOLE_USAGE" ]; then
+            echo "Error: console.* usage found in source files. Use pino logger instead:"
+            echo "$CONSOLE_USAGE"
+            echo ""
+            echo "Import the logger: import { logger } from '@/lib/utils/logger'"
+            echo "Use logger.info(), logger.warn(), or logger.error() instead"
+            exit 1
+          fi
+          echo "Logging standards check passed!"
+
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    needs: changes
+    if: false
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run tests with coverage
+        run: pnpm test:run --coverage
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage/lcov.info
+          flags: unittests
+          name: codecov-umbrella
+
+  build-test:
+    name: Build Test
+    runs-on: ubuntu-latest
+    needs: changes
+    if: false
+    strategy:
+      matrix:
+        environment: [development, production]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build for ${{ matrix.environment }}
+        run: pnpm build
+        env:
+          NODE_ENV: ${{ matrix.environment == 'production' && 'production' || 'development' }}
+          NEXT_PUBLIC_SITE_URL: ${{ matrix.environment == 'production' && 'https://on-aptos.com' || 'http://localhost:3001' }}
+
+  docker-test:
+    name: Docker Build Test
+    runs-on: ubuntu-latest
+    needs: changes
+    if: false
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: false
+          tags: on-aptos:pr-${{ github.event.number }}
+          build-args: |
+            NEXT_PUBLIC_SITE_URL=https://on-aptos.com
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  size-check:
+    name: Bundle Size Check
+    runs-on: ubuntu-latest
+    needs: changes
+    if: false
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build and analyze bundle
+        run: pnpm analyze
+        env:
+          NEXT_PUBLIC_SITE_URL: https://on-aptos.com
+
+      - name: Upload bundle analysis
+        uses: actions/upload-artifact@v3
+        with:
+          name: bundle-analysis
+          path: .next/analyze/
+
+  accessibility:
+    name: Accessibility Check
+    runs-on: ubuntu-latest
+    needs: changes
+    if: false
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build application
+        run: pnpm build
+        env:
+          NEXT_PUBLIC_SITE_URL: https://on-aptos.com
+
+      - name: Start application
+        run: pnpm start &
+        env:
+          NODE_ENV: production
+
+      - name: Wait for app to be ready
+        run: npx wait-on http://localhost:3001 --timeout 60000
+
+      - name: Run accessibility tests
+        run: |
+          npx @axe-core/cli http://localhost:3001 \
+            --tags wcag2a,wcag2aa \
+            --exit
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    if: false
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'table'
+
+      - name: Run npm audit
+        run: npm audit --audit-level=high
+
+  # Comment on PR with results
+  comment:
+    name: PR Comment
+    runs-on: ubuntu-latest
+    needs: [lint-and-format, test, build-test, docker-test, size-check]
+    if: false
+    steps:
+      - name: Comment PR
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const botComment = comments.find(comment => 
+              comment.user.type === 'Bot' && comment.body.includes('**PR Quality Check Results**')
+            );
+
+            const results = {
+              'lint-and-format': '${{ needs.lint-and-format.result }}',
+              'test': '${{ needs.test.result }}',
+              'build-test': '${{ needs.build-test.result }}',
+              'docker-test': '${{ needs.docker-test.result }}',
+              'size-check': '${{ needs.size-check.result }}'
+            };
+
+
+            const body = `**PR Quality Check Results**
+
+            | Check | Status |
+            |-------|--------|
+            | Lint & Format | ${results['lint-and-format']} |
+            | Tests | ${results.test} |
+            | Build | ${results['build-test']} |
+            | Docker | ${results['docker-test']} |
+            | Bundle Size | ${results['size-check']} |
+
+            ---
+            _Updated at ${new Date().toISOString()}_`;
+
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: body
+              });
+            }

@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
+
 import { aptosAnalytics } from '@/lib/services/aptos-analytics';
+import { logger } from '@/lib/utils/logger';
 
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
 
-    const account_address = searchParams.get('account_address');
+    const account_address =
+      searchParams.get('address') || searchParams.get('account_address');
     const profile_address = searchParams.get('profile_address');
     const date_start = searchParams.get('date_start');
     const date_end = searchParams.get('date_end');
@@ -29,7 +32,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ data });
   } catch (error) {
-    console.error('Aries rewards API error:', error);
+    logger.error('Aries rewards API error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch Aries rewards' },
       { status: 500 }

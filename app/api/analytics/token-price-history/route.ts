@@ -1,12 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
+
 import { aptosAnalytics } from '@/lib/services/aptos-analytics';
+import { logger } from '@/lib/utils/logger';
 
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
 
-    const address = searchParams.get('address');
-    const lookback = searchParams.get('lookback') as
+    const address =
+      searchParams.get('address') || searchParams.get('tokenAddress');
+    const lookback = (searchParams.get('lookback') ||
+      searchParams.get('timeframe')) as
       | 'hour'
       | 'day'
       | 'week'
@@ -34,7 +38,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ data });
   } catch (error) {
-    console.error('Token price history API error:', error);
+    logger.error('Token price history API error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch token price history' },
       { status: 500 }

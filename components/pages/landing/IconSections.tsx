@@ -1,5 +1,6 @@
-import { IconSection } from './IconSection';
 import { useTranslation } from '@/hooks/useTranslation';
+
+import { IconSection } from './IconSection';
 
 interface Icon {
   name: string;
@@ -27,7 +28,7 @@ const getFallbackTitle = (key: string): string => {
     case 'landing.sections.liquid_staking':
       return 'Liquid Staking';
     case 'landing.sections.rwas':
-      return 'RWAs';
+      return 'Real World Assets';
     case 'landing.sections.defi_protocols':
       return 'DeFi Protocols';
     default:
@@ -38,17 +39,17 @@ const getFallbackTitle = (key: string): string => {
 const getFallbackDescription = (key: string): string => {
   switch (key) {
     case 'landing.sections.portfolio_description':
-      return 'Monitor your Aptos assets, track performance, and analyze your DeFi positions';
+      return 'Monitor your Aptos assets';
     case 'landing.sections.stablecoins_description':
-      return 'Track stablecoin supplies and market data on Aptos';
+      return 'Track stablecoin supplies';
     case 'landing.sections.bitcoin_assets_description':
-      return 'Bitcoin-backed tokens and synthetic BTC assets on Aptos';
+      return 'Track Bitcoin assets';
     case 'landing.sections.liquid_staking_description':
-      return 'Liquid staking tokens and APT staking derivatives';
+      return 'Real World Assets';
     case 'landing.sections.rwas_description':
-      return 'Real World Assets on Aptos';
+      return 'Track RWAs on Aptos';
     case 'landing.sections.defi_protocols_description':
-      return 'Decentralized finance protocols and analytics';
+      return 'Track DeFi on Aptos';
     default:
       return '';
   }
@@ -104,23 +105,10 @@ export const IconSections = () => {
       ],
     },
     {
-      titleKey: 'landing.sections.liquid_staking',
-      descriptionKey: 'landing.sections.liquid_staking_description',
-      apiEndpoint: '/api/aptos/lst',
-      route: '/lst',
-      icons: [
-        { name: 'Thala', src: '/icons/lst/thala.png' },
-        { name: 'Amnis', src: '/icons/lst/amnis.jpg' },
-        { name: 'Kofi', src: '/icons/lst/kofi.png' },
-        { name: 'Trufin', src: '/icons/lst/trufin.jpg' },
-      ],
-    },
-    {
       titleKey: 'landing.sections.rwas',
       descriptionKey: 'landing.sections.rwas_description',
       apiEndpoint: '/api/aptos/rwas',
       route: '/rwas',
-      underConstruction: true,
       icons: [
         { name: 'Pact', src: '/icons/rwas/pact.png' },
         { name: 'BlackRock', src: '/icons/rwas/blackrock.png' },
@@ -133,7 +121,6 @@ export const IconSections = () => {
       descriptionKey: 'landing.sections.defi_protocols_description',
       apiEndpoint: '/api/defi/overview',
       route: '/defi',
-      underConstruction: true,
       icons: [
         {
           name: 'DEX',
@@ -157,13 +144,13 @@ export const IconSections = () => {
 
   return (
     <div id="dashboards" className="w-full overflow-hidden">
-      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4 lg:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
         {iconSections.map((section, index) => (
           <div
             key={index}
-            className="opacity-0 animate-fade-in-up"
+            className="opacity-0 animate-fade-in-up w-full"
             style={{
-              animationDelay: `${index * 50}ms`,
+              animationDelay: `${index * 75}ms`,
               animationFillMode: 'both',
             }}
           >

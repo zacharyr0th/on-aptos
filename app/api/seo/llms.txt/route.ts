@@ -1,6 +1,9 @@
-import { NextResponse } from 'next/server';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
+
+import { NextResponse } from 'next/server';
+
+import { logger } from '@/lib/utils/logger';
 
 // Enterprise-grade headers for maximum LLM and SEO visibility
 const ENTERPRISE_HEADERS = {
@@ -48,7 +51,7 @@ const ENTERPRISE_HEADERS = {
 // Monitoring and analytics
 async function logAccess(userAgent: string | null, referer: string | null) {
   // In production, you'd send this to your analytics service
-  console.log('[llms.txt] Access:', {
+  logger.info('[llms.txt] Access:', {
     timestamp: new Date().toISOString(),
     userAgent,
     referer,
@@ -119,7 +122,7 @@ Documentation: https://onaptos.com/api-spec
 
     return response;
   } catch (error) {
-    console.error('[llms.txt] Failed to serve:', error);
+    logger.error('[llms.txt] Failed to serve:', error);
 
     // Fallback content for error cases
     const fallbackContent = `# On Aptos - API Documentation

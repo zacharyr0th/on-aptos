@@ -1,16 +1,3 @@
-import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Separator } from '@/components/ui/separator';
-import {
-  TooltipProvider,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
 import {
   ExternalLink,
   Copy,
@@ -27,9 +14,24 @@ import {
   Calendar,
   Info,
 } from 'lucide-react';
+import Image from 'next/image';
+import React, { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { NFTTransferHistory } from './NFTTransferHistory';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  TooltipProvider,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
+
+import { NFTTransferHistory } from './NFTTransferHistory';
 import type { NFT } from './types';
 
 interface NFTDetailViewProps {
@@ -79,9 +81,10 @@ export function NFTDetailView({ nft, onClose, className }: NFTDetailViewProps) {
   useEffect(() => {
     if (nft.token_properties) {
       try {
-        const props = typeof nft.token_properties === 'string' 
-          ? JSON.parse(nft.token_properties) 
-          : nft.token_properties;
+        const props =
+          typeof nft.token_properties === 'string'
+            ? JSON.parse(nft.token_properties)
+            : nft.token_properties;
         const attrs = Object.entries(props).map(([key, value]) => ({
           trait_type: key,
           value: value,
@@ -94,7 +97,7 @@ export function NFTDetailView({ nft, onClose, className }: NFTDetailViewProps) {
   }, [nft]);
 
   return (
-    <Card className={cn("w-full max-w-7xl mx-auto", className)}>
+    <Card className={cn('w-full max-w-7xl mx-auto', className)}>
       <CardContent className="p-0">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 lg:gap-8 h-full">
           {/* Left Column - Image and Basic Info */}
@@ -124,11 +127,11 @@ export function NFTDetailView({ nft, onClose, className }: NFTDetailViewProps) {
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 className={cn(
-                  "object-contain transition-opacity duration-300",
-                  imageLoaded ? "opacity-100" : "opacity-0"
+                  'object-contain transition-opacity duration-300',
+                  imageLoaded ? 'opacity-100' : 'opacity-0'
                 )}
                 onLoad={() => setImageLoaded(true)}
-                onError={(e) => {
+                onError={e => {
                   const img = e.currentTarget as HTMLImageElement;
                   img.src = '/placeholder.jpg';
                   setImageLoaded(true);
@@ -170,7 +173,9 @@ export function NFTDetailView({ nft, onClose, className }: NFTDetailViewProps) {
                       <Button
                         variant="outline"
                         size="icon"
-                        onClick={() => copyToClipboard(nft.token_data_id, 'Token ID')}
+                        onClick={() =>
+                          copyToClipboard(nft.token_data_id, 'Token ID')
+                        }
                       >
                         {copied === 'Token ID' ? (
                           <Check className="h-4 w-4" />
@@ -235,7 +240,9 @@ export function NFTDetailView({ nft, onClose, className }: NFTDetailViewProps) {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => copyToClipboard(nft.token_data_id, 'Token ID')}
+                          onClick={() =>
+                            copyToClipboard(nft.token_data_id, 'Token ID')
+                          }
                         >
                           <Copy className="h-3 w-3" />
                         </Button>
@@ -253,7 +260,9 @@ export function NFTDetailView({ nft, onClose, className }: NFTDetailViewProps) {
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => copyToClipboard(nft.creator_address, 'Creator')}
+                            onClick={() =>
+                              copyToClipboard(nft.creator_address!, 'Creator')
+                            }
                           >
                             <Copy className="h-3 w-3" />
                           </Button>
@@ -276,8 +285,12 @@ export function NFTDetailView({ nft, onClose, className }: NFTDetailViewProps) {
 
                     {/* Property Version */}
                     <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
-                      <span className="text-sm font-medium">Property Version</span>
-                      <Badge variant="secondary">v{nft.property_version_v1}</Badge>
+                      <span className="text-sm font-medium">
+                        Property Version
+                      </span>
+                      <Badge variant="secondary">
+                        v{nft.property_version_v1}
+                      </Badge>
                     </div>
                   </div>
                 </div>
@@ -296,11 +309,15 @@ export function NFTDetailView({ nft, onClose, className }: NFTDetailViewProps) {
                       </div>
                       {nft.collection_uri && (
                         <div className="flex items-center justify-between">
-                          <span className="text-sm font-medium">Collection URI</span>
+                          <span className="text-sm font-medium">
+                            Collection URI
+                          </span>
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => window.open(nft.collection_uri, '_blank')}
+                            onClick={() =>
+                              window.open(nft.collection_uri, '_blank')
+                            }
                           >
                             <Globe className="h-3 w-3 mr-1" />
                             View

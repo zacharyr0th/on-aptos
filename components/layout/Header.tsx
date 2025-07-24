@@ -1,21 +1,23 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { ThemeToggle } from '@/components/layout/theme-toggle';
-import { LanguageToggle } from '@/components/ui/language-toggle';
-import { ErrorBoundary } from '../errors/ErrorBoundary';
+import { useWallet } from '@aptos-labs/wallet-adapter-react';
 import {
   Menu,
   X,
   Bitcoin,
   Coins,
   Building2,
-  TrendingUp,
-  Briefcase,
+  BarChart,
 } from 'lucide-react';
-import { useTranslation } from '@/hooks/useTranslation';
+import Image from 'next/image';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import React, { useState, useEffect } from 'react';
+
+import { ThemeToggle } from '@/components/layout/theme-toggle';
+import { defiProtocols } from '@/components/pages/defi/data/protocols';
+import { Badge } from '@/components/ui/badge';
+import { LanguageToggle } from '@/components/ui/language-toggle';
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -25,27 +27,36 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Badge } from '@/components/ui/badge';
+import { useTranslation } from '@/hooks/useTranslation';
 import { cn } from '@/lib/utils';
-import { defiProtocols } from '@/components/pages/defi/data/protocols';
-import Image from 'next/image';
+
+import { ErrorBoundary } from '../errors/ErrorBoundary';
+
 
 const HeaderComponent = (): React.ReactElement | null => {
   const pathname = usePathname();
+  const { account } = useWallet();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const isHomePage = pathname === '/';
+
+  // Get wallet address
+  const walletAddress = account?.address?.toString();
+  const normalizedAddress = walletAddress
+    ? walletAddress.startsWith('0x')
+      ? walletAddress
+      : `0x${walletAddress}`
+    : undefined;
   const { t } = useTranslation('common');
 
-  const title = useMemo(() => {
+  const title = (() => {
     const pageKeys: Record<string, string> = {
       '/bitcoin': 'page_titles.bitcoin',
-      '/lst': 'page_titles.lsts',
       '/stables': 'page_titles.stablecoins',
       '/stablecoins': 'page_titles.stablecoins',
       '/defi': 'page_titles.defi',
@@ -59,7 +70,6 @@ const HeaderComponent = (): React.ReactElement | null => {
     if (translation === translationKey) {
       const fallbacks: Record<string, string> = {
         'page_titles.bitcoin': 'Bitcoin',
-        'page_titles.lsts': 'LSTs',
         'page_titles.stablecoins': 'Stablecoins',
         'page_titles.defi': 'DeFi',
         'page_titles.rwas': 'RWAs',
@@ -70,7 +80,7 @@ const HeaderComponent = (): React.ReactElement | null => {
     }
 
     return translation;
-  }, [pathname, t]);
+  })();
 
   const toggleMenu = () => setMobileMenuOpen(prev => !prev);
   const closeMenu = () => setMobileMenuOpen(false);
@@ -126,44 +136,70 @@ const HeaderComponent = (): React.ReactElement | null => {
                       Assets
                     </NavigationMenuTrigger>
                     <NavigationMenuContent>
-                      <ul className="grid w-[280px] gap-2 p-4">
-                        <ListItem
-                          href="/stables"
-                          title={t('navigation.stablecoins', 'Stablecoins')}
-                          icon={<Coins className="h-4 w-4" />}
-                          active={
-                            pathname === '/stables' ||
-                            pathname === '/stablecoins'
-                          }
-                        >
-                          Track USDT, USDC, USDe and other stablecoins on Aptos
-                        </ListItem>
-                        <ListItem
-                          href="/bitcoin"
-                          title={t('navigation.bitcoin', 'Bitcoin')}
-                          icon={<Bitcoin className="h-4 w-4" />}
-                          active={pathname === '/bitcoin'}
-                        >
-                          Monitor wrapped Bitcoin assets like xBTC, SBTC, and
-                          aBTC
-                        </ListItem>
-                        <ListItem
-                          href="/rwas"
-                          title={t('navigation.rwas', 'RWAs')}
-                          icon={<Building2 className="h-4 w-4" />}
-                          active={pathname === '/rwas'}
-                        >
-                          Real-world assets tokenized on the Aptos blockchain
-                        </ListItem>
-                        <ListItem
-                          href="/lst"
-                          title={t('navigation.lsts', 'LSTs')}
-                          icon={<TrendingUp className="h-4 w-4" />}
-                          active={pathname === '/lst'}
-                        >
-                          Liquid staking tokens including amAPT and stAPT
-                        </ListItem>
-                      </ul>
+                      <div className="w-[320px] p-4">
+                        <div className="grid gap-1">
+                          <Link
+                            href="/stables"
+                            className={cn(
+                              'flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-accent',
+                              'border border-transparent hover:border-border',
+                              (pathname === '/stables' ||
+                                pathname === '/stablecoins') &&
+                                'bg-accent border-border'
+                            )}
+                            onClick={() => setMobileMenuOpen(false)}
+                          >
+                            <Coins className="h-4 w-4" />
+                            <div>
+                              <div className="font-medium">
+                                {t('navigation.stablecoins', 'Stablecoins')}
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                Track USDT, USDC, USDe and other stablecoins
+                              </div>
+                            </div>
+                          </Link>
+                          <Link
+                            href="/bitcoin"
+                            className={cn(
+                              'flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-accent',
+                              'border border-transparent hover:border-border',
+                              pathname === '/bitcoin' &&
+                                'bg-accent border-border'
+                            )}
+                            onClick={() => setMobileMenuOpen(false)}
+                          >
+                            <Bitcoin className="h-4 w-4" />
+                            <div>
+                              <div className="font-medium">
+                                {t('navigation.bitcoin', 'Bitcoin')}
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                Monitor wrapped Bitcoin assets on Aptos
+                              </div>
+                            </div>
+                          </Link>
+                          <Link
+                            href="/rwas"
+                            className={cn(
+                              'flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-accent',
+                              'border border-transparent hover:border-border',
+                              pathname === '/rwas' && 'bg-accent border-border'
+                            )}
+                            onClick={() => setMobileMenuOpen(false)}
+                          >
+                            <Building2 className="h-4 w-4" />
+                            <div>
+                              <div className="font-medium">
+                                {t('navigation.rwas', 'RWAs')}
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                Real-world assets tokenized on Aptos
+                              </div>
+                            </div>
+                          </Link>
+                        </div>
+                      </div>
                     </NavigationMenuContent>
                   </NavigationMenuItem>
 
@@ -176,6 +212,22 @@ const HeaderComponent = (): React.ReactElement | null => {
                       <div className="w-[320px]">
                         <ScrollArea className="h-[450px] rounded-md scroll-smooth">
                           <div className="p-4">
+                            {/* DeFi Dashboard Link */}
+                            <div className="mb-3">
+                              <Link
+                                href="/defi"
+                                className={cn(
+                                  'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent',
+                                  'border border-transparent hover:border-border',
+                                  pathname === '/defi' &&
+                                    'bg-accent border-border'
+                                )}
+                                onClick={() => setMobileMenuOpen(false)}
+                              >
+                                <BarChart className="h-4 w-4" />
+                                <span>DeFi Dashboard</span>
+                              </Link>
+                            </div>
                             {/* Group protocols by category */}
                             {['Trading', 'Credit', 'Yield', 'Multiple'].map(
                               category => {
@@ -271,7 +323,9 @@ const HeaderComponent = (): React.ReactElement | null => {
                         href="/portfolio"
                         className={navigationMenuTriggerStyle()}
                       >
-                        Your Portfolio
+                        {pathname === '/portfolio' && normalizedAddress
+                          ? `${normalizedAddress.slice(0, 6)}...${normalizedAddress.slice(-4)}`
+                          : 'Your Portfolio'}
                       </Link>
                     </NavigationMenuLink>
                   </NavigationMenuItem>
@@ -381,13 +435,6 @@ const HeaderComponent = (): React.ReactElement | null => {
                     >
                       {t('navigation.rwas', 'RWAs')}
                     </MobileNavLink>
-                    <MobileNavLink
-                      href="/lst"
-                      active={pathname === '/lst'}
-                      onClick={closeMenu}
-                    >
-                      {t('navigation.lsts', 'LSTs')}
-                    </MobileNavLink>
                   </div>
 
                   <div className="py-2 border-t border-border">
@@ -411,7 +458,9 @@ const HeaderComponent = (): React.ReactElement | null => {
                       active={pathname === '/portfolio'}
                       onClick={closeMenu}
                     >
-                      {t('navigation.portfolio', 'Your Portfolio')}
+                      {pathname === '/portfolio' && normalizedAddress
+                        ? `${normalizedAddress.slice(0, 6)}...${normalizedAddress.slice(-4)}`
+                        : t('navigation.portfolio', 'Your Portfolio')}
                     </MobileNavLink>
                   </div>
                 </div>
@@ -430,25 +479,6 @@ const HeaderComponent = (): React.ReactElement | null => {
   );
 };
 
-// Desktop Nav Link
-const NavLink = ({
-  href,
-  active,
-  children,
-}: {
-  href: string;
-  active: boolean;
-  children: React.ReactNode;
-}) => (
-  <Link
-    href={href}
-    className={`text-sm font-medium transition-colors duration-200 hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-sm px-1 py-1 ${
-      active ? 'text-primary' : 'text-muted-foreground'
-    }`}
-  >
-    {children}
-  </Link>
-);
 
 // Mobile Nav Link
 const MobileNavLink = ({
@@ -512,4 +542,4 @@ const ListItem = React.forwardRef<
 ListItem.displayName = 'ListItem';
 
 HeaderComponent.displayName = 'Header';
-export const Header = React.memo(HeaderComponent);
+export const Header = HeaderComponent;

@@ -17,12 +17,12 @@ services:
       - CMC_API_KEY=${CMC_API_KEY}
       - RWA_API_KEY=${RWA_API_KEY}
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/api/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1); })"]
-      interval: 30s
-      timeout: 3s
-      start_period: 40s
-      retries: 3
+    # healthcheck:
+    #   test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/api/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1); })"]
+    #   interval: 30s
+    #   timeout: 3s
+    #   start_period: 40s
+    #   retries: 3
     networks:
       - app-network
 

@@ -446,6 +446,8 @@ export const PHANTOM_ASSET_PATTERNS = [
   /0x7e783b349d3e89cf5931af376ebeadbfab855b3fa239b7ada8f5a92fbea6b387::staking::.*/,
   // Thala staked assets
   /0xfaf4e633ae9eb31366c9ca24214231760926576c7b625313b3688b5e900731f6::.*/,
+  // CELL tokens (hidden from portfolio view)
+  /0x2ebb2ccac5e027a87fa0e2e5f656a3a4238d6a48d93ec9b610d570fc0aa0df12::.*/,
   // Generic locked asset patterns
   /.*::locked::.*/i,
   /.*::staked::.*/i,

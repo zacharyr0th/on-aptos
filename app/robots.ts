@@ -10,7 +10,6 @@ export default function robots(): MetadataRoute.Robots {
         allow: [
           '/',
           '/api/aptos/btc',
-          '/api/aptos/lst',
           '/api/aptos/stables',
           '/api/aptos/rwas',
           '/api/prices',
@@ -20,7 +19,6 @@ export default function robots(): MetadataRoute.Robots {
           '/llms.txt', // Specifically allow LLM documentation
           '/bitcoin',
           '/defi',
-          '/lst',
           '/stablecoins',
           '/rwas',
           '/btc',

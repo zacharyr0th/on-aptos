@@ -2,7 +2,8 @@ import { graphQLRequest } from '../lib/utils/fetch-utils';
 import { getEnvVar } from '../lib/config/validate-env';
 
 const INDEXER_URL = 'https://indexer.mainnet.aptoslabs.com/v1/graphql';
-const CASH_TOKEN_ADDRESS = '0x61ed8b048636516b4eaf4c74250fa4f9440d9c3e163d96aeb863fe658a4bdc67::CASH::CASH';
+const CASH_TOKEN_ADDRESS =
+  '0x61ed8b048636516b4eaf4c74250fa4f9440d9c3e163d96aeb863fe658a4bdc67::CASH::CASH';
 
 // Query to get unique holders count and distribution
 const CASH_HOLDERS_QUERY = `
@@ -135,9 +136,9 @@ async function queryCashHolders() {
         timeout: 30000,
         retries: 2,
       }
-    ).catch(async (error) => {
+    ).catch(async error => {
       console.error('Raw error:', error);
-      
+
       // Try to make a simpler query to debug
       console.log('\nTrying a simpler query...');
       const simpleQuery = `
@@ -153,7 +154,7 @@ async function queryCashHolders() {
           }
         }
       `;
-      
+
       try {
         const res = await fetch(INDEXER_URL, {
           method: 'POST',
@@ -162,14 +163,14 @@ async function queryCashHolders() {
           },
           body: JSON.stringify({ query: simpleQuery }),
         });
-        
+
         const data = await res.text();
         console.log('Response status:', res.status);
         console.log('Response data:', data);
       } catch (e) {
         console.error('Simple query error:', e);
       }
-      
+
       throw error;
     });
 
@@ -190,7 +191,9 @@ async function queryCashHolders() {
 
     console.log('HOLDER STATISTICS:');
     console.log(`- Total Unique Holders: ${holdersCount.toLocaleString()}`);
-    console.log(`- Total Supply: ${formatAmount(totalSupply, metadata?.decimals || 6)}`);
+    console.log(
+      `- Total Supply: ${formatAmount(totalSupply, metadata?.decimals || 6)}`
+    );
     console.log('\n-----------------------------------\n');
 
     // Get distribution data
@@ -212,55 +215,82 @@ async function queryCashHolders() {
 
     console.log('\nDISTRIBUTION ANALYSIS:');
     console.log('(Assuming 6 decimals for CASH token)\n');
-    
+
     const decimals = metadata?.decimals || 6;
-    
+
     // Small holders
-    const smallCount = distributionResponse.small_holders?.aggregate?.count || 0;
-    const smallAmount = distributionResponse.small_holders?.aggregate?.sum?.amount || '0';
+    const smallCount =
+      distributionResponse.small_holders?.aggregate?.count || 0;
+    const smallAmount =
+      distributionResponse.small_holders?.aggregate?.sum?.amount || '0';
     console.log(`Small holders (< 1,000 CASH):`);
-    console.log(`  - Count: ${smallCount.toLocaleString()} (${((smallCount / holdersCount) * 100).toFixed(2)}%)`);
+    console.log(
+      `  - Count: ${smallCount.toLocaleString()} (${((smallCount / holdersCount) * 100).toFixed(2)}%)`
+    );
     console.log(`  - Total held: ${formatAmount(smallAmount, decimals)}`);
-    console.log(`  - % of supply: ${((BigInt(smallAmount) * 100n) / BigInt(totalSupply)).toString()}%\n`);
+    console.log(
+      `  - % of supply: ${((BigInt(smallAmount) * 100n) / BigInt(totalSupply)).toString()}%\n`
+    );
 
     // Medium holders
-    const mediumCount = distributionResponse.medium_holders?.aggregate?.count || 0;
-    const mediumAmount = distributionResponse.medium_holders?.aggregate?.sum?.amount || '0';
+    const mediumCount =
+      distributionResponse.medium_holders?.aggregate?.count || 0;
+    const mediumAmount =
+      distributionResponse.medium_holders?.aggregate?.sum?.amount || '0';
     console.log(`Medium holders (1,000 - 10,000 CASH):`);
-    console.log(`  - Count: ${mediumCount.toLocaleString()} (${((mediumCount / holdersCount) * 100).toFixed(2)}%)`);
+    console.log(
+      `  - Count: ${mediumCount.toLocaleString()} (${((mediumCount / holdersCount) * 100).toFixed(2)}%)`
+    );
     console.log(`  - Total held: ${formatAmount(mediumAmount, decimals)}`);
-    console.log(`  - % of supply: ${((BigInt(mediumAmount) * 100n) / BigInt(totalSupply)).toString()}%\n`);
+    console.log(
+      `  - % of supply: ${((BigInt(mediumAmount) * 100n) / BigInt(totalSupply)).toString()}%\n`
+    );
 
     // Large holders
-    const largeCount = distributionResponse.large_holders?.aggregate?.count || 0;
-    const largeAmount = distributionResponse.large_holders?.aggregate?.sum?.amount || '0';
+    const largeCount =
+      distributionResponse.large_holders?.aggregate?.count || 0;
+    const largeAmount =
+      distributionResponse.large_holders?.aggregate?.sum?.amount || '0';
     console.log(`Large holders (10,000 - 100,000 CASH):`);
-    console.log(`  - Count: ${largeCount.toLocaleString()} (${((largeCount / holdersCount) * 100).toFixed(2)}%)`);
+    console.log(
+      `  - Count: ${largeCount.toLocaleString()} (${((largeCount / holdersCount) * 100).toFixed(2)}%)`
+    );
     console.log(`  - Total held: ${formatAmount(largeAmount, decimals)}`);
-    console.log(`  - % of supply: ${((BigInt(largeAmount) * 100n) / BigInt(totalSupply)).toString()}%\n`);
+    console.log(
+      `  - % of supply: ${((BigInt(largeAmount) * 100n) / BigInt(totalSupply)).toString()}%\n`
+    );
 
     // Whale holders
-    const whaleCount = distributionResponse.whale_holders?.aggregate?.count || 0;
-    const whaleAmount = distributionResponse.whale_holders?.aggregate?.sum?.amount || '0';
+    const whaleCount =
+      distributionResponse.whale_holders?.aggregate?.count || 0;
+    const whaleAmount =
+      distributionResponse.whale_holders?.aggregate?.sum?.amount || '0';
     console.log(`Whale holders (>= 100,000 CASH):`);
-    console.log(`  - Count: ${whaleCount.toLocaleString()} (${((whaleCount / holdersCount) * 100).toFixed(2)}%)`);
+    console.log(
+      `  - Count: ${whaleCount.toLocaleString()} (${((whaleCount / holdersCount) * 100).toFixed(2)}%)`
+    );
     console.log(`  - Total held: ${formatAmount(whaleAmount, decimals)}`);
-    console.log(`  - % of supply: ${((BigInt(whaleAmount) * 100n) / BigInt(totalSupply)).toString()}%\n`);
+    console.log(
+      `  - % of supply: ${((BigInt(whaleAmount) * 100n) / BigInt(totalSupply)).toString()}%\n`
+    );
 
     console.log('-----------------------------------\n');
     console.log('TOP 10 HOLDERS:');
     topHolders.forEach((holder: any, index: number) => {
       const amount = formatAmount(holder.amount, decimals);
-      const percentage = ((BigInt(holder.amount) * 10000n) / BigInt(totalSupply));
+      const percentage = (BigInt(holder.amount) * 10000n) / BigInt(totalSupply);
       const percentageStr = (Number(percentage) / 100).toFixed(2);
-      console.log(`${index + 1}. ${holder.owner_address.slice(0, 6)}...${holder.owner_address.slice(-4)}`);
+      console.log(
+        `${index + 1}. ${holder.owner_address.slice(0, 6)}...${holder.owner_address.slice(-4)}`
+      );
       console.log(`   Amount: ${amount} (${percentageStr}% of supply)`);
     });
 
     console.log('\n-----------------------------------');
-    console.log(`\nTOTAL UNIQUE CASH TOKEN HOLDERS: ${holdersCount.toLocaleString()}`);
+    console.log(
+      `\nTOTAL UNIQUE CASH TOKEN HOLDERS: ${holdersCount.toLocaleString()}`
+    );
     console.log('-----------------------------------\n');
-
   } catch (error) {
     console.error('Error querying CASH holders:', error);
     if (error instanceof Error) {
@@ -275,10 +305,10 @@ function formatAmount(amount: string, decimals: number): string {
     const divisor = BigInt(10 ** decimals);
     const wholePart = bigAmount / divisor;
     const fractionalPart = bigAmount % divisor;
-    
+
     // Format with commas
     const wholeStr = wholePart.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    
+
     // Add fractional part if needed
     if (fractionalPart > 0n) {
       const fractionalStr = fractionalPart.toString().padStart(decimals, '0');
@@ -288,7 +318,7 @@ function formatAmount(amount: string, decimals: number): string {
         return `${wholeStr}.${trimmed}`;
       }
     }
-    
+
     return wholeStr;
   } catch (error) {
     return amount;

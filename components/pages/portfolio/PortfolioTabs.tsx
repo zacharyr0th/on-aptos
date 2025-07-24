@@ -1,7 +1,9 @@
 'use client';
 
 import React from 'react';
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
 import { TransactionHistoryTable } from './TransactionHistoryTable';
 
 interface PortfolioTabsProps {
@@ -22,16 +24,11 @@ export function PortfolioTabs({
   return (
     <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 mt-6">
       {/* Sidebar */}
-      <div className="lg:col-span-2 space-y-6">
-        {sidebarContent}
-      </div>
+      <div className="lg:col-span-2 space-y-6">{sidebarContent}</div>
 
       {/* Main Content */}
       <div className="lg:col-span-3 space-y-6">
-        <Tabs
-          value={activeTab}
-          onValueChange={v => setActiveTab(v)}
-        >
+        <Tabs value={activeTab} onValueChange={v => setActiveTab(v)}>
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="portfolio">Portfolio</TabsTrigger>
             <TabsTrigger value="transactions">Transactions</TabsTrigger>

@@ -1,81 +1,58 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getWalletAssets } from '@/lib/services/blockchain/portfolio/portfolio-service';
-import {
-  withValidation,
-  PortfolioAssetsQuerySchema,
-} from '@/lib/utils/validation';
-import {
-  buildSuccessResponse,
-  withAPIHandler,
-  createCacheHeaders,
-} from '@/lib/utils/api-response';
-// Rate limiting removed - not compatible with serverless architecture
-import { PortfolioAssetsResponse, StandardAPIResponse } from '@/lib/types/api';
+
+import { AssetService } from '@/lib/services/portfolio/services/asset-service';
 import { logger } from '@/lib/utils/logger';
 
-// Set max duration for Vercel serverless function
-export const maxDuration = 30; // 30 seconds
-
-const handler = withValidation(PortfolioAssetsQuerySchema)(async ({
-  query,
-  request,
-}) => {
-  const startTime = Date.now();
-
-  return await withAPIHandler(
-    async (): Promise<PortfolioAssetsResponse> => {
-      if (!query) throw new Error('Missing query parameters');
-
-      const { walletAddress, showOnlyVerified } = query;
-
-      logger.info(
-        `[Assets API] Fetching assets for ${walletAddress}, showOnlyVerified: ${showOnlyVerified}`
-      );
-
-      // Call the service directly - showOnlyVerified is a string from query params
-      const assets = await getWalletAssets(
-        walletAddress,
-        showOnlyVerified === 'true' || showOnlyVerified === true
-      );
-
-      logger.info(`[Assets API] Retrieved ${assets.length} assets`);
-
-      // Calculate total portfolio value
-      const totalValue = assets.reduce(
-        (sum, asset) => sum + (asset.value || 0),
-        0
-      );
-
-      return {
-        assets,
-        totalValue,
-        assetCount: assets.length,
-      };
-    },
-    {
-      startTime,
-      operation: 'Portfolio Assets Fetch',
-      apiCalls: 1,
-    }
-  )();
-});
-
 export async function GET(request: NextRequest) {
-  const response = await handler(request);
+  const { searchParams } = new URL(request.url);
+  const walletAddress = searchParams.get('walletAddress');
+  
+  try {
 
-  // Add caching headers for portfolio data
-  const cacheHeaders = createCacheHeaders(
-    30, // 30 seconds cache
-    60, // 1 minute stale-while-revalidate
-    {
-      'X-Service': 'portfolio-assets',
-      'X-API-Version': '1.0',
+    if (!walletAddress) {
+      return NextResponse.json(
+        { error: 'Wallet address is required' },
+        { status: 400 }
+      );
     }
-  );
 
-  Object.entries(cacheHeaders).forEach(([key, value]) => {
-    response.headers.set(key, value);
-  });
+    logger.info('[Portfolio Assets API] Fetching assets for:', walletAddress);
 
-  return response;
+    // Get wallet assets using our updated service
+    const assets = await AssetService.getWalletAssets(walletAddress);
+
+    logger.info(`[Portfolio Assets API] Found ${assets.length} assets`);
+
+    // Return ALL assets - no filtering
+    const filteredAssets = assets;
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        assets: filteredAssets,
+        totalCount: filteredAssets.length,
+      },
+    });
+  } catch (error) {
+    // Enhanced error logging with full error details
+    const errorDetails = {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      name: error instanceof Error ? error.name : 'UnknownError',
+      walletAddress,
+      timestamp: new Date().toISOString(),
+    };
+
+    logger.error('Portfolio assets API error:', errorDetails);
+    logger.error('[Portfolio Assets API] Full error object:', error);
+
+    return NextResponse.json(
+      {
+        error: 'Failed to fetch portfolio assets',
+        details: errorDetails.message,
+        walletAddress,
+      },
+      { status: 500 }
+    );
+  }
 }

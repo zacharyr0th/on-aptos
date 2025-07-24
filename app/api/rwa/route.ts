@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { withApiEnhancements } from '@/lib/utils/server';
-import { SERVICE_CONFIG } from '@/lib/config/cache';
+
 import { API_CONFIG } from '@/lib/config/app';
 import {
-  ApiError,
-  formatApiError,
   withErrorHandling,
   type ErrorContext,
 } from '@/lib/utils';
+import { logger } from '@/lib/utils/logger';
+import { withApiEnhancements } from '@/lib/utils/server';
 
 // RWA.xyz API configuration
 const RWA_API_KEY = API_CONFIG.rwa.apiKey;
@@ -228,8 +227,8 @@ async function fetchRealTimeRWAData() {
 
   try {
     // Log the request for debugging
-    console.log('Fetching RWA data from:', RWA_BASE_URL);
-    console.log('API Key configured:', !!RWA_API_KEY);
+    logger.info('Fetching RWA data from:', RWA_BASE_URL);
+    logger.info('API Key configured:', !!RWA_API_KEY);
 
     // Use Promise.all for parallel requests
     const [tokenResponse, assetResponse] = await Promise.all([
@@ -282,14 +281,14 @@ async function fetchRealTimeRWAData() {
       ),
     ]);
 
-    console.log('Token response status:', tokenResponse.status);
-    console.log('Asset response status:', assetResponse.status);
+    logger.info('Token response status:', tokenResponse.status);
+    logger.info('Asset response status:', assetResponse.status);
 
     if (!tokenResponse.ok || !assetResponse.ok) {
       const tokenError = !tokenResponse.ok ? await tokenResponse.text() : '';
       const assetError = !assetResponse.ok ? await assetResponse.text() : '';
-      console.error('API Error - Token:', tokenError);
-      console.error('API Error - Asset:', assetError);
+      logger.error('API Error - Token:', tokenError);
+      logger.error('API Error - Asset:', assetError);
       throw new Error(
         `RWA.xyz API error: Token ${tokenResponse.status}, Asset ${assetResponse.status}`
       );
@@ -300,8 +299,8 @@ async function fetchRealTimeRWAData() {
       assetResponse.json() as Promise<RWAXyzApiResponse>,
     ]);
 
-    console.log('Token data results:', tokenData.results?.length || 0);
-    console.log('Asset data results:', assetData.results?.length || 0);
+    logger.info('Token data results:', tokenData.results?.length || 0);
+    logger.info('Asset data results:', assetData.results?.length || 0);
 
     // Reset circuit breaker on success
     resetCircuitBreaker();
@@ -329,8 +328,8 @@ async function fetchRealTimeRWAData() {
       0
     );
 
-    console.log('Total protocols found:', protocols.length);
-    console.log('Total RWA value:', totalAptosValue);
+    logger.info('Total protocols found:', protocols.length);
+    logger.info('Total RWA value:', totalAptosValue);
 
     return {
       success: true,
@@ -376,7 +375,7 @@ export async function GET(request: NextRequest) {
 
           return data;
         } catch (error) {
-          console.error('RWA API error:', error);
+          logger.error('RWA API error:', error);
 
           // Return fallback data on errors
           return {

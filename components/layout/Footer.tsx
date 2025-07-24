@@ -1,3 +1,6 @@
+import { Clock } from 'lucide-react';
+import Image from 'next/image';
+import { useTheme } from 'next-themes';
 import React, {
   FC,
   memo,
@@ -6,15 +9,14 @@ import React, {
   useState,
   useEffect,
 } from 'react';
-import { Clock } from 'lucide-react';
-import { FaGlobe, FaXTwitter, FaGithub } from '@/components/icons/SocialIcons';
-import { ErrorBoundary } from '../errors/ErrorBoundary';
-import Image from 'next/image';
-import { useTheme } from 'next-themes';
-import { useTranslation } from '@/hooks/useTranslation';
-import { DEVELOPER_CONFIG } from '@/lib/config/app';
+
+import { FaGlobe, FaGithub, FaXTwitter } from '@/components/icons/SocialIcons';
 import { ThemeToggle } from '@/components/layout/theme-toggle';
 import { LanguageToggle } from '@/components/ui/language-toggle';
+import { useTranslation } from '@/hooks/useTranslation';
+import { DEVELOPER_CONFIG } from '@/lib/config/app';
+
+import { ErrorBoundary } from '../errors/ErrorBoundary';
 
 interface FooterProps {
   showAptosAttribution?: boolean;
@@ -102,14 +104,9 @@ CurrentUTCTime.displayName = 'CurrentUTCTime';
 
 const AptPrice: FC = memo(function AptPrice(): ReactElement {
   const { t } = useTranslation('common');
-  const { resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const [aptPriceData, setAptPriceData] = useState<any>(null);
+  const [currentPrice, setCurrentPrice] = useState<number | null>(null);
+  const [change24h, setChange24h] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<any>(null);
 
@@ -117,13 +114,39 @@ const AptPrice: FC = memo(function AptPrice(): ReactElement {
   useEffect(() => {
     const fetchPrice = async () => {
       try {
-        const response = await fetch('/api/prices/cmc/apt');
-        if (response.ok) {
-          const data = await response.json();
-          setAptPriceData(data);
+        // Fetch current price
+        const currentResponse = await fetch(
+          '/api/analytics/token-latest-price?address=0x1::aptos_coin::AptosCoin'
+        );
+        if (!currentResponse.ok) {
+          throw new Error('Failed to fetch current price');
+        }
+        const currentData = await currentResponse.json();
+
+        if (currentData.data && currentData.data.length > 0) {
+          const latestPrice = currentData.data[0].price_usd;
+          setCurrentPrice(latestPrice);
+
+          // Fetch 24h historical price
+          const historicalResponse = await fetch(
+            '/api/analytics/token-price-history?address=0x1::aptos_coin::AptosCoin&lookback=day&limit=2'
+          );
+          if (historicalResponse.ok) {
+            const historicalData = await historicalResponse.json();
+
+            if (historicalData.data && historicalData.data.length >= 2) {
+              // Get the price from 24h ago (last item in array)
+              const price24hAgo =
+                historicalData.data[historicalData.data.length - 1].price_usd;
+              const percentChange =
+                ((latestPrice - price24hAgo) / price24hAgo) * 100;
+              setChange24h(percentChange);
+            }
+          }
+
           setError(null);
         } else {
-          throw new Error('Failed to fetch price');
+          throw new Error('No price data available');
         }
       } catch (err) {
         setError(err);
@@ -163,12 +186,7 @@ const AptPrice: FC = memo(function AptPrice(): ReactElement {
     );
   }
 
-  if (
-    error ||
-    !aptPriceData?.data?.price ||
-    (typeof aptPriceData.data.price === 'object' &&
-      !aptPriceData.data.price.price)
-  ) {
+  if (error || currentPrice === null) {
     return (
       <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] xs:text-xs sm:text-sm text-muted-foreground">
         <Image
@@ -192,10 +210,6 @@ const AptPrice: FC = memo(function AptPrice(): ReactElement {
     );
   }
 
-  const priceData = aptPriceData.data.price;
-  const price = typeof priceData === 'number' ? priceData : priceData.price;
-  const change24h: number = priceData.change24h || 0;
-  const isPositive = change24h >= 0;
 
   return (
     <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] xs:text-xs sm:text-sm">
@@ -213,27 +227,9 @@ const AptPrice: FC = memo(function AptPrice(): ReactElement {
           img.src = '/placeholder.jpg';
         }}
       />
-      <span
-        className={`font-medium whitespace-nowrap ${
-          change24h !== 0
-            ? isPositive
-              ? 'text-green-500'
-              : 'text-red-500'
-            : ''
-        }`}
-      >
-        ${price.toFixed(2)}
+      <span className="font-medium whitespace-nowrap text-muted-foreground">
+        ${currentPrice.toFixed(2)}
       </span>
-      {change24h !== 0 && (
-        <span
-          className={`font-medium whitespace-nowrap ${
-            isPositive ? 'text-green-500' : 'text-red-500'
-          }`}
-        >
-          {isPositive ? '+' : ''}
-          {change24h.toFixed(2)}%
-        </span>
-      )}
     </div>
   );
 });

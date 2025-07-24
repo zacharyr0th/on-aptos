@@ -1,11 +1,19 @@
 'use client';
 
-import React, { useState, useMemo, useCallback, memo, useEffect } from 'react';
+import { GeistMono } from 'geist/font/mono';
 import { AlertTriangle } from 'lucide-react';
+import Image from 'next/image';
+import React, { useState, useMemo, useCallback, memo, useEffect } from 'react';
+
+import { ErrorBoundary } from '@/components/errors/ErrorBoundary';
+import { Footer } from '@/components/layout/Footer';
+import { Header } from '@/components/layout/Header';
+import { MarketShareChart } from '@/components/pages/rwas/Chart';
+import { RwaTokenDialog } from '@/components/pages/rwas/Dialog';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table,
   TableBody,
@@ -14,26 +22,17 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { MarketShareChart } from '@/components/pages/rwas/Chart';
-import { RwaTokenDialog } from '@/components/pages/rwas/Dialog';
-import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
-import { ErrorBoundary } from '@/components/errors/ErrorBoundary';
-import { RootErrorBoundary } from '@/components/errors/RootErrorBoundary';
-import { Skeleton } from '@/components/ui/skeleton';
-import Image from 'next/image';
-import { formatCurrency } from '@/lib/utils';
-import {
-  formatAmount,
-  formatPercentage as formatPercent,
-  formatNumber,
-} from '@/lib/utils/format';
-import { RWA_COLORS } from '@/lib/config/colors';
-import { RWA_TOKEN_BY_TICKER } from './rwa-constants';
-import { useResponsive } from '@/hooks/useResponsive';
 import { usePageTranslation } from '@/hooks/useTranslation';
-import { logger } from '@/lib/utils/logger';
-// Removed complex suspense boundaries for simpler implementation
+import { RWA_COLORS } from '@/lib/constants';
+import {
+  formatCurrency,
+  formatAmount,
+  formatAmountFull,
+  formatPercentage,
+} from '@/lib/utils';
+
+import { RWA_TOKEN_BY_TICKER } from './rwa-constants';
+
 
 // Function to darken a hex color based on TVL ranking (higher TVL = darker)
 const darkenColor = (hexColor: string, darkenFactor: number): string => {
@@ -134,26 +133,6 @@ interface ProtocolData {
   protocol: string;
 }
 
-// Format currency for display - using centralized formatAmount
-const formatRWAAmount = (value: number): string => {
-  return formatAmount(value, 'USD');
-};
-
-// Format total value with full amount and 2 decimal places
-const formatTotalRWAAmount = (value: number): string => {
-  return formatAmount(value, 'USD', { compact: false, decimals: 2 });
-};
-
-// Format percentage - using centralized formatPercent
-const formatPercentage = (value: number): string => {
-  if (!Number.isFinite(value)) return '0.0';
-  // formatPercent expects value as percentage (not decimal), so we don't divide by 100
-  return formatPercent(value, {
-    minimumFractionDigits: value >= 0.1 ? 1 : 2,
-    maximumFractionDigits: value >= 0.1 ? 1 : 2,
-  }).replace('%', ''); // Remove % since we add it manually in the component
-};
-
 // Calculate market share
 const calculateMarketShare = (
   tokenValue: number,
@@ -177,7 +156,6 @@ const TokenCard = memo(function TokenCard({
 }): React.ReactElement {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
-  const { isMobile } = useResponsive();
 
   // Calculate token data
   const tokenData = useMemo(() => {
@@ -189,7 +167,14 @@ const TokenCard = memo(function TokenCard({
     return {
       marketSharePercent: formatPercentage(marketSharePercent),
       value: protocol.totalValue,
-      formattedValue: formatRWAAmount(protocol.totalValue),
+      formattedValue: (() => {
+        const value = protocol.totalValue;
+        if (value >= 1_000_000_000)
+          return `$${(value / 1_000_000_000).toFixed(1)}b`;
+        if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}m`;
+        if (value >= 1_000) return `$${(value / 1_000).toFixed(1)}k`;
+        return `$${value.toFixed(0)}`;
+      })(),
     };
   }, [protocol.totalValue, totalValue]);
 
@@ -221,82 +206,45 @@ const TokenCard = memo(function TokenCard({
 
   return (
     <>
-      <div
-        className="bg-card border rounded-lg overflow-hidden group cursor-pointer hover:border-primary/50 transition-colors"
-        onClick={handleCardClick}
-      >
-        <div className="h-1" style={{ backgroundColor: tokenColor }} />
-        <div
-          className={`flex justify-between items-center ${isMobile ? 'p-2 pb-0' : 'p-2 sm:p-2.5 pb-0'}`}
-        >
-          <div className="flex items-center gap-2 min-w-0 flex-1">
-            <div
-              className={`${isMobile ? 'w-4 h-4' : 'w-4 h-4 sm:w-5 sm:h-5'} relative flex-shrink-0`}
-            >
-              {!imageLoaded && (
-                <div className="absolute inset-0 bg-muted animate-pulse rounded-full" />
-              )}
-              <Image
-                src={getLogoUrl(protocol.protocol, protocol.assetTicker)}
-                alt={`${protocol.assetTicker} icon`}
-                width={20}
-                height={20}
-                className={`object-contain rounded-full ${!imageLoaded ? 'opacity-0' : ''}`}
-                onLoad={handleImageLoad}
-                onError={e => {
-                  const img = e.target as HTMLImageElement;
-                  img.src = '/placeholder.jpg';
-                  handleImageLoad();
-                }}
-              />
-            </div>
-            <h3
-              className={`${isMobile ? 'text-sm font-semibold' : 'text-base sm:text-lg font-semibold'} text-card-foreground truncate`}
-            >
-              {protocol.assetTicker}
-            </h3>
+      <div className="group cursor-pointer" onClick={handleCardClick}>
+        <div className="flex items-center gap-2 mb-2">
+          <div className="w-5 h-5 relative">
+            {!imageLoaded && (
+              <div className="absolute inset-0 bg-muted animate-pulse rounded-full" />
+            )}
+            <Image
+              src={getLogoUrl(protocol.protocol, protocol.assetTicker)}
+              alt={`${protocol.assetTicker} icon`}
+              width={20}
+              height={20}
+              className={`object-contain rounded-full ${!imageLoaded ? 'opacity-0' : ''}`}
+              onLoad={handleImageLoad}
+              onError={e => {
+                const img = e.target as HTMLImageElement;
+                img.src = '/placeholder.jpg';
+                handleImageLoad();
+              }}
+            />
           </div>
-          <Badge
-            variant="outline"
-            className={`${isMobile ? 'text-xs px-1.5 py-0.5' : 'text-xs px-2 py-0.5'} flex-shrink-0 ml-2`}
-          >
-            {getActualProvider(protocol.assetTicker, protocol.protocol)}
-          </Badge>
+          <h3 className="text-base font-semibold">{protocol.assetTicker}</h3>
         </div>
-        <div
-          className={`${isMobile ? 'px-2 pt-1 pb-0' : 'px-2 sm:px-2.5 pt-1 sm:pt-1.5 pb-0'}`}
-        >
-          <p
-            className={`${isMobile ? 'text-base font-bold' : 'text-lg sm:text-xl font-bold'} text-card-foreground font-mono`}
-          >
-            {tokenData.formattedValue}
-          </p>
-          <p
-            className={`${isMobile ? 'text-xs' : 'text-xs'} text-muted-foreground truncate`}
-          >
-            {protocol.name}
-          </p>
+        <p className="text-lg font-bold font-mono mb-0.5">
+          {tokenData.formattedValue}
+        </p>
+        <div className="flex items-baseline justify-between mb-1">
+          <span className="text-xs text-muted-foreground">
+            {t('rwas:stats.market_share')}
+          </span>
+          <span className="text-xs text-muted-foreground font-mono">
+            {tokenData.marketSharePercent}%
+          </span>
         </div>
-        <div
-          className={`${isMobile ? 'p-2 pt-1' : 'p-2 sm:p-2.5 pt-1 sm:pt-1.5'}`}
-        >
-          <div
-            className={`flex justify-between ${isMobile ? 'text-xs mb-1' : 'text-xs mb-1.5'}`}
-          >
-            <span className="text-muted-foreground">
-              {t('rwas:stats.market_share')}
-            </span>
-            <span className="font-medium text-muted-foreground font-mono">
-              {tokenData.marketSharePercent}%
-            </span>
-          </div>
-          <Progress
-            className="h-1"
-            value={parseFloat(tokenData.marketSharePercent)}
-            trackColor={`${tokenColor}20`}
-            indicatorColor={tokenColor}
-          />
-        </div>
+        <Progress
+          className="h-1"
+          value={parseFloat(tokenData.marketSharePercent)}
+          trackColor={`${tokenColor}20`}
+          indicatorColor={tokenColor}
+        />
       </div>
 
       <RwaTokenDialog
@@ -352,150 +300,38 @@ const TokenCard = memo(function TokenCard({
   );
 });
 
-// Loading state component
 const LoadingState = memo(function LoadingState(): React.ReactElement {
-  const { isMobile } = useResponsive();
-
   return (
     <div className="space-y-6">
-      {/* Skeleton for total value card */}
-      <Card className="border rounded-lg p-4 mb-6">
-        <div className="flex items-center">
-          <div className="flex-grow">
-            <Skeleton className="h-6 w-32 mb-2" />
-            <Skeleton className="h-8 w-60" />
-          </div>
-          <div className="flex flex-col items-end">
-            <Skeleton className="h-10 w-10 rounded mb-1" />
-            <Skeleton className="h-4 w-16" />
-          </div>
-        </div>
-      </Card>
-
-      {/* Desktop Layout Skeleton */}
-      <div className="hidden lg:block">
-        {/* Top section: 3 cards + chart */}
-        <div className="grid grid-cols-4 gap-6 mb-6">
-          {/* First 3 cards skeleton */}
-          <div className="col-span-1 space-y-4">
-            {[1, 2, 3].map(i => (
-              <div
-                key={i}
-                className="bg-card border rounded-lg overflow-hidden"
-              >
-                <Skeleton className="h-1 w-full" />
-                <div className="p-2.5">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Skeleton className="h-5 w-5 rounded-full" />
-                    <Skeleton className="h-6 w-16" />
-                  </div>
-                  <Skeleton className="h-7 w-32 mb-1" />
-                  <Skeleton className="h-4 w-24 mb-3" />
-                  <div className="flex justify-between text-xs mb-1.5">
-                    <Skeleton className="h-3 w-20" />
-                    <Skeleton className="h-3 w-8" />
-                  </div>
-                  <Skeleton className="h-1 w-full" />
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Chart skeleton */}
-          <div className="col-span-3 bg-card border rounded-lg p-6">
-            <Skeleton className="h-[250px] sm:h-[300px] w-full" />
-          </div>
-        </div>
-
-        {/* Remaining rows skeleton - 2 rows of 4 cards */}
-        <div className="grid grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Token cards skeleton */}
+        <div className="md:col-span-1 space-y-6">
           {[1, 2, 3, 4].map(i => (
-            <div
-              key={`row1-${i}`}
-              className="bg-card border rounded-lg overflow-hidden"
-            >
-              <Skeleton className="h-1 w-full" />
-              <div className="p-2.5">
-                <div className="flex items-center gap-2 mb-2">
-                  <Skeleton className="h-5 w-5 rounded-full" />
-                  <Skeleton className="h-6 w-16" />
-                </div>
-                <Skeleton className="h-7 w-32 mb-1" />
-                <Skeleton className="h-4 w-24 mb-3" />
-                <div className="flex justify-between text-xs mb-1.5">
-                  <Skeleton className="h-3 w-20" />
-                  <Skeleton className="h-3 w-8" />
-                </div>
-                <Skeleton className="h-1 w-full" />
+            <div key={i}>
+              <div className="flex items-center gap-2 mb-2">
+                <Skeleton className="h-5 w-5 rounded-full" />
+                <Skeleton className="h-5 w-16" />
               </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-4 gap-4 mb-6">
-          {[1, 2, 3, 4].map(i => (
-            <div
-              key={`row2-${i}`}
-              className="bg-card border rounded-lg overflow-hidden"
-            >
-              <Skeleton className="h-1 w-full" />
-              <div className="p-2.5">
-                <div className="flex items-center gap-2 mb-2">
-                  <Skeleton className="h-5 w-5 rounded-full" />
-                  <Skeleton className="h-6 w-16" />
-                </div>
-                <Skeleton className="h-7 w-32 mb-1" />
-                <Skeleton className="h-4 w-24 mb-3" />
-                <div className="flex justify-between text-xs mb-1.5">
-                  <Skeleton className="h-3 w-20" />
-                  <Skeleton className="h-3 w-8" />
-                </div>
-                <Skeleton className="h-1 w-full" />
+              <Skeleton className="h-6 w-32 mb-1" />
+              <Skeleton className="h-3 w-24 mb-2" />
+              <div className="flex justify-between mb-1">
+                <Skeleton className="h-3 w-20" />
+                <Skeleton className="h-3 w-8" />
               </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Mobile Layout Skeleton */}
-      <div className="lg:hidden space-y-6">
-        {/* All cards skeleton */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
-            <div
-              key={`mobile-${i}`}
-              className="bg-card border rounded-lg overflow-hidden"
-            >
               <Skeleton className="h-1 w-full" />
-              <div className={`${isMobile ? 'p-2' : 'p-2.5'}`}>
-                <div className="flex items-center gap-2 mb-2">
-                  <Skeleton
-                    className={`${isMobile ? 'h-4 w-4' : 'h-5 w-5'} rounded-full`}
-                  />
-                  <Skeleton className="h-6 w-16" />
-                </div>
-                <Skeleton className="h-7 w-32 mb-1" />
-                <Skeleton className="h-4 w-24 mb-3" />
-                <div className="flex justify-between text-xs mb-1.5">
-                  <Skeleton className="h-3 w-20" />
-                  <Skeleton className="h-3 w-8" />
-                </div>
-                <Skeleton className="h-1 w-full" />
-              </div>
             </div>
           ))}
         </div>
 
         {/* Chart skeleton */}
-        <div className="bg-card border rounded-lg p-6">
-          <Skeleton className="h-[250px] w-full" />
+        <div className="md:col-span-1 lg:col-span-3 min-h-[250px] sm:min-h-[300px] relative">
+          <Skeleton className="absolute inset-0" />
         </div>
       </div>
     </div>
   );
 });
 
-// Error state component
 const ErrorState = memo(function ErrorState({
   error,
   onRetry,
@@ -505,22 +341,81 @@ const ErrorState = memo(function ErrorState({
   onRetry: () => void;
   t: (key: string, fallback?: string) => string;
 }): React.ReactElement {
+  const statusMatch = error.match(/HTTP error! Status: (\d+)/);
+  const status = statusMatch ? statusMatch[1] : null;
+  const isCustomMessage = !error.startsWith('HTTP error!');
+
+  // Extract seconds from error message for countdown
+  const secondsMatch = error.match(/Try again in (\d+) seconds/);
+  const initialSeconds = secondsMatch ? parseInt(secondsMatch[1], 10) : 0;
+  const [countdown, setCountdown] = useState(initialSeconds);
+
+  React.useEffect(() => {
+    // Only start countdown if we have seconds to count down from
+    if (initialSeconds <= 0) return;
+
+    setCountdown(initialSeconds);
+
+    const timer = setInterval(() => {
+      setCountdown(prev => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [initialSeconds, error]);
+
   return (
-    <Card className="border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/50">
-      <CardContent className="p-6">
-        <div className="flex items-center gap-4">
-          <div className="p-3 rounded-lg bg-red-100 dark:bg-red-900">
-            <AlertTriangle className="h-8 w-8 text-red-600 dark:text-red-400" />
-          </div>
-          <div>
-            <h2 className="text-lg font-medium text-red-900 dark:text-red-100 mb-1">
-              {t('rwas:error.error_loading_rwa_data')}
-            </h2>
-            <p className="text-red-700 dark:text-red-300 mb-2">{error}</p>
-            <Button onClick={onRetry} variant="destructive" size="sm">
-              {t('rwas:error.retry')}
-            </Button>
-          </div>
+    <Card className="border-destructive mb-6">
+      <CardContent className="p-6 flex items-center">
+        <AlertTriangle className="h-10 w-10 mr-4 flex-shrink-0 text-destructive" />
+        <div>
+          <h3 className="font-bold text-lg mb-1 text-card-foreground">
+            {t('rwas:loading.error_title')}
+          </h3>
+          {status && (
+            <p className="text-muted-foreground text-sm mb-1">
+              HTTP error! Status: {status}
+            </p>
+          )}
+
+          {isCustomMessage ? (
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="font-medium">
+                {t('rwas:loading.rate_limit_message')}
+              </span>
+              {countdown > 0 && (
+                <span className="text-muted-foreground">
+                  {t('rwas:loading.try_again_in')}
+                </span>
+              )}
+              <Button
+                onClick={onRetry}
+                variant="outline"
+                size="sm"
+                className="h-8 px-3"
+                disabled={countdown > 0}
+              >
+                {countdown > 0 ? `${countdown}s` : t('rwas:loading.try_again')}
+              </Button>
+            </div>
+          ) : (
+            <p className="text-muted-foreground">
+              {t('rwas:loading.request_failed')}
+              <Button
+                onClick={onRetry}
+                variant="outline"
+                className="ml-3"
+                size="sm"
+              >
+                {t('rwas:loading.try_again')}
+              </Button>
+            </p>
+          )}
         </div>
       </CardContent>
     </Card>
@@ -528,20 +423,21 @@ const ErrorState = memo(function ErrorState({
 });
 
 export default function RWAsPage(): React.ReactElement {
-  const { isMobile } = useResponsive();
   const { t } = usePageTranslation('rwas');
+  const [forceRefresh, setForceRefresh] = useState(false);
 
   // Fetch real-time RWA data using direct API call
   const [rwaResponse, setRwaResponse] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [rwaError, setRwaError] = useState<Error | null>(null);
+  const [isFetching, setIsFetching] = useState(false);
 
   const fetchRwaData = useCallback(async () => {
     try {
-      setIsLoading(true);
+      setIsFetching(true);
       setRwaError(null);
 
-      const response = await fetch('/api/rwa', {
+      const response = await fetch('/api/aptos/rwa', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -553,44 +449,35 @@ export default function RWAsPage(): React.ReactElement {
       }
 
       const data = await response.json();
-      logger.debug('[RWA Page] API Response:', data);
+      console.log('[RWA Page] API Response:', data);
       setRwaResponse(data);
     } catch (error) {
       setRwaError(error instanceof Error ? error : new Error(String(error)));
     } finally {
       setIsLoading(false);
+      setIsFetching(false);
     }
   }, []);
 
-  // Initial fetch
+  // Auto-refetch every 5 minutes
   useEffect(() => {
     fetchRwaData();
-  }, [fetchRwaData]);
 
-  // Removed preload metrics - using direct API instead
-
-  // Background refresh every 10 minutes
-  useEffect(() => {
-    const interval = setInterval(
-      () => {
-        // Only refresh if user is on the page
-        if (!document.hidden) {
-          if (process.env.NODE_ENV === 'development') {
-            logger.debug('🔄 Background refresh triggered');
-          }
-          fetchRwaData();
-        }
-      },
-      10 * 60 * 1000
-    ); // 10 minutes
-
+    const interval = setInterval(fetchRwaData, 5 * 60 * 1000);
     return () => clearInterval(interval);
-  }, [fetchRwaData]);
-
-  // Removed prefetch logic - using direct API instead
+  }, [fetchRwaData, forceRefresh]);
 
   // Extract data - withApiEnhancements already wraps it in {data: ..., cached: ...}
   const data: any = rwaResponse?.data || null;
+  const loading = isLoading;
+  const error = rwaError?.message || null;
+  const refreshing = isFetching && !isLoading;
+
+  // Manual refresh handler
+  const fetchSupplyData = useCallback(async (): Promise<void> => {
+    setForceRefresh(prev => !prev); // Toggle to force refresh
+    await fetchRwaData();
+  }, [fetchRwaData]);
 
   // Extract protocols from the response and map fields
   const protocols = useMemo(() => {
@@ -606,153 +493,76 @@ export default function RWAsPage(): React.ReactElement {
     }));
   }, [data]);
   const totalRWAValue = data?.totalAptosValue || 0;
-  const dataSource = data?.dataSource || 'RWA.xyz API';
-  const timestamp = data?.timestamp;
 
   // Process data for display
   const processedData = useMemo(() => {
     if (!protocols.length) return null;
-
-    if (process.env.NODE_ENV === 'development') {
-      // Validate that all data comes from RWA.xyz API
-      logger.debug('🔍 Processing RWA data from RWA.xyz API:', {
-        protocolCount: protocols.length,
-        totalValue: totalRWAValue,
-        dataSource,
-        timestamp,
-      });
-
-      // Log each protocol's data to verify it's real
-      protocols.forEach((protocol: any, index: number) => {
-        logger.debug(
-          `📊 Protocol ${index + 1}: ${protocol.assetTicker} - ${formatAmount(protocol.totalValue, 'USD', { compact: false })} (${protocol.protocol})`
-        );
-
-        // Validate required fields are present
-        if (!protocol.totalValue || protocol.totalValue <= 0) {
-          logger.warn(
-            `⚠️ Invalid totalValue for ${protocol.assetTicker}: ${protocol.totalValue}`
-          );
-        }
-        if (!protocol.tokenAddress) {
-          logger.warn(`⚠️ Missing tokenAddress for ${protocol.assetTicker}`);
-        }
-      });
-    }
 
     // Sort by value (largest first)
     const sortedProtocols = [...protocols].sort(
       (a, b) => b.totalValue - a.totalValue
     );
 
-    // Calculate unique providers
-    const uniqueProviders = new Set<string>();
-    sortedProtocols.forEach((protocol: any) => {
-      const provider = getActualProvider(
-        protocol.assetTicker,
-        protocol.protocol
-      );
-      uniqueProviders.add(provider);
-    });
-
-    if (process.env.NODE_ENV === 'development') {
-      logger.debug(
-        '✅ All data validated from RWA.xyz API - NO MOCK DATA USED'
-      );
-    }
-
     return {
       protocols: sortedProtocols,
       totalValue: totalRWAValue,
-      totalFormatted: formatTotalRWAAmount(totalRWAValue),
+      totalFormatted: formatAmountFull(totalRWAValue, 'USD'),
       assetCount: sortedProtocols.length,
-      providerCount: uniqueProviders.size,
     };
-  }, [protocols, totalRWAValue, dataSource, timestamp]);
+  }, [protocols, totalRWAValue]);
 
   const handleRetry = useCallback(() => {
-    fetchRwaData();
-  }, [fetchRwaData]);
-
-  const loading = isLoading;
-  const error = rwaError?.message || null;
+    fetchSupplyData();
+  }, [fetchSupplyData]);
 
   return (
-    <RootErrorBoundary>
-      <div className="min-h-screen flex flex-col bg-background relative">
+    <ErrorBoundary>
+      <div
+        className={`min-h-screen flex flex-col relative ${GeistMono.className}`}
+      >
         {/* Background gradient - fixed to viewport */}
         <div className="fixed inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/10 pointer-events-none" />
+
+        <div className="fixed top-0 left-0 right-0 h-1 z-30">
+          {refreshing && <div className="h-full bg-muted animate-pulse"></div>}
+        </div>
 
         <div className="container-layout pt-6 relative">
           <Header />
         </div>
 
-        <main className="container-layout py-6 flex-1 relative">
+        <main className="container-layout py-3 flex-1 relative">
           {loading ? (
             <LoadingState />
           ) : error ? (
             <ErrorState error={error} onRetry={handleRetry} t={t} />
           ) : processedData ? (
             <>
-              {/* Total Value Card */}
-              <div
-                className={`flex items-center bg-card border rounded-lg ${isMobile ? 'py-2.5 px-3' : 'py-3 px-4'} mb-4 sm:mb-6`}
-              >
-                <div className="flex-grow min-w-0">
-                  <h2
-                    className={`${isMobile ? 'text-sm font-medium' : 'text-sm sm:text-base lg:text-lg font-medium'} text-card-foreground`}
-                  >
-                    {t('rwas:stats.total_rwa_value')}
-                  </h2>
-                  <p
-                    className={`${isMobile ? 'text-lg font-bold' : 'text-lg sm:text-xl lg:text-2xl font-bold'} text-card-foreground font-mono`}
-                  >
-                    {isMobile
-                      ? formatRWAAmount(processedData.totalValue)
-                      : processedData.totalFormatted}
-                  </p>
+              {/* Mobile: Show total supply at top */}
+              <div className="md:hidden mb-6">
+                <div className="flex items-center justify-between mb-1">
+                  <h2 className="text-sm text-muted-foreground">Total Value</h2>
                 </div>
-                <div className="flex flex-col items-end flex-shrink-0 space-y-2">
-                  <div
-                    className={`${isMobile ? 'text-xs' : 'text-xs'} text-muted-foreground text-center`}
-                  >
-                    {t('rwas:stats.real_world_assets')}
-                  </div>
-                  <div
-                    className={`flex items-center ${isMobile ? 'gap-0.5' : 'gap-1'} text-xs text-muted-foreground`}
-                  >
-                    <span>{t('rwas:stats.data_powered_by_prefix')}</span>
-                    <a
-                      href="https://rwa.xyz"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-muted-foreground hover:text-foreground transition-colors"
-                    >
-                      RWA.xyz
-                    </a>
-                    <Image
-                      src="/icons/rwas/rwa.png"
-                      alt="RWA.xyz"
-                      width={12}
-                      height={12}
-                      className="inline rounded-full"
-                      onError={e => {
-                        const img = e.target as HTMLImageElement;
-                        img.src = '/placeholder.jpg';
-                      }}
-                    />
-                  </div>
-                </div>
+                <p className="text-xl font-bold font-mono">
+                  {(() => {
+                    const value = processedData.totalValue;
+                    if (value >= 1_000_000_000)
+                      return `$${(value / 1_000_000_000).toFixed(1)}b`;
+                    if (value >= 1_000_000)
+                      return `$${(value / 1_000_000).toFixed(1)}m`;
+                    if (value >= 1_000)
+                      return `$${(value / 1_000).toFixed(1)}k`;
+                    return `$${value.toFixed(0)}`;
+                  })()}
+                </p>
               </div>
 
-              {/* Desktop: Top row with 3 cards + chart, Mobile: All cards then chart */}
-              {/* Desktop Layout */}
-              <div className="hidden lg:block">
-                {/* Top row: 3 cards + chart */}
-                <div className="grid grid-cols-4 gap-4 xl:gap-6 mb-4 xl:mb-6 items-start">
-                  {/* First 3 cards */}
-                  <div className="col-span-1 space-y-3 xl:space-y-4">
-                    {processedData.protocols.slice(0, 3).map(protocol => (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                {/* Mobile: Show cards in 2 columns, Desktop: Show in 1 column on left */}
+                <div className="grid grid-cols-2 gap-4 md:grid-cols-1 md:col-span-1 md:space-y-4">
+                  {processedData.protocols
+                    ?.slice(0, 4)
+                    .map((protocol: any) => (
                       <TokenCard
                         key={protocol.id}
                         protocol={protocol}
@@ -760,104 +570,59 @@ export default function RWAsPage(): React.ReactElement {
                         allProtocols={processedData.protocols}
                         t={t}
                       />
-                    ))}
-                  </div>
-
-                  {/* Chart - matches height of 3 cards */}
-                  <div className="col-span-3 bg-card border rounded-lg overflow-hidden h-full">
-                    <ErrorBoundary
-                      fallback={
-                        <div className="flex items-center justify-center h-full">
-                          <div className="text-center p-4">
-                            <AlertTriangle className="h-8 w-8 mx-auto mb-2 text-destructive" />
-                            <p className="text-sm text-muted-foreground">
-                              {t('error.failed_to_load_chart')}
-                            </p>
-                          </div>
-                        </div>
-                      }
-                    >
-                      <MarketShareChart
-                        data={processedData.protocols}
-                        totalValue={processedData.totalValue}
-                      />
-                    </ErrorBoundary>
-                  </div>
+                    )) || []}
                 </div>
 
-                {/* Two rows of 4 cards */}
-                {processedData.protocols.length > 3 && (
-                  <>
-                    {/* First row of 4 cards (indices 3-6) */}
-                    <div className="grid grid-cols-4 gap-3 xl:gap-4 mb-4 xl:mb-6">
-                      {processedData.protocols.slice(3, 7).map(protocol => (
-                        <TokenCard
-                          key={protocol.id}
-                          protocol={protocol}
-                          totalValue={processedData.totalValue}
-                          allProtocols={processedData.protocols}
-                          t={t}
+                {/* Chart takes full width on mobile */}
+                <div className="col-span-2 md:col-span-1 lg:col-span-3 min-h-[250px] sm:min-h-[300px] relative">
+                  {/* Total value and RWA.xyz branding in top right corner */}
+                  <div className="absolute top-4 right-4 z-10 text-right">
+                    <div className="flex items-center justify-end gap-2 text-xs text-muted-foreground mb-2">
+                      <span>Powered by</span>
+                      <div className="flex items-center gap-1">
+                        <Image
+                          src="/icons/rwas/rwa.png"
+                          alt="RWA.xyz"
+                          width={16}
+                          height={16}
+                          className="object-contain"
+                          onError={e => {
+                            const img = e.target as HTMLImageElement;
+                            img.src = '/placeholder.jpg';
+                          }}
                         />
-                      ))}
+                        <span className="font-medium">RWA.xyz</span>
+                      </div>
                     </div>
 
-                    {/* Second row of 4 cards (indices 7-10) */}
-                    {processedData.protocols.length > 7 && (
-                      <div className="grid grid-cols-4 gap-3 xl:gap-4 mb-4 xl:mb-6">
-                        {processedData.protocols.slice(7, 11).map(protocol => (
-                          <TokenCard
-                            key={protocol.id}
-                            protocol={protocol}
-                            totalValue={processedData.totalValue}
-                            allProtocols={processedData.protocols}
-                            t={t}
-                          />
-                        ))}
+                    <div>
+                      <div className="flex items-center justify-end gap-3 mb-1">
+                        <h2 className="text-sm text-muted-foreground">
+                          Total Value
+                        </h2>
                       </div>
-                    )}
+                      <p className="text-lg font-bold font-mono">
+                        {(() => {
+                          const value = processedData.totalValue;
+                          if (value >= 1_000_000_000)
+                            return `$${(value / 1_000_000_000).toFixed(1)}b`;
+                          if (value >= 1_000_000)
+                            return `$${(value / 1_000_000).toFixed(1)}m`;
+                          if (value >= 1_000)
+                            return `$${(value / 1_000).toFixed(1)}k`;
+                          return `$${value.toFixed(0)}`;
+                        })()}
+                      </p>
+                    </div>
+                  </div>
 
-                    {/* Additional rows if needed (more than 11 assets) */}
-                    {processedData.protocols.length > 11 && (
-                      <div className="grid grid-cols-4 gap-3 xl:gap-4 mb-4 xl:mb-6">
-                        {processedData.protocols.slice(11).map(protocol => (
-                          <TokenCard
-                            key={protocol.id}
-                            protocol={protocol}
-                            totalValue={processedData.totalValue}
-                            allProtocols={processedData.protocols}
-                            t={t}
-                          />
-                        ))}
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
-
-              {/* Mobile and Tablet Layout */}
-              <div className="lg:hidden space-y-4 sm:space-y-6">
-                {/* All individual cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                  {processedData.protocols.map(protocol => (
-                    <TokenCard
-                      key={protocol.id}
-                      protocol={protocol}
-                      totalValue={processedData.totalValue}
-                      allProtocols={processedData.protocols}
-                      t={t}
-                    />
-                  ))}
-                </div>
-
-                {/* Chart */}
-                <div className="bg-card border rounded-lg overflow-hidden min-h-[250px] sm:min-h-[300px]">
                   <ErrorBoundary
                     fallback={
                       <div className="flex items-center justify-center h-full">
                         <div className="text-center p-4">
                           <AlertTriangle className="h-8 w-8 mx-auto mb-2 text-destructive" />
                           <p className="text-sm text-muted-foreground">
-                            {t('rwas:error.failed_to_load_chart')}
+                            {t('rwas:loading.chart_error')}
                           </p>
                         </div>
                       </div>
@@ -871,6 +636,24 @@ export default function RWAsPage(): React.ReactElement {
                 </div>
               </div>
 
+              {/* Remaining cards below the chart */}
+              {processedData.protocols &&
+                processedData.protocols.length > 4 && (
+                  <div className="mb-6">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                      {processedData.protocols.slice(4).map((protocol: any) => (
+                        <TokenCard
+                          key={protocol.id}
+                          protocol={protocol}
+                          totalValue={processedData.totalValue}
+                          allProtocols={processedData.protocols}
+                          t={t}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+
               {/* Asset Details Table */}
               <div className="mt-8 w-full overflow-hidden">
                 <hr className="border-t border-border mb-6" />
@@ -879,21 +662,21 @@ export default function RWAsPage(): React.ReactElement {
                     <TableHeader>
                       <TableRow>
                         <TableHead className="min-w-[120px] sm:min-w-[150px]">
-                          Protocol
+                          Asset
                         </TableHead>
                         <TableHead className="min-w-[100px] sm:min-w-[120px]">
                           TVL
                         </TableHead>
-                        <TableHead className="min-w-[50px] sm:min-w-[60px]">
+                        <TableHead className="min-w-[50px] sm:min-w-[60px] hidden md:table-cell">
                           %
                         </TableHead>
-                        <TableHead className="min-w-[100px] sm:min-w-[140px]">
+                        <TableHead className="min-w-[100px] sm:min-w-[140px] hidden md:table-cell">
                           Category
                         </TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {processedData.protocols.map(protocol => {
+                      {processedData.protocols?.map((protocol: any) => {
                         const marketSharePercent = (
                           (protocol.totalValue / processedData.totalValue) *
                           100
@@ -923,12 +706,21 @@ export default function RWAsPage(): React.ReactElement {
                               </div>
                             </TableCell>
                             <TableCell className="font-mono whitespace-nowrap">
-                              {formatCurrency(protocol.totalValue, 'USD')}
+                              {(() => {
+                                const value = protocol.totalValue;
+                                if (value >= 1_000_000_000)
+                                  return `$${(value / 1_000_000_000).toFixed(1)}b`;
+                                if (value >= 1_000_000)
+                                  return `$${(value / 1_000_000).toFixed(1)}m`;
+                                if (value >= 1_000)
+                                  return `$${(value / 1_000).toFixed(1)}k`;
+                                return `$${value.toFixed(0)}`;
+                              })()}
                             </TableCell>
-                            <TableCell className="font-mono whitespace-nowrap">
+                            <TableCell className="font-mono whitespace-nowrap hidden md:table-cell">
                               {marketSharePercent}%
                             </TableCell>
-                            <TableCell className="text-sm">
+                            <TableCell className="text-sm hidden md:table-cell">
                               {typeof protocol.assetClass === 'object' &&
                               protocol.assetClass?.name
                                 ? protocol.assetClass.name
@@ -947,6 +739,6 @@ export default function RWAsPage(): React.ReactElement {
 
         <Footer className="relative" />
       </div>
-    </RootErrorBoundary>
+    </ErrorBoundary>
   );
 }

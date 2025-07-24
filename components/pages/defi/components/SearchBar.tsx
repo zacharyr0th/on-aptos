@@ -1,5 +1,5 @@
 import { Search } from 'lucide-react';
-import { Input } from '@/components/ui/input';
+
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -7,6 +7,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
+import { Input } from '@/components/ui/input';
 import { usePageTranslation } from '@/hooks/useTranslation';
 
 interface SearchBarProps {
@@ -38,12 +39,12 @@ export function SearchBar({
         {/* Search Input - When open on mobile */}
         {mobileSearchOpen && (
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder={t('defi:search.placeholder')}
               value={searchQuery}
               onChange={e => onSearchChange(e.target.value)}
-              className="pl-9 h-10 text-sm bg-card shadow-sm border-border/50 focus:border-primary/50 w-full"
+              className="pl-10 h-12 text-base bg-card shadow-sm border-border/50 focus:border-primary/50 w-full rounded-lg"
               onBlur={() => {
                 if (!searchQuery) {
                   onMobileSearchToggle();

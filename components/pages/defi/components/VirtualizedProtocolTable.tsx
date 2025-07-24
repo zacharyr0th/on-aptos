@@ -1,17 +1,19 @@
+import { Github, Globe } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
 import React, { useMemo, useCallback } from 'react';
 import { FixedSizeList as List } from 'react-window';
-import Link from 'next/link';
-import Image from 'next/image';
+
+import { FaXTwitter } from '@/components/icons/SocialIcons';
 import {
   Tooltip,
   TooltipTrigger,
   TooltipContent,
 } from '@/components/ui/tooltip';
 import { useResponsive } from '@/hooks/useResponsive';
-import { defiProtocols } from '../data';
 import { usePageTranslation } from '@/hooks/useTranslation';
-import { Github, Globe } from 'lucide-react';
-import { FaXTwitter } from '@/components/icons/SocialIcons';
+
+import { defiProtocols } from '../data';
 
 interface VirtualizedProtocolTableProps {
   filteredProtocols: typeof defiProtocols;
@@ -125,7 +127,7 @@ const Row = React.memo(
 
           {/* Desktop: Links */}
           {!isMobile && (
-            <div className="w-1/4 px-6">
+            <div className="w-1/4 pl-6 pr-4 flex justify-end">
               <div className="flex items-center gap-3">
                 {socialLinks.map((link, linkIndex) => {
                   const IconComponent = link.icon;
@@ -244,7 +246,7 @@ export const VirtualizedProtocolTable = React.memo(
                   <div className="font-bold text-base py-6 px-6 w-1/4">
                     {t('defi:table.subcategory', 'Subcategory')}
                   </div>
-                  <div className="font-bold text-base py-6 px-6 w-1/4">
+                  <div className="font-bold text-base py-6 pl-6 pr-4 w-1/4 text-right">
                     {t('defi:table.links', 'Links')}
                   </div>
                 </>

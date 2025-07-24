@@ -4,8 +4,14 @@
  */
 
 import { z } from 'zod';
-import { PROTOCOL_ADDRESSES, PROTOCOLS_BY_TYPE } from '@/lib/aptos-constants';
-import { PROTOCOLS, ProtocolType } from '@/lib/protocol-registry';
+
+import {
+  PROTOCOLS,
+  ProtocolType,
+  getProtocolsByType,
+  getAllProtocolAddresses,
+} from '@/lib/protocol-registry';
+import { serviceLogger } from '@/lib/utils/logger';
 
 // Token addresses for better parsing
 const TOKEN_ADDRESSES = {
@@ -101,7 +107,7 @@ export class ComprehensivePositionChecker {
       const data = await response.json();
       return Array.isArray(data) ? data : [];
     } catch (error) {
-      console.error('Error fetching account resources:', error);
+      serviceLogger.error('Error fetching account resources:', error);
       return [];
     }
   }
@@ -212,11 +218,12 @@ export class ComprehensivePositionChecker {
     description: string;
   } {
     // Check all protocol addresses from the registry
-    for (const [address, protocolName] of Object.entries(PROTOCOL_ADDRESSES)) {
+    const allAddresses = getAllProtocolAddresses();
+    for (const address of allAddresses) {
       if (resourceType.includes(address)) {
         // Find the protocol info from the registry
-        const protocol = Object.values(PROTOCOLS).find(
-          p => p.name === protocolName || p.addresses.includes(address)
+        const protocol = Object.values(PROTOCOLS).find(p =>
+          p.addresses.includes(address)
         );
 
         if (protocol) {
@@ -322,7 +329,7 @@ export class ComprehensivePositionChecker {
     walletAddress: string
   ): Promise<ComprehensivePositionSummary> {
     try {
-      console.log(
+      serviceLogger.info(
         `🔍 Analyzing comprehensive positions for wallet: ${walletAddress}`
       );
 
@@ -403,8 +410,9 @@ export class ComprehensivePositionChecker {
         }
 
         // Find the protocol address from the registry
+        const allAddresses = getAllProtocolAddresses();
         const protocolAddress =
-          Object.keys(PROTOCOL_ADDRESSES).find(addr =>
+          allAddresses.find(addr =>
             protocolResourceList.some(r => r.type.includes(addr))
           ) || '';
 
@@ -452,7 +460,7 @@ export class ComprehensivePositionChecker {
         lastUpdated: new Date().toISOString(),
       };
     } catch (error) {
-      console.error('Error getting comprehensive positions:', error);
+      serviceLogger.error('Error getting comprehensive positions:', error);
       return {
         walletAddress,
         positions: [],

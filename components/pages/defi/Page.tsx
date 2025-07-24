@@ -1,11 +1,13 @@
 'use client';
 
-import React, { useState } from 'react';
 import { GeistMono } from 'geist/font/mono';
-import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
-import { RootErrorBoundary } from '@/components/errors/RootErrorBoundary';
+import React, { useState } from 'react';
+
 import { ErrorBoundary } from '@/components/errors/ErrorBoundary';
+import { Footer } from '@/components/layout/Footer';
+import { Header } from '@/components/layout/Header';
+import { usePageTranslation } from '@/hooks/useTranslation';
+
 import {
   StatsSection,
   FilterControls,
@@ -13,8 +15,6 @@ import {
   ProtocolDisplay,
 } from './components';
 import { defiProtocols, categories } from './data';
-import { usePageTranslation } from '@/hooks/useTranslation';
-// Simplified for better compatibility
 
 export default function DefiPage(): React.ReactElement {
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -23,7 +23,8 @@ export default function DefiPage(): React.ReactElement {
   >(undefined);
   const [searchQuery, setSearchQuery] = useState('');
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
-  const { t, getText } = usePageTranslation('defi');
+  const [refreshing, setRefreshing] = useState(false);
+  const { t } = usePageTranslation('defi');
 
   // Filter protocols based on category, subcategory, and search
   const filteredProtocols = defiProtocols.filter(protocol => {
@@ -69,18 +70,22 @@ export default function DefiPage(): React.ReactElement {
   };
 
   return (
-    <RootErrorBoundary>
+    <ErrorBoundary>
       <div
-        className={`min-h-screen flex flex-col bg-background dark:bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjMDAwIj48L3JlY3Q+CjxwYXRoIGQ9Ik0wIDVMNSAwWk02IDRMNCA2Wk0tMSAxTDEgLTFaIiBzdHJva2U9IiMyMjIiIHN0cm9rZS13aWR0aD0iMC41Ij48L3BhdGg+Cjwvc3ZnPg==')] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjZmZmIj48L3JlY3Q+CjxwYXRoIGQ9Ik0wIDVMNSAwWk02IDRMNCA2Wk0tMSAxTDEgLTFaIiBzdHJva2U9IiNlZWUiIHN0cm9rZS13aWR0aD0iMC41Ij48L3BhdGg+Cjwvc3ZnPg==')] relative ${GeistMono.className}`}
+        className={`min-h-screen flex flex-col relative ${GeistMono.className}`}
       >
         {/* Background gradient - fixed to viewport */}
         <div className="fixed inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/10 pointer-events-none" />
+
+        <div className="fixed top-0 left-0 right-0 h-1 z-30">
+          {refreshing && <div className="h-full bg-muted animate-pulse"></div>}
+        </div>
 
         <div className="container-layout pt-6 relative">
           <Header />
         </div>
 
-        <main className="container-layout py-6 flex-1 relative">
+        <main className="container-layout py-4 md:py-3 flex-1 relative px-4 md:px-0">
           <ErrorBoundary
             fallback={
               <div className="p-4 rounded-md bg-destructive/10 text-destructive mb-6">
@@ -116,7 +121,7 @@ export default function DefiPage(): React.ReactElement {
             onSubcategoryChange={setSelectedSubcategory}
           />
 
-          <div className="mt-4 md:mt-8 space-y-4">
+          <div className="mt-6 md:mt-8 space-y-4">
             <SearchBar
               searchQuery={searchQuery}
               onSearchChange={setSearchQuery}
@@ -139,6 +144,6 @@ export default function DefiPage(): React.ReactElement {
 
         <Footer className="relative" />
       </div>
-    </RootErrorBoundary>
+    </ErrorBoundary>
   );
 }

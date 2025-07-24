@@ -1,16 +1,17 @@
-import React, { ReactNode } from 'react';
+import { Analytics } from '@vercel/analytics/react';
+import { Metadata, Viewport } from 'next';
+import { headers } from 'next/headers';
 import { Geist, Geist_Mono } from 'next/font/google';
-import './globals.css';
+import Script from 'next/script';
+import React, { ReactNode } from 'react';
 
 import { ThemeProvider } from '@/components/layout/theme-provider';
 import { I18nProvider } from '@/components/providers/I18nProvider';
-import { WalletProvider } from '@/components/wallet/WalletProvider';
 import { Toaster } from '@/components/ui/sonner';
-import { Analytics } from '@vercel/analytics/react';
-import { Metadata, Viewport } from 'next';
-import Script from 'next/script';
+import { WalletProvider } from '@/components/wallet/WalletProvider';
 import { APP_CONFIG, DEVELOPER_CONFIG } from '@/lib/config/app';
-import { headers } from 'next/headers';
+
+import './globals.css';
 
 // Load fonts with CSS variables
 const geistSans = Geist({
@@ -30,13 +31,12 @@ export const metadata: Metadata = {
     template: '%s | On Aptos - Blockchain Analytics',
   },
   description:
-    'Real-time analytics for Bitcoin, DeFi, LST, and Stablecoins on Aptos blockchain. Track token supplies, prices, and market data with our comprehensive API and dashboards.',
+    'Real-time analytics for Bitcoin, DeFi, and Stablecoins on Aptos blockchain. Track token supplies, prices, and market data with our comprehensive API and dashboards.',
   keywords: [
     'Aptos',
     'blockchain',
     'DeFi',
     'Bitcoin',
-    'LST',
     'Stablecoins',
     'cryptocurrency',
     'blockchain analytics',
@@ -76,7 +76,7 @@ export const metadata: Metadata = {
     url: '/',
     title: 'On Aptos - Real-time Blockchain Analytics',
     description:
-      'Real-time analytics for Bitcoin, DeFi, LST, and Stablecoins on Aptos blockchain. Track token supplies, prices, and market data.',
+      'Real-time analytics for Bitcoin, DeFi, and Stablecoins on Aptos blockchain. Track token supplies, prices, and market data.',
     siteName: 'On Aptos',
     images: [
       {
@@ -91,7 +91,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'On Aptos - Real-time Blockchain Analytics',
     description:
-      'Real-time analytics for Bitcoin, DeFi, LST, and Stablecoins on Aptos blockchain.',
+      'Real-time analytics for Bitcoin, DeFi, and Stablecoins on Aptos blockchain.',
     creator: DEVELOPER_CONFIG.twitter,
     site: '@onaptos',
     images: ['/twitter-image.png'],

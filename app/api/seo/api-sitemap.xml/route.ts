@@ -19,12 +19,6 @@ export async function GET(request: NextRequest) {
       priority: 0.8,
     },
     {
-      url: '/api/aptos/lst',
-      lastmod: currentDate,
-      changefreq: 'hourly',
-      priority: 0.8,
-    },
-    {
       url: '/api/aptos/stables',
       lastmod: currentDate,
       changefreq: 'hourly',

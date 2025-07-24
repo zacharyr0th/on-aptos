@@ -7,9 +7,10 @@ import {
   Tooltip,
   TooltipProps,
 } from 'recharts';
+
 import { useResponsive } from '@/hooks/useResponsive';
+import { RWA_COLORS } from '@/lib/constants';
 import { formatCurrency } from '@/lib/utils';
-import { RWA_COLORS } from '@/lib/config/colors';
 
 // Function to darken a hex color based on TVL ranking (higher TVL = darker)
 const darkenColor = (hexColor: string, darkenFactor: number): string => {
@@ -317,28 +318,6 @@ export const MarketShareChart = memo<MarketShareChartProps>(
     return (
       <div className="flex flex-col items-center justify-center w-full h-full min-h-[300px]">
         <div className="w-full h-full relative">
-          {/* Legend */}
-          <div
-            className={`absolute ${isMobile ? 'top-2 left-2' : 'top-3 left-3'} z-10 bg-card/95 backdrop-blur border rounded-lg ${isMobile ? 'p-1.5' : 'p-3'} ${isMobile ? 'text-xs' : 'text-sm'} ${isMobile ? 'space-y-1' : 'space-y-2'} shadow-sm`}
-          >
-            <div
-              className={`flex items-center ${isMobile ? 'gap-1.5' : 'gap-2'}`}
-            >
-              <div
-                className={`${isMobile ? 'w-2 h-2' : 'w-3 h-3'} rounded-full bg-foreground/70`}
-              ></div>
-              <span className="text-card-foreground/90">Providers</span>
-            </div>
-            <div
-              className={`flex items-center ${isMobile ? 'gap-1.5' : 'gap-2'}`}
-            >
-              <div
-                className={`${isMobile ? 'w-2 h-2 border' : 'w-3 h-3 border-2'} rounded-full border-foreground/70`}
-              ></div>
-              <span className="text-card-foreground/90">Assets</span>
-            </div>
-          </div>
-
           <ResponsiveContainer width="100%" height="100%" minHeight={300}>
             <PieChart>
               {/* Inner ring - Providers */}

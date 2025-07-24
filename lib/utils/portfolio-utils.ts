@@ -169,7 +169,7 @@ export function validateWalletAddress(address: string | null): {
 
   // Import AptosValidators dynamically to avoid circular dependencies
   try {
-    const { AptosValidators } = require('@/lib/aptos-constants');
+    const { AptosValidators } = require('@/lib/constants');
     const validation = AptosValidators.validateAddress(address);
     return validation.isValid
       ? { isValid: true }

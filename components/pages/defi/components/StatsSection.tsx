@@ -1,15 +1,16 @@
 'use client';
 
+import { DollarSign, TrendingUp, Building2, Coins } from 'lucide-react';
 import React from 'react';
-import { DollarSign, TrendingUp, Building2, Coins, Clock } from 'lucide-react';
+
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { formatCurrency } from '@/lib/utils';
+import { useDefiMetrics } from '@/hooks/useDefiMetrics';
 import { usePageTranslation } from '@/hooks/useTranslation';
-import { useState, useEffect, useCallback } from 'react';
+import { formatCurrency } from '@/lib/utils';
 
 interface StatsSectionProps {
   protocolCount: number;
@@ -21,16 +22,12 @@ interface StatsSectionProps {
 
 export function StatsSection({ protocolCount }: StatsSectionProps) {
   const { t } = usePageTranslation('defi');
+  const { metrics: defiMetrics, isLoading, error } = useDefiMetrics();
 
-  // Use static fallback data since DeFi metrics are not critical for main functionality
-  const [defiMetrics, setDefiMetrics] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  // Use static fallback values for now - DeFi page works without these metrics
-  const tvl = defiMetrics?.data?.tvl ?? 0;
-  const spotVolume = defiMetrics?.data?.spotVolume ?? 0;
-  const totalFees24h = defiMetrics?.data?.fees?.total24h ?? 0;
+  // Use live data with fallbacks
+  const tvl = defiMetrics?.tvl ?? 0;
+  const spotVolume = defiMetrics?.spotVolume ?? 0;
+  const totalFees24h = defiMetrics?.fees?.total24h ?? 0;
 
   // Enhanced number formatting function for proper B/M/K display
   const formatNumberClean = (value: number) => {
@@ -47,43 +44,39 @@ export function StatsSection({ protocolCount }: StatsSectionProps) {
   };
 
   // Helper to determine if we have live data
-  const hasLiveData = defiMetrics?.data && !error;
+  const hasLiveData = defiMetrics && !error;
   const hasTvlData = hasLiveData && tvl > 0;
   const hasVolumeData = hasLiveData && spotVolume > 0;
   const hasFeesData = hasLiveData && totalFees24h > 0;
 
   return (
-    <div className="space-y-4 md:space-y-6 mb-4 md:mb-6">
-      {/* Primary Metrics Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
+    <div className="mb-8">
+      {/* Primary Metrics Row - Optimized for mobile and desktop */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 lg:gap-6 mb-6">
         {/* TVL Card */}
         <Tooltip>
           <TooltipTrigger asChild>
-            <div className="flex items-center bg-card border rounded-lg py-3 px-3 sm:px-4 shadow-sm cursor-help">
-              <div className="flex-grow min-w-0">
-                <h2 className="text-sm md:text-lg font-medium text-card-foreground truncate">
-                  {t('defi:stats.total_value_locked')}
+            <div className="flex flex-col bg-card border rounded-xl p-4 md:p-5 shadow-sm hover:shadow-md transition-all duration-200 cursor-help min-h-[100px] md:min-h-[120px] group">
+              <div className="mb-3">
+                <h2 className="text-sm md:text-base font-semibold text-card-foreground">
+                  Total Value Locked
                 </h2>
-                <p className="text-lg md:text-2xl font-bold text-card-foreground font-mono">
+              </div>
+              <div className="flex-1 flex flex-col justify-center">
+                <p className="text-lg md:text-2xl font-bold text-card-foreground font-mono mb-1">
                   {isLoading ? (
-                    <span className="animate-pulse bg-muted rounded w-16 h-6 inline-block"></span>
+                    <span className="animate-pulse bg-muted rounded w-16 md:w-20 h-6 md:h-8 inline-block"></span>
                   ) : (
                     formatNumberClean(tvl)
                   )}
                 </p>
-                <p className="text-xs text-muted-foreground mt-1 truncate">
-                  {t('defi:stats.live_from_defillama')}
-                </p>
-              </div>
-              <div className="p-2 rounded-lg bg-secondary/50 flex-shrink-0">
-                <DollarSign className="h-4 w-4 md:h-5 md:w-5 text-muted-foreground" />
               </div>
             </div>
           </TooltipTrigger>
           <TooltipContent>
             <p>
               Total value of all assets locked in DeFi protocols across the
-              ecosystem
+              Aptos ecosystem
             </p>
           </TooltipContent>
         </Tooltip>
@@ -91,24 +84,20 @@ export function StatsSection({ protocolCount }: StatsSectionProps) {
         {/* Volume Card */}
         <Tooltip>
           <TooltipTrigger asChild>
-            <div className="flex items-center bg-card border rounded-lg py-3 px-3 sm:px-4 shadow-sm cursor-help">
-              <div className="flex-grow min-w-0">
-                <h2 className="text-sm md:text-lg font-medium text-card-foreground truncate">
-                  {t('defi:stats.volume_24h')}
+            <div className="flex flex-col bg-card border rounded-xl p-4 md:p-5 shadow-sm hover:shadow-md transition-all duration-200 cursor-help min-h-[100px] md:min-h-[120px] group">
+              <div className="mb-3">
+                <h2 className="text-sm md:text-base font-semibold text-card-foreground">
+                  24h Volume
                 </h2>
-                <p className="text-lg md:text-2xl font-bold text-card-foreground font-mono">
+              </div>
+              <div className="flex-1 flex flex-col justify-center">
+                <p className="text-lg md:text-2xl font-bold text-card-foreground font-mono mb-1">
                   {isLoading ? (
-                    <span className="animate-pulse bg-muted rounded w-16 h-6 inline-block"></span>
+                    <span className="animate-pulse bg-muted rounded w-16 md:w-20 h-6 md:h-8 inline-block"></span>
                   ) : (
                     formatNumberClean(spotVolume)
                   )}
                 </p>
-                <p className="text-xs text-muted-foreground mt-1 truncate">
-                  {t('defi:stats.live_from_defillama')}
-                </p>
-              </div>
-              <div className="p-2 rounded-lg bg-secondary/50 flex-shrink-0">
-                <TrendingUp className="h-4 w-4 md:h-5 md:w-5 text-muted-foreground" />
               </div>
             </div>
           </TooltipTrigger>
@@ -120,57 +109,23 @@ export function StatsSection({ protocolCount }: StatsSectionProps) {
           </TooltipContent>
         </Tooltip>
 
-        {/* Protocol Count Card */}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <div className="flex items-center bg-card border rounded-lg py-3 px-3 sm:px-4 shadow-sm cursor-help">
-              <div className="flex-grow min-w-0">
-                <h2 className="text-sm md:text-lg font-medium text-card-foreground truncate">
-                  {t('defi:stats.protocols')}
-                </h2>
-                <p className="text-lg md:text-2xl font-bold text-card-foreground font-mono">
-                  {Math.floor(protocolCount).toString()}
-                </p>
-                <p className="text-xs text-muted-foreground mt-1 truncate">
-                  {t('defi:stats.defi_protocols')}
-                </p>
-              </div>
-              <div className="p-2 rounded-lg bg-secondary/50 flex-shrink-0">
-                <Building2 className="h-4 w-4 md:h-5 md:w-5 text-muted-foreground" />
-              </div>
-            </div>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>
-              Number of DeFi protocols currently tracked on Aptos blockchain
-            </p>
-          </TooltipContent>
-        </Tooltip>
-      </div>
-
-      {/* Secondary Metrics Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
         {/* Fees Card */}
         <Tooltip>
           <TooltipTrigger asChild>
-            <div className="flex items-center bg-card border rounded-lg py-3 px-3 sm:px-4 shadow-sm cursor-help">
-              <div className="flex-grow min-w-0">
-                <h2 className="text-sm md:text-lg font-medium text-card-foreground truncate">
-                  {t('defi:stats.fees_24h')}
+            <div className="flex flex-col bg-card border rounded-xl p-4 md:p-5 shadow-sm hover:shadow-md transition-all duration-200 cursor-help min-h-[100px] md:min-h-[120px] group">
+              <div className="mb-3">
+                <h2 className="text-sm md:text-base font-semibold text-card-foreground">
+                  24h Fees
                 </h2>
-                <p className="text-lg md:text-2xl font-bold text-card-foreground font-mono">
+              </div>
+              <div className="flex-1 flex flex-col justify-center">
+                <p className="text-lg md:text-2xl font-bold text-card-foreground font-mono mb-1">
                   {isLoading ? (
-                    <span className="animate-pulse bg-muted rounded w-16 h-6 inline-block"></span>
+                    <span className="animate-pulse bg-muted rounded w-16 md:w-20 h-6 md:h-8 inline-block"></span>
                   ) : (
                     formatNumberClean(totalFees24h)
                   )}
                 </p>
-                <p className="text-xs text-muted-foreground mt-1 truncate">
-                  {t('defi:stats.protocol_fees')}
-                </p>
-              </div>
-              <div className="p-2 rounded-lg bg-secondary/50 flex-shrink-0">
-                <Coins className="h-4 w-4 md:h-5 md:w-5 text-muted-foreground" />
               </div>
             </div>
           </TooltipTrigger>
@@ -181,30 +136,26 @@ export function StatsSection({ protocolCount }: StatsSectionProps) {
           </TooltipContent>
         </Tooltip>
 
-        {/* Stablecoin Volume Card - Coming Soon */}
+        {/* Protocol Count Card */}
         <Tooltip>
           <TooltipTrigger asChild>
-            <div className="flex items-center bg-card border rounded-lg py-3 px-3 sm:px-4 shadow-sm cursor-help">
-              <div className="flex-grow min-w-0">
-                <h2 className="text-sm md:text-lg font-medium text-card-foreground truncate">
-                  {t('defi:stats.stablecoin_volume')}
+            <div className="flex flex-col bg-card border rounded-xl p-4 md:p-5 shadow-sm hover:shadow-md transition-all duration-200 cursor-help min-h-[100px] md:min-h-[120px] group">
+              <div className="mb-3">
+                <h2 className="text-sm md:text-base font-semibold text-card-foreground">
+                  Active Protocols
                 </h2>
-                <p className="text-lg md:text-2xl font-bold text-muted-foreground">
-                  {t('defi:stats.coming_soon')}
-                </p>
-                <p className="text-xs text-muted-foreground mt-1 truncate">
-                  {t('defi:stats.stablecoin_trading')}
-                </p>
               </div>
-              <div className="p-2 rounded-lg bg-secondary/50 flex-shrink-0">
-                <Clock className="h-4 w-4 md:h-5 md:w-5 text-muted-foreground" />
+              <div className="flex-1 flex flex-col justify-center">
+                <p className="text-lg md:text-2xl font-bold text-card-foreground font-mono mb-1">
+                  {Math.floor(protocolCount).toString()}
+                </p>
               </div>
             </div>
           </TooltipTrigger>
           <TooltipContent>
             <p>
-              Stablecoin trading volume metrics will be available in a future
-              update
+              Number of active DeFi protocols currently tracked on Aptos
+              blockchain
             </p>
           </TooltipContent>
         </Tooltip>

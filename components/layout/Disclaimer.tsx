@@ -1,14 +1,15 @@
 'use client';
 
+import { ExternalLink } from 'lucide-react';
 import React from 'react';
+
+import { Button } from '@/components/ui/button';
 import {
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { ExternalLink } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 
 export function Disclaimer() {

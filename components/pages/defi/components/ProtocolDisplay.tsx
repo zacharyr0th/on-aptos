@@ -1,9 +1,12 @@
 import React from 'react';
+
 import { Button } from '@/components/ui/button';
 import { useResponsive } from '@/hooks/useResponsive';
-import { defiProtocols } from '../data';
-import { ProtocolTable } from './ProtocolTable';
 import { usePageTranslation } from '@/hooks/useTranslation';
+
+import { defiProtocols } from '../data';
+
+import { ProtocolTable } from './ProtocolTable';
 
 interface ProtocolDisplayProps {
   filteredProtocols: typeof defiProtocols;

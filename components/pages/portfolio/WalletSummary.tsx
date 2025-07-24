@@ -1,8 +1,3 @@
-import React, { useMemo } from 'react';
-import Image from 'next/image';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
 import {
   Wallet,
   TrendingUp,
@@ -12,12 +7,17 @@ import {
   Info,
   DollarSign,
   Building2,
+  Activity,
+  Shield,
+  Coins,
+  ChartBar,
+  ArrowUpRight,
+  ArrowDownRight,
+  Image as ImageIcon,
+  Layers,
 } from 'lucide-react';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+import Image from 'next/image';
+import React, { useMemo, useState } from 'react';
 import {
   PieChart as RechartsPieChart,
   Pie,
@@ -26,14 +26,27 @@ import {
   Tooltip as RechartsTooltip,
   TooltipProps,
 } from 'recharts';
+
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { cn } from '@/lib/utils';
 import {
   formatCurrency,
   formatPercentage,
   formatTokenAmount,
 } from '@/lib/utils/format';
+import { processAllocationData } from '@/lib/utils/token-categorization';
 import { getTokenLogoUrlWithFallback } from '@/lib/utils/token-logos';
-import { cn } from '@/lib/utils';
+
 import { getProtocolLogo } from './utils';
+
 
 interface FungibleAsset {
   asset_type: string;
@@ -60,12 +73,16 @@ interface WalletSummaryProps {
   totalValue?: number;
   className?: string;
   isLoading?: boolean;
+  selectedNFT?: any;
+  selectedDeFiPosition?: any;
   pieChartData?: Array<{
     symbol: string;
     value: number;
     percentage: number;
   }>;
   pieChartColors?: string[];
+  nfts?: any[];
+  nftTotalValue?: number;
 }
 
 interface AssetAllocation {
@@ -76,19 +93,20 @@ interface AssetAllocation {
   color: string;
   logo: string;
   isDefi?: boolean;
+  category?: string;
 }
 
 const CHART_COLORS = [
-  '#3b82f6',
-  '#8b5cf6',
-  '#ec4899',
-  '#f59e0b',
-  '#10b981',
-  '#06b6d4',
-  '#f43f5e',
-  '#6366f1',
-  '#84cc16',
-  '#f97316',
+  '#93c5fd', // Light Blue
+  '#c4b5fd', // Light Purple
+  '#f9a8d4', // Light Pink
+  '#fed7aa', // Light Orange
+  '#a7f3d0', // Light Green
+  '#a5f3fc', // Light Cyan
+  '#fca5a5', // Light Red
+  '#c7d2fe', // Light Indigo
+  '#d9f99d', // Light Lime
+  '#fdba74', // Light Amber
 ];
 
 // Custom tooltip component for the pie chart
@@ -107,10 +125,10 @@ const CustomTooltip = React.memo(({ active, payload }: any) => {
         <p className="font-semibold text-popover-foreground">{data.symbol}</p>
       </div>
       <p className="text-muted-foreground">
-        Allocation: {formatPercentage(data.percentage)}%
+        Value: {formatCurrency(data.value)}
       </p>
       <p className="text-muted-foreground">
-        Value: {formatCurrency(data.value)}
+        {data.percentage.toFixed(1)}% of portfolio
       </p>
     </div>
   );
@@ -127,104 +145,10 @@ export const WalletSummary: React.FC<WalletSummaryProps> = ({
   isLoading = false,
   pieChartData: providedPieChartData,
   pieChartColors: providedPieChartColors,
+  nfts = [],
+  nftTotalValue = 0,
 }) => {
-  // Calculate asset allocation for pie chart
-  const assetAllocation = useMemo((): AssetAllocation[] => {
-    // Use provided pie chart data if available, but filter for value > $0.1
-    if (providedPieChartData && providedPieChartData.length > 0) {
-      return providedPieChartData
-        .filter(item => item.value > 0.1) // Filter out items with value <= $0.1
-        .map((item, index) => {
-          // Find the corresponding asset for logo
-          const asset = assets?.find(a => a.metadata?.symbol === item.symbol);
-          return {
-            name: item.symbol,
-            symbol: item.symbol,
-            value: item.value,
-            percentage: item.percentage,
-            color:
-              providedPieChartColors?.[
-                index % (providedPieChartColors.length || 1)
-              ] || CHART_COLORS[index % CHART_COLORS.length],
-            logo: asset
-              ? getTokenLogoUrlWithFallback(asset.asset_type, asset.metadata)
-              : '/placeholder.jpg',
-          };
-        });
-    }
-
-    // Fallback to original calculation if no provided data
-    if (
-      ((!assets || assets.length === 0) &&
-        (!defiPositions || defiPositions.length === 0)) ||
-      totalValue === 0
-    )
-      return [];
-
-    // Combine assets and DeFi positions, filtering for value > $0.1
-    const allItems: Array<{
-      name: string;
-      symbol: string;
-      value: number;
-      logo: string;
-      isDefi?: boolean;
-    }> = [];
-
-    // Add valid assets (value > $0.1)
-    if (assets) {
-      assets
-        .filter(asset => (asset.value || 0) > 0.1)
-        .forEach(asset => {
-          allItems.push({
-            name: asset.metadata?.name || 'Unknown',
-            symbol: asset.metadata?.symbol || 'UNK',
-            value: asset.value || 0,
-            logo: getTokenLogoUrlWithFallback(asset.asset_type, asset.metadata),
-            isDefi: false,
-          });
-        });
-    }
-
-    // Remove DeFi positions - we don't want them in the tokens view anymore
-
-    // Sort by value descending
-    allItems.sort((a, b) => b.value - a.value);
-
-    // Take top 6 items, group the rest as "Other"
-    const topItems = allItems.slice(0, 6);
-    const otherItems = allItems.slice(6);
-    const otherValue = otherItems.reduce((sum, item) => sum + item.value, 0);
-
-    const allocation = topItems.map((item, index) => ({
-      name: item.name,
-      symbol: item.symbol,
-      value: item.value,
-      percentage: (item.value / totalValue) * 100,
-      color: CHART_COLORS[index % CHART_COLORS.length],
-      logo: item.logo,
-      isDefi: item.isDefi,
-    }));
-
-    // Add "Other" if there are remaining items
-    if (otherValue > 0) {
-      allocation.push({
-        name: 'Other',
-        symbol: 'Other',
-        value: otherValue,
-        percentage: (otherValue / totalValue) * 100,
-        color: '#94a3b8',
-        logo: '/placeholder.jpg',
-      });
-    }
-
-    return allocation;
-  }, [
-    assets,
-    defiPositions,
-    totalValue,
-    providedPieChartData,
-    providedPieChartColors,
-  ]);
+  const [activeTab, setActiveTab] = useState('allocation');
 
   // Calculate portfolio metrics
   const portfolioMetrics = useMemo(() => {
@@ -232,24 +156,191 @@ export const WalletSummary: React.FC<WalletSummaryProps> = ({
     const verifiedAssets = assets.filter(
       asset => asset.isVerified !== false
     ).length;
-
-    let highestValueAsset: FungibleAsset | null = null;
-    let maxValue = 0;
-
-    for (const asset of assets) {
-      const assetValue = asset.value || 0;
-      if (assetValue > maxValue) {
-        maxValue = assetValue;
-        highestValueAsset = asset;
-      }
-    }
+    const totalDefiValue = (defiPositions || []).reduce(
+      (sum, pos) => sum + (pos.totalValue || 0),
+      0
+    );
 
     return {
       totalAssets,
       verifiedAssets,
-      highestValueAsset,
+      totalDefiValue,
+      tokenValue: totalValue - totalDefiValue,
+      nftCount: nfts.length,
     };
-  }, [assets]);
+  }, [assets, defiPositions, totalValue, nfts]);
+
+  // Calculate allocation data and process categories/top tokens
+  const { allocationCategories, topTokens } = useMemo(() => {
+    const allocations: Array<{
+      assetType: string;
+      symbol: string;
+      value: number;
+      percentage: number;
+    }> = [];
+
+    // Add token assets
+    if (assets && assets.length > 0) {
+      assets
+        .filter(asset => (asset.value || 0) > 0.1)
+        .forEach(asset => {
+          allocations.push({
+            assetType: asset.asset_type,
+            symbol: asset.metadata?.symbol || 'UNK',
+            value: asset.value || 0,
+            percentage:
+              totalValue > 0 ? ((asset.value || 0) / totalValue) * 100 : 0,
+          });
+        });
+    }
+
+    // Add DeFi positions aggregated
+    if (defiPositions && defiPositions.length > 0) {
+      const defiTotal = defiPositions.reduce(
+        (sum, pos) => sum + (pos.totalValue || 0),
+        0
+      );
+      if (defiTotal > 0) {
+        allocations.push({
+          assetType: 'DeFi Positions',
+          symbol: 'DEFI',
+          value: defiTotal,
+          percentage: totalValue > 0 ? (defiTotal / totalValue) * 100 : 0,
+        });
+      }
+    }
+
+    // Process the allocations to get categories and top tokens
+    const { categories, topTokens: topTokensList } =
+      processAllocationData(allocations);
+
+    return {
+      allocationCategories: categories,
+      topTokens: topTokensList,
+    };
+  }, [assets, defiPositions, totalValue]);
+
+  // Calculate allocation data for the donut chart (all by value)
+  const { allAssetsData } = useMemo(() => {
+    const allItems: AssetAllocation[] = [];
+    let colorIndex = 0;
+
+    // Add all tokens with value > $0.1
+    if (assets && assets.length > 0) {
+      assets
+        .filter(asset => (asset.value || 0) > 0.1)
+        .sort((a, b) => (b.value || 0) - (a.value || 0))
+        .forEach(asset => {
+          allItems.push({
+            name: asset.metadata?.name || 'Unknown',
+            symbol: asset.metadata?.symbol || 'UNK',
+            value: asset.value || 0,
+            percentage:
+              totalValue > 0 ? ((asset.value || 0) / totalValue) * 100 : 0,
+            color: CHART_COLORS[colorIndex % CHART_COLORS.length],
+            logo: getTokenLogoUrlWithFallback(asset.asset_type, asset.metadata),
+            category: 'Tokens',
+          });
+          colorIndex++;
+        });
+    }
+
+    // Add all DeFi positions with value
+    if (defiPositions && defiPositions.length > 0) {
+      defiPositions
+        .filter(position => position.totalValue > 0)
+        .sort((a, b) => b.totalValue - a.totalValue)
+        .forEach(position => {
+          allItems.push({
+            name: position.protocol,
+            symbol: position.protocol,
+            value: position.totalValue,
+            percentage:
+              totalValue > 0 ? (position.totalValue / totalValue) * 100 : 0,
+            color: CHART_COLORS[colorIndex % CHART_COLORS.length],
+            logo: getProtocolLogo(position.protocol),
+            category: 'DeFi',
+          });
+          colorIndex++;
+        });
+    }
+
+    return { allAssetsData: allItems };
+  }, [assets, defiPositions, totalValue]);
+
+  // Keep the old data structure for backward compatibility but not used
+  const { categoryData, assetData, valueBasedCategoryData } = useMemo(() => {
+    const tokenCount = assets.length;
+    const defiCount = defiPositions.length;
+
+    const totalAssetCount = tokenCount + defiCount;
+
+    // Calculate value-based totals
+    const tokenValue = assets.reduce(
+      (sum, asset) => sum + (asset.value || 0),
+      0
+    );
+    const defiValue = defiPositions.reduce(
+      (sum, pos) => sum + (pos.totalValue || 0),
+      0
+    );
+
+    // Inner ring - Categories by value
+    const valueCategories = [
+      { name: 'Tokens', value: tokenValue, color: '#93c5fd' },
+      { name: 'DeFi', value: defiValue, color: '#c4b5fd' },
+    ].filter(cat => cat.value > 0);
+
+    // Keep original count-based categories for compatibility
+    const categories = [
+      { name: 'Tokens', value: tokenCount, color: '#93c5fd' },
+      { name: 'DeFi', value: defiCount, color: '#c4b5fd' },
+    ].filter(cat => cat.value > 0);
+
+    // Outer ring - Individual assets (show count, not value)
+    const assetItems: AssetAllocation[] = [];
+
+    // Add tokens (show top tokens by value but represent by count = 1 each)
+    if (assets && assets.length > 0) {
+      const tokenAssets = assets
+        .filter(asset => (asset.value || 0) > 0.1)
+        .sort((a, b) => (b.value || 0) - (a.value || 0))
+        .slice(0, 8);
+
+      tokenAssets.forEach((asset, index) => {
+        assetItems.push({
+          name: asset.metadata?.name || 'Unknown',
+          symbol: asset.metadata?.symbol || 'UNK',
+          value: 1, // Each token counts as 1 asset
+          percentage: totalAssetCount > 0 ? (1 / totalAssetCount) * 100 : 0,
+          color: CHART_COLORS[index % CHART_COLORS.length],
+          logo: getTokenLogoUrlWithFallback(asset.asset_type, asset.metadata),
+          category: 'Tokens',
+        });
+      });
+    }
+
+    // Add DeFi positions (each protocol counts as 1)
+    if (defiPositions && defiPositions.length > 0) {
+      defiPositions.forEach((position, index) => {
+        assetItems.push({
+          name: position.protocol,
+          symbol: position.protocol,
+          value: 1, // Each protocol counts as 1 asset
+          percentage: totalAssetCount > 0 ? (1 / totalAssetCount) * 100 : 0,
+          color: CHART_COLORS[(index + assets.length) % CHART_COLORS.length],
+          logo: '/placeholder.jpg',
+          category: 'DeFi',
+        });
+      });
+    }
+
+    return {
+      categoryData: categories,
+      assetData: assetItems,
+      valueBasedCategoryData: valueCategories,
+    };
+  }, [assets, defiPositions]);
 
   // Loading state
   if (isLoading) {
@@ -264,11 +355,12 @@ export const WalletSummary: React.FC<WalletSummaryProps> = ({
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <Skeleton className="h-16" />
-            <Skeleton className="h-16" />
+          <div className="grid grid-cols-3 gap-4">
+            <Skeleton className="h-20" />
+            <Skeleton className="h-20" />
+            <Skeleton className="h-20" />
           </div>
-          <Skeleton className="h-32" />
+          <Skeleton className="h-64" />
           <div className="space-y-2">
             {[...Array(3)].map((_, i) => (
               <Skeleton key={i} className="h-8" />
@@ -304,176 +396,145 @@ export const WalletSummary: React.FC<WalletSummaryProps> = ({
   }
 
   return (
-    <div className="space-y-8">
-      {/* Combined Portfolio Overview and Asset Holdings */}
-      <Card className="border border-border bg-card">
-        <CardHeader className="border-b border-border bg-muted/30">
-          <CardTitle className="text-lg font-semibold tracking-tight">
-            Portfolio Overview
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          {/* Stats Row */}
-          <div className="grid grid-cols-3 border-b border-border">
-            <div className="p-6 border-r border-border">
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <DollarSign className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-xs uppercase tracking-wide text-muted-foreground font-medium">
-                    Total Value
-                  </span>
-                </div>
-                <p className="text-2xl font-mono font-bold tracking-tight">
-                  {formatCurrency(totalValue)}
-                </p>
-              </div>
-            </div>
+    <div className="space-y-12">
+      {/* Minimal Stats */}
+      <div className="grid grid-cols-3 gap-12">
+        <div>
+          <p className="text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400 mb-0.5">
+            Tokens
+          </p>
+          <p className="text-xl font-light">{assets.length}</p>
+        </div>
+        <div>
+          <p className="text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400 mb-0.5">
+            NFTs
+          </p>
+          <p className="text-xl font-light">{portfolioMetrics.nftCount}</p>
+        </div>
+        <div>
+          <p className="text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400 mb-0.5">
+            DeFi Protocols
+          </p>
+          <p className="text-xl font-light">{defiPositions.length}</p>
+        </div>
+      </div>
 
-            <div className="p-6 border-r border-border">
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <PieChart className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-xs uppercase tracking-wide text-muted-foreground font-medium">
-                    Assets
-                  </span>
-                </div>
-                <p className="text-2xl font-mono font-bold tracking-tight">
-                  {portfolioMetrics.totalAssets}
-                </p>
-              </div>
-            </div>
+      {/* Divider */}
+      <div className="border-b border-neutral-200 dark:border-neutral-800"></div>
 
-            <div className="p-6">
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-xs uppercase tracking-wide text-muted-foreground font-medium">
-                    Verified
-                  </span>
-                </div>
-                <p className="text-2xl font-mono font-bold tracking-tight">
-                  {portfolioMetrics.verifiedAssets}/
-                  {portfolioMetrics.totalAssets}
-                </p>
-              </div>
-            </div>
+      {/* Portfolio Analytics */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+        {/* Allocation Chart */}
+        <div className="space-y-4">
+          {/* Header */}
+          <div>
+            <h3 className="text-lg font-semibold">Allocation</h3>
           </div>
 
-          {/* Asset Holdings with Pie Chart */}
-          {assetAllocation.length > 0 && (
-            <div className="p-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Pie Chart */}
-              <div className="flex flex-col">
-                <h4 className="text-sm font-medium text-muted-foreground mb-4 uppercase tracking-wide">
-                  Allocation
-                </h4>
-                <div className="w-full h-80">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <RechartsPieChart>
-                      <Pie
-                        data={assetAllocation}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={50}
-                        outerRadius={120}
-                        paddingAngle={2}
-                        dataKey="value"
-                        stroke="hsl(var(--border))"
-                        strokeWidth={1}
-                      >
-                        {assetAllocation.map((entry, index) => (
-                          <Cell
-                            key={`cell-${index}`}
-                            fill={entry.color}
-                            className="hover:opacity-80 transition-opacity"
-                          />
-                        ))}
-                      </Pie>
-                      <RechartsTooltip content={<CustomTooltip />} />
-                    </RechartsPieChart>
-                  </ResponsiveContainer>
+          <div className="h-80">
+            {allAssetsData.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <RechartsPieChart>
+                  {/* Single ring showing all assets by value */}
+                  <Pie
+                    data={allAssetsData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={120}
+                    paddingAngle={2}
+                    dataKey="value"
+                    stroke="none"
+                  >
+                    {allAssetsData.map((entry, index) => (
+                      <Cell
+                        key={`asset-${index}`}
+                        fill={entry.color}
+                        className="hover:opacity-80 transition-opacity cursor-pointer"
+                      />
+                    ))}
+                  </Pie>
+
+                  <RechartsTooltip content={<CustomTooltip />} />
+                </RechartsPieChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex items-center justify-center h-full">
+                <div className="text-center">
+                  <PieChart className="h-12 w-12 mx-auto mb-3 text-muted-foreground/30" />
+                  <p className="text-sm text-muted-foreground">
+                    No assets with value data
+                  </p>
+                  <p className="text-xs text-muted-foreground/70 mt-1">
+                    Assets will appear here once price data is available
+                  </p>
                 </div>
               </div>
+            )}
+          </div>
+        </div>
 
-              {/* Holdings List */}
-              <div className="flex flex-col">
-                <h4 className="text-sm font-medium text-muted-foreground mb-4 uppercase tracking-wide">
-                  Holdings
-                </h4>
-                <div className="space-y-4 flex-1">
-                  {assetAllocation.map((item, index) => (
+        {/* Allocation Legend */}
+        <div className="space-y-4">
+          {/* Header */}
+          <div>
+            <h3 className="text-lg font-semibold">Holdings</h3>
+          </div>
+
+          {/* Enhanced Legend */}
+          <div className="space-y-3">
+            {/* Show top assets from the chart */}
+            {allAssetsData.length > 0 ? (
+              <div className="space-y-2">
+                <div className="space-y-2">
+                  {/* Show all assets */}
+                  {allAssetsData.map((asset, index) => (
                     <div
-                      key={index}
-                      className="flex items-center justify-between p-4 border border-border rounded-lg bg-muted/20"
+                      key={`${asset.symbol}-${index}`}
+                      className="flex items-center gap-3 py-2"
                     >
-                      <div className="flex items-center gap-3 min-w-0 flex-1">
-                        <div
-                          className="w-3 h-3 rounded-full flex-shrink-0 border"
-                          style={{
-                            backgroundColor: item.color,
-                            borderColor: item.color,
-                          }}
-                        />
-                        <div className="w-8 h-8 rounded-lg bg-background border border-border flex items-center justify-center overflow-hidden flex-shrink-0">
-                          {item.symbol !== 'Other' ? (
-                            <Image
-                              src={item.logo}
-                              alt={item.symbol}
-                              width={32}
-                              height={32}
-                              className={cn(
-                                'w-full h-full object-cover',
-                                item.symbol === 'APT' && 'dark:invert'
-                              )}
-                            />
-                          ) : (
-                            <PieChart className="h-4 w-4 text-muted-foreground" />
+                      <div
+                        className="w-3 h-3 rounded-full"
+                        style={{ backgroundColor: asset.color }}
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <div className="text-sm font-medium">
+                            {asset.symbol}
+                          </div>
+                          {asset.category === 'DeFi' && (
+                            <Badge variant="secondary" className="text-xs">
+                              DeFi
+                            </Badge>
                           )}
                         </div>
-
-                        <div className="min-w-0 flex-1">
-                          <h3 className="font-semibold tracking-tight truncate text-sm">
-                            {item.symbol}
-                          </h3>
-                          <span className="text-xs text-muted-foreground uppercase">
-                            {item.symbol === 'Other' ? 'MULTIPLE' : 'TOKEN'}
-                          </span>
+                        <div className="text-xs text-muted-foreground">
+                          {formatCurrency(asset.value)}
                         </div>
                       </div>
-
-                      <div className="text-right flex-shrink-0 ml-4">
-                        <p className="font-mono font-bold tracking-tight text-sm">
-                          {formatCurrency(item.value)}
-                        </p>
-                        <p className="text-xs text-muted-foreground font-mono">
-                          {item.percentage.toFixed(1)}%
-                        </p>
+                      <div className="text-sm text-muted-foreground">
+                        {asset.percentage.toFixed(1)}%
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
-            </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+            ) : (
+              <div className="flex items-center justify-center h-full">
+                <div className="text-center">
+                  <Layers className="h-8 w-8 mx-auto mb-2 text-muted-foreground/30" />
+                  <p className="text-sm text-muted-foreground">
+                    No holdings to display
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
 
-      {/* Empty state */}
-      {assets.length === 0 && (
-        <Card className="border border-border bg-card">
-          <CardContent className="p-12 text-center">
-            <Wallet className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2 tracking-tight">
-              No Assets
-            </h3>
-            <p className="text-muted-foreground text-sm">
-              No token holdings detected in this wallet
-            </p>
-          </CardContent>
-        </Card>
-      )}
+      {/* Divider */}
+      <div className="border-b-2 border-border/50"></div>
     </div>
   );
 };

@@ -26,8 +26,8 @@ interface TokenPriceData {
 }
 
 interface BalanceHistoryData {
-  hourly_timestamp: string;
-  total_store_balance_usd: number;
+  date_day: string;
+  total_balance_usd: number;
 }
 
 interface TopPriceChangeData {

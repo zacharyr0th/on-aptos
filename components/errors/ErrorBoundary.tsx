@@ -2,6 +2,8 @@
 
 import React from 'react';
 
+import { logger } from '@/lib/utils/logger';
+
 interface Props {
   children: React.ReactNode;
   fallback?: React.ReactNode;
@@ -24,7 +26,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     // Log to error reporting service here
-    console.error('Component Error:', error, errorInfo);
+    logger.error('Component Error:', error, errorInfo);
   }
 
   render() {

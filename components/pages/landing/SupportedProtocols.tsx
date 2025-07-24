@@ -1,6 +1,9 @@
 'use client';
 
+import { ChevronUp, ChevronDown } from 'lucide-react';
 import { useState, useMemo } from 'react';
+
+import { Badge } from '@/components/ui/badge';
 import {
   Table,
   TableBody,
@@ -9,8 +12,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { ChevronUp, ChevronDown } from 'lucide-react';
 import { PROTOCOLS, ProtocolType } from '@/lib/protocol-registry';
 
 const typeLabels: Record<ProtocolType, string> = {

@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
+
 import { STABLECOINS } from '@/lib/aptos-constants';
 import { TETHER_RESERVE_ADDRESS } from '@/lib/config/data';
+import { logger } from '@/lib/utils/logger';
 
 const INDEXER = 'https://indexer.mainnet.aptoslabs.com/v1/graphql';
 
@@ -51,7 +53,7 @@ export async function GET() {
     const result = await response.json();
 
     if (result.errors) {
-      console.error('GraphQL errors:', result.errors);
+      logger.error('GraphQL errors:', result.errors);
       throw new Error('GraphQL query failed: ' + JSON.stringify(result.errors));
     }
 
@@ -86,7 +88,7 @@ export async function GET() {
       },
     });
   } catch (error) {
-    console.error('Error fetching USDT data:', error);
+    logger.error('Error fetching USDT data:', error);
     return NextResponse.json(
       {
         error: 'Failed to fetch USDT data',

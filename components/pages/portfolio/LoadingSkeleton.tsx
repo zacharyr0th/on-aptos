@@ -1,8 +1,8 @@
 'use client';
 
-import { Skeleton } from '@/components/ui/skeleton';
-import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import { Header } from '@/components/layout/Header';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export const LoadingSkeleton = () => {
   return (

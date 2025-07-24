@@ -20,7 +20,6 @@ module.exports = {
       '/': 1.0,
       '/bitcoin': 0.9,
       '/defi': 0.9,
-      '/lst': 0.9,
       '/stablecoins': 0.9,
       '/rwas': 0.9,
       '/btc': 0.9, // Alternative bitcoin path
