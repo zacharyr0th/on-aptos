@@ -117,7 +117,13 @@ export function usePortfolioData(
         });
 
         // Fetch NFTs in parallel since it uses a different service
-        const nftsData = await NFTService.getAllWalletNFTs(walletAddress);
+        let nftsData = [];
+        try {
+          nftsData = await NFTService.getAllWalletNFTs(walletAddress);
+        } catch (nftError) {
+          logger.error('Failed to fetch NFTs:', nftError);
+          // Continue without NFTs if rate limited
+        }
 
         logger.debug('API responses received', {
           assetsStatus: assetsResponse.status,
@@ -241,7 +247,13 @@ export function usePortfolioData(
         retryDelay: 2000,
       });
 
-      const nftsData = await NFTService.getAllWalletNFTs(walletAddress);
+      let nftsData = [];
+      try {
+        nftsData = await NFTService.getAllWalletNFTs(walletAddress);
+      } catch (nftError) {
+        logger.error('Failed to fetch NFTs:', nftError);
+        // Continue without NFTs if rate limited
+      }
 
       if (!assetsResponse.ok || !defiResponse.ok) {
         const errors = [];
