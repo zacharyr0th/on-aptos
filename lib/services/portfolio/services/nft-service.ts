@@ -211,6 +211,11 @@ export class NFTService {
         logger.info(
           `[NFTService] Page ${page} returned ${response.data.length} NFTs`
         );
+        
+        // Add a small delay between batches to avoid rate limiting
+        if (offset + limit < totalCount) {
+          await sleep(500); // 500ms between batches
+        }
 
         allNFTs.push(...response.data);
         offset += limit;
