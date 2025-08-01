@@ -1,0 +1,382 @@
+{
+  "page": {
+    "title": "Aptos의 DeFi",
+    "description": "Aptos 블록체인의 DeFi 프로토콜 종합 디렉토리"
+  },
+  "stats": {
+    "total_value_locked": "총 예치 가치",
+    "volume_24h": "24시간 거래량",
+    "protocols": "프로토콜",
+    "filtered_protocols": "필터된 프로토콜",
+    "live_from_defillama": "DeFiLlama 실시간 데이터",
+    "estimated_tvl": "예상 TVL",
+    "volume_data": "24시간 거래량",
+    "defi_protocols": "DeFi 프로토콜",
+    "fees_24h": "Fees 24h",
+    "protocol_fees": "Protocol fees",
+    "stablecoin_volume": "Stablecoin Volume",
+    "stablecoin_trading": "Stablecoin trading volume",
+    "coming_soon": "Coming Soon"
+  },
+  "search": {
+    "placeholder": "프로토콜 검색...",
+    "results": "{{count}}개 프로토콜 발견",
+    "results_of": "총 {{total}}개 프로토콜 중",
+    "no_results": "검색 조건에 맞는 프로토콜이 없습니다.",
+    "clear_search": "검색 초기화",
+    "search_hint": "이름, 카테고리 또는 설명으로 검색"
+  },
+  "filters": {
+    "all": "전체",
+    "category": "카테고리",
+    "subcategory": "하위 카테고리",
+    "clear_filters": "필터 초기화",
+    "filter_by_category": "카테고리별 필터",
+    "view_grid": "그리드 보기",
+    "view_table": "테이블 보기",
+    "mobile_filters": "필터",
+    "active_filters": "활성 필터",
+    "subcategories_header": "{{category}} 하위 카테고리:"
+  },
+  "tooltips": {
+    "grid_view": "그리드 보기로 전환",
+    "table_view": "테이블 보기로 전환",
+    "category_filter": "카테고리별 프로토콜 필터",
+    "subcategory_filter": "하위 카테고리별 프로토콜 필터",
+    "clear_all_filters": "모든 활성 필터 제거",
+    "search_protocols": "모든 프로토콜 검색",
+    "protocol_website": "공식 웹사이트 방문",
+    "protocol_github": "GitHub에서 소스 코드 보기",
+    "protocol_twitter": "X (Twitter) 팔로우",
+    "category_description": "{{category}} 프로토콜: {{description}}",
+    "subcategory_description": "{{subcategory}}: {{description}}"
+  },
+  "categories": {
+    "All": {
+      "name": "전체",
+      "description": "모든 DeFi 프로토콜"
+    },
+    "Credit": {
+      "name": "크레딧",
+      "description": "차입, 대출 및 신용 기반 서비스를 촉진하는 프로토콜",
+      "subcategories": {
+        "Lending": {
+          "name": "대출",
+          "description": "사용자가 이자율과 함께 암호화폐 자산을 대출하고 차입할 수 있는 플랫폼"
+        },
+        "RWA Lending": {
+          "name": "실물 자산 대출",
+          "description": "부동산이나 상품과 같은 실물 자산으로 뒷받침되는 대출 프로토콜"
+        },
+        "NFT Lending": {
+          "name": "NFT 대출",
+          "description": "NFT를 담보로 돈을 빌리거나 NFT 보유자에게 대출"
+        },
+        "Uncollateralized Lending": {
+          "name": "무담보 대출",
+          "description": "평판이나 신용 점수를 기반으로 한 담보 없는 대출"
+        },
+        "CDP": {
+          "name": "CDP",
+          "description": "담보 부채 포지션 - 스마트 계약에 담보를 고정하여 스테이블코인 생성"
+        }
+      }
+    },
+    "Yield": {
+      "name": "수익률",
+      "description": "스테이킹, 수익률 생성 및 보상 분배에 초점을 맞춘 프로토콜",
+      "subcategories": {
+        "Liquid Staking": {
+          "name": "유동성 스테이킹",
+          "description": "유동성을 유지하기 위해 거래 가능한 영수증을 받으면서 토큰 스테이킹"
+        },
+        "Restaking": {
+          "name": "재스테이킹",
+          "description": "이미 스테이킹된 토큰을 사용하여 추가 보상을 위해 추가 프로토콜 보안"
+        },
+        "Liquid Restaking": {
+          "name": "유동성 재스테이킹",
+          "description": "거래하거나 DeFi에서 사용할 수 있는 유동 토큰으로 재스테이킹"
+        },
+        "Liquidity Manager": {
+          "name": "유동성 관리자",
+          "description": "풀 간 유동성을 최적화하고 재조정하는 도구 또는 프로토콜"
+        },
+        "Leveraged Farming": {
+          "name": "레버리지 파밍",
+          "description": "자금을 빌려 유동성 제공을 늘리고 파밍 보상을 증폭"
+        },
+        "Yield Aggregator": {
+          "name": "수익률 집계자",
+          "description": "최고의 수익률 기회를 자동으로 찾고 전환"
+        }
+      }
+    },
+    "Trading": {
+      "name": "거래",
+      "description": "거래, 마켓 메이킹 및 유동성 제공을 위한 프로토콜",
+      "subcategories": {
+        "DEX": {
+          "name": "DEX",
+          "description": "중개자 없이 토큰을 교환하는 탈중앙화 거래소"
+        },
+        "DEX Aggregator": {
+          "name": "DEX 집계자",
+          "description": "최적의 거래를 위해 여러 DEX에서 최고 가격 찾기"
+        },
+        "Perps": {
+          "name": "무기한 선물",
+          "description": "암호화폐 자산에 레버리지를 이용한 무기한 선물 계약 거래"
+        },
+        "Options": {
+          "name": "옵션",
+          "description": "가격 움직임을 헤지하거나 투기하기 위한 옵션 계약 매매"
+        },
+        "Prediction Market": {
+          "name": "예측 시장",
+          "description": "암호화폐를 사용하여 실제 이벤트와 결과에 베팅"
+        },
+        "Launchpad": {
+          "name": "런치패드",
+          "description": "공정한 분배와 커뮤니티 기능으로 새로운 토큰 출시"
+        }
+      }
+    },
+    "Multiple": {
+      "name": "다중",
+      "description": "다양한 카테고리에 걸쳐 여러 DeFi 제품을 제공하는 프로토콜"
+    }
+  },
+  "subcategories": {
+    "lending": "대출",
+    "rwa_lending": "실물 자산 대출",
+    "nft_lending": "NFT 대출",
+    "uncollateralized_lending": "무담보 대출",
+    "cdp": "CDP",
+    "liquid_staking": "유동성 스테이킹",
+    "restaking": "재스테이킹",
+    "liquid_restaking": "유동성 재스테이킹",
+    "liquidity_manager": "유동성 관리자",
+    "leveraged_farming": "레버리지 파밍",
+    "yield_aggregator": "수익률 집계자",
+    "dex": "DEX",
+    "dex_aggregator": "DEX 집계자",
+    "perps": "무기한 선물",
+    "launchpad": "런치패드",
+    "options": "옵션",
+    "prediction_markets": "예측 시장"
+  },
+  "protocol": {
+    "website": "웹사이트",
+    "github": "GitHub",
+    "twitter": "X (Twitter)",
+    "links": "링크",
+    "tvl": "TVL",
+    "volume": "거래량",
+    "yield": "수익률",
+    "status": "상태",
+    "launch_date": "출시일",
+    "audit_status": "감사 상태",
+    "networks": "네트워크",
+    "category": "카테고리",
+    "subcategory": "하위 카테고리",
+    "description": "설명",
+    "more_info": "자세히",
+    "external_links": "외부 링크",
+    "implementation": "구현",
+    "security": "보안",
+    "token": "토큰"
+  },
+  "protocol_values": {
+    "status": {
+      "Active": "활성",
+      "Deprecated": "폐기됨",
+      "Beta": "베타",
+      "Coming Soon": "출시 예정"
+    },
+    "audit_status": {
+      "Audited": "감사됨",
+      "Unaudited": "감사되지 않음",
+      "In Progress": "진행 중",
+      "Partially Audited": "부분 감사됨"
+    },
+    "networks": {
+      "mainnet": "메인넷",
+      "testnet": "테스트넷",
+      "devnet": "개발넷"
+    },
+    "implementations": {
+      "Money Market": "머니 마켓",
+      "Isolated Pools": "격리된 풀",
+      "Validator Delegated": "검증자 위임",
+      "Range Orders": "범위 주문",
+      "Borrowing-based": "차입 기반",
+      "Multi-protocol": "다중 프로토콜",
+      "AMM": "AMM",
+      "CLOB": "CLOB",
+      "Hybrid": "하이브리드",
+      "Route Optimization": "라우트 최적화",
+      "Gas Optimization": "가스 최적화",
+      "Cross-chain": "크로스체인",
+      "Cross-margin": "크로스 마진",
+      "Fair Launch": "공정 출시",
+      "Protocol Suite": "프로토콜 스위트"
+    }
+  },
+  "protocols": {
+    "mirage": {
+      "description": "Composable liquidity layer bringing next-gen DeFi. Deposit collateral and borrow self-repaying stablecoin loans powered by perpetuals with up to 100x leverage.",
+      "categoryBreakdown": "Trading • Perps",
+      "feeStructure": "Dynamic fee structure based on trading volume and position size. Competitive fees for perpetual futures trading.",
+      "integration": {
+        "description": "Fully on-chain perpetuals with CEX-like experience. All positions, vaults, and orders are represented as NFTs for secondary market trading."
+      }
+    }
+  },
+  "protocol_descriptions": {
+    "Panora": "온체인 주문서와 10개 이상의 AMM에 연결되는 \"메타-DEX\"로, 풀 간에 주문을 분할하면서 UI에서 자동 업데이트되는 정규 토큰 목록을 관리합니다.",
+    "Kana": "9개 체인에 걸쳐 스왈을 라우팅; 페이마스터 계약을 통해 사용자가 가스용 APT를 보유하지 않고도 Aptos에서 거래 가능; 주문서 기반 perp 엔진.",
+    "Thetis": "Thetis는 스팩 집계기, 50× 무기한 선물, 유동성 부트스트래핑 풀(LBPs)을 하나의 지붕 아래 번들합니다.",
+    "Anqa": "15개 이상의 Aptos DEX에서 99%의 유동성 커버리지를 주장; 실시간 샘플링으로 서명 전 슬리피지를 미리 보고 가스 절약을 위해 멀티 토큰 스왈을 배치 처리할 수 있습니다.",
+    "LiquidSwap": "Pontem의 플래그십 AMM이자 Aptos 메인넷에서 최초로 라이브된 DEX; 클래식 Uniswap-V2 풀, 스테이블 스왈 커브, 공식적으로 검증된 집중 유동성 설계를 제공합니다.",
+    "Econia": "Aptos의 낙관적 동시성에 최적화된 하이퍼 병렬 온체인 주문서; 1초 미만의 최종성으로 시장을 병렬 처리하고 완전한 REST/MQTT 데이터 스택을 노출합니다.",
+    "Cellana": "veNFT 투표자가 배출을 지시하고 100%의 수수료를 포획하는 ve(3,3) AMM.",
+    "PancakeSwap": "Binance의 플래그십 DEX가 V2 AMM을 Move로 복제하고 일부 CAKE 유동성을 Aptos로 브리징했습니다.",
+    "SushiSwap": "Sushi는 첫 번째 비EVM 통합을 수행하여 친숙한 Trident 라우터 UX를 보존하면서 Aptos에서 결제되는 크로스체인 경로를 가능하게 했습니다.",
+    "Hyperion": "HFT 스타일 거래를 위해 Aptos의 처리량을 활용하는 완전한 온체인 하이브리드 주문서 + CL-AMM.",
+    "Tapp": "Aptos 테스트넷에서 최초로 훅이 활성화된 Uniswap V4 스타일 모듈러 DEX; 스마트 계약 훅을 통해 빌더가 커스텀 풀을 구성할 수 있고 사용자는 프로그래머블 스왈을 얻을 수 있습니다.",
+    "Merkle": "XP, 루트 박스, 150× 레버리지를 갖춘 게임화된 perp DEX; 200억 달러 이상의 총 거래량.",
+    "AGDEX": "리테일 트레이더를 위해 슬리피지를 좋게 유지하는 낮은 영향 오라클 체결을 갖춘 1-100× 크로스 마진 perp를 제공합니다.",
+    "Pump": "누구나 본딩 커브를 통해 밈 토큰을 발행할 수 있습니다; 모든 코인은 선판매나 팀 할당 없이 공정하게 출시됩니다.",
+    "Emojicoin": "사용자가 유니코드 이모지와 1대 1로 매핑된 토큰을 발행할 수 있게 함; 각 출시는 즉시 가격 발견과 투기를 위해 Econia의 CL-AMM 커브를 사용합니다.",
+    "Aries": "Aptos에서 최초의 Compound 스타일 머니 마켓으로, 90% LTV E-Mode, 통합 브리징, 그리고 하나의 인터페이스에서 현물 거래로 업그레이드되었습니다.",
+    "Superposition": "영국은행의 FHS VaR에서 영감을 받은 고급 리스크 관리 플랫폼으로, 실시간 리스크 모니터링과 동적 담보 요소 조정을 통해 레버리지 수익 기회를 제공합니다.",
+    "Joule": "레버리지 파밍을 위해 분리된 대출 풀과 \"Liquidity Anchors\"를 결합합니다.",
+    "Echelon": "E-Mode와 분리된 시장을 모두 지원하는 대출 허브.",
+    "Aptin": "정형 검증을 위해 Move Prover를 사용하고 세분화된 분리 풀 리스크 컨트롤을 제공하는 보안 우선 대출 플랫폼.",
+    "Meso": "사용자 구성 가능한 부채 상한선과 프로토콜 부족을 보완하는 안전 모듈이 있는 자본 효율적 대출.",
+    "TruFin": "기업급 리퀴 스테이킹; 사용자는 APT 스테이킹의 대가로 TruAPT를 받습니다.",
+    "Amnis": "이중 토큰 시스템이 stAPT(수익 창출) 및 amAPT(안정성)를 발행하여 사용자가 수익과 안정성 사이를 전환할 수 있게 하면서 검증자 수수료를 스테이커에게 되돌립니다.",
+    "Kofi": "MEV 부스트 리퀴 스테이킹과 레버리지 LSD 볼트.",
+    "Ichi": "자동화된 유동성 관리자 볼트로 프로젝트가 단측 유동성을 제공할 수 있음; 스마트 범위가 비영구 손실을 줄이기 위해 리뱸런싱하며 재무부는 네이티브 토큰으로 스왈 수수료를 획득.",
+    "Vibrant X": "예금을 최고 APY Aptos 풀로 재배치하는 수익 최적화 도구 및 포트폴리오 대시보드.",
+    "Moar": "사용자가 한 곳에서 대출하고 다른 곳에서 배포할 수 있는 크로스 프로토콜 신용 계정으로 레버리지 파밍 레이어를 구축.",
+    "Thala": "멀티 풀 AMM, 초과 담보 MOD 스테이블코인, sthAPT와 thAPT를 통한 리퀴 스테이킹을 특징으로 하는 DeFi 애플리케이션 스위트.",
+    "Mirage": "A composable liquidity layer powering DeFi's next frontier. Deposit collateral and borrow a self-repaying stablecoin loan powered by perpetuals. Features fully on-chain perps with CEX-like experience, instant execution, low fees, and up to 100x leverage."
+  },
+  "protocol_category_breakdown": {
+    "Thala": "트레이딩 • 수익 • 신용"
+  },
+  "table": {
+    "protocol": "프로토콜",
+    "category": "카테고리",
+    "subcategory": "하위 카테고리",
+    "tvl": "TVL",
+    "links": "링크",
+    "sort_by": "정렬",
+    "sort_asc": "오름차순 정렬",
+    "sort_desc": "내림차순 정렬"
+  },
+  "fallbacks": {
+    "multiple_defi_products": "다중 DeFi 제품",
+    "defi_protocol_category": "DeFi 프로토콜 카테고리",
+    "defi_protocol_subcategory": "DeFi 프로토콜 하위 카테고리",
+    "unknown_category": "알 수 없는 카테고리",
+    "unknown_subcategory": "알 수 없는 하위 카테고리",
+    "no_description": "설명이 없습니다",
+    "visit_protocol": "프로토콜 방문"
+  },
+  "actions": {
+    "view_protocol": "프로토콜 보기",
+    "visit_website": "웹사이트 방문",
+    "view_on_github": "GitHub에서 보기",
+    "follow_on_twitter": "X 팔로우",
+    "copy_link": "링크 복사",
+    "share": "공유"
+  },
+  "ui": {
+    "search": {
+      "placeholder": "프로토콜 검색...",
+      "results_count": "{{count}}개 결과",
+      "results_count_plural": "{{count}}개 결과",
+      "breadcrumb": "전체 > {{category}}"
+    },
+    "filters": {
+      "category": "카테고리:",
+      "all_categories": "모든 카테고리",
+      "clear_filters": "초기화",
+      "view_mode": {
+        "grid": "그리드 보기",
+        "table": "테이블 보기"
+      },
+      "tooltips": {
+        "category_filter": "카테고리별 프로토콜 필터",
+        "clear_filters": "모든 활성 필터 초기화",
+        "grid_view": "그리드 보기로 전환",
+        "table_view": "테이블 보기로 전환"
+      }
+    },
+    "stats": {
+      "total_protocols": "총 프로토콜",
+      "total_protocols_tooltip": "추적되는 DeFi 프로토콜의 총 수",
+      "categories": "카테고리",
+      "categories_tooltip": "사용 가능한 DeFi 카테고리 수",
+      "data_source": "데이터 소스",
+      "data_source_tooltip": "프로토콜 데이터의 출처",
+      "loading": "통계 로딩 중..."
+    },
+    "table": {
+      "headers": {
+        "name": "이름",
+        "category": "카테고리",
+        "links": "링크"
+      },
+      "tooltips": {
+        "sort_by_name": "프로토콜 이름으로 정렬",
+        "sort_by_category": "카테고리로 정렬",
+        "visit_website": "프로토콜 웹사이트 방문",
+        "view_github": "GitHub 저장소 보기",
+        "follow_twitter": "Twitter 팔로우"
+      },
+      "no_data": "프로토콜이 없습니다",
+      "loading": "프로토콜 로딩 중..."
+    },
+    "grid": {
+      "tooltips": {
+        "protocol_card": "{{protocol}} 세부 정보를 보려면 클릭",
+        "visit_website": "{{protocol}} 웹사이트 방문",
+        "view_github": "GitHub에서 {{protocol}} 보기",
+        "follow_twitter": "Twitter에서 {{protocol}} 팔로우"
+      }
+    },
+    "messages": {
+      "no_protocols": "검색 조건에 맞는 프로토콜이 없습니다.",
+      "loading": "로딩 중...",
+      "error": "프로토콜 로딩 오류",
+      "empty_state": "사용 가능한 DeFi 프로토콜이 없습니다",
+      "try_clearing_filters": "필터나 검색어를 초기화해 보세요."
+    }
+  },
+  "common_values": {
+    "na": "해당 없음",
+    "not_available": "사용할 수 없음",
+    "real_time": "실시간",
+    "live": "라이브",
+    "estimated": "예상",
+    "unknown": "알 수 없음",
+    "loading": "로딩 중...",
+    "error": "오류",
+    "coming_soon": "출시 예정",
+    "tbd": "미정",
+    "varies": "가변"
+  },
+  "units": {
+    "million": "백만",
+    "billion": "십억",
+    "trillion": "조",
+    "percent": "%",
+    "usd": "USD",
+    "apt": "APT",
+    "btc": "BTC"
+  }
+}

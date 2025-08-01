@@ -1,0 +1,77 @@
+{
+  "page": {
+    "title": "Stablecoin trên Aptos",
+    "description": "Stablecoin và tiền tệ ổn định trên blockchain Aptos"
+  },
+  "stats": {
+    "total_stablecoin_value": "Tổng giá trị Stablecoin",
+    "stablecoins": "Stablecoin",
+    "market_share": "Thị phần",
+    "market_cap": "Vốn hóa thị trường",
+    "price": "Giá",
+    "supply": "Cung cấp",
+    "volume_24h": "Khối lượng 24h",
+    "price_change_24h": "Thay đổi giá 24h",
+    "asset_details": "Chi tiết tài sản"
+  },
+  "table": {
+    "token": "Token",
+    "supply": "Cung cấp",
+    "market_share": "%",
+    "type": "Loại",
+    "issuer": "Nhà phát hành"
+  },
+  "loading": {
+    "loading_stablecoin_data": "Đang tải dữ liệu stablecoin...",
+    "loading": "Đang tải...",
+    "rate_limit_message": "Wow! Vui lòng đi chậm lại một chút.",
+    "try_again_in": "Thử lại sau",
+    "try_again": "Thử lại",
+    "request_failed": "Không thể hoàn thành yêu cầu."
+  },
+  "error": {
+    "error_loading_stablecoin_data": "Lỗi khi tải dữ liệu Stablecoin",
+    "retry": "Thử lại",
+    "failed_to_load_chart": "Không thể tải biểu đồ"
+  },
+  "stablecoins": {
+    "usdt": "Tether USD",
+    "usdc": "USD Coin",
+    "dai": "Dai Stablecoin",
+    "busd": "Binance USD",
+    "frax": "Frax",
+    "tusd": "TrueUSD",
+    "usdp": "Pax Dollar",
+    "gusd": "Gemini Dollar"
+  },
+  "types": {
+    "fiat_collateralized": "Thế chấp bằng tiền pháp định",
+    "crypto_collateralized": "Thế chấp bằng crypto",
+    "algorithmic": "Thuật toán",
+    "commodity_backed": "Được hỗ trợ bởi hàng hóa"
+  },
+  "actions": {
+    "view_details": "Xem chi tiết",
+    "trade": "Giao dịch",
+    "add_to_wallet": "Thêm vào ví",
+    "visit_website": "Truy cập trang web"
+  },
+  "filters": {
+    "all": "Tất cả",
+    "by_type": "Theo loại",
+    "by_market_cap": "Theo vốn hóa",
+    "stable": "Ổn định",
+    "depegged": "Mất neo"
+  },
+  "labels": {
+    "tether_reserve_address": "Địa chỉ dự trữ Tether",
+    "subtracted_from_supply": "(Đã trừ khỏi nguồn cung lưu hành)",
+    "view_on_explorer": "Xem trên Aptos Explorer",
+    "reserve_address": "địa chỉ dự trữ"
+  },
+  "fallbacks": {
+    "unknown_stablecoin": "Stablecoin không xác định",
+    "data_not_available": "Dữ liệu không khả dụng",
+    "price_unavailable": "Giá không khả dụng"
+  }
+}

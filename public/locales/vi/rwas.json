@@ -1,0 +1,76 @@
+{
+  "page": {
+    "title": "Tài sản thế giới thực trên Aptos",
+    "description": "RWA và tài sản thế giới thực được token hóa trên blockchain Aptos"
+  },
+  "stats": {
+    "total_rwa_value": "Tổng giá trị RWA",
+    "real_world_assets": "Tài sản thế giới thực",
+    "data_powered_by": "Dữ liệu được cung cấp bởi RWA.xyz",
+    "data_powered_by_prefix": "Dữ liệu được cung cấp bởi",
+    "rwa_assets": "Tài sản RWA",
+    "market_share": "Thị phần",
+    "total_value": "Tổng giá trị",
+    "asset_count": "Số lượng tài sản",
+    "protocols": "Giao thức"
+  },
+  "loading": {
+    "loading_rwa_data": "Đang tải dữ liệu RWA...",
+    "loading": "Đang tải...",
+    "rate_limit_message": "Đã đạt giới hạn API. Vui lòng đợi trước khi thử lại.",
+    "try_again_in": "Thử lại sau",
+    "try_again": "Thử lại",
+    "request_failed": "Yêu cầu thất bại. Vui lòng thử lại."
+  },
+  "error": {
+    "error_loading_rwa_data": "Lỗi khi tải dữ liệu RWA",
+    "failed_to_load_chart": "Không thể tải biểu đồ",
+    "retry": "Thử lại",
+    "failed_to_load_data": "Không thể tải dữ liệu"
+  },
+  "protocols": {
+    "pact": "Pact",
+    "securitize": "Securitize",
+    "franklin_templeton": "Franklin Templeton",
+    "libre_capital": "Libre Capital",
+    "ondo": "Ondo",
+    "blackrock": "BlackRock"
+  },
+  "labels": {
+    "bridged": "đã cầu nối",
+    "value_not_available": "Giá trị không khả dụng",
+    "token_id": "ID Token",
+    "current_value": "Giá trị hiện tại",
+    "asset_name": "Tên tài sản",
+    "asset_issuer": "Nhà phát hành tài sản",
+    "standards": "Tiêu chuẩn",
+    "not_specified": "Không xác định",
+    "regulatory_framework": "Khung pháp lý",
+    "governing_body": "Cơ quan quản lý",
+    "issuer_legal_structure_country": "Quốc gia cấu trúc pháp lý của nhà phát hành",
+    "contract_address": "Địa chỉ hợp đồng",
+    "network_id": "ID mạng",
+    "asset_id": "ID tài sản"
+  },
+  "sections": {
+    "value_information": "Thông tin giá trị",
+    "asset_details": "Chi tiết tài sản",
+    "regulatory_information": "Thông tin pháp lý",
+    "legal_structure": "Cấu trúc pháp lý",
+    "technical_details": "Chi tiết kỹ thuật"
+  },
+  "actions": {
+    "view_details": "Xem chi tiết",
+    "visit_website": "Truy cập trang web"
+  },
+  "filters": {
+    "all": "Tất cả",
+    "by_protocol": "Theo giao thức",
+    "by_value": "Theo giá trị"
+  },
+  "fallbacks": {
+    "unknown_asset": "Tài sản không xác định",
+    "data_not_available": "Dữ liệu không khả dụng",
+    "value_unavailable": "Giá trị không khả dụng"
+  }
+}

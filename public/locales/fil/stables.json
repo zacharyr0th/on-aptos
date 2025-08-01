@@ -1,0 +1,77 @@
+{
+  "page": {
+    "title": "Stablecoins sa Aptos",
+    "description": "Stablecoins at stable currencies sa Aptos blockchain"
+  },
+  "stats": {
+    "total_stablecoin_value": "Kabuuang Halaga ng Stablecoin",
+    "stablecoins": "Stablecoins",
+    "market_share": "Market Share",
+    "market_cap": "Market Cap",
+    "price": "Presyo",
+    "supply": "Suplay",
+    "volume_24h": "Volume 24h",
+    "price_change_24h": "Pagbabago ng Presyo 24h",
+    "asset_details": "Mga Detalye ng Asset"
+  },
+  "table": {
+    "token": "Token",
+    "supply": "Suplay",
+    "market_share": "%",
+    "type": "Uri",
+    "issuer": "Nag-isyu"
+  },
+  "loading": {
+    "loading_stablecoin_data": "Nilo-load ang stablecoin data...",
+    "loading": "Nag-lo-load...",
+    "rate_limit_message": "Woah! Pakibagalan po.",
+    "try_again_in": "Subukan muli sa",
+    "try_again": "Subukan Muli",
+    "request_failed": "Hindi nakumpleto ang request."
+  },
+  "error": {
+    "error_loading_stablecoin_data": "Error sa Pag-load ng Stablecoin Data",
+    "retry": "Subukan Muli",
+    "failed_to_load_chart": "Nabigo ang pag-load ng chart"
+  },
+  "stablecoins": {
+    "usdt": "Tether USD",
+    "usdc": "USD Coin",
+    "dai": "Dai Stablecoin",
+    "busd": "Binance USD",
+    "frax": "Frax",
+    "tusd": "TrueUSD",
+    "usdp": "Pax Dollar",
+    "gusd": "Gemini Dollar"
+  },
+  "types": {
+    "fiat_collateralized": "Fiat Collateralized",
+    "crypto_collateralized": "Crypto Collateralized",
+    "algorithmic": "Algorithmic",
+    "commodity_backed": "Commodity Backed"
+  },
+  "actions": {
+    "view_details": "Tingnan ang mga Detalye",
+    "trade": "Mag-trade",
+    "add_to_wallet": "Idagdag sa Wallet",
+    "visit_website": "Bisitahin ang Website"
+  },
+  "filters": {
+    "all": "Lahat",
+    "by_type": "Ayon sa Uri",
+    "by_market_cap": "Ayon sa Market Cap",
+    "stable": "Stable",
+    "depegged": "Depegged"
+  },
+  "labels": {
+    "tether_reserve_address": "Tether Reserve Address",
+    "subtracted_from_supply": "(Binawas mula sa circulating supply)",
+    "view_on_explorer": "Tingnan sa Aptos Explorer",
+    "reserve_address": "reserve address"
+  },
+  "fallbacks": {
+    "unknown_stablecoin": "Hindi Kilalang Stablecoin",
+    "data_not_available": "Hindi available ang data",
+    "price_unavailable": "Hindi available ang presyo"
+  }
+}

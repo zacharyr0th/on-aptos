@@ -1,0 +1,446 @@
+{
+  "page": {
+    "title": "DeFi trên Aptos",
+    "description": "Danh sách toàn diện các giao thức DeFi trên blockchain Aptos"
+  },
+  "stats": {
+    "total_value_locked": "Tổng giá trị khóa",
+    "volume_24h": "Khối lượng 24h",
+    "protocols": "Giao thức",
+    "filtered_protocols": "Giao thức đã lọc",
+    "live_from_defillama": "Trực tiếp từ DeFiLlama",
+    "estimated_tvl": "TVL ước tính",
+    "volume_data": "Khối lượng giao dịch 24h",
+    "defi_protocols": "Giao thức DeFi",
+    "fees_24h": "Phí 24h",
+    "protocol_fees": "Phí giao thức",
+    "stablecoin_volume": "Khối lượng Stablecoin",
+    "stablecoin_trading": "Khối lượng giao dịch stablecoin",
+    "coming_soon": "Sắp ra mắt"
+  },
+  "search": {
+    "placeholder": "Tìm kiếm giao thức...",
+    "results": "Tìm thấy {{count}} giao thức",
+    "results_of": "trong tổng số {{total}} giao thức",
+    "no_results": "Không tìm thấy giao thức nào phù hợp với tiêu chí của bạn.",
+    "clear_search": "Xóa tìm kiếm",
+    "search_hint": "Tìm kiếm theo tên, danh mục hoặc mô tả"
+  },
+  "filters": {
+    "all": "Tất cả",
+    "category": "Danh mục",
+    "subcategory": "Danh mục phụ",
+    "clear_filters": "Xóa bộ lọc",
+    "filter_by_category": "Lọc theo danh mục",
+    "view_grid": "Xem dạng lưới",
+    "view_table": "Xem dạng bảng",
+    "mobile_filters": "Bộ lọc",
+    "active_filters": "Bộ lọc đang hoạt động",
+    "subcategories_header": "Danh mục phụ {{category}}:"
+  },
+  "tooltips": {
+    "grid_view": "Chuyển sang xem dạng lưới",
+    "table_view": "Chuyển sang xem dạng bảng",
+    "category_filter": "Lọc giao thức theo danh mục",
+    "subcategory_filter": "Lọc giao thức theo danh mục phụ",
+    "clear_all_filters": "Xóa tất cả bộ lọc đang hoạt động",
+    "search_protocols": "Tìm kiếm trong tất cả giao thức",
+    "protocol_website": "Truy cập trang web chính thức",
+    "protocol_github": "Xem mã nguồn trên GitHub",
+    "protocol_twitter": "Theo dõi trên X (Twitter)",
+    "category_description": "Giao thức {{category}}: {{description}}",
+    "subcategory_description": "{{subcategory}}: {{description}}"
+  },
+  "categories": {
+    "All": {
+      "name": "Tất cả",
+      "description": "Tất cả giao thức DeFi"
+    },
+    "Credit": {
+      "name": "Tín dụng",
+      "description": "Các giao thức hỗ trợ vay, cho vay và dịch vụ tín dụng",
+      "subcategories": {
+        "Lending": {
+          "name": "Cho vay",
+          "description": "Nền tảng cho phép người dùng cho vay và vay tài sản crypto với lãi suất"
+        },
+        "RWA Lending": {
+          "name": "Cho vay RWA",
+          "description": "Giao thức cho vay được bảo đảm bằng tài sản thực như bất động sản hoặc hàng hóa"
+        },
+        "NFT Lending": {
+          "name": "Cho vay NFT",
+          "description": "Vay tiền sử dụng NFT làm tài sản thế chấp hoặc cho vay cho người sở hữu NFT"
+        },
+        "Uncollateralized Lending": {
+          "name": "Cho vay không thế chấp",
+          "description": "Các khoản vay không cần tài sản thế chấp, dựa trên uy tín hoặc điểm tín dụng"
+        },
+        "CDP": {
+          "name": "CDP",
+          "description": "Vị thế nợ có tài sản thế chấp - Tạo stablecoin bằng cách khóa tài sản thế chấp trong hợp đồng thông minh"
+        }
+      }
+    },
+    "Yield": {
+      "name": "Lợi suất",
+      "description": "Các giao thức tập trung vào staking, tạo lợi suất và phân phối phần thưởng",
+      "subcategories": {
+        "Liquid Staking": {
+          "name": "Staking thanh khoản",
+          "description": "Stake token trong khi nhận chứng chỉ có thể giao dịch để duy trì tính thanh khoản"
+        },
+        "Restaking": {
+          "name": "Restaking",
+          "description": "Sử dụng token đã stake để bảo mật các giao thức bổ sung nhằm kiếm thêm phần thưởng"
+        },
+        "Liquid Restaking": {
+          "name": "Restaking thanh khoản",
+          "description": "Restaking với token thanh khoản có thể giao dịch hoặc sử dụng trong DeFi"
+        },
+        "Liquidity Manager": {
+          "name": "Quản lý thanh khoản",
+          "description": "Công cụ hoặc giao thức tối ưu hóa và cân bằng lại thanh khoản trên các pool"
+        },
+        "Leveraged Farming": {
+          "name": "Farming đòn bẩy",
+          "description": "Vay vốn để tăng cung cấp thanh khoản và khuếch đại phần thưởng farming"
+        },
+        "Yield Aggregator": {
+          "name": "Tổng hợp lợi suất",
+          "description": "Tự động tìm và chuyển đổi giữa các cơ hội lợi suất tốt nhất"
+        }
+      }
+    },
+    "Trading": {
+      "name": "Giao dịch",
+      "description": "Các giao thức cho giao dịch, tạo lập thị trường và cung cấp thanh khoản",
+      "subcategories": {
+        "DEX": {
+          "name": "DEX",
+          "description": "Sàn giao dịch phi tập trung để hoán đổi token mà không cần trung gian"
+        },
+        "DEX Aggregator": {
+          "name": "Tổng hợp DEX",
+          "description": "Tìm giá tốt nhất trên nhiều DEX để giao dịch tối ưu"
+        },
+        "Perps": {
+          "name": "Hợp đồng vĩnh viễn",
+          "description": "Giao dịch hợp đồng tương lai vĩnh viễn với đòn bẩy trên tài sản crypto"
+        },
+        "Options": {
+          "name": "Quyền chọn",
+          "description": "Mua và bán hợp đồng quyền chọn để phòng hộ hoặc đầu cơ về biến động giá"
+        },
+        "Prediction Market": {
+          "name": "Thị trường dự đoán",
+          "description": "Đặt cược vào các sự kiện và kết quả thực tế sử dụng crypto"
+        },
+        "Launchpad": {
+          "name": "Launchpad",
+          "description": "Ra mắt token mới với phân phối công bằng và tính năng cộng đồng"
+        }
+      }
+    },
+    "Multiple": {
+      "name": "Đa dạng",
+      "description": "Các giao thức cung cấp nhiều sản phẩm DeFi trên các danh mục khác nhau"
+    }
+  },
+  "subcategories": {
+    "lending": "Cho vay",
+    "rwa_lending": "Cho vay RWA",
+    "nft_lending": "Cho vay NFT",
+    "uncollateralized_lending": "Cho vay không thế chấp",
+    "cdp": "CDP",
+    "liquid_staking": "Staking thanh khoản",
+    "restaking": "Restaking",
+    "liquid_restaking": "Restaking thanh khoản",
+    "liquidity_manager": "Quản lý thanh khoản",
+    "leveraged_farming": "Farming đòn bẩy",
+    "yield_aggregator": "Tổng hợp lợi suất",
+    "dex": "DEX",
+    "dex_aggregator": "Tổng hợp DEX",
+    "perps": "Hợp đồng vĩnh viễn",
+    "launchpad": "Launchpad",
+    "options": "Quyền chọn",
+    "prediction_markets": "Thị trường dự đoán"
+  },
+  "protocol": {
+    "website": "Trang web",
+    "github": "GitHub",
+    "twitter": "X (Twitter)",
+    "links": "Liên kết",
+    "tvl": "TVL",
+    "volume": "Khối lượng",
+    "yield": "Lợi suất",
+    "status": "Trạng thái",
+    "launch_date": "Ngày ra mắt",
+    "audit_status": "Tình trạng kiểm toán",
+    "networks": "Mạng",
+    "category": "Danh mục",
+    "subcategory": "Danh mục phụ",
+    "description": "Mô tả",
+    "more_info": "Thông tin thêm",
+    "external_links": "Liên kết ngoài",
+    "implementation": "Triển khai",
+    "security": "Bảo mật",
+    "token": "Token"
+  },
+  "protocol_values": {
+    "status": {
+      "Active": "Hoạt động",
+      "Deprecated": "Ngừng hoạt động",
+      "Beta": "Beta",
+      "Coming Soon": "Sắp ra mắt"
+    },
+    "audit_status": {
+      "Audited": "Đã kiểm toán",
+      "Unaudited": "Chưa kiểm toán",
+      "In Progress": "Đang tiến hành",
+      "Partially Audited": "Kiểm toán một phần"
+    },
+    "networks": {
+      "mainnet": "Mainnet",
+      "testnet": "Testnet",
+      "devnet": "Devnet"
+    },
+    "implementations": {
+      "Money Market": "Thị trường tiền tệ",
+      "Isolated Pools": "Pool cách ly",
+      "Validator Delegated": "Ủy quyền validator",
+      "Range Orders": "Lệnh khoảng",
+      "Borrowing-based": "Dựa trên vay mượn",
+      "Multi-protocol": "Đa giao thức",
+      "AMM": "AMM",
+      "CLOB": "CLOB",
+      "Hybrid": "Kết hợp",
+      "Route Optimization": "Tối ưu lộ trình",
+      "Gas Optimization": "Tối ưu gas",
+      "Cross-chain": "Chuỗi chéo",
+      "Cross-margin": "Margin chéo",
+      "Fair Launch": "Ra mắt công bằng",
+      "Protocol Suite": "Bộ giao thức"
+    }
+  },
+  "protocols": {
+    "names": {
+      "Panora": "Panora",
+      "Kana": "Kana",
+      "Thetis": "Thetis",
+      "Anqa": "Anqa",
+      "LiquidSwap": "LiquidSwap",
+      "Econia": "Econia",
+      "Cellana": "Cellana",
+      "PancakeSwap": "PancakeSwap",
+      "SushiSwap": "SushiSwap",
+      "Hyperion": "Hyperion",
+      "Tapp": "Tapp",
+      "Merkle": "Merkle",
+      "AGDEX": "AGDEX",
+      "Pump": "Pump",
+      "Emojicoin": "Emojicoin",
+      "Aries": "Aries",
+      "Superposition": "Superposition",
+      "Joule": "Joule",
+      "Echelon": "Echelon",
+      "Aptin": "Aptin",
+      "Meso": "Meso",
+      "TruFin": "TruFin",
+      "Amnis": "Amnis",
+      "Kofi": "Kofi",
+      "Ichi": "Ichi",
+      "Vibrant X": "Vibrant X",
+      "Moar": "Moar",
+      "Thala": "Thala",
+      "Mirage": "Mirage"
+    },
+    "short_descriptions": {
+      "Panora": "Tổng hợp meta-DEX",
+      "Kana": "Bộ định tuyến hoán đổi chuỗi chéo",
+      "Thetis": "Nền tảng giao dịch đa sản phẩm",
+      "Anqa": "Tổng hợp DEX nâng cao",
+      "LiquidSwap": "DEX đầu tiên trên Aptos",
+      "Econia": "Sổ lệnh hiệu suất cao",
+      "Cellana": "ve(3,3) AMM",
+      "PancakeSwap": "DEX đa chuỗi phổ biến",
+      "SushiSwap": "Nền tảng DeFi chuỗi chéo",
+      "Hyperion": "Nền tảng giao dịch kết hợp",
+      "Tapp": "DEX mô-đun có hook",
+      "Merkle": "Hợp đồng vĩnh viễn game hóa",
+      "AGDEX": "Hợp đồng vĩnh viễn margin chéo",
+      "Pump": "Launchpad token meme",
+      "Emojicoin": "Launchpad token emoji",
+      "Aries": "Cho vay kiểu Compound",
+      "Superposition": "Quản lý rủi ro nâng cao",
+      "Joule": "Pool cho vay cách ly",
+      "Echelon": "Trung tâm cho vay đa chế độ",
+      "Aptin": "Cho vay ưu tiên bảo mật",
+      "Meso": "Cho vay hiệu quả vốn",
+      "TruFin": "Staking thanh khoản doanh nghiệp",
+      "Amnis": "Staking thanh khoản hai token",
+      "Kofi": "Staking tăng cường MEV",
+      "Ichi": "Quản lý thanh khoản tự động",
+      "Vibrant X": "Tối ưu hóa lợi suất",
+      "Moar": "Lớp farming đòn bẩy",
+      "Thala": "Bộ giao thức DeFi",
+      "Mirage": "Lớp thanh khoản kết hợp"
+    }
+  },
+  "protocol_descriptions": {
+    "Panora": "Một \"meta-DEX\" kết nối với sổ lệnh on-chain và hơn 10 AMM, chia lệnh qua các pool trong khi quản lý danh sách token chính thức tự động cập nhật trong giao diện.",
+    "Kana": "Định tuyến hoán đổi qua chín chuỗi; hợp đồng Paymaster cho phép người dùng giao dịch trên Aptos mà không cần giữ APT cho gas; công cụ perp dựa trên sổ lệnh.",
+    "Thetis": "Thetis kết hợp tổng hợp spot, hợp đồng vĩnh viễn 50× và pool khởi động thanh khoản (LBP) dưới một mái nhà.",
+    "Anqa": "Tuyên bố bao phủ 99% thanh khoản qua hơn 15 DEX Aptos; lấy mẫu thời gian thực xem trước slippage trước khi ký và cho phép gộp hoán đổi nhiều token để tiết kiệm gas.",
+    "LiquidSwap": "AMM hàng đầu của Pontem và DEX đầu tiên hoạt động trên Aptos mainnet; cung cấp pool Uniswap-V2 cổ điển, đường cong stable-swap và thiết kế thanh khoản tập trung được xác minh chính thức.",
+    "Econia": "Sổ lệnh on-chain siêu song song được tối ưu cho đồng thời lạc quan của Aptos; xử lý thị trường song song với độ hoàn thiện dưới giây và cung cấp stack dữ liệu REST/MQTT đầy đủ.",
+    "Cellana": "Một ve(3,3) AMM nơi người bỏ phiếu veNFT điều hướng phát thải và thu 100% phí.",
+    "PancakeSwap": "DEX hàng đầu của Binance đã sao chép AMM V2 của mình lên Move và cầu nối một số thanh khoản CAKE sang Aptos.",
+    "SushiSwap": "Sushi thực hiện tích hợp non-EVM đầu tiên, cho phép các tuyến chuỗi chéo thanh toán trên Aptos trong khi giữ nguyên trải nghiệm Trident router quen thuộc.",
+    "Hyperion": "Sổ lệnh + CL-AMM kết hợp hoàn toàn on-chain tận dụng thông lượng của Aptos cho giao dịch kiểu HFT.",
+    "Tapp": "DEX mô-đun có hook kiểu Uniswap V4 đầu tiên trên Aptos testnet; hook hợp đồng thông minh cho phép builder tạo pool tùy chỉnh trong khi người dùng có hoán đổi lập trình được.",
+    "Merkle": "DEX perp game hóa với XP, hộp chiến lợi phẩm và đòn bẩy 150×; hơn 20 tỷ USD tổng khối lượng.",
+    "AGDEX": "Cung cấp perp margin chéo 1-100× với fill oracle ảnh hưởng thấp giữ slippage chặt cho trader bán lẻ.",
+    "Pump": "Bất kỳ ai cũng có thể mint token meme qua đường cong liên kết; mọi coin đều ra mắt công bằng không có presale hoặc phân bổ team.",
+    "Emojicoin": "Cho phép người dùng mint token ánh xạ 1-1 với emoji Unicode; mỗi lần ra mắt sử dụng đường cong CL-AMM của Econia để khám phá giá tức thì và đầu cơ.",
+    "Aries": "Thị trường tiền tệ kiểu Compound đầu tiên trên Aptos, nâng cấp với E-Mode LTV 90%, cầu nối tích hợp và giao dịch spot trong một giao diện.",
+    "Superposition": "Nền tảng quản lý rủi ro nâng cao lấy cảm hứng từ FHS VaR của Ngân hàng Anh, cung cấp cơ hội lợi suất đòn bẩy với giám sát rủi ro thời gian thực và điều chỉnh hệ số tài sản thế chấp động.",
+    "Joule": "Kết hợp pool cho vay cách ly với \"Neo thanh khoản\" cho farming đòn bẩy.",
+    "Echelon": "Trung tâm cho vay hỗ trợ cả thị trường E-Mode và cách ly.",
+    "Aptin": "Nền tảng cho vay ưu tiên bảo mật sử dụng Move Prover để xác minh chính thức và kiểm soát rủi ro pool cách ly chi tiết.",
+    "Meso": "Cho vay hiệu quả vốn với trần nợ do người dùng cấu hình và Mô-đun An toàn hỗ trợ thiếu hụt giao thức.",
+    "TruFin": "Staking thanh khoản cấp doanh nghiệp; người dùng nhận TruAPT đổi lấy staking APT.",
+    "Amnis": "Hệ thống hai token phát hành stAPT (sinh lời) và amAPT (ổn định), cho phép người dùng chuyển đổi giữa lợi suất và ổn định trong khi định tuyến hoa hồng validator về cho staker.",
+    "Kofi": "Staking thanh khoản tăng cường MEV với vault LSD đòn bẩy.",
+    "Ichi": "Vault Quản lý Thanh khoản Tự động cho phép dự án gieo thanh khoản một chiều; khoảng thông minh cân bằng lại để cắt giảm tổn thất tạm thời trong khi ngân quỹ kiếm phí hoán đổi bằng token gốc của họ.",
+    "Vibrant X": "Tối ưu hóa lợi suất và bảng điều khiển danh mục phân bổ lại tiền gửi cho pool Aptos APY hàng đầu.",
+    "Moar": "Xây dựng lớp farm đòn bẩy với tài khoản tín dụng xuyên giao thức cho phép người dùng vay ở một nơi và triển khai ở nơi khác.",
+    "Thala": "Bộ ứng dụng DeFi có AMM đa pool, stablecoin MOD thế chấp quá mức và liquid-staking qua sthAPT và thAPT.",
+    "Mirage": "Lớp thanh khoản kết hợp thúc đẩy biên giới tiếp theo của DeFi. Gửi tài sản thế chấp và vay khoản vay stablecoin tự trả được cung cấp bởi hợp đồng vĩnh viễn. Có perp hoàn toàn on-chain với trải nghiệm như CEX, thực thi tức thì, phí thấp và đòn bẩy lên đến 100x."
+  },
+  "protocol_category_breakdown": {
+    "Thala": "Giao dịch • Lợi suất • Tín dụng"
+  },
+  "protocols": {
+    "mirage": {
+      "description": "Lớp thanh khoản kết hợp thúc đẩy biên giới tiếp theo của DeFi. Gửi tài sản thế chấp và vay khoản vay stablecoin tự trả được cung cấp bởi hợp đồng vĩnh viễn với đòn bẩy lên đến 100x.",
+      "categoryBreakdown": "Giao dịch • Hợp đồng vĩnh viễn",
+      "feeStructure": "Cấu trúc phí động dựa trên khối lượng giao dịch và kích thước vị thế. Mức phí cạnh tranh cho giao dịch hợp đồng tương lai vĩnh viễn.",
+      "integration": {
+        "description": "Hợp đồng vĩnh viễn hoàn toàn on-chain với trải nghiệm như CEX. Tất cả vị thế, vault và lệnh được token hóa thành NFT để giao dịch thị trường thứ cấp."
+      }
+    }
+  },
+  "table": {
+    "protocol": "Giao thức",
+    "category": "Danh mục",
+    "subcategory": "Danh mục phụ",
+    "tvl": "TVL",
+    "links": "Liên kết",
+    "sort_by": "Sắp xếp theo",
+    "sort_asc": "Sắp xếp tăng dần",
+    "sort_desc": "Sắp xếp giảm dần"
+  },
+  "fallbacks": {
+    "multiple_defi_products": "Nhiều sản phẩm DeFi",
+    "defi_protocol_category": "Danh mục giao thức DeFi",
+    "defi_protocol_subcategory": "Danh mục phụ giao thức DeFi",
+    "unknown_category": "Danh mục không xác định",
+    "unknown_subcategory": "Danh mục phụ không xác định",
+    "no_description": "Không có mô tả",
+    "visit_protocol": "Truy cập giao thức"
+  },
+  "actions": {
+    "view_protocol": "Xem giao thức",
+    "visit_website": "Truy cập trang web",
+    "view_on_github": "Xem trên GitHub",
+    "follow_on_twitter": "Theo dõi trên X",
+    "copy_link": "Sao chép liên kết",
+    "share": "Chia sẻ"
+  },
+  "ui": {
+    "search": {
+      "placeholder": "Tìm kiếm giao thức...",
+      "results_count": "{{count}} kết quả",
+      "results_count_plural": "{{count}} kết quả",
+      "breadcrumb": "Tất cả > {{category}}"
+    },
+    "filters": {
+      "category": "Danh mục:",
+      "all_categories": "Tất cả danh mục",
+      "clear_filters": "Xóa",
+      "view_mode": {
+        "grid": "Xem dạng lưới",
+        "table": "Xem dạng bảng"
+      },
+      "tooltips": {
+        "category_filter": "Lọc giao thức theo danh mục",
+        "clear_filters": "Xóa tất cả bộ lọc đang hoạt động",
+        "grid_view": "Chuyển sang xem dạng lưới",
+        "table_view": "Chuyển sang xem dạng bảng"
+      }
+    },
+    "stats": {
+      "total_protocols": "Tổng số giao thức",
+      "total_protocols_tooltip": "Tổng số giao thức DeFi được theo dõi",
+      "categories": "Danh mục",
+      "categories_tooltip": "Số lượng danh mục DeFi có sẵn",
+      "data_source": "Nguồn dữ liệu",
+      "data_source_tooltip": "Nguồn dữ liệu giao thức",
+      "loading": "Đang tải thống kê..."
+    },
+    "table": {
+      "headers": {
+        "name": "Tên",
+        "category": "Danh mục",
+        "links": "Liên kết"
+      },
+      "tooltips": {
+        "sort_by_name": "Sắp xếp theo tên giao thức",
+        "sort_by_category": "Sắp xếp theo danh mục",
+        "visit_website": "Truy cập trang web giao thức",
+        "view_github": "Xem kho GitHub",
+        "follow_twitter": "Theo dõi trên Twitter"
+      },
+      "no_data": "Không tìm thấy giao thức",
+      "loading": "Đang tải giao thức..."
+    },
+    "grid": {
+      "tooltips": {
+        "protocol_card": "Nhấp để xem chi tiết {{protocol}}",
+        "visit_website": "Truy cập trang web {{protocol}}",
+        "view_github": "Xem {{protocol}} trên GitHub",
+        "follow_twitter": "Theo dõi {{protocol}} trên Twitter"
+      }
+    },
+    "messages": {
+      "no_protocols": "Không tìm thấy giao thức nào phù hợp với tiêu chí của bạn.",
+      "loading": "Đang tải...",
+      "error": "Lỗi khi tải giao thức",
+      "empty_state": "Không có giao thức DeFi nào",
+      "try_clearing_filters": "Hãy thử xóa bộ lọc hoặc từ khóa tìm kiếm."
+    }
+  },
+  "common_values": {
+    "na": "N/A",
+    "not_available": "Không khả dụng",
+    "real_time": "Thời gian thực",
+    "live": "Trực tiếp",
+    "estimated": "Ước tính",
+    "unknown": "Không xác định",
+    "loading": "Đang tải...",
+    "error": "Lỗi",
+    "coming_soon": "Sắp ra mắt",
+    "tbd": "Sẽ thông báo sau",
+    "varies": "Thay đổi"
+  },
+  "units": {
+    "million": "Tr",
+    "billion": "Tỷ",
+    "trillion": "Nghìn tỷ",
+    "percent": "%",
+    "usd": "USD",
+    "apt": "APT",
+    "btc": "BTC"
+  }
+}

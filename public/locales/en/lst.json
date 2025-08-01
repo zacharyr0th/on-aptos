@@ -1,0 +1,115 @@
+{
+  "page": {
+    "title": "LSTs on Aptos",
+    "description": "Liquid Staking Tokens on Aptos blockchain"
+  },
+  "stats": {
+    "total_lst_value": "Total LST Value",
+    "liquid_staking_tokens": "Liquid Staking Tokens",
+    "market_share": "Market Share",
+    "apr": "APR",
+    "staked_apt": "Staked APT",
+    "validators": "Validators",
+    "total_stakers": "Total Stakers",
+    "average_apr": "Average APR"
+  },
+  "providers": {
+    "all": "All",
+    "amnis": "Amnis Finance",
+    "tortuga": "Tortuga Finance",
+    "ditto": "Ditto Finance",
+    "thala": "Thala Labs",
+    "other": "Other"
+  },
+  "table": {
+    "token": "Token",
+    "provider": "Provider",
+    "apr": "APR",
+    "tvl": "TVL",
+    "market_cap": "Market Cap",
+    "price": "Price",
+    "stakers": "Stakers",
+    "validators": "Validators",
+    "liquidity": "Liquidity",
+    "exchange_rate": "Exchange Rate"
+  },
+  "details": {
+    "overview": "Overview",
+    "staking_info": "Staking Info",
+    "validators": "Validators",
+    "rewards": "Rewards",
+    "unstaking": "Unstaking",
+    "governance": "Governance",
+    "security": "Security",
+    "documentation": "Documentation",
+    "contracts": "Contracts"
+  },
+  "staking": {
+    "stake_apt": "Stake APT",
+    "unstake": "Unstake",
+    "claim_rewards": "Claim Rewards",
+    "auto_compound": "Auto-Compound",
+    "staking_period": "Staking Period",
+    "unbonding_period": "Unbonding Period",
+    "minimum_stake": "Minimum Stake",
+    "current_apr": "Current APR"
+  },
+  "validators": {
+    "validator": "Validator",
+    "commission": "Commission",
+    "delegation": "Delegation",
+    "uptime": "Uptime",
+    "voting_power": "Voting Power",
+    "self_stake": "Self Stake",
+    "delegators": "Delegators",
+    "performance": "Performance"
+  },
+  "messages": {
+    "loading": "Loading liquid staking data...",
+    "error": "Error loading data",
+    "no_data": "No LST data available",
+    "coming_soon": "More liquid staking providers coming soon",
+    "refresh": "Refresh Data",
+    "last_updated": "Last updated",
+    "stake_success": "Successfully staked APT",
+    "unstake_success": "Unstaking process initiated"
+  },
+  "tooltips": {
+    "lst": "Liquid Staking Tokens allow stakers to earn rewards while maintaining liquidity",
+    "apr": "Annual Percentage Rate based on current staking rewards",
+    "tvl": "Total value locked in the liquid staking protocol",
+    "exchange_rate": "Current exchange rate between LST and APT",
+    "unbonding": "Time required to fully unstake and receive your APT",
+    "validators": "Number of validators staking on behalf of token holders",
+    "auto_compound": "Rewards are automatically reinvested to maximize returns"
+  },
+  "risks": {
+    "title": "Risks & Considerations",
+    "slashing": "Slashing Risk",
+    "liquidity": "Liquidity Risk",
+    "smart_contract": "Smart Contract Risk",
+    "validator": "Validator Risk",
+    "depeg": "Depeg Risk",
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High"
+  },
+  "rewards": {
+    "current_rewards": "Current Rewards",
+    "pending_rewards": "Pending Rewards",
+    "claimed_rewards": "Claimed Rewards",
+    "next_distribution": "Next Distribution",
+    "reward_history": "Reward History",
+    "compound_earnings": "Compound Earnings",
+    "total_earned": "Total Earned"
+  },
+  "analytics": {
+    "staking_ratio": "Staking Ratio",
+    "growth_rate": "Growth Rate",
+    "market_dominance": "Market Dominance",
+    "holder_distribution": "Holder Distribution",
+    "whale_concentration": "Whale Concentration",
+    "daily_volume": "Daily Volume",
+    "liquidity_depth": "Liquidity Depth"
+  }
+}

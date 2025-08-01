@@ -1,0 +1,76 @@
+{
+  "page": {
+    "title": "Real-World-Assets auf Aptos",
+    "description": "RWAs und tokenisierte Real-World-Assets auf der Aptos-Blockchain"
+  },
+  "stats": {
+    "total_rwa_value": "Gesamt-RWA-Wert",
+    "real_world_assets": "Real-World-Assets",
+    "data_powered_by": "Daten bereitgestellt von RWA.xyz",
+    "data_powered_by_prefix": "Daten bereitgestellt von",
+    "rwa_assets": "RWA-Assets",
+    "market_share": "Marktanteil",
+    "total_value": "Gesamtwert",
+    "asset_count": "Anzahl der Assets",
+    "protocols": "Protokolle"
+  },
+  "loading": {
+    "loading_rwa_data": "RWA-Daten werden geladen …",
+    "loading": "Lädt …",
+    "rate_limit_message": "API-Rate-Limit erreicht. Bitte warte, bevor du es erneut versuchst.",
+    "try_again_in": "Erneut versuchen in",
+    "try_again": "Erneut versuchen",
+    "request_failed": "Anfrage fehlgeschlagen. Bitte versuche es erneut."
+  },
+  "error": {
+    "error_loading_rwa_data": "Fehler beim Laden der RWA-Daten",
+    "failed_to_load_chart": "Diagramm konnte nicht geladen werden",
+    "retry": "Erneut versuchen",
+    "failed_to_load_data": "Daten konnten nicht geladen werden"
+  },
+  "protocols": {
+    "pact": "Pact",
+    "securitize": "Securitize",
+    "franklin_templeton": "Franklin Templeton",
+    "libre_capital": "Libre Capital",
+    "ondo": "Ondo",
+    "blackrock": "BlackRock"
+  },
+  "labels": {
+    "bridged": "gebridged",
+    "value_not_available": "Wert nicht verfügbar",
+    "token_id": "Token-ID",
+    "current_value": "Aktueller Wert",
+    "asset_name": "Asset-Name",
+    "asset_issuer": "Asset-Emittent",
+    "standards": "Standards",
+    "not_specified": "Nicht angegeben",
+    "regulatory_framework": "Regulatorischer Rahmen",
+    "governing_body": "Aufsichtsbehörde",
+    "issuer_legal_structure_country": "Land der rechtlichen Struktur des Emittenten",
+    "contract_address": "Contract-Adresse",
+    "network_id": "Netzwerk-ID",
+    "asset_id": "Asset-ID"
+  },
+  "sections": {
+    "value_information": "Wertinformationen",
+    "asset_details": "Asset-Details",
+    "regulatory_information": "Regulatorische Informationen",
+    "legal_structure": "Rechtsstruktur",
+    "technical_details": "Technische Details"
+  },
+  "actions": {
+    "view_details": "Details anzeigen",
+    "visit_website": "Website besuchen"
+  },
+  "filters": {
+    "all": "Alle",
+    "by_protocol": "Nach Protokoll",
+    "by_value": "Nach Wert"
+  },
+  "fallbacks": {
+    "unknown_asset": "Unbekanntes Asset",
+    "data_not_available": "Daten nicht verfügbar",
+    "value_unavailable": "Wert nicht verfügbar"
+  }
+}

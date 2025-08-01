@@ -1,0 +1,77 @@
+{
+  "page": {
+    "title": "Stablecoins na Aptos",
+    "description": "Stablecoins e moedas estáveis na blockchain Aptos"
+  },
+  "stats": {
+    "total_stablecoin_value": "Valor total do stablecoin",
+    "stablecoins": "Stablecoins",
+    "market_share": "Quota de mercado",
+    "market_cap": "Market Cap",
+    "price": "Preço",
+    "supply": "Oferta",
+    "volume_24h": "Volume 24h",
+    "price_change_24h": "Mudança de preço 24h",
+    "asset_details": "Detalhes do ativo"
+  },
+  "table": {
+    "token": "Token",
+    "supply": "Fornecimento",
+    "market_share": "%",
+    "type": "Tipo",
+    "issuer": "Emissor"
+  },
+  "loading": {
+    "loading_stablecoin_data": "Carregando dados de stablecoin...",
+    "loading": "Carregando...",
+    "rate_limit_message": "Woah!Por favor, diminua a velocidade lá.",
+    "try_again_in": "Tente novamente",
+    "try_again": "Tente novamente",
+    "request_failed": "A solicitação não pôde ser concluída."
+  },
+  "error": {
+    "error_loading_stablecoin_data": "Erro ao carregar dados de stablecoin",
+    "retry": "Tente novamente",
+    "failed_to_load_chart": "Falha ao carregar gráfico"
+  },
+  "stablecoins": {
+    "usdt": "Tether USD",
+    "usdc": "Moeda USD",
+    "dai": "Dai Stablecoin",
+    "busd": "Binance USD",
+    "frax": "Frax",
+    "tusd": "Trueusd",
+    "usdp": "Dólar pax",
+    "gusd": "Gemini Dollar"
+  },
+  "types": {
+    "fiat_collateralized": "Colateralizada por fiat",
+    "crypto_collateralized": "Colateralizada por crypto",
+    "algorithmic": "Algorítmica",
+    "commodity_backed": "Lastreada em commodities"
+  },
+  "actions": {
+    "view_details": "Ver detalhes",
+    "trade": "Troca",
+    "add_to_wallet": "Adicione à carteira",
+    "visit_website": "Visite o site"
+  },
+  "filters": {
+    "all": "Todos",
+    "by_type": "Por tipo",
+    "by_market_cap": "Por valor de mercado",
+    "stable": "Estável",
+    "depegged": "Despareada"
+  },
+  "labels": {
+    "tether_reserve_address": "Endereço de reserva de corda",
+    "subtracted_from_supply": "(Subtraído da oferta circulante)",
+    "view_on_explorer": "Ver sobre o Aptos Explorer",
+    "reserve_address": "endereço de reserva"
+  },
+  "fallbacks": {
+    "unknown_stablecoin": "Stablecoin desconhecida",
+    "data_not_available": "Dados não disponíveis",
+    "price_unavailable": "Preço indisponível"
+  }
+}

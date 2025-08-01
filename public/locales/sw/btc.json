@@ -1,0 +1,121 @@
+{
+  "page": {
+    "title": "Bitcoin kwenye Aptos",
+    "description": "Mali za Bitcoin na masoko ya pesa kwenye blockchain ya Aptos"
+  },
+  "stats": {
+    "total_supply": "Ugavi wa Jumla",
+    "total_btc_value": "Thamani ya Jumla ya Bitcoin",
+    "bitcoin_assets": "Mali za Bitcoin",
+    "market_share": "Sehemu ya Soko",
+    "price": "Price",
+    "market_cap": "Utaji wa Soko",
+    "volume_24h": "Kiasi cha Saa 24",
+    "tvl": "TVL",
+    "apy": "APY",
+    "utilization": "Utilization",
+    "decimals": "Decimals",
+    "network": "Network",
+    "aptos_mainnet": "Aptos Mainnet"
+  },
+  "loading": {
+    "loading_btc_data": "Loading Bitcoin data...",
+    "loading": "Loading...",
+    "loading_market_data": "Loading market data...",
+    "error_title": "Error Loading Data",
+    "rate_limit_message": "API rate limit reached. Please wait before trying again.",
+    "try_again_in": "Try again in",
+    "try_again": "Try Again",
+    "request_failed": "Request failed. Please try again.",
+    "chart_error": "Failed to load chart"
+  },
+  "error": {
+    "error_loading_btc_data": "Error Loading Bitcoin Data",
+    "retry": "Retry",
+    "failed_to_load_chart": "Failed to load chart",
+    "error_calculating_supply": "Error calculating supply",
+    "unknown_error": "Unknown error",
+    "invalid_data": "Invalid data",
+    "invalid_metadata": "Invalid metadata"
+  },
+  "assets": {
+    "bitcoin": "Bitcoin",
+    "wbtc": "Wrapped Bitcoin",
+    "btc": "Bitcoin",
+    "sbtc": "Staked Bitcoin",
+    "tbtc": "Threshold Bitcoin"
+  },
+  "money_markets": {
+    "title": "Money Markets",
+    "supply": "Supply",
+    "borrow": "Borrow",
+    "supply_apy": "Supply APY",
+    "borrow_apy": "Borrow APY",
+    "total_supplied": "Total Supplied",
+    "total_borrowed": "Total Borrowed",
+    "available_to_borrow": "Available to Borrow",
+    "utilization_rate": "Utilization Rate"
+  },
+  "actions": {
+    "supply": "Supply",
+    "borrow": "Borrow",
+    "withdraw": "Withdraw",
+    "repay": "Repay",
+    "view_details": "View Details",
+    "trade": "Trade",
+    "bridge": "Bridge",
+    "wrap": "Wrap",
+    "unwrap": "Unwrap"
+  },
+  "yield": {
+    "lending": "Lending",
+    "borrowing": "Borrowing",
+    "farming": "Farming",
+    "staking": "Staking",
+    "rewards": "Rewards",
+    "incentives": "Incentives"
+  },
+  "protocols": {
+    "aries": "Aries",
+    "echelon": "Echelon",
+    "aptin": "Aptin",
+    "thala": "Thala",
+    "echo": "Echo",
+    "protocol": "Protocol",
+    "echo_data_soon": "Echo protocol data coming soon"
+  },
+  "filters": {
+    "all": "All",
+    "by_protocol": "By Protocol",
+    "by_apy": "By APY",
+    "lending": "Lending",
+    "trading": "Trading",
+    "bridging": "Bridging"
+  },
+  "bridge": {
+    "bridge_bitcoin": "Bridge Bitcoin",
+    "from": "From",
+    "to": "To",
+    "amount": "Amount",
+    "fee": "Fee",
+    "estimated_time": "Estimated Time",
+    "supported_networks": "Supported Networks"
+  },
+  "fallbacks": {
+    "unknown_asset": "Unknown Asset",
+    "data_not_available": "Data not available",
+    "price_unavailable": "Price unavailable"
+  },
+  "info": {
+    "what_is_wrapped_btc": "What is Wrapped BTC?",
+    "wrapped_btc_description": "Wrapped Bitcoin (wBTC) is a tokenized representation of Bitcoin on other blockchains, enabling the use of Bitcoin in DeFi applications.",
+    "benefits": "Benefits",
+    "defi_access": "DeFi access",
+    "earn_yield": "Earn yield",
+    "maintain_btc_exposure": "Maintain BTC exposure",
+    "bitcoin_backed_asset": "Bitcoin-backed Asset"
+  },
+  "status": {
+    "coming_soon": "Coming Soon"
+  }
+}

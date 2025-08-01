@@ -1,0 +1,77 @@
+{
+  "page": {
+    "title": "Stablecoins akan Aptos",
+    "description": "Stablecoins da kwanciyar hankali a kan blockchain na Aptos"
+  },
+  "stats": {
+    "total_stablecoin_value": "Total Stablecoin Darajar",
+    "stablecoins": "Stablecoins",
+    "market_share": "Rabon Kasuwa",
+    "market_cap": "Kasuwa Cap",
+    "price": "Farashi",
+    "supply": "Kayyade",
+    "volume_24h": "Juzu'i na 24h",
+    "price_change_24h": "Farashin Canjin 24h",
+    "asset_details": "Bayanin kadari"
+  },
+  "table": {
+    "token": "Alama",
+    "supply": "Kayyade",
+    "market_share": "%",
+    "type": "Nau'i",
+    "issuer": "Mai bayarwa"
+  },
+  "loading": {
+    "loading_stablecoin_data": "Loading stablecoin data...",
+    "loading": "Loading...",
+    "rate_limit_message": "Woah! Da fatan za a rage a can.",
+    "try_again_in": "Sake gwadawa",
+    "try_again": "Sake gwadawa",
+    "request_failed": "Ba a iya kammala buƙatar ba."
+  },
+  "error": {
+    "error_loading_stablecoin_data": "Kuskuren loda bayanan Stablecoin",
+    "retry": "Sake gwadawa",
+    "failed_to_load_chart": "An kasa loda ginshiƙi"
+  },
+  "stablecoins": {
+    "usdt": "Tsarin USD",
+    "usdc": "USD Coin",
+    "dai": "Dai Stablecoin",
+    "busd": "Binance USD",
+    "frax": "Frax",
+    "tusd": "TrueUSD",
+    "usdp": "Pax Dollar",
+    "gusd": "Dollar Gemini"
+  },
+  "types": {
+    "fiat_collateralized": "Fiat Collateralized",
+    "crypto_collateralized": "Crypto Collateralized",
+    "algorithmic": "Algorithmic",
+    "commodity_backed": "Kayayyakin Tallafawa"
+  },
+  "actions": {
+    "view_details": "Duba cikakkun bayanai",
+    "trade": "Kasuwanci",
+    "add_to_wallet": "Ƙara zuwa Wallet",
+    "visit_website": "Ziyarci Yanar Gizo"
+  },
+  "filters": {
+    "all": "All",
+    "by_type": "By Type",
+    "by_market_cap": "By Market Cap",
+    "stable": "Stable",
+    "depegged": "Depegged"
+  },
+  "labels": {
+    "tether_reserve_address": "Tether Reserve Address",
+    "subtracted_from_supply": "(Subtracted from circulating supply)",
+    "view_on_explorer": "View on Aptos Explorer",
+    "reserve_address": "reserve address"
+  },
+  "fallbacks": {
+    "unknown_stablecoin": "Unknown Stablecoin",
+    "data_not_available": "Data not available",
+    "price_unavailable": "Price unavailable"
+  }
+}

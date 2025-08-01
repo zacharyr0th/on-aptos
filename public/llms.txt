@@ -1,0 +1,250 @@
+# On Aptos
+
+On Aptos is an open analytics project that surfaces real-time token supplies, prices, and DeFi metrics for the Aptos blockchain. The service powers both human-friendly dashboards and a free REST/tRPC API that LLMs can query directly.
+
+Key facts at a glance:
+
+• Assets covered — Bitcoin wrappers (xBTC, SBTC, aBTC), major stablecoins (USDT, USDC, USDe, sUSDe), liquid-staking tokens (amAPT, stAPT, thAPT, sthAPT, kAPT, stkAPT) and emerging real-world-asset (RWA) tokens.
+
+• Data freshness — Circulating supply figures and USD prices update every minute via on-chain indexers, price feeds and internal caching.
+
+• Endpoints — `/api/aptos/{category}` for granular asset groups, `/api/prices` for a consolidated price feed, and `/api/trpc` for type-safe queries.
+
+• Built by — Zachary Roth (ecosystem builder & full-stack developer).
+
+The sections below preserve the original long-form README for full technical context.
+
+## 🚀 Getting Started in 60 Seconds
+
+### Quick API Test
+```bash
+# Get Bitcoin token supplies
+curl -X GET "https://onaptos.com/api/aptos/btc" \
+  -H "Accept: application/json"
+
+# Get stablecoin data  
+curl -X GET "https://onaptos.com/api/aptos/stables"
+
+# Get real world assets data
+curl -X GET "https://onaptos.com/api/aptos/rwas"
+```
+
+### TypeScript Integration
+```typescript
+// Using fetch
+const response = await fetch('https://onaptos.com/api/aptos/btc');
+const btcData = await response.json();
+
+// Using tRPC client
+import { createTRPCProxyClient, httpBatchLink } from '@trpc/client';
+import type { AppRouter } from './server/api/root';
+
+const trpc = createTRPCProxyClient<AppRouter>({
+  links: [httpBatchLink({ url: 'https://onaptos.com/api/trpc' })],
+});
+
+const lstData = await trpc.lst.getSupplies.query();
+const rwaData = await trpc.rwas.getSupplies.query();
+```
+
+### 🎮 Live Playground
+- [OpenAPI Spec](https://onaptos.com/api-spec) - Interactive API documentation
+- [Postman Collection](https://onaptos.com/postman) - Pre-configured API requests
+- [Live Demo](https://onaptos.com) - See all dashboards in action
+
+## API Reference
+
+<details>
+<summary><strong>REST Endpoints</strong></summary>
+
+- **[Stablecoins API](https://onaptos.com/api/aptos/stables)** - GET `/api/aptos/stables`
+  - Returns: Supply data for USDt, USDC, USDe, sUSDe
+  - Rate limit: 100 req/min per IP
+
+- **[Bitcoin API](https://onaptos.com/api/aptos/btc)** - GET `/api/aptos/btc` 
+  - Returns: Supply data for xBTC, SBTC, aBTC
+  - Rate limit: 100 req/min per IP
+
+- **[LST API](https://onaptos.com/api/aptos/lst)** - GET `/api/aptos/lst`
+  - Returns: Supply data for amAPT, stAPT, thAPT, sthAPT, kAPT, stkAPT
+  - Rate limit: 100 req/min per IP
+
+- **[RWA API](https://onaptos.com/api/aptos/rwas)** - GET `/api/aptos/rwas`
+  - Returns: Supply data for tokenized real world assets on Aptos
+  - Rate limit: 100 req/min per IP
+
+- **[Prices API](https://onaptos.com/api/prices)** - GET `/api/prices`
+  - Returns: Real-time pricing data across all supported tokens
+  - Rate limit: 200 req/min per IP
+
+</details>
+
+<details>
+<summary><strong>tRPC Procedures</strong></summary>
+
+```typescript
+// Available tRPC procedures
+trpc.stablecoins.getSupplies.query()    // Stablecoin data
+trpc.bitcoin.getSupplies.query()        // Bitcoin token data  
+trpc.lst.getSupplies.query()            // LST data
+trpc.rwas.getSupplies.query()           // RWA data
+trpc.prices.getAll.query()              // Price data
+trpc.defi.getTvl.query()                // DeFi TVL data
+```
+
+Full [tRPC API documentation](https://onaptos.com/api/trpc) with TypeScript definitions.
+
+</details>
+
+## Live Dashboards
+
+- **[Stablecoins Dashboard](https://onaptos.com/stablecoins)** - Real-time supply tracking and market share visualization
+- **[Bitcoin Dashboard](https://onaptos.com/bitcoin)** - Cross-bridge analytics for wrapped Bitcoin tokens
+- **[LST Dashboard](https://onaptos.com/lst)** - Liquid staking rewards and validator performance
+- **[RWA Dashboard](https://onaptos.com/rwas)** - Real-time tracking of tokenized real world assets
+- **[DeFi Dashboard](https://onaptos.com/defi)** - Protocol TVL and yield farming analytics
+
+## Local Development
+
+### Prerequisites
+- Node.js 18+ 
+- pnpm 8+
+- Docker (optional, for local Aptos node)
+
+### Quick Setup
+```bash
+# Clone repository
+git clone https://github.com/zacharytylerroth/on-aptos.git
+cd on-aptos
+
+# Install dependencies
+pnpm install
+
+# Start development server
+pnpm dev
+
+# Optional: Start local Aptos node with Docker
+docker-compose up -d aptos-node
+```
+
+### Environment Configuration
+```bash
+# Copy environment template
+cp .env.example .env.local
+
+# Required environment variables
+APTOS_INDEXER_URL=https://indexer.mainnet.aptoslabs.com/v1/graphql
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+### Type-Safe API Development
+```typescript
+// Generate tRPC types
+pnpm generate:trpc
+
+// Run type checking
+pnpm type-check
+
+// Build for production
+pnpm build
+```
+
+## Compatibility Matrix
+
+| On Aptos Version | Aptos Node | Next.js | tRPC | Breaking Changes |
+|------------------|------------|---------|------|------------------|
+| 1.0.0 - 1.2.x    | 1.8.0+     | 14.x    | 10.x | Initial release  |
+| 1.3.0 - 1.5.x    | 1.9.0+     | 15.x    | 11.x | Fungible Asset standard support |
+| 2.0.0+           | 1.10.0+    | 15.3+   | 11.x | API v2, rate limiting |
+
+## Security & Rate Limits
+
+### Rate Limits
+- **Public API**: 100 requests/minute per IP address
+- **Prices endpoint**: 200 requests/minute per IP address  
+- **WebSocket**: 50 connections per IP address
+
+### Security
+- All API endpoints use HTTPS with TLS 1.3
+- CORS configured for browser integration
+- No authentication required for public data
+- Rate limiting enforced at CDN level
+
+### Responsible Disclosure
+Report security vulnerabilities to: zacharyroth@pm.me
+
+## Supported Assets
+
+### Stablecoins
+- **USDt** (Tether USD) - Legacy coin + FA standard
+- **USDC** (USD Coin) - Native and bridged variants  
+- **USDe** (Ethena USDe) - Synthetic dollar
+- **sUSDe** (Staked USDe) - Yield-bearing USDe
+
+### Bitcoin Tokens  
+- **xBTC** (OKX wrapped Bitcoin) - Cross-chain BTC
+- **SBTC** (StakeStone Bitcoin) - Yield-bearing BTC
+- **aBTC** (Aptos Bitcoin) - Native wrapped BTC
+
+### Liquid Staking Tokens
+- **amAPT** (Amnis APT) - Automated liquid staking
+- **stAPT** (Staked APT) - Simple liquid staking  
+- **thAPT** (Thala APT) - DeFi-integrated staking
+- **sthAPT** (Super Thala APT) - Enhanced yield staking
+- **kAPT** (Kofi APT) - Community-driven staking
+- **stkAPT** (Staked APT) - Institutional staking
+
+### Real World Assets (RWAs)
+- Tokenized assets representing real-world value
+- Track supply and pricing for RWA tokens on Aptos
+- Integration with traditional finance and DeFi protocols
+
+## Technical Implementation
+
+- **[Package Configuration](https://github.com/zacharytylerroth/on-aptos/blob/main/package.json)** - Next.js 15.3.3 with TypeScript, tRPC, TailwindCSS
+- **[TypeScript Configuration](https://github.com/zacharytylerroth/on-aptos/blob/main/tsconfig.json)** - Strict TypeScript with path aliases and React 19
+- **[Component Architecture](https://github.com/zacharytylerroth/on-aptos/tree/main/src/components)** - Modular React components with shadcn/ui design system
+- **[API Routes](https://github.com/zacharytylerroth/on-aptos/tree/main/src/pages/api)** - RESTful endpoints and tRPC procedures
+- **[Database Schema](https://github.com/zacharytylerroth/on-aptos/blob/main/prisma/schema.prisma)** - Prisma ORM with PostgreSQL
+
+## Changelog
+
+See [CHANGELOG.md](https://github.com/zacharytylerroth/on-aptos/blob/main/CHANGELOG.md) for detailed version history following [Keep a Changelog](https://keepachangelog.com/) format.
+
+## Contributing
+
+We welcome contributions! Please see our [Contributing Guide](https://github.com/zacharytylerroth/on-aptos/blob/main/CONTRIBUTING.md) for details.
+
+### Code of Conduct
+This project follows the [Contributor Covenant](https://github.com/zacharytylerroth/on-aptos/blob/main/CODE_OF_CONDUCT.md) code of conduct.
+
+## FAQ
+
+**Q: Why doesn't my wrapped BTC token appear in the dashboard?**  
+A: We currently support major wrapped BTC tokens (xBTC, SBTC, aBTC). For new token inclusion, please open an issue with the token contract address.
+
+**Q: How often is the supply data updated?**  
+A: Supply data updates every 30 seconds via the Aptos Indexer. Price data updates every 10 seconds from multiple sources.
+
+**Q: Can I use this API commercially?**  
+A: Yes, the API is free for commercial use under our MIT license. Rate limits apply to ensure fair usage.
+
+**Q: How do you handle Aptos node upgrades?**  
+A: We maintain compatibility matrices and test against Aptos testnet before mainnet upgrades. Breaking changes are versioned.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/zacharytylerroth/on-aptos/blob/main/LICENSE) file for details.
+
+**SPDX-License-Identifier**: MIT
+
+## Credits
+
+**Creator & Lead Developer**: [Zachary Roth](https://www.zacharyr0th.com/)  
+Ecosystem builder, market analyst, and writer specializing in blockchain technology with deep expertise across Bitcoin, Ethereum, Solana, and Aptos ecosystems. Passionate about permissionless markets and building tools that democratize access to blockchain data.
+
+**Connect**: [Website](https://www.zacharyr0th.com/) • [Twitter](https://x.com/zacharyr0th)
+
+---
+
+Last-Modified: 2025-06-10T00:00:00Z

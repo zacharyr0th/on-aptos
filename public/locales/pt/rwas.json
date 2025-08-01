@@ -1,0 +1,76 @@
+{
+  "page": {
+    "title": "Ativos do mundo real na Aptos",
+    "description": "RWAs e ativos do mundo real tokenizados na blockchain Aptos"
+  },
+  "stats": {
+    "total_rwa_value": "Valor total da RWA",
+    "rwa_assets": "Ativos RWA",
+    "market_share": "Quota de mercado",
+    "total_value": "Valor total",
+    "asset_count": "Contagem de ativos",
+    "protocols": "Protocolos",
+    "real_world_assets": "Ativos do mundo real",
+    "data_powered_by": "Dados fornecidos por RWA.xyz",
+    "data_powered_by_prefix": "Dados fornecidos por"
+  },
+  "loading": {
+    "loading_rwa_data": "Carregando dados RWA ...",
+    "loading": "Carregando...",
+    "rate_limit_message": "Limite de taxa de API alcançado.Por favor, espere antes de tentar novamente.",
+    "try_again_in": "Tente novamente",
+    "try_again": "Tente novamente",
+    "request_failed": "Solicitação falhou.Por favor, tente novamente."
+  },
+  "error": {
+    "error_loading_rwa_data": "Erro ao carregar dados RWA",
+    "retry": "Tente novamente",
+    "failed_to_load_data": "Falha ao carregar dados",
+    "failed_to_load_chart": "Falha ao carregar gráfico"
+  },
+  "protocols": {
+    "pact": "Pacto",
+    "securitize": "Securitize",
+    "franklin_templeton": "Franklin Templeton",
+    "libre_capital": "Capital livre",
+    "ondo": "Ondo",
+    "blackrock": "BlackRock"
+  },
+  "labels": {
+    "bridged": "ponte",
+    "value_not_available": "Valor não disponível",
+    "token_id": "Id token",
+    "current_value": "Valor atual",
+    "asset_name": "Nome do ativo",
+    "asset_issuer": "Emissor de ativos",
+    "standards": "Padrões",
+    "not_specified": "Não especificado",
+    "regulatory_framework": "Estrutura regulatória",
+    "governing_body": "Corpo governante",
+    "issuer_legal_structure_country": "Emissor de estrutura legal país",
+    "contract_address": "Endereço do contrato",
+    "network_id": "ID da rede",
+    "asset_id": "ID do ativo"
+  },
+  "sections": {
+    "value_information": "Informações de valor",
+    "asset_details": "Detalhes dos ativos",
+    "regulatory_information": "Informações regulatórias",
+    "legal_structure": "Estrutura legal",
+    "technical_details": "Detalhes técnicos"
+  },
+  "actions": {
+    "view_details": "Ver detalhes",
+    "visit_website": "Visite o site"
+  },
+  "filters": {
+    "all": "Todos",
+    "by_protocol": "Por protocolo",
+    "by_value": "Por valor"
+  },
+  "fallbacks": {
+    "unknown_asset": "Ativo desconhecido",
+    "data_not_available": "Dados não disponíveis",
+    "value_unavailable": "Valor indisponível"
+  }
+}

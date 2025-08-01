@@ -1,0 +1,121 @@
+{
+  "page": {
+    "title": "Bitcoin sa Aptos",
+    "description": "Mga Bitcoin assets at money markets sa Aptos blockchain"
+  },
+  "stats": {
+    "total_supply": "Kabuuang Suplay",
+    "total_btc_value": "Kabuuang Halaga ng Bitcoin",
+    "bitcoin_assets": "Mga Bitcoin Asset",
+    "market_share": "Market Share",
+    "price": "Presyo",
+    "market_cap": "Market Cap",
+    "volume_24h": "Volume 24h",
+    "tvl": "TVL",
+    "apy": "APY",
+    "utilization": "Paggamit",
+    "decimals": "Mga Decimal",
+    "network": "Network",
+    "aptos_mainnet": "Aptos Mainnet"
+  },
+  "loading": {
+    "loading_btc_data": "Nilo-load ang Bitcoin data...",
+    "loading": "Nag-lo-load...",
+    "loading_market_data": "Nilo-load ang market data...",
+    "error_title": "Error sa Pag-load ng Data",
+    "rate_limit_message": "Naabot na ang API rate limit. Mangyaring maghintay bago subukan muli.",
+    "try_again_in": "Subukan muli sa",
+    "try_again": "Subukan Muli",
+    "request_failed": "Nabigo ang request. Pakisubukan muli.",
+    "chart_error": "Nabigo ang pag-load ng chart"
+  },
+  "error": {
+    "error_loading_btc_data": "Error sa Pag-load ng Bitcoin Data",
+    "retry": "Subukan Muli",
+    "failed_to_load_chart": "Nabigo ang pag-load ng chart",
+    "error_calculating_supply": "Error sa pagkalkula ng supply",
+    "unknown_error": "Hindi kilalang error",
+    "invalid_data": "Invalid na data",
+    "invalid_metadata": "Invalid na metadata"
+  },
+  "assets": {
+    "bitcoin": "Bitcoin",
+    "wbtc": "Wrapped Bitcoin",
+    "btc": "Bitcoin",
+    "sbtc": "Staked Bitcoin",
+    "tbtc": "Threshold Bitcoin"
+  },
+  "money_markets": {
+    "title": "Money Markets",
+    "supply": "Suplay",
+    "borrow": "Humiram",
+    "supply_apy": "APY ng Suplay",
+    "borrow_apy": "Borrow APY",
+    "total_supplied": "Kabuuang Na-supply",
+    "total_borrowed": "Kabuuang Hiniram",
+    "available_to_borrow": "Available na Mahiram",
+    "utilization_rate": "Rate ng Paggamit"
+  },
+  "actions": {
+    "supply": "Mag-supply",
+    "borrow": "Humiram",
+    "withdraw": "Mag-withdraw",
+    "repay": "Bayaran",
+    "view_details": "Tingnan ang mga Detalye",
+    "trade": "Mag-trade",
+    "bridge": "Bridge",
+    "wrap": "I-wrap",
+    "unwrap": "I-unwrap"
+  },
+  "yield": {
+    "lending": "Pagpapahiram",
+    "borrowing": "Paghihiram",
+    "farming": "Farming",
+    "staking": "Staking",
+    "rewards": "Mga Reward",
+    "incentives": "Mga Insentibo"
+  },
+  "protocols": {
+    "aries": "Aries",
+    "echelon": "Echelon",
+    "aptin": "Aptin",
+    "thala": "Thala",
+    "echo": "Echo",
+    "protocol": "Protocol",
+    "echo_data_soon": "Paparating na ang Echo protocol data"
+  },
+  "filters": {
+    "all": "Lahat",
+    "by_protocol": "Ayon sa Protocol",
+    "by_apy": "Ayon sa APY",
+    "lending": "Pagpapahiram",
+    "trading": "Trading",
+    "bridging": "Bridging"
+  },
+  "bridge": {
+    "bridge_bitcoin": "I-bridge ang Bitcoin",
+    "from": "Mula sa",
+    "to": "Papunta sa",
+    "amount": "Halaga",
+    "fee": "Bayad",
+    "estimated_time": "Tinatayang Oras",
+    "supported_networks": "Mga Suportadong Network"
+  },
+  "fallbacks": {
+    "unknown_asset": "Hindi Kilalang Asset",
+    "data_not_available": "Hindi available ang data",
+    "price_unavailable": "Hindi available ang presyo"
+  },
+  "info": {
+    "what_is_wrapped_btc": "Ano ang Wrapped BTC?",
+    "wrapped_btc_description": "Ang Wrapped Bitcoin (wBTC) ay isang tokenized na representasyon ng Bitcoin sa ibang mga blockchain, na nagbibigay-daan sa paggamit ng Bitcoin sa mga DeFi application.",
+    "benefits": "Mga Benepisyo",
+    "defi_access": "Access sa DeFi",
+    "earn_yield": "Kumita ng yield",
+    "maintain_btc_exposure": "Panatilihin ang BTC exposure",
+    "bitcoin_backed_asset": "Bitcoin-backed na Asset"
+  },
+  "status": {
+    "coming_soon": "Paparating Na"
+  }
+}

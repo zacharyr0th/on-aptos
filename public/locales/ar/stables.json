@@ -1,0 +1,77 @@
+{
+  "page": {
+    "title": "العملات المستقرة على أبتوس",
+    "description": "العملات المستقرة والعملات المرتبطة على بلوكتشين أبتوس"
+  },
+  "stats": {
+    "total_stablecoin_value": "إجمالي قيمة العملات المستقرة",
+    "stablecoins": "العملات المستقرة",
+    "market_share": "حصة السوق",
+    "market_cap": "القيمة السوقية",
+    "price": "السعر",
+    "supply": "المعروض",
+    "volume_24h": "حجم التداول خلال 24 ساعة",
+    "price_change_24h": "تغير السعر خلال 24 ساعة",
+    "asset_details": "تفاصيل الأصل"
+  },
+  "table": {
+    "token": "الرمز",
+    "supply": "المعروض",
+    "market_share": "%",
+    "type": "النوع",
+    "issuer": "المُصدر"
+  },
+  "loading": {
+    "loading_stablecoin_data": "جارٍ تحميل بيانات العملات المستقرة…",
+    "loading": "جارٍ التحميل…",
+    "rate_limit_message": "مهلًا! يرجى الإبطاء قليلًا.",
+    "try_again_in": "أعد المحاولة خلال",
+    "try_again": "أعد المحاولة",
+    "request_failed": "تعذّر إكمال الطلب."
+  },
+  "error": {
+    "error_loading_stablecoin_data": "خطأ في تحميل بيانات العملات المستقرة",
+    "retry": "إعادة المحاولة",
+    "failed_to_load_chart": "فشل تحميل الرسم البياني"
+  },
+  "stablecoins": {
+    "usdt": "تيثر دولار أمريكي",
+    "usdc": "عملة USD",
+    "dai": "داي",
+    "busd": "باينانس USD",
+    "frax": "فراكس",
+    "tusd": "ترو USD",
+    "usdp": "باكس دولار",
+    "gusd": "جيميني دولار"
+  },
+  "types": {
+    "fiat_collateralized": "مدعومة بعملة ورقية",
+    "crypto_collateralized": "مدعومة بأصول مشفرة",
+    "algorithmic": "خوارزمية",
+    "commodity_backed": "مدعومة بسلع"
+  },
+  "actions": {
+    "view_details": "عرض التفاصيل",
+    "trade": "تداول",
+    "add_to_wallet": "إضافة إلى المحفظة",
+    "visit_website": "زيارة الموقع"
+  },
+  "filters": {
+    "all": "الكل",
+    "by_type": "حسب النوع",
+    "by_market_cap": "حسب القيمة السوقية",
+    "stable": "مستقرة",
+    "depegged": "فك الارتباط"
+  },
+  "labels": {
+    "tether_reserve_address": "عنوان احتياطي تيثر",
+    "subtracted_from_supply": "(مخصوم من المعروض المتداول)",
+    "view_on_explorer": "عرض على مستكشف أبتوس",
+    "reserve_address": "عنوان الاحتياطي"
+  },
+  "fallbacks": {
+    "unknown_stablecoin": "عملة مستقرة غير معروفة",
+    "data_not_available": "البيانات غير متوفرة",
+    "price_unavailable": "السعر غير متوفر"
+  }
+}
