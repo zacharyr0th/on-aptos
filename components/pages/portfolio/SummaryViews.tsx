@@ -89,8 +89,41 @@ const CustomTreemapContent = (props: any) => {
   // Get the fill color from the data
   const fillColor = root?.children?.[index]?.fill || props.fill || "#8884d8";
 
-  // Only show text for top 3 collections (index 0, 1, 2) and if rectangle is large enough
-  const showText = index < 3 && width > 50 && height > 30;
+  // More aggressive mobile-friendly thresholds
+  const area = width * height;
+  const minWidth = 40;
+  const minHeight = 25;
+  
+  // Show text only if rectangle is large enough to avoid overlapping
+  const canShowText = width >= minWidth && height >= minHeight;
+  const canShowBothLines = width >= 60 && height >= 40;
+  
+  if (!canShowText) {
+    return (
+      <rect
+        x={x}
+        y={y}
+        width={width}
+        height={height}
+        style={{
+          fill: fillColor,
+          stroke: "rgba(255,255,255,0.2)",
+          strokeWidth: 0.5,
+        }}
+      />
+    );
+  }
+  
+  // Calculate font sizes based on available space
+  const maxNameLength = Math.floor(width / 6); // Rough estimate of characters that fit
+  const nameFontSize = Math.max(7, Math.min(12, width / 8));
+  const valueFontSize = Math.max(6, Math.min(10, width / 10));
+  
+  // Smart text truncation
+  let displayName = name;
+  if (name.length > maxNameLength) {
+    displayName = name.substring(0, Math.max(3, maxNameLength - 3)) + "...";
+  }
 
   return (
     <g>
@@ -101,38 +134,40 @@ const CustomTreemapContent = (props: any) => {
         height={height}
         style={{
           fill: fillColor,
-          stroke: "none",
+          stroke: "rgba(255,255,255,0.2)",
+          strokeWidth: 0.5,
         }}
       />
-      {showText && (
-        <>
-          <text
-            x={x + width / 2}
-            y={y + height / 2 - 8}
-            textAnchor="middle"
-            fill="#1a1a1a"
-            style={{
-              fontSize: "12px",
-              fontFamily: "var(--font-sans)",
-              fontWeight: 500,
-            }}
-          >
-            {name}
-          </text>
-          <text
-            x={x + width / 2}
-            y={y + height / 2 + 8}
-            textAnchor="middle"
-            fill="#1a1a1a"
-            style={{
-              fontSize: "11px",
-              fontFamily: "var(--font-mono)",
-              fontVariantNumeric: "tabular-nums",
-            }}
-          >
-            {value}
-          </text>
-        </>
+      
+      {/* Collection name */}
+      <text
+        x={x + width / 2}
+        y={canShowBothLines ? y + height / 2 - 4 : y + height / 2}
+        textAnchor="middle"
+        fill="#1a1a1a"
+        style={{
+          fontSize: `${nameFontSize}px`,
+          fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+          fontWeight: 600,
+        }}
+      >
+        {displayName}
+      </text>
+      
+      {/* Value - only show if there's enough space */}
+      {canShowBothLines && (
+        <text
+          x={x + width / 2}
+          y={y + height / 2 + 8}
+          textAnchor="middle"
+          fill="rgba(26,26,26,0.7)"
+          style={{
+            fontSize: `${valueFontSize}px`,
+            fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', monospace",
+          }}
+        >
+          {value}
+        </text>
       )}
     </g>
   );
@@ -492,8 +527,8 @@ export const NFTSummaryView: React.FC<NFTSummaryViewProps> = ({
           </div>
         </div>
       ) : (
-        <div className="h-64 w-full">
-          <ResponsiveContainer width="100%" height={256}>
+        <div className="h-52 sm:h-64 w-full bg-neutral-50 dark:bg-neutral-900/50 rounded-lg overflow-hidden">
+          <ResponsiveContainer width="100%" height="100%">
             <Treemap
               data={treemapData}
               dataKey="size"
@@ -518,9 +553,9 @@ export const NFTSummaryView: React.FC<NFTSummaryViewProps> = ({
                   if (active && payload && payload.length) {
                     const data = payload[0].payload;
                     return (
-                      <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-lg shadow-lg p-3">
-                        <p className="font-medium text-sm">{data.name}</p>
-                        <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                      <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-lg shadow-lg p-2 sm:p-3 z-50">
+                        <p className="font-medium text-xs sm:text-sm">{data.name}</p>
+                        <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400">
                           {data.size} NFTs ({data.percentage.toFixed(1)}%)
                         </p>
                       </div>
