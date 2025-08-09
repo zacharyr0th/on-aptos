@@ -1,0 +1,76 @@
+{
+  "page": {
+    "title": "أصول العالم الحقيقي على أبتوس",
+    "description": "أصول العالم الحقيقي (RWA) المُرمَّزة على بلوكتشين أبتوس"
+  },
+  "stats": {
+    "total_rwa_value": "إجمالي قيمة RWA",
+    "real_world_assets": "أصول العالم الحقيقي",
+    "data_powered_by": "البيانات مقدمة من RWA.xyz",
+    "data_powered_by_prefix": "البيانات مدعومة من",
+    "rwa_assets": "أصول RWA",
+    "market_share": "حصة السوق",
+    "total_value": "إجمالي القيمة",
+    "asset_count": "عدد الأصول",
+    "protocols": "البروتوكولات"
+  },
+  "loading": {
+    "loading_rwa_data": "جارٍ تحميل بيانات RWA...",
+    "loading": "جارٍ التحميل...",
+    "rate_limit_message": "تم الوصول إلى حد معدل واجهة البرمجة. يرجى الانتظار قبل المحاولة مرة أخرى.",
+    "try_again_in": "أعد المحاولة خلال",
+    "try_again": "أعد المحاولة",
+    "request_failed": "فشلت العملية. يرجى المحاولة مرة أخرى."
+  },
+  "error": {
+    "error_loading_rwa_data": "خطأ في تحميل بيانات RWA",
+    "failed_to_load_chart": "فشل في تحميل المخطط",
+    "retry": "إعادة المحاولة",
+    "failed_to_load_data": "فشل تحميل البيانات"
+  },
+  "protocols": {
+    "pact": "Pact",
+    "securitize": "Securitize",
+    "franklin_templeton": "Franklin Templeton",
+    "libre_capital": "Libre Capital",
+    "ondo": "Ondo",
+    "blackrock": "BlackRock"
+  },
+  "labels": {
+    "bridged": "مُجسّر",
+    "value_not_available": "القيمة غير متوفرة",
+    "token_id": "معرّف الرمز",
+    "current_value": "القيمة الحالية",
+    "asset_name": "اسم الأصل",
+    "asset_issuer": "مُصدر الأصل",
+    "standards": "المعايير",
+    "not_specified": "غير محدد",
+    "regulatory_framework": "الإطار التنظيمي",
+    "governing_body": "الجهة المنظمة",
+    "issuer_legal_structure_country": "بلد الهيكل القانوني للمُصدر",
+    "contract_address": "عنوان العقد",
+    "network_id": "معرّف الشبكة",
+    "asset_id": "معرّف الأصل"
+  },
+  "sections": {
+    "value_information": "معلومات القيمة",
+    "asset_details": "تفاصيل الأصل",
+    "regulatory_information": "المعلومات التنظيمية",
+    "legal_structure": "الهيكل القانوني",
+    "technical_details": "التفاصيل التقنية"
+  },
+  "actions": {
+    "view_details": "عرض التفاصيل",
+    "visit_website": "زيارة الموقع"
+  },
+  "filters": {
+    "all": "الكل",
+    "by_protocol": "حسب البروتوكول",
+    "by_value": "حسب القيمة"
+  },
+  "fallbacks": {
+    "unknown_asset": "أصل غير معروف",
+    "data_not_available": "البيانات غير متوفرة",
+    "value_unavailable": "القيمة غير متوفرة"
+  }
+}

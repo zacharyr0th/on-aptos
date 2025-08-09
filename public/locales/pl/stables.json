@@ -1,0 +1,77 @@
+{
+  "page": {
+    "title": "Stablecoiny na Aptos",
+    "description": "Stablecoiny i stabilne waluty na blockchainie Aptos"
+  },
+  "stats": {
+    "total_stablecoin_value": "Całkowita wartość stablecoinów",
+    "stablecoins": "Stablecoiny",
+    "market_share": "Udział w rynku",
+    "market_cap": "Kapitalizacja rynkowa",
+    "price": "Cena",
+    "supply": "Podaż",
+    "volume_24h": "Wolumen 24h",
+    "price_change_24h": "Zmiana ceny 24h",
+    "asset_details": "Szczegóły aktywa"
+  },
+  "table": {
+    "token": "Token",
+    "supply": "Podaż",
+    "market_share": "%",
+    "type": "Typ",
+    "issuer": "Emitent"
+  },
+  "loading": {
+    "loading_stablecoin_data": "Ładowanie danych stablecoinów...",
+    "loading": "Ładowanie...",
+    "rate_limit_message": "Proszę zwolnić tempo.",
+    "try_again_in": "Spróbuj ponownie za",
+    "try_again": "Spróbuj ponownie",
+    "request_failed": "Nie udało się zrealizować żądania."
+  },
+  "error": {
+    "error_loading_stablecoin_data": "Błąd ładowania danych stablecoinów",
+    "retry": "Ponów",
+    "failed_to_load_chart": "Nie udało się załadować wykresu"
+  },
+  "stablecoins": {
+    "usdt": "Tether USD",
+    "usdc": "USD Coin",
+    "dai": "Dai Stablecoin",
+    "busd": "Binance USD",
+    "frax": "Frax",
+    "tusd": "TrueUSD",
+    "usdp": "Pax Dollar",
+    "gusd": "Gemini Dollar"
+  },
+  "types": {
+    "fiat_collateralized": "Zabezpieczone fiatem",
+    "crypto_collateralized": "Zabezpieczone krypto",
+    "algorithmic": "Algorytmiczne",
+    "commodity_backed": "Zabezpieczone towarami"
+  },
+  "actions": {
+    "view_details": "Zobacz szczegóły",
+    "trade": "Handluj",
+    "add_to_wallet": "Dodaj do portfela",
+    "visit_website": "Odwiedź stronę"
+  },
+  "filters": {
+    "all": "Wszystkie",
+    "by_type": "Według typu",
+    "by_market_cap": "Według kapitalizacji",
+    "stable": "Stabilne",
+    "depegged": "Odpięte"
+  },
+  "labels": {
+    "tether_reserve_address": "Adres rezerwy Tether",
+    "subtracted_from_supply": "(Odjęte od podaży w obiegu)",
+    "view_on_explorer": "Zobacz w eksploratorze Aptos",
+    "reserve_address": "adres rezerwy"
+  },
+  "fallbacks": {
+    "unknown_stablecoin": "Nieznany stablecoin",
+    "data_not_available": "Dane niedostępne",
+    "price_unavailable": "Cena niedostępna"
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "page": {
+    "title": "Real World Assets on Aptos",
+    "description": "RWAs and tokenized real world assets on the Aptos blockchain"
+  },
+  "stats": {
+    "total_rwa_value": "Total RWA Value",
+    "real_world_assets": "Real World Assets",
+    "data_powered_by": "Data powered by RWA.xyz",
+    "data_powered_by_prefix": "Data powered by",
+    "rwa_assets": "RWA Assets",
+    "market_share": "Market Share",
+    "total_value": "Total Value",
+    "asset_count": "Asset Count",
+    "protocols": "Protocols"
+  },
+  "loading": {
+    "loading_rwa_data": "Loading RWA data...",
+    "loading": "Loading...",
+    "rate_limit_message": "API rate limit reached. Please wait before trying again.",
+    "try_again_in": "Try again in",
+    "try_again": "Try Again",
+    "request_failed": "Request failed. Please try again."
+  },
+  "error": {
+    "error_loading_rwa_data": "Error loading RWA data",
+    "failed_to_load_chart": "Failed to load chart",
+    "retry": "Retry",
+    "failed_to_load_data": "Failed to load data"
+  },
+  "protocols": {
+    "pact": "Pact",
+    "securitize": "Securitize",
+    "franklin_templeton": "Franklin Templeton",
+    "libre_capital": "Libre Capital",
+    "ondo": "Ondo",
+    "blackrock": "BlackRock"
+  },
+  "labels": {
+    "bridged": "bridged",
+    "value_not_available": "Value not available",
+    "token_id": "Token ID",
+    "current_value": "Current Value",
+    "asset_name": "Asset Name",
+    "asset_issuer": "Asset Issuer",
+    "standards": "Standards",
+    "not_specified": "Not Specified",
+    "regulatory_framework": "Regulatory Framework",
+    "governing_body": "Governing Body",
+    "issuer_legal_structure_country": "Issuer Legal Structure Country",
+    "contract_address": "Contract Address",
+    "network_id": "Network ID",
+    "asset_id": "Asset ID"
+  },
+  "sections": {
+    "value_information": "Value Information",
+    "asset_details": "Asset Details",
+    "regulatory_information": "Regulatory Information",
+    "legal_structure": "Legal Structure",
+    "technical_details": "Technical Details"
+  },
+  "actions": {
+    "view_details": "View Details",
+    "visit_website": "Visit Website"
+  },
+  "filters": {
+    "all": "All",
+    "by_protocol": "By Protocol",
+    "by_value": "By Value"
+  },
+  "fallbacks": {
+    "unknown_asset": "Unknown Asset",
+    "data_not_available": "Data not available",
+    "value_unavailable": "Value unavailable"
+  }
+}

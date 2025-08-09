@@ -1,0 +1,121 @@
+{
+  "page": {
+    "title": "Bitcoin в Aptos",
+    "description": "Bitcoin-активы и денежные рынки в блокчейне Aptos"
+  },
+  "stats": {
+    "total_supply": "Общий объём выпуска",
+    "total_btc_value": "Общая стоимость Bitcoin",
+    "bitcoin_assets": "Bitcoin-активы",
+    "market_share": "Доля рынка",
+    "price": "Цена",
+    "market_cap": "Рыночная капитализация",
+    "volume_24h": "Объём 24ч",
+    "tvl": "TVL",
+    "apy": "APY",
+    "utilization": "Использование",
+    "decimals": "Десятичные знаки",
+    "network": "Сеть",
+    "aptos_mainnet": "Aptos Mainnet"
+  },
+  "loading": {
+    "loading_btc_data": "Загрузка данных Bitcoin...",
+    "loading": "Загрузка...",
+    "loading_market_data": "Загрузка рыночных данных...",
+    "error_title": "Ошибка загрузки данных",
+    "rate_limit_message": "Достигнут лимит API. Пожалуйста, подождите перед повторной попыткой.",
+    "try_again_in": "Попробовать снова через",
+    "try_again": "Попробовать снова",
+    "request_failed": "Запрос не выполнен. Пожалуйста, попробуйте снова.",
+    "chart_error": "Не удалось загрузить график"
+  },
+  "error": {
+    "error_loading_btc_data": "Ошибка загрузки данных Bitcoin",
+    "retry": "Повторить",
+    "failed_to_load_chart": "Не удалось загрузить график",
+    "error_calculating_supply": "Ошибка расчёта предложения",
+    "unknown_error": "Неизвестная ошибка",
+    "invalid_data": "Неверные данные",
+    "invalid_metadata": "Неверные метаданные"
+  },
+  "assets": {
+    "bitcoin": "Bitcoin",
+    "wbtc": "Wrapped Bitcoin",
+    "btc": "Bitcoin",
+    "sbtc": "Staked Bitcoin",
+    "tbtc": "Threshold Bitcoin"
+  },
+  "money_markets": {
+    "title": "Денежные рынки",
+    "supply": "Предоставить",
+    "borrow": "Занять",
+    "supply_apy": "APY предоставления",
+    "borrow_apy": "APY заимствования",
+    "total_supplied": "Всего предоставлено",
+    "total_borrowed": "Всего заимствовано",
+    "available_to_borrow": "Доступно для заимствования",
+    "utilization_rate": "Коэффициент использования"
+  },
+  "actions": {
+    "supply": "Предоставить",
+    "borrow": "Занять",
+    "withdraw": "Вывести",
+    "repay": "Погасить",
+    "view_details": "Просмотреть детали",
+    "trade": "Торговать",
+    "bridge": "Мост",
+    "wrap": "Обернуть",
+    "unwrap": "Развернуть"
+  },
+  "yield": {
+    "lending": "Кредитование",
+    "borrowing": "Заимствование",
+    "farming": "Фарминг",
+    "staking": "Стейкинг",
+    "rewards": "Награды",
+    "incentives": "Стимулы"
+  },
+  "protocols": {
+    "aries": "Aries",
+    "echelon": "Echelon",
+    "aptin": "Aptin",
+    "thala": "Thala",
+    "echo": "Echo",
+    "protocol": "Протокол",
+    "echo_data_soon": "Данные протокола Echo скоро появятся"
+  },
+  "filters": {
+    "all": "Все",
+    "by_protocol": "По протоколу",
+    "by_apy": "По APY",
+    "lending": "Кредитование",
+    "trading": "Торговля",
+    "bridging": "Мосты"
+  },
+  "bridge": {
+    "bridge_bitcoin": "Мост Bitcoin",
+    "from": "Откуда",
+    "to": "Куда",
+    "amount": "Сумма",
+    "fee": "Комиссия",
+    "estimated_time": "Расчётное время",
+    "supported_networks": "Поддерживаемые сети"
+  },
+  "fallbacks": {
+    "unknown_asset": "Неизвестный актив",
+    "data_not_available": "Данные недоступны",
+    "price_unavailable": "Цена недоступна"
+  },
+  "info": {
+    "what_is_wrapped_btc": "Что такое Wrapped BTC?",
+    "wrapped_btc_description": "Wrapped Bitcoin (wBTC) - это токенизированное представление Bitcoin в других блокчейнах, что позволяет использовать Bitcoin в DeFi приложениях.",
+    "benefits": "Преимущества",
+    "defi_access": "Доступ к DeFi",
+    "earn_yield": "Получать доходность",
+    "maintain_btc_exposure": "Сохранять экспозицию BTC",
+    "bitcoin_backed_asset": "Актив, обеспеченный Bitcoin"
+  },
+  "status": {
+    "coming_soon": "Скоро"
+  }
+}

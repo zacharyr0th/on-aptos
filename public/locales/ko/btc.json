@@ -1,0 +1,121 @@
+{
+  "page": {
+    "title": "Aptos의 비트코인",
+    "description": "Aptos 블록체인의 비트코인 자산 및 머니 마켓"
+  },
+  "stats": {
+    "total_supply": "총 공급량",
+    "total_btc_value": "총 비트코인 가치",
+    "bitcoin_assets": "비트코인 자산",
+    "market_share": "시장 점유율",
+    "price": "가격",
+    "market_cap": "시가총액",
+    "volume_24h": "24시간 거래량",
+    "tvl": "TVL",
+    "apy": "APY",
+    "utilization": "활용률",
+    "decimals": "소수점",
+    "network": "네트워크",
+    "aptos_mainnet": "Aptos 메인넷"
+  },
+  "loading": {
+    "loading_btc_data": "비트코인 데이터 로딩 중...",
+    "loading": "로딩 중...",
+    "loading_market_data": "마켓 데이터 로딩 중...",
+    "error_title": "데이터 로딩 오류",
+    "rate_limit_message": "API 요청 제한에 도달했습니다. 잠시 후 다시 시도해주세요.",
+    "try_again_in": "다시 시도하기까지",
+    "try_again": "다시 시도",
+    "request_failed": "요청이 실패했습니다. 다시 시도해주세요.",
+    "chart_error": "차트 로딩 실패"
+  },
+  "error": {
+    "error_loading_btc_data": "비트코인 데이터 로딩 오류",
+    "retry": "재시도",
+    "failed_to_load_chart": "차트 로딩 실패",
+    "error_calculating_supply": "공급량 계산 오류",
+    "unknown_error": "알 수 없는 오류",
+    "invalid_data": "잘못된 데이터",
+    "invalid_metadata": "잘못된 메타데이터"
+  },
+  "assets": {
+    "bitcoin": "비트코인",
+    "wbtc": "래핑된 비트코인",
+    "btc": "비트코인",
+    "sbtc": "스테이킹된 비트코인",
+    "tbtc": "임계값 비트코인"
+  },
+  "money_markets": {
+    "title": "머니 마켓",
+    "supply": "공급",
+    "borrow": "대출",
+    "supply_apy": "공급 APY",
+    "borrow_apy": "대출 APY",
+    "total_supplied": "총 공급량",
+    "total_borrowed": "총 대출량",
+    "available_to_borrow": "대출 가능량",
+    "utilization_rate": "활용률"
+  },
+  "actions": {
+    "supply": "공급",
+    "borrow": "대출",
+    "withdraw": "출금",
+    "repay": "상환",
+    "view_details": "세부 정보 보기",
+    "trade": "거래",
+    "bridge": "브릿지",
+    "wrap": "래핑",
+    "unwrap": "언래핑"
+  },
+  "yield": {
+    "lending": "대출",
+    "borrowing": "차입",
+    "farming": "파밍",
+    "staking": "스테이킹",
+    "rewards": "보상",
+    "incentives": "인센티브"
+  },
+  "protocols": {
+    "aries": "Aries",
+    "echelon": "Echelon",
+    "aptin": "Aptin",
+    "thala": "Thala",
+    "echo": "Echo",
+    "protocol": "프로토콜",
+    "echo_data_soon": "Echo 프로토콜 데이터 곧 출시"
+  },
+  "filters": {
+    "all": "전체",
+    "by_protocol": "프로토콜별",
+    "by_apy": "APY별",
+    "lending": "대출",
+    "trading": "거래",
+    "bridging": "브릿지"
+  },
+  "bridge": {
+    "bridge_bitcoin": "비트코인 브릿지",
+    "from": "보내는 곳",
+    "to": "받는 곳",
+    "amount": "수량",
+    "fee": "수수료",
+    "estimated_time": "예상 시간",
+    "supported_networks": "지원 네트워크"
+  },
+  "fallbacks": {
+    "unknown_asset": "알 수 없는 자산",
+    "data_not_available": "데이터를 사용할 수 없습니다",
+    "price_unavailable": "가격을 사용할 수 없습니다"
+  },
+  "info": {
+    "what_is_wrapped_btc": "래핑된 BTC란?",
+    "wrapped_btc_description": "래핑된 비트코인(wBTC)은 다른 블록체인에서 비트코인을 토큰화한 것으로, DeFi 애플리케이션에서 비트코인을 사용할 수 있게 합니다.",
+    "benefits": "장점",
+    "defi_access": "DeFi 접근",
+    "earn_yield": "수익 창출",
+    "maintain_btc_exposure": "BTC 노출 유지",
+    "bitcoin_backed_asset": "비트코인 담보 자산"
+  },
+  "status": {
+    "coming_soon": "곧 출시"
+  }
+}

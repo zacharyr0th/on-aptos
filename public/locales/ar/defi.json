@@ -1,0 +1,382 @@
+{
+  "page": {
+    "title": "التمويل اللامركزي على أبتوس",
+    "description": "دليل شامل لبروتوكولات DeFi على بلوكتشين أبتوس"
+  },
+  "stats": {
+    "total_value_locked": "إجمالي القيمة المقفلة",
+    "volume_24h": "حجم التداول خلال 24 ساعة",
+    "protocols": "البروتوكولات",
+    "filtered_protocols": "البروتوكولات المُفلترة",
+    "live_from_defillama": "مباشر من DeFiLlama",
+    "estimated_tvl": "القيمة المقفلة المقدَّرة",
+    "volume_data": "حجم التداول خلال 24 ساعة",
+    "defi_protocols": "بروتوكولات DeFi",
+    "fees_24h": "Fees 24h",
+    "protocol_fees": "Protocol fees",
+    "stablecoin_volume": "Stablecoin Volume",
+    "stablecoin_trading": "Stablecoin trading volume",
+    "coming_soon": "Coming Soon"
+  },
+  "search": {
+    "placeholder": "ابحث عن البروتوكولات...",
+    "results": "تم العثور على {{count}} بروتوكول",
+    "results_of": "من أصل {{total}} بروتوكول",
+    "no_results": "لم يتم العثور على بروتوكولات تطابق معاييرك.",
+    "clear_search": "مسح البحث",
+    "search_hint": "ابحث بالاسم أو الفئة أو الوصف"
+  },
+  "filters": {
+    "all": "الكل",
+    "category": "الفئة",
+    "subcategory": "الفئة الفرعية",
+    "clear_filters": "مسح المرشحات",
+    "filter_by_category": "التصفية حسب الفئة",
+    "view_grid": "عرض شبكي",
+    "view_table": "عرض جدولي",
+    "mobile_filters": "مرشحات",
+    "active_filters": "المرشحات النشطة",
+    "subcategories_header": "الفئات الفرعية لـ {{category}}:"
+  },
+  "tooltips": {
+    "grid_view": "التبديل إلى العرض الشبكي",
+    "table_view": "التبديل إلى العرض الجدولي",
+    "category_filter": "تصفية البروتوكولات حسب الفئة",
+    "subcategory_filter": "تصفية البروتوكولات حسب الفئة الفرعية",
+    "clear_all_filters": "إزالة جميع المرشحات النشطة",
+    "search_protocols": "البحث في جميع البروتوكولات",
+    "protocol_website": "زيارة الموقع الرسمي",
+    "protocol_github": "عرض الكود المصدري على GitHub",
+    "protocol_twitter": "متابعة على X (تويتر)",
+    "category_description": "بروتوكولات {{category}}: {{description}}",
+    "subcategory_description": "{{subcategory}}: {{description}}"
+  },
+  "categories": {
+    "All": {
+      "name": "الكل",
+      "description": "جميع بروتوكولات DeFi"
+    },
+    "Credit": {
+      "name": "القروض",
+      "description": "بروتوكولات تسهّل الاقتراض والإقراض والخدمات المعتمدة على الائتمان",
+      "subcategories": {
+        "Lending": {
+          "name": "الإقراض",
+          "description": "منصات يمكن للمستخدمين من خلالها إقراض واقتراض الأصول المشفرة بأسعار فائدة"
+        },
+        "RWA Lending": {
+          "name": "إقراض الأصول الواقعية",
+          "description": "بروتوكولات إقراض مدعومة بأصول واقعية مثل العقارات أو السلع"
+        },
+        "NFT Lending": {
+          "name": "إقراض NFT",
+          "description": "اقتراض الأموال باستخدام الـNFT كضمان أو الإقراض لحاملي NFT"
+        },
+        "Uncollateralized Lending": {
+          "name": "إقراض غير مضمون",
+          "description": "قروض بدون ضمانات، تعتمد على السمعة أو تقييم الائتمان"
+        },
+        "CDP": {
+          "name": "مراكز الدين المضمونة (CDP)",
+          "description": "إنشاء عملات مستقرة عن طريق حجز الضمان في العقود الذكية"
+        }
+      }
+    },
+    "Yield": {
+      "name": "العائد",
+      "description": "بروتوكولات تركز على التخزين وتوليد العائد وتوزيع المكافآت",
+      "subcategories": {
+        "Liquid Staking": {
+          "name": "التخزين السائل",
+          "description": "تخزين الرموز مع الحصول على إيصالات قابلة للتداول للحفاظ على السيولة"
+        },
+        "Restaking": {
+          "name": "إعادة التخزين",
+          "description": "استخدام الرموز المخزنة مسبقًا لتأمين بروتوكولات إضافية مقابل مكافآت"
+        },
+        "Liquid Restaking": {
+          "name": "إعادة التخزين السائلة",
+          "description": "إعادة التخزين بواسطة رموز سائلة يمكن تداولها أو استخدامها في DeFi"
+        },
+        "Liquidity Manager": {
+          "name": "مدير السيولة",
+          "description": "أدوات أو بروتوكولات تعمل على تحسين وإعادة توازن السيولة عبر الأحواض"
+        },
+        "Leveraged Farming": {
+          "name": "الزراعة بالرافعة",
+          "description": "اقتراض أموال لزيادة توفير السيولة وتعظيم مكافآت الزراعة"
+        },
+        "Yield Aggregator": {
+          "name": "مجمّع عوائد",
+          "description": "العثور تلقائيًا على أفضل فرص العائد والتبديل بينها"
+        }
+      }
+    },
+    "Trading": {
+      "name": "التداول",
+      "description": "بروتوكولات للتداول وصناعة السوق وتوفير السيولة",
+      "subcategories": {
+        "DEX": {
+          "name": "البورصات اللامركزية",
+          "description": "بورصات لامركزية لتبديل الرموز دون وسطاء"
+        },
+        "DEX Aggregator": {
+          "name": "مجمّع DEX",
+          "description": "إيجاد أفضل الأسعار عبر عدة بورصات لامركزية لتحقيق تداول مثالي"
+        },
+        "Perps": {
+          "name": "العقود الدائمة",
+          "description": "تداول عقود الآجلة الدائمة برافعة مالية على الأصول المشفرة"
+        },
+        "Options": {
+          "name": "الخيارات",
+          "description": "شراء وبيع عقود الخيارات للتحوط أو المضاربة على تحركات الأسعار"
+        },
+        "Prediction Market": {
+          "name": "سوق التنبؤ",
+          "description": "المراهنة على الأحداث والنتائج الواقعية باستخدام التشفير"
+        },
+        "Launchpad": {
+          "name": "منصة إطلاق",
+          "description": "إطلاق رموز جديدة بتوزيع عادل وميزات مجتمعية"
+        }
+      }
+    },
+    "Multiple": {
+      "name": "متعدد",
+      "description": "بروتوكولات تقدم عدة منتجات DeFi عبر فئات مختلفة"
+    }
+  },
+  "subcategories": {
+    "lending": "الإقراض",
+    "rwa_lending": "إقراض الأصول الواقعية",
+    "nft_lending": "إقراض NFT",
+    "uncollateralized_lending": "إقراض غير مضمون",
+    "cdp": "CDP",
+    "liquid_staking": "التخزين السائل",
+    "restaking": "إعادة التخزين",
+    "liquid_restaking": "إعادة التخزين السائلة",
+    "liquidity_manager": "مدير السيولة",
+    "leveraged_farming": "الزراعة بالرافعة",
+    "yield_aggregator": "مجمّع عوائد",
+    "dex": "البورصات اللامركزية",
+    "dex_aggregator": "مجمّع DEX",
+    "perps": "العقود الدائمة",
+    "launchpad": "منصة إطلاق",
+    "options": "الخيارات",
+    "prediction_markets": "أسواق التنبؤ"
+  },
+  "protocol": {
+    "website": "الموقع",
+    "github": "GitHub",
+    "twitter": "X (تويتر)",
+    "links": "الروابط",
+    "tvl": "TVL",
+    "volume": "الحجم",
+    "yield": "العائد",
+    "status": "الحالة",
+    "launch_date": "تاريخ الإطلاق",
+    "audit_status": "حالة التدقيق",
+    "networks": "الشبكات",
+    "category": "الفئة",
+    "subcategory": "الفئة الفرعية",
+    "description": "الوصف",
+    "more_info": "مزيد من المعلومات",
+    "external_links": "روابط خارجية",
+    "implementation": "التنفيذ",
+    "security": "الأمان",
+    "token": "الرمز المميز"
+  },
+  "protocol_values": {
+    "status": {
+      "Active": "نشط",
+      "Deprecated": "مهجور",
+      "Beta": "بيتا",
+      "Coming Soon": "قريباً"
+    },
+    "audit_status": {
+      "Audited": "مُدقّق",
+      "Unaudited": "غير مُدقّق",
+      "In Progress": "قيد التقدم",
+      "Partially Audited": "مُدقّق جزئياً"
+    },
+    "networks": {
+      "mainnet": "الشبكة الرئيسية",
+      "testnet": "شبكة الاختبار",
+      "devnet": "شبكة التطوير"
+    },
+    "implementations": {
+      "Money Market": "السوق المالية",
+      "Isolated Pools": "المجمعات المعزولة",
+      "Validator Delegated": "مُفوّض للمصدق",
+      "Range Orders": "أوامر النطاق",
+      "Borrowing-based": "قائم على الاقتراض",
+      "Multi-protocol": "متعدد البروتوكولات",
+      "AMM": "AMM",
+      "CLOB": "CLOB",
+      "Hybrid": "هجين",
+      "Route Optimization": "تحسين المسار",
+      "Gas Optimization": "تحسين الغاز",
+      "Cross-chain": "عبر السلاسل",
+      "Cross-margin": "الهامش المتقاطع",
+      "Fair Launch": "إطلاق عادل",
+      "Protocol Suite": "مجموعة البروتوكولات"
+    }
+  },
+  "protocols": {
+    "mirage": {
+      "description": "Composable liquidity layer bringing next-gen DeFi. Deposit collateral and borrow self-repaying stablecoin loans powered by perpetuals with up to 100x leverage.",
+      "categoryBreakdown": "Trading • Perps",
+      "feeStructure": "Dynamic fee structure based on trading volume and position size. Competitive fees for perpetual futures trading.",
+      "integration": {
+        "description": "Fully on-chain perpetuals with CEX-like experience. All positions, vaults, and orders are represented as NFTs for secondary market trading."
+      }
+    }
+  },
+  "protocol_descriptions": {
+    "Panora": "\"ميتا-ديكس\" يتصل بدفتر أوامر على السلسلة وأكثر من 10 صانعي سوق آليين، يقسم الأوامر عبر المجمعات بينما ينظم قائمة رمزية معيارية تحدث تلقائياً في واجهته.",
+    "Kana": "يوجه المقايضات عبر تسع سلاسل؛ عقد دافع الأجور يتيح للمستخدمين التداول على أبتوس دون امتلاك APT للغاز؛ محرك عقود دائمة مبني على دفتر الأوامر.",
+    "Thetis": "تيتيس يجمع مجمع فوري، عقود دائمة 50×، ومجمعات إنشاء السيولة (LBPs) تحت سقف واحد.",
+    "Anqa": "يدعي تغطية سيولة 99% عبر أكثر من 15 بورصة لامركزية في أبتوس؛ العينات الفورية تعاين الانزلاق قبل التوقيع وتتيح تجميع مقايضات متعددة الرموز لتوفير الغاز.",
+    "LiquidSwap": "صانع السوق الآلي الرئيسي لبونتيم وأول بورصة لامركزية مباشرة على الشبكة الرئيسية لأبتوس؛ يقدم مجمعات Uniswap-V2 الكلاسيكية، منحنى تبادل مستقر، وتصميم سيولة مركزة محقق رسمياً.",
+    "Econia": "دفتر أوامر على السلسلة فائق التوازي محسّن للتزامن المتفائل في أبتوس؛ يعالج الأسواق بالتوازي مع إنهاء دون الثانية ويعرض مجموعة بيانات REST/MQTT كاملة.",
+    "Cellana": "AMM ve(3,3) حيث يوجه مصوتو veNFT الانبعاثات ويلتقطون 100% من الرسوم.",
+    "PancakeSwap": "نسخ بورصة باينانس اللامركزية الرئيسية AMM V2 الخاص بها على Move وربط بعض سيولة CAKE بأبتوس.",
+    "SushiSwap": "نفذ Sushi أول تكامل غير EVM له، مما يمكّن مسارات عبر السلاسل التي تتم تسويتها على Aptos بينما يحافظ على تجربة المستخدم المألوفة لموجه Trident.",
+    "Hyperion": "هجين مختلط بالكامل على السلسلة من دفتر الأوامر + CL-AMM يستفيد مو عرض نقل أبتوس للتداول بنمط HFT.",
+    "Tapp": "أول بورصة لامركزية معيارية مُمكّنة بالخطافات، بنمط Uniswap V4، على شبكة اختبار Aptos؛ خطافات العقود الذكية تتيح للبناة تركيب مجمعات مخصصة بينما يحصل المستخدمون على مقايضات قابلة للبرمجة.",
+    "Merkle": "بورصة عقود دائمة لامركزية مع عناصر اللعب بنقاط الخبرة وصناديق الغنائم ورافعة 150×؛ أكثر من 20 مليار دولار من إجمالي الحجم.",
+    "AGDEX": "يقدم عقود دائمة بهامش متقاطع 1-100× مع تعبئة اوراكل منخفضة التأثير تحافظ على انزلاق محدود للمتداولين بالتجزئة.",
+    "Pump": "يمكن لأي شخص سك رموز ميم عبر منحنيات الربط؛ كل عملة يتم إطلاقها بعدالة دون بيع مسبق أو تخصيص للفريق.",
+    "Emojicoin": "يتيح للمستخدمين سك رموز معينة 1-إلى-1 مع رموز يونيكود التعبيرية؛ كل إطلاق يستخدم منحنى CL-AMM لإيكونيا لاكتشاف الأسعار الفوري والمضاربة.",
+    "Aries": "أول سوق نقدي بنمط Compound على أبتوس، محدث بوضع E-Mode LTV 90%، وربط متكامل، وتداول فوري في واجهة واحدة.",
+    "Superposition": "منصة إدارة مخاطر متقدمة مستوحاة من FHS VaR لبنك إنجلترا، تقدم فرص عوائد مع رافعة مع مراقبة المخاطر في الوقت الفعلي وتعديل ديناميكي لعامل الضمان.",
+    "Joule": "يجمع بين مجمعات الإقراض المعزولة و\"مراسي السيولة\" للزراعة برافعة.",
+    "Echelon": "مركز إقراض يدعم كلاً من وضع E-Mode والأسواق المعزولة.",
+    "Aptin": "منصة إقراض تركز على الأمان أولاً تستخدم Move Prover للتحقق الرسمي وضوابط المخاطر الدقيقة للمجمعات المعزولة.",
+    "Meso": "إقراض فعال رأس المال مع حدود دين قابلة للتكوين من قبل المستخدم ووحدة أمان تدعم عجز البروتوكول.",
+    "TruFin": "ستيكينغ سائل بمستوى مؤسسي؛ يحصل المستخدمون على TruAPT مقابل ستيكينغ APT.",
+    "Amnis": "نظام رمزين مزدوج يصدر stAPT (مولد عوائد) و amAPT (مستقر)، يسمح للمستخدمين بالتبديل بين العائد والاستقرار بينما يوجه عمولة المدقق عائدة إلى المراهنين.",
+    "Kofi": "ستيكينغ سائل معزز بـ MEV مع خزائن LSD برافعة.",
+    "Ichi": "خزائن مدير السيولة الآلي تسمح للمشاريع ببذر سيولة أحادية الجانب؛ النطاقات الذكية تعيد التوازن لتقليل الخسارة المؤقتة بينما تكسب الخزائن رسوم المقايضة برمزها الأصلي.",
+    "Vibrant X": "محسّن عوائد ولوحة متابعة محفظة يعيد تخصيص الودائع إلى مجمعات Aptos ذات أعلى APY.",
+    "Moar": "يبني طبقة زراعة مع رافعة مع حسابات ائتمان عبر البروتوكولات تمكّن المستخدمين من الاقتراض في مكان والنشر في آخر.",
+    "Thala": "مجموعة من تطبيقات DeFi تحتوي على AMM متعدد المجمعات، عملة MOD المستقرة مفرطة الضمان، والستيكينغ السائل عبر sthAPT و thAPT.",
+    "Mirage": "A composable liquidity layer powering DeFi's next frontier. Deposit collateral and borrow a self-repaying stablecoin loan powered by perpetuals. Features fully on-chain perps with CEX-like experience, instant execution, low fees, and up to 100x leverage."
+  },
+  "protocol_category_breakdown": {
+    "Thala": "التداول • العائد • الائتمان"
+  },
+  "table": {
+    "protocol": "البروتوكول",
+    "category": "الفئة",
+    "subcategory": "الفئة الفرعية",
+    "tvl": "TVL",
+    "links": "الروابط",
+    "sort_by": "الفرز حسب",
+    "sort_asc": "الفرز تصاعديًا",
+    "sort_desc": "الفرز تنازليًا"
+  },
+  "fallbacks": {
+    "multiple_defi_products": "منتجات DeFi متعددة",
+    "defi_protocol_category": "فئة بروتوكول DeFi",
+    "defi_protocol_subcategory": "فئة فرعية لبروتوكول DeFi",
+    "unknown_category": "فئة غير معروفة",
+    "unknown_subcategory": "فئة فرعية غير معروفة",
+    "no_description": "لا يوجد وصف",
+    "visit_protocol": "زيارة البروتوكول"
+  },
+  "actions": {
+    "view_protocol": "عرض البروتوكول",
+    "visit_website": "زيارة الموقع",
+    "view_on_github": "عرض على GitHub",
+    "follow_on_twitter": "متابعة على X",
+    "copy_link": "نسخ الرابط",
+    "share": "مشاركة"
+  },
+  "ui": {
+    "search": {
+      "placeholder": "ابحث عن البروتوكولات...",
+      "results_count": "{{count}} نتيجة",
+      "results_count_plural": "{{count}} نتائج",
+      "breadcrumb": "الكل > {{category}}"
+    },
+    "filters": {
+      "category": "الفئة:",
+      "all_categories": "جميع الفئات",
+      "clear_filters": "مسح",
+      "view_mode": {
+        "grid": "عرض شبكي",
+        "table": "عرض جدولي"
+      },
+      "tooltips": {
+        "category_filter": "تصفية البروتوكولات حسب الفئة",
+        "clear_filters": "مسح جميع المرشحات النشطة",
+        "grid_view": "التبديل إلى العرض الشبكي",
+        "table_view": "التبديل إلى العرض الجدولي"
+      }
+    },
+    "stats": {
+      "total_protocols": "إجمالي البروتوكولات",
+      "total_protocols_tooltip": "إجمالي عدد بروتوكولات DeFi المُتعقبة",
+      "categories": "الفئات",
+      "categories_tooltip": "عدد فئات DeFi المتاحة",
+      "data_source": "مصدر البيانات",
+      "data_source_tooltip": "مصدر بيانات البروتوكولات",
+      "loading": "جارٍ تحميل الإحصاءات..."
+    },
+    "table": {
+      "headers": {
+        "name": "الاسم",
+        "category": "الفئة",
+        "links": "الروابط"
+      },
+      "tooltips": {
+        "sort_by_name": "الفرز حسب اسم البروتوكول",
+        "sort_by_category": "الفرز حسب الفئة",
+        "visit_website": "زيارة موقع البروتوكول",
+        "view_github": "عرض مستودع GitHub",
+        "follow_twitter": "متابعة على Twitter"
+      },
+      "no_data": "لم يتم العثور على بروتوكولات",
+      "loading": "جارٍ تحميل البروتوكولات..."
+    },
+    "grid": {
+      "tooltips": {
+        "protocol_card": "اضغط لعرض تفاصيل {{protocol}}",
+        "visit_website": "زيارة موقع {{protocol}}",
+        "view_github": "عرض {{protocol}} على GitHub",
+        "follow_twitter": "متابعة {{protocol}} على Twitter"
+      }
+    },
+    "messages": {
+      "no_protocols": "لم يتم العثور على بروتوكولات تطابق معاييرك.",
+      "loading": "جارٍ التحميل...",
+      "error": "حدث خطأ أثناء تحميل البروتوكولات",
+      "empty_state": "لا توجد بروتوكولات DeFi متاحة",
+      "try_clearing_filters": "حاول مسح المرشحات أو مصطلحات البحث."
+    }
+  },
+  "common_values": {
+    "na": "غير متاح",
+    "not_available": "غير متاح",
+    "real_time": "في الوقت الفعلي",
+    "live": "مباشر",
+    "estimated": "مقدر",
+    "unknown": "غير معروف",
+    "loading": "جارٍ التحميل...",
+    "error": "خطأ",
+    "coming_soon": "قريباً",
+    "tbd": "سيتم تحديده",
+    "varies": "يختلف"
+  },
+  "units": {
+    "million": "م",
+    "billion": "ب",
+    "trillion": "ت",
+    "percent": "%",
+    "usd": "USD",
+    "apt": "APT",
+    "btc": "BTC"
+  }
+}

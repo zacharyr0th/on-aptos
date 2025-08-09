@@ -1,0 +1,236 @@
+name: 🔐 Security Scan
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    # Run security scan daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch: # Allow manual trigger
+
+# Prevent multiple security scans from running simultaneously
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+jobs:
+  gitleaks:
+    name: 🔍 Secret Detection (Gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Full history for better secret detection
+
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }} # Optional: for Gitleaks Pro
+        with:
+          config: .gitleaks.toml
+
+  truffleHog:
+    name: 🔍 Secret Detection (TruffleHog)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: TruffleHog OSS
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+          extra_args: --debug --only-verified
+
+  semgrep:
+    name: 🔍 SAST (Semgrep)
+    runs-on: ubuntu-latest
+    container:
+      image: returntocorp/semgrep
+    if: (github.actor != 'dependabot[bot]')
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Semgrep
+        run: |
+          semgrep \
+            --config=auto \
+            --config=p/security-audit \
+            --config=p/secrets \
+            --config=p/nodejs \
+            --config=p/typescript \
+            --config=p/react \
+            --sarif \
+            --output=semgrep.sarif \
+            --severity=ERROR \
+            --severity=WARNING \
+            .
+
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: semgrep.sarif
+        if: always()
+
+  codeql:
+    name: 🔍 CodeQL Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ['javascript']
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          queries: security-extended,security-and-quality
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{matrix.language}}"
+
+  dependency-check:
+    name: 🔍 Dependency Vulnerability Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run npm audit
+        run: pnpm audit --audit-level high
+        continue-on-error: true
+
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/node@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high --file=package.json
+
+      - name: Upload Snyk results to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: snyk.sarif
+
+  env-validation:
+    name: 🔍 Environment Security Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check for committed .env files
+        run: |
+          if find . -name ".env*" ! -name ".env.example" ! -path "./node_modules/*" ! -path "./.git/*" | grep -q .; then
+            echo "ERROR: Found .env files that should not be committed:"
+            find . -name ".env*" ! -name ".env.example" ! -path "./node_modules/*" ! -path "./.git/*"
+            exit 1
+          fi
+          echo "✅ No .env files found in repository"
+
+      - name: Validate .env.example
+        run: |
+          if [ ! -f .env.example ]; then
+            echo "ERROR: .env.example file is missing"
+            exit 1
+          fi
+          
+          # Check that example values don't look like real secrets
+          if grep -E "(sk_|pk_|AIza|ya29|xox[baprs]|ghp_|gho_|ghu_|ghs_|github_pat_)" .env.example; then
+            echo "ERROR: .env.example contains what looks like real secrets"
+            exit 1
+          fi
+          
+          echo "✅ .env.example validation passed"
+
+      - name: Check for hardcoded secrets in source
+        run: |
+          # Check for potential hardcoded secrets (excluding blockchain addresses)
+          if grep -r -E "(password|passwd|pwd|secret|key|token|auth|bearer|jwt|oauth|api.*key|access.*token|refresh.*token)\s*[=:]\s*['\"][^'\"]{20,}['\"]" \
+            --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" \
+            --exclude-dir=node_modules --exclude-dir=.git --exclude-dir=test \
+            . | grep -v -E "(process\.env|your_.*_here|example|test|mock|placeholder)"; then
+            echo "WARNING: Found potential hardcoded secrets"
+            exit 1
+          fi
+          echo "✅ No hardcoded secrets detected"
+
+  security-summary:
+    name: 📊 Security Summary
+    runs-on: ubuntu-latest
+    needs: [gitleaks, truffleHog, semgrep, codeql, dependency-check, env-validation]
+    if: always()
+    steps:
+      - name: Security Scan Summary
+        run: |
+          echo "## 🔐 Security Scan Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|---------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Gitleaks | ${{ needs.gitleaks.result == 'success' && '✅ Pass' || '❌ Fail' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| TruffleHog | ${{ needs.truffleHog.result == 'success' && '✅ Pass' || '❌ Fail' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Semgrep SAST | ${{ needs.semgrep.result == 'success' && '✅ Pass' || '❌ Fail' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| CodeQL | ${{ needs.codeql.result == 'success' && '✅ Pass' || '❌ Fail' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Dependencies | ${{ needs.dependency-check.result == 'success' && '✅ Pass' || '❌ Fail' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Environment | ${{ needs.env-validation.result == 'success' && '✅ Pass' || '❌ Fail' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [[ "${{ needs.gitleaks.result }}" == "success" && "${{ needs.truffleHog.result }}" == "success" && "${{ needs.env-validation.result }}" == "success" ]]; then
+            echo "🎉 **All critical security checks passed!**" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ **Some security checks failed. Please review the results above.**" >> $GITHUB_STEP_SUMMARY
+          fi

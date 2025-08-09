@@ -1,0 +1,121 @@
+{
+  "page": {
+    "title": "Bitcoin lórí Aptos",
+    "description": "Àwọn ohun-ìní Bitcoin àti àwọn ọjà owó lórí blockchain Aptos"
+  },
+  "stats": {
+    "total_supply": "Ìpèsè Gbogbo",
+    "total_btc_value": "Iye Bitcoin Gbogbo",
+    "bitcoin_assets": "Ohun-ìní Bitcoin",
+    "market_share": "Ìpín Ọjà",
+    "price": "Owó",
+    "market_cap": "Agbára Ọjà",
+    "volume_24h": "Ìwọ̀n 24h",
+    "tvl": "TVL",
+    "apy": "APY",
+    "utilization": "Lílo",
+    "decimals": "Àwọn díà",
+    "network": "Nẹ́tíwọ̀ọ̀kì",
+    "aptos_mainnet": "Aptos Mainnet"
+  },
+  "loading": {
+    "loading_btc_data": "Ń gbé dátà Bitcoin...",
+    "loading": "Ń gbé...",
+    "loading_market_data": "Ń gbé dátà ọjà...",
+    "error_title": "Àṣìṣe Ní Gbígbé Dátà",
+    "rate_limit_message": "Òpó ìwọ̀n API ti dé. Jọ̀wọ́ dúró kí o tó gbìyànjú lẹ́ẹ̀kan síi.",
+    "try_again_in": "Gbìyànjú lẹ́ẹ̀kan síi ní",
+    "try_again": "Gbìyànjú Lẹ́ẹ̀kan Síi",
+    "request_failed": "Ìbéèrè kùnà. Jọ̀wọ́ gbìyànjú lẹ́ẹ̀kan síi.",
+    "chart_error": "Kò lè gbé àwòrán"
+  },
+  "error": {
+    "error_loading_btc_data": "Àṣìṣe Ní Gbígbé Dátà Bitcoin",
+    "retry": "Tún gbìyànjú",
+    "failed_to_load_chart": "Kò lè gbé àwòrán",
+    "error_calculating_supply": "Àṣìṣe ní ṣíṣirò ìpèsè",
+    "unknown_error": "Àṣìṣe àìmọ̀",
+    "invalid_data": "Dátà tí kò tọ́",
+    "invalid_metadata": "Metadata tí kò tọ́"
+  },
+  "assets": {
+    "bitcoin": "Bitcoin",
+    "wbtc": "Bitcoin Tí a Fi Pamọ́",
+    "btc": "Bitcoin",
+    "sbtc": "Bitcoin Tí a Dó",
+    "tbtc": "Bitcoin Àlà"
+  },
+  "money_markets": {
+    "title": "Àwọn Ọjà Owó",
+    "supply": "Pèsè",
+    "borrow": "Yá",
+    "supply_apy": "APY Ìpèsè",
+    "borrow_apy": "APY Yíyá",
+    "total_supplied": "Àpapọ̀ Tí a Pèsè",
+    "total_borrowed": "Àpapọ̀ Tí a Yá",
+    "available_to_borrow": "Tó Wà Láti Yá",
+    "utilization_rate": "Ìwọ̀n Lílo"
+  },
+  "actions": {
+    "supply": "Pèsè",
+    "borrow": "Yá",
+    "withdraw": "Yọ",
+    "repay": "San padà",
+    "view_details": "Wo Àlàyé",
+    "trade": "Ṣòwò",
+    "bridge": "Àfonífaàsí",
+    "wrap": "Dì",
+    "unwrap": "Tú"
+  },
+  "yield": {
+    "lending": "Yínìí",
+    "borrowing": "Yíyá",
+    "farming": "Ọ̀gbìn",
+    "staking": "Ìdókòwò",
+    "rewards": "Ẹ̀bùn",
+    "incentives": "Ìwúrí"
+  },
+  "protocols": {
+    "aries": "Aries",
+    "echelon": "Echelon",
+    "aptin": "Aptin",
+    "thala": "Thala",
+    "echo": "Echo",
+    "protocol": "Ìlànà",
+    "echo_data_soon": "Dátà ìlànà Echo ń bọ̀ láìpẹ́"
+  },
+  "filters": {
+    "all": "Gbogbo",
+    "by_protocol": "Nípa Ìlànà",
+    "by_apy": "Nípa APY",
+    "lending": "Yínìí",
+    "trading": "Ìṣòwò",
+    "bridging": "Àfonífaàsí"
+  },
+  "bridge": {
+    "bridge_bitcoin": "Ṣe Àfonífaàsí Bitcoin",
+    "from": "Láti",
+    "to": "Sí",
+    "amount": "Iye",
+    "fee": "Owó ìdíyelé",
+    "estimated_time": "Àkókò Tí a Ṣèrò",
+    "supported_networks": "Àwọn Nẹ́tíwọ̀ọ̀kì Tí a Ṣàtìlẹ́yìn"
+  },
+  "fallbacks": {
+    "unknown_asset": "Ohun-ìní Àìmọ̀",
+    "data_not_available": "Dátà kò sí",
+    "price_unavailable": "Owó kò sí"
+  },
+  "info": {
+    "what_is_wrapped_btc": "Kíni Bitcoin Tí a Fi Pamọ́?",
+    "wrapped_btc_description": "Bitcoin Tí a Fi Pamọ́ (wBTC) jẹ́ àpẹẹrẹ tókìn ti Bitcoin lórí àwọn blockchain mìíràn, tó ń jẹ́ kí a lè lo Bitcoin nínú àwọn ohun èlò DeFi.",
+    "benefits": "Àwọn Ànfààní",
+    "defi_access": "Ìwọlé DeFi",
+    "earn_yield": "Jèrè èrè",
+    "maintain_btc_exposure": "Tọ́jú ìfarahàn BTC",
+    "bitcoin_backed_asset": "Ohun-ìní Tí Bitcoin Ṣàtìlẹ́yìn"
+  },
+  "status": {
+    "coming_soon": "Ń bọ̀ láìpẹ́"
+  }
+}

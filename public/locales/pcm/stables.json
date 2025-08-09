@@ -1,0 +1,77 @@
+{
+  "page": {
+    "title": "Stablecoins for Aptos",
+    "description": "Stablecoins and stable currencies for di Aptos blockchain"
+  },
+  "stats": {
+    "total_stablecoin_value": "Total Stablecoin Value",
+    "stablecoins": "Stablecoins",
+    "market_share": "Market Share",
+    "market_cap": "Market Cap",
+    "price": "Price",
+    "supply": "Supply",
+    "volume_24h": "Volume 24h",
+    "price_change_24h": "Price Change 24h",
+    "asset_details": "Asset Details"
+  },
+  "table": {
+    "token": "Token",
+    "supply": "Supply",
+    "market_share": "%",
+    "type": "Type",
+    "issuer": "Issuer"
+  },
+  "loading": {
+    "loading_stablecoin_data": "Dey load stablecoin data...",
+    "loading": "Dey Load...",
+    "rate_limit_message": "Woah! Abeg slow down small.",
+    "try_again_in": "Try again for",
+    "try_again": "Try Again",
+    "request_failed": "Di request no fit complete."
+  },
+  "error": {
+    "error_loading_stablecoin_data": "Error to Load Stablecoin Data",
+    "retry": "Retry",
+    "failed_to_load_chart": "E no fit load chart"
+  },
+  "stablecoins": {
+    "usdt": "Tether USD",
+    "usdc": "USD Coin",
+    "dai": "Dai Stablecoin",
+    "busd": "Binance USD",
+    "frax": "Frax",
+    "tusd": "TrueUSD",
+    "usdp": "Pax Dollar",
+    "gusd": "Gemini Dollar"
+  },
+  "types": {
+    "fiat_collateralized": "Fiat Collateralized",
+    "crypto_collateralized": "Crypto Collateralized",
+    "algorithmic": "Algorithmic",
+    "commodity_backed": "Commodity Backed"
+  },
+  "actions": {
+    "view_details": "View Details",
+    "trade": "Trade",
+    "add_to_wallet": "Add to Wallet",
+    "visit_website": "Visit Website"
+  },
+  "filters": {
+    "all": "All",
+    "by_type": "By Type",
+    "by_market_cap": "By Market Cap",
+    "stable": "Stable",
+    "depegged": "Depegged"
+  },
+  "labels": {
+    "tether_reserve_address": "Tether Reserve Address",
+    "subtracted_from_supply": "(Don minus from circulating supply)",
+    "view_on_explorer": "View for Aptos Explorer",
+    "reserve_address": "reserve address"
+  },
+  "fallbacks": {
+    "unknown_stablecoin": "Unknown Stablecoin",
+    "data_not_available": "Data no dey available",
+    "price_unavailable": "Price no dey available"
+  }
+}

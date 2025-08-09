@@ -1,0 +1,121 @@
+{
+  "page": {
+    "title": "Aptos 上的比特币",
+    "description": "Aptos 区块链上的比特币资产和货币市场"
+  },
+  "stats": {
+    "total_supply": "总供应量",
+    "total_btc_value": "比特币总价值",
+    "bitcoin_assets": "比特币资产",
+    "market_share": "市场份额",
+    "price": "价格",
+    "market_cap": "市值",
+    "volume_24h": "24小时交易量",
+    "tvl": "TVL",
+    "apy": "APY",
+    "utilization": "利用率",
+    "decimals": "小数位数",
+    "network": "网络",
+    "aptos_mainnet": "Aptos 主网"
+  },
+  "loading": {
+    "loading_btc_data": "正在加载比特币数据...",
+    "loading": "加载中...",
+    "loading_market_data": "正在加载市场数据...",
+    "error_title": "数据加载错误",
+    "rate_limit_message": "API 请求频率限制已达到。请稍后再试。",
+    "try_again_in": "请在以下时间后重试",
+    "try_again": "重试",
+    "request_failed": "请求失败。请重试。",
+    "chart_error": "图表加载失败"
+  },
+  "error": {
+    "error_loading_btc_data": "比特币数据加载错误",
+    "retry": "重试",
+    "failed_to_load_chart": "图表加载失败",
+    "error_calculating_supply": "供应量计算错误",
+    "unknown_error": "未知错误",
+    "invalid_data": "无效数据",
+    "invalid_metadata": "无效元数据"
+  },
+  "assets": {
+    "bitcoin": "比特币",
+    "wbtc": "包装比特币",
+    "btc": "比特币",
+    "sbtc": "质押比特币",
+    "tbtc": "门限比特币"
+  },
+  "money_markets": {
+    "title": "货币市场",
+    "supply": "供应",
+    "borrow": "借贷",
+    "supply_apy": "供应 APY",
+    "borrow_apy": "借贷 APY",
+    "total_supplied": "总供应量",
+    "total_borrowed": "总借贷量",
+    "available_to_borrow": "可借贷数量",
+    "utilization_rate": "利用率"
+  },
+  "actions": {
+    "supply": "供应",
+    "borrow": "借贷",
+    "withdraw": "提取",
+    "repay": "偿还",
+    "view_details": "查看详情",
+    "trade": "交易",
+    "bridge": "跨链桥",
+    "wrap": "包装",
+    "unwrap": "解包"
+  },
+  "yield": {
+    "lending": "借贷",
+    "borrowing": "借款",
+    "farming": "流动性挖矿",
+    "staking": "质押",
+    "rewards": "奖励",
+    "incentives": "激励"
+  },
+  "protocols": {
+    "aries": "Aries",
+    "echelon": "Echelon",
+    "aptin": "Aptin",
+    "thala": "Thala",
+    "echo": "Echo",
+    "protocol": "协议",
+    "echo_data_soon": "Echo 协议数据即将推出"
+  },
+  "filters": {
+    "all": "全部",
+    "by_protocol": "按协议",
+    "by_apy": "按 APY",
+    "lending": "借贷",
+    "trading": "交易",
+    "bridging": "跨链"
+  },
+  "bridge": {
+    "bridge_bitcoin": "比特币跨链桥",
+    "from": "来源",
+    "to": "目标",
+    "amount": "数量",
+    "fee": "手续费",
+    "estimated_time": "预计时间",
+    "supported_networks": "支持的网络"
+  },
+  "fallbacks": {
+    "unknown_asset": "未知资产",
+    "data_not_available": "数据不可用",
+    "price_unavailable": "价格不可用"
+  },
+  "info": {
+    "what_is_wrapped_btc": "什么是包装比特币？",
+    "wrapped_btc_description": "包装比特币（wBTC）是比特币在其他区块链上的代币化表示，使比特币能够在 DeFi 应用中使用。",
+    "benefits": "优势",
+    "defi_access": "DeFi 访问",
+    "earn_yield": "赚取收益",
+    "maintain_btc_exposure": "保持 BTC 敞口",
+    "bitcoin_backed_asset": "比特币支持的资产"
+  },
+  "status": {
+    "coming_soon": "即将推出"
+  }
+}

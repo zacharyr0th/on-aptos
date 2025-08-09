@@ -1,0 +1,152 @@
+title = "GitLeaks Configuration for On Aptos"
+
+# Global configuration
+[extend]
+# useDefault will extend the base configuration with the default gitleaks config:
+# https://github.com/zricethezav/gitleaks/blob/master/config/gitleaks.toml
+useDefault = true
+
+[rules]
+
+# Custom rules specific to our project
+[[rules]]
+id = "aptos-build-secret"
+description = "Aptos Build Secret"
+regex = '''AG-[A-Z0-9]{20,}'''
+secretGroup = 1
+keywords = [
+    "APTOS_BUILD_SECRET",
+    "AG-",
+]
+
+[[rules]]
+id = "coinmarketcap-api-key"
+description = "CoinMarketCap API Key"
+regex = '''[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}'''
+secretGroup = 1
+keywords = [
+    "CMC_API_KEY",
+    "coinmarketcap",
+]
+
+[[rules]]
+id = "rwa-api-key"
+description = "RWA API Key (hex format)"
+regex = '''[a-f0-9]{64}'''
+secretGroup = 1
+keywords = [
+    "RWA_API_KEY",
+    "rwa.xyz",
+]
+
+[[rules]]
+id = "panora-api-key-partial"
+description = "Panora API Key (partial - excluding known public key)"
+regex = '''[a-zA-Z0-9\^#_]{30,}'''
+secretGroup = 1
+keywords = [
+    "PANORA_API_KEY",
+]
+# Allowlist the known public Panora key
+allowlist = {regexes = ['''a4\^KV_EaTf4MW#ZdvgGKX#HUD\^3IFEAOV_kzpIE\^3BQGA8pDnrkT7JcIy#HNlLGi''']}
+
+[[rules]]
+id = "vercel-token"
+description = "Vercel Authentication Token"
+regex = '''(vercel_[a-zA-Z0-9]{24}|vc_[a-zA-Z0-9]{24})'''
+secretGroup = 1
+keywords = [
+    "vercel_",
+    "vc_",
+    "VERCEL_TOKEN",
+]
+
+[[rules]]
+id = "github-token"
+description = "GitHub Personal Access Token"
+regex = '''ghp_[a-zA-Z0-9]{36}|gho_[a-zA-Z0-9]{36}|ghu_[a-zA-Z0-9]{36}|ghs_[a-zA-Z0-9]{36}|ghr_[a-zA-Z0-9]{36}|github_pat_[a-zA-Z0-9]{22}_[a-zA-Z0-9]{59}'''
+secretGroup = 1
+keywords = [
+    "ghp_",
+    "gho_",
+    "ghu_", 
+    "ghs_",
+    "ghr_",
+    "github_pat_",
+    "GITHUB_TOKEN",
+]
+
+[[rules]]
+id = "npm-token"
+description = "npm access token"
+regex = '''npm_[a-zA-Z0-9]{36}'''
+secretGroup = 1
+keywords = [
+    "npm_",
+    "NPM_TOKEN",
+]
+
+[[rules]]
+id = "env-file-detection"
+description = "Environment files with secrets"
+regex = '''(?i)(password|passwd|pwd|secret|key|token|auth|bearer|jwt|oauth|api.*key|access.*token|refresh.*token)\s*=\s*[\'""]?[^\s\'""\n]{8,}'''
+secretGroup = 1
+path = '''\.env$|\.env\..*'''
+keywords = [
+    "password=",
+    "secret=",
+    "key=",
+    "token=",
+]
+# Allowlist example/template values
+allowlist = {regexes = [
+    '''your_.*_here''',
+    '''your_key''',
+    '''your_secret''',
+    '''your_token''',
+    '''example\.com''',
+    '''localhost''',
+    '''127\.0\.0\.1''',
+]}
+
+# Global allowlists
+[allowlist]
+description = "Global allowlist"
+regexes = [
+    # Blockchain addresses (Aptos addresses are 32 bytes in hex)
+    '''0x[a-fA-F0-9]{64}''',
+    # Test/example values
+    '''test-.*''',
+    '''example.*''',
+    '''demo.*''',
+    '''placeholder.*''',
+    '''mock.*''',
+    # Development localhost URLs
+    '''http://localhost:\d+''',
+    '''https://localhost:\d+''',
+    '''127\.0\.0\.1:\d+''',
+    # Common false positives
+    '''sha256.*''',
+    '''md5.*''',
+    '''base64.*''',
+]
+
+# File-specific allowlists
+paths = [
+    # Don't scan lock files
+    '''package-lock\.json''',
+    '''pnpm-lock\.yaml''',
+    '''yarn\.lock''',
+    # Don't scan git objects
+    '''\.git/.*''',
+    # Don't scan node_modules
+    '''node_modules/.*''',
+    # Don't scan test fixtures that might contain fake secrets
+    '''test/.*\.test\.ts''',
+    '''test/.*\.spec\.ts''',
+    '''\.__test__\..*''',
+    # Don't scan documentation that might show example secrets
+    '''README\.md''',
+    '''CHANGELOG\.md''',
+    '''docs/.*\.md''',
+]

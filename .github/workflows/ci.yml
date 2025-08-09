@@ -1,0 +1,251 @@
+name: 🚀 CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+
+jobs:
+  lint-and-typecheck:
+    name: 🔍 Lint & Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run ESLint
+        run: pnpm lint --max-warnings=50
+        continue-on-error: true
+        env:
+          # Prevent ESLint from finding actual .env files
+          NODE_ENV: test
+
+      - name: Run TypeScript compiler
+        run: npx tsc --noEmit
+
+      - name: Check for console statements
+        run: |
+          if grep -r "console\.\(log\|warn\|error\|info\|debug\)" \
+            --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" \
+            --exclude-dir=node_modules --exclude-dir=.git \
+            --exclude="*.test.*" --exclude="*.spec.*" \
+            --exclude-dir=test --exclude-dir=scripts .; then
+            echo "⚠️ Found console statements in source code. Consider using Pino logger instead."
+            echo "This is a warning, not blocking the build."
+          else
+            echo "✅ No console statements found in source code"
+          fi
+
+  test:
+    name: 🧪 Test Suite
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18, 20]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run tests
+        run: pnpm test:run
+        env:
+          NODE_ENV: test
+          # Mock environment variables for tests
+          NEXT_PUBLIC_SITE_URL: http://localhost:3000
+          APTOS_BUILD_SECRET: test-secret
+          PANORA_API_KEY: test-key
+          CMC_API_KEY: test-key
+          RWA_API_KEY: test-key
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-node-${{ matrix.node-version }}
+          path: coverage/
+
+  build:
+    name: 🏗️ Build Check
+    runs-on: ubuntu-latest
+    needs: [lint-and-typecheck]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build application
+        run: pnpm build
+        env:
+          # Mock environment variables for build
+          NEXT_PUBLIC_SITE_URL: https://on-aptos.com
+          APTOS_BUILD_SECRET: build-placeholder
+          PANORA_API_KEY: build-placeholder
+          CMC_API_KEY: build-placeholder
+          RWA_API_KEY: build-placeholder
+          DEVELOPER_NAME: Build Test
+          DEVELOPER_EMAIL: test@example.com
+          DEVELOPER_WEBSITE: https://example.com
+          DEVELOPER_TWITTER: https://x.com/example
+          DEVELOPER_TWITTER_HANDLE: example
+          DEVELOPER_GITHUB: https://github.com/example
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-output
+          path: .next/
+          retention-days: 1
+
+  secret-detection:
+    name: 🔐 Pre-commit Secret Detection
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python for pre-commit
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install pre-commit
+        run: |
+          pip install pre-commit
+          pre-commit install
+
+      - name: Create secrets baseline if missing
+        run: |
+          if [ ! -f .secrets.baseline ]; then
+            pip install detect-secrets
+            detect-secrets scan --baseline .secrets.baseline
+          fi
+
+      - name: Run pre-commit hooks (secrets only)
+        run: |
+          # Only run secret detection hooks, not the expensive ones
+          pre-commit run gitleaks --all-files
+          pre-commit run detect-secrets --all-files
+          pre-commit run detect-private-key --all-files
+          pre-commit run check-env-files --all-files
+
+  dependency-audit:
+    name: 📦 Dependency Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run audit
+        run: pnpm audit --audit-level moderate
+        continue-on-error: true
+
+      - name: Check for high/critical vulnerabilities
+        run: |
+          if pnpm audit --audit-level high; then
+            echo "✅ No high or critical vulnerabilities found"
+          else
+            echo "❌ High or critical vulnerabilities detected"
+            echo "Please run 'pnpm audit' locally and fix the issues"
+            exit 1
+          fi
+
+  ci-summary:
+    name: 📊 CI Summary
+    runs-on: ubuntu-latest
+    needs: [lint-and-typecheck, test, build, secret-detection, dependency-audit]
+    if: always()
+    steps:
+      - name: CI Summary
+        run: |
+          echo "## 🚀 CI/CD Pipeline Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|---------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Lint & TypeCheck | ${{ needs.lint-and-typecheck.result == 'success' && '✅ Pass' || '❌ Fail' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Tests | ${{ needs.test.result == 'success' && '✅ Pass' || '❌ Fail' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Build | ${{ needs.build.result == 'success' && '✅ Pass' || '❌ Fail' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Secret Detection | ${{ needs.secret-detection.result == 'success' && '✅ Pass' || '❌ Fail' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Dependencies | ${{ needs.dependency-audit.result == 'success' && '✅ Pass' || '❌ Fail' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [[ "${{ needs.lint-and-typecheck.result }}" == "success" && 
+                "${{ needs.test.result }}" == "success" && 
+                "${{ needs.build.result }}" == "success" && 
+                "${{ needs.secret-detection.result }}" == "success" ]]; then
+            echo "🎉 **All CI checks passed! Ready to merge.**" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Some CI checks failed. Please review the results above.**" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Fail if critical checks failed
+        if: needs.secret-detection.result != 'success' || needs.build.result != 'success'
+        run: |
+          echo "Critical checks failed. Failing the CI pipeline."
+          exit 1

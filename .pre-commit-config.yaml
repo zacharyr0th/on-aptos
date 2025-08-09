@@ -1,0 +1,132 @@
+# Pre-commit hooks configuration for secret detection and code quality
+# See https://pre-commit.com for more information
+
+repos:
+  # Secret detection with Gitleaks
+  - repo: https://github.com/zricethezav/gitleaks
+    rev: v8.21.2
+    hooks:
+      - id: gitleaks
+        name: Detect secrets with Gitleaks
+        description: Detect hardcoded secrets using Gitleaks
+        entry: gitleaks detect --source . -v --config .gitleaks.toml
+        language: golang
+        stages: [commit]
+
+  # Additional secret detection with detect-secrets
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        name: Detect secrets with detect-secrets
+        args: ['--baseline', '.secrets.baseline']
+        exclude: |
+          (?x)^(
+            package-lock\.json|
+            pnpm-lock\.yaml|
+            \.git/.*|
+            node_modules/.*|
+            .*\.lock
+          )$
+
+  # File content checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      # Prevent committing large files
+      - id: check-added-large-files
+        args: ['--maxkb=5000']  # 5MB limit
+        
+      # Check for private keys
+      - id: detect-private-key
+      
+      # Prevent committing AWS credentials
+      - id: detect-aws-credentials
+        args: [--allow-missing-credentials-file]
+      
+      # Check file formats
+      - id: check-json
+      - id: check-yaml
+      - id: check-toml
+      
+      # Ensure files end with newline
+      - id: end-of-file-fixer
+        exclude: |
+          (?x)^(
+            .*\.lock|
+            \.git/.*|
+            node_modules/.*
+          )$
+      
+      # Remove trailing whitespace
+      - id: trailing-whitespace
+        exclude: |
+          (?x)^(
+            .*\.md|
+            \.git/.*|
+            node_modules/.*
+          )$
+      
+      # Check merge conflicts
+      - id: check-merge-conflict
+      
+      # Check case conflicts
+      - id: check-case-conflict
+
+  # Environment file validation
+  - repo: local
+    hooks:
+      - id: check-env-files
+        name: Check .env files are not committed
+        entry: bash -c 'if [ -f .env ] || [ -f .env.local ] || [ -f .env.production ]; then echo "ERROR: .env files should not be committed. Use .env.example instead."; exit 1; fi'
+        language: system
+        pass_filenames: false
+        always_run: true
+        
+      # Check for hardcoded localhost URLs in production files
+      - id: check-localhost-urls
+        name: Check for hardcoded localhost URLs
+        entry: bash -c 'if grep -r "localhost\|127\.0\.0\.1" --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" --exclude-dir=node_modules --exclude-dir=.git --exclude="*.test.*" --exclude="*.spec.*" .; then echo "WARNING: Found localhost URLs in non-test files. Make sure these are properly configured via environment variables."; fi'
+        language: system
+        pass_filenames: false
+        always_run: true
+        
+      # Check for console.log statements
+      - id: check-console-statements
+        name: Check for console.log statements
+        entry: bash -c 'if grep -r "console\.\(log\|warn\|error\|info\|debug\)" --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" --exclude-dir=node_modules --exclude-dir=.git --exclude="*.test.*" --exclude="*.spec.*" --exclude-dir=test --exclude-dir=scripts .; then echo "ERROR: Found console statements in source code. Use Pino logger instead."; exit 1; fi'
+        language: system
+        pass_filenames: false
+        always_run: true
+
+  # TypeScript and linting
+  - repo: local
+    hooks:
+      - id: typescript-check
+        name: TypeScript type checking
+        entry: npx tsc --noEmit
+        language: system
+        files: \.(ts|tsx)$
+        pass_filenames: false
+        
+      - id: eslint-check
+        name: ESLint
+        entry: npx eslint --max-warnings=0
+        language: system
+        files: \.(ts|tsx|js|jsx)$
+        
+      # Run tests to ensure changes don't break functionality
+      - id: run-tests
+        name: Run test suite
+        entry: pnpm test:run
+        language: system
+        pass_filenames: false
+        stages: [push]  # Only run on push, not every commit
+
+  # Commit message validation
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v3.0.0
+    hooks:
+      - id: conventional-pre-commit
+        stages: [commit-msg]
+        args: [--strict]
