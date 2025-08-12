@@ -1,0 +1,77 @@
+{
+  "page": {
+    "title": "Aptos पर स्थिर सिक्के",
+    "description": "Aptos ब्लॉकचेन पर स्थिर सिक्के और स्थिर मुद्राएं"
+  },
+  "stats": {
+    "total_stablecoin_value": "कुल स्थिर सिक्का मूल्य",
+    "stablecoins": "स्थिर सिक्के",
+    "market_share": "बाजार हिस्सेदारी",
+    "market_cap": "बाजार पूंजी",
+    "price": "मूल्य",
+    "supply": "आपूर्ति",
+    "volume_24h": "24 घंटे की मात्रा",
+    "price_change_24h": "24 घंटे में मूल्य परिवर्तन",
+    "asset_details": "संपत्ति विवरण"
+  },
+  "table": {
+    "token": "टोकन",
+    "supply": "आपूर्ति",
+    "market_share": "%",
+    "type": "प्रकार",
+    "issuer": "जारीकर्ता"
+  },
+  "loading": {
+    "loading_stablecoin_data": "स्थिर सिक्का डेटा लोड हो रहा है...",
+    "loading": "लोड हो रहा है...",
+    "rate_limit_message": "वाह! कृपया थोड़ा धीमा करें।",
+    "try_again_in": "फिर से कोशिश करें",
+    "try_again": "फिर से कोशिश करें",
+    "request_failed": "अनुरोध पूरा नहीं हो सका।"
+  },
+  "error": {
+    "error_loading_stablecoin_data": "स्थिर सिक्का डेटा लोड करने में त्रुटि",
+    "retry": "फिर से कोशिश करें",
+    "failed_to_load_chart": "चार्ट लोड करने में असफल"
+  },
+  "stablecoins": {
+    "usdt": "टीथर यूएसडी",
+    "usdc": "यूएसडी सिक्का",
+    "dai": "दाई स्टैबेकॉइन",
+    "busd": "बिनेंस यूएसडी",
+    "frax": "फ्रेक्स",
+    "tusd": "TrueUSD",
+    "usdp": "Pax Dollar",
+    "gusd": "Gemini Dollar"
+  },
+  "types": {
+    "fiat_collateralized": "फिएट संपार्श्विक",
+    "crypto_collateralized": "क्रिप्टो संपार्श्विक",
+    "algorithmic": "एल्गोरिदमिक",
+    "commodity_backed": "वस्तु समर्थित"
+  },
+  "actions": {
+    "view_details": "विवरण देखें",
+    "trade": "व्यापार",
+    "add_to_wallet": "वॉलेट में जोड़ें",
+    "visit_website": "वेबसाइट पर जाएं"
+  },
+  "filters": {
+    "all": "सभी",
+    "by_type": "प्रकार के अनुसार",
+    "by_market_cap": "बाजार पूंजी के अनुसार",
+    "stable": "स्थिर",
+    "depegged": "डिपेग्ड"
+  },
+  "labels": {
+    "tether_reserve_address": "Tether रिज़र्व पता",
+    "subtracted_from_supply": "(प्रचलन आपूर्ति से घटाया गया)",
+    "view_on_explorer": "Aptos एक्सप्लोरर पर देखें",
+    "reserve_address": "रिज़र्व पता"
+  },
+  "fallbacks": {
+    "unknown_stablecoin": "अज्ञात स्थिर सिक्का",
+    "data_not_available": "डेटा उपलब्ध नहीं",
+    "price_unavailable": "मूल्य उपलब्ध नहीं"
+  }
+}

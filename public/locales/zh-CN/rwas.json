@@ -1,0 +1,76 @@
+{
+  "page": {
+    "title": "Aptos 上的现实世界资产",
+    "description": "Aptos 区块链上的 RWAs 和代币化现实世界资产"
+  },
+  "stats": {
+    "total_rwa_value": "RWA 总价值",
+    "real_world_assets": "现实世界资产",
+    "data_powered_by": "数据由 RWA.xyz 提供",
+    "data_powered_by_prefix": "数据由",
+    "rwa_assets": "RWA 资产",
+    "market_share": "市场份额",
+    "total_value": "总价值",
+    "asset_count": "资产数量",
+    "protocols": "协议"
+  },
+  "loading": {
+    "loading_rwa_data": "正在加载 RWA 数据...",
+    "loading": "加载中...",
+    "rate_limit_message": "API 请求频率限制已达到。请稍后再试。",
+    "try_again_in": "请在以下时间后重试",
+    "try_again": "重试",
+    "request_failed": "请求失败。请重试。"
+  },
+  "error": {
+    "error_loading_rwa_data": "RWA 数据加载错误",
+    "failed_to_load_chart": "图表加载失败",
+    "retry": "重试",
+    "failed_to_load_data": "数据加载失败"
+  },
+  "protocols": {
+    "pact": "Pact",
+    "securitize": "Securitize",
+    "franklin_templeton": "Franklin Templeton",
+    "libre_capital": "Libre Capital",
+    "ondo": "Ondo",
+    "blackrock": "BlackRock"
+  },
+  "labels": {
+    "bridged": "跨链",
+    "value_not_available": "价值不可用",
+    "token_id": "代币 ID",
+    "current_value": "当前价值",
+    "asset_name": "资产名称",
+    "asset_issuer": "资产发行方",
+    "standards": "标准",
+    "not_specified": "未指定",
+    "regulatory_framework": "监管框架",
+    "governing_body": "管理机构",
+    "issuer_legal_structure_country": "发行方法律结构所在国",
+    "contract_address": "合约地址",
+    "network_id": "网络 ID",
+    "asset_id": "资产 ID"
+  },
+  "sections": {
+    "value_information": "价值信息",
+    "asset_details": "资产详情",
+    "regulatory_information": "监管信息",
+    "legal_structure": "法律结构",
+    "technical_details": "技术详情"
+  },
+  "actions": {
+    "view_details": "查看详情",
+    "visit_website": "访问网站"
+  },
+  "filters": {
+    "all": "全部",
+    "by_protocol": "按协议",
+    "by_value": "按价值"
+  },
+  "fallbacks": {
+    "unknown_asset": "未知资产",
+    "data_not_available": "数据不可用",
+    "value_unavailable": "价值不可用"
+  }
+}

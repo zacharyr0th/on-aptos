@@ -1,0 +1,121 @@
+{
+  "page": {
+    "title": "Aptos上のビットコイン",
+    "description": "Aptosブロックチェーン上のビットコイン資産とマネーマーケット"
+  },
+  "stats": {
+    "total_supply": "総供給量",
+    "total_btc_value": "ビットコインの総価値",
+    "bitcoin_assets": "ビットコイン資産",
+    "market_share": "マーケットシェア",
+    "price": "価格",
+    "market_cap": "時価総額",
+    "volume_24h": "24時間取引量",
+    "tvl": "TVL",
+    "apy": "APY",
+    "utilization": "利用率",
+    "decimals": "小数点以下の桁数",
+    "network": "ネットワーク",
+    "aptos_mainnet": "Aptosメインネット"
+  },
+  "loading": {
+    "loading_btc_data": "ビットコインデータを読み込み中...",
+    "loading": "読み込み中...",
+    "loading_market_data": "市場データを読み込み中...",
+    "error_title": "データ読み込みエラー",
+    "rate_limit_message": "APIレート制限に達しました。しばらくしてから再試行してください。",
+    "try_again_in": "再試行まで",
+    "try_again": "再試行",
+    "request_failed": "リクエストに失敗しました。もう一度お試しください。",
+    "chart_error": "チャートの読み込みに失敗しました"
+  },
+  "error": {
+    "error_loading_btc_data": "ビットコインデータ読み込みエラー",
+    "retry": "再試行",
+    "failed_to_load_chart": "チャートの読み込みに失敗しました",
+    "error_calculating_supply": "供給量計算エラー",
+    "unknown_error": "不明なエラー",
+    "invalid_data": "無効なデータ",
+    "invalid_metadata": "無効なメタデータ"
+  },
+  "assets": {
+    "bitcoin": "ビットコイン",
+    "wbtc": "ラップドビットコイン",
+    "btc": "ビットコイン",
+    "sbtc": "ステークドビットコイン",
+    "tbtc": "Threshold Bitcoin"
+  },
+  "money_markets": {
+    "title": "マネーマーケット",
+    "supply": "供給",
+    "borrow": "借入",
+    "supply_apy": "供給APY",
+    "borrow_apy": "借入APY",
+    "total_supplied": "総供給量",
+    "total_borrowed": "総借入量",
+    "available_to_borrow": "借入可能額",
+    "utilization_rate": "利用率"
+  },
+  "actions": {
+    "supply": "供給",
+    "borrow": "借入",
+    "withdraw": "引き出し",
+    "repay": "返済",
+    "view_details": "詳細を見る",
+    "trade": "取引",
+    "bridge": "ブリッジ",
+    "wrap": "ラップ",
+    "unwrap": "アンラップ"
+  },
+  "yield": {
+    "lending": "レンディング",
+    "borrowing": "借入",
+    "farming": "ファーミング",
+    "staking": "ステーキング",
+    "rewards": "リワード",
+    "incentives": "インセンティブ"
+  },
+  "protocols": {
+    "aries": "Aries",
+    "echelon": "Echelon",
+    "aptin": "Aptin",
+    "thala": "Thala",
+    "echo": "Echo",
+    "protocol": "プロトコル",
+    "echo_data_soon": "Echoプロトコルのデータは近日公開予定"
+  },
+  "filters": {
+    "all": "すべて",
+    "by_protocol": "プロトコル別",
+    "by_apy": "APY別",
+    "lending": "レンディング",
+    "trading": "取引",
+    "bridging": "ブリッジ"
+  },
+  "bridge": {
+    "bridge_bitcoin": "ビットコインをブリッジ",
+    "from": "送信元",
+    "to": "送信先",
+    "amount": "金額",
+    "fee": "手数料",
+    "estimated_time": "推定時間",
+    "supported_networks": "対応ネットワーク"
+  },
+  "fallbacks": {
+    "unknown_asset": "不明な資産",
+    "data_not_available": "データが利用できません",
+    "price_unavailable": "価格が利用できません"
+  },
+  "info": {
+    "what_is_wrapped_btc": "ラップドBTCとは？",
+    "wrapped_btc_description": "ラップドビットコイン（wBTC）は、他のブロックチェーン上でビットコインをトークン化した表現で、DeFiアプリケーションでビットコインを使用できるようにします。",
+    "benefits": "メリット",
+    "defi_access": "DeFiアクセス",
+    "earn_yield": "利率獲得",
+    "maintain_btc_exposure": "BTC エクスポージャーの維持",
+    "bitcoin_backed_asset": "ビットコイン担保資産"
+  },
+  "status": {
+    "coming_soon": "近日公開"
+  }
+}

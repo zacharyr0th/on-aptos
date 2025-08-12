@@ -1,0 +1,77 @@
+{
+  "page": {
+    "title": "Стейблкоины в Aptos",
+    "description": "Стейблкоины и стабильные валюты в блокчейне Aptos"
+  },
+  "stats": {
+    "total_stablecoin_value": "Общая стоимость стейблкоинов",
+    "stablecoins": "Стейблкоины",
+    "market_share": "Доля рынка",
+    "market_cap": "Рыночная капитализация",
+    "price": "Цена",
+    "supply": "Предложение",
+    "volume_24h": "Объём 24ч",
+    "price_change_24h": "Изменение цены 24ч",
+    "asset_details": "Детали актива"
+  },
+  "table": {
+    "token": "Токен",
+    "supply": "Предложение",
+    "market_share": "%",
+    "type": "Тип",
+    "issuer": "Эмитент"
+  },
+  "loading": {
+    "loading_stablecoin_data": "Загрузка данных стейблкоинов...",
+    "loading": "Загрузка...",
+    "rate_limit_message": "Пожалуйста, не торопитесь!",
+    "try_again_in": "Попробовать снова через",
+    "try_again": "Попробовать снова",
+    "request_failed": "Запрос не может быть выполнен."
+  },
+  "error": {
+    "error_loading_stablecoin_data": "Ошибка загрузки данных стейблкоинов",
+    "retry": "Повторить",
+    "failed_to_load_chart": "Не удалось загрузить график"
+  },
+  "stablecoins": {
+    "usdt": "Tether USD",
+    "usdc": "USD Coin",
+    "dai": "Dai Stablecoin",
+    "busd": "Binance USD",
+    "frax": "Frax",
+    "tusd": "TrueUSD",
+    "usdp": "Pax Dollar",
+    "gusd": "Gemini Dollar"
+  },
+  "types": {
+    "fiat_collateralized": "Обеспеченный фиатом",
+    "crypto_collateralized": "Обеспеченный криптовалютой",
+    "algorithmic": "Алгоритмический",
+    "commodity_backed": "Обеспеченный товарами"
+  },
+  "actions": {
+    "view_details": "Просмотреть детали",
+    "trade": "Торговать",
+    "add_to_wallet": "Добавить в кошелёк",
+    "visit_website": "Посетить сайт"
+  },
+  "filters": {
+    "all": "Все",
+    "by_type": "По типу",
+    "by_market_cap": "По рыночной капитализации",
+    "stable": "Стабильные",
+    "depegged": "Отвязанные"
+  },
+  "labels": {
+    "tether_reserve_address": "Адрес резерва Tether",
+    "subtracted_from_supply": "(Вычтено из циркулирующего предложения)",
+    "view_on_explorer": "Посмотреть в Aptos Explorer",
+    "reserve_address": "адрес резерва"
+  },
+  "fallbacks": {
+    "unknown_stablecoin": "Неизвестный стейблкоин",
+    "data_not_available": "Данные недоступны",
+    "price_unavailable": "Цена недоступна"
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "page": {
+    "title": "Bitcoin akan Aptos",
+    "description": "Kasuwancin Bitcoin da kasuwannin kuɗi akan blockchain na Aptos"
+  },
+  "stats": {
+    "total_supply": "Jimlar Kayayyakin",
+    "total_btc_value": "Jimlar Darajar Bitcoin",
+    "bitcoin_assets": "Kadar Bitcoin",
+    "market_share": "Rabon Kasuwa",
+    "price": "Farashi",
+    "market_cap": "Kasuwa Cap",
+    "volume_24h": "Juzu'i na 24h",
+    "tvl": "TVL",
+    "apy": "APY",
+    "utilization": "Amfani",
+    "decimals": "Ƙididdiga",
+    "network": "Cibiyar sadarwa",
+    "aptos_mainnet": "Aptos Mainnet"
+  },
+  "loading": {
+    "loading_btc_data": "Ana lodawa bayanan Bitcoin...",
+    "loading": "Ana lodawa...",
+    "loading_market_data": "Ana lodawa bayanan kasuwa...",
+    "error_title": "Kuskuren Load Data",
+    "rate_limit_message": "An kai iyakar API. Da fatan za a jira kafin a sake gwadawa.",
+    "try_again_in": "Sake gwadawa",
+    "try_again": "Sake gwadawa",
+    "request_failed": "Buƙatar ta kasa. Da fatan za a sake gwadawa.",
+    "chart_error": "An kasa loda ginshiƙi"
+  },
+  "error": {
+    "error_loading_btc_data": "Kuskuren loda bayanan Bitcoin",
+    "retry": "Sake gwadawa",
+    "failed_to_load_chart": "An kasa loda ginshiƙi",
+    "error_calculating_supply": "Kuskuren lissafin wadata",
+    "unknown_error": "Kuskuren da ba a sani ba",
+    "invalid_data": "Bayanai mara inganci",
+    "invalid_metadata": "Bayanan da ba su da inganci"
+  },
+  "assets": {
+    "bitcoin": "Bitcoin",
+    "wbtc": "Bitcoin nade",
+    "btc": "Bitcoin",
+    "sbtc": "Bitcoin Staked",
+    "tbtc": "Tsarin Bitcoin"
+  },
+  "money_markets": {
+    "title": "Kasuwannin Kuɗi",
+    "supply": "Samarwa",
+    "borrow": "Aro",
+    "supply_apy": "Kashi APY",
+    "borrow_apy": "Aro APY",
+    "total_supplied": "Jimlar da aka kawo",
+    "total_borrowed": "Jimlar aro",
+    "available_to_borrow": "Akwai don Aro",
+    "utilization_rate": "Kiwon Amfani"
+  },
+  "actions": {
+    "supply": "Samarwa",
+    "borrow": "Aro",
+    "withdraw": "Janye",
+    "repay": "Biya",
+    "view_details": "Duba cikakkun bayanai",
+    "trade": "Kasuwanci",
+    "bridge": "Gada",
+    "wrap": "Nade",
+    "unwrap": "Budewa"
+  },
+  "yield": {
+    "lending": "Lending",
+    "borrowing": "Borrowing",
+    "farming": "Farming",
+    "staking": "Staking",
+    "rewards": "Rewards",
+    "incentives": "Incentives"
+  },
+  "protocols": {
+    "aries": "Aries",
+    "echelon": "Echelon",
+    "aptin": "Aptin",
+    "thala": "Thala",
+    "echo": "Echo",
+    "protocol": "Protocol",
+    "echo_data_soon": "Echo protocol data coming soon"
+  },
+  "filters": {
+    "all": "Duk",
+    "by_protocol": "Ta hanyar ka'ida",
+    "by_apy": "Ta APY",
+    "lending": "Bada rance",
+    "trading": "Ciniki",
+    "bridging": "Gada"
+  },
+  "bridge": {
+    "bridge_bitcoin": "Gada Bitcoin",
+    "from": "daga",
+    "to": "zuwa",
+    "amount": "Ƙididdiga",
+    "fee": "Kuɗi",
+    "estimated_time": "Lokaci Kiyasta",
+    "supported_networks": "Cibiyoyin Tallafawa"
+  },
+  "fallbacks": {
+    "unknown_asset": "Ba a sani ba",
+    "data_not_available": "Babu bayanai",
+    "price_unavailable": "Babu farashin"
+  },
+  "info": {
+    "what_is_wrapped_btc": "What is Wrapped BTC?",
+    "wrapped_btc_description": "Wrapped Bitcoin (wBTC) is a tokenized representation of Bitcoin on other blockchains, enabling the use of Bitcoin in DeFi applications.",
+    "benefits": "Benefits",
+    "defi_access": "DeFi access",
+    "earn_yield": "Earn yield",
+    "maintain_btc_exposure": "Maintain BTC exposure",
+    "bitcoin_backed_asset": "Bitcoin-backed Asset"
+  },
+  "status": {
+    "coming_soon": "Ana zuwa"
+  }
+}

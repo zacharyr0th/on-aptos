@@ -1,0 +1,121 @@
+{
+  "page": {
+    "title": "Bitcoin for Aptos",
+    "description": "Bitcoin assets and money markets for di Aptos blockchain"
+  },
+  "stats": {
+    "total_supply": "Total Supply",
+    "total_btc_value": "Total Bitcoin Value",
+    "bitcoin_assets": "Bitcoin Assets",
+    "market_share": "Market Share",
+    "price": "Price",
+    "market_cap": "Market Cap",
+    "volume_24h": "Volume 24h",
+    "tvl": "TVL",
+    "apy": "APY",
+    "utilization": "Utilization",
+    "decimals": "Decimals",
+    "network": "Network",
+    "aptos_mainnet": "Aptos Mainnet"
+  },
+  "loading": {
+    "loading_btc_data": "Dey load Bitcoin data...",
+    "loading": "Dey Load...",
+    "loading_market_data": "Dey load market data...",
+    "error_title": "Error to Load Data",
+    "rate_limit_message": "API rate limit don reach. Abeg wait before you try again.",
+    "try_again_in": "Try again for",
+    "try_again": "Try Again",
+    "request_failed": "Request no work. Abeg try again.",
+    "chart_error": "E no fit load chart"
+  },
+  "error": {
+    "error_loading_btc_data": "Error to Load Bitcoin Data",
+    "retry": "Retry",
+    "failed_to_load_chart": "E no fit load chart",
+    "error_calculating_supply": "Error dey calculate supply",
+    "unknown_error": "Unknown error",
+    "invalid_data": "Invalid data",
+    "invalid_metadata": "Invalid metadata"
+  },
+  "assets": {
+    "bitcoin": "Bitcoin",
+    "wbtc": "Wrapped Bitcoin",
+    "btc": "Bitcoin",
+    "sbtc": "Staked Bitcoin",
+    "tbtc": "Threshold Bitcoin"
+  },
+  "money_markets": {
+    "title": "Money Markets",
+    "supply": "Supply",
+    "borrow": "Borrow",
+    "supply_apy": "Supply APY",
+    "borrow_apy": "Borrow APY",
+    "total_supplied": "Total Supplied",
+    "total_borrowed": "Total Borrowed",
+    "available_to_borrow": "Available to Borrow",
+    "utilization_rate": "Utilization Rate"
+  },
+  "actions": {
+    "supply": "Supply",
+    "borrow": "Borrow",
+    "withdraw": "Withdraw",
+    "repay": "Repay",
+    "view_details": "View Details",
+    "trade": "Trade",
+    "bridge": "Bridge",
+    "wrap": "Wrap",
+    "unwrap": "Unwrap"
+  },
+  "yield": {
+    "lending": "Lending",
+    "borrowing": "Borrowing",
+    "farming": "Farming",
+    "staking": "Staking",
+    "rewards": "Rewards",
+    "incentives": "Incentives"
+  },
+  "protocols": {
+    "aries": "Aries",
+    "echelon": "Echelon",
+    "aptin": "Aptin",
+    "thala": "Thala",
+    "echo": "Echo",
+    "protocol": "Protocol",
+    "echo_data_soon": "Echo protocol data go come soon"
+  },
+  "filters": {
+    "all": "All",
+    "by_protocol": "By Protocol",
+    "by_apy": "By APY",
+    "lending": "Lending",
+    "trading": "Trading",
+    "bridging": "Bridging"
+  },
+  "bridge": {
+    "bridge_bitcoin": "Bridge Bitcoin",
+    "from": "From",
+    "to": "To",
+    "amount": "Amount",
+    "fee": "Fee",
+    "estimated_time": "Estimated Time",
+    "supported_networks": "Supported Networks"
+  },
+  "fallbacks": {
+    "unknown_asset": "Unknown Asset",
+    "data_not_available": "Data no dey available",
+    "price_unavailable": "Price no dey available"
+  },
+  "info": {
+    "what_is_wrapped_btc": "Wetin be Wrapped BTC?",
+    "wrapped_btc_description": "Wrapped Bitcoin (wBTC) na tokenized representation of Bitcoin for other blockchains, e dey enable make you use Bitcoin for DeFi applications.",
+    "benefits": "Benefits",
+    "defi_access": "DeFi access",
+    "earn_yield": "Earn yield",
+    "maintain_btc_exposure": "Maintain BTC exposure",
+    "bitcoin_backed_asset": "Bitcoin-backed Asset"
+  },
+  "status": {
+    "coming_soon": "E Dey Come"
+  }
+}

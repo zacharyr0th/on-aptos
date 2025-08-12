@@ -1,0 +1,76 @@
+{
+  "page": {
+    "title": "Aktywa rzeczywiste na Aptos",
+    "description": "RWA i tokenizowane aktywa rzeczywiste na blockchainie Aptos"
+  },
+  "stats": {
+    "total_rwa_value": "Całkowita wartość RWA",
+    "real_world_assets": "Aktywa rzeczywiste",
+    "data_powered_by": "Dane dostarczane przez RWA.xyz",
+    "data_powered_by_prefix": "Dane dostarczane przez",
+    "rwa_assets": "Aktywa RWA",
+    "market_share": "Udział w rynku",
+    "total_value": "Całkowita wartość",
+    "asset_count": "Liczba aktywów",
+    "protocols": "Protokoły"
+  },
+  "loading": {
+    "loading_rwa_data": "Ładowanie danych RWA...",
+    "loading": "Ładowanie...",
+    "rate_limit_message": "Osiągnięto limit API. Poczekaj przed kolejną próbą.",
+    "try_again_in": "Spróbuj ponownie za",
+    "try_again": "Spróbuj ponownie",
+    "request_failed": "Żądanie nie powiodło się. Spróbuj ponownie."
+  },
+  "error": {
+    "error_loading_rwa_data": "Błąd ładowania danych RWA",
+    "failed_to_load_chart": "Nie udało się załadować wykresu",
+    "retry": "Ponów",
+    "failed_to_load_data": "Nie udało się załadować danych"
+  },
+  "protocols": {
+    "pact": "Pact",
+    "securitize": "Securitize",
+    "franklin_templeton": "Franklin Templeton",
+    "libre_capital": "Libre Capital",
+    "ondo": "Ondo",
+    "blackrock": "BlackRock"
+  },
+  "labels": {
+    "bridged": "mostkowane",
+    "value_not_available": "Wartość niedostępna",
+    "token_id": "ID tokena",
+    "current_value": "Aktualna wartość",
+    "asset_name": "Nazwa aktywa",
+    "asset_issuer": "Emitent aktywa",
+    "standards": "Standardy",
+    "not_specified": "Nieokreślone",
+    "regulatory_framework": "Ramy regulacyjne",
+    "governing_body": "Organ zarządzający",
+    "issuer_legal_structure_country": "Kraj struktury prawnej emitenta",
+    "contract_address": "Adres kontraktu",
+    "network_id": "ID sieci",
+    "asset_id": "ID aktywa"
+  },
+  "sections": {
+    "value_information": "Informacje o wartości",
+    "asset_details": "Szczegóły aktywa",
+    "regulatory_information": "Informacje regulacyjne",
+    "legal_structure": "Struktura prawna",
+    "technical_details": "Szczegóły techniczne"
+  },
+  "actions": {
+    "view_details": "Zobacz szczegóły",
+    "visit_website": "Odwiedź stronę"
+  },
+  "filters": {
+    "all": "Wszystkie",
+    "by_protocol": "Według protokołu",
+    "by_value": "Według wartości"
+  },
+  "fallbacks": {
+    "unknown_asset": "Nieznane aktywo",
+    "data_not_available": "Dane niedostępne",
+    "value_unavailable": "Wartość niedostępna"
+  }
+}

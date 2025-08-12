@@ -1,0 +1,121 @@
+{
+  "page": {
+    "title": "Bitcoin sur Aptos",
+    "description": "Actifs Bitcoin et marchés monétaires sur la blockchain Aptos"
+  },
+  "stats": {
+    "total_supply": "Offre Totale",
+    "total_btc_value": "Valeur Totale du Bitcoin",
+    "bitcoin_assets": "Actifs Bitcoin",
+    "market_share": "Part de Marché",
+    "price": "Prix",
+    "market_cap": "Capitalisation Boursière",
+    "volume_24h": "Volume 24h",
+    "tvl": "TVL",
+    "apy": "APY",
+    "utilization": "Utilisation",
+    "decimals": "Décimales",
+    "network": "Réseau",
+    "aptos_mainnet": "Mainnet Aptos"
+  },
+  "loading": {
+    "loading_btc_data": "Chargement des données Bitcoin...",
+    "loading": "Chargement...",
+    "loading_market_data": "Chargement des données de marché...",
+    "error_title": "Erreur de Chargement des Données",
+    "rate_limit_message": "Limite de requêtes API atteinte. Veuillez patienter avant de réessayer.",
+    "try_again_in": "Réessayez dans",
+    "try_again": "Réessayer",
+    "request_failed": "Échec de la requête. Veuillez réessayer.",
+    "chart_error": "Échec du chargement du graphique"
+  },
+  "error": {
+    "error_loading_btc_data": "Erreur lors du chargement des données Bitcoin",
+    "retry": "Réessayer",
+    "failed_to_load_chart": "Échec du chargement du graphique",
+    "error_calculating_supply": "Erreur lors du calcul de l’offre",
+    "unknown_error": "Erreur inconnue",
+    "invalid_data": "Données invalides",
+    "invalid_metadata": "Métadonnées invalides"
+  },
+  "assets": {
+    "bitcoin": "Bitcoin",
+    "wbtc": "Bitcoin enveloppé",
+    "btc": "Bitcoin",
+    "sbtc": "Bitcoin Staké",
+    "tbtc": "Bitcoin Threshold"
+  },
+  "money_markets": {
+    "title": "Marchés Monétaires",
+    "supply": "Approvisionnement",
+    "borrow": "Emprunter",
+    "supply_apy": "APY d'Approvisionnement",
+    "borrow_apy": "APY d'Emprunt",
+    "total_supplied": "Total Approvisionné",
+    "total_borrowed": "Total Emprunté",
+    "available_to_borrow": "Disponible à l’Emprunt",
+    "utilization_rate": "Taux d’Utilisation"
+  },
+  "actions": {
+    "supply": "Approvisionner",
+    "borrow": "Emprunter",
+    "withdraw": "Retirer",
+    "repay": "Rembourser",
+    "view_details": "Voir les Détails",
+    "trade": "Échanger",
+    "bridge": "Pont",
+    "wrap": "Envelopper",
+    "unwrap": "Unwrap"
+  },
+  "yield": {
+    "lending": "Prêt",
+    "borrowing": "Emprunt",
+    "farming": "Farming",
+    "staking": "Staking",
+    "rewards": "Récompenses",
+    "incentives": "Incitations"
+  },
+  "protocols": {
+    "aries": "Aries",
+    "echelon": "Echelon",
+    "aptin": "Aptin",
+    "thala": "Thala",
+    "echo": "Echo",
+    "protocol": "Protocole",
+    "echo_data_soon": "Données du protocole Echo disponibles bientôt"
+  },
+  "filters": {
+    "all": "Tous",
+    "by_protocol": "Par Protocole",
+    "by_apy": "Par APY",
+    "lending": "Prêt",
+    "trading": "Échange",
+    "bridging": "Passerelle"
+  },
+  "bridge": {
+    "bridge_bitcoin": "Transférer du Bitcoin",
+    "from": "De",
+    "to": "À",
+    "amount": "Montant",
+    "fee": "Frais",
+    "estimated_time": "Temps Estimé",
+    "supported_networks": "Réseaux Pris en Charge"
+  },
+  "fallbacks": {
+    "unknown_asset": "Actif Inconnu",
+    "data_not_available": "Données non disponibles",
+    "price_unavailable": "Prix non disponible"
+  },
+  "info": {
+    "what_is_wrapped_btc": "Qu’est-ce que le Wrapped BTC ?",
+    "wrapped_btc_description": "Le Wrapped Bitcoin (wBTC) est une représentation tokenisée du Bitcoin sur d'autres blockchains, permettant l'utilisation du Bitcoin dans les applications DeFi.",
+    "benefits": "Avantages",
+    "defi_access": "Accès à la DeFi",
+    "earn_yield": "Gagner du rendement",
+    "maintain_btc_exposure": "Maintenir une exposition au BTC",
+    "bitcoin_backed_asset": "Actif adossé au Bitcoin"
+  },
+  "status": {
+    "coming_soon": "Bientôt Disponible"
+  }
+}

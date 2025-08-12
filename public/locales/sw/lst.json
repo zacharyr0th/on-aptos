@@ -1,0 +1,115 @@
+{
+  "page": {
+    "title": "LST kwenye Aptos",
+    "description": "Tokeni za Liquid Staking kwenye blockchain ya Aptos"
+  },
+  "stats": {
+    "total_lst_value": "Thamani ya Jumla ya LST",
+    "liquid_staking_tokens": "Tokeni za Liquid Staking",
+    "market_share": "Sehemu ya Soko",
+    "apr": "APR",
+    "staked_apt": "APT Zilizowekwa",
+    "validators": "Wathibitishaji",
+    "total_stakers": "Waweka Jumla",
+    "average_apr": "APR ya Wastani"
+  },
+  "providers": {
+    "all": "Wote",
+    "amnis": "Amnis Finance",
+    "tortuga": "Tortuga Finance",
+    "ditto": "Ditto Finance",
+    "thala": "Thala Labs",
+    "other": "Wengine"
+  },
+  "table": {
+    "token": "Tokeni",
+    "provider": "Mtoa huduma",
+    "apr": "APR",
+    "tvl": "TVL",
+    "market_cap": "Utaji wa Soko",
+    "price": "Bei",
+    "stakers": "Waweka",
+    "validators": "Wathibitishaji",
+    "liquidity": "Ukwasi",
+    "exchange_rate": "Kiwango cha Kubadilisha"
+  },
+  "details": {
+    "overview": "Muhtasari",
+    "staking_info": "Taarifa za Kuweka",
+    "validators": "Wathibitishaji",
+    "rewards": "Tuzo",
+    "unstaking": "Kutoa",
+    "governance": "Utawala",
+    "security": "Usalama",
+    "documentation": "Nyaraka",
+    "contracts": "Mikataba"
+  },
+  "staking": {
+    "stake_apt": "Weka APT",
+    "unstake": "Toa",
+    "claim_rewards": "Dai Tuzo",
+    "auto_compound": "Mchanganyiko wa Kiotomatiki",
+    "staking_period": "Kipindi cha Kuweka",
+    "unbonding_period": "Kipindi cha Kufungua",
+    "minimum_stake": "Kiwango cha Chini cha Kuweka",
+    "current_apr": "APR ya Sasa"
+  },
+  "validators": {
+    "validator": "Mthibitishaji",
+    "commission": "Tume",
+    "delegation": "Ujumbe",
+    "uptime": "Muda wa Kuwa Hai",
+    "voting_power": "Nguvu ya Kupiga Kura",
+    "self_stake": "Kuweka Kwake",
+    "delegators": "Wajumbe",
+    "performance": "Utendaji"
+  },
+  "messages": {
+    "loading": "Inapakia data ya liquid staking...",
+    "error": "Kosa katika kupakia data",
+    "no_data": "Hakuna data ya LST inayopatikana",
+    "coming_soon": "Watoa huduma zaidi wa liquid staking wanakuja hivi karibuni",
+    "refresh": "Onyesha Upya Data",
+    "last_updated": "Imesasishwa mwisho",
+    "stake_success": "Umeweka APT kwa mafanikio",
+    "unstake_success": "Umeanza mchakato wa kutoa"
+  },
+  "tooltips": {
+    "lst": "Tokeni za Liquid Staking zinawaruhusu waweka kupata tuzo huku wakidumisha ukwasi",
+    "apr": "Kiwango cha Mwaka kinachokadiriwa kutokana na tuzo za sasa za kuweka",
+    "tvl": "Thamani ya jumla iliyofungwa katika itifaki ya liquid staking",
+    "exchange_rate": "Kiwango cha sasa cha kubadilishana kati ya LST na APT",
+    "unbonding": "Muda unaohitajika kutoa kabisa na kupata APT zako",
+    "validators": "Idadi ya wathibitishaji wanaoweka kwa niaba ya wamiliki wa tokeni",
+    "auto_compound": "Tuzo zinawekwa upya kiotomatiki ili kuongeza mapato"
+  },
+  "risks": {
+    "title": "Hatari na Matumaini",
+    "slashing": "Hatari ya Kukatwa",
+    "liquidity": "Hatari ya Ukwasi",
+    "smart_contract": "Hatari ya Mkataba Mwerevu",
+    "validator": "Hatari ya Mthibitishaji",
+    "depeg": "Hatari ya Kutofungwa",
+    "low": "Chini",
+    "medium": "Kati",
+    "high": "Juu"
+  },
+  "rewards": {
+    "current_rewards": "Tuzo za Sasa",
+    "pending_rewards": "Tuzo Zinazosubiri",
+    "claimed_rewards": "Tuzo Zilizodaiwa",
+    "next_distribution": "Usambazaji Ujao",
+    "reward_history": "Historia ya Tuzo",
+    "compound_earnings": "Mapato ya Mchanganyiko",
+    "total_earned": "Jumla Iliyopatikana"
+  },
+  "analytics": {
+    "staking_ratio": "Uwiano wa Kuweka",
+    "growth_rate": "Kiwango cha Ukuaji",
+    "market_dominance": "Utawala wa Soko",
+    "holder_distribution": "Mgawanyo wa Wamiliki",
+    "whale_concentration": "Mkusanyiko wa Nyangumi",
+    "daily_volume": "Kiasi cha Kila Siku",
+    "liquidity_depth": "Kina cha Ukwasi"
+  }
+}

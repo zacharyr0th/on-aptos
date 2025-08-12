@@ -1,0 +1,77 @@
+{
+  "page": {
+    "title": "Stablecoins on Aptos",
+    "description": "Stablecoins and stable currencies on the Aptos blockchain"
+  },
+  "stats": {
+    "total_stablecoin_value": "Total Stablecoin Value",
+    "stablecoins": "Stablecoins",
+    "market_share": "Market Share",
+    "market_cap": "Market Cap",
+    "price": "Price",
+    "supply": "Supply",
+    "volume_24h": "Volume 24h",
+    "price_change_24h": "Price Change 24h",
+    "asset_details": "Asset Details"
+  },
+  "table": {
+    "token": "Token",
+    "supply": "Supply",
+    "market_share": "%",
+    "type": "Type",
+    "issuer": "Issuer"
+  },
+  "loading": {
+    "loading_stablecoin_data": "Loading stablecoin data...",
+    "loading": "Loading...",
+    "rate_limit_message": "Woah! Please slow down there.",
+    "try_again_in": "Try again in",
+    "try_again": "Try Again",
+    "request_failed": "The request could not be completed."
+  },
+  "error": {
+    "error_loading_stablecoin_data": "Error Loading Stablecoin Data",
+    "retry": "Retry",
+    "failed_to_load_chart": "Failed to load chart"
+  },
+  "stablecoins": {
+    "usdt": "Tether USD",
+    "usdc": "USD Coin",
+    "dai": "Dai Stablecoin",
+    "busd": "Binance USD",
+    "frax": "Frax",
+    "tusd": "TrueUSD",
+    "usdp": "Pax Dollar",
+    "gusd": "Gemini Dollar"
+  },
+  "types": {
+    "fiat_collateralized": "Fiat Collateralized",
+    "crypto_collateralized": "Crypto Collateralized",
+    "algorithmic": "Algorithmic",
+    "commodity_backed": "Commodity Backed"
+  },
+  "actions": {
+    "view_details": "View Details",
+    "trade": "Trade",
+    "add_to_wallet": "Add to Wallet",
+    "visit_website": "Visit Website"
+  },
+  "filters": {
+    "all": "All",
+    "by_type": "By Type",
+    "by_market_cap": "By Market Cap",
+    "stable": "Stable",
+    "depegged": "Depegged"
+  },
+  "labels": {
+    "tether_reserve_address": "Tether Reserve Address",
+    "subtracted_from_supply": "(Subtracted from circulating supply)",
+    "view_on_explorer": "View on Aptos Explorer",
+    "reserve_address": "reserve address"
+  },
+  "fallbacks": {
+    "unknown_stablecoin": "Unknown Stablecoin",
+    "data_not_available": "Data not available",
+    "price_unavailable": "Price unavailable"
+  }
+}

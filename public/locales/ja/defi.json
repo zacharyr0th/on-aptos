@@ -1,0 +1,382 @@
+{
+  "page": {
+    "title": "Aptos上のDeFi",
+    "description": "Aptosブロックチェーン上のDeFiプロトコルの包括的なディレクトリ"
+  },
+  "stats": {
+    "total_value_locked": "TVL（ロック総額）",
+    "volume_24h": "24時間取引量",
+    "protocols": "プロトコル",
+    "filtered_protocols": "フィルタされたプロトコル",
+    "live_from_defillama": "DeFiLlamaからライブ配信",
+    "estimated_tvl": "推定TVL",
+    "volume_data": "24時間取引量",
+    "defi_protocols": "DeFiプロトコル",
+    "fees_24h": "Fees 24h",
+    "protocol_fees": "Protocol fees",
+    "stablecoin_volume": "Stablecoin Volume",
+    "stablecoin_trading": "Stablecoin trading volume",
+    "coming_soon": "Coming Soon"
+  },
+  "search": {
+    "placeholder": "プロトコルを検索...",
+    "results": "{{count}}件のプロトコルが見つかりました",
+    "results_of": "{{total}}件のプロトコル中",
+    "no_results": "条件に一致するプロトコルが見つかりません。",
+    "clear_search": "検索をクリア",
+    "search_hint": "名前、カテゴリ、または説明で検索"
+  },
+  "filters": {
+    "all": "すべて",
+    "category": "カテゴリ",
+    "subcategory": "サブカテゴリ",
+    "clear_filters": "フィルタをクリア",
+    "filter_by_category": "カテゴリで絞り込む",
+    "view_grid": "グリッド表示",
+    "view_table": "テーブル表示",
+    "mobile_filters": "フィルタ",
+    "active_filters": "アクティブなフィルタ",
+    "subcategories_header": "{{category}} サブカテゴリ："
+  },
+  "tooltips": {
+    "grid_view": "グリッド表示に切り替える",
+    "table_view": "テーブル表示に切り替える",
+    "category_filter": "カテゴリでプロトコルを絞り込む",
+    "subcategory_filter": "サブカテゴリでプロトコルを絞り込む",
+    "clear_all_filters": "すべてのアクティブなフィルタを削除",
+    "search_protocols": "すべてのプロトコルを検索",
+    "protocol_website": "公式ウェブサイトを訪問",
+    "protocol_github": "GitHubでソースコードを表示",
+    "protocol_twitter": "X（Twitter）でフォロー",
+    "category_description": "{{category}} プロトコル：{{description}}",
+    "subcategory_description": "{{subcategory}}：{{description}}"
+  },
+  "categories": {
+    "All": {
+      "name": "すべて",
+      "description": "すべてのDeFiプロトコル"
+    },
+    "Credit": {
+      "name": "クレジット",
+      "description": "借入、貸出、および信用ベースのサービスを促進するプロトコル",
+      "subcategories": {
+        "Lending": {
+          "name": "レンディング",
+          "description": "ユーザーが金利付きで暗号資産を貸し借りできるプラットフォーム"
+        },
+        "RWA Lending": {
+          "name": "RWAレンディング",
+          "description": "不動産やコモディティなどの実世界資産を担保とするレンディングプロトコル"
+        },
+        "NFT Lending": {
+          "name": "NFTレンディング",
+          "description": "NFTを担保として借り入れ、またはNFT保有者に貸し出し"
+        },
+        "Uncollateralized Lending": {
+          "name": "無担保レンディング",
+          "description": "評判や信用スコアに基づく担保なしのローン"
+        },
+        "CDP": {
+          "name": "CDP",
+          "description": "担保付債務ポジション - スマートコントラクトに担保をロックしてステーブルコインを作成"
+        }
+      }
+    },
+    "Yield": {
+      "name": "イールド",
+      "description": "ステーキング、利回り生成、リワード配布に重点を置いたプロトコル",
+      "subcategories": {
+        "Liquid Staking": {
+          "name": "リキッドステーキング",
+          "description": "流動性を維持するために取引可能なレシートを受け取りながらトークンをステーキング"
+        },
+        "Restaking": {
+          "name": "リステーキング",
+          "description": "すでにステーキングされたトークンを使用して、追加のプロトコルをセキュアにし、追加リワードを獲得"
+        },
+        "Liquid Restaking": {
+          "name": "リキッドリステーキング",
+          "description": "DeFiで取引または使用できる流動性トークンでのリステーキング"
+        },
+        "Liquidity Manager": {
+          "name": "流動性マネージャー",
+          "description": "プール全体の流動性を最適化およびリバランスするツールまたはプロトコル"
+        },
+        "Leveraged Farming": {
+          "name": "レバレッジファーミング",
+          "description": "流動性提供を増やし、ファーミングリワードを増幅するために資金を借入"
+        },
+        "Yield Aggregator": {
+          "name": "イールドアグリゲーター",
+          "description": "最適な利回り機会を自動的に見つけて切り替える"
+        }
+      }
+    },
+    "Trading": {
+      "name": "トレーディング",
+      "description": "取引、マーケットメイキング、流動性提供のためのプロトコル",
+      "subcategories": {
+        "DEX": {
+          "name": "DEX",
+          "description": "仲介なしでトークンを交換するための分散型取引所"
+        },
+        "DEX Aggregator": {
+          "name": "DEXアグリゲーター",
+          "description": "複数のDEX間で最適な価格を見つけ、最適な取引を実現"
+        },
+        "Perps": {
+          "name": "パーペチュアル",
+          "description": "暗号資産でレバレッジをかけた永続先物契約を取引"
+        },
+        "Options": {
+          "name": "オプション",
+          "description": "価格変動をヘッジまたは投機するためにオプション契約を売買"
+        },
+        "Prediction Market": {
+          "name": "予測市場",
+          "description": "暗号通貨を使用して実世界のイベントや結果に賭ける"
+        },
+        "Launchpad": {
+          "name": "ローンチパッド",
+          "description": "公正な配布とコミュニティ機能で新しいトークンをローンチ"
+        }
+      }
+    },
+    "Multiple": {
+      "name": "複合",
+      "description": "異なるカテゴリにまたがる複数のDeFi商品を提供するプロトコル"
+    }
+  },
+  "subcategories": {
+    "lending": "レンディング",
+    "rwa_lending": "RWAレンディング",
+    "nft_lending": "NFTレンディング",
+    "uncollateralized_lending": "無担保レンディング",
+    "cdp": "CDP",
+    "liquid_staking": "リキッドステーキング",
+    "restaking": "リステーキング",
+    "liquid_restaking": "リキッドリステーキング",
+    "liquidity_manager": "流動性マネージャー",
+    "leveraged_farming": "レバレッジファーミング",
+    "yield_aggregator": "イールドアグリゲーター",
+    "dex": "DEX",
+    "dex_aggregator": "DEXアグリゲーター",
+    "perps": "パーペチュアル",
+    "launchpad": "ローンチパッド",
+    "options": "オプション",
+    "prediction_markets": "予測市場"
+  },
+  "protocol": {
+    "website": "ウェブサイト",
+    "github": "GitHub",
+    "twitter": "X（Twitter）",
+    "links": "リンク",
+    "tvl": "TVL",
+    "volume": "取引量",
+    "yield": "利回り",
+    "status": "ステータス",
+    "launch_date": "ローンチ日",
+    "audit_status": "監査ステータス",
+    "networks": "ネットワーク",
+    "category": "カテゴリ",
+    "subcategory": "サブカテゴリ",
+    "description": "説明",
+    "more_info": "詳細情報",
+    "external_links": "外部リンク",
+    "implementation": "実装",
+    "security": "セキュリティ",
+    "token": "トークン"
+  },
+  "protocol_values": {
+    "status": {
+      "Active": "アクティブ",
+      "Deprecated": "非推奨",
+      "Beta": "ベータ",
+      "Coming Soon": "近日公開"
+    },
+    "audit_status": {
+      "Audited": "監査済み",
+      "Unaudited": "未監査",
+      "In Progress": "進行中",
+      "Partially Audited": "部分的に監査済み"
+    },
+    "networks": {
+      "mainnet": "メインネット",
+      "testnet": "テストネット",
+      "devnet": "開発ネット"
+    },
+    "implementations": {
+      "Money Market": "マネーマーケット",
+      "Isolated Pools": "分離プール",
+      "Validator Delegated": "バリデーター委任",
+      "Range Orders": "レンジオーダー",
+      "Borrowing-based": "借入ベース",
+      "Multi-protocol": "マルチプロトコル",
+      "AMM": "AMM",
+      "CLOB": "CLOB",
+      "Hybrid": "ハイブリッド",
+      "Route Optimization": "ルート最適化",
+      "Gas Optimization": "ガス最適化",
+      "Cross-chain": "クロスチェーン",
+      "Cross-margin": "クロスマージン",
+      "Fair Launch": "フェアローンチ",
+      "Protocol Suite": "プロトコルスイート"
+    }
+  },
+  "protocols": {
+    "mirage": {
+      "description": "Composable liquidity layer bringing next-gen DeFi. Deposit collateral and borrow self-repaying stablecoin loans powered by perpetuals with up to 100x leverage.",
+      "categoryBreakdown": "Trading • Perps",
+      "feeStructure": "Dynamic fee structure based on trading volume and position size. Competitive fees for perpetual futures trading.",
+      "integration": {
+        "description": "Fully on-chain perpetuals with CEX-like experience. All positions, vaults, and orders are represented as NFTs for secondary market trading."
+      }
+    }
+  },
+  "protocol_descriptions": {
+    "Panora": "オンチェーンオーダーブックえ10以上のAMMに接続する「メタDEX」で、プール間で注文を分割し、UIで自動更新される正規トークンリストを管理します。",
+    "Kana": "9つのチェーン間でスワップをルーティング；Paymasterコントラクトにより、ユーザーはガス用のAPTを保有せずにAptosで取引可能；オーダーブックベースのperp エンジン。",
+    "Thetis": "Thetisはスポットアグリゲーター、50×パーペチュアル、リクイディティブートストラッピングプール（LBPs）を1つの屋根の下にバンドルします。",
+    "Anqa": "15以上のAptos DEXでの99%の流動性カバレッジを主張；リアルタイムサンプリングで署名前にスリッパージをプレビューし、ガス節約のためのマルチトークンスワップのバッチ処理が可能。",
+    "LiquidSwap": "PontemのフラッグシップAMMでAptos mainnet上初のライブDEX；クラシックUniswap-V2プール、ステーブルスワップカーブ、正式に検証された集中流動性設計を提供。",
+    "Econia": "Aptosの楽観的同時実行に最適化されたハイパーパラレルオンチェーンオーダーブック；1秒未満のファイナリティでマーケットを並列処理し、完全なREST/MQTTデータスタックを公開。",
+    "Cellana": "veNFT投票者がエミッションを指揮し、100%の手数料を収集するve(3,3) AMM。",
+    "PancakeSwap": "BinanceのフラッグシップDEXがV2 AMMをMoveにクローンし、一部のCAKE流動性をAptosにブリッジしました。",
+    "SushiSwap": "Sushiは初の非EVM統合を実行し、馴染みのTridentルーターUXを保持しながらAptosで決済されるクロスチェーンルートを可能にしました。",
+    "Hyperion": "HFTスタイル取引のAptosOAのスループットを活用する完全オンチェーンハイブリッドオーダーブック + CL-AMM。",
+    "Tapp": "Aptosテストネット上初のフック有効Uniswap V4スタイルモジュラーDEX；スマートコントラクトフックによりビルダーがカスタムプールを作成でき、ユーザーはプログラマブルスワップを利用できます。",
+    "Merkle": "XP、ルートボックス、150×レバレッジを特徴とするゲーミフィケーションしたperp DEX；総ボリューム200億ドル以上。",
+    "AGDEX": "小口トレーダーのためにスリッパージを緩密に保つ低インパクトオラクルフィルで1-100×クロスマージンパーペチュアルを提供。",
+    "Pump": "誰でもボンディングカーブを介してミームトークンを造幣可能；すべてのコインはプリセールやチーム割当なしでフェアローンチされます。",
+    "Emojicoin": "ユーザーがUnicode絵文字と1対1でマッピングされたトークンを造幣可能；各ローンチはEconiaのCL-AMMカーブを使用して瞬時価格発見と投機を行います。",
+    "Aries": "Aptos上初のCompoundスタイルマネーマーケット、90%LTV E-Mode、統合ブリッジング、スポット取引を1つのインターフェースでアップグレード。",
+    "Superposition": "イングランド銀行のFHS VaRにインスパイアされた高度なリスク管理プラットフォームで、リアルタイムリスク監視と動的担保ファクター調整を備えたレバレッジ利回り機会を提供。",
+    "Joule": "レバレッジファーミングのために分離された貸付プールと「流動性アンカー」を組み合わせます。",
+    "Echelon": "E-Modeと分離されたマーケットの両方をサポートする貸付ハブ。",
+    "Aptin": "正式検証のMove Proverと細かい分離プールリスクコントロールを使用するセキュリティファーストの貸付プラットフォーム。",
+    "Meso": "ユーザー設定の债務上限と、プロトコルの不足を補完するセーフティモジュールを備えた資本効率的な貸付。",
+    "TruFin": "エンタープライズグレードのリキッドステーキング；ユーザーはAPTのステーキングの代わりにTruAPTを受け取ります。",
+    "Amnis": "デュアルトークンシステムがstAPT（利回りあり）とamAPT（安定）を発行し、ユーザーが利回りと安定性を切り替えることを可能にし、バリデーター手数料をステーカーに還元します。",
+    "Kofi": "MEVブーストされたリキッドステーキングとレバレッジLSDボールト。",
+    "Ichi": "自動流動性マネージャーボールトでプロジェクトが片側流動性を提供可能；スマートレンジがリバランシングしてインパーマネントロスを削減し、財務がネイティブトークンでスワップ手数料を獲得。",
+    "Vibrant X": "預金を最高APYのAptosプールに再配置する利回りオプティマイザーとポートフォリオダッシュボード。",
+    "Moar": "ユーザーが一方で借り、他方でデプロイできるクロスプロトコルクレジットアカウントでレバレッジファームレイヤーを構築。",
+    "Thala": "マルチプールAMM、超担保型MODステーブルコイン、sthAPTとthAPTによるリキッドステーキングを特徴とするDeFiアプリケーションスイート。",
+    "Mirage": "A composable liquidity layer powering DeFi's next frontier. Deposit collateral and borrow a self-repaying stablecoin loan powered by perpetuals. Features fully on-chain perps with CEX-like experience, instant execution, low fees, and up to 100x leverage."
+  },
+  "protocol_category_breakdown": {
+    "Thala": "トレーディング • イールド • クレジット"
+  },
+  "table": {
+    "protocol": "プロトコル",
+    "category": "カテゴリ",
+    "subcategory": "サブカテゴリ",
+    "tvl": "TVL",
+    "links": "リンク",
+    "sort_by": "並び替え",
+    "sort_asc": "昇順",
+    "sort_desc": "降順"
+  },
+  "fallbacks": {
+    "multiple_defi_products": "複数のDeFi商品",
+    "defi_protocol_category": "DeFiプロトコルカテゴリ",
+    "defi_protocol_subcategory": "DeFiプロトコルサブカテゴリ",
+    "unknown_category": "不明なカテゴリ",
+    "unknown_subcategory": "不明なサブカテゴリ",
+    "no_description": "説明がありません",
+    "visit_protocol": "プロトコルを訪問"
+  },
+  "actions": {
+    "view_protocol": "プロトコルを表示",
+    "visit_website": "ウェブサイトを訪問",
+    "view_on_github": "GitHubで表示",
+    "follow_on_twitter": "Xでフォロー",
+    "copy_link": "リンクをコピー",
+    "share": "共有"
+  },
+  "ui": {
+    "search": {
+      "placeholder": "プロトコルを検索...",
+      "results_count": "{{count}}件の結果",
+      "results_count_plural": "{{count}}件の結果",
+      "breadcrumb": "すべて > {{category}}"
+    },
+    "filters": {
+      "category": "カテゴリ：",
+      "all_categories": "すべてのカテゴリ",
+      "clear_filters": "クリア",
+      "view_mode": {
+        "grid": "グリッド表示",
+        "table": "テーブル表示"
+      },
+      "tooltips": {
+        "category_filter": "カテゴリでプロトコルを絞り込む",
+        "clear_filters": "すべてのアクティブなフィルタをクリア",
+        "grid_view": "グリッド表示に切り替える",
+        "table_view": "テーブル表示に切り替える"
+      }
+    },
+    "stats": {
+      "total_protocols": "総プロトコル数",
+      "total_protocols_tooltip": "追跡されているDeFiプロトコルの総数",
+      "categories": "カテゴリ",
+      "categories_tooltip": "利用可能なDeFiカテゴリの数",
+      "data_source": "データソース",
+      "data_source_tooltip": "プロトコルデータの取得元",
+      "loading": "統計を読み込み中..."
+    },
+    "table": {
+      "headers": {
+        "name": "名前",
+        "category": "カテゴリ",
+        "links": "リンク"
+      },
+      "tooltips": {
+        "sort_by_name": "プロトコル名で並び替え",
+        "sort_by_category": "カテゴリで並び替え",
+        "visit_website": "プロトコルのウェブサイトを訪問",
+        "view_github": "GitHubリポジトリを表示",
+        "follow_twitter": "Twitterでフォロー"
+      },
+      "no_data": "プロトコルが見つかりません",
+      "loading": "プロトコルを読み込み中..."
+    },
+    "grid": {
+      "tooltips": {
+        "protocol_card": "{{protocol}}の詳細を表示するにはクリック",
+        "visit_website": "{{protocol}}のウェブサイトを訪問",
+        "view_github": "{{protocol}}をGitHubで表示",
+        "follow_twitter": "{{protocol}}をTwitterでフォロー"
+      }
+    },
+    "messages": {
+      "no_protocols": "条件に一致するプロトコルが見つかりません。",
+      "loading": "読み込み中...",
+      "error": "プロトコルの読み込みエラー",
+      "empty_state": "利用可能なDeFiプロトコルがありません",
+      "try_clearing_filters": "フィルタや検索条件をクリアしてみてください。"
+    }
+  },
+  "common_values": {
+    "na": "該当なし",
+    "not_available": "利用不可",
+    "real_time": "リアルタイム",
+    "live": "ライブ",
+    "estimated": "推定",
+    "unknown": "不明",
+    "loading": "読み込み中...",
+    "error": "エラー",
+    "coming_soon": "近日公開",
+    "tbd": "未定",
+    "varies": "変動"
+  },
+  "units": {
+    "million": "M",
+    "billion": "B",
+    "trillion": "T",
+    "percent": "%",
+    "usd": "USD",
+    "apt": "APT",
+    "btc": "BTC"
+  }
+}

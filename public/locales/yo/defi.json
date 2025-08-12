@@ -1,0 +1,446 @@
+{
+  "page": {
+    "title": "DeFi lórí Aptos",
+    "description": "Àkójọ pípé ti àwọn ìlànà DeFi lórí blockchain Aptos"
+  },
+  "stats": {
+    "total_value_locked": "Àpapọ̀ Owó Tí a Tì",
+    "volume_24h": "Ìwọ̀n 24h",
+    "protocols": "Àwọn Ìlànà",
+    "filtered_protocols": "Àwọn Ìlànà Tí a Yà",
+    "live_from_defillama": "Láàyè láti DeFiLlama",
+    "estimated_tvl": "TVL Tí a Ṣèrò",
+    "volume_data": "Ìwọ̀n pàṣípààrọ̀ 24h",
+    "defi_protocols": "Àwọn ìlànà DeFi",
+    "fees_24h": "Owó ìdíyelé 24h",
+    "protocol_fees": "Owó ìdíyelé ìlànà",
+    "stablecoin_volume": "Ìwọ̀n Owó Ìdúró",
+    "stablecoin_trading": "Ìwọ̀n pàṣípààrọ̀ owó ìdúró",
+    "coming_soon": "Ń bọ̀ láìpẹ́"
+  },
+  "search": {
+    "placeholder": "Wá àwọn ìlànà...",
+    "results": "{{count}} àwọn ìlànà tí a rí",
+    "results_of": "nínú {{total}} àwọn ìlànà",
+    "no_results": "A kò rí àwọn ìlànà tó bá àwárí rẹ mu.",
+    "clear_search": "Fọ ìwádìí",
+    "search_hint": "Wá pẹ̀lú orúkọ, ẹ̀ka, tàbí àpèjúwe"
+  },
+  "filters": {
+    "all": "Gbogbo",
+    "category": "Ẹ̀ka",
+    "subcategory": "Ẹ̀ka-kékeré",
+    "clear_filters": "Fọ Àwọn Àjẹ́kù",
+    "filter_by_category": "Yà sọ́tọ̀ nípa Ẹ̀ka",
+    "view_grid": "Wò ní Grid",
+    "view_table": "Wò ní Tábìlì",
+    "mobile_filters": "Àwọn Àjẹ́kù",
+    "active_filters": "Àwọn àjẹ́kù tó ń ṣiṣẹ́",
+    "subcategories_header": "{{category}} àwọn ẹ̀ka-kékeré:"
+  },
+  "tooltips": {
+    "grid_view": "Yí padà sí ìwò grid",
+    "table_view": "Yí padà sí ìwò tábìlì",
+    "category_filter": "Yà àwọn ìlànà sọ́tọ̀ nípa ẹ̀ka",
+    "subcategory_filter": "Yà àwọn ìlànà sọ́tọ̀ nípa ẹ̀ka-kékeré",
+    "clear_all_filters": "Yọ gbogbo àwọn àjẹ́kù tó ń ṣiṣẹ́",
+    "search_protocols": "Wá kárí gbogbo àwọn ìlànà",
+    "protocol_website": "Bẹ ojú-òpó ayélujára aṣẹ́ wò",
+    "protocol_github": "Wo koodu orísun lórí GitHub",
+    "protocol_twitter": "Tẹ̀lé lórí X (Twitter)",
+    "category_description": "{{category}} àwọn ìlànà: {{description}}",
+    "subcategory_description": "{{subcategory}}: {{description}}"
+  },
+  "categories": {
+    "All": {
+      "name": "Gbogbo",
+      "description": "Gbogbo àwọn ìlànà DeFi"
+    },
+    "Credit": {
+      "name": "Gbèsè",
+      "description": "Àwọn ìlànà tó ń ṣèrànwọ́ fún yíyá, yínìí, àti àwọn iṣẹ́ gbèsè",
+      "subcategories": {
+        "Lending": {
+          "name": "Yínìí",
+          "description": "Àwọn pẹpẹ níbi tí àwọn òǹṣàmúlò lè yá tàbí yì àwọn ohun-ìní crypto pẹ̀lú ìwọ̀n èlé"
+        },
+        "RWA Lending": {
+          "name": "Yínìí RWA",
+          "description": "Àwọn ìlànà yínìí tí àwọn ohun-ìní ayé gidi bíi ilé tàbí àwọn ohun tí a lè rà ń ṣàtìlẹ́yìn"
+        },
+        "NFT Lending": {
+          "name": "Yínìí NFT",
+          "description": "Yá owó nípa lílo NFTs gẹ́gẹ́ bíi dúkìá tàbí yì sí àwọn tó ni NFT"
+        },
+        "Uncollateralized Lending": {
+          "name": "Yínìí Láìsí Dúkìá",
+          "description": "Àwọn ìyáwó láìsí dúkìá, tó dá lórí orúkọ rere tàbí ìwọ̀n gbèsè"
+        },
+        "CDP": {
+          "name": "CDP",
+          "description": "Àwọn Ipò Gbèsè Dúkìá - Ṣẹ̀dá àwọn owó ìdúró nípa títì dúkìá sínú àwọn àdéhùn ọlọ́gbọ́n"
+        }
+      }
+    },
+    "Yield": {
+      "name": "Èrè",
+      "description": "Àwọn ìlànà tó dá lórí ìdókòwò, ìṣẹ̀dá èrè, àti pínpín ẹ̀bùn",
+      "subcategories": {
+        "Liquid Staking": {
+          "name": "Ìdókòwò Olómi",
+          "description": "Fi tókìn dó kó o sì gba ìwé-ẹ̀rí tí o lè ṣòwò láti máa ní olómi"
+        },
+        "Restaking": {
+          "name": "Ìtúndókòwò",
+          "description": "Lo àwọn tókìn tí o ti dó láti dáàbò bo àwọn ìlànà mìíràn fún èrè àfikún"
+        },
+        "Liquid Restaking": {
+          "name": "Ìtúndókòwò Olómi",
+          "description": "Ìtúndókòwò pẹ̀lú àwọn tókìn olómi tí a lè ṣòwò tàbí lò nínú DeFi"
+        },
+        "Liquidity Manager": {
+          "name": "Alábòójútó Olómi",
+          "description": "Àwọn irinṣẹ́ tàbí ìlànà tó ń ṣàmúdájú kí ó sì tún ṣètò olómi káàkiri àwọn àkójọpọ̀"
+        },
+        "Leveraged Farming": {
+          "name": "Ọ̀gbìn Alágbára",
+          "description": "Yá owó láti mú ìpèsè olómi pọ̀ sí i kí o sì mú ẹ̀bùn ọ̀gbìn pọ̀ sí i"
+        },
+        "Yield Aggregator": {
+          "name": "Akójọpọ̀ Èrè",
+          "description": "Wá kí o sì yí padà láàárín àwọn ànfààní èrè tó dára jùlọ láìfọwọ́yí"
+        }
+      }
+    },
+    "Trading": {
+      "name": "Ìṣòwò",
+      "description": "Àwọn ìlànà fún ìṣòwò, ṣíṣe ọjà, àti ìpèsè olómi",
+      "subcategories": {
+        "DEX": {
+          "name": "DEX",
+          "description": "Àwọn pàṣípààrọ̀ aláìlákòóso fún ṣíṣe pàṣípààrọ̀ tókìn láìsí aláàárín"
+        },
+        "DEX Aggregator": {
+          "name": "Akójọpọ̀ DEX",
+          "description": "Wá àwọn owó tó dára jùlọ káàkiri ọ̀pọ̀lọpọ̀ DEX fún ìṣòwò tó dára jùlọ"
+        },
+        "Perps": {
+          "name": "Perps",
+          "description": "Ṣòwò àwọn àdéhùn ọjọ́-iwájú aláìlópin pẹ̀lú agbára lórí àwọn ohun-ìní crypto"
+        },
+        "Options": {
+          "name": "Àṣàyàn",
+          "description": "Ra àti ta àwọn àdéhùn àṣàyàn láti dáàbò bo tàbí gbérò lórí ìṣípòpadà owó"
+        },
+        "Prediction Market": {
+          "name": "Ọjà Àsọtẹ́lẹ̀",
+          "description": "Tẹ́tẹ́ lórí àwọn ìṣẹ̀lẹ̀ ayé gidi àti àbájáde nípa lílo crypto"
+        },
+        "Launchpad": {
+          "name": "Ibi Ìfilọ́lẹ̀",
+          "description": "Fi àwọn tókìn tuntun ṣeré pẹ̀lú pínpín tó ṣe déédéé àti àwọn ẹ̀yà àwùjọ"
+        }
+      }
+    },
+    "Multiple": {
+      "name": "Púpọ̀",
+      "description": "Àwọn ìlànà tó ń pèsè ọ̀pọ̀lọpọ̀ ọjà DeFi káàkiri oríṣiríṣi ẹ̀ka"
+    }
+  },
+  "subcategories": {
+    "lending": "Yínìí",
+    "rwa_lending": "Yínìí RWA",
+    "nft_lending": "Yínìí NFT",
+    "uncollateralized_lending": "Yínìí Láìsí Dúkìá",
+    "cdp": "CDP",
+    "liquid_staking": "Ìdókòwò Olómi",
+    "restaking": "Ìtúndókòwò",
+    "liquid_restaking": "Ìtúndókòwò Olómi",
+    "liquidity_manager": "Alábòójútó Olómi",
+    "leveraged_farming": "Ọ̀gbìn Alágbára",
+    "yield_aggregator": "Akójọpọ̀ Èrè",
+    "dex": "DEX",
+    "dex_aggregator": "Akójọpọ̀ DEX",
+    "perps": "Perps",
+    "launchpad": "Ibi Ìfilọ́lẹ̀",
+    "options": "Àṣàyàn",
+    "prediction_markets": "Àwọn Ọjà Àsọtẹ́lẹ̀"
+  },
+  "protocol": {
+    "website": "Ojú-òpó ayélujára",
+    "github": "GitHub",
+    "twitter": "X (Twitter)",
+    "links": "Àwọn Ìsopọ̀",
+    "tvl": "TVL",
+    "volume": "Ìwọ̀n",
+    "yield": "Èrè",
+    "status": "Ipò",
+    "launch_date": "Ọjọ́ Ìfilọ́lẹ̀",
+    "audit_status": "Ipò Àyẹ̀wò",
+    "networks": "Àwọn Nẹ́tíwọ̀ọ̀kì",
+    "category": "Ẹ̀ka",
+    "subcategory": "Ẹ̀ka-kékeré",
+    "description": "Àpèjúwe",
+    "more_info": "Àlàyé Síi",
+    "external_links": "Àwọn Ìsopọ̀ Òde",
+    "implementation": "Ìmúṣẹ",
+    "security": "Ààbò",
+    "token": "Tókìn"
+  },
+  "protocol_values": {
+    "status": {
+      "Active": "Ń ṣiṣẹ́",
+      "Deprecated": "Ti kúrò",
+      "Beta": "Beta",
+      "Coming Soon": "Ń bọ̀ láìpẹ́"
+    },
+    "audit_status": {
+      "Audited": "Ti yẹ̀wò",
+      "Unaudited": "Kò tíì yẹ̀wò",
+      "In Progress": "Ń lọ lọ́wọ́",
+      "Partially Audited": "Ti yẹ̀wò díẹ̀"
+    },
+    "networks": {
+      "mainnet": "Mainnet",
+      "testnet": "Testnet",
+      "devnet": "Devnet"
+    },
+    "implementations": {
+      "Money Market": "Ọjà Owó",
+      "Isolated Pools": "Àwọn Àkójọpọ̀ Ìyàsọ́tọ̀",
+      "Validator Delegated": "Tí a Rán sí Olùfọwọ́sí",
+      "Range Orders": "Àwọn Àṣẹ Ìwọ̀n",
+      "Borrowing-based": "Tó dá lórí Yíyá",
+      "Multi-protocol": "Ìlànà-púpọ̀",
+      "AMM": "AMM",
+      "CLOB": "CLOB",
+      "Hybrid": "Àdàpọ̀",
+      "Route Optimization": "Ìmúdára Ọ̀nà",
+      "Gas Optimization": "Ìmúdára Gas",
+      "Cross-chain": "Kọjá-chain",
+      "Cross-margin": "Kọjá-margin",
+      "Fair Launch": "Ìfilọ́lẹ̀ Òdodo",
+      "Protocol Suite": "Àkójọpọ̀ Ìlànà"
+    }
+  },
+  "protocols": {
+    "names": {
+      "Panora": "Panora",
+      "Kana": "Kana",
+      "Thetis": "Thetis",
+      "Anqa": "Anqa",
+      "LiquidSwap": "LiquidSwap",
+      "Econia": "Econia",
+      "Cellana": "Cellana",
+      "PancakeSwap": "PancakeSwap",
+      "SushiSwap": "SushiSwap",
+      "Hyperion": "Hyperion",
+      "Tapp": "Tapp",
+      "Merkle": "Merkle",
+      "AGDEX": "AGDEX",
+      "Pump": "Pump",
+      "Emojicoin": "Emojicoin",
+      "Aries": "Aries",
+      "Superposition": "Superposition",
+      "Joule": "Joule",
+      "Echelon": "Echelon",
+      "Aptin": "Aptin",
+      "Meso": "Meso",
+      "TruFin": "TruFin",
+      "Amnis": "Amnis",
+      "Kofi": "Kofi",
+      "Ichi": "Ichi",
+      "Vibrant X": "Vibrant X",
+      "Moar": "Moar",
+      "Thala": "Thala",
+      "Mirage": "Mirage"
+    },
+    "short_descriptions": {
+      "Panora": "Akójọpọ̀ Meta-DEX",
+      "Kana": "Olùdarí pàṣípààrọ̀ kọjá-chain",
+      "Thetis": "Pẹpẹ ìṣòwò ọjà-púpọ̀",
+      "Anqa": "Akójọpọ̀ DEX tó ga",
+      "LiquidSwap": "DEX Aptos àkọ́kọ́",
+      "Econia": "Ìwé àṣẹ tó ń ṣiṣẹ́ gíga",
+      "Cellana": "ve(3,3) AMM",
+      "PancakeSwap": "DEX multichain olókìkí",
+      "SushiSwap": "Pẹpẹ DeFi kọjá-chain",
+      "Hyperion": "Pẹpẹ ìṣòwò àdàpọ̀",
+      "Tapp": "DEX módúlà tó ní hook",
+      "Merkle": "Perpetuals eré",
+      "AGDEX": "Perps kọjá-margin",
+      "Pump": "Ibi ìfilọ́lẹ̀ tókìn meme",
+      "Emojicoin": "Ibi ìfilọ́lẹ̀ tókìn emoji",
+      "Aries": "Yínìí bíi Compound",
+      "Superposition": "Ìṣàkóso ewu tó ga",
+      "Joule": "Àwọn àkójọpọ̀ yínìí ìyàsọ́tọ̀",
+      "Echelon": "Ilé-iṣẹ́ yínìí ọ̀nà-púpọ̀",
+      "Aptin": "Yínìí ààbò-àkọ́kọ́",
+      "Meso": "Yínìí tó ní agbára owó",
+      "TruFin": "Ìdókòwò olómi ilé-iṣẹ́",
+      "Amnis": "Ìdókòwò olómi tókìn-méjì",
+      "Kofi": "Ìdókòwò tó ní MEV",
+      "Ichi": "Alábòójútó olómi aládàáṣe",
+      "Vibrant X": "Olùmúdára èrè",
+      "Moar": "Ìpele ọ̀gbìn alágbára",
+      "Thala": "Àkójọpọ̀ ìlànà DeFi",
+      "Mirage": "Ìpele olómi tí a lè sopọ̀"
+    }
+  },
+  "protocol_descriptions": {
+    "Panora": "\"Meta-DEX\" kan tó sopọ̀ mọ́ ìwé-àṣẹ lórí-chain àti 10+ AMMs, ń pín àwọn àṣẹ káàkiri àwọn àkójọpọ̀ bí ó ṣe ń ṣàkójọ àtòjọ tókìn tó ń sọ ara rẹ̀ di tuntun nínú UI rẹ̀.",
+    "Kana": "Ń darí àwọn pàṣípààrọ̀ káàkiri chain mẹ́sàn-án; àdéhùn Paymaster jẹ́ kí àwọn òǹṣàmúlò ṣòwò lórí Aptos láìní APT fún gas; ẹ́ńjìnì perp tó dá lórí ìwé-àṣẹ.",
+    "Thetis": "Thetis ń kó akójọpọ̀ spot, 50× perpetuals, àti àwọn àkójọpọ̀ ìgbéga-olómi (LBPs) jọ sí abẹ́ òrùlé kan.",
+    "Anqa": "Sọ pé ó ní 99% ìbò olómi káàkiri 15+ Aptos DEXes; àyẹ̀wò lójú ẹsẹ̀ ń fi slippage hàn kí o tó fọwọ́ sí i ó sì jẹ́ kí o lè kó àwọn pàṣípààrọ̀ tókìn púpọ̀ jọ láti fi owó gas pamọ́.",
+    "LiquidSwap": "AMM àgbéléró Pontem àti DEX àkọ́kọ́ tó wà láàyè lórí Aptos mainnet; ń pèsè àwọn àkójọpọ̀ Uniswap-V2 àtìbẹ̀rẹ̀, ìkọ́ pàṣípààrọ̀ ìdúró, àti àpẹẹrẹ olómi-tó-pọ̀ tí a fọwọ́ sí.",
+    "Econia": "Ìwé-àṣẹ lórí-chain hyper-parallel tí a ṣàmúdára fún ìfojúkojú àìròtẹ́lẹ̀ Aptos; ń ṣiṣẹ́ àwọn ọjà ní parallel pẹ̀lú ìparí abẹ́-ìṣẹ́jú-àáyá kan ó sì ń fi àkójọ dátà REST/MQTT pípé hàn.",
+    "Cellana": "ve(3,3) AMM níbi tí àwọn olùdìbò veNFT ń darí àwọn ìgbéjáde tí wọ́n sì ń gba 100% àwọn owó ìdíyelé.",
+    "PancakeSwap": "DEX àgbéléró Binance ṣẹ̀dà V2 AMM rẹ̀ sórí Move ó sì kọjá díẹ̀ nínú olómi CAKE sí Aptos.",
+    "SushiSwap": "Sushi ṣe ìsopọ̀ àkọ́kọ́ rẹ̀ tí kìí ṣe EVM, ń mú àwọn ọ̀nà kọjá-chain ṣiṣẹ́ tó ń parí lórí Aptos bí ó ṣe ń tọ́jú UX olùdarí Trident tó wọ́pọ̀.",
+    "Hyperion": "Ìwé-àṣẹ àdàpọ̀ + CL-AMM tó wà lórí-chain pátápátá tó ń lo ìgbéjáde Aptos fún ìṣòwò bíi HFT.",
+    "Tapp": "DEX módúlà àkọ́kọ́ tó ní hook, bíi Uniswap V4 lórí Aptos testnet; àwọn hook àdéhùn ọlọ́gbọ́n jẹ́ kí àwọn olùkọ́ lè sopọ̀ àwọn àkójọpọ̀ àdáni bí àwọn òǹṣàmúlò ṣe ń ní àwọn pàṣípààrọ̀ tí a lè ṣètò.",
+    "Merkle": "DEX perp eré pẹ̀lú XP, àwọn àpótí-ẹ̀bùn, àti 150× agbára; ju $20b ìwọ̀n gbogbo lọ.",
+    "AGDEX": "Ń pèsè 1-100× perps kọjá-margin pẹ̀lú àwọn kíkún oracle ìpa-kékeré tó ń jẹ́ kí slippage dúró fún àwọn oníṣòwò kékeré.",
+    "Pump": "Ẹnikẹ́ni lè ṣe àwọn tókìn meme nípa àwọn ìkọ́ ìsopọ̀; gbogbo owó ni a fi ṣeré ní òdodo pẹ̀lú àìsí ìtà-ṣáájú tàbí ìpín ẹgbẹ́.",
+    "Emojicoin": "Jẹ́ kí àwọn òǹṣàmúlò ṣe àwọn tókìn tí a so pọ̀ 1-sí-1 pẹ̀lú àwọn emoji Unicode; ìfilọ́lẹ̀ kọ̀ọ̀kan ń lo ìkọ́ CL-AMM Econia fún ìwárí owó lẹ́sẹ̀kẹsẹ̀ àti àkíyèsí.",
+    "Aries": "Ọjà owó bíi Compound àkọ́kọ́ lórí Aptos, tí a ṣàfikún pẹ̀lú 90%-LTV E-Mode, ìsopọ̀ àfonífaàsí, àti ìṣòwò spot nínú ojú ìwé kan.",
+    "Superposition": "Pẹpẹ ìṣàkóso ewu tó ga tí Bank of England's FHS VaR ṣe àtìlẹ́yìn, tó ń pèsè àwọn ànfààní èrè alágbára pẹ̀lú àbójútó ewu lójú ẹsẹ̀ àti ìṣàtúnṣe ìwọ̀n dúkìá tó ń yí padà.",
+    "Joule": "Ń darapọ̀ àwọn àkójọpọ̀ yínìí ìyàsọ́tọ̀ pẹ̀lú \"Àwọn Òkúta Olómi\" fún ọ̀gbìn alágbára.",
+    "Echelon": "Ilé-iṣẹ́ yínìí tó ń ṣàtìlẹ́yìn E-Mode àti àwọn ọjà ìyàsọ́tọ̀.",
+    "Aptin": "Pẹpẹ yínìí ààbò-àkọ́kọ́ tó ń lo Move Prover fún ìfọwọ́sí àìdánilójú àti àwọn ìṣàkóso ewu àkójọpọ̀-ìyàsọ́tọ̀ tó péye.",
+    "Meso": "Yínìí tó ní agbára owó pẹ̀lú àwọn òpó gbèsè tí òǹṣàmúlò ṣètò àti Módúlù Ààbò tó ń dúró fún àìtó ìlànà.",
+    "TruFin": "Ìdókòwò olómi ìpele ilé-iṣẹ́; àwọn òǹṣàmúlò gba TruAPT ní pàṣípààrọ̀ fún dídó APT.",
+    "Amnis": "Ètò tókìn-méjì ń gbé stAPT (tó ń mú èrè wá) àti amAPT (ìdúró) jáde, ń jẹ́ kí àwọn òǹṣàmúlò yí padà láàárín èrè àti ìdúró bí wọ́n ṣe ń darí owó ìdíyelé olùfọwọ́sí padà sí àwọn olùdókòwò.",
+    "Kofi": "Ìdókòwò olómi tó ní MEV pẹ̀lú àwọn àgò LSD-alágbára.",
+    "Ichi": "Àwọn àgò Alábòójútó Olómi Aládàáṣe jẹ́ kí àwọn iṣẹ́ àkànṣe gbin olómi ẹ̀gbẹ́-kan; àwọn ìwọ̀n ọlọ́gbọ́n tún ṣètò láti gé ìpàdánù aláìṣeé bí àwọn ilé-ìṣúra ṣe ń jèrè owó ìdíyelé pàṣípààrọ̀ nínú tókìn ìbílẹ̀ wọn.",
+    "Vibrant X": "Olùmúdára-èrè àti àtẹ àpò-owó tó ń tún pín àwọn ìfipamọ́ sí àwọn àkójọpọ̀ Aptos tó ní APY gíga jùlọ.",
+    "Moar": "Ń kọ́ ìpele ọ̀gbìn-alágbára pẹ̀lú àwọn àkáǹtì gbèsè kọjá-ìlànà tó ń jẹ́ kí àwọn òǹṣàmúlò yá ní ibìkan kí wọ́n sì lò ní ibòmíràn.",
+    "Thala": "Àkójọpọ̀ àwọn ohun èlò DeFi tó ní AMM àkójọpọ̀-púpọ̀, owó ìdúró MOD tó ní dúkìá ju, àti ìdókòwò-olómi nípa sthAPT àti thAPT.",
+    "Mirage": "Ìpele olómi tí a lè sopọ̀ tó ń mú ojú ọ̀nà DeFi tó tẹ̀lé ṣiṣẹ́. Fi dúkìá sílẹ̀ kí o sì yá ìyáwó owó ìdúró tó ń san ara rẹ̀ tí perpetuals ń ṣe agbára. Ó ní perps lórí-chain pátápátá pẹ̀lú ìrírí bíi CEX, ìṣiṣẹ́ lẹ́sẹ̀kẹsẹ̀, owó ìdíyelé kékeré, àti agbára tó tó 100x."
+  },
+  "protocol_category_breakdown": {
+    "Thala": "Ìṣòwò • Èrè • Gbèsè"
+  },
+  "protocols": {
+    "mirage": {
+      "description": "Ìpele olómi tí a lè sopọ̀ tó ń mú ojú ọ̀nà DeFi tó tẹ̀lé ṣiṣẹ́. Fi dúkìá sílẹ̀ kí o sì yá ìyáwó owó ìdúró tó ń san ara rẹ̀ tí perpetuals ń ṣe agbára pẹ̀lú agbára tó tó 100x.",
+      "categoryBreakdown": "Ìṣòwò • Perps",
+      "feeStructure": "Ètò owó ìdíyelé tó ń yí padà tó dá lórí ìwọ̀n ìṣòwò àti ìwọ̀n ipò. Àwọn owó tó ń díjú fún ìṣòwò perpetual futures.",
+      "integration": {
+        "description": "Perpetuals lórí-chain pátápátá pẹ̀lú ìrírí bíi CEX. Gbogbo àwọn ipò, àgò, àti àṣẹ ni a sọ di NFTs fún ìṣòwò ọjà kejì."
+      }
+    }
+  },
+  "table": {
+    "protocol": "Ìlànà",
+    "category": "Ẹ̀ka",
+    "subcategory": "Ẹ̀ka-kékeré",
+    "tvl": "TVL",
+    "links": "Àwọn Ìsopọ̀",
+    "sort_by": "Tò nípa",
+    "sort_asc": "Tò láti kéré sí ńlá",
+    "sort_desc": "Tò láti ńlá sí kéré"
+  },
+  "fallbacks": {
+    "multiple_defi_products": "Ọ̀pọ̀lọpọ̀ ọjà DeFi",
+    "defi_protocol_category": "Ẹ̀ka ìlànà DeFi",
+    "defi_protocol_subcategory": "Ẹ̀ka-kékeré ìlànà DeFi",
+    "unknown_category": "Ẹ̀ka Àìmọ̀",
+    "unknown_subcategory": "Ẹ̀ka-kékeré Àìmọ̀",
+    "no_description": "Kò sí àpèjúwe",
+    "visit_protocol": "Bẹ Ìlànà Wò"
+  },
+  "actions": {
+    "view_protocol": "Wo Ìlànà",
+    "visit_website": "Bẹ Ojú-òpó Ayélujára Wò",
+    "view_on_github": "Wo lórí GitHub",
+    "follow_on_twitter": "Tẹ̀lé lórí X",
+    "copy_link": "Ṣẹ̀dà Ìsopọ̀",
+    "share": "Pín"
+  },
+  "ui": {
+    "search": {
+      "placeholder": "Wá àwọn ìlànà...",
+      "results_count": "{{count}} èsì",
+      "results_count_plural": "{{count}} àwọn èsì",
+      "breadcrumb": "Gbogbo > {{category}}"
+    },
+    "filters": {
+      "category": "Ẹ̀ka:",
+      "all_categories": "Gbogbo Àwọn Ẹ̀ka",
+      "clear_filters": "Fọ",
+      "view_mode": {
+        "grid": "Wò ní Grid",
+        "table": "Wò ní Tábìlì"
+      },
+      "tooltips": {
+        "category_filter": "Yà àwọn ìlànà sọ́tọ̀ nípa ẹ̀ka",
+        "clear_filters": "Fọ gbogbo àwọn àjẹ́kù tó ń ṣiṣẹ́",
+        "grid_view": "Yí padà sí ìwò grid",
+        "table_view": "Yí padà sí ìwò tábìlì"
+      }
+    },
+    "stats": {
+      "total_protocols": "Àpapọ̀ Àwọn Ìlànà",
+      "total_protocols_tooltip": "Iye gbogbo àwọn ìlànà DeFi tí a ń tọpinpin",
+      "categories": "Àwọn Ẹ̀ka",
+      "categories_tooltip": "Iye àwọn ẹ̀ka DeFi tó wà",
+      "data_source": "Orísun Dátà",
+      "data_source_tooltip": "Ibi tí dátà ìlànà ti ń wá",
+      "loading": "Ń gbé àwọn ìṣirò..."
+    },
+    "table": {
+      "headers": {
+        "name": "Orúkọ",
+        "category": "Ẹ̀ka",
+        "links": "Àwọn Ìsopọ̀"
+      },
+      "tooltips": {
+        "sort_by_name": "Tò nípa orúkọ ìlànà",
+        "sort_by_category": "Tò nípa ẹ̀ka",
+        "visit_website": "Bẹ ojú-òpó ìlànà wò",
+        "view_github": "Wo ilé-ìpamọ́ GitHub",
+        "follow_twitter": "Tẹ̀lé lórí Twitter"
+      },
+      "no_data": "A kò rí àwọn ìlànà",
+      "loading": "Ń gbé àwọn ìlànà..."
+    },
+    "grid": {
+      "tooltips": {
+        "protocol_card": "Tẹ̀ láti wo àlàyé {{protocol}}",
+        "visit_website": "Bẹ ojú-òpó {{protocol}} wò",
+        "view_github": "Wo {{protocol}} lórí GitHub",
+        "follow_twitter": "Tẹ̀lé {{protocol}} lórí Twitter"
+      }
+    },
+    "messages": {
+      "no_protocols": "A kò rí àwọn ìlànà tó bá àwárí rẹ mu.",
+      "loading": "Ń gbé...",
+      "error": "Àṣìṣe ní gbígbé àwọn ìlànà",
+      "empty_state": "Kò sí àwọn ìlànà DeFi",
+      "try_clearing_filters": "Gbìyànjú láti fọ àwọn àjẹ́kù tàbí ọ̀rọ̀ ìwádìí rẹ."
+    }
+  },
+  "common_values": {
+    "na": "K/S",
+    "not_available": "Kò Sí",
+    "real_time": "Àkókò-gidi",
+    "live": "Láàyè",
+    "estimated": "Tí a Ṣèrò",
+    "unknown": "Àìmọ̀",
+    "loading": "Ń gbé...",
+    "error": "Àṣìṣe",
+    "coming_soon": "Ń bọ̀ láìpẹ́",
+    "tbd": "TBD",
+    "varies": "Ó yàtọ̀"
+  },
+  "units": {
+    "million": "M",
+    "billion": "B",
+    "trillion": "T",
+    "percent": "%",
+    "usd": "USD",
+    "apt": "APT",
+    "btc": "BTC"
+  }
+}

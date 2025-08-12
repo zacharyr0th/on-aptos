@@ -1,0 +1,121 @@
+{
+  "page": {
+    "title": "Bitcoin na Aptos",
+    "description": "Aktywa Bitcoin i rynki pieniężne na blockchainie Aptos"
+  },
+  "stats": {
+    "total_supply": "Całkowita podaż",
+    "total_btc_value": "Całkowita wartość Bitcoin",
+    "bitcoin_assets": "Aktywa Bitcoin",
+    "market_share": "Udział w rynku",
+    "price": "Cena",
+    "market_cap": "Kapitalizacja rynkowa",
+    "volume_24h": "Wolumen 24h",
+    "tvl": "TVL",
+    "apy": "APY",
+    "utilization": "Wykorzystanie",
+    "decimals": "Miejsca dziesiętne",
+    "network": "Sieć",
+    "aptos_mainnet": "Sieć główna Aptos"
+  },
+  "loading": {
+    "loading_btc_data": "Ładowanie danych Bitcoin...",
+    "loading": "Ładowanie...",
+    "loading_market_data": "Ładowanie danych rynkowych...",
+    "error_title": "Błąd ładowania danych",
+    "rate_limit_message": "Osiągnięto limit API. Poczekaj przed kolejną próbą.",
+    "try_again_in": "Spróbuj ponownie za",
+    "try_again": "Spróbuj ponownie",
+    "request_failed": "Żądanie nie powiodło się. Spróbuj ponownie.",
+    "chart_error": "Nie udało się załadować wykresu"
+  },
+  "error": {
+    "error_loading_btc_data": "Błąd ładowania danych Bitcoin",
+    "retry": "Ponów",
+    "failed_to_load_chart": "Nie udało się załadować wykresu",
+    "error_calculating_supply": "Błąd obliczania podaży",
+    "unknown_error": "Nieznany błąd",
+    "invalid_data": "Nieprawidłowe dane",
+    "invalid_metadata": "Nieprawidłowe metadane"
+  },
+  "assets": {
+    "bitcoin": "Bitcoin",
+    "wbtc": "Opakowany Bitcoin",
+    "btc": "Bitcoin",
+    "sbtc": "Stakowany Bitcoin",
+    "tbtc": "Threshold Bitcoin"
+  },
+  "money_markets": {
+    "title": "Rynki pieniężne",
+    "supply": "Podaż",
+    "borrow": "Pożyczka",
+    "supply_apy": "APY podaży",
+    "borrow_apy": "APY pożyczki",
+    "total_supplied": "Całkowita podaż",
+    "total_borrowed": "Całkowite pożyczki",
+    "available_to_borrow": "Dostępne do pożyczenia",
+    "utilization_rate": "Wskaźnik wykorzystania"
+  },
+  "actions": {
+    "supply": "Zaopatrz",
+    "borrow": "Pożycz",
+    "withdraw": "Wypłać",
+    "repay": "Spłać",
+    "view_details": "Zobacz szczegóły",
+    "trade": "Handluj",
+    "bridge": "Mostek",
+    "wrap": "Opakuj",
+    "unwrap": "Rozpakuj"
+  },
+  "yield": {
+    "lending": "Pożyczanie",
+    "borrowing": "Pożyczanie",
+    "farming": "Farming",
+    "staking": "Staking",
+    "rewards": "Nagrody",
+    "incentives": "Zachęty"
+  },
+  "protocols": {
+    "aries": "Aries",
+    "echelon": "Echelon",
+    "aptin": "Aptin",
+    "thala": "Thala",
+    "echo": "Echo",
+    "protocol": "Protokół",
+    "echo_data_soon": "Dane protokołu Echo wkrótce"
+  },
+  "filters": {
+    "all": "Wszystkie",
+    "by_protocol": "Według protokołu",
+    "by_apy": "Według APY",
+    "lending": "Pożyczanie",
+    "trading": "Handel",
+    "bridging": "Mostkowanie"
+  },
+  "bridge": {
+    "bridge_bitcoin": "Mostkuj Bitcoin",
+    "from": "Z",
+    "to": "Do",
+    "amount": "Kwota",
+    "fee": "Opłata",
+    "estimated_time": "Szacowany czas",
+    "supported_networks": "Obsługiwane sieci"
+  },
+  "fallbacks": {
+    "unknown_asset": "Nieznane aktywo",
+    "data_not_available": "Dane niedostępne",
+    "price_unavailable": "Cena niedostępna"
+  },
+  "info": {
+    "what_is_wrapped_btc": "Czym jest opakowany BTC?",
+    "wrapped_btc_description": "Opakowany Bitcoin (wBTC) to tokenizowana reprezentacja Bitcoin na innych blockchainach, umożliwiająca korzystanie z Bitcoin w aplikacjach DeFi.",
+    "benefits": "Korzyści",
+    "defi_access": "Dostęp do DeFi",
+    "earn_yield": "Zarabiaj zyski",
+    "maintain_btc_exposure": "Zachowaj ekspozycję na BTC",
+    "bitcoin_backed_asset": "Aktywo wspierane przez Bitcoin"
+  },
+  "status": {
+    "coming_soon": "Wkrótce"
+  }
+}

@@ -1,0 +1,382 @@
+{
+  "page": {
+    "title": "Aptos पर DeFi",
+    "description": "Aptos ब्लॉकचेन पर DeFi प्रोटोकॉल की व्यापक निर्देशिका"
+  },
+  "stats": {
+    "total_value_locked": "कुल लॉक्ड वैल्यू",
+    "volume_24h": "24 घंटे की मात्रा",
+    "protocols": "प्रोटोकॉल",
+    "filtered_protocols": "फ़िल्टर किए गए प्रोटोकॉल",
+    "live_from_defillama": "DeFiLlama से लाइव",
+    "estimated_tvl": "अनुमानित TVL",
+    "volume_data": "24 घंटे की ट्रेडिंग मात्रा",
+    "defi_protocols": "DeFi प्रोटोकॉल",
+    "fees_24h": "Fees 24h",
+    "protocol_fees": "Protocol fees",
+    "stablecoin_volume": "Stablecoin Volume",
+    "stablecoin_trading": "Stablecoin trading volume",
+    "coming_soon": "Coming Soon"
+  },
+  "search": {
+    "placeholder": "प्रोटोकॉल खोजें...",
+    "results": "{{count}} प्रोटोकॉल मिले",
+    "results_of": "{{total}} प्रोटोकॉल में से",
+    "no_results": "आपके मापदंडों से मेल खाने वाले कोई प्रोटोकॉल नहीं मिले।",
+    "clear_search": "खोज साफ़ करें",
+    "search_hint": "नाम, श्रेणी, या विवरण से खोजें"
+  },
+  "filters": {
+    "all": "सभी",
+    "category": "श्रेणी",
+    "subcategory": "उप-श्रेणी",
+    "clear_filters": "फिल्टर साफ़ करें",
+    "filter_by_category": "श्रेणी के अनुसार फ़िल्टर करें",
+    "view_grid": "ग्रिड व्यू",
+    "view_table": "टेबल व्यू",
+    "mobile_filters": "फिल्टर",
+    "active_filters": "सक्रिय फिल्टर",
+    "subcategories_header": "{{category}} उप-श्रेणियां:"
+  },
+  "tooltips": {
+    "grid_view": "ग्रिड व्यू पर स्विच करें",
+    "table_view": "टेबल व्यू पर स्विच करें",
+    "category_filter": "श्रेणी के अनुसार प्रोटोकॉल फ़िल्टर करें",
+    "subcategory_filter": "उप-श्रेणी के अनुसार प्रोटोकॉल फ़िल्टर करें",
+    "clear_all_filters": "सभी सक्रिय फिल्टर हटाएं",
+    "search_protocols": "सभी प्रोटोकॉल में खोजें",
+    "protocol_website": "आधिकारिक वेबसाइट पर जाएं",
+    "protocol_github": "GitHub पर सोर्स कोड देखें",
+    "protocol_twitter": "X (Twitter) पर फॉलो करें",
+    "category_description": "{{category}} प्रोटोकॉल: {{description}}",
+    "subcategory_description": "{{subcategory}}: {{description}}"
+  },
+  "categories": {
+    "All": {
+      "name": "सभी",
+      "description": "सभी DeFi प्रोटोकॉल"
+    },
+    "Credit": {
+      "name": "क्रेडिट",
+      "description": "प्रोटोकॉल जो उधार देने, उधार लेने और क्रेडिट-आधारित सेवाओं की सुविधा प्रदान करते हैं",
+      "subcategories": {
+        "Lending": {
+          "name": "उधार देना",
+          "description": "प्लेटफॉर्म जहां उपयोगकर्ता ब्याज दरों के साथ क्रिप्टो संपत्ति उधार दे और उधार ले सकते हैं"
+        },
+        "RWA Lending": {
+          "name": "RWA उधार",
+          "description": "रियल एस्टेट या कमोडिटीज जैसी वास्तविक-विश्व संपत्ति द्वारा समर्थित उधार प्रोटोकॉल"
+        },
+        "NFT Lending": {
+          "name": "NFT उधार",
+          "description": "NFTs को संपार्श्विक के रूप में उपयोग करके पैसे उधार लें या NFT धारकों को उधार दें"
+        },
+        "Uncollateralized Lending": {
+          "name": "बिना संपार्श्विक उधार",
+          "description": "प्रतिष्ठा या क्रेडिट स्कोरिंग के आधार पर बिना संपार्श्विक के ऋण"
+        },
+        "CDP": {
+          "name": "सीडीपी",
+          "description": "संपार्श्विक ऋण स्थिति - स्मार्ट कॉन्ट्रैक्ट में संपार्श्विक लॉक करके स्थिर सिक्के बनाएं"
+        }
+      }
+    },
+    "Yield": {
+      "name": "यील्ड",
+      "description": "स्टेकिंग, यील्ड जेनरेशन और रिवार्ड वितरण पर केंद्रित प्रोटोकॉल",
+      "subcategories": {
+        "Liquid Staking": {
+          "name": "लिक्विड स्टेकिंग",
+          "description": "तरलता बनाए रखने के लिए ट्रेडेबल रसीदें प्राप्त करते समय टोकन स्टेक करें"
+        },
+        "Restaking": {
+          "name": "रीस्टेकिंग",
+          "description": "अतिरिक्त पुरस्कारों के लिए अतिरिक्त प्रोटोकॉल को सुरक्षित करने के लिए पहले से स्टेक्ड टोकन का उपयोग करें"
+        },
+        "Liquid Restaking": {
+          "name": "लिक्विड रीस्टेकिंग",
+          "description": "लिक्विड टोकन के साथ रीस्टेकिंग जिन्हें ट्रेड किया जा सकता है या DeFi में उपयोग किया जा सकता है"
+        },
+        "Liquidity Manager": {
+          "name": "लिक्विडिटी मैनेजर",
+          "description": "टूल या प्रोटोकॉल जो पूल में तरलता को अनुकूलित और पुनर्संतुलित करते हैं"
+        },
+        "Leveraged Farming": {
+          "name": "लीवरेज्ड फार्मिंग",
+          "description": "तरलता प्रावधान बढ़ाने और फार्मिंग पुरस्कारों को बढ़ाने के लिए फंड उधार लें"
+        },
+        "Yield Aggregator": {
+          "name": "यील्ड एग्रीगेटर",
+          "description": "स्वचालित रूप से सर्वोत्तम यील्ड अवसर खोजें और उनके बीच स्विच करें"
+        }
+      }
+    },
+    "Trading": {
+      "name": "ट्रेडिंग",
+      "description": "ट्रेडिंग, मार्केट मेकिंग और तरलता प्रावधान के लिए प्रोटोकॉल",
+      "subcategories": {
+        "DEX": {
+          "name": "डेक्स",
+          "description": "बिना मध्यस्थों के टोकन स्वैप करने के लिए विकेंद्रीकृत एक्सचेंज"
+        },
+        "DEX Aggregator": {
+          "name": "DEX एग्रीगेटर",
+          "description": "अनुकूलित ट्रेड के लिए कई DEXes में सर्वोत्तम मूल्य खोजें"
+        },
+        "Perps": {
+          "name": "पेरप्स",
+          "description": "क्रिप्टो संपत्ति पर लीवरेज के साथ पर्पेचुअल फ्यूचर्स कॉन्ट्रैक्ट ट्रेड करें"
+        },
+        "Options": {
+          "name": "ऑप्शन्स",
+          "description": "मूल्य आंदोलनों पर हेज या अनुमान लगाने के लिए ऑप्शन कॉन्ट्रैक्ट खरीदें और बेचें"
+        },
+        "Prediction Market": {
+          "name": "प्रेडिक्शन मार्केट",
+          "description": "क्रिप्टो का उपयोग करके वास्तविक-विश्व की घटनाओं और परिणामों पर दांव लगाएं"
+        },
+        "Launchpad": {
+          "name": "लॉन्चपैड",
+          "description": "निष्पक्ष वितरण और समुदायिक सुविधाओं के साथ नए टोकन लॉन्च करें"
+        }
+      }
+    },
+    "Multiple": {
+      "name": "मल्टिपल",
+      "description": "विभिन्न श्रेणियों में कई DeFi उत्पाद प्रदान करने वाले प्रोटोकॉल"
+    }
+  },
+  "subcategories": {
+    "lending": "उधार देना",
+    "rwa_lending": "RWA उधार",
+    "nft_lending": "NFT उधार",
+    "uncollateralized_lending": "बिना संपार्श्विक उधार",
+    "cdp": "सीडीपी",
+    "liquid_staking": "लिक्विड स्टेकिंग",
+    "restaking": "रीस्टेकिंग",
+    "liquid_restaking": "लिक्विड रीस्टेकिंग",
+    "liquidity_manager": "लिक्विडिटी मैनेजर",
+    "leveraged_farming": "लीवरेज्ड फार्मिंग",
+    "yield_aggregator": "यील्ड एग्रीगेटर",
+    "dex": "डेक्स",
+    "dex_aggregator": "DEX एग्रीगेटर",
+    "perps": "पेरप्स",
+    "launchpad": "लॉन्चपैड",
+    "options": "ऑप्शन्स",
+    "prediction_markets": "प्रेडिक्शन मार्केट"
+  },
+  "protocol": {
+    "website": "वेबसाइट",
+    "github": "GitHub",
+    "twitter": "एक्स (ट्विटर)",
+    "links": "लिंक",
+    "tvl": "TVL",
+    "volume": "मात्रा",
+    "yield": "यील्ड",
+    "status": "स्थिति",
+    "launch_date": "लॉन्च तारीख",
+    "audit_status": "ऑडिट स्थिति",
+    "networks": "नेटवर्क",
+    "category": "श्रेणी",
+    "subcategory": "उप-श्रेणी",
+    "description": "विवरण",
+    "more_info": "अधिक जानकारी",
+    "external_links": "बाहरी लिंक",
+    "implementation": "कार्यान्वयन",
+    "security": "सुरक्षा",
+    "token": "टोकन"
+  },
+  "protocol_values": {
+    "status": {
+      "Active": "सक्रिय",
+      "Deprecated": "पुराना",
+      "Beta": "बीटा",
+      "Coming Soon": "जल्द आ रहा है"
+    },
+    "audit_status": {
+      "Audited": "ऑडिटेड",
+      "Unaudited": "अनऑडिटेड",
+      "In Progress": "प्रगति में",
+      "Partially Audited": "आंशिक रूप से ऑडिटेड"
+    },
+    "networks": {
+      "mainnet": "मेननेट",
+      "testnet": "टेस्टनेट",
+      "devnet": "डेवनेट"
+    },
+    "implementations": {
+      "Money Market": "मनी मार्केट",
+      "Isolated Pools": "आइसोलेटेड पूल्स",
+      "Validator Delegated": "वैलिडेटर डेलिगेटेड",
+      "Range Orders": "रेंज ऑर्डर",
+      "Borrowing-based": "उधार-आधारित",
+      "Multi-protocol": "मल्टी-प्रोटोकॉल",
+      "AMM": "AMM",
+      "CLOB": "CLOB",
+      "Hybrid": "हाइब्रिड",
+      "Route Optimization": "रूट अनुकूलन",
+      "Gas Optimization": "गैस अनुकूलन",
+      "Cross-chain": "क्रॉस-चेन",
+      "Cross-margin": "क्रॉस-मार्जिन",
+      "Fair Launch": "फेयर लॉन्च",
+      "Protocol Suite": "प्रोटोकॉल सूट"
+    }
+  },
+  "protocols": {
+    "mirage": {
+      "description": "Composable liquidity layer bringing next-gen DeFi. Deposit collateral and borrow self-repaying stablecoin loans powered by perpetuals with up to 100x leverage.",
+      "categoryBreakdown": "Trading • Perps",
+      "feeStructure": "Dynamic fee structure based on trading volume and position size. Competitive fees for perpetual futures trading.",
+      "integration": {
+        "description": "Fully on-chain perpetuals with CEX-like experience. All positions, vaults, and orders are represented as NFTs for secondary market trading."
+      }
+    }
+  },
+  "protocol_descriptions": {
+    "Panora": "एक \"मेटा-डेक्स\" जो ऑन-चेन ऑर्डर-बुक और 10+ एएऎऎ से जुड़ता है, पूल्स में ऑर्डर विभाजित करता है और एक कैनोनिकल टोकन सूची बनाता है जो अपने यूआई में स्वतः अपडेट होती है।",
+    "Kana": "नौ चेन्स में स्वैप्स को रूट करता है; एक पेमास्टर कॉन्ट्रैक्ट उपयोगकर्ताओं को गैस के लिए APT रखे बिना Aptos पर ट्रेड करने देता है; एक ऑर्डरबुक-आधारित perp इंजन।",
+    "Thetis": "Thetis एक स्पॉट एग्रीगेटर, 50× पर्पेचुअल्स, और लिक्विडिटी-बूटस्ट्रैपिंग पूल्स (LBPs) को एक छत के नीचे बंडल करता है।",
+    "Anqa": "15+ Aptos DEXes में 99% लिक्विडिटी कवरेज का दावा करता है; रियल-टाइम सैंपलिंग साइन करने से पहले स्लिपेज का पूर्वावलोकन करती है और गैस बचाने के लिए मल्टी-टोकन स्वैप्स को बैच करने देती है।",
+    "LiquidSwap": "Pontem का फ्लैगशिप AMM और Aptos मेननेट पर पहला लाइव DEX; क्लासिक Uniswap-V2 पूल्स, एक स्टेबल-स्वैप कर्व, और एक औपचारिक रूप से सत्यापित केंद्रित-तरलता डिजाइन प्रदान करता है।",
+    "Econia": "Aptos के आशावादी concurrency के लिए ऑप्टिमाइज़्ड एक हाइपर-पैरेलल ऑन-चेन ऑर्डर-बुक; सब-सेकंड फाइनैलिटी के साथ मार्केट्स को पैरेलल में प्रोसेस करता है और एक पूरी REST/MQTT डेटा स्टैक को एक्सपोज़ करता है।",
+    "Cellana": "एक ve(3,3) AMM जहाँ veNFT मतदाता उत्सर्जन को निर्देशित करते हैं और 100% फीस को कैप्चर करते हैं।",
+    "PancakeSwap": "Binance के फ्लैगशिप DEX ने अपने V2 AMM को Move पर क्लोन किया और कुछ CAKE लिक्विडिटी को Aptos में ब्रिज किया।",
+    "SushiSwap": "Sushi ने अपना पहला गैर-EVM एकीकरण निष्पादित किया, जो क्रॉस-चेन रूट्स को सक्षम बनाता है जो Aptos पर सेटल होते हैं जबकि परिचित Trident राउटर UX को बनाए रखते हैं।",
+    "Hyperion": "एक पूरी तरह ऑन-चेन हाइब्रिड ऑर्डर-बुक + CL-AMM जो HFT-शैली ट्रेडिंग के लिए Aptos के throughput का फायदा उठाता है।",
+    "Tapp": "Aptos testnet पर पहला hook-enabled, Uniswap V4-शैली मॉड्यूलर DEX; स्मार्ट-कॉन्ट्रैक्ट hooks बिल्डर्स को कस्टम पूल्स कॉम्पोज़ करने देते हैं जबकि यूजर्स को प्रोग्रामेबल स्वैप्स मिलते हैं।",
+    "Merkle": "एक गेमिफाइड perp DEX XP, लूट-बॉक्सेस, और 150× लीवरेज के साथ; $20b से अधिक कुल वॉल्यूम।",
+    "AGDEX": "रिटेल ट्रेडर्स के लिए स्लिपेज को तंग रखने वाले कम प्रभाव ओरेकल फिल्स के साथ 1-100× क्रॉस-मार्जिन perps प्रदान करता है।",
+    "Pump": "कोई भी bonding curves के माध्यम से meme tokens मिंट कर सकता है; हर कॉइन बिना प्री-सेल या टीम अलोकेशन के फेयर-लॉन्च किया जाता है।",
+    "Emojicoin": "यूजर्स को Unicode emojis के साथ 1-से-1 मैप किए गए tokens मिंट करने देता है; हर लॉन्च instant price discovery और speculation के लिए Econia के CL-AMM curve का उपयोग करता है।",
+    "Aries": "Aptos पर पहला Compound-शैली मनी मार्केट, 90%-LTV E-Mode, एकीकृत ब्रिजिंग, और एक इंटरफेस में स्पॉट ट्रेडिंग के साथ अपग्रेडेड।",
+    "Superposition": "Bank of England के FHS VaR से प्रेरित उन्नत जोखिम प्रबंधन प्लेटफॉर्म, रियल-टाइम जोखिम मॉनिटरिंग और डायनामिक कॉलेटरल फैक्टर अजस्टमेंट के साथ लीवरेज्ड यील्ड अवसर प्रदान करता है।",
+    "Joule": "लीवरेज्ड फार्मिंग के लिए आइसोलेटेड लेंडिंग पूल्स को \"Liquidity Anchors\" के साथ जोड़ता है।",
+    "Echelon": "एक लेंडिंग हब जो E-Mode और आइसोलेटेड मार्केट्स दोनों को सपोर्ट करता है।",
+    "Aptin": "सिक्योरिटी-फर्स्ट लेंडिंग प्लेटफॉर्म जो formal verification के लिए Move Prover और granular, isolated-pool risk controls का उपयोग करता है।",
+    "Meso": "यूजर-कॉन्फिगर्ड डेट सीलिंग्स और एक Safety Module के साथ कैपिटल-एफिशेंट लेंडिंग जो protocol shortfalls को backstop करता है।",
+    "TruFin": "एंटरप्राइज़-ग्रेड लिक्विड स्टेकिंग; यूजर्स APT को स्टेक करने के बदले में TruAPT प्राप्त करते हैं।",
+    "Amnis": "दोहरा टोकन सिस्टम stAPT (यील्ड-बेयरिंग) और amAPT (स्टेबल) जारी करता है, यूजर्स को yield और stability के बीच टॉगल करने देता है जबकि validator commission को stakers को वापस रूट करता है।",
+    "Kofi": "MEV-boosted लिक्विड स्टेकिंग और leveraged-LSD vaults के साथ।",
+    "Ichi": "Automated Liquidity Manager vaults प्रोजेक्ट्स को single-sided liquidity seed करने देते हैं; smart ranges impermanent loss काटने के लिए rebalance करते हैं जबकि treasuries अपने native token में swap fees कमाते हैं।",
+    "Vibrant X": "Yield-optimizer और portfolio dashboard जो डिपॉजिट्स को top-APY Aptos pools में reallocate करता है।",
+    "Moar": "Cross-protocol credit accounts के साथ leveraged-farm layer बना रहा है जो users को एक जगह borrow करने और दूसरी जगह deploy करने की सुविधा देता है।",
+    "Thala": "DeFi अनुप्रयोगों का एक सूट जिसमें एक मल्टी-पूल AMM, अधिक-पार्श्विक MOD स्टेबलकॉइन, और sthAPT और thAPT के माध्यम से लिक्विड-स्टेकिंग है।",
+    "Mirage": "A composable liquidity layer powering DeFi's next frontier. Deposit collateral and borrow a self-repaying stablecoin loan powered by perpetuals. Features fully on-chain perps with CEX-like experience, instant execution, low fees, and up to 100x leverage."
+  },
+  "protocol_category_breakdown": {
+    "Thala": "ट्रेडिंग • यील्ड • क्रेडिट"
+  },
+  "table": {
+    "protocol": "प्रोटोकॉल",
+    "category": "श्रेणी",
+    "subcategory": "उप-श्रेणी",
+    "tvl": "TVL",
+    "links": "लिंक",
+    "sort_by": "इसके अनुसार क्रमबद्ध करें",
+    "sort_asc": "आरोही क्रम में सॉर्ट करें",
+    "sort_desc": "अवरोही क्रम में सॉर्ट करें"
+  },
+  "fallbacks": {
+    "multiple_defi_products": "कई DeFi उत्पाद",
+    "defi_protocol_category": "DeFi प्रोटोकॉल श्रेणी",
+    "defi_protocol_subcategory": "DeFi प्रोटोकॉल उप-श्रेणी",
+    "unknown_category": "अज्ञात श्रेणी",
+    "unknown_subcategory": "अज्ञात उप-श्रेणी",
+    "no_description": "कोई विवरण उपलब्ध नहीं",
+    "visit_protocol": "प्रोटोकॉल पर जाएं"
+  },
+  "actions": {
+    "view_protocol": "प्रोटोकॉल देखें",
+    "visit_website": "वेबसाइट पर जाएं",
+    "view_on_github": "GitHub पर देखें",
+    "follow_on_twitter": "X पर फॉलो करें",
+    "copy_link": "लिंक कॉपी करें",
+    "share": "साझा करें"
+  },
+  "ui": {
+    "search": {
+      "placeholder": "प्रोटोकॉल खोजें...",
+      "results_count": "{{count}} परिणाम",
+      "results_count_plural": "{{count}} परिणाम",
+      "breadcrumb": "सभी > {{category}}"
+    },
+    "filters": {
+      "category": "श्रेणी:",
+      "all_categories": "सभी श्रेणियां",
+      "clear_filters": "साफ़ करें",
+      "view_mode": {
+        "grid": "ग्रिड व्यू",
+        "table": "टेबल व्यू"
+      },
+      "tooltips": {
+        "category_filter": "श्रेणी के अनुसार प्रोटोकॉल फ़िल्टर करें",
+        "clear_filters": "सभी सक्रिय फिल्टर साफ़ करें",
+        "grid_view": "ग्रिड व्यू पर स्विच करें",
+        "table_view": "टेबल व्यू पर स्विच करें"
+      }
+    },
+    "stats": {
+      "total_protocols": "कुल प्रोटोकॉल",
+      "total_protocols_tooltip": "ट्रैक किए गए DeFi प्रोटोकॉल की कुल संख्या",
+      "categories": "श्रेणियां",
+      "categories_tooltip": "उपलब्ध DeFi श्रेणियों की संख्या",
+      "data_source": "डेटा स्रोत",
+      "data_source_tooltip": "प्रोटोकॉल डेटा कहां से आता है",
+      "loading": "आंकड़े लोड हो रहे हैं..."
+    },
+    "table": {
+      "headers": {
+        "name": "नाम",
+        "category": "श्रेणी",
+        "links": "लिंक"
+      },
+      "tooltips": {
+        "sort_by_name": "प्रोटोकॉल नाम के अनुसार सॉर्ट करें",
+        "sort_by_category": "श्रेणी के अनुसार सॉर्ट करें",
+        "visit_website": "प्रोटोकॉल वेबसाइट पर जाएं",
+        "view_github": "GitHub रिपॉजिटरी देखें",
+        "follow_twitter": "Twitter पर फॉलो करें"
+      },
+      "no_data": "कोई प्रोटोकॉल नहीं मिला",
+      "loading": "प्रोटोकॉल लोड हो रहे हैं..."
+    },
+    "grid": {
+      "tooltips": {
+        "protocol_card": "{{protocol}} विवरण देखने के लिए क्लिक करें",
+        "visit_website": "{{protocol}} वेबसाइट पर जाएं",
+        "view_github": "{{protocol}} को GitHub पर देखें",
+        "follow_twitter": "{{protocol}} को Twitter पर फॉलो करें"
+      }
+    },
+    "messages": {
+      "no_protocols": "आपके मापदंडों से मेल खाने वाले कोई प्रोटोकॉल नहीं मिले।",
+      "loading": "लोड हो रहा है...",
+      "error": "प्रोटोकॉल लोड करने में त्रुटि",
+      "empty_state": "कोई DeFi प्रोटोकॉल उपलब्ध नहीं",
+      "try_clearing_filters": "अपने फिल्टर या खोज शब्दों को साफ़ करने का प्रयास करें।"
+    }
+  },
+  "common_values": {
+    "na": "उ/न",
+    "not_available": "उपलब्ध नहीं",
+    "real_time": "रीयल-टाइम",
+    "live": "लाइव",
+    "estimated": "अनुमानित",
+    "unknown": "अज्ञात",
+    "loading": "लोड हो रहा है...",
+    "error": "त्रुटि",
+    "coming_soon": "जल्द आ रहा है",
+    "tbd": "निर्धारित होना है",
+    "varies": "भिन्न होता है"
+  },
+  "units": {
+    "million": "M",
+    "billion": "B",
+    "trillion": "T",
+    "percent": "%",
+    "usd": "USD",
+    "apt": "APT",
+    "btc": "BTC"
+  }
+}

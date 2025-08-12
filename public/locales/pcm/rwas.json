@@ -1,0 +1,76 @@
+{
+  "page": {
+    "title": "Real World Assets for Aptos",
+    "description": "RWAs and tokenized real world assets for di Aptos blockchain"
+  },
+  "stats": {
+    "total_rwa_value": "Total RWA Value",
+    "real_world_assets": "Real World Assets",
+    "data_powered_by": "Data powered by RWA.xyz",
+    "data_powered_by_prefix": "Data powered by",
+    "rwa_assets": "RWA Assets",
+    "market_share": "Market Share",
+    "total_value": "Total Value",
+    "asset_count": "Asset Count",
+    "protocols": "Protocols"
+  },
+  "loading": {
+    "loading_rwa_data": "Dey load RWA data...",
+    "loading": "Dey Load...",
+    "rate_limit_message": "API rate limit don reach. Abeg wait before you try again.",
+    "try_again_in": "Try again for",
+    "try_again": "Try Again",
+    "request_failed": "Request no work. Abeg try again."
+  },
+  "error": {
+    "error_loading_rwa_data": "Error to load RWA data",
+    "failed_to_load_chart": "E no fit load chart",
+    "retry": "Retry",
+    "failed_to_load_data": "E no fit load data"
+  },
+  "protocols": {
+    "pact": "Pact",
+    "securitize": "Securitize",
+    "franklin_templeton": "Franklin Templeton",
+    "libre_capital": "Libre Capital",
+    "ondo": "Ondo",
+    "blackrock": "BlackRock"
+  },
+  "labels": {
+    "bridged": "bridged",
+    "value_not_available": "Value no dey available",
+    "token_id": "Token ID",
+    "current_value": "Current Value",
+    "asset_name": "Asset Name",
+    "asset_issuer": "Asset Issuer",
+    "standards": "Standards",
+    "not_specified": "Not Specified",
+    "regulatory_framework": "Regulatory Framework",
+    "governing_body": "Governing Body",
+    "issuer_legal_structure_country": "Issuer Legal Structure Country",
+    "contract_address": "Contract Address",
+    "network_id": "Network ID",
+    "asset_id": "Asset ID"
+  },
+  "sections": {
+    "value_information": "Value Information",
+    "asset_details": "Asset Details",
+    "regulatory_information": "Regulatory Information",
+    "legal_structure": "Legal Structure",
+    "technical_details": "Technical Details"
+  },
+  "actions": {
+    "view_details": "View Details",
+    "visit_website": "Visit Website"
+  },
+  "filters": {
+    "all": "All",
+    "by_protocol": "By Protocol",
+    "by_value": "By Value"
+  },
+  "fallbacks": {
+    "unknown_asset": "Unknown Asset",
+    "data_not_available": "Data no dey available",
+    "value_unavailable": "Value no dey available"
+  }
+}

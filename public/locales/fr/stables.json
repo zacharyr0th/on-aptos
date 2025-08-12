@@ -1,0 +1,77 @@
+{
+  "page": {
+    "title": "Stablecoins sur Aptos",
+    "description": "Stablecoins et monnaies stables sur la blockchain Aptos"
+  },
+  "stats": {
+    "total_stablecoin_value": "Valeur Totale des Stablecoins",
+    "stablecoins": "Stablecoins",
+    "market_share": "Part de Marché",
+    "market_cap": "Capitalisation Boursière",
+    "price": "Prix",
+    "supply": "Offre",
+    "volume_24h": "Volume 24h",
+    "price_change_24h": "Variation du Prix sur 24h",
+    "asset_details": "Détails de l'actif"
+  },
+  "table": {
+    "token": "Jeton",
+    "supply": "Offre",
+    "market_share": "%",
+    "type": "Type",
+    "issuer": "Émetteur"
+  },
+  "loading": {
+    "loading_stablecoin_data": "Chargement des données des stablecoins...",
+    "loading": "Chargement...",
+    "rate_limit_message": "Oups ! Veuillez ralentir un peu.",
+    "try_again_in": "Réessayez dans",
+    "try_again": "Réessayer",
+    "request_failed": "La requête n’a pas pu être complétée."
+  },
+  "error": {
+    "error_loading_stablecoin_data": "Erreur lors du chargement des données des stablecoins",
+    "retry": "Réessayer",
+    "failed_to_load_chart": "Échec du chargement du graphique"
+  },
+  "stablecoins": {
+    "usdt": "Tether USD",
+    "usdc": "USD Coin",
+    "dai": "Dai Stablecoin",
+    "busd": "Binance USD",
+    "frax": "Frax",
+    "tusd": "TrueUSD",
+    "usdp": "Pax Dollar",
+    "gusd": "Gemini Dollar"
+  },
+  "types": {
+    "fiat_collateralized": "Adossé à une monnaie fiduciaire",
+    "crypto_collateralized": "Adossé à des cryptos",
+    "algorithmic": "Algorithmique",
+    "commodity_backed": "Adossé à des matières premières"
+  },
+  "actions": {
+    "view_details": "Voir les détails",
+    "trade": "Échanger",
+    "add_to_wallet": "Ajouter au portefeuille",
+    "visit_website": "Visiter le site"
+  },
+  "filters": {
+    "all": "Tous",
+    "by_type": "Par Type",
+    "by_market_cap": "Par Capitalisation",
+    "stable": "Stable",
+    "depegged": "Décorrélé"
+  },
+  "labels": {
+    "tether_reserve_address": "Adresse de Réserve de Tether",
+    "subtracted_from_supply": "(Soustrait de l’offre en circulation)",
+    "view_on_explorer": "Voir sur l’explorateur Aptos",
+    "reserve_address": "adresse de réserve"
+  },
+  "fallbacks": {
+    "unknown_stablecoin": "Stablecoin Inconnu",
+    "data_not_available": "Données non disponibles",
+    "price_unavailable": "Prix non disponible"
+  }
+}

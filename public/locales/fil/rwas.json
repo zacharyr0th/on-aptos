@@ -1,0 +1,76 @@
+{
+  "page": {
+    "title": "Real World Assets sa Aptos",
+    "description": "RWAs at tokenized real world assets sa Aptos blockchain"
+  },
+  "stats": {
+    "total_rwa_value": "Kabuuang Halaga ng RWA",
+    "real_world_assets": "Real World Assets",
+    "data_powered_by": "Data powered by RWA.xyz",
+    "data_powered_by_prefix": "Data powered by",
+    "rwa_assets": "RWA Assets",
+    "market_share": "Market Share",
+    "total_value": "Kabuuang Halaga",
+    "asset_count": "Bilang ng Asset",
+    "protocols": "Mga Protocol"
+  },
+  "loading": {
+    "loading_rwa_data": "Nilo-load ang RWA data...",
+    "loading": "Nag-lo-load...",
+    "rate_limit_message": "Naabot na ang API rate limit. Mangyaring maghintay bago subukan muli.",
+    "try_again_in": "Subukan muli sa",
+    "try_again": "Subukan Muli",
+    "request_failed": "Nabigo ang request. Pakisubukan muli."
+  },
+  "error": {
+    "error_loading_rwa_data": "Error sa pag-load ng RWA data",
+    "failed_to_load_chart": "Nabigo ang pag-load ng chart",
+    "retry": "Subukan Muli",
+    "failed_to_load_data": "Nabigo ang pag-load ng data"
+  },
+  "protocols": {
+    "pact": "Pact",
+    "securitize": "Securitize",
+    "franklin_templeton": "Franklin Templeton",
+    "libre_capital": "Libre Capital",
+    "ondo": "Ondo",
+    "blackrock": "BlackRock"
+  },
+  "labels": {
+    "bridged": "na-bridge",
+    "value_not_available": "Hindi available ang halaga",
+    "token_id": "Token ID",
+    "current_value": "Kasalukuyang Halaga",
+    "asset_name": "Pangalan ng Asset",
+    "asset_issuer": "Nag-isyu ng Asset",
+    "standards": "Mga Pamantayan",
+    "not_specified": "Hindi Tinukoy",
+    "regulatory_framework": "Regulatory Framework",
+    "governing_body": "Governing Body",
+    "issuer_legal_structure_country": "Bansa ng Legal Structure ng Nag-isyu",
+    "contract_address": "Contract Address",
+    "network_id": "Network ID",
+    "asset_id": "Asset ID"
+  },
+  "sections": {
+    "value_information": "Impormasyon ng Halaga",
+    "asset_details": "Mga Detalye ng Asset",
+    "regulatory_information": "Regulatory Information",
+    "legal_structure": "Legal Structure",
+    "technical_details": "Mga Teknikal na Detalye"
+  },
+  "actions": {
+    "view_details": "Tingnan ang mga Detalye",
+    "visit_website": "Bisitahin ang Website"
+  },
+  "filters": {
+    "all": "Lahat",
+    "by_protocol": "Ayon sa Protocol",
+    "by_value": "Ayon sa Halaga"
+  },
+  "fallbacks": {
+    "unknown_asset": "Hindi Kilalang Asset",
+    "data_not_available": "Hindi available ang data",
+    "value_unavailable": "Hindi available ang halaga"
+  }
+}

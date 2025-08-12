@@ -1,0 +1,121 @@
+{
+  "page": {
+    "title": "Bitcoin trên Aptos",
+    "description": "Tài sản Bitcoin và thị trường tiền tệ trên blockchain Aptos"
+  },
+  "stats": {
+    "total_supply": "Tổng cung",
+    "total_btc_value": "Tổng giá trị Bitcoin",
+    "bitcoin_assets": "Tài sản Bitcoin",
+    "market_share": "Thị phần",
+    "price": "Giá",
+    "market_cap": "Vốn hóa thị trường",
+    "volume_24h": "Khối lượng 24h",
+    "tvl": "TVL",
+    "apy": "APY",
+    "utilization": "Sử dụng",
+    "decimals": "Số thập phân",
+    "network": "Mạng",
+    "aptos_mainnet": "Aptos Mainnet"
+  },
+  "loading": {
+    "loading_btc_data": "Đang tải dữ liệu Bitcoin...",
+    "loading": "Đang tải...",
+    "loading_market_data": "Đang tải dữ liệu thị trường...",
+    "error_title": "Lỗi tải dữ liệu",
+    "rate_limit_message": "Đã đạt giới hạn tốc độ API. Vui lòng đợi trước khi thử lại.",
+    "try_again_in": "Thử lại sau",
+    "try_again": "Thử lại",
+    "request_failed": "Yêu cầu thất bại. Vui lòng thử lại.",
+    "chart_error": "Không thể tải biểu đồ"
+  },
+  "error": {
+    "error_loading_btc_data": "Lỗi tải dữ liệu Bitcoin",
+    "retry": "Thử lại",
+    "failed_to_load_chart": "Không thể tải biểu đồ",
+    "error_calculating_supply": "Lỗi khi tính toán nguồn cung",
+    "unknown_error": "Lỗi không xác định",
+    "invalid_data": "Dữ liệu không hợp lệ",
+    "invalid_metadata": "Metadata không hợp lệ"
+  },
+  "assets": {
+    "bitcoin": "Bitcoin",
+    "wbtc": "Wrapped Bitcoin",
+    "btc": "Bitcoin",
+    "sbtc": "Staked Bitcoin",
+    "tbtc": "Threshold Bitcoin"
+  },
+  "money_markets": {
+    "title": "Thị trường tiền tệ",
+    "supply": "Cung cấp",
+    "borrow": "Vay",
+    "supply_apy": "APY cung cấp",
+    "borrow_apy": "APY vay",
+    "total_supplied": "Tổng đã cung cấp",
+    "total_borrowed": "Tổng đã vay",
+    "available_to_borrow": "Có sẵn để vay",
+    "utilization_rate": "Tỷ lệ sử dụng"
+  },
+  "actions": {
+    "supply": "Cung cấp",
+    "borrow": "Vay",
+    "withdraw": "Rút",
+    "repay": "Trả nợ",
+    "view_details": "Xem chi tiết",
+    "trade": "Giao dịch",
+    "bridge": "Cầu nối",
+    "wrap": "Bọc",
+    "unwrap": "Mở bọc"
+  },
+  "yield": {
+    "lending": "Cho vay",
+    "borrowing": "Vay",
+    "farming": "Farming",
+    "staking": "Staking",
+    "rewards": "Phần thưởng",
+    "incentives": "Khuyến khích"
+  },
+  "protocols": {
+    "aries": "Aries",
+    "echelon": "Echelon",
+    "aptin": "Aptin",
+    "thala": "Thala",
+    "echo": "Echo",
+    "protocol": "Giao thức",
+    "echo_data_soon": "Dữ liệu giao thức Echo sắp có"
+  },
+  "filters": {
+    "all": "Tất cả",
+    "by_protocol": "Theo giao thức",
+    "by_apy": "Theo APY",
+    "lending": "Cho vay",
+    "trading": "Giao dịch",
+    "bridging": "Cầu nối"
+  },
+  "bridge": {
+    "bridge_bitcoin": "Cầu nối Bitcoin",
+    "from": "Từ",
+    "to": "Đến",
+    "amount": "Số lượng",
+    "fee": "Phí",
+    "estimated_time": "Thời gian ước tính",
+    "supported_networks": "Mạng được hỗ trợ"
+  },
+  "fallbacks": {
+    "unknown_asset": "Tài sản không xác định",
+    "data_not_available": "Dữ liệu không khả dụng",
+    "price_unavailable": "Giá không khả dụng"
+  },
+  "info": {
+    "what_is_wrapped_btc": "Wrapped Bitcoin là gì?",
+    "wrapped_btc_description": "Wrapped Bitcoin (wBTC) là một phiên bản token hóa của Bitcoin trên các blockchain khác, cho phép sử dụng Bitcoin trong các ứng dụng DeFi.",
+    "benefits": "Lợi ích",
+    "defi_access": "Truy cập DeFi",
+    "earn_yield": "Kiếm lợi suất",
+    "maintain_btc_exposure": "Duy trì tiếp xúc với BTC",
+    "bitcoin_backed_asset": "Tài sản được hỗ trợ bởi Bitcoin"
+  },
+  "status": {
+    "coming_soon": "Sắp ra mắt"
+  }
+}

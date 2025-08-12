@@ -1,0 +1,77 @@
+{
+  "page": {
+    "title": "Owó Ìdúró lórí Aptos",
+    "description": "Àwọn owó ìdúró àti owó tó dúró lórí blockchain Aptos"
+  },
+  "stats": {
+    "total_stablecoin_value": "Iye Owó Ìdúró Gbogbo",
+    "stablecoins": "Owó Ìdúró",
+    "market_share": "Ìpín Ọjà",
+    "market_cap": "Agbára Ọjà",
+    "price": "Owó",
+    "supply": "Ìpèsè",
+    "volume_24h": "Ìwọ̀n 24h",
+    "price_change_24h": "Ìyípadà Owó 24h",
+    "asset_details": "Àlàyé Ohun-ìní"
+  },
+  "table": {
+    "token": "Tókìn",
+    "supply": "Ìpèsè",
+    "market_share": "%",
+    "type": "Irú",
+    "issuer": "Olùgbéjáde"
+  },
+  "loading": {
+    "loading_stablecoin_data": "Ń gbé dátà owó ìdúró...",
+    "loading": "Ń gbé...",
+    "rate_limit_message": "Àh! Jọ̀wọ́ fà sẹ́yìn díẹ̀.",
+    "try_again_in": "Gbìyànjú lẹ́ẹ̀kan síi ní",
+    "try_again": "Gbìyànjú Lẹ́ẹ̀kan Síi",
+    "request_failed": "A kò lè parí ìbéèrè náà."
+  },
+  "error": {
+    "error_loading_stablecoin_data": "Àṣìṣe Ní Gbígbé Dátà Owó Ìdúró",
+    "retry": "Tún gbìyànjú",
+    "failed_to_load_chart": "Kò lè gbé àwòrán"
+  },
+  "stablecoins": {
+    "usdt": "Tether USD",
+    "usdc": "USD Coin",
+    "dai": "Dai Stablecoin",
+    "busd": "Binance USD",
+    "frax": "Frax",
+    "tusd": "TrueUSD",
+    "usdp": "Pax Dollar",
+    "gusd": "Gemini Dollar"
+  },
+  "types": {
+    "fiat_collateralized": "Tí Owó Fiat Ṣàtìlẹ́yìn",
+    "crypto_collateralized": "Tí Crypto Ṣàtìlẹ́yìn",
+    "algorithmic": "Àlgórítímù",
+    "commodity_backed": "Tí Ohun-èlò Ṣàtìlẹ́yìn"
+  },
+  "actions": {
+    "view_details": "Wo Àlàyé",
+    "trade": "Ṣòwò",
+    "add_to_wallet": "Fi sí Àpò-owó",
+    "visit_website": "Bẹ Ojú-òpó Ayélujára Wò"
+  },
+  "filters": {
+    "all": "Gbogbo",
+    "by_type": "Nípa Irú",
+    "by_market_cap": "Nípa Agbára Ọjà",
+    "stable": "Ìdúró",
+    "depegged": "Tí kò dúró"
+  },
+  "labels": {
+    "tether_reserve_address": "Àdírẹ́sì Ìpamọ́ Tether",
+    "subtracted_from_supply": "(Tí a yọ kúrò nínú ìpèsè tó ń káàkiri)",
+    "view_on_explorer": "Wo lórí Aptos Explorer",
+    "reserve_address": "àdírẹ́sì ìpamọ́"
+  },
+  "fallbacks": {
+    "unknown_stablecoin": "Owó Ìdúró Àìmọ̀",
+    "data_not_available": "Dátà kò sí",
+    "price_unavailable": "Owó kò sí"
+  }
+}
