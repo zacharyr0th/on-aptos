@@ -2,7 +2,6 @@
  * Enterprise-grade error handling utilities
  */
 
-import { errorLogger } from "@/lib/utils/core/logger";
 
 const isProduction = process.env.NODE_ENV === "production";
 

@@ -23,7 +23,7 @@ const BREAKPOINTS = {
  * Replaces both useWindowSize and use-mobile hooks
  */
 export function useResponsive(): ResponsiveState {
-  const [state, setState] = useState<ResponsiveState>(() => {
+  const [state, setState] = useState<ResponsiveState>( => {
     // Server-side rendering safe defaults
     if (typeof window === "undefined") {
       return {
@@ -52,7 +52,7 @@ export function useResponsive(): ResponsiveState {
 
   // Debounced resize handler for better performance
   const handleResize = useCallback(
-    debounce(() => {
+    debounce( => {
       const width = window.innerWidth;
       const height = window.innerHeight;
 

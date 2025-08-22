@@ -9,7 +9,6 @@ import type {
   TranslatableString,
   TranslatableStringArray,
 } from "@/components/pages/defi/data/types";
-import { logger, errorLogger } from "@/lib/utils/core/logger";
 import { i18nEventManager } from "@/lib/i18n/events";
 
 /**
@@ -102,7 +101,7 @@ export function useTranslation(namespace: Namespace | Namespace[] = "common") {
 
   // Safe translation with fallback - SSR compatible
   const t = useCallback(
-    (key: string, fallback?: string, options?: any): string => {
+    (key: string, fallback?: string, options?: Record<string, unknown>): string => {
       try {
         // For SSR compatibility, always return fallback or key during server render
         if (typeof window === "undefined") {
@@ -184,7 +183,7 @@ export function useTranslation(namespace: Namespace | Namespace[] = "common") {
 
   // Helper function to get text from i18n objects
   const getText = useCallback(
-    (i18nObj: any, defaultText?: string): string => {
+    (i18nObj: Record<string, unknown>, defaultText?: string): string => {
       if (!i18nObj) return defaultText || "";
       if (typeof i18nObj === "string") return i18nObj;
       if (typeof i18nObj === "object" && i18nObj[i18n.language]) {

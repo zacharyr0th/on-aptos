@@ -276,7 +276,7 @@ interface BaseDefiProtocol {
 
   // === Pools & Staking ===
   pools?: PoolData[];
-  
+
   // === Lending/Borrowing Metrics ===
   lending?: {
     borrowRates?: Array<{
@@ -296,7 +296,7 @@ interface BaseDefiProtocol {
     totalSupplied?: string;
     totalBorrowed?: string;
   };
-  
+
   // === Stablecoin Metrics ===
   stablecoins?: {
     exposure?: string; // Total stablecoin exposure

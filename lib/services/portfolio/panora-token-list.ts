@@ -1,5 +1,4 @@
 import { cacheFirst } from "@/lib/utils";
-import { logger } from "@/lib/utils/core/logger";
 
 const PANORA_TOKEN_LIST_ENDPOINT = "https://api.panora.exchange/tokenlist";
 const PANORA_API_KEY = process.env.PANORA_API_KEY!;

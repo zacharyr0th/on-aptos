@@ -49,12 +49,12 @@ export default function DefiPage(): React.ReactElement {
     const matchesSearch =
       searchQuery === "" ||
       protocol.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (() => {
+      ( => {
         const desc = t(protocol.description, "");
         return desc
           ? desc.toLowerCase().includes(searchQuery.toLowerCase())
           : false;
-      })() ||
+      })) ||
       protocol.subcategory.toLowerCase().includes(searchQuery.toLowerCase()) ||
       protocol.category.toLowerCase().includes(searchQuery.toLowerCase());
 

@@ -81,7 +81,7 @@ export const IconSections = () => {
 
   // Randomly select 3 tokens
   const getRandomTokens = () => {
-    const shuffled = [...availableTokenIcons].sort(() => Math.random() - 0.5);
+    const shuffled = [...availableTokenIcons].sort( => Math.random() - 0.5);
     return shuffled.slice(0, 3);
   };
 
@@ -184,7 +184,7 @@ export const IconSections = () => {
   return (
     <div id="dashboards" className="w-full overflow-hidden">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-3 lg:gap-4">
-        {iconSections.map((section, index) => (
+        {iconSections.map((item, _index) => (
           <div
             key={index}
             className="opacity-0 animate-fade-in-up w-full"

@@ -1,4 +1,3 @@
-import { logger } from "@/lib/utils/core/logger";
 
 /**
  * Sanitizes text content to prevent XSS attacks
@@ -34,7 +33,7 @@ export interface NFTMetadata {
   token_name?: string | null;
   collection_name?: string | null;
   description?: string | null;
-  [key: string]: any;
+  [key: string]: Record<string, unknown>;
 }
 
 export function sanitizeNFTMetadata<T extends NFTMetadata>(metadata: T): T {

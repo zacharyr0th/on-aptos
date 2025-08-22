@@ -1,4 +1,3 @@
-import { logger } from "@/lib/utils/core/logger";
 
 export interface YieldOpportunity {
   id: string;
@@ -40,7 +39,7 @@ export interface YieldOpportunity {
 export class DefiLlamaIntegration {
   private static instance: DefiLlamaIntegration;
   private readonly apiUrl = "https://yields.llama.fi";
-  private cache = new Map<string, { data: any; timestamp: number }>();
+  private cache = new Map<string, { data: Record<string, unknown>; timestamp: number }>();
   private cacheTimeout = 5 * 60 * 1000; // 5 minutes
 
   private constructor() {}
@@ -100,7 +99,7 @@ export class DefiLlamaIntegration {
   /**
    * Transform DefiLlama pool to our YieldOpportunity format
    */
-  transformPool(pool: any): YieldOpportunity {
+  transformPool(pool: Record<string, unknown>): YieldOpportunity {
     // Determine opportunity type
     let opportunityType:
       | "lending"
@@ -186,7 +185,7 @@ export class DefiLlamaIntegration {
     };
   }
 
-  private extractFeatures(pool: any): string[] {
+  private extractFeatures(pool: Record<string, unknown>): string[] {
     const features = [];
 
     if (pool.stablecoin) features.push("Stablecoin");
@@ -204,7 +203,7 @@ export class DefiLlamaIntegration {
   /**
    * Get protocol statistics
    */
-  async getProtocolStats(protocol: string): Promise<any> {
+  async getProtocolStats(protocol: string): Promise<Record<string, unknown>> {
     try {
       const response = await fetch(`${this.apiUrl}/protocol/${protocol}`);
       if (!response.ok) {

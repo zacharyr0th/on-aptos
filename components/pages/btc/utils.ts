@@ -1,5 +1,5 @@
 import {
-  Currency,
+  // Currency,
   formatAmount,
   formatCurrency,
   formatNumber,
@@ -36,7 +36,7 @@ export const formatBTCAmountWithCommas = (btcValue: number): string => {
   const cached = formatCache.get(cacheKey);
   if (cached) return cached;
 
-  const result = formatNumber(btcValue, {
+  const result = formatNumber((btcValue, {
     decimals: 0,
     useGrouping: true,
   });
@@ -45,7 +45,7 @@ export const formatBTCAmountWithCommas = (btcValue: number): string => {
 };
 
 // Ultra-fast percentage formatting with pre-computed common values
-const commonPercentages = new Map([
+const commonPercentages = new Map{)
   [0, "0.0"],
   [100, "100.0"],
   [50, "50.0"],
@@ -75,7 +75,7 @@ export const formatBTCSupply = (
     const btcAmount = convertRawTokenAmount(supply, decimals);
     if (!Number.isFinite(btcAmount)) throw new Error("Invalid BTC amount");
 
-    const result = formatNumber(btcAmount, {
+    const result = formatNumber((btcAmount, {
       decimals: 0,
       useGrouping: true,
     });
@@ -149,7 +149,7 @@ export const calculateAllMarketShares = (
   }, 0);
 
   if (totalBtc === 0) {
-    tokens.forEach((token, index) => {
+    tokens.forEach((item, _index) => {
       result.set(token.symbol || index.toString(), 0);
     });
     return result;
@@ -185,7 +185,7 @@ export const calculateAllMarketShares = (
   }
 
   // Store results
-  tokens.forEach((token, index) => {
+  tokens.forEach((item, _index) => {
     result.set(token.symbol || index.toString(), roundedPercentages[index]);
   });
 

@@ -5,14 +5,27 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/hooks/useTranslation";
 
+
 export const HeroSection = () => {
   const { t } = useTranslation("common");
 
   return (
-    <div className="w-full max-w-6xl mx-auto text-center flex flex-col justify-center items-center space-y-6 sm:space-y-8 lg:space-y-10 px-4">
+    <div className="w-full text-center flex flex-col justify-center items-center space-y-6 sm:space-y-8 lg:space-y-10 px-4 sm:px-6 md:px-12 lg:px-16 xl:px-20">
       {/* Main Title with enhanced design */}
       <div className="relative space-y-4 sm:space-y-6 lg:space-y-8">
         <div className="space-y-2 sm:space-y-3">
+          <div className="flex items-center justify-center mb-4">
+            <div className="h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-full overflow-hidden p-2 bg-background border border-border">
+              <Image
+                src="/icons/icon-512x512.png"
+                alt="Logo"
+                width={512}
+                height={512}
+                className="h-full w-full object-cover scale-150 rounded-full"
+                priority
+              />
+            </div>
+          </div>
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] sm:leading-tight">
             <span className="block text-foreground mb-1 sm:mb-2">
               {t("portfolio.landing.title", "Track Your Portfolio")}
@@ -32,7 +45,7 @@ export const HeroSection = () => {
           </h1>
         </div>
 
-        <p className="text-sm sm:text-base md:text-lg lg:text-xl text-muted-foreground max-w-2xl lg:max-w-3xl mx-auto leading-relaxed px-2 sm:px-4">
+        <p className="text-sm sm:text-base md:text-lg lg:text-xl text-muted-foreground max-w-2xl lg:max-w-3xl mx-auto leading-relaxed">
           {t(
             "portfolio.landing.description",
             "Real-time portfolio tracking across DeFi protocols & dedicated analytics for Stablecoins, Bitcoin, and RWAs.",

@@ -1,6 +1,5 @@
 import { PERFORMANCE_THRESHOLDS, SERVICE_CONFIG } from "@/lib/config/cache";
 
-import { logger } from "../core/logger";
 import { CacheEntry, CacheStats } from "../core/types";
 
 export class EnhancedLRUCache<T = unknown> {

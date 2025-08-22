@@ -1,9 +1,8 @@
 import type { DeFiPosition as NewDeFiPosition } from "@/lib/services/defi";
 import { scanDeFiPositions } from "@/lib/services/defi";
-import { logger } from "@/lib/utils/core/logger";
 
-import { DeFiPositionConverter } from "../shared/defi-position-converter";
 import type { DeFiPosition } from "../../portfolio/types";
+import { DeFiPositionConverter } from "../shared/defi-position-converter";
 
 export class DeFiService {
   static async getWalletDeFiPositions(
@@ -11,16 +10,13 @@ export class DeFiService {
   ): Promise<DeFiPosition[]> {
     try {
       // Use the new simplified scanner directly
-      const result = await scanDeFiPositions(address, {
-        minValueUSD: 0, // Show ALL positions regardless of value
-      });
+      const result = await scanDeFiPositions(address);
 
       // Convert from new format to existing portfolio format
       return result.positions.map((pos: NewDeFiPosition) =>
         this.convertNewPosition(pos),
       );
     } catch (error) {
-      logger.error("Failed to fetch DeFi positions:", error);
       throw error;
     }
   }
@@ -49,26 +45,26 @@ export class DeFiService {
     const protocols = new Set<string>();
 
     for (const position of positions) {
-      totalValueLocked += position.totalValueUSD;
+      totalValueLocked += position.totalValue;
       protocols.add(position.protocol);
 
       // Calculate supplied value
-      const suppliedValue = position.suppliedAssets.reduce(
+      const suppliedValue = (position.position.supplied || []).reduce(
         (sum, asset) => sum + asset.value,
         0,
       );
       totalSupplied += suppliedValue;
 
       // Calculate borrowed value
-      const borrowedValue = position.borrowedAssets.reduce(
+      const borrowedValue = (position.position.borrowed || []).reduce(
         (sum, asset) => sum + asset.value,
         0,
       );
       totalBorrowed += borrowedValue;
 
       // Calculate weighted APY
-      for (const asset of position.suppliedAssets) {
-        if (asset.apy) {
+      for (const asset of position.position.supplied || []) {
+        if (asset.apy && totalValueLocked > 0) {
           weightedAPY += (asset.value / totalValueLocked) * asset.apy;
         }
       }
@@ -95,22 +91,23 @@ export class DeFiService {
     }>;
   }> {
     try {
-      const result = await scanDeFiPositions(address, {
-        minValueUSD: 0, // Show ALL positions regardless of value
-      });
+      const result = await scanDeFiPositions(address);
 
       // Convert to expected format
       const protocolBreakdown: Record<string, number> = {};
       for (const position of result.positions) {
-        protocolBreakdown[position.protocol] = 
-          (protocolBreakdown[position.protocol] || 0) + position.totalValueUSD;
+        protocolBreakdown[position.protocol] =
+          (protocolBreakdown[position.protocol] || 0) + position.totalValue;
       }
 
       const topProtocols = Object.entries(protocolBreakdown)
         .map(([protocol, valueUSD]) => ({
           protocol,
           valueUSD,
-          percentage: result.totalValueUSD > 0 ? (valueUSD / result.totalValueUSD) * 100 : 0,
+          percentage:
+            result.totalValueUSD > 0
+              ? (valueUSD / result.totalValueUSD) * 100
+              : 0,
         }))
         .sort((a, b) => b.valueUSD - a.valueUSD)
         .slice(0, 5);
@@ -122,7 +119,6 @@ export class DeFiService {
         topProtocols,
       };
     } catch (error) {
-      logger.error("Failed to fetch DeFi summary:", error);
       return {
         totalPositions: 0,
         totalValueUSD: 0,

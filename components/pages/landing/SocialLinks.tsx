@@ -7,7 +7,7 @@ export const SocialLinks = () => {
   const { t } = useTranslation("common");
 
   const socialLinks = [
-    ...(DEVELOPER_CONFIG.website
+    ...((DEVELOPER_CONFIG.website)
       ? [
           {
             href: DEVELOPER_CONFIG.website,
@@ -17,7 +17,7 @@ export const SocialLinks = () => {
           },
         ]
       : []),
-    ...(DEVELOPER_CONFIG.twitter
+    ...((DEVELOPER_CONFIG.twitter)
       ? [
           {
             href: `https://x.com/${DEVELOPER_CONFIG.twitter.replace("@", "")}`,
@@ -27,7 +27,7 @@ export const SocialLinks = () => {
           },
         ]
       : []),
-    ...(DEVELOPER_CONFIG.github
+    ...((DEVELOPER_CONFIG.github)
       ? [
           {
             href: DEVELOPER_CONFIG.github,
@@ -44,7 +44,7 @@ export const SocialLinks = () => {
       <div className="flex items-center justify-center gap-4 sm:gap-6 lg:gap-8 py-6 sm:py-8 md:py-12">
         {/* Social links */}
         <div className="flex items-center gap-4 sm:gap-6 lg:gap-8">
-          {socialLinks.map((link, index) => (
+          {socialLinks.map((item, _index) => (
             <a
               key={index}
               href={link.href}

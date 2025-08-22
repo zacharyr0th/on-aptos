@@ -2,6 +2,7 @@
 
 import React from "react";
 
+
 interface Props {
   children: React.ReactNode;
   fallback?: React.ReactNode;
@@ -22,9 +23,9 @@ export class ErrorBoundary extends React.Component<Props, State> {
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+  componentDidCatch(error: Error, _errorInfo: React.ErrorInfo) {
     // Log to error reporting service here
-    console.error("Component Error:", { error: error.message, errorInfo });
+    errorLogger.error(`Component Error: ${error.message}`);
   }
 
   render() {

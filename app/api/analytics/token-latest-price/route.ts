@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { aptosAnalytics } from "@/lib/services/blockchain/aptos-analytics";
 import { PanoraService } from "@/lib/services/portfolio/panora-service";
-import { apiLogger } from "@/lib/utils/core/logger";
 
 // Cache price data for 5 minutes
 export const revalidate = 300;

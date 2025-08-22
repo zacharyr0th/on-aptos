@@ -2,17 +2,14 @@
 
 import { GeistMono } from "geist/font/mono";
 import { AlertTriangle, Copy } from "lucide-react";
-import Image from "next/image";
 import React, { useState, useEffect, useMemo, useCallback, memo } from "react";
-import { toast } from "sonner";
+// import { toast } from "sonner";
 
 import { ErrorBoundary } from "@/components/errors/ErrorBoundary";
 import { Footer } from "@/components/layout/Footer";
+import { MarketShareChart } from "@/components/shared/MarketShareChart";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { MarketShareChart } from "@/components/shared/MarketShareChart";
-import { ChartDataItem, formatAssetValue, calculateMarketShare } from "@/lib/utils/format/chart-utils";
-import { formatAmount } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -31,27 +28,34 @@ import {
   SupplyData,
 } from "@/lib/config";
 import { STABLECOIN_COLORS } from "@/lib/constants/ui/colors";
-import { logger } from "@/lib/utils/core/logger";
-import { copyToClipboard, truncateAddress } from "@/lib/utils/token/token-utils";
+import { formatAmount } from "@/lib/utils";
+import {
+  ChartDataItem,
+  // formatAssetValue,
+  // calculateMarketShare,
+} from "@/lib/utils/format/chart-utils";
+import {
+  copyToClipboard,
+  truncateAddress,
+} from "@/lib/utils/token/token-utils";
 
 const TOKEN_METADATA = STABLECOIN_METADATA;
 
-const TokenCard = memo(function TokenCard({
+const TokenCard = memo((function TokenCard({
   token,
   totalSupply,
   susdePrice,
-  suppliesData = {},
-  usdtReserve,
+  _suppliesData = {},
+  _usdtReserve,
   t,
 }: {
   token: DisplayToken;
   totalSupply: string;
   susdePrice?: number;
   suppliesData?: Record<string, string>;
-  usdtReserve?: any;
+  usdtReserve?: Record<string, unknown>;
   t: (key: string) => string;
 }): React.ReactElement {
-
   const { marketSharePercent, formattedDisplaySupply } = useMemo(() => {
     const calcMarketShare = () => {
       if (BigInt(totalSupply) === 0n) return "0";
@@ -136,7 +140,6 @@ const TokenCard = memo(function TokenCard({
   const symbol = token.symbol;
   const metadata = TOKEN_METADATA[symbol];
 
-
   return (
     <>
       <div className="group">
@@ -145,13 +148,13 @@ const TokenCard = memo(function TokenCard({
             <div className="flex items-center">
               {[...token.components]
                 .sort((a, b) => (BigInt(b.supply) > BigInt(a.supply) ? 1 : -1))
-                .map((component, index) => (
+                .map((item, _index) => (
                   <React.Fragment key={component.symbol}>
                     <div className="flex items-center">
                       <div className="w-5 h-5 relative flex-shrink-0 mr-1">
                         <Image
                           src={
-                            (TOKEN_METADATA[component.symbol]
+                            ((TOKEN_METADATA[component.symbol])
                               ?.thumbnail as string) || "/placeholder.jpg"
                           }
                           alt={`${component.symbol} icon`}
@@ -203,7 +206,6 @@ const TokenCard = memo(function TokenCard({
         </div>
         <Progress className="h-1" value={Number(marketSharePercent)} />
       </div>
-
     </>
   );
 });
@@ -248,7 +250,7 @@ const LoadingState = memo(function LoadingState(): React.ReactElement {
   );
 });
 
-const ErrorState = memo(function ErrorState({
+const ErrorState = memo((function ErrorState({
   error,
   onRetry,
   t,
@@ -344,7 +346,7 @@ export default function StablesPage(): React.ReactElement {
   const { t } = usePageTranslation("stables");
 
   // Use direct API call for stables data
-  const [stablesData, setStablesData] = useState<any | null>(null);
+  const [ setStablesData] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [stablesError, setStablesError] = useState<Error | null>(null);
   const [isFetching, setIsFetching] = useState(false);
@@ -367,12 +369,10 @@ export default function StablesPage(): React.ReactElement {
       }
 
       const data = await response.json();
-      logger.info(
         `[Stables Page] Fetched data: ${JSON.stringify(data).substring(0, 200)}`,
       );
       setStablesData(data);
     } catch (error) {
-      logger.error(
         `[Stables Page] Error fetching data: ${error instanceof Error ? error.message : String(error)}`,
       );
       setStablesError(
@@ -402,7 +402,7 @@ export default function StablesPage(): React.ReactElement {
     }>;
     total?: string;
     total_raw?: string;
-    usdt_reserve?: any;
+    usdt_reserve?: Record<string, unknown>;
     [key: string]: unknown;
   } | null = stablesData || null;
   const loading = isLoading;
@@ -411,7 +411,6 @@ export default function StablesPage(): React.ReactElement {
 
   // Debug logging
   if (data) {
-    logger.info(
       `[Stables Page] Data structure: has supplies = ${!!data.supplies}, supplies length = ${data.supplies?.length}`,
     );
   }
@@ -467,7 +466,7 @@ export default function StablesPage(): React.ReactElement {
     // Create supplies data map
     const suppliesMap: Record<string, string> = {};
     if (Array.isArray(supplies)) {
-      supplies.forEach((supply: any) => {
+      supplies.forEach((supply: Record<string, unknown>) => {
         suppliesMap[supply.symbol] = supply.supply_raw ?? supply.supply ?? "0";
       });
     }
@@ -491,7 +490,7 @@ export default function StablesPage(): React.ReactElement {
     const formatTotal = () => {
       // adjustedTotalValue is already in dollars
       const dollars = Number(adjustedTotalValue);
-      return new Intl.NumberFormat("en-US", {
+      return new Intl.NumberFormat(("en-US", {
         style: "currency",
         currency: "USD",
         maximumFractionDigits: 2,
@@ -512,10 +511,10 @@ export default function StablesPage(): React.ReactElement {
     const processSuppliesForCards = () => {
       if (!Array.isArray(supplies)) return [];
 
-      const usdeToken = supplies.find((t: any) => t.symbol === "USDe");
-      const susdeToken = supplies.find((t: any) => t.symbol === "sUSDe");
+      const usdeToken = supplies.find((t: Record<string, unknown>) => t.symbol === "USDe");
+      const susdeToken = supplies.find((t: Record<string, unknown>) => t.symbol === "sUSDe");
       const otherTokens = supplies.filter(
-        (t: any) => !["USDe", "sUSDe"].includes(t.symbol),
+        (t: Record<string, unknown>) => !["USDe", "sUSDe"].includes(t.symbol),
       );
 
       const displayTokens: DisplayToken[] = [...otherTokens];
@@ -613,7 +612,7 @@ export default function StablesPage(): React.ReactElement {
                 <div className="grid grid-cols-2 gap-4 md:grid-cols-1 md:col-span-1 md:space-y-4">
                   {processedSupplies
                     ?.slice(0, 4)
-                    .map((token: any) => (
+                    .map((token: Record<string, unknown>) => (
                       <TokenCard
                         key={token.symbol}
                         token={token}
@@ -641,29 +640,43 @@ export default function StablesPage(): React.ReactElement {
                     }
                   >
                     <MarketShareChart
-                      data={processedSupplies?.map((token: any) => {
-                        const dollarSupply = parseFloat(token.supply || "0");
-                        const totalDollarSupply = processedSupplies.reduce(
-                          (sum: number, t: any) => sum + parseFloat(t.supply || "0"), 
-                          0
-                        );
-                        const percentage = totalDollarSupply > 0 ? (dollarSupply / totalDollarSupply) * 100 : 0;
-                        return {
-                          name: token.symbol,
-                          value: percentage, // Pie chart expects percentage in value field
-                          formattedSupply: formatAmount(dollarSupply),
-                          symbol: token.symbol,
-                          supply: token.supply,
-                          supply_raw: token.supply_raw,
-                          decimals: token.decimals || 6,
-                        };
-                      }) || []}
-                      totalValue={processedSupplies?.reduce((sum: number, t: any) => sum + parseFloat(t.supply || "0"), 0) || 0}
+                      data={
+                        processedSupplies?.map((token: Record<string, unknown>) => {
+                          const dollarSupply = parseFloat(token.supply || "0");
+                          const totalDollarSupply = processedSupplies.reduce(
+                            (sum: number, t: Record<string, unknown>) =>
+                              sum + parseFloat(t.supply || "0"),
+                            0,
+                          );
+                          const percentage =
+                            totalDollarSupply > 0
+                              ? (dollarSupply / totalDollarSupply) * 100
+                              : 0;
+                          return {
+                            name: token.symbol,
+                            value: percentage, // Pie chart expects percentage in value field
+                            formattedSupply: formatAmount(dollarSupply),
+                            symbol: token.symbol,
+                            supply: token.supply,
+                            supply_raw: token.supply_raw,
+                            decimals: token.decimals || 6,
+                          };
+                        }) || []
+                      }
+                      totalValue={
+                        processedSupplies?.reduce(
+                          (sum: number, t: Record<string, unknown>) =>
+                            sum + parseFloat(t.supply || "0"),
+                          0,
+                        ) || 0
+                      }
                       colors={STABLECOIN_COLORS}
                       topRightContent={
                         <div className="text-right">
                           <div className="flex items-center justify-end gap-3 mb-1">
-                            <h2 className="text-sm text-muted-foreground">Total Supply</h2>
+                            <h2 className="text-sm text-muted-foreground">
+                              Total Supply
+                            </h2>
                           </div>
                           <p className="text-lg font-bold font-mono">
                             {formattedTotalSupply}
@@ -679,7 +692,7 @@ export default function StablesPage(): React.ReactElement {
               {processedSupplies && processedSupplies.length > 4 && (
                 <div className="mb-6">
                   <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {processedSupplies.slice(4).map((token: any) => (
+                    {processedSupplies.slice(4).map((token: Record<string, unknown>) => (
                       <TokenCard
                         key={token.symbol}
                         token={token}
@@ -719,11 +732,11 @@ export default function StablesPage(): React.ReactElement {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {processedSuppliesForTable?.map((token: any) => {
+                      {processedSuppliesForTable?.map((token: Record<string, unknown>) => {
                         const metadata = TOKEN_METADATA[token.symbol];
                         const totalDollarSupply =
                           processedSuppliesForTable.reduce(
-                            (sum: number, t: any) => sum + Number(t.supply),
+                            (sum: number, t: Record<string, unknown>) => sum + Number(t.supply),
                             0,
                           );
                         const marketSharePercent = (
@@ -785,7 +798,7 @@ export default function StablesPage(): React.ReactElement {
                             <TableCell className="font-mono whitespace-nowrap">
                               <div className="flex flex-col">
                                 <span>
-                                  {(() => {
+                                  {( => {
                                     const value = Number(token.supply);
                                     if (value >= 1_000_000_000)
                                       return `$${(value / 1_000_000_000).toFixed(1)}b`;
@@ -794,7 +807,7 @@ export default function StablesPage(): React.ReactElement {
                                     if (value >= 1_000)
                                       return `$${(value / 1_000).toFixed(1)}k`;
                                     return `$${value.toFixed(0)}`;
-                                  })()}
+                                  }))}
                                 </span>
                               </div>
                             </TableCell>

@@ -49,6 +49,7 @@ export interface DeFiPosition {
   // Required fields
   positionId: string; // Was missing in some places
   protocol: string;
+  protocolLabel?: string; // For display purposes
   protocolType: string;
   totalValue: number;
   address: string;
@@ -220,7 +221,7 @@ export interface VaultInfo {
 }
 
 // Type guards
-export function isDeFiPosition(obj: any): obj is DeFiPosition {
+export function isDeFiPosition(obj: unknown): obj is DeFiPosition {
   return (
     obj &&
     typeof obj.protocol === "string" &&

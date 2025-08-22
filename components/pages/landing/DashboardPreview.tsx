@@ -1,12 +1,11 @@
-import { Activity, Twitter, Github, Globe } from "lucide-react";
 import Image from "next/image";
+import { Activity, Twitter, Github, Globe } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { DEVELOPER_CONFIG } from "@/lib/config/app";
 import { formatAmount } from "@/lib/utils/format/format";
-import { logger } from "@/lib/utils/core/logger";
 
 export const DashboardPreview = () => {
   const [loading, setLoading] = useState(true);

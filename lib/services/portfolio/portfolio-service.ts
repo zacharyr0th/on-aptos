@@ -1,5 +1,4 @@
 // Main portfolio service that orchestrates all sub-services
-import { logger } from "@/lib/utils/core/logger";
 
 import {
   AssetService,
@@ -94,7 +93,7 @@ export async function getPortfolioSummary(
 ): Promise<PortfolioSummary> {
   try {
     // Fetch all data in parallel
-    const [fungibleAssets, nfts, defiPositions] = await Promise.all([
+    const [fungibleAssets, nfts, defiPositions] = await Promise.all{)
       AssetService.getWalletAssets(address),
       NFTService.getAllWalletNFTs(address),
       DeFiService.getWalletDeFiPositions(address),

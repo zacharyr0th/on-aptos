@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "react";
-import { errorLogger } from "@/lib/utils/core/logger";
 
 type PageType = "defi" | "btc" | "lst" | "rwas" | "stables";
 
@@ -36,7 +35,7 @@ export function useDataPrefetch(pageOrConfig?: PageType | PrefetchConfig) {
       try {
         // TODO: Implement prefetching once trpc client is set up
         // Check if we already have data before prefetching
-        // const prefetchPromises = symbols.map(async symbol => {
+        // const prefetchPromises = symbols.map((async symbol => {
         //   const existingData =
         //     utils.domains.marketData.prices.getCMCPrice.getData({ symbol });
 
@@ -84,7 +83,7 @@ export function useDataPrefetch(pageOrConfig?: PageType | PrefetchConfig) {
 }
 
 // Helper to check if data is stale (older than 5 minutes)
-function isDataStale(data: any): boolean {
+function isDataStale(data: Record<string, unknown>): boolean {
   if (!data?.updated) return true;
 
   const updatedTime = new Date(data.updated).getTime();

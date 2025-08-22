@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { DeFiService } from "@/lib/services/defi/services/defi-service";
-import { apiLogger } from "@/lib/utils/core/logger";
 
 // Cache for 5 minutes
 export const revalidate = 300;

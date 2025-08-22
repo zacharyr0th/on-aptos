@@ -8,7 +8,6 @@ import {
   type ErrorContext,
 } from "@/lib/utils";
 import { enhancedFetch } from "@/lib/utils/api/fetch-utils";
-import { errorLogger } from "@/lib/utils/core/logger";
 
 // Revalidate this route every 5 minutes
 export const revalidate = 300;

@@ -1,4 +1,3 @@
-import { ImageResponse } from "next/og";
 
 export const alt = "DeFi on Aptos - Protocol Analytics";
 export const size = {

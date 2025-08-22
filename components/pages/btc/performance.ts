@@ -1,4 +1,4 @@
-import { logger } from "@/lib/utils/core/logger";
+
 import { PerformanceMetrics } from "./types";
 
 // Performance measurement utilities

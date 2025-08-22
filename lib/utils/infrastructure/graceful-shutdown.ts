@@ -1,4 +1,3 @@
-import { logger } from "../core/logger";
 
 // Check if we're in Node.js runtime
 const isNodeRuntime = typeof process !== "undefined" && process.versions?.node;
@@ -205,7 +204,7 @@ export function setupGracefulShutdown(): void {
             return;
           }
 
-          (global as any).server.close((error: any) => {
+          (global as any).server.close((error: Record<string, unknown>) => {
             if (error) {
               reject(error);
             } else {

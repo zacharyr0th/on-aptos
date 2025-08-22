@@ -13,6 +13,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { WalletProvider } from "@/components/wallet/WalletProvider";
 import { APP_CONFIG, DEVELOPER_CONFIG } from "@/lib/config/app";
+import { QueryProvider } from "@/lib/providers/QueryProvider";
 
 import "./globals.css";
 
@@ -235,24 +236,26 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}
       >
-        <I18nProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="dark"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <WalletProvider>
-              <TooltipProvider>
-                <ErrorBoundary>
-                  <LayoutContent>{children}</LayoutContent>
-                </ErrorBoundary>
-              </TooltipProvider>
-              <Toaster />
-              <Analytics />
-            </WalletProvider>
-          </ThemeProvider>
-        </I18nProvider>
+        <QueryProvider>
+          <I18nProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="dark"
+              enableSystem
+              disableTransitionOnChange
+            >
+              <WalletProvider>
+                <TooltipProvider>
+                  <ErrorBoundary>
+                    <LayoutContent>{children}</LayoutContent>
+                  </ErrorBoundary>
+                </TooltipProvider>
+                <Toaster />
+                <Analytics />
+              </WalletProvider>
+            </ThemeProvider>
+          </I18nProvider>
+        </QueryProvider>
       </body>
     </html>
   );

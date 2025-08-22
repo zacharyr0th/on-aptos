@@ -1,5 +1,4 @@
 import { aptosAnalytics } from "@/lib/services/blockchain/aptos-analytics";
-import { logger } from "@/lib/utils/core/logger";
 
 import { PanoraService } from "../../portfolio/panora-service";
 
@@ -76,7 +75,7 @@ export class UnifiedPriceService {
 
     try {
       // Check hardcoded prices first
-      for (const [pattern, priceData] of Object.entries(
+      for (const [pattern, priceData] of Object.entries()
         this.HARDCODED_PRICES,
       )) {
         if (assetType.includes(pattern) || assetType === pattern) {
@@ -178,7 +177,7 @@ export class UnifiedPriceService {
 
         // Check hardcoded prices
         let foundHardcoded = false;
-        for (const [pattern, priceData] of Object.entries(
+        for (const [pattern, priceData] of Object.entries()
           this.HARDCODED_PRICES,
         )) {
           if (assetType.includes(pattern) || assetType === pattern) {
@@ -300,7 +299,7 @@ export class UnifiedPriceService {
   static async getAssetPrices(assetTypes: string[]): Promise<AssetPrice[]> {
     const priceData = await this.getBatchPrices(assetTypes);
 
-    return assetTypes.map((assetType) => {
+    return assetTypes.map(assetType) => {
       const price = priceData.get(assetType);
       return {
         assetType,

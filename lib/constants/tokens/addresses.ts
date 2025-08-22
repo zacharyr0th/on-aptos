@@ -13,13 +13,15 @@ export const TETHER_RESERVES = {
 // BTC token addresses that aren't in BTC_TOKENS config
 export const ADDITIONAL_BTC_TOKENS = {
   WBTC: {
-    asset_type: "0x68844a0d7f2587e726ad0579f3d640865bb4162c08a4589eeda3f9689ec52a3d",
+    asset_type:
+      "0x68844a0d7f2587e726ad0579f3d640865bb4162c08a4589eeda3f9689ec52a3d",
     decimals: 8,
     name: "Wrapped Bitcoin",
     symbol: "WBTC",
   },
   FiaBTC: {
-    asset_type: "0x75de592a7e62e6224d13763c392190fda8635ebb79c798a5e9dd0840102f3f93",
+    asset_type:
+      "0x75de592a7e62e6224d13763c392190fda8635ebb79c798a5e9dd0840102f3f93",
     decimals: 8,
     name: "Fiat Bitcoin",
     symbol: "FiaBTC",

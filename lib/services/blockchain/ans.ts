@@ -1,4 +1,3 @@
-import { logger } from "@/lib/utils/core/logger";
 
 interface AnsResolveResult {
   address: string | null;

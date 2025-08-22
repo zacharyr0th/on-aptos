@@ -1,6 +1,5 @@
 import { EventEmitter } from "events";
 
-import { logger } from "@/lib/utils/core/logger";
 
 // Singleton event emitter for i18n events
 class I18nEventManager extends EventEmitter {

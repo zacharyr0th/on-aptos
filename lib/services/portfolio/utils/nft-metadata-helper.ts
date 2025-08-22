@@ -3,7 +3,6 @@ import {
   IPFS_GATEWAYS,
   extractIPFSHash,
 } from "@/lib/utils/infrastructure/ipfs-gateway-fallback";
-import { logger } from "@/lib/utils/core/logger";
 
 // Function to convert IPFS URL to HTTP URL
 export async function convertIPFSToHTTP(url: string): Promise<string> {
@@ -126,7 +125,7 @@ export async function extractNFTImageUrl(
         ".svg",
         ".bmp",
       ];
-      if (imageExtensions.some((ext) => httpUrl.toLowerCase().includes(ext))) {
+      if (imageExtensions.some(ext) => httpUrl.toLowerCase().includes(ext))) {
         return httpUrl;
       }
 

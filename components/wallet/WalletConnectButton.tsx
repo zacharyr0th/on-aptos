@@ -2,7 +2,6 @@
 
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { Wallet, LogOut, Copy, Check } from "lucide-react";
-import Image from "next/image";
 import { useState, useEffect, useMemo } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -17,7 +16,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useTranslation } from "@/hooks/useTranslation";
 import { cn } from "@/lib/utils";
-import { errorLogger, logger } from "@/lib/utils/core/logger";
 
 interface WalletConnectButtonProps {
   size?: "sm" | "default" | "lg";
@@ -129,7 +127,7 @@ export function WalletConnectButton({
   //   setConnectingWallet("Aptos Connect");
   //   try {
   //     // Try to connect with Aptos Connect
-  //     await connect("Aptos Connect" as any);
+  //     await connect("Aptos Connect" as unknown);
   //     setShowWalletModal(false);
   //   } catch (error) {
   //     logger.warn(`Failed to connect with Aptos Connect: ${error instanceof Error ? error.message : String(error)}`);
@@ -150,9 +148,9 @@ export function WalletConnectButton({
     setConnectingWallet(walletName);
 
     try {
-      await connect(walletName as any);
+      await connect(walletName as unknown);
       setShowWalletModal(false);
-    } catch (error: any) {
+    } catch (error: Record<string, unknown>) {
       const errorMessage =
         error?.message || error?.toString() || "Unknown connection error";
 

@@ -1,4 +1,3 @@
-import { logger } from "@/lib/utils/core/logger";
 
 const APTOS_ANALYTICS_BASE_URL =
   "https://api.mainnet.aptoslabs.com/v1/analytics";
@@ -72,7 +71,7 @@ export class AptosAnalyticsService {
   ): Promise<T> {
     const url = new URL(`${APTOS_ANALYTICS_BASE_URL}${endpoint}`);
 
-    Object.entries(params).forEach(([key, value]) => {
+    Object.entries(params).forEach(key, value]) => {
       if (value !== undefined && value !== null) {
         url.searchParams.append(key, String(value));
       }
@@ -88,12 +87,12 @@ export class AptosAnalyticsService {
 
       return data.data;
     } catch (error) {
-      logger.error(`Failed to fetch ${endpoint}:`, error);
+      logger.error({ error }, `Failed to fetch ${endpoint}`);
       throw error;
     }
   }
 
-  async getGasUsage(params: {
+  async getGasUsage((params: {
     gas_payer_address: string;
     start_unix_secs: number;
     end_unix_secs: number;
@@ -103,7 +102,7 @@ export class AptosAnalyticsService {
     return this.fetchAnalytics<GasUsageData[]>("/gas/usage", params);
   }
 
-  async getTokenHistoricalPrices(params: {
+  async getTokenHistoricalPrices((params: {
     address: string;
     lookback: "hour" | "day" | "week" | "month" | "year" | "all";
     limit?: number;
@@ -116,14 +115,14 @@ export class AptosAnalyticsService {
     );
   }
 
-  async getTokenLatestPrice(params: {
+  async getTokenLatestPrice((params: {
     address: string;
     date_utc?: string;
   }): Promise<TokenPriceData[]> {
     return this.fetchAnalytics<TokenPriceData[]>("/token/latest_price", params);
   }
 
-  async getHistoricalStoreBalances(params: {
+  async getHistoricalStoreBalances((params: {
     account_address: string;
     lookback: "year" | "all";
   }): Promise<BalanceHistoryData[]> {
@@ -133,7 +132,7 @@ export class AptosAnalyticsService {
     );
   }
 
-  async getTopPriceChanges(params: {
+  async getTopPriceChanges((params: {
     lookback: "hour" | "day" | "week" | "month";
     limit?: number;
     only_emoji?: boolean;
@@ -145,7 +144,7 @@ export class AptosAnalyticsService {
     );
   }
 
-  async getHistoricalTransactions(params: {
+  async getHistoricalTransactions((params: {
     account_address: string;
     date_start?: string;
     date_end?: string;
@@ -159,7 +158,7 @@ export class AptosAnalyticsService {
     );
   }
 
-  async getAriesRewards(params: {
+  async getAriesRewards((params: {
     account_address: string;
     profile_address: string;
     date_start?: string;
@@ -171,7 +170,7 @@ export class AptosAnalyticsService {
     );
   }
 
-  async getAriesPoolAPR(params: {
+  async getAriesPoolAPR((params: {
     reserve_asset_type: string;
     date_start?: string;
     date_end?: string;

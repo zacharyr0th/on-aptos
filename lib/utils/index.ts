@@ -11,8 +11,19 @@ export * from "./api";
 export * from "./cache";
 
 // ===== FORMAT UTILITIES =====
-// Re-export all format utilities
-export * from "./format";
+// Re-export specific format utilities (avoiding conflicts)
+export {
+  formatCurrency,
+  formatNumber,
+  formatPercentage,
+  formatDate,
+  formatAmount,
+  formatAmountFull,
+  formatCompactNumber,
+  formatLargeNumber,
+  formatBigIntWithDecimals,
+  convertRawTokenAmount,
+} from "./format";
 
 // ===== TOKEN UTILITIES =====
 // Re-export all token utilities
@@ -21,7 +32,11 @@ export * from "./token";
 // ===== INFRASTRUCTURE UTILITIES =====
 // Re-export infrastructure utilities (selective export for client safety)
 export { setupGracefulShutdown } from "./infrastructure/graceful-shutdown";
-export { extractIPFSHash, resolveIPFSUrl, IPFS_GATEWAYS } from "./infrastructure/ipfs-gateway-fallback";
+export {
+  extractIPFSHash,
+  resolveIPFSUrl,
+  IPFS_GATEWAYS,
+} from "./infrastructure/ipfs-gateway-fallback";
 // sitemap is server-only, not exported here
 
 // ===== SERVER-SIDE ONLY EXPORTS =====

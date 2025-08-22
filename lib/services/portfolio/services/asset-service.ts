@@ -5,7 +5,6 @@ import {
   isPhantomAsset,
 } from "@/lib/constants/protocols/protocol-registry";
 import { graphQLRequest } from "@/lib/utils/api/fetch-utils";
-import { logger } from "@/lib/utils/core/logger";
 
 import {
   UnifiedPriceService,
@@ -32,7 +31,7 @@ export class AssetService {
       const directQuery = `query { current_fungible_asset_balances(where: { owner_address: { _eq: "${address}" }, amount: { _gt: "0" } }) { amount asset_type is_frozen is_primary last_transaction_timestamp last_transaction_version token_standard metadata { name symbol decimals icon_uri } } }`;
 
       const result = await graphQLRequest<{
-        current_fungible_asset_balances: any[];
+        current_fungible_asset_balances: unknown[];
       }>(ENDPOINTS.APTOS_INDEXER, { query: directQuery }, { headers });
 
       const faBalances = result.current_fungible_asset_balances || [];
@@ -42,7 +41,7 @@ export class AssetService {
       );
 
       // Process fungible asset balances directly
-      const assets = faBalances.map((balance: any) => ({
+      const assets = faBalances.map((balance: Record<string, unknown>) => ({
         ...balance,
         hasBalance: true,
       }));
@@ -60,7 +59,7 @@ export class AssetService {
 
       // Get unique asset types for price fetching
       const uniqueAssetTypes = [
-        ...new Set(assets.map((a: any) => a.asset_type)),
+        ...new Set(assets.map((a: Record<string, unknown>) => a.asset_type)),
       ];
 
       logger.info(
@@ -108,7 +107,7 @@ export class AssetService {
 
       // Process and enrich assets
       const processedAssets = await Promise.all(
-        assets.map(async (asset: any) => {
+        assets.map(async (asset: Record<string, unknown>) => {
           const formattedBalance = UnifiedDecimalUtils.formatBalance(
             asset.amount,
             asset.asset_type,

@@ -6,8 +6,17 @@
 type RequestKey = string;
 type RequestPromise<T = unknown> = Promise<T>;
 
+interface CachedResponseData {
+  text: string;
+  status: number;
+  statusText: string;
+  headers: Headers;
+  ok: boolean;
+}
+
 export class RequestDeduplicator {
-  private pendingRequests = new Map<RequestKey, RequestPromise>();
+  private pendingRequests = new Map<RequestKey, Promise<CachedResponseData>>();
+  private pendingFunctions = new Map<string, RequestPromise>();
   private readonly maxCacheSize = 1000; // Prevent memory leaks
   private requestCount = 0;
 
@@ -29,7 +38,14 @@ export class RequestDeduplicator {
 
     // Check if there's already a pending request for this key
     if (this.pendingRequests.has(key)) {
-      return this.pendingRequests.get(key) as Promise<Response>;
+      const cachedDataPromise = this.pendingRequests.get(key)!;
+      // Wait for the cached data and create a fresh Response for this consumer
+      const cachedData = await cachedDataPromise;
+      return new Response(cachedData.text, {
+        status: cachedData.status,
+        statusText: cachedData.statusText,
+        headers: new Headers(cachedData.headers),
+      });
     }
 
     // Clean up cache if it gets too large
@@ -37,32 +53,38 @@ export class RequestDeduplicator {
       this.cleanup();
     }
 
-    // Create the request promise
-    const requestPromise = fetch(url, options)
-      .then(async (response) => {
-        // For successful responses, cache the body content
-        if (response.ok) {
-          const responseText = await response.text();
-          // Create a new Response with the cached body for each consumer
-          return new Response(responseText, {
-            status: response.status,
-            statusText: response.statusText,
-            headers: response.headers,
-          });
-        }
-        // For error responses, just clone as before
-        return response.clone();
-      })
-      .finally(() => {
-        // Remove from pending requests when done
-        this.pendingRequests.delete(key);
-      });
+    // Create the request promise that caches the response data
+    const requestPromise = fetch(url, options).then(async (response) => {
+      // Cache the response data to allow multiple consumers
+      const responseData: CachedResponseData = {
+        text: await response.text(),
+        status: response.status,
+        statusText: response.statusText,
+        headers: new Headers(response.headers),
+        ok: response.ok,
+      };
 
-    // Store the promise
+      return responseData;
+    });
+
+    // Store the promise for the cached data
     this.pendingRequests.set(key, requestPromise);
     this.requestCount++;
 
-    return requestPromise;
+    // Clean up after a delay to prevent memory leaks
+    requestPromise.finally(() => {
+      setTimeout(() => {
+        this.pendingRequests.delete(key);
+      }, 100); // Keep cached for 100ms to handle rapid duplicate requests
+    });
+
+    // Wait for the data and create a Response for the first consumer
+    const cachedData = await requestPromise;
+    return new Response(cachedData.text, {
+      status: cachedData.status,
+      statusText: cachedData.statusText,
+      headers: new Headers(cachedData.headers),
+    });
   }
 
   /**
@@ -74,12 +96,12 @@ export class RequestDeduplicator {
     ttl: number = 30000, // 30 seconds default TTL
   ): Promise<T> {
     // Check if there's already a pending request for this key
-    if (this.pendingRequests.has(key)) {
-      return this.pendingRequests.get(key) as Promise<T>;
+    if (this.pendingFunctions.has(key)) {
+      return this.pendingFunctions.get(key) as Promise<T>;
     }
 
     // Clean up cache if it gets too large
-    if (this.pendingRequests.size >= this.maxCacheSize) {
+    if (this.pendingFunctions.size >= this.maxCacheSize) {
       this.cleanup();
     }
 
@@ -91,11 +113,11 @@ export class RequestDeduplicator {
       ),
     ]).finally(() => {
       // Remove from pending requests when done
-      this.pendingRequests.delete(key);
+      this.pendingFunctions.delete(key);
     });
 
     // Store the promise
-    this.pendingRequests.set(key, requestPromise);
+    this.pendingFunctions.set(key, requestPromise);
     this.requestCount++;
 
     return requestPromise;
@@ -105,11 +127,24 @@ export class RequestDeduplicator {
    * Clean up old requests (remove oldest half)
    */
   private cleanup(): void {
-    const entries = Array.from(this.pendingRequests.entries());
-    const toRemove = entries.slice(0, Math.floor(entries.length / 2));
-
-    for (const [key] of toRemove) {
+    // Clean up fetch requests
+    const fetchEntries = Array.from(this.pendingRequests.entries());
+    const fetchToRemove = fetchEntries.slice(
+      0,
+      Math.floor(fetchEntries.length / 2),
+    );
+    for (const [key] of fetchToRemove) {
       this.pendingRequests.delete(key);
+    }
+
+    // Clean up function requests
+    const funcEntries = Array.from(this.pendingFunctions.entries());
+    const funcToRemove = funcEntries.slice(
+      0,
+      Math.floor(funcEntries.length / 2),
+    );
+    for (const [key] of funcToRemove) {
+      this.pendingFunctions.delete(key);
     }
   }
 
@@ -118,6 +153,7 @@ export class RequestDeduplicator {
    */
   clear(): void {
     this.pendingRequests.clear();
+    this.pendingFunctions.clear();
     this.requestCount = 0;
   }
 
@@ -134,7 +170,10 @@ export class RequestDeduplicator {
   /**
    * Static method for compatibility with services that expect the old interface
    */
-  static async deduplicate<T>(key: string, requestFn: () => Promise<T>): Promise<T> {
+  static async deduplicate<T>(
+    key: string,
+    requestFn: () => Promise<T>,
+  ): Promise<T> {
     return dedupeAsyncCall(key, requestFn);
   }
 }
@@ -187,4 +226,3 @@ export function createDedupedEndpoint<TArgs extends unknown[], TReturn>(
 ) {
   return withDeduplication(endpoint, keyGenerator, ttl);
 }
-

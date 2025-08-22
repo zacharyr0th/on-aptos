@@ -4,7 +4,6 @@ import { Network } from "@aptos-labs/ts-sdk";
 import { AptosWalletAdapterProvider } from "@aptos-labs/wallet-adapter-react";
 import { ReactNode } from "react";
 
-import { logger } from "@/lib/utils/core/logger";
 
 interface WalletProviderProps {
   children: ReactNode;

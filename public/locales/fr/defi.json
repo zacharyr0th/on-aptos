@@ -248,7 +248,6 @@
     "Tapp": "Le premier DEX modulaire activé par hooks, de style Uniswap V4, sur le testnet Aptos; les hooks de contrats intelligents permettent aux constructeurs de composer des pools personnalisés tandis que les utilisateurs obtiennent des échanges programmables.",
     "Merkle": "Un DEX de perpétuels gamifié avec XP, coffres au trésor, et effet de levier 150×; plus de 20 milliards $ de volume total.",
     "AGDEX": "Offre des perpétuels à marge croisée 1-100× avec des remplissages d'oracle à faible impact qui maintiennent le glissement serré pour les traders de détail.",
-    "Pump": "Tout le monde peut frapper des tokens meme via des courbes de bonding; chaque pièce est lancée de manière équitable sans prévente ou allocation d'équipe.",
     "Emojicoin": "Permet aux utilisateurs de frapper des tokens mappés 1-pour-1 avec les emojis Unicode; chaque lancement utilise la courbe CL-AMM d'Econia pour découverte instantanée de prix et spéculation.",
     "Aries": "Le premier marché monétaire de style Compound sur Aptos, amélioré avec E-Mode LTV à 90%, bridging intégré, et trading spot dans une interface.",
     "Superposition": "Plateforme avancée de gestion des risques inspirée du FHS VaR de la Banque d'Angleterre, offrant des opportunités de rendement avec effet de levier avec surveillance des risques en temps réel et ajustement dynamique du facteur de garantie.",

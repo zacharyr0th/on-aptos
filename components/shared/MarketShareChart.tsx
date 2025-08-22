@@ -9,8 +9,11 @@ import {
 } from "recharts";
 
 import { useResponsive } from "@/hooks/useResponsive";
-import { formatAssetValue, CHART_DIMENSIONS, ChartDataItem } from "@/lib/utils/format/chart-utils";
-import { logger, errorLogger } from "@/lib/utils/core/logger";
+import {
+  formatAssetValue,
+  CHART_DIMENSIONS,
+  ChartDataItem,
+} from "@/lib/utils/format/chart-utils";
 
 export interface MarketShareChartProps {
   data: ChartDataItem[];
@@ -23,19 +26,21 @@ export interface MarketShareChartProps {
 }
 
 // Custom tooltip component
-const CustomTooltip = memo<TooltipProps<number, string> & { 
-  customRenderer?: (data: any) => React.ReactNode;
-}>((props) => {
-  const { active, payload, customRenderer } = props as any;
+const CustomTooltip = memo<
+  TooltipProps<number, string> & {
+    customRenderer?: (data: Record<string, unknown>) => React.ReactNode;
+  }
+>((props) => {
+  const { active, payload, customRenderer } = props as unknown;
   if (!active || !payload?.length) return null;
 
   try {
     const data = payload[0].payload as ChartDataItem;
-    
+
     if (customRenderer) {
       return customRenderer(data);
     }
-    
+
     const { name, value, formattedSupply, provider } = data;
     const isProvider = !provider || provider === name;
 
@@ -50,13 +55,9 @@ const CustomTooltip = memo<TooltipProps<number, string> & {
             {isProvider ? "Total Value" : "Value"}: {formattedSupply}
           </p>
         )}
-        <p className="text-muted-foreground">
-          Share: {value.toFixed(2)}%
-        </p>
+        <p className="text-muted-foreground">Share: {value.toFixed(2)}%</p>
         {!isProvider && provider && (
-          <p className="text-muted-foreground text-xs">
-            Provider: {provider}
-          </p>
+          <p className="text-muted-foreground text-xs">Provider: {provider}</p>
         )}
       </div>
     );
@@ -78,14 +79,19 @@ const CustomLegend = memo<{
   colors: Record<string, string>;
   maxItems?: number;
   customRenderer?: (item: ChartDataItem, index: number) => React.ReactNode;
-}>(({ chartData, colors, maxItems = 4, customRenderer }) => {
+}>({ chartData, colors, maxItems = 4, customRenderer }) => {
   if (!chartData.length) return null;
 
   const shouldShowAll = chartData.length <= maxItems;
-  const itemsToShow = shouldShowAll ? chartData : chartData.slice(0, maxItems - 1);
+  const itemsToShow = shouldShowAll
+    ? chartData
+    : chartData.slice(0, maxItems - 1);
   const remainingItems = shouldShowAll ? [] : chartData.slice(maxItems - 1);
   const remainingCount = remainingItems.length;
-  const remainingPercentage = remainingItems.reduce((sum, item) => sum + item.value, 0);
+  const remainingPercentage = remainingItems.reduce(
+    (sum, item) => sum + item.value,
+    0,
+  );
 
   return (
     <div className="flex flex-col gap-4">
@@ -94,11 +100,17 @@ const CustomLegend = memo<{
           return customRenderer(item, i);
         }
 
-        const displayValue = Number.isFinite(item.value) ? item.value.toFixed(2) : "0.00";
-        const color = item.color || colors[item.name] || colors.default || "#888";
+        const displayValue = Number.isFinite(item.value)
+          ? item.value.toFixed(2)
+          : "0.00";
+        const color =
+          item.color || colors[item.name] || colors.default || "#888";
 
         return (
-          <div key={`legend-${item.name}-${i}`} className="flex items-center gap-3">
+          <div
+            key={`legend-${item.name}-${i}`}
+            className="flex items-center gap-3"
+          >
             <div
               className="w-3 h-3 rounded-sm flex-shrink-0"
               style={{ backgroundColor: color }}
@@ -171,12 +183,15 @@ export const MarketShareChart = memo<MarketShareChartProps>(
     );
 
     // Memoized color getter for cells
-    const getCellColor = useCallback((entry: ChartDataItem) => {
-      if (entry.name === "Other") {
-        return "#d4d4d8";
-      }
-      return entry.color || colors[entry.name] || colors.default || "#888";
-    }, [colors]);
+    const getCellColor = useCallback(
+      (entry: ChartDataItem) => {
+        if (entry.name === "Other") {
+          return "#d4d4d8";
+        }
+        return entry.color || colors[entry.name] || colors.default || "#888";
+      },
+      [colors],
+    );
 
     // Error boundary fallback
     if (!chartData.length) {
@@ -218,7 +233,7 @@ export const MarketShareChart = memo<MarketShareChartProps>(
                     startAngle={90}
                     endAngle={450}
                   >
-                    {chartData.map((entry, index) => (
+                    {chartData.map((item, _index) => (
                       <Cell
                         key={`cell-${entry.name}-${index}`}
                         fill={getCellColor(entry)}

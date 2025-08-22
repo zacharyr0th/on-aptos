@@ -14,21 +14,24 @@ export function LayoutContent({ children }: LayoutContentProps) {
 
   // Home page (landing page) has its own custom layout
   const isHomePage = pathname === "/";
-  
+
+  // Portfolio page has its own layout handling
+  const isPortfolioPage = pathname === "/portfolio";
+
   // Main dashboard pages have their own Footer component
   const isDashboardPage = [
     "/portfolio",
-    "/stables", 
+    "/stables",
     "/bitcoin",
     "/rwas",
     "/defi",
     "/yields",
-    "/tokens"
+    "/tokens",
   ].includes(pathname);
 
-  // Show header on all pages except the landing page
-  const showHeader = !isHomePage;
-  
+  // Show header on all pages except the landing page and portfolio page
+  const showHeader = !isHomePage && !isPortfolioPage;
+
   // Show footer for API docs, error pages, and other misc pages
   // Hide footer for home and dashboard pages which have their own
   const showFooter = !isHomePage && !isDashboardPage;

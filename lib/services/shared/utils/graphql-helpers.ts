@@ -1,17 +1,22 @@
 import { getEnvVar } from "@/lib/config/validate-env";
 import { API_ENDPOINTS, ERROR_MESSAGES } from "@/lib/constants";
 import { graphQLRequest } from "@/lib/utils/api/fetch-utils";
-import { logger } from "@/lib/utils/core/logger";
 
 // GraphQL queries for asset services
 export const QUERIES = {
   COIN_SUPPLY: `
     query GetCoinSupply($coinType: String!) {
-      coin_supply(where: { coin_type: { _eq: $coinType } }) {
-        coin_type
-        supply
-        last_transaction_timestamp
-        last_transaction_version
+      current_fungible_asset_balances_aggregate(
+        where: { 
+          asset_type: { _eq: $coinType },
+          amount: { _gt: "0" }
+        }
+      ) {
+        aggregate {
+          sum {
+            amount
+          }
+        }
       }
     }
   `,
@@ -86,8 +91,8 @@ export const QUERIES = {
 
   BATCH_COIN_INFO: `
     query GetBatchCoinInfo($coinTypes: [String!]!) {
-      coin_infos(where: { coin_type: { _in: $coinTypes } }) {
-        coin_type
+      fungible_asset_metadata(where: { asset_type: { _in: $coinTypes } }) {
+        asset_type
         name
         symbol
         decimals
@@ -130,7 +135,7 @@ export async function executeGraphQLQuery<T>(
     );
 
     if (response.errors && response.errors.length > 0) {
-      const errorMessage = response.errors.map((e) => e.message).join(", ");
+      const errorMessage = response.errors.map(e) => e.message).join(", ");
       logger.error("GraphQL query errors:", response.errors);
       throw new Error(`GraphQL errors: ${errorMessage}`);
     }
@@ -155,13 +160,20 @@ export async function executeGraphQLQuery<T>(
 export async function getCoinSupply(coinType: string): Promise<number> {
   try {
     const data = await executeGraphQLQuery<{
-      coin_supply: Array<{ supply: string }>;
+      current_fungible_asset_balances_aggregate: {
+        aggregate: {
+          sum: {
+            amount: string | null;
+          };
+        };
+      };
     }>(QUERIES.COIN_SUPPLY, { coinType });
 
-    if (data.coin_supply && data.coin_supply.length > 0) {
-      return parseFloat(data.coin_supply[0].supply);
-    }
-    return 0;
+    const totalSupply = parseFloat(
+      data.current_fungible_asset_balances_aggregate?.aggregate?.sum?.amount ||
+        "0",
+    );
+    return totalSupply;
   } catch (error) {
     logger.error("Failed to get coin supply:", { coinType, error });
     return 0;

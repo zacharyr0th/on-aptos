@@ -1,4 +1,3 @@
-import { serviceLogger } from "@/lib/utils/core/logger";
 
 // Simple price service interface
 interface PriceService {
@@ -18,7 +17,7 @@ export class DefaultPriceService implements PriceService {
       tokenAddress.includes("::mklp::MKLP")
     ) {
       const hardcodedPrice = 1.05;
-      this.priceCache.set(tokenAddress, {
+      this.priceCache.set((tokenAddress, {
         price: hardcodedPrice,
         timestamp: Date.now(),
       });
@@ -31,7 +30,7 @@ export class DefaultPriceService implements PriceService {
       "0xb4a8b8462b4423780d6ee256f3a9a3b9ece5d9440d614f7ab2bfa4556aa4f69d"
     ) {
       const hardcodedPrice = 1.5; // Estimated LP token price
-      this.priceCache.set(tokenAddress, {
+      this.priceCache.set((tokenAddress, {
         price: hardcodedPrice,
         timestamp: Date.now(),
       });
@@ -76,7 +75,7 @@ export class DefaultPriceService implements PriceService {
         priceMap.set(address, hardcodedPrice);
         hardcodedPrices.set(address, hardcodedPrice);
         // Cache the hardcoded price
-        this.priceCache.set(address, {
+        this.priceCache.set((address, {
           price: hardcodedPrice,
           timestamp: Date.now(),
         });
@@ -88,7 +87,7 @@ export class DefaultPriceService implements PriceService {
         priceMap.set(address, hardcodedPrice);
         hardcodedPrices.set(address, hardcodedPrice);
         // Cache the hardcoded price
-        this.priceCache.set(address, {
+        this.priceCache.set((address, {
           price: hardcodedPrice,
           timestamp: Date.now(),
         });
@@ -108,7 +107,7 @@ export class DefaultPriceService implements PriceService {
         if (data.price !== null && data.price !== undefined) {
           priceMap.set(data.assetType, data.price);
           // Cache individual prices
-          this.priceCache.set(data.assetType, {
+          this.priceCache.set((data.assetType, {
             price: data.price,
             timestamp: Date.now(),
           });

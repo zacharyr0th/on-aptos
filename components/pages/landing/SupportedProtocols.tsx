@@ -12,7 +12,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { PROTOCOLS, ProtocolType } from "@/lib/constants/protocols/protocol-registry";
+import {
+  PROTOCOLS,
+  ProtocolType,
+} from "@/lib/constants/protocols/protocol-registry";
 
 const typeLabels: Record<ProtocolType, string> = {
   [ProtocolType.LIQUID_STAKING]: "Liquid Staking",
@@ -146,7 +149,7 @@ export const SupportedProtocols = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {sortedProtocols.map((protocol, index) => (
+                {sortedProtocols.map((item, _index) => (
                   <TableRow
                     key={protocol.name}
                     className={`group hover:bg-muted/50 transition-colors ${

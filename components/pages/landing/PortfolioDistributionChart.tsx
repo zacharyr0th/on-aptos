@@ -9,18 +9,20 @@ import {
   Tooltip as RechartsTooltip,
 } from "recharts";
 
-// Chart colors that work in both light and dark modes
+import { formatCurrency } from "@/lib/utils/format/format";
+
+// Minimal chart colors matching the portfolio page
 const CHART_COLORS = [
-  "hsl(210 70% 65%)", // Blue
-  "hsl(270 60% 70%)", // Purple
-  "hsl(330 65% 75%)", // Pink
-  "hsl(30 70% 75%)", // Orange
-  "hsl(150 50% 70%)", // Green
-  "hsl(190 60% 70%)", // Cyan
-  "hsl(0 60% 75%)", // Red
-  "hsl(50 70% 70%)", // Yellow
-  "hsl(260 50% 80%)", // Lavender
-  "hsl(210 20% 65%)", // Slate
+  "#1a1a1a", // Primary black
+  "#2a2a2a", // Dark gray
+  "#3a3a3a", // Medium dark gray
+  "#4a4a4a", // Medium gray
+  "#5a5a5a", // Light gray
+  "#6a6a6a", // Lighter gray
+  "#7a7a7a", // Light medium gray
+  "#8a8a8a", // Light gray
+  "#9a9a9a", // Very light gray
+  "#aaaaaa", // Lightest gray
 ];
 
 // Sample data for the chart
@@ -34,14 +36,14 @@ const assetData = [
 ];
 
 // Add colors to data
-const dataWithColors = assetData.map((item, index) => ({
+const dataWithColors = assetData.map((item, _index) => ({
   ...item,
   color: CHART_COLORS[index % CHART_COLORS.length],
   percentage: item.value,
 }));
 
 // Custom tooltip matching portfolio page style
-const CustomTooltip = React.memo(({ active, payload }: any) => {
+const CustomTooltip = React.memo({ active, payload }: Record<string, unknown>) => {
   if (!active || !payload || !payload[0]) return null;
 
   const data = payload[0].payload;
@@ -54,8 +56,8 @@ const CustomTooltip = React.memo(({ active, payload }: any) => {
         />
         <span className="text-xs font-medium">{data.name}</span>
       </div>
-      <div className="text-xs text-muted-foreground mt-1">
-        {data.percentage}% • ${(data.value * 124.5678).toFixed(2)}
+      <div className="text-xs text-muted-foreground mt-1 font-mono">
+        {data.percentage}% • {formatCurrency(data.value * 124.5678)}
       </div>
     </div>
   );
@@ -77,8 +79,10 @@ export function PortfolioDistributionChart() {
             paddingAngle={2}
             dataKey="value"
             stroke="none"
+            animationBegin={0}
+            animationDuration={600}
           >
-            {dataWithColors.map((entry, index) => (
+            {dataWithColors.map((item, _index) => (
               <Cell
                 key={`asset-${index}`}
                 fill={entry.color}
@@ -93,8 +97,8 @@ export function PortfolioDistributionChart() {
       {/* Center value */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
         <div className="text-center">
-          <div className="text-xl sm:text-3xl lg:text-4xl font-bold">
-            $12,456
+          <div className="text-xl sm:text-3xl lg:text-4xl font-bold font-mono">
+            {formatCurrency(12456)}
           </div>
         </div>
       </div>

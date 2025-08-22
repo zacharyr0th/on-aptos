@@ -1,5 +1,4 @@
 import { Copy } from "lucide-react";
-import Image from "next/image";
 import React, { useCallback, useMemo, memo } from "react";
 import {
   ResponsiveContainer,
@@ -9,7 +8,7 @@ import {
   Tooltip,
   TooltipProps,
 } from "recharts";
-import { toast } from "sonner";
+// import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -20,7 +19,6 @@ import {
 } from "@/components/ui/tooltip";
 import { useResponsive } from "@/hooks/useResponsive";
 import { formatCurrency } from "@/lib/utils";
-import { logger } from "@/lib/utils/core/logger";
 import {
   ChartDataItem,
   formatPercentage,
@@ -30,7 +28,10 @@ import {
   measurePerformance,
   CHART_DIMENSIONS,
 } from "@/lib/utils/format/chart-utils";
-import { copyToClipboard, getTokenLogoUrlSync } from "@/lib/utils/token/token-utils";
+import {
+  copyToClipboard,
+  getTokenLogoUrlSync,
+} from "@/lib/utils/token/token-utils";
 
 // Generic asset data interface
 export interface AssetData {
@@ -61,7 +62,7 @@ export interface MarketShareChartProps {
 
 // Optimized custom tooltip with memoization
 const CustomTooltip = memo<TooltipProps<number, string>>((props) => {
-  const { active, payload } = props as any;
+  const { active, payload } = props as unknown;
   const { isMobile } = useResponsive();
   if (!active || !payload?.length) return null;
 
@@ -93,7 +94,7 @@ const CustomTooltip = memo<TooltipProps<number, string>>((props) => {
     );
   } catch (error) {
     logger.error(
-      `Error rendering tooltip: ${error instanceof Error ? error.message : String(error)}`
+      `Error rendering tooltip: ${error instanceof Error ? error.message : String(error)}`,
     );
     return (
       <div className="bg-popover/95 backdrop-blur border rounded-md shadow-lg p-3 text-sm">
@@ -109,7 +110,7 @@ CustomTooltip.displayName = "CustomTooltip";
 const TokenNameCopy = memo<{
   symbol: string;
   address?: string;
-}>(({ symbol, address }) => {
+}>({ symbol, address }) => {
   const handleCopy = useCallback(async (text: string, label: string) => {
     if (!text) return;
     await copyToClipboard(text, label);
@@ -161,7 +162,7 @@ const CustomLegend = memo<{
     { assetAddress: string; name?: string; decimals?: number }
   >;
   colorMap: Record<string, string>;
-}>(({ chartData, tokenMetadata, colorMap }) => {
+}>({ chartData, tokenMetadata, colorMap }) => {
   if (!chartData.length) return null;
 
   // Show all items if 4 or fewer, otherwise show top 3 + "others"
@@ -237,14 +238,15 @@ export const MarketShareChart = memo<MarketShareChartProps>(
 
     // Process data based on asset type
     const chartData = useMemo<ChartDataItem[]>(() => {
-      return measurePerformance(() => {
+      return measurePerformance( => {
         try {
           if (!data.length) return [];
 
           const processedData: ChartDataItem[] = data.map((asset) => {
             const supply = asset.supply_raw || asset.supply || "0";
-            const supplyNum = Number(BigInt(supply)) / Math.pow(10, asset.decimals || 6);
-            
+            const supplyNum =
+              Number(BigInt(supply)) / Math.pow(10, asset.decimals || 6);
+
             let usdValue = supplyNum;
             let btcValue: number | undefined;
 
@@ -252,16 +254,24 @@ export const MarketShareChart = memo<MarketShareChartProps>(
             if (assetType === "btc" && priceMultiplier) {
               btcValue = supplyNum;
               usdValue = supplyNum * priceMultiplier;
-            } else if (assetType === "stablecoins" && asset.symbol === "sUSDe" && priceMultiplier) {
+            } else if (
+              assetType === "stablecoins" &&
+              asset.symbol === "sUSDe" &&
+              priceMultiplier
+            ) {
               usdValue = supplyNum * priceMultiplier;
             }
 
             // Calculate market share
-            const totalValue = totalUSD || (totalBTC ? totalBTC * (priceMultiplier || 1) : 0) || 
-                              data.reduce((sum, item) => {
-                                const itemSupply = Number(BigInt(item.supply_raw || item.supply || "0")) / Math.pow(10, item.decimals || 6);
-                                return sum + itemSupply;
-                              }, 0);
+            const totalValue =
+              totalUSD ||
+              (totalBTC ? totalBTC * (priceMultiplier || 1) : 0) ||
+              data.reduce((sum, item) => {
+                const itemSupply =
+                  Number(BigInt(item.supply_raw || item.supply || "0")) /
+                  Math.pow(10, item.decimals || 6);
+                return sum + itemSupply;
+              }, 0);
 
             const marketShare = calculateMarketShare(usdValue, totalValue);
 
@@ -269,7 +279,10 @@ export const MarketShareChart = memo<MarketShareChartProps>(
               name: asset.symbol,
               originalSymbol: asset.symbol,
               value: marketShare,
-              formattedSupply: formatAssetValue(usdValue, assetType === "btc" ? "BTC" : "USD"),
+              formattedSupply: formatAssetValue(
+                usdValue,
+                assetType === "btc" ? "BTC" : "USD",
+              ),
               _usdValue: assetType !== "btc" ? usdValue : undefined,
               _btcValue: btcValue,
             };
@@ -277,9 +290,15 @@ export const MarketShareChart = memo<MarketShareChartProps>(
 
           // Sort by value and group small items
           const sortedData = processedData.sort((a, b) => b.value - a.value);
-          return groupSmallItems(sortedData, 1.0, colorMap.Other || "hsl(240 5% 45%)");
+          return groupSmallItems(
+            sortedData,
+            1.0,
+            colorMap.Other || "hsl(240 5% 45%)",
+          );
         } catch (error) {
-          logger.error(`Error processing chart data: ${error instanceof Error ? error.message : String(error)}`);
+          logger.error(
+            `Error processing chart data: ${error instanceof Error ? error.message : String(error)}`,
+          );
           return [];
         }
       }, "chartData calculation");
@@ -296,22 +315,25 @@ export const MarketShareChart = memo<MarketShareChartProps>(
           : CHART_DIMENSIONS.desktop.outerRadius,
         size: isMobile ? "w-56 h-56" : "w-80 h-80",
       }),
-      [isMobile]
+      [isMobile],
     );
 
     // Memoized color getter for cells
     const getCellColor = useCallback(
       (entry: ChartDataItem) => {
-        return entry.color || colorMap[entry.name] || colorMap.default || "#6b7280";
+        return (
+          entry.color || colorMap[entry.name] || colorMap.default || "#6b7280"
+        );
       },
-      [colorMap]
+      [colorMap],
     );
 
     // Calculate center display value
     const centerValue = useMemo(() => {
       if (centerLabel) return centerLabel;
       if (totalUSD) return formatAssetValue(totalUSD, "USD");
-      if (totalBTC && priceMultiplier) return formatAssetValue(totalBTC * priceMultiplier, "USD");
+      if (totalBTC && priceMultiplier)
+        return formatAssetValue(totalBTC * priceMultiplier, "USD");
       if (totalBTC) return formatAssetValue(totalBTC, "BTC");
       return "$0";
     }, [centerLabel, totalUSD, totalBTC, priceMultiplier]);
@@ -406,7 +428,7 @@ export const MarketShareChart = memo<MarketShareChartProps>(
         </div>
       </div>
     );
-  }
+  },
 );
 
 MarketShareChart.displayName = "MarketShareChart";

@@ -7,7 +7,6 @@ import {
   defiLlamaService,
   type AptosDefiMetrics,
 } from "@/lib/services/external/defi-llama";
-import { serviceLogger } from "@/lib/utils/core/logger";
 
 interface UseDefiMetricsReturn {
   metrics: AptosDefiMetrics | null;

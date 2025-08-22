@@ -9,7 +9,6 @@ import {
   LIQUID_STAKING_TOKENS,
   CEX_ADDRESSES,
 } from "@/lib/constants";
-
 import {
   getProtocolByAddress,
   getProtocolLabel,
@@ -17,7 +16,6 @@ import {
   type ProtocolInfo,
 } from "@/lib/constants/protocols/protocol-registry";
 
-import { logger } from "../core/logger";
 
 // Create lookup for backward compatibility
 const RWA_TOKEN_BY_ADDRESS = Object.fromEntries(
@@ -33,7 +31,7 @@ export interface Transaction {
   success: boolean;
   function?: string;
   gas_fee?: string;
-  events?: any[];
+  events?: unknown[];
   sender?: string;
 }
 
@@ -628,9 +626,9 @@ export class EnhancedTransactionAnalyzer {
   private static analyzeAsset(
     assetType: string,
   ): EnhancedTransactionInfo["assetInfo"] {
-    const isStablecoin = Object.values(STABLECOINS).includes(assetType as any);
+    const isStablecoin = Object.values(STABLECOINS).includes(assetType as unknown);
     const isLST = Object.values(LIQUID_STAKING_TOKENS).includes(
-      assetType as any,
+      assetType as unknown,
     );
     const isRWA = !!RWA_TOKEN_BY_ADDRESS[assetType];
 
@@ -639,12 +637,12 @@ export class EnhancedTransactionAnalyzer {
     if (isStablecoin) {
       displaySymbol =
         Object.entries(STABLECOINS).find(
-          ([_, addr]) => addr === assetType,
+          ([ addr]) => addr === assetType,
         )?.[0] || "Stablecoin";
     } else if (isLST) {
       displaySymbol =
         Object.entries(LIQUID_STAKING_TOKENS).find(
-          ([_, addr]) => addr === assetType,
+          ([ addr]) => addr === assetType,
         )?.[0] || "LST";
     } else if (isRWA) {
       displaySymbol = RWA_TOKEN_BY_ADDRESS[assetType].assetTicker;

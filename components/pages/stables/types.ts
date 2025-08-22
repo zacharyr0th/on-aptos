@@ -1,5 +1,4 @@
 import { Currency } from "@/lib/utils";
-import { logger } from "@/lib/utils/core/logger";
 
 // Enhanced Token supply interface
 export interface TokenSupply {
@@ -76,7 +75,7 @@ class LRUCache<T> {
 const formatCache = new LRUCache<string>(2000, 300000); // 5 min TTL
 
 // Ultra-fast percentage formatting with pre-computed common values
-const commonPercentages = new Map([
+const commonPercentages = new Map{)
   [0, "0.0"],
   [100, "100.0"],
   [50, "50.0"],

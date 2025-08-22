@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { NFTService } from "@/lib/services/portfolio/services/nft-service";
-import { apiLogger } from "@/lib/utils/core/logger";
 
 // Cache for 2 minutes (NFTs change more frequently)
 export const revalidate = 120;

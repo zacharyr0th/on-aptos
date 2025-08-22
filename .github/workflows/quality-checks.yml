@@ -1,0 +1,330 @@
+name: Quality Checks
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch: # Allow manual triggers
+
+jobs:
+  code-quality:
+    runs-on: ubuntu-latest
+    name: Code Quality & Security
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Needed for comprehensive scanning
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # ==========================================
+      # STATIC CODE ANALYSIS
+      # ==========================================
+
+      - name: TypeScript type check
+        run: pnpm exec tsc --noEmit
+
+      - name: Lint check
+        run: pnpm run lint
+        if: success() || failure()
+
+      - name: Build check
+        run: pnpm run build
+        if: success() || failure()
+
+      # ==========================================
+      # SECURITY & COMPLIANCE CHECKS
+      # ==========================================
+
+      - name: Check for console statements
+        run: |
+          echo "🔍 Checking for console statements in source code..."
+          
+          if grep -r "console\." \
+            --include="*.ts" \
+            --include="*.tsx" \
+            --exclude-dir=node_modules \
+            --exclude-dir=.next \
+            --exclude-dir=dist \
+            --exclude-dir=build \
+            --exclude="*.test.*" \
+            --exclude="*.spec.*" \
+            app/ lib/ components/ ; then
+            
+            echo "❌ Console statements found in source code!"
+            echo "Please use the logger from @/lib/utils/logger instead."
+            echo "Examples:"
+            echo "  console.log() -> logger.info()"
+            echo "  console.error() -> logger.error()"
+            echo "  console.warn() -> logger.warn()"
+            exit 1
+          else
+            echo "✅ No console statements found in source code!"
+          fi
+        if: success() || failure()
+
+      - name: Secrets detection
+        run: |
+          echo "🔍 Scanning for secrets and API keys..."
+          
+          # Define critical secret patterns
+          SECRET_PATTERNS=(
+            # Real API keys and tokens
+            "api[_-]?key[s]?[[:space:]]*[:=][[:space:]]*['\"][a-zA-Z0-9_-]{20,}['\"]"
+            "secret[_-]?key[s]?[[:space:]]*[:=][[:space:]]*['\"][a-zA-Z0-9_-]{20,}['\"]"
+            "access[_-]?token[s]?[[:space:]]*[:=][[:space:]]*['\"][a-zA-Z0-9_-]{20,}['\"]"
+            
+            # Specific service keys
+            "sk-[a-zA-Z0-9]{48}"
+            "pk-[a-zA-Z0-9]{48}"
+            "AKIA[0-9A-Z]{16}"
+            "AIza[0-9A-Za-z_-]{35}"
+            "ghp_[A-Za-z0-9_]{36}"
+            "gho_[A-Za-z0-9_]{36}"
+            "ghu_[A-Za-z0-9_]{36}"
+            "ghs_[A-Za-z0-9_]{36}"
+            "ghr_[A-Za-z0-9_]{36}"
+            
+            # Private keys
+            "-----BEGIN[[:space:]]+RSA[[:space:]]+PRIVATE[[:space:]]+KEY-----"
+            "-----BEGIN[[:space:]]+PRIVATE[[:space:]]+KEY-----"
+            "-----BEGIN[[:space:]]+OPENSSH[[:space:]]+PRIVATE[[:space:]]+KEY-----"
+            
+            # JWT tokens
+            "eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}"
+            
+            # Database URLs with credentials
+            "(postgres|mysql|mongodb)://[^[:space:]]*:[^[:space:]]*@"
+            
+            # Service tokens
+            "xox[baprs]-[0-9a-zA-Z-]+"
+            "sk_live_[0-9a-zA-Z]{24}"
+            "pk_live_[0-9a-zA-Z]{24}"
+            "rk_live_[0-9a-zA-Z]{24}"
+            
+            # Environment variables with long values
+            "(PASSWORD|SECRET|KEY)[[:space:]]*[:=][[:space:]]*['\"][^'\"]{20,}['\"]"
+          )
+          
+          EXIT_CODE=0
+          
+          for pattern in "${SECRET_PATTERNS[@]}"; do
+            if grep -rE "$pattern" \
+              --include="*.ts" \
+              --include="*.tsx" \
+              --include="*.js" \
+              --include="*.jsx" \
+              --include="*.json" \
+              --include="*.env*" \
+              --exclude-dir=node_modules \
+              --exclude-dir=.next \
+              --exclude-dir=dist \
+              --exclude-dir=build \
+              --exclude-dir=.git \
+              --exclude-dir=.vercel \
+              --exclude="package-lock.json" \
+              --exclude="pnpm-lock.yaml" \
+              --exclude="*.yml" \
+              --exclude="*.yaml" \
+              . 2>/dev/null; then
+              
+              echo "❌ POTENTIAL SECRET FOUND with pattern: ${pattern:0:50}..."
+              EXIT_CODE=1
+            fi
+          done
+          
+          # Check for sensitive files
+          SENSITIVE_FILES=(".env" ".env.local" ".env.production" "*.pem" "*.key" "credentials.json")
+          for file_pattern in "${SENSITIVE_FILES[@]}"; do
+            if find . -name "$file_pattern" -not -path "./node_modules/*" -not -path "./.git/*" | grep -q .; then
+              echo "❌ SENSITIVE FILE FOUND: $file_pattern"
+              find . -name "$file_pattern" -not -path "./node_modules/*" -not -path "./.git/*"
+              EXIT_CODE=1
+            fi
+          done
+          
+          if [ $EXIT_CODE -eq 0 ]; then
+            echo "✅ No secrets detected!"
+          else
+            echo ""
+            echo "🛡️  Security recommendations:"
+            echo "  • Use environment variables for all secrets"
+            echo "  • Add sensitive files to .gitignore"
+            echo "  • Never commit actual API keys or passwords"
+            echo "  • Use placeholder values in examples"
+          fi
+          
+          exit $EXIT_CODE
+        if: success() || failure()
+
+      - name: Check for deprecated Aptos tables
+        run: |
+          echo "🔍 Checking for deprecated Aptos indexer tables..."
+          
+          # Define deprecated tables based on Aptos documentation
+          DEPRECATED_TABLES=(
+            "coin_activities("
+            "coin_balances("
+            "coin_infos("
+            "coin_supply("
+            "collection_datas("
+            "current_ans_lookup("
+            "current_coin_balances("
+            "current_collection_datas("
+            "current_delegated_staking_pool_balances("
+            "current_staking_pool_voter("
+            "current_table_items("
+            "current_token_datas("
+            "current_token_ownerships("
+            "current_token_pending_claims("
+            "delegated_staking_activities("
+            "delegated_staking_pool_balances("
+            "delegated_staking_pools("
+            "indexer_status("
+            "legacy_migration_v1("
+            "move_resources("
+            "nft_marketplace_v2("
+            "num_active_delegator_per_pool("
+            "processor_status("
+            "proposal_votes("
+            "staking_pool_voter("
+            "table_items("
+            "table_metadatas("
+            "token_activities("
+            "token_datas("
+            "token_ownerships("
+            "write_set_changes("
+          )
+          
+          EXIT_CODE=0
+          
+          for table in "${DEPRECATED_TABLES[@]}"; do
+            if grep -r "$table" \
+              --include="*.ts" \
+              --include="*.tsx" \
+              --include="*.js" \
+              --include="*.jsx" \
+              --exclude-dir=node_modules \
+              --exclude-dir=.next \
+              --exclude-dir=dist \
+              --exclude-dir=build \
+              --exclude-dir=.git \
+              . > /dev/null 2>&1; then
+              
+              echo "❌ DEPRECATED TABLE FOUND: $table"
+              grep -r "$table" \
+                --include="*.ts" \
+                --include="*.tsx" \
+                --include="*.js" \
+                --include="*.jsx" \
+                --exclude-dir=node_modules \
+                --exclude-dir=.next \
+                --exclude-dir=dist \
+                --exclude-dir=build \
+                --exclude-dir=.git \
+                .
+              EXIT_CODE=1
+            fi
+          done
+          
+          if [ $EXIT_CODE -eq 0 ]; then
+            echo "✅ No deprecated Aptos indexer tables found!"
+          else
+            echo ""
+            echo "📚 Common replacements:"
+            echo "  coin_activities → fungible_asset_activities"
+            echo "  coin_balances → current_fungible_asset_balances"
+            echo "  current_token_ownerships → current_token_ownerships_v2"
+            echo "  token_activities → token_activities_v2"
+            echo "  current_token_datas → current_token_datas_v2"
+            echo ""
+            echo "See: https://aptos.dev/en/build/indexer/indexer-api/indexer-reference"
+          fi
+          
+          exit $EXIT_CODE
+        if: success() || failure()
+
+  # ==========================================
+  # TESTS (Separate job for parallel execution)
+  # ==========================================
+
+  tests:
+    runs-on: ubuntu-latest
+    name: Tests
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run tests
+        run: pnpm test --if-present
+        if: success() || failure()
+
+  # ==========================================
+  # SUMMARY (Runs after all jobs complete)
+  # ==========================================
+
+  summary:
+    runs-on: ubuntu-latest
+    name: Quality Check Summary
+    needs: [code-quality, tests]
+    if: always()
+    
+    steps:
+      - name: Check results
+        run: |
+          echo "📊 Quality Check Results:"
+          echo "========================="
+          
+          if [ "${{ needs.code-quality.result }}" == "success" ]; then
+            echo "✅ Code Quality: PASSED"
+          else
+            echo "❌ Code Quality: FAILED"
+          fi
+          
+          if [ "${{ needs.tests.result }}" == "success" ]; then
+            echo "✅ Tests: PASSED"
+          elif [ "${{ needs.tests.result }}" == "skipped" ]; then
+            echo "⏭️  Tests: SKIPPED (no tests found)"
+          else
+            echo "❌ Tests: FAILED"
+          fi
+          
+          echo "========================="
+          
+          if [ "${{ needs.code-quality.result }}" == "success" ] && ([ "${{ needs.tests.result }}" == "success" ] || [ "${{ needs.tests.result }}" == "skipped" ]); then
+            echo "🎉 All quality checks passed!"
+            exit 0
+          else
+            echo "🚨 Quality checks failed. Please review the errors above."
+            exit 1
+          fi

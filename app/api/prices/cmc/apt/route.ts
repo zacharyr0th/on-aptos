@@ -68,5 +68,5 @@ export async function GET(_request: NextRequest) {
       apiCalls: 1,
       cacheHit: false,
     },
-  )();
+  );
 }

@@ -49,7 +49,7 @@ export const AptosValidators = {
         isValid: false,
         error:
           error instanceof z.ZodError
-            ? (error as any).errors[0]?.message
+            ? (error as unknown).errors[0]?.message
             : "Invalid address format",
       };
     }
@@ -69,7 +69,7 @@ export const AptosValidators = {
         isValid: false,
         error:
           error instanceof z.ZodError
-            ? (error as any).errors[0]?.message
+            ? (error as unknown).errors[0]?.message
             : "Invalid asset type format",
       };
     }

@@ -5,15 +5,16 @@ import {
   ProtocolType,
   getProtocolByAddress,
 } from "@/lib/constants/protocols/protocol-registry";
+import type { DeFiPosition } from "@/lib/types/consolidated";
 import { graphQLRequest } from "@/lib/utils/api/fetch-utils";
-import { logger } from "@/lib/utils/core/logger";
 
 import { AssetService } from "../../portfolio/services/asset-service";
 
 const INDEXER = "https://indexer.mainnet.aptoslabs.com/v1/graphql";
 const APTOS_API_KEY = getEnvVar("APTOS_BUILD_SECRET");
 
-export interface DeFiPosition {
+// Using consolidated DeFiPosition type
+interface LegacyDeFiPosition {
   protocol: string;
   protocolLabel: string;
   protocolType: ProtocolType;
@@ -105,7 +106,6 @@ export class DeFiBalanceService {
     walletAddress: string,
   ): Promise<DeFiPosition[]> {
     try {
-      logger.info(
         `Fetching comprehensive DeFi positions for wallet: ${walletAddress}`,
       );
 
@@ -142,14 +142,12 @@ export class DeFiBalanceService {
       const filteredPositions = allPositions.filter((position) => {
         // Always include LP tokens regardless of value
         if (this.isLPToken(position)) {
-          logger.info(
-            `Including LP token regardless of value: ${position.protocol} - ${position.position.supplied?.[0]?.symbol || "Unknown"}`,
+            `Including LP token regardless of value: ${position.protocol} - ${position.position.supplied?.[0]?.asset || "Unknown"}`,
           );
           return true;
         }
 
         if (position.totalValue < MIN_DEFI_VALUE_THRESHOLD) {
-          logger.info(
             `Filtering out dust DeFi position in ${position.protocol}: $${position.totalValue.toFixed(4)}`,
           );
           return false;
@@ -157,12 +155,10 @@ export class DeFiBalanceService {
         return true;
       });
 
-      logger.info(
         `Found ${filteredPositions.length} comprehensive DeFi positions (filtered from ${allPositions.length}) for wallet ${walletAddress}`,
       );
       return filteredPositions;
     } catch (error) {
-      logger.error("Error fetching DeFi positions:", error);
       throw new Error(
         `Failed to fetch DeFi positions: ${error instanceof Error ? error.message : "Unknown error"}`,
       );
@@ -179,7 +175,6 @@ export class DeFiBalanceService {
       const summary = await this.getComprehensivePositions(walletAddress);
       const positions: DeFiPosition[] = [];
 
-      logger.info(
         `Processing ${summary.positions.length} comprehensive positions, ${summary.totalActivePositions} active`,
       );
 
@@ -223,7 +218,6 @@ export class DeFiBalanceService {
           .map((p) => [p.assetType, p.price!]),
       );
 
-      logger.info(
         `Fetched prices for ${priceData.length} tokens in DeFi positions`,
       );
 
@@ -233,6 +227,7 @@ export class DeFiBalanceService {
 
         // Convert comprehensive position to DeFi position format with real prices
         const defiPosition: DeFiPosition = {
+          positionId: `${position.protocol}-${position.protocolAddress}`,
           protocol: position.protocol,
           protocolLabel: position.description,
           protocolType: this.mapPositionTypeToProtocolType(position.type),
@@ -251,15 +246,12 @@ export class DeFiBalanceService {
         // The comprehensive checker already filters for active positions
         positions.push(defiPosition);
 
-        logger.info(
           `Added position: ${position.protocol} (${position.type}) - Value: $${defiPosition.totalValue.toFixed(2)}`,
         );
       }
 
-      logger.info(`Returning ${positions.length} comprehensive DeFi positions`);
       return positions;
     } catch (error) {
-      logger.error("Comprehensive position checker failed:", error);
       throw new Error(
         `Failed to fetch comprehensive DeFi positions: ${error instanceof Error ? error.message : "Unknown error"}`,
       );
@@ -397,7 +389,7 @@ export class DeFiBalanceService {
   /**
    * Build position details from comprehensive position (legacy - without prices)
    */
-  private static buildPositionDetails(position: any): DeFiPosition["position"] {
+  private static buildPositionDetails(position: Record<string, unknown>): DeFiPosition["position"] {
     return this.buildPositionDetailsWithPrices(position, new Map());
   }
 
@@ -405,7 +397,7 @@ export class DeFiBalanceService {
    * Build position details from comprehensive position with real prices
    */
   private static buildPositionDetailsWithPrices(
-    position: any,
+    position: Record<string, unknown>,
     priceMap: Map<string, number>,
   ): DeFiPosition["position"] {
     const details: DeFiPosition["position"] = {};
@@ -413,8 +405,8 @@ export class DeFiBalanceService {
     // Handle LP tokens as liquidity positions
     if (position.lpTokens && position.lpTokens.length > 0) {
       details.liquidity = position.lpTokens
-        .filter((lp: any) => lp.balance && lp.balance !== "0")
-        .map((lp: any) => {
+        .filter((lp: Record<string, unknown>) => lp.balance && lp.balance !== "0")
+        .map((lp: Record<string, unknown>) => {
           const balance = parseFloat(lp.balance || "0");
           const price = (priceMap.get(lp.poolTokens[0]) ?? null) || 0; // Use first token price as approximation
           const value = balance * price;
@@ -440,11 +432,11 @@ export class DeFiBalanceService {
     // Handle regular tokens based on position type
     if (position.tokens && position.tokens.length > 0) {
       const nonZeroTokens = position.tokens.filter(
-        (token: any) => token.balance && token.balance !== "0",
+        (token: Record<string, unknown>) => token.balance && token.balance !== "0",
       );
 
       if (nonZeroTokens.length > 0) {
-        const tokenDetails = nonZeroTokens.map((token: any) => {
+        const tokenDetails = nonZeroTokens.map((token: Record<string, unknown>) => {
           const rawBalance = parseFloat(token.balance || "0");
           const decimals = this.getTokenDecimals(token.address, token.symbol);
           const balance = rawBalance / Math.pow(10, decimals);
@@ -495,7 +487,6 @@ export class DeFiBalanceService {
       details.supplied = [
         {
           asset: position.protocolAddress,
-          symbol: position.protocol,
           amount: "1",
           value: 0.001, // Small value to indicate active position
         },
@@ -508,7 +499,7 @@ export class DeFiBalanceService {
   /**
    * Calculate position value (legacy - without prices)
    */
-  private static calculatePositionValue(position: any): number {
+  private static calculatePositionValue(position: Record<string, unknown>): number {
     return this.calculatePositionValueWithPrices(position, new Map());
   }
 
@@ -516,14 +507,14 @@ export class DeFiBalanceService {
    * Calculate position value with real prices
    */
   private static calculatePositionValueWithPrices(
-    position: any,
+    position: Record<string, unknown>,
     priceMap: Map<string, number>,
   ): number {
     let totalValue = 0;
 
     // Calculate value from regular tokens
     if (position.tokens && position.tokens.length > 0) {
-      position.tokens.forEach((token: any) => {
+      position.tokens.forEach((token: Record<string, unknown>) => {
         const rawBalance = parseFloat(token.balance || "0");
         const decimals = this.getTokenDecimals(token.address, token.symbol);
         const balance = rawBalance / Math.pow(10, decimals);
@@ -548,7 +539,7 @@ export class DeFiBalanceService {
 
     // Calculate value from LP tokens
     if (position.lpTokens && position.lpTokens.length > 0) {
-      position.lpTokens.forEach((lp: any) => {
+      position.lpTokens.forEach((lp: Record<string, unknown>) => {
         const balance = parseFloat(lp.balance || "0");
         if (balance > 0) {
           // Use first token price as approximation for LP value
@@ -575,12 +566,13 @@ export class DeFiBalanceService {
     walletAddress: string,
   ): Promise<DeFiPosition[]> {
     try {
-      logger.info(
         `Checking wallet assets for DeFi positions: ${walletAddress}`,
       );
 
       // Import the getWalletAssets function
-      const { AssetService } = await import("../../portfolio/services/asset-service");
+      const { AssetService } = await import(
+        "../../portfolio/services/asset-service"
+      );
 
       // Get wallet assets (including unverified ones to catch LP tokens)
       const walletAssets = await AssetService.getWalletAssets(walletAddress);
@@ -595,12 +587,12 @@ export class DeFiBalanceService {
           for (const address of protocol.addresses) {
             if (assetType === address || assetType.includes(address)) {
               // Found a protocol asset
-              logger.info(
                 `Found protocol asset: ${protocol.name} - ${assetType} (${asset.metadata?.symbol || "UNKNOWN"})`,
               );
 
               // Create a DeFi position for this asset
               const position: DeFiPosition = {
+                positionId: `${protocol.name}-${asset.asset_type}`,
                 protocol: protocol.name,
                 protocolLabel: protocol.description || protocol.label,
                 protocolType: this.mapProtocolTypeToDefiType(protocol.type),
@@ -616,12 +608,10 @@ export class DeFiBalanceService {
         }
       }
 
-      logger.info(
         `Found ${positions.length} DeFi positions from wallet assets`,
       );
       return positions;
     } catch (error) {
-      logger.error("Error checking wallet assets for DeFi positions:", error);
       throw new Error(
         `Failed to fetch wallet asset DeFi positions: ${error instanceof Error ? error.message : "Unknown error"}`,
       );
@@ -641,7 +631,7 @@ export class DeFiBalanceService {
    * Check if a position is an LP token based on symbol or protocol type
    */
   private static isLPToken(position: DeFiPosition): boolean {
-    const symbol = position.position.supplied?.[0]?.symbol?.toLowerCase() || "";
+    const symbol = position.position.supplied?.[0]?.asset?.toLowerCase() || "";
     const protocol = position.protocol.toLowerCase();
 
     return (
@@ -659,7 +649,7 @@ export class DeFiBalanceService {
    * Build position details for LP tokens, attempting to extract underlying assets
    */
   private static async buildLPTokenPosition(
-    asset: any,
+    asset: Record<string, unknown>,
     assetType: string,
   ): Promise<DeFiPosition["position"]> {
     const symbol = asset.metadata?.symbol || "UNKNOWN";
@@ -702,7 +692,6 @@ export class DeFiBalanceService {
       supplied: [
         {
           asset: assetType,
-          symbol: symbol,
           amount: asset.balance?.toString() || "0",
           value: asset.value || 0,
         },
@@ -715,7 +704,7 @@ export class DeFiBalanceService {
    */
   private static async extractUnderlyingAssets(
     assetType: string,
-    asset: any,
+    asset: Record<string, unknown>,
   ): Promise<Array<{ asset: string; symbol: string; amount: string }>> {
     // For Thala LP tokens, we can make educated guesses based on common patterns
     if (asset.metadata?.symbol === "THALA-LP") {
@@ -729,7 +718,6 @@ export class DeFiBalanceService {
           return underlyingAmounts;
         }
       } catch (error) {
-        logger.warn("Failed to get Thala LP token amounts:", error);
       }
 
       // Fallback to showing the tokens but with TBD amounts
@@ -767,14 +755,12 @@ export class DeFiBalanceService {
       // This would require a more sophisticated implementation with direct
       // protocol contract queries or specialized APIs
 
-      logger.info(
         `Attempting to get Thala LP amounts for ${lpTokenAddress}, user balance: ${userLPBalance}`,
       );
 
       // Return null to indicate we couldn't get exact amounts
       return null;
     } catch (error) {
-      logger.warn("Error getting Thala LP token amounts:", error);
       return null;
     }
   }
@@ -786,7 +772,6 @@ export class DeFiBalanceService {
     walletAddress: string,
   ): Promise<DeFiPosition[]> {
     try {
-      logger.info(
         `Fetching legacy DeFi positions for wallet: ${walletAddress}`,
       );
 
@@ -800,7 +785,7 @@ export class DeFiBalanceService {
         farmingPositions,
         derivativesPositions,
         bridgePositions,
-      ] = await Promise.allSettled([
+      ] = await Promise.allSettled{)
         this.getLiquidStakingPositions(walletAddress),
         this.getLendingPositions(walletAddress),
         this.getDexPositions(walletAddress),
@@ -817,7 +802,7 @@ export class DeFiBalanceService {
         farmingPositions,
         derivativesPositions,
         bridgePositions,
-      ].forEach((result, index) => {
+      ].forEach((item, _index) => {
         if (result.status === "fulfilled") {
           positions.push(...result.value);
         } else {
@@ -829,7 +814,6 @@ export class DeFiBalanceService {
             "derivatives",
             "bridge",
           ];
-          logger.warn(
             `Failed to get ${protocolTypes[index]} positions:`,
             result.reason,
           );
@@ -840,7 +824,6 @@ export class DeFiBalanceService {
       const MIN_DEFI_VALUE_THRESHOLD = 0.1;
       const filteredPositions = positions.filter((position) => {
         if (position.totalValue < MIN_DEFI_VALUE_THRESHOLD) {
-          logger.debug(
             `Filtering out dust DeFi position in ${position.protocol}: $${position.totalValue.toFixed(4)}`,
           );
           return false;
@@ -848,12 +831,10 @@ export class DeFiBalanceService {
         return true;
       });
 
-      logger.info(
         `Found ${filteredPositions.length} legacy DeFi positions (filtered from ${positions.length}) for wallet ${walletAddress}`,
       );
       return filteredPositions;
     } catch (error) {
-      logger.error("Error fetching legacy DeFi positions:", error);
       throw new Error(
         `Failed to fetch legacy DeFi positions: ${error instanceof Error ? error.message : "Unknown error"}`,
       );
@@ -924,6 +905,7 @@ export class DeFiBalanceService {
         const protocol = getProtocolByAddress(balance.asset_type);
         if (protocol && protocol.type === ProtocolType.LIQUID_STAKING) {
           positions.push({
+            positionId: `${protocol.name}-${Date.now()}`,
             protocol: protocol.name,
             protocolLabel: protocol.label,
             protocolType: protocol.type,
@@ -932,7 +914,7 @@ export class DeFiBalanceService {
               staked: [
                 {
                   asset: balance.asset_type,
-                  symbol: balance.metadata.symbol,
+                  value: 0, // TODO: Calculate actual value
                   amount: balance.amount,
                 },
               ],
@@ -942,7 +924,6 @@ export class DeFiBalanceService {
         }
       }
     } catch (error) {
-      logger.error("Error fetching liquid staking positions:", error);
     }
 
     return positions;
@@ -973,7 +954,7 @@ export class DeFiBalanceService {
             decimals: number;
           };
         }>;
-      }>(INDEXER, {
+      }>((INDEXER, {
         query: `
           query GetLendingBalances($ownerAddress: String!) {
             current_fungible_asset_balances(
@@ -1008,6 +989,7 @@ export class DeFiBalanceService {
             balance.metadata.symbol.toLowerCase().includes("borrow");
 
           const position: DeFiPosition = {
+            positionId: `${protocol.name}-${balance.asset_type}`,
             protocol: protocol.name,
             protocolLabel: protocol.label,
             protocolType: protocol.type,
@@ -1020,7 +1002,7 @@ export class DeFiBalanceService {
             position.position.supplied = [
               {
                 asset: balance.asset_type,
-                symbol: balance.metadata.symbol,
+                value: 0, // TODO: Calculate value
                 amount: balance.amount,
               },
             ];
@@ -1028,7 +1010,7 @@ export class DeFiBalanceService {
             position.position.borrowed = [
               {
                 asset: balance.asset_type,
-                symbol: balance.metadata.symbol,
+                value: 0, // TODO: Calculate value
                 amount: balance.amount,
               },
             ];
@@ -1038,7 +1020,6 @@ export class DeFiBalanceService {
         }
       }
     } catch (error) {
-      logger.error("Error fetching lending positions:", error);
     }
 
     return positions;
@@ -1068,7 +1049,7 @@ export class DeFiBalanceService {
             decimals: number;
           };
         }>;
-      }>(INDEXER, {
+      }>((INDEXER, {
         query: `
           query GetDexBalances($ownerAddress: String!) {
             current_fungible_asset_balances(
@@ -1102,6 +1083,7 @@ export class DeFiBalanceService {
 
           if (isLPToken) {
             positions.push({
+              positionId: `${protocol.name}-${balance.asset_type}`,
               protocol: protocol.name,
               protocolLabel: protocol.label,
               protocolType: protocol.type,
@@ -1110,8 +1092,8 @@ export class DeFiBalanceService {
                 liquidity: [
                   {
                     poolId: balance.asset_type,
-                    token0: { asset: "", symbol: "", amount: "0" },
-                    token1: { asset: "", symbol: "", amount: "0" },
+                    token0: { symbol: "", amount: "0" },
+                    token1: { symbol: "", amount: "0" },
                     lpTokens: balance.amount,
                   },
                 ],
@@ -1122,7 +1104,6 @@ export class DeFiBalanceService {
         }
       }
     } catch (error) {
-      logger.error("Error fetching DEX positions:", error);
     }
 
     return positions;
@@ -1152,7 +1133,7 @@ export class DeFiBalanceService {
             decimals: number;
           };
         }>;
-      }>(INDEXER, {
+      }>((INDEXER, {
         query: `
           query GetFarmingBalances($ownerAddress: String!) {
             current_fungible_asset_balances(
@@ -1180,6 +1161,7 @@ export class DeFiBalanceService {
         const protocol = getProtocolByAddress(balance.asset_type);
         if (protocol && protocol.type === ProtocolType.FARMING) {
           positions.push({
+            positionId: `${protocol.name}-${Date.now()}`,
             protocol: protocol.name,
             protocolLabel: protocol.label,
             protocolType: protocol.type,
@@ -1188,7 +1170,7 @@ export class DeFiBalanceService {
               staked: [
                 {
                   asset: balance.asset_type,
-                  symbol: balance.metadata.symbol,
+                  value: 0, // TODO: Calculate actual value
                   amount: balance.amount,
                 },
               ],
@@ -1198,7 +1180,6 @@ export class DeFiBalanceService {
         }
       }
     } catch (error) {
-      logger.error("Error fetching farming positions:", error);
     }
 
     return positions;
@@ -1228,7 +1209,7 @@ export class DeFiBalanceService {
             decimals: number;
           };
         }>;
-      }>(INDEXER, {
+      }>((INDEXER, {
         query: `
           query GetDerivativesBalances($ownerAddress: String!) {
             current_fungible_asset_balances(
@@ -1256,17 +1237,18 @@ export class DeFiBalanceService {
         const protocol = getProtocolByAddress(balance.asset_type);
         if (protocol && protocol.type === ProtocolType.DERIVATIVES) {
           positions.push({
+            positionId: `${protocol.name}-${Date.now()}`,
             protocol: protocol.name,
             protocolLabel: protocol.label,
             protocolType: protocol.type,
             address: balance.asset_type,
             position: {
-              derivatives: [
+              staked: [
                 {
                   asset: balance.asset_type,
-                  symbol: balance.metadata.symbol,
+                  value: 0, // TODO: Calculate actual value
                   amount: balance.amount,
-                  type: "long", // Default, would need more analysis to determine
+                  apy: 0, // TODO: Calculate APY
                 },
               ],
             },
@@ -1275,7 +1257,6 @@ export class DeFiBalanceService {
         }
       }
     } catch (error) {
-      logger.error("Error fetching derivatives positions:", error);
     }
 
     return positions;
@@ -1305,7 +1286,7 @@ export class DeFiBalanceService {
             decimals: number;
           };
         }>;
-      }>(INDEXER, {
+      }>((INDEXER, {
         query: `
           query GetBridgeBalances($ownerAddress: String!) {
             current_fungible_asset_balances(
@@ -1335,6 +1316,7 @@ export class DeFiBalanceService {
           // Bridge tokens are usually considered phantom/locked assets
           // but we still track them for transparency
           positions.push({
+            positionId: `${protocol.name}-${Date.now()}`,
             protocol: protocol.name,
             protocolLabel: protocol.label,
             protocolType: protocol.type,
@@ -1343,7 +1325,7 @@ export class DeFiBalanceService {
               supplied: [
                 {
                   asset: balance.asset_type,
-                  symbol: balance.metadata.symbol,
+                  value: 0, // TODO: Calculate actual value
                   amount: balance.amount,
                 },
               ],
@@ -1353,7 +1335,6 @@ export class DeFiBalanceService {
         }
       }
     } catch (error) {
-      logger.error("Error fetching bridge positions:", error);
     }
 
     return positions;
@@ -1391,10 +1372,12 @@ export class DeFiBalanceService {
 
       // Calculate protocol breakdown
       for (const position of positions) {
-        if (!stats.protocolBreakdown[position.protocolType]) {
-          stats.protocolBreakdown[position.protocolType] = 0;
+        const protocolType =
+          position.protocolType as keyof typeof stats.protocolBreakdown;
+        if (!stats.protocolBreakdown[protocolType]) {
+          stats.protocolBreakdown[protocolType] = 0;
         }
-        stats.protocolBreakdown[position.protocolType] += position.totalValue;
+        stats.protocolBreakdown[protocolType] += position.totalValue;
       }
 
       // Calculate top protocols
@@ -1418,7 +1401,6 @@ export class DeFiBalanceService {
 
       return stats;
     } catch (error) {
-      logger.error("Error calculating DeFi stats:", error);
       return {
         totalPositions: 0,
         totalValueLocked: 0,
@@ -1483,7 +1465,7 @@ export class DeFiBalanceService {
           const lpInfo = this.parseLPToken(resource.type);
 
           if (lpInfo.isLPToken) {
-            const balance = (resource.data as any)?.coin?.value || "0";
+            const balance = (resource.data as unknown)?.coin?.value || "0";
             const tokenSymbols = lpInfo.tokens.map((t) =>
               this.getTokenSymbol(t),
             );
@@ -1495,7 +1477,7 @@ export class DeFiBalanceService {
             });
           } else if (resource.type.includes("::coin::CoinStore<")) {
             // Regular token
-            const balance = (resource.data as any)?.coin?.value || "0";
+            const balance = (resource.data as unknown)?.coin?.value || "0";
             const tokenMatch = resource.type.match(/CoinStore<(.+)>/);
 
             if (tokenMatch) {
@@ -1522,14 +1504,14 @@ export class DeFiBalanceService {
           tokens.some((t) => t.balance !== "0") ||
           lpTokens.some((lp) => lp.balance !== "0") ||
           protocolResourceList.some((r) => {
-            const data = r.data as any;
+            const data = r.data as unknown;
             return data?.coin?.value !== "0" || Object.keys(data).length > 1;
           });
 
         positions.push({
           protocol: protocolName,
           protocolAddress,
-          type: positionType as any,
+          type: positionType as unknown,
           description: identification.description,
           tokens,
           lpTokens,
@@ -1559,7 +1541,6 @@ export class DeFiBalanceService {
         lastUpdated: new Date().toISOString(),
       };
     } catch (error) {
-      logger.error("Error getting comprehensive positions:", error);
       return {
         walletAddress,
         positions: [],
@@ -1581,7 +1562,7 @@ export class DeFiBalanceService {
         {
           headers: {
             "Content-Type": "application/json",
-            ...(APTOS_API_KEY
+            ...((APTOS_API_KEY)
               ? { Authorization: `Bearer ${APTOS_API_KEY}` }
               : {}),
           },
@@ -1597,7 +1578,6 @@ export class DeFiBalanceService {
       const data = await response.json();
       return Array.isArray(data) ? data : [];
     } catch (error) {
-      logger.error("Error fetching account resources:", error);
       return [];
     }
   }

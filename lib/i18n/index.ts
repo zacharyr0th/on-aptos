@@ -3,7 +3,6 @@ import HttpApi from "i18next-http-backend";
 import { initReactI18next } from "react-i18next";
 
 import { i18nEventManager } from "@/lib/i18n/events";
-import { logger } from "@/lib/utils/core/logger";
 
 // Only import English translations for SSR - other languages load on demand
 import commonEn from "../../public/locales/en/common.json";
@@ -120,7 +119,7 @@ const i18nConfig = {
       credentials: "same-origin",
     },
     // Custom request with retry logic and better error handling
-    request: async (options: any, url: string, payload: any, callback: any) => {
+    request: async (options: Record<string, unknown>, url: string, payload: Record<string, unknown>, callback: Record<string, unknown>) => {
       const maxRetries = 2;
       let attempt = 0;
 

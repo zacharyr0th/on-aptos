@@ -2,7 +2,6 @@
  * Centralized UI component type definitions
  */
 
-import { StaticImageData } from "next/image";
 
 import { TokenMetadata } from "./tokens";
 
@@ -44,7 +43,7 @@ export interface LoadingSkeletonProps {
   variant: LoadingSkeletonVariant;
   className?: string;
   count?: number;
-  [key: string]: any; // For variant-specific props
+  [key: string]: Record<string, unknown>; // For variant-specific props
 }
 
 // Chart types
@@ -71,7 +70,7 @@ export interface TableColumn<T = any> {
   sortable?: boolean;
   width?: string | number;
   align?: "left" | "center" | "right";
-  render?: (value: any, row: T) => React.ReactNode;
+  render?: (value: Record<string, unknown>, row: T) => React.ReactNode;
 }
 
 export interface TableProps<T = any> {
@@ -240,7 +239,7 @@ export interface TooltipProps {
 }
 
 // Type guards
-export function isValidImageSrc(src: any): src is string | StaticImageData {
+export function isValidImageSrc(src: Record<string, unknown>): src is string | StaticImageData {
   return (
     typeof src === "string" || (src && typeof src === "object" && "src" in src)
   );

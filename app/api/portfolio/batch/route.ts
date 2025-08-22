@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { getEnvVar } from "@/lib/config/validate-env";
-import { AssetService } from "@/lib/services/portfolio/services/asset-service";
 import { DeFiService } from "@/lib/services/defi/services/defi-service";
+import { AssetService } from "@/lib/services/portfolio/services/asset-service";
 import { NFTService } from "@/lib/services/portfolio/services/nft-service";
-import { apiLogger } from "@/lib/utils/core/logger";
+
+
 
 // Revalidate cache every 5 minutes
 export const revalidate = 300;
@@ -81,7 +82,7 @@ async function fetchTransactionsInternal(
     }
 
     // Get transaction details for the fetched versions
-    const txVersions = accountTxns.map((tx: any) => tx.transaction_version);
+    const txVersions = accountTxns.map((tx: unknown) => tx.transaction_version);
 
     // Fetch transaction details - get both user_transactions and block_metadata_transactions
     const detailsQuery = `
@@ -142,7 +143,7 @@ async function fetchTransactionsInternal(
       );
       // Return basic data without details
       return {
-        data: accountTxns.map((tx: any) => ({
+        data: accountTxns.map((tx: unknown) => ({
           transaction_version: tx.transaction_version,
           transaction_timestamp: new Date().toISOString(),
           type: "Transaction",
@@ -165,7 +166,7 @@ async function fetchTransactionsInternal(
     const allTransactionsMap = new Map();
 
     // Add user transactions
-    userTransactions.forEach((tx: any) => {
+    userTransactions.forEach((tx: unknown) => {
       allTransactionsMap.set(tx.version, {
         ...tx,
         transaction_type: "user_transaction",
@@ -173,7 +174,7 @@ async function fetchTransactionsInternal(
     });
 
     // Add block metadata transactions (these might be missing from user_transactions)
-    blockMetadataTransactions.forEach((tx: any) => {
+    blockMetadataTransactions.forEach((tx: unknown) => {
       if (!allTransactionsMap.has(tx.version)) {
         allTransactionsMap.set(tx.version, {
           ...tx,
@@ -215,7 +216,7 @@ async function fetchTransactionsInternal(
     );
 
     // Group events by transaction version
-    const eventsByVersion = events.reduce((acc: any, event: any) => {
+    const eventsByVersion = events.reduce((acc: unknown, event: unknown) => {
       if (!acc[event.transaction_version]) acc[event.transaction_version] = [];
       acc[event.transaction_version].push(event);
       return acc;
@@ -229,7 +230,7 @@ async function fetchTransactionsInternal(
       );
     }
 
-    const transactions = sortedTransactions.map((tx: any) => {
+    const transactions = sortedTransactions.map((tx: unknown) => {
       // Extract amount from events
       let amount = "0";
       let assetType = "APT";
@@ -303,18 +304,18 @@ async function fetchTransactionsInternal(
 }
 
 interface BatchResponse {
-  assets: any[] | null;
-  defiPositions: any[] | null;
-  nfts: any[] | null;
+  assets: unknown[] | null;
+  defiPositions: unknown[] | null;
+  nfts: unknown[] | null;
   nftTotalCount: number | null;
   nftCollectionStats: {
     collections: Array<{ name: string; count: number }>;
     totalCollections: number;
   } | null;
-  metrics: any | null;
-  summary: any | null;
+  metrics: unknown | null;
+  summary: unknown | null;
   hasMoreNFTs: boolean;
-  transactions: any[] | null;
+  transactions: unknown[] | null;
   hasMoreTransactions: boolean;
 }
 
@@ -419,10 +420,10 @@ export async function GET(request: NextRequest) {
     // Handle NFTs
     if (nftResult.status === "fulfilled") {
       if (includeAllNFTs) {
-        response.nfts = nftResult.value as any[];
+        response.nfts = nftResult.value as unknown[];
         response.hasMoreNFTs = false;
       } else {
-        const paginatedResult = nftResult.value as any;
+        const paginatedResult = nftResult.value as Record<string, unknown>;
         response.nfts = paginatedResult.data;
         response.hasMoreNFTs = paginatedResult.hasMore;
       }

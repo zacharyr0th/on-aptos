@@ -3,7 +3,6 @@
  * Most caching is handled by TanStack Query on the client
  */
 
-import { errorLogger } from "@/lib/utils/core/logger";
 
 interface CacheEntry<T> {
   data: T;

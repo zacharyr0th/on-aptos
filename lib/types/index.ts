@@ -3,35 +3,19 @@
  * Single source of truth for all types used across the application
  */
 
-// Re-export all API types
-export * from "./api";
+// Primary export: consolidated types (single source of truth)
+export * from "./consolidated";
 
-// Re-export all token types
-export * from "./tokens";
+// Runtime validation schemas (commented out due to build issues)
+// export * from "./validation";
+
+// Legacy exports for backward compatibility (will be phased out)
+export * from "./api";
+export * from "./ui";
+// Note: tokens.ts exports conflicted with consolidated exports
 
 // Re-export token functions (not types)
 export { normalizeIssuer, getThumbnailUrl } from "./tokens";
-
-// Re-export all DeFi types (excluding conflicting names)
-export {
-  ProtocolType,
-  type DeFiPosition as DeFiPositionDetailed, // Renamed to avoid conflict
-  type GroupedDeFiPosition,
-  type ProtocolInfo,
-  type YieldInfo,
-  type PoolInfo,
-  type LendingMarket,
-  type VaultInfo,
-  isDeFiPosition,
-  hasHealthStatus,
-  hasRewards,
-  getProtocolTypeLabel,
-  calculateHealthRatio,
-  getHealthStatus,
-} from "./defi";
-
-// Re-export all UI types
-export * from "./ui";
 
 // Re-export types from utils/types for backward compatibility
 export type {

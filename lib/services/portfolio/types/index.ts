@@ -1,56 +1,17 @@
 // Portfolio service type definitions
+// Import core types from consolidated types
+import type {
+  FungibleAsset,
+  NFT,
+  DeFiPosition,
+  Transaction,
+} from "@/lib/types/consolidated";
 
-export interface FungibleAsset {
-  asset_type: string;
-  amount: string;
-  metadata?: {
-    name: string;
-    symbol: string;
-    decimals: number;
-    icon_uri?: string;
-    project_uri?: string;
-    creator_address?: string;
-  };
-  price?: number;
-  value?: number;
-  balance?: number;
-  isVerified?: boolean;
-  protocolInfo?: {
-    protocol: string;
-    protocolLabel: string;
-    protocolType: string;
-    isPhantomAsset: boolean;
-  };
-  is_frozen?: boolean;
-  is_primary?: boolean;
-  last_transaction_timestamp?: string;
-  last_transaction_version?: number;
-  token_standard?: string;
-}
+// Re-export core types
+export type { FungibleAsset, NFT, DeFiPosition };
 
-export interface NFT {
-  token_data_id: string;
-  token_name: string;
-  collection_name: string;
-  token_uri: string;
-  description?: string;
-  property_version_v1: number;
-  amount: number;
-  cdn_image_uri?: string;
-  cdn_animation_uri?: string;
-  collection_description?: string;
-  creator_address?: string;
-  collection_uri?: string;
-  last_transaction_version?: number;
-  last_transaction_timestamp?: string;
-  token_standard?: string;
-  is_soulbound?: boolean;
-  collection_id?: string;
-  supply?: number;
-  maximum?: number;
-  current_supply?: number;
-  max_supply?: number;
-}
+// Alias for backward compatibility
+export type WalletTransaction = Transaction;
 
 export interface PortfolioHistoryPoint {
   date: string;
@@ -84,46 +45,6 @@ export interface PortfolioMetrics {
   }[];
   topGainers: AssetPrice[];
   topLosers: AssetPrice[];
-}
-
-export interface WalletTransaction {
-  transaction_version: string;
-  transaction_timestamp: string;
-  type: string;
-  amount: string;
-  asset_type: string;
-  sender?: string;
-  receiver?: string;
-  gas_fee?: string;
-  success: boolean;
-  function?: string;
-  payload?: any;
-}
-
-export interface DeFiPosition {
-  protocol: string;
-  protocolType: string;
-  poolName: string;
-  positionType: string;
-  suppliedAssets: Array<{
-    asset: string;
-    amount: number;
-    value: number;
-    apy?: number;
-  }>;
-  borrowedAssets: Array<{
-    asset: string;
-    amount: number;
-    value: number;
-    apy?: number;
-  }>;
-  totalValueUSD: number;
-  healthFactor?: number;
-  claimableRewards?: Array<{
-    asset: string;
-    amount: number;
-    value: number;
-  }>;
 }
 
 export interface ANSNameResponse {

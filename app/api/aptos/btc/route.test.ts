@@ -32,7 +32,7 @@ describe("GET /api/aptos/btc", () => {
     };
 
     // Mock different responses for different queries
-    vi.mocked(fetch).mockImplementation(async (url: string, options: any) => {
+    vi.mocked(fetch).mockImplementation(async (url: string, options: unknown) => {
       const body = JSON.parse(options.body);
       if (body.query.includes("fungible_asset_metadata")) {
         return Promise.resolve({

@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
-import { logger } from "@/lib/utils/core/logger";
+
 
 /**
  * Standard cache headers for API responses
  */
-export const CACHE_HEADERS = {
   // 5 minutes cache with stale-while-revalidate
   SHORT: "public, s-maxage=300, stale-while-revalidate=600",
   // 1 hour cache with stale-while-revalidate
@@ -39,12 +38,11 @@ export function successResponse<T>(
     headers?: ApiHeaders;
     cache?: keyof typeof CACHE_HEADERS;
     status?: number;
-  }
+  },
 ) {
-  const cacheControl = options?.cache 
-    ? CACHE_HEADERS[options.cache] 
-    : options?.headers?.["Cache-Control"] 
-    || CACHE_HEADERS.SHORT;
+  const cacheControl = options?.cache
+    ? CACHE_HEADERS[options.cache]
+    : options?.headers?.["Cache-Control"] || CACHE_HEADERS.SHORT;
 
   const headers: ApiHeaders = {
     "Cache-Control": cacheControl,
@@ -55,7 +53,7 @@ export function successResponse<T>(
 
   return NextResponse.json(data, {
     status: options?.status || 200,
-    headers: headers as any,
+    headers: headers as unknown,
   });
 }
 
@@ -66,9 +64,9 @@ export function errorResponse(
   error: string | Error,
   options?: {
     status?: number;
-    details?: any;
+    details?: Record<string, unknown>;
     service?: string;
-  }
+  },
 ) {
   const errorMessage = error instanceof Error ? error.message : error;
   const status = options?.status || 500;
@@ -94,7 +92,7 @@ export function errorResponse(
         "X-Content-Type": "application/json",
         ...(options?.service && { "X-Service": options.service }),
       },
-    }
+    },
   );
 }
 
@@ -103,14 +101,14 @@ export function errorResponse(
  */
 export function validateParams(
   params: Record<string, any>,
-  required: string[]
+  required: string[],
 ): { valid: boolean; missing?: string[] } {
-  const missing = required.filter(key => !params[key]);
-  
+  const missing = required.filter((key) => !params[key]);
+
   if (missing.length > 0) {
     return { valid: false, missing };
   }
-  
+
   return { valid: true };
 }
 
@@ -118,8 +116,7 @@ export function validateParams(
  * Standard validation error response
  */
 export function validationError(missing: string[]) {
-  return errorResponse(
-    `Missing required parameters: ${missing.join(", ")}`,
-    { status: 400 }
-  );
+  return errorResponse(`Missing required parameters: ${missing.join(", ")}`, {
+    status: 400,
+  });
 }

@@ -1,10 +1,10 @@
+import Image from "next/image";
 "use client";
 
 import { InfoIcon } from "lucide-react";
-import Image from "next/image";
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 
-import { Disclaimer } from "@/components/layout/Disclaimer";
+// import { Disclaimer } from "@/components/layout/Disclaimer";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
@@ -20,7 +20,6 @@ import { PROTOCOL_ICONS } from "@/lib/config";
 import { ECHO_PROTOCOL_CONFIG, SupplyData } from "@/lib/config/data";
 import { YIELD_COLORS } from "@/lib/constants/ui/colors";
 import { formatCurrency, formatBigIntWithDecimals } from "@/lib/utils";
-import { errorLogger } from "@/lib/utils/core/logger";
 
 import { Market, ProtocolData } from "./types";
 import { formatBTCAmountWithCommas } from "./utils";
@@ -48,10 +47,10 @@ export default function MoneyMarkets({
   supplyData,
 }: MoneyMarketsProps) {
   const { t } = usePageTranslation("btc");
-  const [selectedMarket, setSelectedMarket] = useState<Market | null>(null);
+  // const [selectedMarket, setSelectedMarket] = useState<Market | null>(null);
 
   // Calculate Echo data based on configuration and real data
-  const echoData = useMemo((): ProtocolData | null => {
+  const echoData = useMemo(: ProtocolData | null => {
     if (!echelonData || !supplyData || !ECHO_PROTOCOL_CONFIG.enabled)
       return null;
 
@@ -157,7 +156,6 @@ export default function MoneyMarkets({
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
-
         {/* Protocols arranged horizontally on md+ screens */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <ProtocolSection
@@ -294,7 +292,7 @@ const ProtocolSection: React.FC<ProtocolSectionProps> = ({
                         }}
                       >
                         ~
-                        {(m.apyReward !== undefined
+                        {((m.apyReward !== undefined)
                           ? m.apyReward * 100
                           : 0
                         ).toFixed(2)}

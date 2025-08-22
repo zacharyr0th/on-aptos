@@ -38,7 +38,7 @@ export interface ParsedRWAAsset {
   circulatingSupply: number;
 }
 
-export function parseCSVLine(line: string): string[] {
+export function parseCSVLine( _line: string): string[] {
   const result: string[] = [];
   let current = "";
   let inQuotes = false;
@@ -60,7 +60,7 @@ export function parseCSVLine(line: string): string[] {
   return result;
 }
 
-export function parseCSVData(csvContent: string): CSVRWAAsset[] {
+export function parseCSVData( _csvContent: string): CSVRWAAsset[] {
   const lines = csvContent.trim().split("\n");
   if (lines.length < 2) return [];
 
@@ -72,7 +72,7 @@ export function parseCSVData(csvContent: string): CSVRWAAsset[] {
     if (values.length !== headers.length) continue;
 
     const asset: Record<string, string | number> = {};
-    headers.forEach((header, index) => {
+    headers.forEach((item, _index) => {
       const value = values[index];
 
       // Convert numeric fields
@@ -93,9 +93,9 @@ export function parseCSVData(csvContent: string): CSVRWAAsset[] {
   return assets;
 }
 
-export function transformCSVToRWAAsset(csvAsset: CSVRWAAsset): ParsedRWAAsset {
+export function transformCSVToRWAAsset( _csvAsset: CSVRWAAsset): ParsedRWAAsset {
   // Determine asset class mapping
-  const getAssetClassCategory = (assetClass: string): string => {
+  const getAssetClassCategory = ( _assetClass: string): string => {
     const classLower = assetClass.toLowerCase();
     if (classLower.includes("treasury") || classLower.includes("us-treasury")) {
       return "treasury";
@@ -111,7 +111,7 @@ export function transformCSVToRWAAsset(csvAsset: CSVRWAAsset): ParsedRWAAsset {
   };
 
   // Generate logo URL based on protocol
-  const getLogoUrl = (protocol: string, ticker: string): string => {
+  const getLogoUrl = ( _protocol: string, ticker: string): string => {
     const protocolLower = protocol.toLowerCase();
     if (protocolLower.includes("pact")) {
       return "/icons/pact.png";

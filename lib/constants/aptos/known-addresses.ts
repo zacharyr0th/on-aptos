@@ -91,8 +91,6 @@ export const knownAptosRelatedAddresses: Record<string, string> = {
     "Merkle Trade",
   "0x60955b957956d79bc80b096d3e41bad525dd400d8ce957cdeb05719ed1e4fc26":
     "Thala router",
-  "0x4e5e85fd647c7e19560590831616a3c021080265576af3182535a1d19e8bc2b3":
-    "Uptos Pump",
   "0xcd7b88c2181881bf8e7ef741cae867aee038e75df94224496a4a81627edf7f65": "Defy",
   "0xa3111961a31597ca770c60be02fc9f72bdee663f563e45223e79793557eef0d9":
     "Lucid Finance",

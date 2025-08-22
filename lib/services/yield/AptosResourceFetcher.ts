@@ -3,7 +3,6 @@ import {
   YIELD_TOKEN_ADDRESSES,
   getSymbolFromAddress,
 } from "@/lib/constants";
-import { logger } from "@/lib/utils/core/logger";
 
 export interface ProtocolOpportunity {
   id: string;
@@ -29,7 +28,7 @@ export interface ProtocolOpportunity {
 export class AptosResourceFetcher {
   private static instance: AptosResourceFetcher;
   private apiUrl = "https://api.mainnet.aptoslabs.com/v1";
-  private cache = new Map<string, { data: any; timestamp: number }>();
+  private cache = new Map<string, { data: Record<string, unknown>; timestamp: number }>();
   private cacheTimeout = 5 * 60 * 1000; // 5 minutes
 
   private constructor() {}
@@ -58,7 +57,7 @@ export class AptosResourceFetcher {
         {
           headers: {
             "Content-Type": "application/json",
-            ...(process.env.APTOS_BUILD_SECRET
+            ...(process.env.APTOS_BUILD_SECRET)
               ? { Authorization: `Bearer ${process.env.APTOS_BUILD_SECRET}` }
               : {}),
           },
@@ -81,9 +80,9 @@ export class AptosResourceFetcher {
   /**
    * Get a specific resource
    */
-  async getResource(account: string, resourceType: string): Promise<any> {
+  async getResource(account: string, resourceType: string): Promise<Record<string, unknown>> {
     const resources = await this.getResources(account);
-    return resources.find((r) => r.type === resourceType);
+    return resources.find(r) => r.type === resourceType);
   }
 
   /**
@@ -94,9 +93,9 @@ export class AptosResourceFetcher {
     data: {
       key_type: string;
       value_type: string;
-      key: any;
+      key: Record<string, unknown>;
     };
-  }): Promise<any> {
+  }): Promise<Record<string, unknown>> {
     try {
       const response = await fetch(
         `${this.apiUrl}/tables/${params.table}/item`,
@@ -104,7 +103,7 @@ export class AptosResourceFetcher {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            ...(process.env.APTOS_BUILD_SECRET
+            ...(process.env.APTOS_BUILD_SECRET)
               ? { Authorization: `Bearer ${process.env.APTOS_BUILD_SECRET}` }
               : {}),
           },
@@ -139,7 +138,7 @@ export class AptosResourceFetcher {
     if (match) {
       return match[1]
         .split(",")
-        .map((s) => s.trim())
+        .map(s) => s.trim())
         .filter((s) => !s.includes("Null")); // Filter out null placeholders
     }
     return [];
@@ -212,8 +211,8 @@ export class AptosResourceFetcher {
       const resources = await this.getResources(protocolAddress);
 
       // Filter resources based on config
-      const relevantResources = resources.filter((r: any) =>
-        config.resourceFilters.some((filter) => r.type.includes(filter)),
+      const relevantResources = resources.filter((r: Record<string, unknown>) =>
+        config.resourceFilters.some(filter) => r.type.includes(filter)),
       );
 
       for (const resource of relevantResources) {
@@ -238,7 +237,7 @@ export class AptosResourceFetcher {
    * Parse resource data into opportunity format
    */
   private async parseResourceToOpportunity(
-    resource: any,
+    resource: Record<string, unknown>,
     protocolName: string,
     config: {
       opportunityType:
@@ -288,7 +287,7 @@ export class AptosResourceFetcher {
   /**
    * Calculate APY from resource data
    */
-  calculateAPY(resourceData: any, opportunityType: string): number {
+  calculateAPY(resourceData: Record<string, unknown>, opportunityType: string): number {
     if (!resourceData) return 0;
 
     switch (opportunityType) {
@@ -308,7 +307,7 @@ export class AptosResourceFetcher {
   /**
    * Calculate TVL from resource data
    */
-  calculateTVL(resourceData: any, opportunityType: string): number {
+  calculateTVL(resourceData: Record<string, unknown>, opportunityType: string): number {
     if (!resourceData) return 0;
 
     switch (opportunityType) {
@@ -349,14 +348,14 @@ export class AptosResourceFetcher {
    * Extract rewards from resource data
    */
   private extractRewards(
-    resourceData: any,
+    resourceData: Record<string, unknown>,
   ): Array<{ token: string; symbol: string; apr: number }> | undefined {
     if (!resourceData?.reward_tokens && !resourceData?.rewards)
       return undefined;
 
     const rewardTokens =
       resourceData.reward_tokens || resourceData.rewards || [];
-    return rewardTokens.map((token: any) => ({
+    return rewardTokens.map(token: Record<string, unknown>) => ({
       token: typeof token === "string" ? token : token.token || token.address,
       symbol: this.getSymbol(
         typeof token === "string" ? token : token.token || token.address,
@@ -368,7 +367,7 @@ export class AptosResourceFetcher {
   /**
    * Check if resource is active
    */
-  private isResourceActive(resourceData: any): boolean {
+  private isResourceActive(resourceData: Record<string, unknown>): boolean {
     if (!resourceData) return false;
 
     // Check various activity indicators
@@ -386,7 +385,7 @@ export class AptosResourceFetcher {
   }
 
   // Specific APY calculation methods
-  private calculateLendingAPY(resourceData: any): number {
+  private calculateLendingAPY(resourceData: Record<string, unknown>): number {
     const apy =
       resourceData.supply_apy ||
       resourceData.current_apy ||
@@ -398,14 +397,14 @@ export class AptosResourceFetcher {
     return apy > 100 ? apy / 100 : apy;
   }
 
-  private calculateLiquidityAPY(resourceData: any): number {
+  private calculateLiquidityAPY(resourceData: Record<string, unknown>): number {
     const feeAPY = resourceData.fee_apy || resourceData.trading_fee_apy || 0;
     const rewardAPY =
       resourceData.reward_apy || resourceData.incentive_apy || 0;
     return feeAPY + rewardAPY;
   }
 
-  private calculateStakingAPY(resourceData: any): number {
+  private calculateStakingAPY(resourceData: Record<string, unknown>): number {
     return (
       resourceData.staking_apy ||
       resourceData.validator_apy ||
@@ -414,7 +413,7 @@ export class AptosResourceFetcher {
     );
   }
 
-  private calculateFarmingAPY(resourceData: any): number {
+  private calculateFarmingAPY(resourceData: Record<string, unknown>): number {
     const baseAPY = resourceData.base_apy || resourceData.lp_apy || 0;
     const farmingAPY = resourceData.farming_apy || resourceData.reward_apy || 0;
     return baseAPY + farmingAPY;

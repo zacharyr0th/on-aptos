@@ -61,72 +61,9 @@ export interface PortfolioAssetsResponse {
   assetCount: number;
 }
 
-// DeFi Types
-export interface DeFiPosition {
-  protocol: string;
-  protocolType: string;
-  totalValue: number;
-  address: string;
-  position: {
-    supplied?: Array<{
-      asset: string;
-      amount: string;
-      value: number;
-    }>;
-    borrowed?: Array<{
-      asset: string;
-      amount: string;
-      value: number;
-    }>;
-    staked?: Array<{
-      asset: string;
-      amount: string;
-      value: number;
-    }>;
-    liquidity?: Array<{
-      poolId: string;
-      lpTokens: string;
-      token0?: { symbol: string; amount: string };
-      token1?: { symbol: string; amount: string };
-    }>;
-  };
-  protocolInfo?: {
-    name: string;
-    category: string;
-    logo?: string;
-  };
-}
+// DeFi Types - removed, now imported from consolidated types
 
-export interface DeFiPositionsResponse {
-  positions: DeFiPosition[];
-  totalValue: number;
-  protocolCount: number;
-}
-
-// NFT Types (matching service output)
-export interface NFT {
-  token_data_id: string;
-  token_name: string;
-  collection_name: string;
-  token_uri: string;
-  description?: string;
-  property_version_v1: number;
-  amount: number;
-  cdn_image_uri?: string;
-  cdn_animation_uri?: string;
-  collection_description?: string;
-  creator_address?: string;
-  collection_uri?: string;
-  last_transaction_version?: number;
-  last_transaction_timestamp?: string;
-  token_standard?: "v1" | "v2";
-}
-
-export interface NFTsResponse {
-  nfts: NFT[];
-  totalCount: number;
-  hasMore: boolean;
-}
+// NFT Types - removed, now imported from consolidated types
 
 // Price Types
 export interface PriceData {

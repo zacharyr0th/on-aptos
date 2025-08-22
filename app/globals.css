@@ -45,11 +45,37 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
-/* NFT Grid Mobile Scrolling Fix */
+/* Mobile Optimizations */
 @media (max-width: 768px) {
   .nft-grid-container {
     -webkit-overflow-scrolling: touch;
     overflow-y: auto;
+  }
+
+  /* Touch targets */
+  button,
+  [role="button"],
+  .clickable {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Prevent zoom on double tap */
+  input,
+  textarea,
+  select {
+    touch-action: manipulation;
+  }
+
+  /* Smooth scrolling for mobile */
+  * {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+
+  /* Card hover adjustments for touch */
+  .card:hover {
+    transform: none;
   }
 }
 
@@ -383,6 +409,305 @@
       padding-left: 1rem !important;
       padding-right: 1rem !important;
     }
+  }
+}
+
+/* === Production Enhancements === */
+
+/* Cross-browser compatibility fixes */
+.portfolio-container {
+  /* Ensure proper layout across browsers */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+
+  /* Fix for IE/Edge */
+  -ms-flex-direction: column;
+  -ms-flex-pack: start;
+  -ms-flex-align: stretch;
+}
+
+/* Enhanced error boundary styles */
+.error-boundary {
+  isolation: isolate;
+  contain: layout style paint;
+}
+
+/* Accessibility enhancements */
+.reduce-motion * {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+.high-contrast {
+  --background: #000000;
+  --foreground: #ffffff;
+  --primary: #ffffff;
+  --primary-foreground: #000000;
+  --border: #ffffff;
+  filter: contrast(150%);
+}
+
+.large-text {
+  font-size: 1.2rem;
+}
+
+.large-text h1 {
+  font-size: 3rem;
+}
+
+.large-text h2 {
+  font-size: 2.5rem;
+}
+
+.large-text h3 {
+  font-size: 2rem;
+}
+
+.keyboard-navigation *:focus {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
+
+.screen-reader-optimized {
+  /* Enhance screen reader experience */
+  .sr-only:focus {
+    position: absolute;
+    width: auto;
+    height: auto;
+    padding: 0.5rem;
+    margin: 0;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    z-index: 100000;
+  }
+}
+
+.focus-visible *:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Text scaling */
+.text-scale {
+  font-size: calc(1rem * var(--text-scale, 1));
+}
+
+/* Performance optimizations */
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000;
+}
+
+.will-change-transform {
+  will-change: transform;
+}
+
+.will-change-opacity {
+  will-change: opacity;
+}
+
+.contain-layout {
+  contain: layout;
+}
+
+.contain-paint {
+  contain: paint;
+}
+
+.contain-strict {
+  contain: strict;
+}
+
+/* Virtual scrolling performance */
+.virtual-list {
+  contain: strict;
+  transform: translateZ(0);
+}
+
+.virtual-list-item {
+  contain: layout style paint;
+  transform: translateZ(0);
+}
+
+/* Image optimization */
+.optimized-image {
+  contain: layout style paint;
+  background: hsl(var(--muted));
+  transition: opacity 0.3s ease;
+}
+
+.optimized-image.loading {
+  opacity: 0;
+}
+
+.optimized-image.loaded {
+  opacity: 1;
+}
+
+/* Lazy loading placeholders */
+.lazy-placeholder {
+  background: linear-gradient(
+    90deg,
+    hsl(var(--muted)) 25%,
+    hsl(var(--muted-foreground) / 0.1) 50%,
+    hsl(var(--muted)) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Network status indicators */
+.offline-indicator {
+  background: linear-gradient(45deg, #ff6b6b, #ee5a5a);
+  color: white;
+  padding: 0.5rem 1rem;
+  text-align: center;
+  font-weight: 500;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10000;
+  animation: slideDown 0.3s ease;
+}
+
+.slow-connection-indicator {
+  background: linear-gradient(45deg, #ffa726, #ff9800);
+  color: white;
+  padding: 0.25rem 1rem;
+  text-align: center;
+  font-size: 0.875rem;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Data validation error styles */
+.validation-error {
+  border: 2px solid hsl(var(--destructive));
+  background: hsl(var(--destructive) / 0.1);
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+/* Browser compatibility warnings */
+.browser-warning {
+  background: linear-gradient(45deg, #ff9800, #f57c00);
+  color: white;
+  padding: 1rem;
+  margin: 1rem;
+  border-radius: 0.5rem;
+  text-align: center;
+}
+
+/* Enhanced mobile optimizations */
+@media (max-width: 768px) {
+  /* Improve touch targets */
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Prevent zoom on focus */
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+
+  /* Optimize scrolling */
+  .mobile-scroll {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+
+  /* Reduce animations on mobile to save battery */
+  .mobile-reduced-motion * {
+    animation-duration: 0.3s !important;
+    transition-duration: 0.3s !important;
+  }
+
+  /* Fix portfolio layout overlaps on mobile */
+  .portfolio-mobile-fix {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
+  /* Prevent horizontal scroll on small screens */
+  .portfolio-container {
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
+  /* Improve text wrapping on mobile */
+  .portfolio-text {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  * {
+    background: transparent !important;
+    color: black !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  a,
+  a:visited {
+    text-decoration: underline;
+  }
+
+  .print-break-after {
+    page-break-after: always;
   }
 }
 

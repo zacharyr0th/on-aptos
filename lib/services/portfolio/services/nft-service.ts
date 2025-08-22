@@ -1,12 +1,39 @@
 import { PORTFOLIO_QUERY_LIMITS } from "@/lib/constants";
-import { logger } from "@/lib/utils/core/logger";
 
-import type { NFT, PaginatedResponse } from "../types";
 import {
   UnifiedGraphQLClient,
   UNIFIED_QUERIES,
 } from "../../shared/utils/unified-graphql-client";
-import { extractNFTImageUrl } from "../utils/nft-metadata-helper";
+import type { NFT, PaginatedResponse } from "../types";
+
+// GraphQL Response Types
+interface GraphQLError {
+  message: string;
+  extensions?: Record<string, unknown>;
+}
+
+interface NFTOwnership {
+  current_token_data: {
+    token_data_id: string;
+    token_name: string;
+    description?: string;
+    token_uri?: string;
+    cdn_image_uri?: string;
+    current_collection?: {
+      collection_name: string;
+      description?: string;
+      uri?: string;
+      creator_address?: string;
+    };
+  };
+  amount: string;
+  owner_address: string;
+  last_transaction_version?: string;
+  last_transaction_timestamp?: string;
+  property_version?: string;
+  table_type?: string;
+  token_standard?: string;
+}
 
 // Rate limiting configuration
 const MAX_RETRIES = 5;
@@ -35,7 +62,6 @@ async function fetchWithRetry(
         INITIAL_RETRY_DELAY * Math.pow(2, attempt),
         MAX_RETRY_DELAY,
       );
-      logger.warn(
         `Rate limited (429), retrying in ${delay}ms... (${retries} retries left)`,
       );
       await sleep(delay);
@@ -48,7 +74,6 @@ async function fetchWithRetry(
         INITIAL_RETRY_DELAY * Math.pow(2, attempt),
         MAX_RETRY_DELAY,
       );
-      logger.warn(
         `Server error (${response.status}), retrying in ${delay}ms... (${retries} retries left)`,
       );
       await sleep(delay);
@@ -62,7 +87,6 @@ async function fetchWithRetry(
         INITIAL_RETRY_DELAY * Math.pow(2, attempt),
         MAX_RETRY_DELAY,
       );
-      logger.warn(
         `Request failed, retrying in ${delay}ms... (${retries} retries left)`,
         error,
       );
@@ -80,13 +104,10 @@ export class NFTService {
     limit: number = PORTFOLIO_QUERY_LIMITS.NFT,
   ): Promise<PaginatedResponse<NFT>> {
     try {
-      logger.info(
         `[NFTService] Getting NFTs for address: ${address}, page: ${page}, limit: ${limit}`,
       );
-      const { limit: queryLimit, offset } = UnifiedGraphQLClient.buildPaginationVariables(
-        page,
-        limit,
-      );
+      const { limit: queryLimit, offset } =
+        UnifiedGraphQLClient.buildPaginationVariables(page, limit);
 
       // Only add delay if we're approaching rate limits
       const now = Date.now();
@@ -103,7 +124,6 @@ export class NFTService {
           (requestCount - RATE_LIMIT_THRESHOLD) * 500,
           5000,
         );
-        logger.info(`Rate limit threshold reached, delaying ${delay}ms`);
         await sleep(delay);
       }
 
@@ -142,13 +162,12 @@ export class NFTService {
 
       if (result.errors) {
         throw new Error(
-          `GraphQL errors: ${result.errors.map((e: any) => e.message).join(", ")}`,
+          `GraphQL errors: ${result.errors.map((e: GraphQLError) => e.message).join(", ")}`,
         );
       }
 
       // Get v2 NFTs only
       const nfts = result.data.current_token_ownerships_v2 || [];
-      logger.info(`[NFTService] Raw response has ${nfts.length} NFTs`);
 
       const hasMore = nfts.length > queryLimit;
 
@@ -157,13 +176,12 @@ export class NFTService {
         nfts.pop();
       }
 
-      logger.info(
         `[NFTService] Processing ${nfts.length} NFTs after pagination`,
       );
 
       // Process NFTs
       const processedNFTs: NFT[] = await Promise.all(
-        nfts.map(async (ownership: any) => {
+        nfts.map(async (ownership: NFTOwnership) => {
           const tokenData = ownership.current_token_data;
           const collection = tokenData?.current_collection;
 
@@ -206,7 +224,6 @@ export class NFTService {
         nextCursor: hasMore ? String(page + 1) : undefined,
       };
     } catch (error) {
-      logger.error("Failed to fetch wallet NFTs:", error);
       throw error;
     }
   }
@@ -247,69 +264,63 @@ export class NFTService {
 
       if (result.errors) {
         throw new Error(
-          `GraphQL errors: ${result.errors.map((e: any) => e.message).join(", ")}`,
+          `GraphQL errors: ${result.errors.map((e: GraphQLError) => e.message).join(", ")}`,
         );
       }
 
       return result.data.current_token_ownerships_v2_aggregate.aggregate.count;
     } catch (error) {
-      logger.error("Failed to get NFT count:", error);
       // Return 0 on error to allow the app to continue
       return 0;
     }
   }
 
   static async getAllWalletNFTs(address: string): Promise<NFT[]> {
-    logger.info(
       `[NFTService] getAllWalletNFTs starting for address: ${address}`,
     );
 
     // First get the total count
     const totalCount = await this.getTotalNFTCount(address);
-    logger.info(`[NFTService] Total NFTs to fetch: ${totalCount}`);
 
     const allNFTs: NFT[] = [];
-    const limit = 100; // Fetch in batches of 100
-    let offset = 0;
+    const limit = 500; // Larger batch size for efficiency
+    const numPages = Math.ceil(totalCount / limit);
 
-    while (offset < totalCount) {
+    // Fetch all pages in parallel (with reasonable limit)
+    const maxParallel = 3;
+
+    for (let i = 0; i < numPages; i += maxParallel) {
+      const pageBatch = [];
+      for (let j = 0; j < maxParallel && i + j < numPages; j++) {
+        const page = i + j + 1;
+          `[NFTService] Queuing page ${page} (NFTs ${(page - 1) * limit + 1} to ${Math.min(page * limit, totalCount)})`,
+        );
+        pageBatch.push(this.getWalletNFTs(address, page, limit));
+      }
+
       try {
-        const page = Math.floor(offset / limit) + 1;
-        logger.info(
-          `[NFTService] Fetching NFTs ${offset + 1} to ${Math.min(offset + limit, totalCount)}...`,
-        );
-
-        const response = await this.getWalletNFTs(address, page, limit);
-        logger.info(
-          `[NFTService] Page ${page} returned ${response.data.length} NFTs`,
-        );
-
-        // Add a delay between batches to avoid rate limiting
-        if (offset + limit < totalCount) {
-          await sleep(1000); // 1 second between batches
-        }
-
-        allNFTs.push(...response.data);
-        offset += limit;
-
-        // Safety check to prevent infinite loops
-        if (page > 100) {
-          logger.warn(
-            `[NFTService] Breaking at page ${page} to prevent infinite loop`,
+        const results = await Promise.all(pageBatch);
+        results.forEach((response, idx) => {
+            `[NFTService] Page ${i + idx + 1} returned ${response.data.length} NFTs`,
           );
-          break;
+          allNFTs.push(...response.data);
+        });
+
+          `[NFTService] Completed batch ${Math.floor(i / maxParallel) + 1}, total NFTs so far: ${allNFTs.length}/${totalCount}`,
+        );
+
+        // Small delay between parallel batches to avoid rate limiting
+        if (i + maxParallel < numPages && numPages > maxParallel) {
+          await sleep(300);
         }
       } catch (error) {
-        logger.error(
-          `[NFTService] Failed to fetch NFTs at offset ${offset}:`,
+          `[NFTService] Failed to fetch NFT batch at pages ${i + 1}-${Math.min(i + maxParallel, numPages)}:`,
           error,
         );
-        logger.error(`Failed to fetch NFTs at offset ${offset}:`, error);
         break;
       }
     }
 
-    logger.info(
       `[NFTService] getAllWalletNFTs completed. Total NFTs: ${allNFTs.length}`,
     );
     return allNFTs;
@@ -367,7 +378,7 @@ export class NFTService {
 
       if (result.errors) {
         throw new Error(
-          `GraphQL errors: ${result.errors.map((e: any) => e.message).join(", ")}`,
+          `GraphQL errors: ${result.errors.map((e: GraphQLError) => e.message).join(", ")}`,
         );
       }
 
@@ -375,7 +386,7 @@ export class NFTService {
       const collectionMap: Record<string, number> = {};
       const ownerships = result.data.current_token_ownerships_v2 || [];
 
-      ownerships.forEach((ownership: any) => {
+      ownerships.forEach((ownership: NFTOwnership) => {
         const collectionName =
           ownership.current_token_data?.current_collection?.collection_name ||
           "Unknown Collection";
@@ -392,7 +403,6 @@ export class NFTService {
         totalCollections: collections.length,
       };
     } catch (error) {
-      logger.error("Failed to get collection stats:", error);
       return { collections: [], totalCollections: 0 };
     }
   }
@@ -423,7 +433,6 @@ export class NFTService {
 
       return response.token_activities_v2 || [];
     } catch (error) {
-      logger.error("Failed to fetch NFT transfer history:", error);
       throw error;
     }
   }

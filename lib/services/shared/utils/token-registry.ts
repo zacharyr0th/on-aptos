@@ -1,6 +1,5 @@
 import { PANORA_TOKENS } from "@/lib/config/data";
 import { TOKEN_REGISTRY, NATIVE_TOKENS, STABLECOINS } from "@/lib/constants";
-import { logger } from "@/lib/utils/core/logger";
 
 /**
  * Unified token registry that consolidates all token address mappings
@@ -49,13 +48,13 @@ const SYMBOL_TO_ADDRESS_MAP = new Map<string, string>();
 // Initialize mappings
 function initializeMappings() {
   // Add core tokens
-  Object.entries(ALL_TOKEN_ADDRESSES).forEach(([symbol, address]) => {
+  Object.entries(ALL_TOKEN_ADDRESSES).forEach(symbol, address]) => {
     ADDRESS_TO_SYMBOL_MAP.set(address, symbol);
     SYMBOL_TO_ADDRESS_MAP.set(symbol.toUpperCase(), address);
   });
 
   // Add from existing registries
-  Object.entries(TOKEN_REGISTRY).forEach(([symbol, address]) => {
+  Object.entries(TOKEN_REGISTRY).forEach(symbol, address]) => {
     if (!ADDRESS_TO_SYMBOL_MAP.has(address)) {
       ADDRESS_TO_SYMBOL_MAP.set(address, symbol);
       SYMBOL_TO_ADDRESS_MAP.set(symbol.toUpperCase(), address);
@@ -72,7 +71,7 @@ function initializeMappings() {
   }
 
   // Add stablecoins
-  Object.entries(STABLECOINS).forEach(([symbol, address]) => {
+  Object.entries(STABLECOINS).forEach(symbol, address]) => {
     if (!ADDRESS_TO_SYMBOL_MAP.has(address)) {
       ADDRESS_TO_SYMBOL_MAP.set(address, symbol);
       SYMBOL_TO_ADDRESS_MAP.set(symbol.toUpperCase(), address);
@@ -80,7 +79,7 @@ function initializeMappings() {
   });
 
   // Add Panora tokens
-  Object.entries(PANORA_TOKENS).forEach(([key, token]) => {
+  Object.entries(PANORA_TOKENS).forEach(key, token]) => {
     if (token.asset_type && !ADDRESS_TO_SYMBOL_MAP.has(token.asset_type)) {
       const symbol = key; // Use the key as the symbol (e.g., "amAPT", "stAPT")
       ADDRESS_TO_SYMBOL_MAP.set(token.asset_type, symbol);
@@ -185,7 +184,7 @@ export class TokenRegistry {
       address.includes("::asset::USDC") ||
       address.includes("::asset::USDT") ||
       address.includes("::asset::DAI") ||
-      Object.values(STABLECOINS).includes(address as any) ||
+      Object.values(STABLECOINS).includes(address as unknown) ||
       address.toLowerCase().includes("usd")
     );
   }
@@ -202,7 +201,7 @@ export class TokenRegistry {
    */
   static isLiquidStakingToken(address: string): boolean {
     return (
-      Object.values(LIQUID_STAKING_ADDRESSES).includes(address as any) ||
+      Object.values(LIQUID_STAKING_ADDRESSES).includes(address as unknown) ||
       address.includes("::stapt_token::") ||
       address.includes("::StakedApt") ||
       address.includes("::amapt_token::") ||

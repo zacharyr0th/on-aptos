@@ -327,15 +327,6 @@ export const PROTOCOLS: Record<string, ProtocolInfo> = {
       "0x6f8ca77dd0a4c65362f475adb1c26ae921b1d75aa6b70e53d0e340efd7d8bc80",
     ],
   },
-  UPTOS_PUMP: {
-    name: "Uptos Pump",
-    label: "UPTOS",
-    type: ProtocolType.DEX,
-    description: "Uptos meme coin launcher",
-    addresses: [
-      "0x4e5e85fd647c7e19560590831616a3c021080265576af3182535a1d19e8bc2b3",
-    ],
-  },
   DEFY: {
     name: "Defy",
     label: "DEFY",
@@ -545,7 +536,7 @@ export function getProtocolLabel(assetType: string): string | null {
 /**
  * Check if an asset is a phantom/locked asset
  */
-export function isPhantomAsset(assetType: string, metadata?: any): boolean {
+export function isPhantomAsset(assetType: string, metadata?: Record<string, unknown>): boolean {
   // Check regex patterns
   if (PHANTOM_ASSET_PATTERNS.some((pattern) => pattern.test(assetType))) {
     return true;

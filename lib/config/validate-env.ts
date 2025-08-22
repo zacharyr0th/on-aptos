@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-import { logger, errorLogger } from "@/lib/utils/core/logger";
 
 const envSchema = z.object({
   // API Keys - validated after parsing
@@ -36,9 +35,9 @@ export function validateEnv(): EnvConfig {
     errorLogger.error("❌ Environment validation failed:");
     errorLogger.error(result.error.format());
 
-    const missingVars = (result.error as any).errors
-      .filter((err: any) => err.message.includes("required"))
-      .map((err: any) => err.path.join("."));
+    const missingVars = (result.error as unknown).errors
+      .filter((err: Record<string, unknown>) => err.message.includes("required"))
+      .map((err: Record<string, unknown>) => err.path.join("."));
 
     if (missingVars.length > 0) {
       throw new Error(

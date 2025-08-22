@@ -3,7 +3,6 @@
  */
 
 import { PanoraTokenListService } from "@/lib/services/portfolio/panora-token-list";
-import { logger } from "@/lib/utils/core/logger";
 
 // List of allowed image domains configured in next.config.js
 const ALLOWED_IMAGE_DOMAINS = [

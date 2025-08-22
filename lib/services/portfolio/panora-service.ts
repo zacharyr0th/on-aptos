@@ -1,7 +1,6 @@
 import { PANORA_TOKENS } from "@/lib/config/data";
 import { TOKEN_REGISTRY, NATIVE_TOKENS, STABLECOINS } from "@/lib/constants";
 import { cacheFirst } from "@/lib/utils";
-import { logger } from "@/lib/utils/core/logger";
 
 const PANORA_API_ENDPOINT = "https://api.panora.exchange/prices";
 // Use environment variable for API key

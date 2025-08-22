@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 import { enhancedFetch } from "@/lib/utils/api/fetch-utils";
-import { errorLogger } from "@/lib/utils/core/logger";
 
 import { GET } from "./route";
 

@@ -2,14 +2,12 @@
 
 import { GeistMono } from "geist/font/mono";
 import { AlertTriangle, Copy } from "lucide-react";
-import Image from "next/image";
 import React, { useState, useMemo, useCallback, memo, useEffect } from "react";
-import { toast } from "sonner";
+// import { toast } from "sonner";
 
 import { ErrorBoundary } from "@/components/errors/ErrorBoundary";
 import { Footer } from "@/components/layout/Footer";
 import { MarketShareChart } from "@/components/shared/MarketShareChart";
-import { ChartDataItem, formatAssetValue, darkenColor } from "@/lib/utils/format/chart-utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -23,11 +21,20 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { usePageTranslation } from "@/hooks/useTranslation";
-import { RWA_COLORS, RWA_TOKEN_BY_TICKER } from "@/lib/constants";
-import { formatCurrency, formatPercentage, formatLargeNumber } from "@/lib/utils";
-import { truncateAddress, copyToClipboard } from "@/lib/utils/token/token-utils";
-
-
+import {
+  formatCurrency,
+  formatPercentage,
+  formatLargeNumber,
+} from "@/lib/utils";
+import {
+  ChartDataItem,
+  // formatAssetValue,
+  darkenColor,
+} from "@/lib/utils/format/chart-utils";
+import {
+  truncateAddress,
+  copyToClipboard,
+} from "@/lib/utils/token/token-utils";
 
 // Consolidated provider mapping
 const PROVIDER_MAPPINGS = {
@@ -72,8 +79,8 @@ const getActualProvider = (
   protocolName: string,
 ): string => {
   return (
-    (PROVIDER_MAPPINGS.assets as any)[assetTicker] ||
-    (PROVIDER_MAPPINGS.protocols as any)[protocolName] ||
+    (PROVIDER_MAPPINGS.assets as unknown)[assetTicker] ||
+    (PROVIDER_MAPPINGS.protocols as unknown)[protocolName] ||
     protocolName
   );
 };
@@ -81,7 +88,7 @@ const getActualProvider = (
 // Get logo based on actual provider
 const getLogoUrl = (protocolName: string, assetTicker: string): string => {
   const provider = getActualProvider(assetTicker, protocolName);
-  return (PROVIDER_MAPPINGS.logos as any)[provider] || "/icons/rwas/pact.webp";
+  return (PROVIDER_MAPPINGS.logos as unknown)[provider] || "/icons/rwas/pact.webp";
 };
 
 // Protocol data interface for RWA protocols
@@ -107,7 +114,7 @@ const calculateMarketShare = (
 };
 
 // Enhanced token card component
-const TokenCard = memo(function TokenCard({
+const TokenCard = memo((function TokenCard({
   protocol,
   totalValue,
   allProtocols,
@@ -146,11 +153,9 @@ const TokenCard = memo(function TokenCard({
       : 0;
   darkenColor(baseColor, darkenFactor);
 
-
   const handleImageLoad = useCallback(() => {
     setImageLoaded(true);
   }, []);
-
 
   return (
     <>
@@ -192,7 +197,6 @@ const TokenCard = memo(function TokenCard({
           value={parseFloat(tokenData.marketSharePercent)}
         />
       </div>
-
     </>
   );
 });
@@ -244,7 +248,7 @@ const LoadingState = memo(function LoadingState(): React.ReactElement {
   );
 });
 
-const ErrorState = memo(function ErrorState({
+const ErrorState = memo((function ErrorState({
   error,
   onRetry,
   t,
@@ -375,7 +379,7 @@ export default function RWAsPage(): React.ReactElement {
   }, [fetchRwaData]);
 
   // Extract data - RWA API returns direct response
-  const data: any = rwaResponse || null;
+  const data: Record<string, unknown> = rwaResponse || null;
   const loading = isLoading;
   const error = rwaError?.message || null;
   const refreshing = isFetching && !isLoading;
@@ -390,7 +394,7 @@ export default function RWAsPage(): React.ReactElement {
     if (!data) return [];
     const protocolsData = data.protocols || [];
     // Map the API response to the expected format
-    return protocolsData.map((protocol: any) => ({
+    return protocolsData.map((protocol: Record<string, unknown>) => ({
       ...protocol,
       totalValue: protocol.totalValue || 0,
       assetTicker: protocol.assetTicker || protocol.symbol,
@@ -471,7 +475,7 @@ export default function RWAsPage(): React.ReactElement {
                 <div className="grid grid-cols-2 gap-4 md:grid-cols-1 md:col-span-1 md:space-y-4">
                   {processedData.protocols
                     ?.slice(0, 4)
-                    .map((protocol: any) => (
+                    .map((protocol: Record<string, unknown>) => (
                       <TokenCard
                         key={protocol.id}
                         protocol={protocol}
@@ -529,12 +533,20 @@ export default function RWAsPage(): React.ReactElement {
                     }
                   >
                     <MarketShareChart
-                      data={processedData.protocols.map((protocol: any) => ({
+                      data={processedData.protocols.map((protocol: Record<string, unknown>) => ({
                         name: protocol.assetTicker,
-                        value: calculateMarketShare(protocol.totalValue, processedData.totalValue),
+                        value: calculateMarketShare(
+                          protocol.totalValue,
+                          processedData.totalValue,
+                        ),
                         formattedSupply: formatLargeNumber(protocol.totalValue),
-                        color: RWA_COLORS[protocol.assetTicker] || RWA_COLORS.default,
-                        provider: getActualProvider(protocol.assetTicker, protocol.protocol)
+                        color:
+                          RWA_COLORS[protocol.assetTicker] ||
+                          RWA_COLORS.default,
+                        provider: getActualProvider(
+                          protocol.assetTicker,
+                          protocol.protocol,
+                        ),
                       }))}
                       totalValue={processedData.totalValue}
                       colors={RWA_COLORS}
@@ -555,9 +567,13 @@ export default function RWAsPage(): React.ReactElement {
                           </div>
                           <div>
                             <div className="flex items-center justify-end gap-3 mb-1">
-                              <h2 className="text-sm text-muted-foreground">Total Value</h2>
+                              <h2 className="text-sm text-muted-foreground">
+                                Total Value
+                              </h2>
                             </div>
-                            <p className="text-lg font-bold font-mono">{formatLargeNumber(processedData.totalValue)}</p>
+                            <p className="text-lg font-bold font-mono">
+                              {formatLargeNumber(processedData.totalValue)}
+                            </p>
                           </div>
                         </div>
                       }
@@ -571,7 +587,7 @@ export default function RWAsPage(): React.ReactElement {
                 processedData.protocols.length > 4 && (
                   <div className="mb-6">
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                      {processedData.protocols.slice(4).map((protocol: any) => (
+                      {processedData.protocols.slice(4).map((protocol: Record<string, unknown>) => (
                         <TokenCard
                           key={protocol.id}
                           protocol={protocol}
@@ -609,7 +625,7 @@ export default function RWAsPage(): React.ReactElement {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {processedData.protocols?.map((protocol: any) => {
+                      {processedData.protocols?.map((protocol: Record<string, unknown>) => {
                         const marketSharePercent = (
                           (protocol.totalValue / processedData.totalValue) *
                           100
@@ -669,7 +685,7 @@ export default function RWAsPage(): React.ReactElement {
                               )}
                             </TableCell>
                             <TableCell className="font-mono whitespace-nowrap">
-                              {formatCurrency(protocol.totalValue, "USD", {
+                              {formatCurrency((protocol.totalValue, "USD", {
                                 decimals: 0,
                               })}
                             </TableCell>

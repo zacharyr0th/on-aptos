@@ -30,7 +30,7 @@ A comprehensive blockchain analytics platform for the Aptos ecosystem, providing
 1. Clone and install:
 
 ```bash
-git clone https://github.com/yourusername/on-aptos.git
+git clone https://github.com/zacharyr0th/on-aptos.git
 cd on-aptos
 pnpm install
 ```
@@ -84,5 +84,5 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ## Support
 
-- Issues: [GitHub Issues](https://github.com/yourusername/on-aptos/issues)
+- Issues: [GitHub Issues](https://github.com/zacharyr0th/on-aptos/issues)
 - Community: [Discord](https://discord.gg/aptos)

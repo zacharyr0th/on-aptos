@@ -1,8 +1,10 @@
 import { PORTFOLIO_QUERY_LIMITS } from "@/lib/constants";
-import { logger } from "@/lib/utils/core/logger";
 
+import {
+  UnifiedGraphQLClient,
+  UNIFIED_QUERIES,
+} from "../../shared/utils/unified-graphql-client";
 import type { WalletTransaction } from "../types";
-import { UnifiedGraphQLClient, UNIFIED_QUERIES } from "../../shared/utils/unified-graphql-client";
 
 export class TransactionService {
   static async getWalletTransactions(
@@ -23,7 +25,14 @@ export class TransactionService {
             gas_unit_price: string;
             max_gas_amount: string;
             entry_function_id_str?: string;
-            payload?: any;
+            payload?: {
+              function?: string;
+              type_arguments?: string[];
+              arguments?: unknown[];
+              code?: {
+                bytecode?: string;
+              };
+            };
           };
         }>;
       }>(
@@ -46,20 +55,30 @@ export class TransactionService {
       // Process and return the transaction data
       return accountTxns.map((tx) => {
         const userTx = tx.user_transaction;
-        
+
         return {
           transaction_version: tx.transaction_version,
           transaction_timestamp: userTx?.timestamp || "",
-          type: userTx?.entry_function_id_str ? "entry_function_payload" : "unknown",
-          amount: "0", // Would need to parse from payload for token transfers
-          asset_type: "APT", // Default, would need to parse from payload
+          sender: userTx?.sender || "",
+          sequence_number: "0", // Default value
+          max_gas_amount: userTx?.max_gas_amount || "0",
+          gas_unit_price: userTx?.gas_unit_price || "0",
+          expiration_timestamp_secs: "0", // Default value
+          payload: userTx?.payload || null,
+          events: [],
+          hash: tx.transaction_version, // Use version as hash fallback
+          gas_used: userTx?.gas_used || "0",
           success: userTx?.success || false,
+          vm_status: userTx?.success ? "Executed successfully" : "Failed",
+          accumulator_root_hash: "",
+          // Processed fields
+          type: userTx?.entry_function_id_str
+            ? "entry_function_payload"
+            : "unknown",
           function: userTx?.entry_function_id_str || undefined,
-          gas_fee: userTx?.gas_used || undefined,
         };
       });
     } catch (error) {
-      logger.error("Failed to fetch wallet transactions:", {
         error: error instanceof Error ? error.message : String(error),
         address,
         limit,
@@ -73,13 +92,13 @@ export class TransactionService {
     address: string,
     startTime: string,
   ): Promise<{
-    fungibleActivities: any[];
-    coinActivities: any[];
+    fungibleActivities: unknown[];
+    coinActivities: unknown[];
   }> {
     try {
       const response = await UnifiedGraphQLClient.query<{
-        fungible_asset_activities: any[];
-        coin_activities: any[];
+        fungible_asset_activities: unknown[];
+        coin_activities: unknown[];
       }>(
         UNIFIED_QUERIES.HISTORICAL_ACTIVITIES,
         {
@@ -96,7 +115,6 @@ export class TransactionService {
         coinActivities: response.coin_activities || [],
       };
     } catch (error) {
-      logger.error("Failed to fetch historical activities:", error);
       throw error;
     }
   }

@@ -3,7 +3,6 @@
  * Combines the best features from both format.ts and formatting.ts
  */
 
-import { logger, errorLogger } from "@/lib/utils/core/logger";
 
 // Types
 export type Currency = string;
@@ -72,7 +71,7 @@ const CACHE_SIZE_LIMIT = 1000;
 function getCacheKey(
   type: string,
   value: number | string,
-  ...args: any[]
+  ...args: unknown[]
 ): string {
   return `${type}:${value}:${JSON.stringify(args)}`;
 }
@@ -81,7 +80,7 @@ function cleanupCache() {
   if (formatCache.size > CACHE_SIZE_LIMIT) {
     const entries = Array.from(formatCache.entries());
     formatCache.clear();
-    entries.slice(-CACHE_SIZE_LIMIT / 2).forEach(([key, value]) => {
+    entries.slice(-CACHE_SIZE_LIMIT / 2).forEach(key, value]) => {
       formatCache.set(key, value);
     });
   }
@@ -466,7 +465,7 @@ export function formatTokenAmount(
 
 /**
  * Format token price with compact notation for very small values
- * For prices < 0.00001, uses format like 0.0₍₃₎5 where ₍₃₎ indicates 3 zeros after decimal
+ * For prices < 0.0001, uses format like 0.0₍₄₎5 where ₍₄₎ indicates 4 zeros after decimal
  */
 export function formatTokenPrice(
   price: number,
@@ -481,8 +480,8 @@ export function formatTokenPrice(
     return showSymbol ? `${currencySymbol}0` : "0";
   }
 
-  // For very small prices (< 0.00001), use compact zero notation
-  if (price < 0.00001) {
+  // For very small prices (< 0.0001), use compact zero notation
+  if (price < 0.0001) {
     // Use toFixed to get precise decimal representation
     const priceStr = price.toFixed(20);
 
@@ -498,13 +497,13 @@ export function formatTokenPrice(
         significantPart.substring(0, 2).replace(/0+$/, "") ||
         significantPart.substring(0, 1);
 
-      if (leadingZeros > 2 && significantDigits) {
-        // Only use this format for more than 2 leading zeros
+      if (leadingZeros > 3 && significantDigits) {
+        // Only use this format for more than 3 leading zeros (4 or more)
         // Convert zero count to subscript
         const subscriptZeros = leadingZeros
           .toString()
           .split("")
-          .map((digit) => "₀₁₂₃₄₅₆₇₈₉"[parseInt(digit)])
+          .map(digit) => "₀₁₂₃₄₅₆₇₈₉"[parseInt(digit)])
           .join("");
 
         const compactNotation = `0.0₍${subscriptZeros}₎${significantDigits}`;
@@ -780,7 +779,7 @@ export function getDecimalPlaces(currencyCode: Currency | string): number {
 }
 
 export function isValidCurrencyCode(code: string): boolean {
-  return /^[A-Z]{3,}$/.test(code.toUpperCase());
+  return /^[A-Z]{3}$/.test(code.toUpperCase());
 }
 
 export function getSupportedFiatCurrencies(): string[] {

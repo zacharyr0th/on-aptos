@@ -1,11 +1,11 @@
 import { NextRequest } from "next/server";
+
 import { AssetService } from "@/lib/services/portfolio/services/asset-service";
 import { withErrorHandling, type ErrorContext } from "@/lib/utils";
 import { 
   successResponse, 
   validationError,
-  validateParams,
-  CACHE_HEADERS 
+  validateParams
 } from "@/lib/utils/api/standard-response";
 
 // Cache for 5 minutes

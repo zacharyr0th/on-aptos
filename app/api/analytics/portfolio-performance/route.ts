@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { apiLogger } from "@/lib/utils/core/logger";
 
 const APTOS_ANALYTICS_API = "https://api.mainnet.aptoslabs.com/v1/analytics";
 
@@ -38,7 +37,7 @@ export async function GET(request: NextRequest) {
       const uniqueValues = [
         ...new Set(
           balanceData.map(
-            (item: any) =>
+            (item: unknown) =>
               item.total_store_balance_usd ||
               item.total_balance_usd ||
               item.balance_usd ||
@@ -68,7 +67,7 @@ export async function GET(request: NextRequest) {
               const altUniqueValues = [
                 ...new Set(
                   alternativeData.map(
-                    (item: any) =>
+                    (item: unknown) =>
                       item.total_store_balance_usd ||
                       item.total_balance_usd ||
                       item.balance_usd ||
@@ -239,7 +238,7 @@ function getTimeframeConfig(timeframe: string) {
   }
 }
 
-async function fetchBalanceHistory(walletAddress: string, config: any) {
+async function fetchBalanceHistory(walletAddress: string, config: unknown) {
   const url = `${APTOS_ANALYTICS_API}/historical_store_balances?account_address=${walletAddress}&lookback=${config.balanceLookback}`;
 
   apiLogger.info(`[fetchBalanceHistory] Fetching from: ${url}`);
@@ -279,7 +278,7 @@ async function fetchBalanceHistory(walletAddress: string, config: any) {
   return result.data;
 }
 
-async function fetchPriceHistory(config: any) {
+async function fetchPriceHistory(config: unknown) {
   const url = `${APTOS_ANALYTICS_API}/token/historical_prices?address=0x1::aptos_coin::AptosCoin&lookback=${config.priceLookback}`;
 
   const headers: HeadersInit = {
@@ -311,13 +310,13 @@ async function fetchPriceHistory(config: any) {
 }
 
 function combineData(
-  balanceData: any[],
-  priceData: any[],
-  config: any,
+  balanceData: unknown[],
+  priceData: unknown[],
+  config: unknown,
 ): PerformanceData[] {
   // Create maps for easier lookup
   const priceMap = new Map();
-  priceData.forEach((item: any) => {
+  priceData.forEach((item: unknown) => {
     // Handle different timestamp fields based on lookback period
     const timestamp =
       item.price_hourly_timestamp ||
@@ -333,7 +332,7 @@ function combineData(
 
   // Create a map of balance data for easier lookup
   const balanceMap = new Map();
-  allBalances.forEach((item: any) => {
+  allBalances.forEach((item: unknown) => {
     // The actual field names from the API
     const timestamp =
       item.date_day || item.hourly_timestamp || item.date || item.timestamp;
@@ -358,7 +357,7 @@ function combineData(
     config.days <= 90
   ) {
     // For short timeframes, use price data points to maintain granularity
-    priceData.forEach((priceItem: any) => {
+    priceData.forEach((priceItem: unknown) => {
       const priceTimestamp =
         priceItem.price_hourly_timestamp ||
         priceItem.bucketed_timestamp_minutes_utc ||
@@ -409,7 +408,7 @@ function combineData(
     });
   } else {
     // For longer timeframes, use balance data points (daily granularity is fine)
-    allBalances.forEach((balanceItem: any) => {
+    allBalances.forEach((balanceItem: unknown) => {
       const timestamp =
         balanceItem.date_day ||
         balanceItem.hourly_timestamp ||

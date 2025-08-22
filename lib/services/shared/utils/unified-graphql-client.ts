@@ -1,7 +1,6 @@
 import { getEnvVar } from "@/lib/config/validate-env";
 import { ENDPOINTS, ERROR_MESSAGES } from "@/lib/constants";
 import { graphQLRequest } from "@/lib/utils/api/fetch-utils";
-import { logger } from "@/lib/utils/core/logger";
 
 /**
  * Unified GraphQL client that standardizes all Aptos Indexer requests
@@ -214,21 +213,30 @@ export const UNIFIED_QUERIES = {
   `,
 
   // Account resource query for comprehensive positions
+  // Note: move_resources is deprecated - using fungible asset balances instead
   ACCOUNT_RESOURCES: `
     query GetAccountResources($address: String!) {
-      move_resources(
-        where: { address: { _eq: $address } }
+      current_fungible_asset_balances(
+        where: { 
+          owner_address: { _eq: $address },
+          amount: { _gt: "0" }
+        }
       ) {
-        address
-        type
-        data
+        owner_address
+        asset_type
+        amount
+        metadata {
+          name
+          symbol
+          decimals
+        }
       }
     }
   `,
 } as const;
 
 export class UnifiedGraphQLClient {
-  private static cache = new Map<string, { data: any; timestamp: number }>();
+  private static cache = new Map<string, { data: Record<string, unknown>; timestamp: number }>();
   private static readonly DEFAULT_CACHE_TTL = 30 * 1000; // 30 seconds
 
   /**
@@ -285,7 +293,7 @@ export class UnifiedGraphQLClient {
         );
 
         if (response.errors && response.errors.length > 0) {
-          const errorMessage = response.errors.map((e) => e.message).join(", ");
+          const errorMessage = response.errors.map(e) => e.message).join(", ");
           const error = new Error(`GraphQL errors: ${errorMessage}`);
 
           logger.error("GraphQL query errors:", {
@@ -402,7 +410,7 @@ export class UnifiedGraphQLClient {
     for (const result of results) {
       if (result.status === "fulfilled") {
         const { name, result: data } = result.value;
-        (batchResult as any)[name] = data;
+        (batchResult as unknown)[name] = data;
       } else {
         const error = result.reason;
         logger.error(`Batch query failed:`, error);
@@ -466,11 +474,11 @@ export class UnifiedGraphQLClient {
    */
   static async healthCheck(): Promise<boolean> {
     try {
-      // Simple query to test connectivity
+      // Simple query to test connectivity using current tables
       await this.query(
         `query HealthCheck { 
-          processor_status(limit: 1) { 
-            processor 
+          current_fungible_asset_balances(limit: 1) { 
+            asset_type
           } 
         }`,
         {},

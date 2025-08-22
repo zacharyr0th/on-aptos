@@ -1,4 +1,3 @@
-import { logger } from "@/lib/utils/core/logger";
 
 import type {
   FungibleAsset,
@@ -21,7 +20,7 @@ export class MetricsService {
         0,
       );
       const defiValue = defiPositions.reduce(
-        (sum, position) => sum + position.totalValueUSD,
+        (sum, position) => sum + position.totalValue,
         0,
       );
       const totalValue = assetValue + defiValue;
@@ -115,7 +114,7 @@ export class MetricsService {
     // Add DeFi positions as aggregated
     if (defiPositions.length > 0) {
       const defiTotal = defiPositions.reduce(
-        (sum, pos) => sum + pos.totalValueUSD,
+        (sum, pos) => sum + pos.totalValue,
         0,
       );
       if (defiTotal > 0) {

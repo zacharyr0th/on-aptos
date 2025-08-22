@@ -247,7 +247,6 @@
     "Tapp": "A primeira DEX modular habilitada com hooks, estilo Uniswap V4, na testnet Aptos; hooks de contratos inteligentes permitem que construtores componham pools personalizados enquanto usuários obtêm swaps programáveis.",
     "Merkle": "Uma DEX de perpétuos gamificada com XP, caixas de saque, e alavancagem 150×; mais de $20 bilhões de volume total.",
     "AGDEX": "Oferece perpétuos de margem cruzada 1-100× com preenchimentos de oráculo de baixo impacto que mantêm o slippage apertado para traders de varejo.",
-    "Pump": "Qualquer um pode cunhar tokens meme via curvas de bonding; cada moeda é lançada de forma justa sem pré-venda ou alocação de equipe.",
     "Emojicoin": "Permite que usuários cunhem tokens mapeados 1-para-1 com emojis Unicode; cada lançamento usa a curva CL-AMM da Econia para descoberta instantânea de preços e especulação.",
     "Aries": "O primeiro mercado monetário estilo Compound no Aptos, aprimorado com E-Mode LTV de 90%, bridging integrado, e trading spot em uma interface.",
     "Superposition": "Plataforma avançada de gerenciamento de risco inspirada no FHS VaR do Banco da Inglaterra, oferecendo oportunidades de rendimento alavancado com monitoramento de risco em tempo real e ajuste dinâmico do fator de garantia.",

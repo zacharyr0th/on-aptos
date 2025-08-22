@@ -14,7 +14,11 @@ export * from "./external/defi-llama";
 export * from "./external/price-service";
 
 // DeFi Services - Ultra-simplified!
-export { scanDeFiPositions, createDeFiProvider, DeFiPositionProvider } from "./defi";
+export {
+  scanDeFiPositions,
+  createDeFiProvider,
+  DeFiPositionProvider,
+} from "./defi";
 export type { DeFiPosition } from "./defi";
 
 // Portfolio Services

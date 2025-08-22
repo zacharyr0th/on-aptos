@@ -1,6 +1,5 @@
 import { YIELD_PROTOCOL_ADDRESSES as PROTOCOL_ADDRESSES } from "@/lib/constants";
 import { DeFiPosition } from "@/lib/services/defi";
-import { logger } from "@/lib/utils/core/logger";
 
 import {
   AptosResourceFetcher,
@@ -64,7 +63,7 @@ export class YieldAggregatorService {
 
       // Fetch opportunities from various sources
       const [lending, liquidity, staking, farming, defiLlama] =
-        await Promise.all([
+        await Promise.all{)
           this.fetchLendingOpportunities(),
           this.fetchLiquidityOpportunities(),
           this.fetchStakingOpportunities(),
@@ -160,7 +159,7 @@ export class YieldAggregatorService {
         targetAPY: this.calculateWeightedAPY(conservativeOps.slice(0, 3)),
         risk: "conservative",
         protocols: [
-          ...new Set(conservativeOps.slice(0, 3).map((o) => o.protocol)),
+          ...new Set(conservativeOps.slice(0, 3).map(o) => o.protocol)),
         ],
         allocation: this.calculateOptimalAllocation(
           conservativeOps.slice(0, 3),
@@ -186,7 +185,7 @@ export class YieldAggregatorService {
           "Combination of lending and liquidity provision for enhanced yields",
         targetAPY: this.calculateWeightedAPY(moderateOps.slice(0, 5)),
         risk: "moderate",
-        protocols: [...new Set(moderateOps.slice(0, 5).map((o) => o.protocol))],
+        protocols: [...new Set(moderateOps.slice(0, 5).map(o) => o.protocol))],
         allocation: this.calculateOptimalAllocation(moderateOps.slice(0, 5)),
         estimatedGas: 1.0,
         steps: this.generateStrategySteps(
@@ -207,7 +206,7 @@ export class YieldAggregatorService {
           "Maximize returns through high-APY farming and staking opportunities",
         targetAPY: this.calculateWeightedAPY(aggressiveOps),
         risk: "aggressive",
-        protocols: [...new Set(aggressiveOps.map((o) => o.protocol))],
+        protocols: [...new Set(aggressiveOps.map(o) => o.protocol))],
         allocation: this.calculateOptimalAllocation(aggressiveOps),
         estimatedGas: 2.0,
         steps: this.generateStrategySteps(
@@ -248,7 +247,7 @@ export class YieldAggregatorService {
 
     try {
       // Use generalized protocol fetcher
-      const [aries, echelon, echo, meso] = await Promise.allSettled([
+      const [aries, echelon, echo, meso] = await Promise.allSettled{)
         this.fetchProtocolOpportunities("Aries", PROTOCOL_ADDRESSES.ARIES, {
           resourceFilters: [
             `${PROTOCOL_ADDRESSES.ARIES}::reserve::ReserveCoinContainer`,
@@ -353,7 +352,7 @@ export class YieldAggregatorService {
     const opportunities: YieldOpportunity[] = [];
 
     try {
-      const [thala, liquidswap] = await Promise.allSettled([
+      const [thala, liquidswap] = await Promise.allSettled{)
         this.fetchProtocolOpportunities("Thala", PROTOCOL_ADDRESSES.THALA, {
           resourceFilters: [
             `${PROTOCOL_ADDRESSES.THALA}::stable_pool::StablePool`,
@@ -399,7 +398,7 @@ export class YieldAggregatorService {
     const opportunities: YieldOpportunity[] = [];
 
     try {
-      const [tortuga, amnis] = await Promise.allSettled([
+      const [tortuga, amnis] = await Promise.allSettled{)
         this.fetchProtocolOpportunities("Tortuga", PROTOCOL_ADDRESSES.TORTUGA, {
           resourceFilters: [`${PROTOCOL_ADDRESSES.TORTUGA}::staked_aptos_coin`],
           opportunityType: "staking",
@@ -438,7 +437,7 @@ export class YieldAggregatorService {
     const opportunities: YieldOpportunity[] = [];
 
     try {
-      const [thalaFarm] = await Promise.allSettled([
+      const [thalaFarm] = await Promise.allSettled{)
         this.fetchProtocolOpportunities(
           "Thala Farm",
           PROTOCOL_ADDRESSES.THALA_FARM,
@@ -479,7 +478,7 @@ export class YieldAggregatorService {
 
   private calculateWeightedAPY(opportunities: YieldOpportunity[]): number {
     if (opportunities.length === 0) return 0;
-    const totalValue = opportunities.reduce((sum, o) => sum + (o.tvl || 0), 0);
+    const totalValue = opportunities.reduce(sum, o) => sum + (o.tvl || 0), 0);
     if (totalValue === 0) return 0;
 
     return opportunities.reduce(
@@ -531,7 +530,7 @@ export class YieldAggregatorService {
   private async fetchDefiLlamaOpportunities(): Promise<YieldOpportunity[]> {
     try {
       const aptosPools = await this.defiLlama.getAptosPools();
-      return aptosPools.map((pool) => this.defiLlama.transformPool(pool));
+      return aptosPools.map(pool) => this.defiLlama.transformPool(pool));
     } catch (error) {
       logger.error("Error fetching DefiLlama opportunities:", error);
       return [];

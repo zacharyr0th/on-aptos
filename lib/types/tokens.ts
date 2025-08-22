@@ -3,7 +3,6 @@
  * Single source of truth for all token-related types
  */
 
-import { StaticImageData } from "next/image";
 
 // Base token structure
 export interface TokenBase {
@@ -157,10 +156,10 @@ export interface TokenBalance {
 }
 
 // Type guards for runtime checking
-export function isTokenMetadata(obj: any): obj is TokenMetadata {
+export function isTokenMetadata(obj: Record<string, unknown>): obj is TokenMetadata {
   return (
     obj &&
-    (typeof obj.symbol === "string" ||
+    (typeof obj.symbol === "string" ||)
       typeof obj.name === "string" ||
       typeof obj.assetAddress === "string")
   );

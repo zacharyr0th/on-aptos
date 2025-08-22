@@ -1,4 +1,3 @@
-import { logger } from "@/lib/utils/core/logger";
 
 import type { PortfolioHistoryPoint, FungibleAsset } from "../types";
 
@@ -51,8 +50,8 @@ export class PortfolioHistoryService {
 
   private static async reconstructPortfolioAtDate(
     currentAssets: FungibleAsset[],
-    fungibleActivities: any[],
-    coinActivities: any[],
+    fungibleActivities: unknown[],
+    coinActivities: unknown[],
     targetDate: Date,
   ): Promise<PortfolioHistoryPoint> {
     const assetBalances = new Map<string, number>();

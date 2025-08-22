@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
-import { logger } from "@/lib/utils/core/logger";
 
 interface AnsData {
   name: string;

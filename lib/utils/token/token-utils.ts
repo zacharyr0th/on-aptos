@@ -12,7 +12,6 @@ import {
   CELER_STABLECOINS,
 } from "@/lib/constants";
 import { PanoraTokenListService } from "@/lib/services/portfolio/panora-token-list";
-import { logger } from "@/lib/utils/core/logger";
 
 // ===== TYPES =====
 
@@ -335,7 +334,7 @@ export async function getTokenLogoUrl(
 
     return null;
   } catch (error) {
-    logger.error("Error fetching token logo URL:", error);
+    logger.error({ error }, "Error fetching token logo URL:");
     return null;
   }
 }
@@ -509,7 +508,7 @@ export function getTokenLogoUrlWithFallbackSync(
  */
 export const copyToClipboard = async (
   text: string,
-  label: string = "Address",
+  _label: string = "Address",
 ): Promise<void> => {
   if (!text) {
     logger.warn("Attempted to copy empty text to clipboard");
@@ -522,7 +521,7 @@ export const copyToClipboard = async (
     // toast.success(`${label} copied to clipboard`);
   } catch (error) {
     logger.error(
-      `Failed to copy to clipboard: ${error instanceof Error ? error.message : String(error)}`
+      `Failed to copy to clipboard: ${error instanceof Error ? error.message : String(error)}`,
     );
     // toast.error("Failed to copy to clipboard");
   }
@@ -531,7 +530,11 @@ export const copyToClipboard = async (
 /**
  * Truncate address for display
  */
-export const truncateAddress = (address: string, startChars = 8, endChars = 8): string => {
+export const truncateAddress = (
+  address: string,
+  startChars = 8,
+  endChars = 8,
+): string => {
   if (!address) return "";
   if (address.length <= startChars + endChars) return address;
   return `${address.slice(0, startChars)}...${address.slice(-endChars)}`;
@@ -547,17 +550,17 @@ export const formatTokenAmount = (
     showDecimals?: boolean;
     maxDecimals?: number;
     useGrouping?: boolean;
-  } = {}
+  } = {},
 ): string => {
   const { showDecimals = true, maxDecimals = 2, useGrouping = true } = options;
 
   try {
     let numericAmount: number;
-    
-    if (typeof amount === 'bigint') {
+
+    if (typeof amount === "bigint") {
       numericAmount = Number(amount) / Math.pow(10, decimals);
-    } else if (typeof amount === 'string') {
-      const cleanAmount = amount.replace(/[,\s]/g, '');
+    } else if (typeof amount === "string") {
+      const cleanAmount = amount.replace(/[\s]/g, "");
       numericAmount = Number(cleanAmount) / Math.pow(10, decimals);
     } else {
       numericAmount = Number(amount);
@@ -574,7 +577,7 @@ export const formatTokenAmount = (
 
     return formatter.format(numericAmount);
   } catch (error) {
-    logger.error("Error formatting token amount:", error);
+    logger.error({ error }, "Error formatting token amount:");
     return "0";
   }
 };
@@ -589,10 +592,10 @@ export const formatTokenSupply = (
   options: {
     showSymbol?: boolean;
     maxDecimals?: number;
-  } = {}
+  } = {},
 ): string => {
   const { showSymbol = true, maxDecimals = 0 } = options;
-  
+
   try {
     const formattedAmount = formatTokenAmount(amount, decimals, {
       showDecimals: maxDecimals > 0,
@@ -602,7 +605,7 @@ export const formatTokenSupply = (
 
     return showSymbol ? `${formattedAmount} ${symbol}` : formattedAmount;
   } catch (error) {
-    logger.error("Error formatting token supply:", error);
+    logger.error({ error }, "Error formatting token supply:");
     return showSymbol ? `0 ${symbol}` : "0";
   }
 };
@@ -615,13 +618,13 @@ export const formatUSDValue = (
   options: {
     decimals?: number;
     compact?: boolean;
-  } = {}
+  } = {},
 ): string => {
   const { decimals = 0, compact = true } = options;
-  
+
   try {
-    const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
-    
+    const numAmount = typeof amount === "string" ? parseFloat(amount) : amount;
+
     if (!Number.isFinite(numAmount)) {
       throw new Error(`Invalid USD amount: ${amount}`);
     }
@@ -644,7 +647,7 @@ export const formatUSDValue = (
       maximumFractionDigits: decimals,
     }).format(numAmount);
   } catch (error) {
-    logger.error("Error formatting USD value:", error);
+    logger.error({ error }, "Error formatting USD value:");
     return "$0";
   }
 };
@@ -659,18 +662,18 @@ export const validateTokenData = (token: {
   decimals?: number;
 }): boolean => {
   try {
-    if (!token.symbol || typeof token.symbol !== 'string') {
+    if (!token.symbol || typeof token.symbol !== "string") {
       logger.warn("Invalid token symbol:", token.symbol);
       return false;
     }
 
-    if (!token.supply || typeof token.supply !== 'string') {
+    if (!token.supply || typeof token.supply !== "string") {
       logger.warn("Invalid token supply:", token.supply);
       return false;
     }
 
     // Try to parse supply as BigInt to validate format
-    BigInt(token.supply.replace(/[,\s]/g, ''));
+    BigInt(token.supply.replace(/[\s]/g, ""));
 
     return true;
   } catch (error) {
@@ -682,18 +685,20 @@ export const validateTokenData = (token: {
 /**
  * Sort tokens by supply (descending)
  */
-export const sortTokensBySupply = <T extends { symbol: string; supply: string }>(tokens: T[]): T[] => {
-  return tokens
-    .filter(validateTokenData)
-    .sort((a, b) => {
-      try {
-        const supplyA = BigInt(a.supply.replace(/[,\s]/g, ''));
-        const supplyB = BigInt(b.supply.replace(/[,\s]/g, ''));
-        return supplyB > supplyA ? 1 : supplyB < supplyA ? -1 : 0;
-      } catch {
-        return 0;
-      }
-    });
+export const sortTokensBySupply = <
+  T extends { symbol: string; supply: string },
+>(
+  tokens: T[],
+): T[] => {
+  return tokens.filter(validateTokenData).sort((a, b) => {
+    try {
+      const supplyA = BigInt(a.supply.replace(/[\s]/g, ""));
+      const supplyB = BigInt(b.supply.replace(/[\s]/g, ""));
+      return supplyB > supplyA ? 1 : supplyB < supplyA ? -1 : 0;
+    } catch {
+      return 0;
+    }
+  });
 };
 
 // Error types for token operations
@@ -731,6 +736,6 @@ export async function preloadTokenList(): Promise<void> {
     await PanoraTokenListService.getTokenList();
     logger.info("Token list preloaded successfully");
   } catch (error) {
-    logger.error("Failed to preload token list:", error);
+    logger.error({ error }, "Failed to preload token list:");
   }
 }

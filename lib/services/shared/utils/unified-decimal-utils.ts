@@ -72,7 +72,7 @@ export class UnifiedDecimalUtils {
     // Determine decimals from token registry or use provided/default
     const decimals =
       options.decimals ||
-      (tokenAddress
+      (tokenAddress)
         ? TokenRegistry.getTokenDecimals(tokenAddress, symbol)
         : DECIMALS.DEFAULT);
 
@@ -253,7 +253,7 @@ export class UnifiedDecimalUtils {
     }>,
     options: ConversionOptions = {},
   ): Array<FormattedBalance & { value?: TokenValue }> {
-    return balances.map(({ amount, tokenAddress, symbol, price }) => {
+    return balances.map({ amount, tokenAddress, symbol, price }) => {
       const formattedBalance = this.formatBalance(
         amount,
         tokenAddress,

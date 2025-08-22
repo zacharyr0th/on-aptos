@@ -247,7 +247,6 @@
     "Tapp": "The first hook-enabled, Uniswap V4-style modular DEX on Aptos testnet; smart-contract hooks let builders compose custom pools while users get programmable swaps.",
     "Merkle": "A gamified perp DEX with XP, loot-boxes, and 150× leverage; more than $20b of total volume.",
     "AGDEX": "Offers 1-100× cross-margin perps with low-impact oracle fills keep slippage tight for retail traders.",
-    "Pump": "Anyone can mint meme tokens via bonding curves; every coin is fair-launched with no presale or team allocation.",
     "Emojicoin": "Lets users mint tokens mapped 1-to-1 with Unicode emojis; each launch uses Econia's CL-AMM curve for instant price discovery and speculation.",
     "Aries": "The first Compound-style money market on Aptos, upgraded with 90%-LTV E-Mode, integrated bridging, and spot trading in one interface.",
     "Superposition": "Advanced risk management platform inspired by Bank of England's FHS VaR, offering leveraged yield opportunities with real-time risk monitoring and dynamic collateral factor adjustment.",

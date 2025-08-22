@@ -43,7 +43,7 @@ export const TokenDialogContent: React.FC<TokenDialogContentProps> = ({
 
   const defaultAddressDisplay = (
     <div className="space-y-2">
-      {addressLines.map((address: any, index: number) => (
+      {addressLines.map((address: unknown, index: number) => (
         <div key={`address-${index}`} className="flex items-center gap-2">
           <div className="flex-grow">
             <code className="bg-muted px-1 py-0.5 rounded text-xs font-mono break-all">
@@ -68,7 +68,7 @@ export const TokenDialogContent: React.FC<TokenDialogContentProps> = ({
 
   const defaultExplorerLinks =
     explorerLines.length > 0 ? (
-      explorerLines.map((link: any, index: number) => (
+      explorerLines.map((link: unknown, index: number) => (
         <a
           key={`explorer-${index}`}
           href={link}
@@ -162,7 +162,7 @@ export const TokenDialogContent: React.FC<TokenDialogContentProps> = ({
         label={`${t("common:labels.tags", "Tags")}:`}
         value={
           <div className="flex flex-wrap gap-2">
-            {metadata.tags?.map((tag: any) => (
+            {metadata.tags?.map((tag: unknown) => (
               <span
                 key={tag}
                 className="bg-muted text-muted-foreground px-2 py-1 rounded-full text-xs"

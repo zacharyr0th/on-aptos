@@ -1,4 +1,3 @@
-import { logger } from "@/lib/utils/core/logger";
 
 export interface CompoundablePosition {
   id: string;

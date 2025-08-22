@@ -81,7 +81,7 @@ export interface StablecoinData {
   supplies: StablecoinSupply[];
   total: string;
   total_raw: string;
-  usdt_reserve?: any; // Based on usage in the service
+  usdt_reserve?: Record<string, unknown>; // Based on usage in the service
 }
 
 export interface BridgedCoinConfig {

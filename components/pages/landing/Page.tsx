@@ -8,10 +8,10 @@ import {
   ChevronUp,
   ChevronDown,
 } from "lucide-react";
-import Image from "next/image";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
+import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -20,13 +20,13 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useTranslation } from "@/hooks/useTranslation";
-import { DEVELOPER_CONFIG } from "@/lib/config/app";
+// import { DEVELOPER_CONFIG } from "@/lib/config/app";
 import { cn } from "@/lib/utils";
 
 import { HeroSection } from "./HeroSection";
 import { IconSections } from "./IconSections";
 import { PortfolioDistributionChart } from "./PortfolioDistributionChart";
-import { SocialLinks } from "./SocialLinks";
+// import { SocialLinks } from "./SocialLinks";
 
 const HomepageDesign = () => {
   const [mounted, setMounted] = useState(false);
@@ -235,45 +235,7 @@ const HomepageDesign = () => {
           </div>
         </section>
 
-        {/* Footer */}
-        <footer className="border-t border-border/50">
-          <div className="container mx-auto px-8 sm:px-12 md:px-20 lg:px-32 xl:px-48 max-w-6xl py-3 sm:py-4 lg:py-6">
-            <div className="flex flex-col items-center gap-3 sm:gap-4">
-              <SocialLinks />
-              {/* Powered by Aptos */}
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <span>{t("portfolio.landing.powered_by", "Powered by")}</span>
-                <a
-                  href="https://aptosfoundation.org/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-medium text-primary hover:text-primary/80 transition-colors inline-flex items-center gap-1"
-                >
-                  Aptos
-                  <Image
-                    src="/icons/apt.png"
-                    alt="Aptos"
-                    width={20}
-                    height={20}
-                    className="inline-block dark:invert"
-                  />
-                </a>
-              </div>
-              {/* Built by */}
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <span>{t("portfolio.landing.built_by", "Built by")}</span>
-                <a
-                  href={DEVELOPER_CONFIG.twitter}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-medium text-primary hover:text-primary/80 transition-colors font-mono"
-                >
-                  {DEVELOPER_CONFIG.twitterHandle}
-                </a>
-              </div>
-            </div>
-          </div>
-        </footer>
+        <Footer className="border-t border-border/50" />
       </div>
     </div>
   );

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { logger } from "@/lib/utils/core/logger";
 
 export async function GET(request: NextRequest) {
   try {
@@ -98,12 +97,12 @@ export async function GET(request: NextRequest) {
 
     // Format the names as the ANS service does
     const nameList = names
-      .filter((name: any) => name.domain && !name.subdomain)
-      .map((name: any) => `${name.domain}.apt`)
+      .filter((name: unknown) => name.domain && !name.subdomain)
+      .map((name: unknown) => `${name.domain}.apt`)
       .concat(
         names
-          .filter((name: any) => name.subdomain && name.domain)
-          .map((name: any) => `${name.subdomain}.${name.domain}.apt`),
+          .filter((name: unknown) => name.subdomain && name.domain)
+          .map((name: unknown) => `${name.subdomain}.${name.domain}.apt`),
       );
 
     // apiLogger.info(`ANS: Found ${nameList.length} names for address ${address}`);

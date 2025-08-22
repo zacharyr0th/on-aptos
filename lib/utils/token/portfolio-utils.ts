@@ -73,19 +73,6 @@ export const HISTORICAL_ACTIVITIES_QUERY = `
       asset_type
       is_transaction_success
     }
-    coin_activities(
-      where: { 
-        owner_address: { _eq: $ownerAddress },
-        transaction_timestamp: { _gte: $startTime }
-      }
-      order_by: { transaction_timestamp: asc }
-    ) {
-      transaction_timestamp
-      activity_type
-      amount
-      coin_type
-      is_transaction_success
-    }
   }
 `;
 
@@ -117,5 +104,5 @@ export interface UsePortfolioHistoryResult {
 
 // Duplicate exports removed - use from core modules instead
 // - RetryOptions and withRetry: use from core/types
-// - validateWalletAddress: use from core/validation  
+// - validateWalletAddress: use from core/validation
 // - createErrorResponse/createSuccessResponse: use from api/response-builder

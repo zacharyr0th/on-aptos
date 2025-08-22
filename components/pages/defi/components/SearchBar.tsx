@@ -105,7 +105,7 @@ export function SearchBar({
           <div className="flex items-center flex-shrink-0">
             <div className="flex items-center gap-3">
               {/* Only show count when there's an active filter */}
-              {(selectedCategory !== "All" ||
+              {((selectedCategory !== "All" ||)
                 selectedSubcategory ||
                 searchQuery) && (
                 <p className="text-sm text-muted-foreground">
@@ -121,7 +121,7 @@ export function SearchBar({
               )}
 
               {/* Breadcrumb Navigation */}
-              {(selectedCategory !== "All" ||
+              {((selectedCategory !== "All" ||)
                 selectedSubcategory ||
                 searchQuery) && (
                 <Breadcrumb>

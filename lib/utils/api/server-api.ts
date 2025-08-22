@@ -4,7 +4,6 @@ import { NextResponse } from "next/server";
 import { CACHE_CONFIG } from "@/lib/config/cache";
 
 import { RateLimitError } from "../core/errors";
-import { logger, errorLogger } from "../core/logger";
 import { RateLimitInfo, ApiResponse } from "../core/types";
 
 // Configuration using centralized config
@@ -83,7 +82,7 @@ export function checkRateLimit(ip: string): RateLimitInfo {
 
   // Check if over limit for the main window
   if (record.count > RATE_LIMIT_MAX_REQUESTS) {
-    const resetInSeconds = Math.ceil((record.resetTime - now) / 1000);
+    const resetInSeconds = Math.ceil(record.resetTime - now) / 1000);
     return {
       allowed: false,
       resetInSeconds,
@@ -242,7 +241,7 @@ export async function withApiEnhancements<T>(
         {
           status: 429,
           headers: {
-            "Retry-After": error.resetInSeconds.toString(),
+            "Retry-After": error.resetInSeconds?.toString() || "60",
           },
         },
       );

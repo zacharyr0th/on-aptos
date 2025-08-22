@@ -328,7 +328,7 @@ export class UnifiedAssetValidator {
    * Check for scam patterns in address or symbol
    */
   private static hasScamPatterns(address: string, symbol?: string): boolean {
-    return this.SCAM_PATTERNS.some((pattern) => {
+    return this.SCAM_PATTERNS.some(pattern) => {
       return pattern.test(address) || (symbol && pattern.test(symbol));
     });
   }

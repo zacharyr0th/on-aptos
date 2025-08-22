@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { logger } from "@/lib/utils/core/logger";
 
 interface GasUsageData {
   total_gas_used_octas: number;

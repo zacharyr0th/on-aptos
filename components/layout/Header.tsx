@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import {
   Menu,
@@ -14,11 +16,10 @@ import {
   Copy,
   TrendingUp,
 } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import React, { useState, useEffect, useMemo } from "react";
-import { toast } from "sonner";
+// import { toast } from "sonner";
 
 import { defiProtocols } from "@/components/pages/defi/data/protocols";
 import { Badge } from "@/components/ui/badge";
@@ -50,7 +51,6 @@ import {
 import { useAnsName } from "@/hooks/useAnsName";
 import { useTranslation } from "@/hooks/useTranslation";
 import { cn } from "@/lib/utils";
-import { logger } from "@/lib/utils/core/logger";
 
 import { ErrorBoundary } from "../errors/ErrorBoundary";
 
@@ -163,11 +163,11 @@ const HeaderComponent = (): React.ReactElement | null => {
   // Handle wallet selection
   const handleWalletSelect = async (walletName: string) => {
     try {
-      await connect(walletName as any);
+      await connect(walletName as string);
       setShowWalletModal(false);
       // Redirect to portfolio page after successful connection
       router.push("/portfolio");
-    } catch (error: any) {
+    } catch (error: Record<string, unknown>) {
       logger.warn(
         `Failed to connect to ${walletName}: ${error instanceof Error ? error.message : String(error)}`,
       );
@@ -203,21 +203,40 @@ const HeaderComponent = (): React.ReactElement | null => {
 
   return (
     <ErrorBoundary>
-      <header className="relative py-3 sm:py-4 z-[9999] isolate">
-        <div className="w-full px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20">
+      <header className="relative py-2 sm:py-3 md:py-4 z-[9999] isolate">
+        <div className="w-full px-4 sm:px-6 md:px-12 lg:px-16 xl:px-20">
           <div className="flex items-center justify-between w-full">
-            {/* Logo */}
-            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold">
-              <Link
-                href="/"
-                className="hover:opacity-90 transition-opacity duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-sm"
-              >
-                <span className="text-primary">{title}</span>{" "}
-                <span className="text-muted-foreground">
-                  {t("landing.hero.title_suffix", "on Aptos")}
-                </span>
-              </Link>
-            </h1>
+            {/* Logo - only show on landing page */}
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              {pathname === "/" && (
+                <Link
+                  href="/"
+                  className="hover:opacity-90 transition-opacity duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-sm flex-shrink-0"
+                >
+                  <div className="h-7 w-7 sm:h-7 sm:w-7 md:h-8 md:w-8 rounded-full overflow-hidden p-0.5 sm:p-0.5 md:p-1 bg-background border border-border">
+                    <Image
+                      src="/icons/icon-512x512.png"
+                      alt="Logo"
+                      width={512}
+                      height={512}
+                      className="h-full w-full object-cover scale-150 rounded-full"
+                      priority
+                    />
+                  </div>
+                </Link>
+              )}
+              <h1 className="text-base sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-extrabold">
+                <Link
+                  href="/"
+                  className="hover:opacity-90 transition-opacity duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-sm"
+                >
+                  <span className="text-primary">{title}</span>{" "}
+                  <span className="text-muted-foreground hidden sm:inline">
+                    {t("landing.hero.title_suffix", "on Aptos")}
+                  </span>
+                </Link>
+              </h1>
+            </div>
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center gap-4">
@@ -509,7 +528,7 @@ const HeaderComponent = (): React.ReactElement | null => {
                 <TooltipTrigger asChild>
                   <button
                     onClick={toggleMenu}
-                    className="p-2 -mr-2 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-md transition-colors hover:bg-muted"
+                    className="p-1.5 sm:p-2 -mr-1 sm:-mr-2 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-md transition-colors hover:bg-muted"
                     aria-label={t(
                       "navigation.toggle_menu",
                       "Toggle navigation menu",
@@ -518,9 +537,9 @@ const HeaderComponent = (): React.ReactElement | null => {
                     aria-controls="mobile-navigation"
                   >
                     {mobileMenuOpen ? (
-                      <X className="w-6 h-6" />
+                      <X className="w-5 h-5 sm:w-6 sm:h-6" />
                     ) : (
-                      <Menu className="w-6 h-6" />
+                      <Menu className="w-5 h-5 sm:w-6 sm:h-6" />
                     )}
                   </button>
                 </TooltipTrigger>

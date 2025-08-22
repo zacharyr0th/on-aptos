@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { logger } from "@/lib/utils/core/logger";
 
 // Cache ANS data for 10 minutes
 export const revalidate = 600;

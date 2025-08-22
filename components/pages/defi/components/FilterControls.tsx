@@ -273,7 +273,7 @@ export function FilterControls({
       {/* Desktop Subcategory Dropdown */}
       {expandedCategory &&
         expandedCategory !== "All" &&
-        (() => {
+        ( => {
           const categoryDef = getCategoryDefinition(expandedCategory);
           return (
             categoryDef &&
@@ -281,13 +281,13 @@ export function FilterControls({
             categoryDef.subcategories &&
             Object.keys(categoryDef.subcategories).length > 0
           );
-        })() && (
+        })) && (
           <div className="mt-4 overflow-hidden">
             <div className="animate-in slide-in-from-top-2 duration-300 ease-out">
               <div className="py-2">
                 {/* Subcategories as Small Buttons */}
                 <div className="flex flex-wrap gap-1.5">
-                  {(() => {
+                  {( => {
                     const categoryDef = getCategoryDefinition(expandedCategory);
                     if (
                       categoryDef &&
@@ -308,7 +308,7 @@ export function FilterControls({
                             item,
                           ): item is {
                             subcategory: string;
-                            description: any;
+                            description: Record<string, unknown>;
                           } => item !== null,
                         )
                         .map(({ subcategory, description }) => (
@@ -342,7 +342,7 @@ export function FilterControls({
                         ));
                     }
                     return [];
-                  })()}
+                  }))}
                 </div>
               </div>
             </div>

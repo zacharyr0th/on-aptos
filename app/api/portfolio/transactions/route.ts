@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { getEnvVar } from "@/lib/config/validate-env";
-import { apiLogger } from "@/lib/utils/core/logger";
 
 const APTOS_INDEXER_URL = "https://api.mainnet.aptoslabs.com/v1/graphql";
 
@@ -76,7 +75,7 @@ async function fetchFromGraphQL(
   }
 
   // Get transaction details for the fetched versions
-  const txVersions = accountTxns.map((tx: any) => tx.transaction_version);
+  const txVersions = accountTxns.map((tx: unknown) => tx.transaction_version);
 
   apiLogger.info(`Fetching details for ${txVersions.length} transactions`);
 
@@ -86,10 +85,10 @@ async function fetchFromGraphQL(
 
   // Since we're only fetching one page, we can get all details in one or two queries
   const detailsBatchSize = 100;
-  let allTransactions: any[] = [];
-  let allEvents: any[] = [];
-  let allSignatures: any[] = [];
-  let allBlockMetadata: any[] = [];
+  let allTransactions: unknown[] = [];
+  let allEvents: unknown[] = [];
+  let allSignatures: unknown[] = [];
+  let allBlockMetadata: unknown[] = [];
 
   for (let i = 0; i < txVersions.length; i += detailsBatchSize) {
     const batchVersions = txVersions.slice(i, i + detailsBatchSize);
@@ -199,19 +198,19 @@ async function fetchFromGraphQL(
   const blockMetadata = allBlockMetadata;
 
   // Group events and signatures by transaction version
-  const eventsByVersion = events.reduce((acc: any, event: any) => {
+  const eventsByVersion = events.reduce((acc: unknown, event: unknown) => {
     if (!acc[event.transaction_version]) acc[event.transaction_version] = [];
     acc[event.transaction_version].push(event);
     return acc;
   }, {});
 
-  const signaturesByVersion = signatures.reduce((acc: any, sig: any) => {
+  const signaturesByVersion = signatures.reduce((acc: unknown, sig: unknown) => {
     if (!acc[sig.transaction_version]) acc[sig.transaction_version] = [];
     acc[sig.transaction_version].push(sig);
     return acc;
   }, {});
 
-  const processedTransactions = transactions.map((tx: any) => {
+  const processedTransactions = transactions.map((tx: unknown) => {
     // Try to extract amount from events (coin transfers, withdrawals, deposits)
     let amount = "0";
     let assetType = "APT";

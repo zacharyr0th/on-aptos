@@ -1,10 +1,8 @@
 import { CACHE_TTL, RETRY_CONFIG, SERVICE_DEFAULTS } from "@/lib/constants";
 import { getCachedData, setCachedData } from "@/lib/utils/cache/cache-manager";
-import { logger } from "@/lib/utils/core/logger";
+import { RequestDeduplicator } from "@/lib/utils/cache/request-deduplication";
 
 import type { ServiceConfig } from "../types";
-
-import { RequestDeduplicator } from "@/lib/utils/cache/request-deduplication";
 
 export abstract class BaseAssetService {
   protected static config: ServiceConfig = {

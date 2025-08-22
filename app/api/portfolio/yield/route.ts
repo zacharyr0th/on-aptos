@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     const yieldService = YieldAggregatorService.getInstance();
     const compoundService = AutoCompoundService.getInstance();
 
-    let data: any = {};
+    let data: unknown = {};
 
     switch (action) {
       case "opportunities": {
@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
         const minAPY = searchParams.get("minAPY")
           ? parseFloat(searchParams.get("minAPY")!)
           : undefined;
-        const maxRisk = searchParams.get("maxRisk") as any;
+        const maxRisk = searchParams.get("maxRisk") as unknown;
         const protocols = searchParams.get("protocols")?.split(",");
         const assets = searchParams.get("assets")?.split(",");
 
@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
           );
         }
 
-        const riskTolerance = (searchParams.get("risk") || "moderate") as any;
+        const riskTolerance = (searchParams.get("risk") || "moderate") as unknown;
         const capital = parseFloat(searchParams.get("capital") || "1000");
         const targetAPY = searchParams.get("targetAPY")
           ? parseFloat(searchParams.get("targetAPY")!)

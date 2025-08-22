@@ -1,6 +1,6 @@
 import { Clock } from "lucide-react";
-import Image from "next/image";
 import { useTheme } from "next-themes";
+import Image from "next/image";
 import React, {
   FC,
   memo,
@@ -15,7 +15,6 @@ import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { LanguageToggle } from "@/components/ui/language-toggle";
 import { useTranslation } from "@/hooks/useTranslation";
 import { DEVELOPER_CONFIG } from "@/lib/config/app";
-import { dedupeFetch } from "@/lib/utils/cache/request-deduplication";
 
 import { ErrorBoundary } from "../errors/ErrorBoundary";
 
@@ -103,104 +102,22 @@ const CurrentUTCTime: FC = memo(function CurrentUTCTime(): ReactElement {
 });
 CurrentUTCTime.displayName = "CurrentUTCTime";
 
-const AptPrice: FC = memo(function AptPrice(): ReactElement {
-  const { t } = useTranslation("common");
-
-  const [currentPrice, setCurrentPrice] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<any>(null);
-
-  // Consolidate image props
-  const aptIconProps = {
-    src: "/icons/apt.png",
-    alt: "APT token",
-    width: 16,
-    height: 16,
-    className:
-      "w-3 h-3 xs:w-3.5 xs:h-3.5 sm:w-4 sm:h-4 flex-shrink-0 rounded-full dark:invert",
-    priority: false,
-    quality: 90,
-    unoptimized: false,
-    onError: (e: React.SyntheticEvent<HTMLImageElement>) => {
-      const img = e.target as HTMLImageElement;
-      img.src = "/placeholder.jpg";
-    },
-  };
-
-  // Fetch APT price data
-  useEffect(() => {
-    const fetchPrice = async () => {
-      try {
-        // Fetch current price using deduplication
-        const currentResponse = await dedupeFetch(
-          "/api/analytics/token-latest-price?address=0x1::aptos_coin::AptosCoin",
-        );
-        if (!currentResponse.ok) {
-          throw new Error("Failed to fetch current price");
-        }
-        const currentData = await currentResponse.json();
-
-        if (currentData.data && currentData.data.length > 0) {
-          const latestPrice = currentData.data[0].price_usd;
-          setCurrentPrice(latestPrice);
-          setError(null);
-        } else {
-          throw new Error("No price data available");
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err : new Error(String(err)));
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPrice();
-    // Refresh every minute
-    const interval = setInterval(fetchPrice, 60 * 1000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] xs:text-xs sm:text-sm text-muted-foreground">
-        <Image
-          {...aptIconProps}
-          className={`${aptIconProps.className} opacity-50`}
-          alt={aptIconProps.alt}
-        />
-        <span className="truncate">
-          {t("messages.apt_price_loading", "Loading...")}
-        </span>
-      </div>
-    );
-  }
-
-  if (error || currentPrice === null) {
-    return (
-      <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] xs:text-xs sm:text-sm text-muted-foreground">
-        <Image
-          {...aptIconProps}
-          className={`${aptIconProps.className} opacity-50`}
-          alt={aptIconProps.alt}
-        />
-        <span className="truncate">
-          {t("messages.apt_price_unavailable", "Unavailable")}
-        </span>
-      </div>
-    );
-  }
-
+const BuiltBy: FC = memo(function BuiltBy(): ReactElement {
   return (
-    <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] xs:text-xs sm:text-sm">
-      <Image {...aptIconProps} alt={aptIconProps.alt} />
-      <span className="font-medium whitespace-nowrap text-muted-foreground">
-        ${currentPrice.toFixed(2)}
-      </span>
+    <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] xs:text-xs sm:text-sm text-muted-foreground">
+      <span>Built by</span>
+      <a
+        href="https://x.com/zacharyr0th"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="font-medium text-foreground hover:text-primary transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded"
+      >
+        zacharyr0th
+      </a>
     </div>
   );
 });
-AptPrice.displayName = "AptPrice";
+BuiltBy.displayName = "BuiltBy";
 
 const ProductHuntBadge: FC = memo(function ProductHuntBadge(): ReactElement {
   const { theme, resolvedTheme } = useTheme();
@@ -318,7 +235,7 @@ const FooterComponent: FC<FooterProps> = ({
                 <ThemeToggle />
               </div>
               <div className="w-px h-4 bg-border"></div>
-              <AptPrice />
+              <BuiltBy />
             </div>
 
             {/* Center: Empty for balance */}
@@ -341,7 +258,7 @@ const FooterComponent: FC<FooterProps> = ({
                   <ThemeToggle />
                 </div>
                 <div className="w-px h-4 bg-border"></div>
-                <AptPrice />
+                <BuiltBy />
               </div>
               <div className="flex items-center gap-4">
                 <CurrentUTCTime />
@@ -361,7 +278,7 @@ const FooterComponent: FC<FooterProps> = ({
               </div>
               <div className="w-px h-4 bg-border flex-shrink-0 hidden xs:block"></div>
               <div className="min-w-0">
-                <AptPrice />
+                <BuiltBy />
               </div>
             </div>
 

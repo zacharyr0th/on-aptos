@@ -1,5 +1,5 @@
 // Stub logger that does nothing
-const noop = (..._args: any[]) => {};
+const noop = (..._args: unknown[]) => {};
 
 export const logger = {
   info: noop,
@@ -17,23 +17,21 @@ export const createLogger = (_module: string) => {
 };
 
 // Specialized loggers for different parts of the application
-export const apiLogger = createLogger("api");
-export const serviceLogger = createLogger("service");
 export const dbLogger = createLogger("database");
 export const utilLogger = createLogger("util");
 export const errorLogger = createLogger("error");
 export const perfLogger = createLogger("performance");
 
 // Backward compatibility exports
-export const log = (...args: any[]) => {
+export const log = (...args: unknown[]) => {
   logger.info(args.length === 1 ? args[0] : args.join(" "));
 };
 
-export const warn = (...args: any[]) => {
+export const warn = (...args: unknown[]) => {
   logger.warn(args.length === 1 ? args[0] : args.join(" "));
 };
 
-export const error = (...args: any[]) => {
+export const error = (...args: unknown[]) => {
   if (args[0] instanceof Error) {
     logger.error(args[0]);
   } else {

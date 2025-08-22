@@ -13,7 +13,6 @@ import {
   APIErrorCode,
   ResponseMeta,
 } from "@/lib/types/api";
-import { logger } from "@/lib/utils/core/logger";
 
 /**
  * Build a successful API response with metadata

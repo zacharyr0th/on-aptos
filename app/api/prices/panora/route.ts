@@ -74,7 +74,7 @@ export async function GET(request: NextRequest) {
       }
 
       // Transform data to consistent format
-      const transformedPrices = prices.map((token: any) => ({
+      const transformedPrices = prices.map((token: unknown) => ({
         chainId: token.chainId,
         tokenAddress: token.tokenAddress,
         faAddress: token.faAddress,
