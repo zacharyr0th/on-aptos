@@ -9,6 +9,7 @@ import { ErrorBoundary } from "@/components/errors/ErrorBoundary";
 import { LayoutContent } from "@/components/layout/LayoutContent";
 import { ThemeProvider } from "@/components/layout/theme-provider";
 import { I18nProvider } from "@/components/providers/I18nProvider";
+import { QueryProvider } from "@/components/providers/QueryProvider";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { WalletProvider } from "@/components/wallet/WalletProvider";
@@ -242,15 +243,17 @@ export default async function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <WalletProvider>
-              <TooltipProvider>
-                <ErrorBoundary>
-                  <LayoutContent>{children}</LayoutContent>
-                </ErrorBoundary>
-              </TooltipProvider>
-              <Toaster />
-              <Analytics />
-            </WalletProvider>
+            <QueryProvider>
+              <WalletProvider>
+                <TooltipProvider>
+                  <ErrorBoundary>
+                    <LayoutContent>{children}</LayoutContent>
+                  </ErrorBoundary>
+                </TooltipProvider>
+                <Toaster />
+                <Analytics />
+              </WalletProvider>
+            </QueryProvider>
           </ThemeProvider>
         </I18nProvider>
       </body>

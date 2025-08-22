@@ -15,6 +15,7 @@ import { sanitizeNFTMetadata, sanitizeImageUrl } from "@/lib/utils/core/security
 import { MinimalNFTGrid } from "./MinimalNFTGrid";
 import { NFT } from "./types";
 import { cleanProtocolName } from "./shared/PortfolioMetrics";
+import { NFTTreemapSkeleton } from "./shared/LoadingSkeletons";
 
 // Custom tooltip component for the pie charts
 const CustomTooltip = React.memo(({ active, payload }: any) => {
@@ -151,25 +152,29 @@ interface DeFiSummaryViewProps {
   totalDefiValue: number;
   getProtocolLogo: (protocol: string) => string;
   onProtocolClick: (position: any) => void;
+  selectedDeFiPosition?: any;
+  accountNames?: any;
 }
 
 interface NFTSummaryViewProps {
   nfts: NFT[];
-  currentPageNFTs: number;
+  currentPageNFTs?: number;
   totalNFTCount?: number | null;
   nftCollectionStats?: {
     collections: Array<{ name: string; count: number }>;
     totalCollections: number;
   } | null;
+  accountNames?: any;
+  isLoading?: boolean;
+  onNFTSelect?: (nft: any) => void;
+  selectedNFT?: any;
+  hasMoreNFTs?: boolean;
+  isLoadingMore?: boolean;
+  loadMoreNFTs?: () => void;
   onCollectionClick?: (collection: string) => void;
   includeGrid?: boolean;
   filteredNFTs?: NFT[];
   nftsLoading?: boolean;
-  hasMoreNFTs?: boolean;
-  isLoadingMore?: boolean;
-  onLoadMore?: () => void;
-  selectedNFT?: NFT | null;
-  onNFTSelect?: (nft: NFT | null) => void;
 }
 
 export const DeFiSummaryView: React.FC<DeFiSummaryViewProps> = ({
@@ -338,7 +343,6 @@ export const NFTSummaryView: React.FC<NFTSummaryViewProps> = ({
   nftsLoading = false,
   hasMoreNFTs = false,
   isLoadingMore = false,
-  onLoadMore,
   selectedNFT,
   onNFTSelect,
 }) => {
@@ -395,7 +399,13 @@ export const NFTSummaryView: React.FC<NFTSummaryViewProps> = ({
     nftCollectionStats?.totalCollections ??
     new Set(nfts.map((nft) => nft.collection_name)).size;
 
-  if (nfts.length === 0 || collections.length === 0) {
+  // Determine if we should show skeleton for treemap
+  const shouldShowTreemapSkeleton = nftsLoading || (
+    // Show skeleton if we don't have collection stats and we know there should be NFTs
+    !nftCollectionStats && totalNFTCount !== null && totalNFTCount > 0 && nfts.length === 0
+  );
+
+  if (nfts.length === 0 && totalNFTCount === 0) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
@@ -492,6 +502,8 @@ export const NFTSummaryView: React.FC<NFTSummaryViewProps> = ({
             </button>
           </div>
         </div>
+      ) : shouldShowTreemapSkeleton ? (
+        <NFTTreemapSkeleton />
       ) : (
         <div className="h-52 sm:h-64 w-full bg-neutral-50 dark:bg-neutral-900/50 rounded-lg overflow-hidden">
           <ResponsiveContainer width="100%" height="100%" minHeight={200}>
@@ -546,7 +558,7 @@ export const NFTSummaryView: React.FC<NFTSummaryViewProps> = ({
             nftsLoading={nftsLoading}
             hasMoreNFTs={hasMoreNFTs}
             isLoadingMore={isLoadingMore}
-            onLoadMore={onLoadMore}
+            onLoadMore={loadMoreNFTs}
             selectedNFT={selectedNFT || null}
             onNFTSelect={onNFTSelect || (() => {})}
           />

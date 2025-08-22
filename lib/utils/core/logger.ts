@@ -1,13 +1,13 @@
-// Stub logger that does nothing
-const noop = (..._args: any[]) => {};
+// Development logger that uses console
+const isDevelopment = process.env.NODE_ENV === 'development';
 
 export const logger = {
-  info: noop,
-  debug: noop,
-  warn: noop,
-  error: noop,
-  fatal: noop,
-  trace: noop,
+  info: (...args: any[]) => isDevelopment && console.log('[INFO]', ...args),
+  debug: (...args: any[]) => isDevelopment && console.debug('[DEBUG]', ...args),
+  warn: (...args: any[]) => isDevelopment && console.warn('[WARN]', ...args),
+  error: (...args: any[]) => isDevelopment && console.error('[ERROR]', ...args),
+  fatal: (...args: any[]) => console.error('[FATAL]', ...args),
+  trace: (...args: any[]) => isDevelopment && console.trace('[TRACE]', ...args),
   child: () => logger,
 };
 

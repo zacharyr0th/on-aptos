@@ -120,6 +120,7 @@ export const PieChart: React.FC<PieChartProps> = ({
               <Cell
                 key={`cell-${index}`}
                 fill={entry.color}
+                stroke="none"
                 style={{ cursor: onClick ? "pointer" : "default" }}
               />
             ))}

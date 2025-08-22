@@ -28,9 +28,16 @@ import { NFTImage } from "./SmartImage";
 // Unified NFT Grid Props
 interface UnifiedNFTGridProps {
   nfts: NFT[] | null;
-  nftsLoading: boolean;
+  nftsLoading?: boolean;
   selectedNFT: NFT | null;
-  onNFTSelect: (nft: NFT) => void;
+  onNFTSelect: (nft: any) => void;
+  isLoading?: boolean;
+  totalNFTCount?: number | null;
+  accountNames?: any;
+  nftCollectionStats?: any;
+  hasMoreNFTs?: boolean;
+  isLoadingMore?: boolean;
+  loadMoreNFTs?: () => void;
 
   // Display modes
   variant?: "minimal" | "enhanced" | "standard";
@@ -42,8 +49,6 @@ interface UnifiedNFTGridProps {
   showMetadata?: boolean;
 
   // Infinite scroll
-  hasMoreNFTs?: boolean;
-  isLoadingMore?: boolean;
   onLoadMore?: () => void;
 
   // Styling

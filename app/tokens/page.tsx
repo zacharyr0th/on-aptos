@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { logger } from "@/lib/utils/core/logger";
 import Image from "next/image";
 import {
   ArrowUpDown,
@@ -479,7 +480,7 @@ export default function TokensPage() {
         }
       }
     } catch (err) {
-      console.warn("Failed to fetch BTC data:", err);
+      logger.warn("Failed to fetch BTC data:", err);
     }
   };
 
@@ -493,7 +494,7 @@ export default function TokensPage() {
         }
       }
     } catch (err) {
-      console.warn("Failed to fetch Bitcoin price:", err);
+      logger.warn("Failed to fetch Bitcoin price:", err);
     }
   };
 
@@ -550,7 +551,7 @@ export default function TokensPage() {
         setHasLoadedAll(true);
       }
     } catch (err) {
-      console.error("Failed to load remaining tokens:", err);
+      logger.error("Failed to load remaining tokens:", err);
       // Don't show error to user, just log it
     } finally {
       setLoadingMore(false);

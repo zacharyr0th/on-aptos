@@ -89,6 +89,8 @@ interface TransactionHistoryTableProps {
   initialLimit?: number;
   preloadedTransactions?: Transaction[] | null;
   preloadedTransactionsLoading?: boolean;
+  transactions?: any[] | null;
+  isLoading?: boolean;
 }
 
 function SortableHeader({

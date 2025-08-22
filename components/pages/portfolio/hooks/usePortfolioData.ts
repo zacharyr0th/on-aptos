@@ -290,6 +290,7 @@ export function usePortfolioData(
   useEffect(() => {
     const fetchData = async () => {
       if (!walletAddress) {
+        logger.debug("[usePortfolioData] No wallet address provided");
         logger.debug("No wallet address provided");
         setAssets(null);
         setNfts(null);
@@ -302,18 +303,14 @@ export function usePortfolioData(
         return;
       }
 
-      logger.info({
-        walletAddress,
-      });
+      logger.debug("[usePortfolioData] Fetching portfolio data for wallet:", walletAddress);
+      logger.info(`Fetching portfolio data for wallet: ${walletAddress}`);
       setIsLoading(true);
       setTransactionsLoading(true); // Start loading transactions immediately
       setError(null);
 
       try {
-        logger.debug({
-          walletAddress,
-          useBatchApi,
-        });
+        logger.debug(`Using batch API: ${useBatchApi} for wallet: ${walletAddress}`);
 
         if (useBatchApi) {
           // Use new batch API endpoint
@@ -346,12 +343,64 @@ export function usePortfolioData(
           const data = batchData.data;
 
           // Set all data at once
+          logger.debug("[usePortfolioData] Batch API response:", {
+            assets: data.assets?.length || 0,
+            defiPositions: data.defiPositions?.length || 0,
+            nfts: data.nfts?.length || 0,
+            nftTotalCount: data.nftTotalCount,
+            transactions: data.transactions?.length || 0
+          });
           setAssets(data.assets || []);
           setDefiPositions(data.defiPositions || []);
           setNfts(data.nfts || []);
           setTotalNFTCount(data.nftTotalCount || 0);
           setHasMoreNFTs(data.hasMoreNFTs || false);
           setNftCollectionStats(data.nftCollectionStats || null);
+
+          // Always try to load all NFTs for accurate collection stats if total > 50
+          logger.debug('[usePortfolioData] Collection stats check:', {
+            hasCollectionStats: !!data.nftCollectionStats,
+            totalCount: data.nftTotalCount,
+            nftCount: data.nfts?.length,
+            willTriggerFallback: data.nftTotalCount && data.nftTotalCount > 50
+          });
+          
+          // If we have more than 50 NFTs total, always load all NFTs for accurate collection stats
+          if (data.nftTotalCount && data.nftTotalCount > 50) {
+            logger.warn(`Loading all ${data.nftTotalCount} NFTs for accurate collection calculation`);
+            logger.debug('[usePortfolioData] Triggering background load of all NFTs for collection stats');
+            
+            // Load all NFTs in the background for collection stats
+            setTimeout(async () => {
+              try {
+                const { NFTService } = await import(
+                  "@/lib/services/portfolio/services/nft-service"
+                );
+                const allNFTs = await NFTService.getAllWalletNFTs(walletAddress);
+                
+                // Calculate collection stats from all NFTs
+                const collectionMap: Record<string, number> = {};
+                allNFTs.forEach(nft => {
+                  const collectionName = nft.collection_name || 'Unknown Collection';
+                  collectionMap[collectionName] = (collectionMap[collectionName] || 0) + 1;
+                });
+                
+                const collections = Object.entries(collectionMap)
+                  .map(([name, count]) => ({ name, count }))
+                  .sort((a, b) => b.count - a.count);
+                
+                const calculatedStats = {
+                  collections,
+                  totalCollections: collections.length,
+                };
+                
+                setNftCollectionStats(calculatedStats);
+                logger.info(`Successfully calculated collection stats from ${allNFTs.length} NFTs: ${collections.length} collections`);
+              } catch (error) {
+                logger.error('Failed to load all NFTs for collection stats:', error);
+              }
+            }, 1000);
+          }
 
           // Set transactions immediately from batch API
           logger.info(
@@ -392,13 +441,7 @@ export function usePortfolioData(
             setAllNFTs(data.nfts || []); // Use initial batch for now
           }
 
-          logger.debug({
-            assets: data.assets?.length || 0,
-            defi: data.defiPositions?.length || 0,
-            nfts: data.nfts?.length || 0,
-            totalNFTs: data.nftTotalCount,
-            transactions: data.transactions?.length || 0,
-          });
+          logger.debug(`Batch API response - assets: ${data.assets?.length || 0}, defi: ${data.defiPositions?.length || 0}, nfts: ${data.nfts?.length || 0}, totalNFTs: ${data.nftTotalCount}, transactions: ${data.transactions?.length || 0}`);
         } else {
           // Fallback to original implementation if batch API fails
           // ... (keeping original code as fallback)
@@ -432,9 +475,7 @@ export function usePortfolioData(
               const finalAssets =
                 assetsData?.data?.assets || assetsData?.assets || [];
               setAssets(finalAssets);
-              logger.debug({
-                count: finalAssets.length,
-              });
+              logger.debug(`Assets loaded: ${finalAssets.length}`);
             } catch (error) {
               logger.error(
                 `Assets parsing error: ${error instanceof Error ? error.message : String(error)}`,
@@ -459,9 +500,7 @@ export function usePortfolioData(
               const finalDefi =
                 defiData?.data?.positions || defiData?.positions || [];
               setDefiPositions(finalDefi);
-              logger.debug({
-                count: finalDefi.length,
-              });
+              logger.debug(`DeFi positions loaded: ${finalDefi.length}`);
             }
           } catch (error) {
             logger.error(
@@ -493,11 +532,7 @@ export function usePortfolioData(
             // Only use initial batch for metrics to avoid redundant loading
             setAllNFTs(initialNFTs.data);
 
-            logger.debug({
-              count: initialNFTs.data.length,
-              hasMore: initialNFTs.hasMore,
-              totalCount,
-            });
+            logger.debug(`NFTs loaded - count: ${initialNFTs.data.length}, hasMore: ${initialNFTs.hasMore}, totalCount: ${totalCount}`);
           } catch (nftError: any) {
             logger.error(
               `Failed to fetch NFTs: ${nftError instanceof Error ? nftError.message : String(nftError)}`,
@@ -544,12 +579,7 @@ export function usePortfolioData(
       setHasMoreNFTs(moreNFTs.hasMore);
       setNftPage(nextPage);
 
-      logger.debug({
-        page: nextPage,
-        count: moreNFTs.data.length,
-        hasMore: moreNFTs.hasMore,
-        total: (nfts?.length || 0) + moreNFTs.data.length,
-      });
+      logger.debug(`Loaded more NFTs - page: ${nextPage}, count: ${moreNFTs.data.length}, hasMore: ${moreNFTs.hasMore}, total: ${(nfts?.length || 0) + moreNFTs.data.length}`);
     } catch (error) {
       logger.error(
         `Failed to load more NFTs: ${error instanceof Error ? error.message : String(error)}`,
@@ -624,13 +654,7 @@ export function usePortfolioData(
           loadTransactions();
         }
 
-        logger.debug({
-          assets: data.assets?.length || 0,
-          defi: data.defiPositions?.length || 0,
-          nfts: data.nfts?.length || 0,
-          totalNFTs: data.nftTotalCount,
-          transactions: data.transactions?.length || 0,
-        });
+        logger.debug(`Refetch response - assets: ${data.assets?.length || 0}, defi: ${data.defiPositions?.length || 0}, nfts: ${data.nfts?.length || 0}, totalNFTs: ${data.nftTotalCount}, transactions: ${data.transactions?.length || 0}`);
       } else {
         // Fallback to original refetch logic
         const { NFTService } = await import(
@@ -692,10 +716,7 @@ export function usePortfolioData(
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Unknown error";
-      logger.error({
-        error: errorMessage,
-        walletAddress,
-      });
+      logger.error(`Refetch error for wallet ${walletAddress}: ${errorMessage}`);
       setError(errorMessage);
     } finally {
       setIsLoading(false);

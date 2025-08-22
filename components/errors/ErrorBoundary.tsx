@@ -24,7 +24,9 @@ export class ErrorBoundary extends React.Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     // Log to error reporting service here
-    console.error("Component Error:", { error: error.message, errorInfo });
+    import("@/lib/utils/core/logger").then(({ logger }) => {
+      logger.error("Component Error:", { error: error.message, errorInfo });
+    });
   }
 
   render() {

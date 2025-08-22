@@ -337,6 +337,7 @@ export class NFTService {
               owner_address: { _eq: $ownerAddress },
               amount: { _gt: "0" }
             }
+            limit: 50000
           ) {
             current_token_data {
               current_collection {
@@ -375,6 +376,10 @@ export class NFTService {
       const collectionMap: Record<string, number> = {};
       const ownerships = result.data.current_token_ownerships_v2 || [];
 
+      logger.info(
+        `[NFTService.getCollectionStats] Processing ${ownerships.length} NFT ownerships for collection stats for address: ${address}`,
+      );
+
       ownerships.forEach((ownership: any) => {
         const collectionName =
           ownership.current_token_data?.current_collection?.collection_name ||
@@ -386,6 +391,10 @@ export class NFTService {
       const collections = Object.entries(collectionMap)
         .map(([name, count]) => ({ name, count }))
         .sort((a, b) => b.count - a.count);
+
+      logger.info(
+        `[NFTService.getCollectionStats] Calculated stats for ${collections.length} collections, total NFTs processed: ${ownerships.length} for address: ${address}`,
+      );
 
       return {
         collections,

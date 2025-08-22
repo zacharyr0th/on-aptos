@@ -434,6 +434,53 @@ export const YieldOpportunitiesSkeleton: React.FC<{ className?: string }> = ({
   </div>
 );
 
+// NFT Treemap Skeleton
+export const NFTTreemapSkeleton: React.FC<{ className?: string }> = ({
+  className = "",
+}) => (
+  <div className={`space-y-4 ${className}`}>
+    {/* Header with title and stats */}
+    <div className="flex items-baseline gap-2 mb-4">
+      <Skeleton className="h-6 w-48" />
+      <Skeleton className="h-4 w-32" />
+    </div>
+    
+    {/* Treemap container */}
+    <div className="h-52 sm:h-64 w-full bg-neutral-50 dark:bg-neutral-900/50 rounded-lg overflow-hidden p-4">
+      {/* Simulated treemap rectangles */}
+      <div className="h-full w-full flex gap-1">
+        {/* Large rectangle */}
+        <div className="flex flex-col gap-1 flex-1">
+          <Skeleton className="h-3/5 w-full rounded-sm" />
+          <div className="flex gap-1 h-2/5">
+            <Skeleton className="h-full flex-1 rounded-sm" />
+            <Skeleton className="h-full flex-1 rounded-sm" />
+          </div>
+        </div>
+        
+        {/* Medium rectangles */}
+        <div className="flex flex-col gap-1 w-1/3">
+          <Skeleton className="h-2/5 w-full rounded-sm" />
+          <div className="flex gap-1 h-1/5">
+            <Skeleton className="h-full flex-1 rounded-sm" />
+            <Skeleton className="h-full flex-1 rounded-sm" />
+          </div>
+          <Skeleton className="h-2/5 w-full rounded-sm" />
+        </div>
+        
+        {/* Small rectangles */}
+        <div className="flex flex-col gap-1 w-1/5">
+          <Skeleton className="h-1/4 w-full rounded-sm" />
+          <Skeleton className="h-1/6 w-full rounded-sm" />
+          <Skeleton className="h-1/4 w-full rounded-sm" />
+          <Skeleton className="h-1/6 w-full rounded-sm" />
+          <Skeleton className="h-1/6 w-full rounded-sm" />
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
 // Generic Loading Component with different variants
 interface LoadingSkeletonProps {
   variant:
@@ -445,7 +492,8 @@ interface LoadingSkeletonProps {
     | "defi-summary"
     | "transactions"
     | "yield-table"
-    | "yield-opportunities";
+    | "yield-opportunities"
+    | "nft-treemap";
   className?: string;
   [key: string]: any; // For variant-specific props
 }
@@ -474,6 +522,8 @@ export const LoadingSkeleton: React.FC<LoadingSkeletonProps> = ({
       return <YieldTableSkeleton className={className} {...props} />;
     case "yield-opportunities":
       return <YieldOpportunitiesSkeleton className={className} {...props} />;
+    case "nft-treemap":
+      return <NFTTreemapSkeleton className={className} {...props} />;
     default:
       return <Skeleton className={className} />;
   }

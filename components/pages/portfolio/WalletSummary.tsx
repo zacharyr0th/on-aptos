@@ -5,9 +5,15 @@ import {
   PieChart as PieChartIcon,
 } from "lucide-react";
 import React, { useMemo } from "react";
+import {
+  ResponsiveContainer,
+  Tooltip as RechartsTooltip,
+  Treemap,
+} from "recharts";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatCurrency, formatTokenAmount } from "@/lib/utils/format/format";
+import { logger } from "@/lib/utils/core/logger";
 
 import {
   PieChart,
@@ -15,7 +21,7 @@ import {
   CHART_COLORS,
 } from "./shared/ChartUtils";
 import { TokenImage } from "./shared/SmartImage";
-import { LoadingSkeleton } from "./shared/LoadingSkeletons";
+import { LoadingSkeleton, NFTTreemapSkeleton } from "./shared/LoadingSkeletons";
 import { usePortfolioMetrics } from "./shared/PortfolioMetrics";
 import type { FungibleAsset, DeFiPosition } from "./shared/PortfolioMetrics";
 
@@ -41,6 +47,11 @@ interface WalletSummaryProps {
   filteredAssetsCount?: number;
   totalNFTCount?: number | null;
   aptPrice?: number;
+  nftCollectionStats?: {
+    collections: Array<{ name: string; count: number }>;
+    totalCollections: number;
+  } | null;
+  nftsLoading?: boolean;
 }
 
 export const WalletSummary: React.FC<WalletSummaryProps> = ({
@@ -55,7 +66,75 @@ export const WalletSummary: React.FC<WalletSummaryProps> = ({
   nfts = [],
   nftTotalValue = 0,
   totalNFTCount,
+  nftCollectionStats,
+  nftsLoading = false,
 }) => {
+  // Calculate collection stats from loaded NFTs if API data is not available
+  const fallbackCollectionStats = useMemo(() => {
+    if (!nfts || nfts.length === 0) return null;
+    
+    const collectionMap: Record<string, number> = {};
+    nfts.forEach(nft => {
+      const collectionName = nft.collection_name || 'Unknown Collection';
+      collectionMap[collectionName] = (collectionMap[collectionName] || 0) + 1;
+    });
+    
+    const collections = Object.entries(collectionMap)
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count);
+    
+    return {
+      collections,
+      totalCollections: collections.length,
+    };
+  }, [nfts]);
+  
+  // Use API data if available, otherwise use fallback
+  const effectiveCollectionStats = nftCollectionStats && nftCollectionStats.collections.length > 0 
+    ? nftCollectionStats 
+    : fallbackCollectionStats;
+
+  // Determine if we should show treemap skeleton
+  const shouldShowTreemapSkeleton = nftsLoading || (
+    // Show skeleton if we don't have any NFT data yet and we're not in the "no NFTs" state
+    !effectiveCollectionStats && totalNFTCount !== 0
+  );
+
+  // Debug logging with verification
+  React.useEffect(() => {
+    if (effectiveCollectionStats) {
+      const calculatedTotal = effectiveCollectionStats.collections.reduce(
+        (sum: number, collection: any) => sum + collection.count, 
+        0
+      );
+      const expectedTotal = totalNFTCount || nfts.length;
+      
+      logger.debug('[WalletSummary Debug]', {
+        nftCollectionStats: !!nftCollectionStats,
+        fallbackCollectionStats: !!fallbackCollectionStats,
+        effectiveCollectionStats: !!effectiveCollectionStats,
+        nftsLength: nfts.length,
+        totalNFTCount,
+        usingAPI: nftCollectionStats && nftCollectionStats.collections.length > 0,
+        calculatedTotal,
+        expectedTotal,
+        mathMatches: calculatedTotal === expectedTotal,
+        collections: effectiveCollectionStats.collections.length,
+        topCollections: effectiveCollectionStats.collections.slice(0, 5).map(c => `${c.name}: ${c.count}`)
+      });
+
+      if (calculatedTotal !== expectedTotal) {
+        logger.warn('[WalletSummary] Collection count mismatch!', {
+          calculated: calculatedTotal,
+          expected: expectedTotal,
+          difference: calculatedTotal - expectedTotal
+        });
+      } else {
+        logger.info('[WalletSummary] ✅ Collection counts verified - treemap shows accurate data for all NFTs');
+      }
+    }
+  }, [nftCollectionStats, fallbackCollectionStats, effectiveCollectionStats, nfts.length, totalNFTCount]);
+
   // Use shared portfolio metrics calculation
   const portfolioMetrics = usePortfolioMetrics(
     assets,
@@ -125,16 +204,16 @@ export const WalletSummary: React.FC<WalletSummaryProps> = ({
       {/* Minimal Stats - Hidden on mobile */}
       <div className="hidden sm:grid grid-cols-3 gap-8">
         <div>
-          <p className="text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400 mb-0.5">
+          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-0.5">
             Tokens
           </p>
-          <p className="text-xl font-light">{portfolioMetrics.totalAssets}</p>
+          <p className="text-xl font-normal">{portfolioMetrics.totalAssets}</p>
         </div>
         <div>
-          <p className="text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400 mb-0.5">
+          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-0.5">
             NFTs
           </p>
-          <div className="text-xl font-light">
+          <div className="text-xl font-normal">
             {totalNFTCount !== null ? (
               totalNFTCount
             ) : portfolioMetrics.nftCount > 0 ? (
@@ -145,7 +224,7 @@ export const WalletSummary: React.FC<WalletSummaryProps> = ({
           </div>
         </div>
         <div>
-          <p className="text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400 mb-0.5">
+          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-0.5">
             <span className="hidden sm:inline">DeFi Positions</span>
             <span className="sm:hidden">DeFi</span>
           </p>
@@ -356,6 +435,148 @@ export const WalletSummary: React.FC<WalletSummaryProps> = ({
 
       {/* Divider */}
       <div className="border-b-2 border-border/50"></div>
+
+      {/* NFT Collection Treemap */}
+      {shouldShowTreemapSkeleton ? (
+        <NFTTreemapSkeleton />
+      ) : effectiveCollectionStats && effectiveCollectionStats.collections.length > 0 ? (
+        <div className="space-y-4">
+          <div className="flex items-baseline gap-2 mb-4">
+            <h3 className="text-lg font-medium">NFT Collection Distribution</h3>
+            <span className="text-sm text-muted-foreground">
+              {totalNFTCount || nfts.length} NFTs across {effectiveCollectionStats.totalCollections} collections
+            </span>
+          </div>
+          
+          <div className="h-52 sm:h-64 w-full bg-neutral-50 dark:bg-neutral-900/50 rounded-lg overflow-hidden">
+            <ResponsiveContainer width="100%" height="100%" minHeight={200}>
+              <Treemap
+                data={effectiveCollectionStats.collections.map((collection, index) => {
+                  const monetPastels = [
+                    "hsl(210, 38%, 76%)",
+                    "hsl(260, 33%, 79%)",
+                    "hsl(340, 28%, 81%)",
+                    "hsl(150, 28%, 77%)",
+                    "hsl(30, 33%, 79%)",
+                    "hsl(190, 31%, 78%)",
+                    "hsl(50, 28%, 80%)",
+                    "hsl(280, 28%, 80%)",
+                    "hsl(110, 23%, 78%)",
+                    "hsl(20, 28%, 80%)",
+                  ];
+                  return {
+                    name: collection.name || "Unnamed Collection",
+                    size: collection.count,
+                    percentage: ((collection.count / (totalNFTCount || nfts.length)) * 100),
+                    fill: monetPastels[index % monetPastels.length],
+                  };
+                })}
+                dataKey="size"
+                nameKey="name"
+                aspectRatio={4 / 3}
+                stroke="none"
+                content={<CustomTreemapContent />}
+              >
+                <RechartsTooltip
+                  content={({ active, payload }) => {
+                    if (active && payload && payload.length) {
+                      const data = payload[0].payload;
+                      return (
+                        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-lg shadow-lg p-2 sm:p-3 z-50">
+                          <p className="font-medium text-xs sm:text-sm">
+                            {data.name}
+                          </p>
+                          <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400">
+                            {data.size} NFTs ({data.percentage.toFixed(1)}%)
+                          </p>
+                        </div>
+                      );
+                    }
+                    return null;
+                  }}
+                />
+              </Treemap>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      ) : null}
     </div>
+  );
+};
+
+// Custom shape renderer for Treemap
+const CustomTreemapContent = (props: any) => {
+  const { x, y, width, height, index, name, value, root } = props;
+  const fillColor = root?.children?.[index]?.fill || props.fill || "#8884d8";
+  const minWidth = 40;
+  const minHeight = 25;
+  const canShowText = width >= minWidth && height >= minHeight;
+  const canShowBothLines = width >= 60 && height >= 40;
+
+  if (!canShowText) {
+    return (
+      <rect
+        x={x}
+        y={y}
+        width={width}
+        height={height}
+        style={{
+          fill: fillColor,
+          stroke: "rgba(255,255,255,0.2)",
+          strokeWidth: 0.5,
+        }}
+      />
+    );
+  }
+
+  const maxNameLength = Math.floor(width / 6);
+  const nameFontSize = Math.max(7, Math.min(12, width / 8));
+  const valueFontSize = Math.max(6, Math.min(10, width / 10));
+  let displayName = name;
+  if (name.length > maxNameLength) {
+    displayName = name.substring(0, Math.max(3, maxNameLength - 3)) + "...";
+  }
+
+  return (
+    <g>
+      <rect
+        x={x}
+        y={y}
+        width={width}
+        height={height}
+        style={{
+          fill: fillColor,
+          stroke: "rgba(255,255,255,0.2)",
+          strokeWidth: 0.5,
+        }}
+      />
+      <text
+        x={x + width / 2}
+        y={canShowBothLines ? y + height / 2 - 4 : y + height / 2}
+        textAnchor="middle"
+        fill="#1a1a1a"
+        style={{
+          fontSize: `${nameFontSize}px`,
+          fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+          fontWeight: 600,
+        }}
+      >
+        {displayName}
+      </text>
+      {canShowBothLines && (
+        <text
+          x={x + width / 2}
+          y={y + height / 2 + 8}
+          textAnchor="middle"
+          fill="rgba(26,26,26,0.7)"
+          style={{
+            fontSize: `${valueFontSize}px`,
+            fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', monospace",
+          }}
+        >
+          {value}
+        </text>
+      )}
+    </g>
   );
 };

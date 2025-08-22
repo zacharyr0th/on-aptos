@@ -47,15 +47,18 @@ interface DeFiTableProps extends BaseTableProps {
   onSortChange: (sortBy: string, order: "asc" | "desc") => void;
 }
 
-export const AssetsTable = ({
-  visibleAssets,
-  selectedItem,
-  showOnlyVerified,
-  portfolioAssets,
-  onItemSelect,
-}: AssetsTableProps) => {
+export const AssetsTable = (props: any) => {
+  // Handle both prop formats
+  const visibleAssets = props.visibleAssets || props.assets || [];
+  const selectedItem = props.selectedItem || props.selectedAsset;
+  const showOnlyVerified = props.showOnlyVerified || props.hideFilteredAssets || false;
+  const portfolioAssets = props.portfolioAssets || props.assets || [];
+  const onItemSelect = props.onItemSelect || props.onAssetSelect;
+  const isLoading = props.isLoading || false;
   // Check if we're on mobile
   const [isMobile, setIsMobile] = React.useState(false);
+  const [displayedCount, setDisplayedCount] = React.useState(50); // Start with more items loaded
+  const [isLoadingMore, setIsLoadingMore] = React.useState(false);
 
   React.useEffect(() => {
     const checkIsMobile = () => setIsMobile(window.innerWidth < 768);
@@ -65,16 +68,56 @@ export const AssetsTable = ({
   }, []);
 
   // Separate APT from other assets
-  const aptAsset = visibleAssets.find(
-    (asset) => asset.asset_type === "0x1::aptos_coin::AptosCoin",
+  const safeVisibleAssets = visibleAssets || [];
+  const aptAsset = safeVisibleAssets.find(
+    (asset: any) => asset.asset_type === "0x1::aptos_coin::AptosCoin",
   );
-  const otherAssets = visibleAssets
-    .filter((asset) => asset.asset_type !== "0x1::aptos_coin::AptosCoin")
-    .sort((a, b) => {
+  const otherAssets = safeVisibleAssets
+    .filter((asset: any) => asset.asset_type !== "0x1::aptos_coin::AptosCoin")
+    .sort((a: any, b: any) => {
       const valueA = a.value || 0;
       const valueB = b.value || 0;
       return valueB - valueA; // Descending order
     });
+
+  // Reset displayed count when assets change
+  React.useEffect(() => {
+    setDisplayedCount(50); // Start with 50 items loaded
+  }, [visibleAssets.length]);
+
+  // Handle scroll-based loading
+  React.useEffect(() => {
+    if (isMobile || isLoading) return;
+
+    const handleScroll = () => {
+      const container = document.querySelector('.asset-table-scroll-container');
+      if (!container) return;
+
+      const { scrollTop, scrollHeight, clientHeight } = container;
+      const scrollPercentage = (scrollTop + clientHeight) / scrollHeight;
+
+      // Load more when user scrolls to 80% of the content
+      if (scrollPercentage > 0.8 && displayedCount <= otherAssets.length && !isLoadingMore) {
+        setIsLoadingMore(true);
+        
+        // Simulate loading delay for smooth UX
+        setTimeout(() => {
+          setDisplayedCount(prevCount => Math.min(prevCount + 100, otherAssets.length + 1));
+          setIsLoadingMore(false);
+        }, 300);
+      }
+    };
+
+    const container = document.querySelector('.asset-table-scroll-container');
+    if (container) {
+      container.addEventListener('scroll', handleScroll);
+      return () => container.removeEventListener('scroll', handleScroll);
+    }
+  }, [displayedCount, otherAssets.length, isLoading, isMobile, isLoadingMore]);
+
+  // Show assets based on displayedCount, or all on mobile
+  const limitedOtherAssets = isMobile ? otherAssets : otherAssets.slice(0, Math.min(displayedCount - 1, otherAssets.length));
+  
 
   // Mobile card component
   const AssetCard = ({
@@ -283,9 +326,32 @@ export const AssetsTable = ({
     </React.Fragment>
   );
 
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="asset-table-container" data-asset-table>
+        <div className="space-y-2">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="flex items-center gap-3 p-3">
+              <Skeleton className="h-10 w-10 rounded-full" />
+              <div className="flex-1">
+                <Skeleton className="h-4 w-24 mb-1" />
+                <Skeleton className="h-3 w-32" />
+              </div>
+              <div className="text-right">
+                <Skeleton className="h-4 w-16 ml-auto mb-1" />
+                <Skeleton className="h-3 w-20 ml-auto" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="asset-table-container" data-asset-table>
-      {visibleAssets.length > 0 ? (
+      {safeVisibleAssets.length > 0 ? (
         <>
           {/* Mobile Card Layout */}
           {isMobile ? (
@@ -293,67 +359,63 @@ export const AssetsTable = ({
               {aptAsset && (
                 <AssetCard
                   asset={aptAsset}
-                  showDivider={otherAssets.length > 0}
+                  showDivider={limitedOtherAssets.length > 0}
                 />
               )}
-              {otherAssets.map((asset) => (
+              {limitedOtherAssets.map((asset: any) => (
                 <AssetCard key={asset.asset_type} asset={asset} />
               ))}
             </div>
           ) : (
-            /* Desktop Table Layout */
-            <div className="flex flex-col sm:h-[calc(100vh-280px)]">
-              {/* Fixed APT Header */}
-              <div className="flex-shrink-0">
+            /* Desktop Table Layout with scroll container */
+            <div className="flex flex-col">
+              <Table>
+                <TableHeader>
+                  <TableRow className="border-b border-border/50">
+                    <TableHead className="w-1/2 sm:w-2/5 text-left font-medium text-muted-foreground text-xs">
+                      Ticker
+                    </TableHead>
+                    <TableHead className="w-1/4 sm:w-1/5 font-medium text-muted-foreground text-xs text-center sm:text-right pr-2 [&>div]:justify-center sm:[&>div]:justify-end">
+                      Quantity
+                    </TableHead>
+                    <TableHead className="hidden sm:table-cell w-1/5 font-medium text-muted-foreground text-xs text-right pr-2 [&>div]:justify-end">
+                      Price
+                    </TableHead>
+                    <TableHead className="w-1/4 sm:w-1/5 font-medium text-muted-foreground text-xs text-right pr-4 [&>div]:justify-end">
+                      Value
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+              </Table>
+              <div className="asset-table-scroll-container overflow-y-auto" style={{ height: '36rem', maxHeight: '70vh' }}>
                 <Table>
-                  <TableHeader>
-                    <TableRow className="border-b border-border/50">
-                      <TableHead className="w-1/2 sm:w-2/5 text-left font-medium text-muted-foreground text-xs">
-                        Ticker
-                      </TableHead>
-                      <TableHead className="w-1/4 sm:w-1/5 font-medium text-muted-foreground text-xs text-center sm:text-right pr-2 [&>div]:justify-center sm:[&>div]:justify-end">
-                        Quantity
-                      </TableHead>
-                      <TableHead className="hidden sm:table-cell w-1/5 font-medium text-muted-foreground text-xs text-right pr-2 [&>div]:justify-end">
-                        Price
-                      </TableHead>
-                      <TableHead className="w-1/4 sm:w-1/5 font-medium text-muted-foreground text-xs text-right pr-4 [&>div]:justify-end">
-                        Value
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  {aptAsset && (
-                    <TableBody>{renderAssetRow(aptAsset, true)}</TableBody>
-                  )}
+                  <TableBody>
+                    {aptAsset && renderAssetRow(aptAsset, limitedOtherAssets.length > 0)}
+                    {limitedOtherAssets.map((asset: any) => renderAssetRow(asset))}
+                  </TableBody>
                 </Table>
+                {/* Loading indicator */}
+                {isLoadingMore && (
+                  <div className="text-center py-3 text-sm text-muted-foreground">
+                    <div className="inline-flex items-center gap-2">
+                      <div className="h-4 w-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+                      Loading more assets...
+                    </div>
+                  </div>
+                )}
+                {/* Show indicator if there are more assets to load */}
+                {!isLoadingMore && displayedCount <= otherAssets.length && otherAssets.length > 49 && (
+                  <div className="text-center py-3 text-sm text-muted-foreground">
+                    Showing {limitedOtherAssets.length + (aptAsset ? 1 : 0)} of {safeVisibleAssets.length} assets • Scroll to load more
+                  </div>
+                )}
+                {/* Show when all assets are loaded */}
+                {!isLoadingMore && displayedCount > otherAssets.length && safeVisibleAssets.length > 50 && (
+                  <div className="text-center py-3 text-sm text-muted-foreground">
+                    All {safeVisibleAssets.length} assets loaded
+                  </div>
+                )}
               </div>
-
-              {/* Scrollable Other Assets */}
-              {otherAssets.length > 0 && (
-                <div className="flex-1 overflow-y-auto">
-                  <Table>
-                    <TableHeader className="sr-only">
-                      <TableRow>
-                        <TableHead className="w-1/2 sm:w-2/5 text-left font-medium text-muted-foreground text-xs">
-                          Ticker
-                        </TableHead>
-                        <TableHead className="w-1/4 sm:w-1/5 font-medium text-muted-foreground text-xs text-center sm:text-right pr-2 [&>div]:justify-center sm:[&>div]:justify-end">
-                          Quantity
-                        </TableHead>
-                        <TableHead className="hidden sm:table-cell w-1/5 font-medium text-muted-foreground text-xs text-right pr-2 [&>div]:justify-end">
-                          Price
-                        </TableHead>
-                        <TableHead className="w-1/4 sm:w-1/5 font-medium text-muted-foreground text-xs text-right pr-4 [&>div]:justify-end">
-                          Value
-                        </TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {otherAssets.map((asset) => renderAssetRow(asset))}
-                    </TableBody>
-                  </Table>
-                </div>
-              )}
             </div>
           )}
         </>
@@ -377,16 +439,16 @@ export const AssetsTable = ({
   );
 };
 
-export const DeFiPositionsTable = ({
-  groupedDeFiPositions,
-  defiPositionsLoading,
-  selectedItem,
-  defiSortBy,
-  defiSortOrder,
-  getProtocolLogo,
-  onItemSelect,
-  onSortChange,
-}: DeFiTableProps) => {
+export const DeFiPositionsTable = (props: any) => {
+  // Handle both prop formats
+  const groupedDeFiPositions = props.groupedDeFiPositions || props.positions || [];
+  const defiPositionsLoading = props.defiPositionsLoading || props.isLoading || false;
+  const selectedItem = props.selectedItem || props.selectedPosition;
+  const defiSortBy = props.defiSortBy || props.sortBy || 'value';
+  const defiSortOrder = props.defiSortOrder || props.sortOrder || 'desc';
+  const getProtocolLogo = props.getProtocolLogo;
+  const onItemSelect = props.onItemSelect || props.onPositionSelect;
+  const onSortChange = props.onSortChange || props.onSort;
   // Check if we're on mobile
   const [isMobile, setIsMobile] = React.useState(false);
 
@@ -489,25 +551,35 @@ export const DeFiPositionsTable = ({
   //   return position.totalValue >= MIN_DEFI_VALUE_THRESHOLD;
   // });
 
-  if (defiSortBy === "type") {
+  if (defiSortBy === "type" && defiSortOrder) {
     sortedPositions.sort((a, b) => {
-      const typeA = Array.from(a.protocolTypes)[0] as string;
-      const typeB = Array.from(b.protocolTypes)[0] as string;
-      const displayA = typeA === "derivatives" ? "perps" : typeA;
-      const displayB = typeB === "derivatives" ? "perps" : typeB;
+      if (!a || !b) return 0;
+      
+      const typeA = a?.protocolTypes ? Array.from(a.protocolTypes)[0] as string : undefined;
+      const typeB = b?.protocolTypes ? Array.from(b.protocolTypes)[0] as string : undefined;
+      const displayA = typeA ? (typeA === "derivatives" ? "perps" : typeA) : "unknown";
+      const displayB = typeB ? (typeB === "derivatives" ? "perps" : typeB) : "unknown";
 
-      if (defiSortOrder === "asc") {
+      if (typeof displayA !== 'string' || typeof displayB !== 'string') {
+        return 0;
+      }
+      
+      if (!defiSortOrder || defiSortOrder === "asc") {
         return displayA.localeCompare(displayB);
       } else {
         return displayB.localeCompare(displayA);
       }
     });
-  } else if (defiSortBy === "value") {
+  } else if (defiSortBy === "value" && defiSortOrder) {
     sortedPositions.sort((a, b) => {
+      if (!a || !b) return 0;
+      const aValue = a.totalValue || 0;
+      const bValue = b.totalValue || 0;
+      
       if (defiSortOrder === "asc") {
-        return a.totalValue - b.totalValue;
+        return aValue - bValue;
       } else {
-        return b.totalValue - a.totalValue;
+        return bValue - aValue;
       }
     });
   }
