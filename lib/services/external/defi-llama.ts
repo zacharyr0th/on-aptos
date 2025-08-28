@@ -3,7 +3,8 @@
  * Provides live TVL, volume, and fees data for DeFi protocols
  */
 
-import { API_ENDPOINTS, CACHE_KEYS } from "@/lib/constants/api/endpoints";
+import { ENDPOINTS as API_ENDPOINTS } from "@/lib/constants/endpoints";
+import { CACHE_KEYS } from "@/lib/constants/api/endpoints";
 import { serviceLogger } from "@/lib/utils/core/logger";
 
 export interface DeFiLlamaChain {
@@ -117,46 +118,43 @@ class DeFiLlamaService {
   // Protocol name mapping from our names to DeFiLlama slugs
   private readonly PROTOCOL_SLUG_MAP: Record<string, string> = {
     // Liquid Staking
-    'Amnis': 'amnis-finance',
-    'Thala LSD': 'thala-lsd',
-    
+    Amnis: "amnis-finance",
+    "Thala LSD": "thala-lsd",
+
     // Lending
-    'Echelon': 'echelon-market',
-    'Aries': 'aries-markets',
-    'Echo': 'echo-lending',
-    'Meso': 'meso-finance',
-    'Joule': 'joule-finance',
-    
+    Echelon: "echelon-market",
+    Aries: "aries-markets",
+    Echo: "echo-lending",
+    Meso: "meso-finance",
+    Joule: "joule-finance",
+
     // DEXs
-    'PancakeSwap': 'pancakeswap-amm',
-    'Sushiswap': 'sushi',
-    'Thala': 'thalaswap',
-    'ThalaSwap': 'thalaswap',
-    'ThalaSwap V2': 'thalaswap-v2',
-    'Liquidswap': 'liquidswap',
-    'Cetus': 'cetus-amm',
-    'Superposition': 'superposition',
-    'Panora': 'panora-exchange',
-    
+    PancakeSwap: "pancakeswap-amm",
+    Sushiswap: "sushi",
+    Thala: "thalaswap",
+    ThalaSwap: "thalaswap",
+    "ThalaSwap V2": "thalaswap-v2",
+    Liquidswap: "liquidswap",
+    Cetus: "cetus-amm",
+    Superposition: "superposition",
+    Panora: "panora-exchange",
+
     // Yield/Strategy
-    'Aptin': 'aptin-finance-v2',
-    'Cellana': 'cellana-finance',
-    'Echo Strategy': 'echo-strategy',
-    'Kofi': 'kofi-finance',
-    'Satay': 'satay-finance',
-    
+    Cellana: "cellana-finance",
+    "Echo Strategy": "echo-strategy",
+    Kofi: "kofi-finance",
+    Satay: "satay-finance",
+
     // Derivatives
-    'Merkle': 'merkle-trade',
-    'Tsunami': 'tsunami-finance',
-    
+    Merkle: "merkle-trade",
+
     // Others
-    'Ondo': 'ondo-finance',
-    'Franklin Templeton': 'franklin-templeton',
-    'Thala CDP': 'thala-cdp',
-    'Mole': 'mole',
-    'Kana': 'kana-labs',
-    'Gui Inu': 'gui-inu',
-    'Emojicoin': 'emojicoin',
+    Ondo: "ondo-finance",
+    "Franklin Templeton": "franklin-templeton",
+    "Thala CDP": "thala-cdp",
+    Mole: "mole",
+    Kana: "kana-labs",
+    "Gui Inu": "gui-inu",
   };
 
   // Get the correct DeFiLlama slug for a protocol
@@ -166,7 +164,7 @@ class DeFiLlamaService {
       return this.PROTOCOL_SLUG_MAP[protocolName];
     }
     // Fallback to lowercase with dashes
-    return protocolName.toLowerCase().replace(/\s+/g, '-');
+    return protocolName.toLowerCase().replace(/\s+/g, "-");
   }
 
   clearCache(): void {
@@ -528,9 +526,11 @@ class DeFiLlamaService {
     isAptosSpecific?: boolean;
   } | null> {
     const cacheKey = `${CACHE_KEYS.defiVolume("protocol")}-${protocolName}-aptos`;
-    const cached = this.getCached<{ volume24h: number; change24h?: number; isAptosSpecific?: boolean }>(
-      cacheKey,
-    );
+    const cached = this.getCached<{
+      volume24h: number;
+      change24h?: number;
+      isAptosSpecific?: boolean;
+    }>(cacheKey);
     if (cached) return cached;
 
     try {
@@ -546,25 +546,34 @@ class DeFiLlamaService {
       }
 
       const data = await response.json();
-      
+
       // Try to get Aptos-specific volume from chain breakdown
       let aptosVolume24h = 0;
       let aptosChange24h;
-      
+
       // Check if there's chain-specific volume data
-      if (data.totalDataChartBreakdown && data.totalDataChartBreakdown.length > 0) {
-        const latestData = data.totalDataChartBreakdown[data.totalDataChartBreakdown.length - 1];
+      if (
+        data.totalDataChartBreakdown &&
+        data.totalDataChartBreakdown.length > 0
+      ) {
+        const latestData =
+          data.totalDataChartBreakdown[data.totalDataChartBreakdown.length - 1];
         if (latestData && latestData.Aptos) {
           aptosVolume24h = latestData.Aptos;
         }
       }
-      
+
       // If no Aptos-specific data, check if protocol is Aptos-only
-      if (aptosVolume24h === 0 && data.chains && data.chains.length === 1 && data.chains[0] === "Aptos") {
+      if (
+        aptosVolume24h === 0 &&
+        data.chains &&
+        data.chains.length === 1 &&
+        data.chains[0] === "Aptos"
+      ) {
         aptosVolume24h = data.total24h || 0;
         aptosChange24h = data.change_1d;
       }
-      
+
       const result = {
         volume24h: aptosVolume24h || data.total24h || 0,
         change24h: aptosChange24h || data.change_1d,
@@ -636,12 +645,14 @@ class DeFiLlamaService {
       );
 
       if (!response.ok) {
-        serviceLogger.debug(`No detailed data for ${protocolSlug}, tried slug: ${slug}, status: ${response.status}`);
+        serviceLogger.debug(
+          `No detailed data for ${protocolSlug}, tried slug: ${slug}, status: ${response.status}`,
+        );
         return null;
       }
 
       const data = await response.json();
-      
+
       // Extract Aptos-specific data
       // First try currentChainTvls for current TVL
       let latestAptosTvl = 0;
@@ -650,33 +661,47 @@ class DeFiLlamaService {
       } else if (data.chainTvls && data.chainTvls.Aptos) {
         // Fall back to historical data
         const aptosTvl = data.chainTvls.Aptos;
-        latestAptosTvl = aptosTvl.tvl && aptosTvl.tvl.length > 0 
-          ? aptosTvl.tvl[aptosTvl.tvl.length - 1].totalLiquidityUSD 
-          : 0;
+        latestAptosTvl =
+          aptosTvl.tvl && aptosTvl.tvl.length > 0
+            ? aptosTvl.tvl[aptosTvl.tvl.length - 1].totalLiquidityUSD
+            : 0;
       }
-        
+
       // Calculate Aptos-specific changes
       let aptosChange1d, aptosChange7d;
-      if (data.chainTvls && data.chainTvls.Aptos && data.chainTvls.Aptos.tvl && data.chainTvls.Aptos.tvl.length > 1) {
+      if (
+        data.chainTvls &&
+        data.chainTvls.Aptos &&
+        data.chainTvls.Aptos.tvl &&
+        data.chainTvls.Aptos.tvl.length > 1
+      ) {
         const aptosTvl = data.chainTvls.Aptos;
         const oneDayAgo = aptosTvl.tvl[Math.max(0, aptosTvl.tvl.length - 2)];
         const sevenDaysAgo = aptosTvl.tvl[Math.max(0, aptosTvl.tvl.length - 8)];
-        
+
         if (oneDayAgo) {
-          aptosChange1d = ((latestAptosTvl - oneDayAgo.totalLiquidityUSD) / oneDayAgo.totalLiquidityUSD) * 100;
+          aptosChange1d =
+            ((latestAptosTvl - oneDayAgo.totalLiquidityUSD) /
+              oneDayAgo.totalLiquidityUSD) *
+            100;
         }
         if (sevenDaysAgo) {
-          aptosChange7d = ((latestAptosTvl - sevenDaysAgo.totalLiquidityUSD) / sevenDaysAgo.totalLiquidityUSD) * 100;
+          aptosChange7d =
+            ((latestAptosTvl - sevenDaysAgo.totalLiquidityUSD) /
+              sevenDaysAgo.totalLiquidityUSD) *
+            100;
         }
       }
-      
+
       // Override with Aptos-specific data
       data.aptosTvl = latestAptosTvl;
       data.aptosChange1d = aptosChange1d;
       data.aptosChange7d = aptosChange7d;
-      
-      serviceLogger.debug(`Protocol ${protocolSlug} (${slug}): Aptos TVL = ${latestAptosTvl}, chains = ${data.chains?.join(',')}`);
-      
+
+      serviceLogger.debug(
+        `Protocol ${protocolSlug} (${slug}): Aptos TVL = ${latestAptosTvl}, chains = ${data.chains?.join(",")}`,
+      );
+
       this.setCache(cacheKey, data);
       return data;
     } catch (error) {
@@ -691,15 +716,13 @@ class DeFiLlamaService {
   async getProtocolYields(protocolName: string): Promise<any[] | null> {
     const cacheKey = `${CACHE_KEYS.defiProtocols()}-yields`;
     const cached = this.getCached<any[]>(cacheKey);
-    
+
     try {
       let pools: any[];
       if (cached) {
         pools = cached;
       } else {
-        const response = await fetch(
-          `${API_ENDPOINTS.DEFILLAMA_BASE}/pools`,
-        );
+        const response = await fetch(`${API_ENDPOINTS.DEFILLAMA_BASE}/pools`);
 
         if (!response.ok) {
           serviceLogger.debug(`No yields data available`);
@@ -713,10 +736,10 @@ class DeFiLlamaService {
 
       // Filter for the specific protocol AND Aptos chain only
       const protocolPools = pools.filter(
-        (pool: any) => 
+        (pool: any) =>
           (pool.project?.toLowerCase() === protocolName.toLowerCase() ||
-           pool.symbol?.toLowerCase().includes(protocolName.toLowerCase())) &&
-          pool.chain?.toLowerCase() === 'aptos'
+            pool.symbol?.toLowerCase().includes(protocolName.toLowerCase())) &&
+          pool.chain?.toLowerCase() === "aptos",
       );
 
       return protocolPools.length > 0 ? protocolPools : null;
@@ -786,7 +809,10 @@ class DeFiLlamaService {
       this.setCache(cacheKey, result);
       return result;
     } catch (error) {
-      serviceLogger.debug(`Error fetching options volume for ${protocolName}:`, error);
+      serviceLogger.debug(
+        `Error fetching options volume for ${protocolName}:`,
+        error,
+      );
       return null;
     }
   }
@@ -797,10 +823,19 @@ class DeFiLlamaService {
   async getProtocolMetrics(protocolName: string): Promise<{
     volume?: { daily: string; change24h?: string };
     fees?: { daily: string; change24h?: string; revenue?: string };
-    tvl?: { current: number; change24h?: number; change7d?: number; tokens?: any };
+    tvl?: {
+      current: number;
+      change24h?: number;
+      change7d?: number;
+      tokens?: any;
+    };
     yields?: any[];
     optionsVolume?: { daily: string; change24h?: string };
-    derivativesVolume?: { daily: string; change24h?: string; openInterest?: string };
+    derivativesVolume?: {
+      daily: string;
+      change24h?: string;
+      openInterest?: string;
+    };
     mcap?: number;
     tokenPrice?: number;
     fdv?: number;
@@ -813,10 +848,10 @@ class DeFiLlamaService {
   } | null> {
     try {
       const [
-        volumeData, 
-        feesData, 
-        detailsData, 
-        yieldsData, 
+        volumeData,
+        feesData,
+        detailsData,
+        yieldsData,
         optionsData,
         derivativesData,
         poolsData,
@@ -833,37 +868,56 @@ class DeFiLlamaService {
       const volume =
         volumeData.status === "fulfilled" ? volumeData.value : null;
       const fees = feesData.status === "fulfilled" ? feesData.value : null;
-      const details = detailsData.status === "fulfilled" ? detailsData.value : null;
-      const yields = yieldsData.status === "fulfilled" ? yieldsData.value : null;
-      const options = optionsData.status === "fulfilled" ? optionsData.value : null;
-      const derivatives = derivativesData.status === "fulfilled" ? derivativesData.value : null;
+      const details =
+        detailsData.status === "fulfilled" ? detailsData.value : null;
+      const yields =
+        yieldsData.status === "fulfilled" ? yieldsData.value : null;
+      const options =
+        optionsData.status === "fulfilled" ? optionsData.value : null;
+      const derivatives =
+        derivativesData.status === "fulfilled" ? derivativesData.value : null;
       const pools = poolsData.status === "fulfilled" ? poolsData.value : null;
 
-      if (!volume && !fees && !details && !yields && !options && !derivatives && !pools) return null;
+      if (
+        !volume &&
+        !fees &&
+        !details &&
+        !yields &&
+        !options &&
+        !derivatives &&
+        !pools
+      )
+        return null;
 
       // Extract COMPREHENSIVE metrics from details - APTOS SPECIFIC
       let tvl, mcap, tokenPrice, fdv, staking, historicalTvl, tokenBreakdown;
       if (details) {
         // Use Aptos-specific TVL if available
         tvl = {
-          current: details.aptosTvl || (details.currentChainTvls?.Aptos) || 0,
+          current: details.aptosTvl || details.currentChainTvls?.Aptos || 0,
           change24h: details.aptosChange1d,
           change7d: details.aptosChange7d,
           tokens: undefined,
         };
-        
+
         // Extract token breakdown from Aptos chain data
-        if (details.chainTvls?.Aptos?.tokens && details.chainTvls.Aptos.tokens.length > 0) {
-          const latestTokens = details.chainTvls.Aptos.tokens[details.chainTvls.Aptos.tokens.length - 1];
+        if (
+          details.chainTvls?.Aptos?.tokens &&
+          details.chainTvls.Aptos.tokens.length > 0
+        ) {
+          const latestTokens =
+            details.chainTvls.Aptos.tokens[
+              details.chainTvls.Aptos.tokens.length - 1
+            ];
           tokenBreakdown = latestTokens.tokens;
           tvl.tokens = tokenBreakdown;
         }
-        
+
         // Historical TVL for Aptos
         if (details.chainTvls?.Aptos?.tvl) {
           historicalTvl = details.chainTvls.Aptos.tvl.slice(-30); // Last 30 days
         }
-        
+
         // Token data
         mcap = details.mcap;
         tokenPrice = details.tokenPrice;
@@ -874,19 +928,21 @@ class DeFiLlamaService {
       // Extract lending/borrowing rates from pools
       let borrowRates, supplyRates;
       if (pools && pools.lending) {
-        const protocolPools = pools.lending.filter((p: any) => 
-          p.project?.toLowerCase() === protocolName.toLowerCase()
+        const protocolPools = pools.lending.filter(
+          (p: any) => p.project?.toLowerCase() === protocolName.toLowerCase(),
         );
-        
+
         if (protocolPools.length > 0) {
-          borrowRates = protocolPools.map((p: any) => ({
-            symbol: p.symbol,
-            apyBorrow: p.apyBorrow,
-            apyBaseBorrow: p.apyBaseBorrow,
-            totalBorrowUsd: p.totalBorrowUsd,
-            ltv: p.ltv,
-          })).filter((p: any) => p.apyBorrow);
-          
+          borrowRates = protocolPools
+            .map((p: any) => ({
+              symbol: p.symbol,
+              apyBorrow: p.apyBorrow,
+              apyBaseBorrow: p.apyBaseBorrow,
+              totalBorrowUsd: p.totalBorrowUsd,
+              ltv: p.ltv,
+            }))
+            .filter((p: any) => p.apyBorrow);
+
           supplyRates = protocolPools.map((p: any) => ({
             symbol: p.symbol,
             apyBase: p.apyBase,
@@ -944,7 +1000,7 @@ class DeFiLlamaService {
    */
   async getTokenPrices(addresses: string[]): Promise<any | null> {
     try {
-      const coins = addresses.map(addr => `aptos:${addr}`).join(',');
+      const coins = addresses.map((addr) => `aptos:${addr}`).join(",");
       const response = await fetch(
         `${API_ENDPOINTS.DEFILLAMA_BASE}/prices/current/${coins}`,
       );
@@ -959,7 +1015,7 @@ class DeFiLlamaService {
   /**
    * Get price chart data for a token
    */
-  async getTokenChart(address: string, period = '30d'): Promise<any | null> {
+  async getTokenChart(address: string, period = "30d"): Promise<any | null> {
     try {
       const coin = `aptos:${address}`;
       const response = await fetch(
@@ -978,7 +1034,7 @@ class DeFiLlamaService {
    */
   async getTokenPercentageChanges(addresses: string[]): Promise<any | null> {
     try {
-      const coins = addresses.map(addr => `aptos:${addr}`).join(',');
+      const coins = addresses.map((addr) => `aptos:${addr}`).join(",");
       const response = await fetch(
         `${API_ENDPOINTS.DEFILLAMA_BASE}/percentage/${coins}`,
       );
@@ -1004,15 +1060,16 @@ class DeFiLlamaService {
         `${API_ENDPOINTS.DEFILLAMA_BASE}/stablecoins`,
       );
       if (!response.ok) return null;
-      
+
       const data = await response.json();
-      
+
       // Filter for Aptos stablecoins
-      const aptosStables = data.peggedAssets?.filter((stable: any) => 
-        stable.chainCirculating?.Aptos || 
-        stable.chains?.includes('Aptos')
-      ) || [];
-      
+      const aptosStables =
+        data.peggedAssets?.filter(
+          (stable: any) =>
+            stable.chainCirculating?.Aptos || stable.chains?.includes("Aptos"),
+        ) || [];
+
       this.setCache(cacheKey, aptosStables);
       return aptosStables;
     } catch (error) {
@@ -1081,12 +1138,18 @@ class DeFiLlamaService {
         fetch(`${API_ENDPOINTS.DEFILLAMA_BASE}/overview/fees/Aptos`),
       ]);
 
-      const dex = dexData.status === 'fulfilled' && dexData.value.ok 
-        ? await dexData.value.json() : null;
-      const options = optionsData.status === 'fulfilled' && optionsData.value.ok
-        ? await optionsData.value.json() : null;
-      const fees = feesData.status === 'fulfilled' && feesData.value.ok
-        ? await feesData.value.json() : null;
+      const dex =
+        dexData.status === "fulfilled" && dexData.value.ok
+          ? await dexData.value.json()
+          : null;
+      const options =
+        optionsData.status === "fulfilled" && optionsData.value.ok
+          ? await optionsData.value.json()
+          : null;
+      const fees =
+        feesData.status === "fulfilled" && feesData.value.ok
+          ? await feesData.value.json()
+          : null;
 
       return { dex, options, fees };
     } catch (error) {
@@ -1104,28 +1167,27 @@ class DeFiLlamaService {
     if (cached) return cached;
 
     try {
-      const response = await fetch(
-        `${API_ENDPOINTS.DEFILLAMA_BASE}/pools`,
-      );
+      const response = await fetch(`${API_ENDPOINTS.DEFILLAMA_BASE}/pools`);
       if (!response.ok) return null;
-      
+
       const data = await response.json();
-      
+
       // Filter and organize Aptos pools
-      const aptosPools = data.data?.filter((pool: any) => 
-        pool.chain?.toLowerCase() === 'aptos'
-      ) || [];
-      
+      const aptosPools =
+        data.data?.filter(
+          (pool: any) => pool.chain?.toLowerCase() === "aptos",
+        ) || [];
+
       // Group by protocol and pool type
       const organized = {
-        lending: aptosPools.filter((p: any) => p.category === 'Lending'),
-        dex: aptosPools.filter((p: any) => p.category === 'DEX'),
-        yield: aptosPools.filter((p: any) => p.category === 'Yield'),
-        other: aptosPools.filter((p: any) => 
-          !['Lending', 'DEX', 'Yield'].includes(p.category)
+        lending: aptosPools.filter((p: any) => p.category === "Lending"),
+        dex: aptosPools.filter((p: any) => p.category === "DEX"),
+        yield: aptosPools.filter((p: any) => p.category === "Yield"),
+        other: aptosPools.filter(
+          (p: any) => !["Lending", "DEX", "Yield"].includes(p.category),
         ),
       };
-      
+
       this.setCache(cacheKey, organized);
       return organized;
     } catch (error) {

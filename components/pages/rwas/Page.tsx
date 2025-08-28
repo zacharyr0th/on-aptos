@@ -7,9 +7,7 @@ import React, { useState, useMemo, useCallback, memo, useEffect } from "react";
 import { toast } from "sonner";
 
 import { ErrorBoundary } from "@/components/errors/ErrorBoundary";
-import { Footer } from "@/components/layout/Footer";
 import { MarketShareChart } from "@/components/shared/MarketShareChart";
-import { ChartDataItem, formatAssetValue, darkenColor } from "@/lib/utils/format/chart-utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -24,10 +22,20 @@ import {
 } from "@/components/ui/table";
 import { usePageTranslation } from "@/hooks/useTranslation";
 import { RWA_COLORS, RWA_TOKEN_BY_TICKER } from "@/lib/constants";
-import { formatCurrency, formatPercentage, formatLargeNumber } from "@/lib/utils";
-import { truncateAddress, copyToClipboard } from "@/lib/utils/token/token-utils";
-
-
+import {
+  formatCurrency,
+  formatPercentage,
+  formatLargeNumber,
+} from "@/lib/utils";
+import {
+  ChartDataItem,
+  formatAssetValue,
+  darkenColor,
+} from "@/lib/utils/format/chart-utils";
+import {
+  truncateAddress,
+  copyToClipboard,
+} from "@/lib/utils/token/token-utils";
 
 // Consolidated provider mapping
 const PROVIDER_MAPPINGS = {
@@ -146,11 +154,9 @@ const TokenCard = memo(function TokenCard({
       : 0;
   darkenColor(baseColor, darkenFactor);
 
-
   const handleImageLoad = useCallback(() => {
     setImageLoaded(true);
   }, []);
-
 
   return (
     <>
@@ -192,7 +198,6 @@ const TokenCard = memo(function TokenCard({
           value={parseFloat(tokenData.marketSharePercent)}
         />
       </div>
-
     </>
   );
 });
@@ -348,7 +353,7 @@ export default function RWAsPage(): React.ReactElement {
       setIsFetching(true);
       setRwaError(null);
 
-      const response = await fetch("/api/rwa", {
+      const response = await fetch("/api/aptos/rwa", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -425,14 +430,13 @@ export default function RWAsPage(): React.ReactElement {
       <div
         className={`min-h-screen flex flex-col relative ${GeistMono.className}`}
       >
-        {/* Background gradient - fixed to viewport */}
-        <div className="fixed inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/10 pointer-events-none" />
+        {/* Background gradient removed - using global textured background */}
 
         <div className="fixed top-0 left-0 right-0 h-1 z-30">
           {refreshing && <div className="h-full bg-muted animate-pulse"></div>}
         </div>
 
-        <main className="w-full px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20 py-8 flex-1 relative">
+        <main className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20 py-8 flex-1 relative">
           {loading ? (
             <LoadingState />
           ) : error ? (
@@ -531,10 +535,18 @@ export default function RWAsPage(): React.ReactElement {
                     <MarketShareChart
                       data={processedData.protocols.map((protocol: any) => ({
                         name: protocol.assetTicker,
-                        value: calculateMarketShare(protocol.totalValue, processedData.totalValue),
+                        value: calculateMarketShare(
+                          protocol.totalValue,
+                          processedData.totalValue,
+                        ),
                         formattedSupply: formatLargeNumber(protocol.totalValue),
-                        color: RWA_COLORS[protocol.assetTicker] || RWA_COLORS.default,
-                        provider: getActualProvider(protocol.assetTicker, protocol.protocol)
+                        color:
+                          RWA_COLORS[protocol.assetTicker] ||
+                          RWA_COLORS.default,
+                        provider: getActualProvider(
+                          protocol.assetTicker,
+                          protocol.protocol,
+                        ),
                       }))}
                       totalValue={processedData.totalValue}
                       colors={RWA_COLORS}
@@ -555,9 +567,13 @@ export default function RWAsPage(): React.ReactElement {
                           </div>
                           <div>
                             <div className="flex items-center justify-end gap-3 mb-1">
-                              <h2 className="text-sm text-muted-foreground">Total Value</h2>
+                              <h2 className="text-sm text-muted-foreground">
+                                Total Value
+                              </h2>
                             </div>
-                            <p className="text-lg font-bold font-mono">{formatLargeNumber(processedData.totalValue)}</p>
+                            <p className="text-lg font-bold font-mono">
+                              {formatLargeNumber(processedData.totalValue)}
+                            </p>
                           </div>
                         </div>
                       }
@@ -686,8 +702,6 @@ export default function RWAsPage(): React.ReactElement {
             </>
           ) : null}
         </main>
-
-        <Footer className="relative" />
       </div>
     </ErrorBoundary>
   );

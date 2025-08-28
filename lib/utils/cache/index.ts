@@ -1,4 +1,11 @@
-// Cache management
+// Unified cache system (NEW - consolidated all cache functionality)
+export {
+  UnifiedCache,
+  type CacheOptions,
+  type CacheStats,
+} from "./unified-cache";
+
+// Legacy cache system for backward compatibility
 export {
   EnhancedLRUCache,
   cacheInstances,
@@ -12,10 +19,7 @@ export {
   cacheFirstWithFallback,
   type CacheInstanceName,
   type CacheFirstOptions,
-} from "./cache-manager";
-
-// Simple cache
-export * from "./simple-cache";
+} from "./unified-cache";
 
 // Request deduplication
 export * from "./request-deduplication";

@@ -81,7 +81,6 @@ export function useMarketPrice(symbol: string): UseMarketPriceResult {
   }, [fetchPrice]);
 
   const refetch = useCallback(() => {
-    setLoading(true);
     return fetchPrice();
   }, [fetchPrice]);
 

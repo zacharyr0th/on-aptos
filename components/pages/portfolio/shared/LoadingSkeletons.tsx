@@ -4,12 +4,11 @@ import React from "react";
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { LoadingSkeletonProps } from "@/lib/types/ui";
 
 // NFT Grid Skeleton
-interface NFTGridSkeletonProps {
-  count?: number;
-  columns?: number;
-  className?: string;
+interface NFTGridSkeletonProps extends Omit<LoadingSkeletonProps, "variant"> {
+  // count, columns, className are inherited from LoadingSkeletonProps
 }
 
 export const NFTGridSkeleton: React.FC<NFTGridSkeletonProps> = ({
@@ -65,9 +64,10 @@ export const SimpleNFTGridSkeleton: React.FC<NFTGridSkeletonProps> = ({
 };
 
 // Asset Table Skeleton
-interface AssetTableSkeletonProps {
+interface AssetTableSkeletonProps
+  extends Omit<LoadingSkeletonProps, "variant"> {
   rows?: number;
-  className?: string;
+  // className is inherited from LoadingSkeletonProps
 }
 
 export const AssetTableSkeleton: React.FC<AssetTableSkeletonProps> = ({
@@ -444,7 +444,7 @@ export const NFTTreemapSkeleton: React.FC<{ className?: string }> = ({
       <Skeleton className="h-6 w-48" />
       <Skeleton className="h-4 w-32" />
     </div>
-    
+
     {/* Treemap container */}
     <div className="h-52 sm:h-64 w-full bg-neutral-50 dark:bg-neutral-900/50 rounded-lg overflow-hidden p-4">
       {/* Simulated treemap rectangles */}
@@ -457,7 +457,7 @@ export const NFTTreemapSkeleton: React.FC<{ className?: string }> = ({
             <Skeleton className="h-full flex-1 rounded-sm" />
           </div>
         </div>
-        
+
         {/* Medium rectangles */}
         <div className="flex flex-col gap-1 w-1/3">
           <Skeleton className="h-2/5 w-full rounded-sm" />
@@ -467,7 +467,7 @@ export const NFTTreemapSkeleton: React.FC<{ className?: string }> = ({
           </div>
           <Skeleton className="h-2/5 w-full rounded-sm" />
         </div>
-        
+
         {/* Small rectangles */}
         <div className="flex flex-col gap-1 w-1/5">
           <Skeleton className="h-1/4 w-full rounded-sm" />
@@ -482,7 +482,7 @@ export const NFTTreemapSkeleton: React.FC<{ className?: string }> = ({
 );
 
 // Generic Loading Component with different variants
-interface LoadingSkeletonProps {
+interface LocalLoadingSkeletonProps {
   variant:
     | "nft-grid"
     | "asset-table"
@@ -498,7 +498,7 @@ interface LoadingSkeletonProps {
   [key: string]: any; // For variant-specific props
 }
 
-export const LoadingSkeleton: React.FC<LoadingSkeletonProps> = ({
+export const LoadingSkeleton: React.FC<LocalLoadingSkeletonProps> = ({
   variant,
   className,
   ...props

@@ -48,5 +48,7 @@ export {
   pick,
   omit,
   generateId,
-  knownAptosRelatedAddresses,
 } from "./utils";
+
+// Re-export known addresses from constants
+export { knownAptosRelatedAddresses } from "@/lib/constants/aptos/known-addresses";

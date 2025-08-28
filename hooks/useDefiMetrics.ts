@@ -2,7 +2,7 @@
  * Hook for fetching and managing DeFi metrics from DeFi Llama
  */
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import {
   defiLlamaService,
   type AptosDefiMetrics,
@@ -70,16 +70,23 @@ export function useDefiMetrics(): UseDefiMetricsReturn {
     fetchMetrics();
   }, [fetchMetrics]);
 
-  const hasData = !!metrics && !error;
-  const isEmpty = !isLoading && !metrics && !error;
+  // Memoize computed properties
+  const hasData = useMemo(() => !!metrics && !error, [metrics, error]);
+  const isEmpty = useMemo(
+    () => !isLoading && !metrics && !error,
+    [isLoading, metrics, error],
+  );
 
-  return {
-    metrics,
-    isLoading,
-    error,
-    refetch: fetchMetrics,
-    hasData,
-    isOffline,
-    isEmpty,
-  };
+  return useMemo(
+    () => ({
+      metrics,
+      isLoading,
+      error,
+      refetch: fetchMetrics,
+      hasData,
+      isOffline,
+      isEmpty,
+    }),
+    [metrics, isLoading, error, fetchMetrics, hasData, isOffline, isEmpty],
+  );
 }

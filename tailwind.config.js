@@ -45,6 +45,19 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // Semantic colors for UI components
+        success: {
+          DEFAULT: "hsl(var(--color-success))",
+        },
+        warning: {
+          DEFAULT: "hsl(var(--color-warning))",
+        },
+        error: {
+          DEFAULT: "hsl(var(--color-error))",
+        },
+        info: {
+          DEFAULT: "hsl(var(--color-info))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar))",
           foreground: "hsl(var(--sidebar-foreground))",

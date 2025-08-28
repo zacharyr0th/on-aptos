@@ -7,12 +7,9 @@ import React, { useState, useEffect, useMemo, useCallback, memo } from "react";
 import { toast } from "sonner";
 
 import { ErrorBoundary } from "@/components/errors/ErrorBoundary";
-import { Footer } from "@/components/layout/Footer";
+import { MarketShareChart } from "@/components/shared/MarketShareChart";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { MarketShareChart } from "@/components/shared/MarketShareChart";
-import { ChartDataItem, formatAssetValue, calculateMarketShare } from "@/lib/utils/format/chart-utils";
-import { formatAmount } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -31,8 +28,17 @@ import {
   SupplyData,
 } from "@/lib/config";
 import { STABLECOIN_COLORS } from "@/lib/constants/ui/colors";
+import { formatAmount } from "@/lib/utils";
 import { logger } from "@/lib/utils/core/logger";
-import { copyToClipboard, truncateAddress } from "@/lib/utils/token/token-utils";
+import {
+  ChartDataItem,
+  formatAssetValue,
+  calculateMarketShare,
+} from "@/lib/utils/format/chart-utils";
+import {
+  copyToClipboard,
+  truncateAddress,
+} from "@/lib/utils/token/token-utils";
 
 const TOKEN_METADATA = STABLECOIN_METADATA;
 
@@ -51,7 +57,6 @@ const TokenCard = memo(function TokenCard({
   usdtReserve?: any;
   t: (key: string) => string;
 }): React.ReactElement {
-
   const { marketSharePercent, formattedDisplaySupply } = useMemo(() => {
     const calcMarketShare = () => {
       if (BigInt(totalSupply) === 0n) return "0";
@@ -136,7 +141,6 @@ const TokenCard = memo(function TokenCard({
   const symbol = token.symbol;
   const metadata = TOKEN_METADATA[symbol];
 
-
   return (
     <>
       <div className="group">
@@ -203,7 +207,6 @@ const TokenCard = memo(function TokenCard({
         </div>
         <Progress className="h-1" value={Number(marketSharePercent)} />
       </div>
-
     </>
   );
 });
@@ -582,14 +585,13 @@ export default function StablesPage(): React.ReactElement {
       <div
         className={`min-h-screen flex flex-col relative ${GeistMono.className}`}
       >
-        {/* Background gradient - fixed to viewport */}
-        <div className="fixed inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/10 pointer-events-none" />
+        {/* Background gradient removed - using global textured background */}
 
         <div className="fixed top-0 left-0 right-0 h-1 z-30">
           {refreshing && <div className="h-full bg-muted animate-pulse"></div>}
         </div>
 
-        <main className="w-full px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20 py-8 flex-1 relative">
+        <main className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20 py-8 flex-1 relative">
           {loading ? (
             <LoadingState />
           ) : error ? (
@@ -641,29 +643,43 @@ export default function StablesPage(): React.ReactElement {
                     }
                   >
                     <MarketShareChart
-                      data={processedSupplies?.map((token: any) => {
-                        const dollarSupply = parseFloat(token.supply || "0");
-                        const totalDollarSupply = processedSupplies.reduce(
-                          (sum: number, t: any) => sum + parseFloat(t.supply || "0"), 
-                          0
-                        );
-                        const percentage = totalDollarSupply > 0 ? (dollarSupply / totalDollarSupply) * 100 : 0;
-                        return {
-                          name: token.symbol,
-                          value: percentage, // Pie chart expects percentage in value field
-                          formattedSupply: formatAmount(dollarSupply),
-                          symbol: token.symbol,
-                          supply: token.supply,
-                          supply_raw: token.supply_raw,
-                          decimals: token.decimals || 6,
-                        };
-                      }) || []}
-                      totalValue={processedSupplies?.reduce((sum: number, t: any) => sum + parseFloat(t.supply || "0"), 0) || 0}
+                      data={
+                        processedSupplies?.map((token: any) => {
+                          const dollarSupply = parseFloat(token.supply || "0");
+                          const totalDollarSupply = processedSupplies.reduce(
+                            (sum: number, t: any) =>
+                              sum + parseFloat(t.supply || "0"),
+                            0,
+                          );
+                          const percentage =
+                            totalDollarSupply > 0
+                              ? (dollarSupply / totalDollarSupply) * 100
+                              : 0;
+                          return {
+                            name: token.symbol,
+                            value: percentage, // Pie chart expects percentage in value field
+                            formattedSupply: formatAmount(dollarSupply),
+                            symbol: token.symbol,
+                            supply: token.supply,
+                            supply_raw: token.supply_raw,
+                            decimals: token.decimals || 6,
+                          };
+                        }) || []
+                      }
+                      totalValue={
+                        processedSupplies?.reduce(
+                          (sum: number, t: any) =>
+                            sum + parseFloat(t.supply || "0"),
+                          0,
+                        ) || 0
+                      }
                       colors={STABLECOIN_COLORS}
                       topRightContent={
                         <div className="text-right">
                           <div className="flex items-center justify-end gap-3 mb-1">
-                            <h2 className="text-sm text-muted-foreground">Total Supply</h2>
+                            <h2 className="text-sm text-muted-foreground">
+                              Total Supply
+                            </h2>
                           </div>
                           <p className="text-lg font-bold font-mono">
                             {formattedTotalSupply}
@@ -811,8 +827,6 @@ export default function StablesPage(): React.ReactElement {
             </>
           ) : null}
         </main>
-
-        <Footer className="relative" />
       </div>
     </ErrorBoundary>
   );

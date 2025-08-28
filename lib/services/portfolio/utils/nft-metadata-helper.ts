@@ -1,9 +1,9 @@
+import { logger } from "@/lib/utils/core/logger";
 import {
   resolveIPFSUrl,
   IPFS_GATEWAYS,
   extractIPFSHash,
 } from "@/lib/utils/infrastructure/ipfs-gateway-fallback";
-import { logger } from "@/lib/utils/core/logger";
 
 // Function to convert IPFS URL to HTTP URL
 export async function convertIPFSToHTTP(url: string): Promise<string> {

@@ -36,9 +36,10 @@ export function validateEnv(): EnvConfig {
     errorLogger.error("❌ Environment validation failed:");
     errorLogger.error(result.error.format());
 
-    const missingVars = (result.error as any).errors
-      .filter((err: any) => err.message.includes("required"))
-      .map((err: any) => err.path.join("."));
+    const errors = result.error.issues || [];
+    const missingVars = errors
+      .filter((err: any) => err.message && err.message.includes("required"))
+      .map((err: any) => (err.path ? err.path.join(".") : "unknown"));
 
     if (missingVars.length > 0) {
       throw new Error(

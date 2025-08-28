@@ -1,41 +1,49 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { logger } from "@/lib/utils/core/logger";
+import {
+  extractParams,
+  errorResponse,
+  successResponse,
+  CACHE_DURATIONS,
+  getAptosAuthHeaders,
+  validateRequiredParams,
+} from "@/lib/utils/api/common";
+import { withRateLimit, RATE_LIMIT_TIERS } from "@/lib/utils/api/rate-limiter";
+import { apiLogger } from "@/lib/utils/core/logger";
 
 // Cache ANS data for 10 minutes
 export const revalidate = 600;
 
-export async function GET(request: NextRequest) {
+async function portfolioANSHandler(request: NextRequest) {
+  const params = extractParams(request);
+
+  // Validate required parameters
+  const validation = validateRequiredParams(params, ["address"]);
+  if (validation) {
+    return errorResponse(validation, 400);
+  }
+
+  const address = params.address!;
+
+  // First, try the official ANS REST API
   try {
-    const searchParams = request.nextUrl.searchParams;
-    const address = searchParams.get("address");
+    const ansApiUrl = `https://www.aptosnames.com/api/mainnet/v1/primary-name/${address}`;
+    // apiLogger.info(`[ANS] Fetching primary name from ANS API for ${address}`);
 
-    if (!address) {
-      return NextResponse.json(
-        { error: "Address parameter is required" },
-        { status: 400 },
-      );
-    }
+    const ansResponse = await fetch(ansApiUrl, {
+      headers: {
+        Accept: "application/json",
+        "User-Agent": "On-Aptos/1.0",
+      },
+      // Add timeout to prevent hanging
+      signal: AbortSignal.timeout(5000),
+    });
 
-    // First, try the official ANS REST API
-    try {
-      const ansApiUrl = `https://www.aptosnames.com/api/mainnet/v1/primary-name/${address}`;
-      // apiLogger.info(`[ANS] Fetching primary name from ANS API for ${address}`);
-
-      const ansResponse = await fetch(ansApiUrl, {
-        headers: {
-          Accept: "application/json",
-          "User-Agent": "On-Aptos/1.0",
-        },
-        // Add timeout to prevent hanging
-        signal: AbortSignal.timeout(5000),
-      });
-
-      if (ansResponse.ok) {
-        const ansData = await ansResponse.json();
-        if (ansData?.name) {
-          // apiLogger.info(`[ANS] Found primary name via ANS API: ${ansData.name}`);
-          return NextResponse.json({
+    if (ansResponse.ok) {
+      const ansData = await ansResponse.json();
+      if (ansData?.name) {
+        return successResponse(
+          {
             success: true,
             data: {
               name: ansData.name,
@@ -44,18 +52,22 @@ export async function GET(request: NextRequest) {
               address: address,
               source: "ans-api",
             },
-          });
-        }
+          },
+          CACHE_DURATIONS.LONG,
+        );
       }
-    } catch {
-      logger.warn(`[ANS] ANS API failed, falling back to GraphQL`);
     }
+  } catch (error) {
+    apiLogger.warn(
+      `[ANS] ANS API failed, falling back to GraphQL: ${error instanceof Error ? error.message : String(error)}`,
+    );
+  }
 
-    // Fallback to GraphQL if ANS API fails
-    const INDEXER = "https://indexer.mainnet.aptoslabs.com/v1/graphql";
+  // Fallback to GraphQL if ANS API fails
+  const INDEXER = "https://indexer.mainnet.aptoslabs.com/v1/graphql";
 
-    // Query for ANS name
-    const query = `
+  // Query for ANS name
+  const query = `
       query GetPrimaryName($owner_address: String!) {
         current_aptos_names(
           where: {
@@ -72,45 +84,42 @@ export async function GET(request: NextRequest) {
       }
     `;
 
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-    };
+  const headers = {
+    "Content-Type": "application/json",
+    ...getAptosAuthHeaders(),
+  };
 
-    if (process.env.APTOS_BUILD_SECRET) {
-      headers["Authorization"] = `Bearer ${process.env.APTOS_BUILD_SECRET}`;
-    }
+  const response = await fetch(INDEXER, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({
+      query,
+      variables: {
+        owner_address: address.toLowerCase(),
+      },
+    }),
+  });
 
-    const response = await fetch(INDEXER, {
-      method: "POST",
-      headers,
-      body: JSON.stringify({
-        query,
-        variables: {
-          owner_address: address.toLowerCase(),
-        },
-      }),
-    });
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
+  const result = await response.json();
 
-    const result = await response.json();
+  if (result.errors) {
+    // apiLogger.error(`[ANS] GraphQL errors:: ${result.errors instanceof Error ? result.errors.message : result.errors}`);
+    throw new Error("GraphQL query failed");
+  }
 
-    if (result.errors) {
-      // apiLogger.error(`[ANS] GraphQL errors:: ${result.errors instanceof Error ? result.errors.message : result.errors}`);
-      throw new Error("GraphQL query failed");
-    }
+  const primaryName = result.data?.current_aptos_names?.[0];
 
-    const primaryName = result.data?.current_aptos_names?.[0];
+  if (primaryName) {
+    const fullName = primaryName.subdomain
+      ? `${primaryName.subdomain}.${primaryName.domain}.apt`
+      : `${primaryName.domain}.apt`;
 
-    if (primaryName) {
-      const fullName = primaryName.subdomain
-        ? `${primaryName.subdomain}.${primaryName.domain}.apt`
-        : `${primaryName.domain}.apt`;
-
-      // apiLogger.info(`[ANS] Found primary name via GraphQL: ${fullName}`);
-      return NextResponse.json({
+    return successResponse(
+      {
         success: true,
         data: {
           name: fullName,
@@ -120,35 +129,22 @@ export async function GET(request: NextRequest) {
           expiration: primaryName.expiration_timestamp,
           source: "graphql",
         },
-      });
-    }
-
-    // No primary name found
-    // apiLogger.info(`[ANS] No primary name found for ${address}`);
-
-    // Set cache headers
-    const responseHeaders = new Headers();
-    responseHeaders.set(
-      "Cache-Control",
-      "public, s-maxage=600, stale-while-revalidate=1200",
-    );
-
-    return NextResponse.json(
-      {
-        success: true,
-        data: null,
       },
-      { headers: responseHeaders },
-    );
-  } catch (error) {
-    // apiLogger.error(`[ANS] Error fetching ANS name:: ${error instanceof Error ? error.message : error}`);
-    return NextResponse.json(
-      {
-        success: false,
-        error: "Failed to fetch ANS name",
-        details: error instanceof Error ? error.message : String(error),
-      },
-      { status: 500 },
+      CACHE_DURATIONS.LONG,
     );
   }
+
+  // No primary name found
+  return successResponse(
+    {
+      success: true,
+      data: null,
+    },
+    CACHE_DURATIONS.LONG,
+  );
 }
+
+export const GET = withRateLimit(portfolioANSHandler, {
+  name: "portfolio-ans",
+  ...RATE_LIMIT_TIERS.RELAXED, // ANS lookups are lightweight
+});

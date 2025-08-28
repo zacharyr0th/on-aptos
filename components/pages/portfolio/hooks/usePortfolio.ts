@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
-import { NFT } from "../types";
+import type { NFT, SortDirection, ViewMode } from "@/lib/types/consolidated";
 
 export interface PortfolioState {
   // View states
   showAccountSwitcher: boolean;
-  nftViewMode: "grid" | "collection";
+  nftViewMode: ViewMode | "collection";
   selectedNFT: NFT | null;
   nftShuffle: number;
   nftPage: number;
@@ -17,13 +17,13 @@ export interface PortfolioState {
 
   // Sort states
   defiSortBy: "protocol" | "type" | "value";
-  defiSortOrder: "asc" | "desc";
+  defiSortOrder: SortDirection;
 
   // Filter states
   filterBySymbol: string[];
   filterByProtocol: string[];
   nftSortField: string;
-  nftSortDirection: "asc" | "desc";
+  nftSortDirection: SortDirection;
 
   // UI states
   isDialogOpen: boolean;
@@ -46,7 +46,9 @@ export const usePortfolio = (
 ) => {
   // State management
   const [showAccountSwitcher, setShowAccountSwitcher] = useState(false);
-  const [nftViewMode, setNftViewMode] = useState<"grid" | "collection">("grid");
+  const [nftViewMode, setNftViewMode] = useState<ViewMode | "collection">(
+    "grid",
+  );
   const [selectedNFT, setSelectedNFT] = useState<NFT | null>(null);
   const [nftShuffle, setNftShuffle] = useState(0);
   const [nftPage, setNftPage] = useState(0);
@@ -64,13 +66,12 @@ export const usePortfolio = (
   const [defiSortBy, setDefiSortBy] = useState<"protocol" | "type" | "value">(
     "value",
   );
-  const [defiSortOrder, setDefiSortOrder] = useState<"asc" | "desc">("desc");
+  const [defiSortOrder, setDefiSortOrder] = useState<SortDirection>("desc");
   const [filterBySymbol, setFilterBySymbol] = useState<string[]>([]);
   const [filterByProtocol, setFilterByProtocol] = useState<string[]>([]);
   const [nftSortField, setNftSortField] = useState<string>("name");
-  const [nftSortDirection, setNftSortDirection] = useState<"asc" | "desc">(
-    "asc",
-  );
+  const [nftSortDirection, setNftSortDirection] =
+    useState<SortDirection>("asc");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedDialogProtocol, setSelectedDialogProtocol] = useState<
     string | null
@@ -81,7 +82,7 @@ export const usePortfolio = (
     setNftShuffle((prev) => prev + 1);
   };
 
-  const shuffledNFTs = (() => {
+  const shuffledNFTs = useMemo(() => {
     if (!nfts || nfts.length === 0) return [];
 
     const shuffled = [...nfts];
@@ -98,10 +99,10 @@ export const usePortfolio = (
     }
 
     return shuffled;
-  })();
+  }, [nfts, nftShuffle]);
 
   // Portfolio metrics calculations
-  const portfolioMetrics = (() => {
+  const portfolioMetrics = useMemo(() => {
     if (!metricsProps) return null;
 
     const {
@@ -148,9 +149,9 @@ export const usePortfolio = (
       last24hValue,
       firstValue,
     };
-  })();
+  }, [metricsProps]);
 
-  const chartData = (() => {
+  const chartData = useMemo(() => {
     if (
       !metricsProps?.averageHistory ||
       metricsProps.averageHistory.length === 0
@@ -167,9 +168,9 @@ export const usePortfolio = (
         value: item.total_balance,
       }))
       .sort((a, b) => a.timestamp - b.timestamp);
-  })();
+  }, [metricsProps?.averageHistory]);
 
-  const pieChartData = (() => {
+  const pieChartData = useMemo(() => {
     if (
       !metricsProps?.portfolioAssets ||
       metricsProps.portfolioAssets.length === 0
@@ -193,18 +194,21 @@ export const usePortfolio = (
     );
 
     const totalValue = Object.values(aggregatedAssets).reduce(
-      (sum: number, asset: any) => sum + asset.value,
+      (sum: number, asset: any) => sum + Number(asset.value || 0),
       0,
     );
 
     return Object.values(aggregatedAssets)
       .map((asset: any) => ({
         ...asset,
-        percentage: totalValue > 0 ? (asset.value / totalValue) * 100 : 0,
+        percentage:
+          Number(totalValue) > 0
+            ? (Number(asset.value) / Number(totalValue)) * 100
+            : 0,
       }))
-      .sort((a: any, b: any) => b.value - a.value)
+      .sort((a: any, b: any) => Number(b.value) - Number(a.value))
       .slice(0, 8);
-  })();
+  }, [metricsProps?.portfolioAssets]);
 
   const pieChartColors = [
     "#3b82f6",

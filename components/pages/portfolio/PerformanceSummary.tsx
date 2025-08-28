@@ -3,7 +3,7 @@ import React from "react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { formatCurrency, formatPercentage } from "@/lib/utils/format/format";
+import { formatCurrency, formatPercentage } from "@/lib/utils/format";
 
 import { usePortfolioHistory } from "./hooks/usePortfolioHistory";
 

@@ -1,36 +1,52 @@
 import { NextRequest, NextResponse } from "next/server";
+
 import { RWAService } from "@/lib/services/asset-types/rwa-service";
-import { withErrorHandling, type ErrorContext } from "@/lib/utils";
+import {
+  successResponse,
+  errorResponse,
+  CACHE_DURATIONS,
+} from "@/lib/utils/api/common";
+import { withRateLimit, RATE_LIMIT_TIERS } from "@/lib/utils/api/rate-limiter";
+import { logger } from "@/lib/utils/core/logger";
 
-export async function GET(request: NextRequest) {
-  const errorContext: ErrorContext = {
-    operation: "RWA Data API",
-    service: "RWA-API",
-    details: {
-      endpoint: "/api/aptos/rwa",
-      userAgent: request.headers.get("user-agent") || "unknown",
-    },
-  };
+const DAY_IN_SECONDS = 86400;
 
-  return withErrorHandling(async () => {
+async function handler(request: NextRequest) {
+  try {
     const forceRefresh = request.nextUrl.searchParams.get("refresh") === "true";
     const data = await RWAService.getRWAData(forceRefresh);
 
-    return NextResponse.json(data, {
-      headers: {
-        "Cache-Control": data.success
-          ? "public, max-age=86400, stale-while-revalidate=43200"
-          : "public, max-age=60, stale-while-revalidate=120",
-        "X-Content-Type": "application/json",
-        "X-Service": "rwa-data",
-        "X-API-Version": "3.0",
-        "X-Data-Source": "RWA.xyz",
-        Vary: "Accept-Encoding",
-      },
-      status: data.success ? 200 : 503,
+    const headers = {
+      "X-Content-Type": "application/json",
+      "X-Service": "rwa-data",
+      "X-API-Version": "3.0",
+      "X-Data-Source": "RWA.xyz",
+      Vary: "Accept-Encoding",
+    };
+
+    if (!data.success) {
+      return errorResponse("Failed to fetch RWA data", 503, data);
+    }
+
+    // RWA data changes infrequently, cache for 1 day
+    return successResponse(data, DAY_IN_SECONDS, headers);
+  } catch (error) {
+    logger.error("RWA Data API error", {
+      error: error instanceof Error ? error.message : String(error),
+      endpoint: "/api/aptos/rwa",
     });
-  }, errorContext);
+    return errorResponse(
+      "Failed to fetch RWA data",
+      500,
+      error instanceof Error ? error.message : undefined,
+    );
+  }
 }
+
+export const GET = withRateLimit(handler, {
+  name: "rwa-data",
+  ...RATE_LIMIT_TIERS.PUBLIC,
+});
 
 export async function OPTIONS(_request: NextRequest) {
   return new NextResponse(null, {

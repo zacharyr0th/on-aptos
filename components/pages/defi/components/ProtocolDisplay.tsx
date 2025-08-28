@@ -43,9 +43,7 @@ export const ProtocolDisplay = React.memo(function ProtocolDisplay({
 
   return (
     <>
-      <VirtualizedProtocolTable
-        filteredProtocols={filteredProtocols}
-      />
+      <VirtualizedProtocolTable filteredProtocols={filteredProtocols} />
 
       {/* DISABLED - ProtocolDialog component removed */}
       {/* <ProtocolDialog

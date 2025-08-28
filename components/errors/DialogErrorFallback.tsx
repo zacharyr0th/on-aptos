@@ -4,10 +4,7 @@ import React from "react";
 
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/hooks/useTranslation";
-
-interface DialogErrorFallbackProps {
-  onCloseDialog?: () => void;
-}
+import { DialogErrorFallbackProps } from "@/lib/types/ui";
 
 export const DialogErrorFallback: React.FC<DialogErrorFallbackProps> = ({
   onCloseDialog,

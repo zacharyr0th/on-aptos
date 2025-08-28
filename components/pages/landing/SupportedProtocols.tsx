@@ -12,17 +12,39 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { PROTOCOLS, ProtocolType } from "@/lib/constants/protocols/protocol-registry";
+import { ProtocolType } from "@/lib/protocols/types";
+import type { SortDirection } from "@/lib/types/consolidated";
+
+// Temporary - will use protocol loader
+const PROTOCOLS: Record<
+  string,
+  {
+    name: string;
+    type: ProtocolType;
+    label: string;
+    description?: string;
+    tvl?: number;
+    volume24h?: number;
+    positions?: number;
+  }
+> = {};
 
 const typeLabels: Record<ProtocolType, string> = {
   [ProtocolType.LIQUID_STAKING]: "Liquid Staking",
   [ProtocolType.LENDING]: "Lending",
   [ProtocolType.DEX]: "DEX",
+  [ProtocolType.YIELD]: "Yield",
   [ProtocolType.FARMING]: "Farming",
   [ProtocolType.DERIVATIVES]: "Derivatives",
+  [ProtocolType.CDP]: "CDP",
+  [ProtocolType.ORACLE]: "Oracle",
+  [ProtocolType.GAMING]: "Gaming",
+  [ProtocolType.SOCIAL]: "Social",
   [ProtocolType.BRIDGE]: "Bridge",
-  [ProtocolType.INFRASTRUCTURE]: "Infrastructure",
-  [ProtocolType.NFT_MARKETPLACE]: "NFT Marketplace",
+  [ProtocolType.LAUNCHPAD]: "Launchpad",
+  [ProtocolType.AGGREGATOR]: "Aggregator",
+  [ProtocolType.NFT]: "NFT",
+  [ProtocolType.UNKNOWN]: "Unknown",
 };
 
 const typeColors: Record<ProtocolType, string> = {
@@ -32,27 +54,40 @@ const typeColors: Record<ProtocolType, string> = {
     "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
   [ProtocolType.DEX]:
     "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300",
+  [ProtocolType.YIELD]:
+    "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300",
   [ProtocolType.FARMING]:
     "bg-yellow-200 text-yellow-900 dark:bg-yellow-900 dark:text-yellow-300",
   [ProtocolType.DERIVATIVES]:
     "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
+  [ProtocolType.CDP]:
+    "bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-300",
+  [ProtocolType.ORACLE]:
+    "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300",
+  [ProtocolType.GAMING]:
+    "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300",
+  [ProtocolType.SOCIAL]:
+    "bg-rose-100 text-rose-800 dark:bg-rose-900 dark:text-rose-300",
   [ProtocolType.BRIDGE]:
     "bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300",
-  [ProtocolType.INFRASTRUCTURE]:
-    "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300",
-  [ProtocolType.NFT_MARKETPLACE]:
+  [ProtocolType.LAUNCHPAD]:
     "bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-300",
+  [ProtocolType.AGGREGATOR]:
+    "bg-violet-100 text-violet-800 dark:bg-violet-900 dark:text-violet-300",
+  [ProtocolType.NFT]:
+    "bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-300",
+  [ProtocolType.UNKNOWN]:
+    "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300",
 };
 
 type SortKey = "protocol" | "category" | "label";
-type SortDirection = "asc" | "desc";
 
 export const SupportedProtocols = () => {
   const [sortKey, setSortKey] = useState<SortKey>("protocol");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
 
   const allProtocols = Object.values(PROTOCOLS).filter(
-    (p) => p.type !== ProtocolType.INFRASTRUCTURE,
+    (p) => p.type !== ProtocolType.UNKNOWN,
   );
   const totalProtocols = allProtocols.length;
 

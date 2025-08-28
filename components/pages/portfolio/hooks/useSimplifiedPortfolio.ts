@@ -1,7 +1,8 @@
 import { useMemo, useCallback } from "react";
+
+import { usePortfolio } from "./usePortfolio";
 import { usePortfolioData } from "./usePortfolioData";
 import { usePortfolioHistory } from "./usePortfolioHistory";
-import { usePortfolio } from "./usePortfolio";
 
 interface UseSimplifiedPortfolioProps {
   walletAddress: string | undefined;
@@ -100,29 +101,33 @@ export function useSimplifiedPortfolio({
           totalValue: number;
           protocolTypes: Set<string>;
         }
-      >
+      >,
     );
 
     return Object.values(grouped);
   }, [defiPositions]);
 
   // Use simplified portfolio hook for derived state
-  const {
-    portfolioMetrics,
-    pieChartData,
-    pieChartColors,
-  } = usePortfolio(nfts || undefined, {
-    portfolioAssets: visibleAssets || undefined,
-    defiPositions: defiPositions || undefined,
-    groupedDeFiPositions: groupedDeFiPositions || undefined,
-    history: history || undefined,
-    averageHistory: averageHistory || undefined,
-    currentPrice: currentPrice || undefined,
-    previousPrice: previousPrice || undefined,
-  });
+  const { portfolioMetrics, pieChartData, pieChartColors } = usePortfolio(
+    nfts || undefined,
+    {
+      portfolioAssets: visibleAssets || undefined,
+      defiPositions: defiPositions || undefined,
+      groupedDeFiPositions: groupedDeFiPositions || undefined,
+      history: history || undefined,
+      averageHistory: averageHistory || undefined,
+      currentPrice: currentPrice || undefined,
+      previousPrice: previousPrice || undefined,
+    },
+  );
 
   // Show skeleton until ALL data is loaded
-  const isLoading = dataLoading || historyLoading || nftsLoading || defiLoading || transactionsLoading;
+  const isLoading =
+    dataLoading ||
+    historyLoading ||
+    nftsLoading ||
+    defiLoading ||
+    transactionsLoading;
 
   return {
     // Data
@@ -132,7 +137,7 @@ export function useSimplifiedPortfolio({
     defiPositions: defiPositions || [],
     groupedDeFiPositions,
     transactions,
-    
+
     // Metrics
     portfolioMetrics,
     pieChartData,
@@ -140,14 +145,14 @@ export function useSimplifiedPortfolio({
     totalNFTCount,
     allNFTs: allNFTs || [],
     nftCollectionStats,
-    
+
     // History
     history,
     currentPrice,
     previousPrice,
     averageHistory,
     accountNames,
-    
+
     // Loading states
     isLoading,
     dataLoading,
@@ -155,12 +160,12 @@ export function useSimplifiedPortfolio({
     defiLoading,
     transactionsLoading,
     historyLoading,
-    
+
     // NFT pagination
     hasMoreNFTs,
     isLoadingMore,
     loadMoreNFTs,
-    
+
     // Error
     error: dataError,
   };

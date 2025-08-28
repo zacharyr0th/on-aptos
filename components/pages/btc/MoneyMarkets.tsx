@@ -157,7 +157,6 @@ export default function MoneyMarkets({
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
-
         {/* Protocols arranged horizontally on md+ screens */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <ProtocolSection

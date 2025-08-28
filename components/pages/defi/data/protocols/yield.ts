@@ -150,29 +150,6 @@ export const yieldProtocols: DefiProtocol[] = [
   },
 
   // YIELD AGGREGATOR
-  {
-    title: "Vibrant X",
-    href: "https://vibrantx.finance",
-    description: "defi:protocol_descriptions.VibrantX",
-    category: "Yield",
-    subcategory: "Yield Aggregator",
-    implementation: YieldAggregatorImplementation.MULTI_PROTOCOL,
-    status: "Active",
-    color: "from-green-500 to-yellow-500",
-    logo: "/icons/protocols/vibrantx.webp",
-    networks: ["mainnet"],
-    security: {
-      auditStatus: "Unaudited",
-    },
-    tvl: {
-      current: "N/A",
-    },
-    external: {
-      socials: {
-        twitter: "https://twitter.com/VibrantXFinance",
-      },
-    },
-  },
 
   // LEVERAGED FARMING
   {

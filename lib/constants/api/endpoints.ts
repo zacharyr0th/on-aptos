@@ -1,10 +1,6 @@
 /**
- * API Endpoints Configuration
- * Consolidated from multiple sources for single source of truth
+ * Cache Key Generators and API Configuration
  */
-
-// Re-export consolidated endpoints for backward compatibility
-export { ENDPOINTS as API_ENDPOINTS } from "../endpoints";
 
 /**
  * Cache Key Generators

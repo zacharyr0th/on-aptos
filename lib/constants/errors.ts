@@ -11,6 +11,8 @@ export const ERROR_MESSAGES = {
   NO_DATA: "No data available",
   RATE_LIMITED: "Rate limit exceeded",
   NETWORK_ERROR: "Network request failed",
+  PARSE_ERROR: "Failed to parse response",
+  VALIDATION_ERROR: "Data validation failed",
 
   // API specific errors
   INVALID_TOKEN: "Invalid token address",
@@ -18,11 +20,8 @@ export const ERROR_MESSAGES = {
   INDEXER_ERROR: "Aptos indexer request failed",
   PRICE_FETCH_FAILED: "Failed to fetch price data",
 
-  // Portfolio specific errors
+  // GraphQL specific
   GRAPHQL_ERROR: "GraphQL query failed",
-  TIMEOUT_ERROR: "Request timeout",
-  PARSE_ERROR: "Failed to parse response",
-  VALIDATION_ERROR: "Data validation failed",
 
   // Asset specific errors
   SUPPLY_FETCH_ERROR: "Failed to fetch supply data",

@@ -21,7 +21,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { formatCurrency } from "@/lib/utils/format/format";
+import { formatCurrency } from "@/lib/utils/format";
 
 import { usePortfolioPerformance } from "./hooks/usePortfolioPerformance";
 

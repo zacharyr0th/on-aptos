@@ -72,11 +72,9 @@ export const IconSections = () => {
     { name: "CELL", src: "/icons/protocols/cellana.webp" },
     { name: "ECHO", src: "/icons/protocols/echo.webp" },
     { name: "PANORA", src: "/icons/protocols/panora.webp" },
-    { name: "EMOJI", src: "/icons/protocols/emojicoin.webp" },
     { name: "KANA", src: "/icons/protocols/kana.webp" },
     { name: "MESO", src: "/icons/protocols/meso.webp" },
-    { name: "APTIN", src: "/icons/protocols/aptin.webp" },
-    { name: "MERKLE", src: "/icons/protocols/merkle.webp" },
+    { name: "ARIES", src: "/icons/protocols/aries.avif" },
   ];
 
   // Randomly select 3 tokens

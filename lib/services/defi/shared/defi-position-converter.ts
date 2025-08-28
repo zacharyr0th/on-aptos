@@ -1,8 +1,7 @@
 import type { DeFiPosition as NewDeFiPosition } from "@/lib/services/defi";
-import { ProtocolType } from "@/lib/types";
+import { ProtocolType } from "@/lib/types/defi";
 
 import type { DeFiPosition as LegacyDeFiPosition } from "../../portfolio/types";
-
 import { TokenRegistry } from "../../shared/utils/token-registry";
 
 /**
@@ -110,12 +109,15 @@ export class DeFiPositionConverter {
 
     // Process assets by type
     for (const asset of position.assets) {
-      const symbol = TokenRegistry.getSymbolFromAddress(asset.tokenAddress);
+      // Handle both tokenAddress and address fields (from different sources)
+      const address = asset.tokenAddress || asset.address || "";
+      const symbol =
+        asset.symbol || TokenRegistry.getSymbolFromAddress(address);
       const assetData = {
-        asset: asset.tokenAddress,
+        asset: address,
         symbol,
-        amount: parseFloat(asset.amount),
-        value: asset.valueUSD,
+        amount: parseFloat(asset.amount || "0"),
+        value: asset.valueUSD || 0,
         apy: asset.metadata?.apy,
       };
 
@@ -135,18 +137,18 @@ export class DeFiPositionConverter {
         case "lp_token":
           // Convert LP token to liquidity format
           liquidityAssets.push({
-            poolId: asset.tokenAddress,
+            poolId: address,
             token0: {
-              asset: asset.tokenAddress,
+              asset: address,
               symbol,
-              amount: asset.amount,
+              amount: asset.amount || "0",
             },
             token1: {
               asset: "Unknown",
               symbol: "Unknown",
               amount: "0",
             },
-            lpTokens: asset.amount,
+            lpTokens: asset.amount || "0",
             value: asset.valueUSD,
           });
           break;
@@ -159,11 +161,9 @@ export class DeFiPositionConverter {
     return {
       id: `${position.protocol}-${position.id}`,
       protocol: position.protocol,
-      protocolType:
-        PROTOCOL_TYPE_MAPPING[ProtocolType.DEX] || "DeFi", // Default to DeFi
+      protocolType: PROTOCOL_TYPE_MAPPING[ProtocolType.DEX] || "DeFi", // Default to DeFi
       poolName: position.protocol,
-      positionType:
-        POSITION_TYPE_MAPPING[position.type] || position.type,
+      positionType: POSITION_TYPE_MAPPING[position.type] || position.type,
       suppliedAssets,
       borrowedAssets,
       liquidityAssets,
@@ -197,12 +197,12 @@ export class DeFiPositionConverter {
     const stakedAssets: UnifiedDeFiPosition["stakedAssets"] = [];
 
     // Process supplied assets
-    if (position.suppliedAssets) {
-      position.suppliedAssets.forEach((asset) => {
+    if (position.position?.supplied) {
+      position.position.supplied.forEach((asset) => {
         suppliedAssets.push({
           asset: asset.asset,
           symbol: TokenRegistry.getSymbolFromAddress(asset.asset),
-          amount: asset.amount,
+          amount: parseFloat(asset.amount),
           value: asset.value,
           apy: asset.apy,
         });
@@ -210,12 +210,12 @@ export class DeFiPositionConverter {
     }
 
     // Process borrowed assets
-    if (position.borrowedAssets) {
-      position.borrowedAssets.forEach((asset) => {
+    if (position.position?.borrowed) {
+      position.position.borrowed.forEach((asset) => {
         borrowedAssets.push({
           asset: asset.asset,
           symbol: TokenRegistry.getSymbolFromAddress(asset.asset),
-          amount: asset.amount,
+          amount: parseFloat(asset.amount),
           value: asset.value,
           apy: asset.apy,
         });
@@ -226,18 +226,18 @@ export class DeFiPositionConverter {
       id: `${position.protocol}-${Date.now()}`,
       protocol: position.protocol,
       protocolType: position.protocolType,
-      poolName: position.poolName || "",
-      positionType: position.positionType,
+      poolName: position.metadata?.poolName || position.metadata?.type || "",
+      positionType: position.type || position.metadata?.type || "unknown",
       suppliedAssets,
       borrowedAssets,
       liquidityAssets,
       stakedAssets,
-      totalValueUSD: position.totalValueUSD,
-      healthFactor: position.healthFactor,
-      claimableRewards: position.claimableRewards?.map((reward) => ({
+      totalValueUSD: position.totalValueUSD ?? position.totalValue,
+      healthFactor: position.health?.ratio,
+      claimableRewards: position.position?.rewards?.map((reward) => ({
         asset: reward.asset,
         symbol: TokenRegistry.getSymbolFromAddress(reward.asset),
-        amount: reward.amount,
+        amount: parseFloat(reward.amount),
         value: reward.value,
       })),
     };
@@ -351,27 +351,48 @@ export class DeFiPositionConverter {
   static toLegacyDeFiPosition(
     position: UnifiedDeFiPosition,
   ): LegacyDeFiPosition {
-    // Combine all asset types into supplied/borrowed arrays
-    const suppliedAssets = [
-      ...position.suppliedAssets,
-      ...position.stakedAssets,
-      ...position.liquidityAssets.map((lp) => ({
-        asset: lp.poolId,
-        amount: parseFloat(lp.lpTokens),
-        value: lp.value,
-      })),
-    ];
+    // Convert to the expected DeFi position format from /lib/types/defi.ts
+    const supplied = position.suppliedAssets.map((asset) => ({
+      asset: asset.asset,
+      amount: asset.amount.toString(),
+      value: asset.value,
+      apy: asset.apy,
+    }));
+
+    const borrowed = position.borrowedAssets.map((asset) => ({
+      asset: asset.asset,
+      amount: asset.amount.toString(),
+      value: asset.value,
+      apy: asset.apy,
+    }));
+
+    const staked = position.stakedAssets.map((asset) => ({
+      asset: asset.asset,
+      amount: asset.amount.toString(),
+      value: asset.value,
+      apy: asset.apy,
+    }));
+
+    const liquidity = position.liquidityAssets.map((lp) => ({
+      poolId: lp.poolId,
+      lpTokens: lp.lpTokens,
+      value: lp.value,
+      token0: lp.token0,
+      token1: lp.token1,
+    }));
 
     return {
+      positionId: position.id,
       protocol: position.protocol,
       protocolType: position.protocolType,
-      poolName: position.poolName || "",
-      positionType: position.positionType,
-      suppliedAssets,
-      borrowedAssets: position.borrowedAssets,
-      totalValueUSD: position.totalValueUSD,
-      healthFactor: position.healthFactor,
-      claimableRewards: position.claimableRewards,
+      totalValue: position.totalValueUSD,
+      address: "", // Will be set by the service
+      position: {
+        supplied: supplied.length > 0 ? supplied : undefined,
+        borrowed: borrowed.length > 0 ? borrowed : undefined,
+        staked: staked.length > 0 ? staked : undefined,
+        liquidity: liquidity.length > 0 ? liquidity : undefined,
+      },
     };
   }
 

@@ -1,15 +1,15 @@
-import { CACHE_TTL, RETRY_CONFIG, SERVICE_DEFAULTS } from "@/lib/constants";
-import { getCachedData, setCachedData } from "@/lib/utils/cache/cache-manager";
+import { CACHE_CONFIG } from "@/lib/config/cache";
+import { RETRY_CONFIG, SERVICE_DEFAULTS } from "@/lib/constants";
+import { getCachedData, setCachedData } from "@/lib/utils/cache/unified-cache";
+import { RequestDeduplicator } from "@/lib/utils/cache/request-deduplication";
 import { logger } from "@/lib/utils/core/logger";
 
 import type { ServiceConfig } from "../types";
 
-import { RequestDeduplicator } from "@/lib/utils/cache/request-deduplication";
-
 export abstract class BaseAssetService {
   protected static config: ServiceConfig = {
     cacheEnabled: SERVICE_DEFAULTS.CACHE_ENABLED,
-    cacheTTL: CACHE_TTL.DEFAULT,
+    cacheTTL: CACHE_CONFIG.TTL.API_SERVICE,
     fallbackEnabled: SERVICE_DEFAULTS.FALLBACK_ENABLED,
     retryAttempts: RETRY_CONFIG.MAX_ATTEMPTS,
     timeout: SERVICE_DEFAULTS.TIMEOUT,

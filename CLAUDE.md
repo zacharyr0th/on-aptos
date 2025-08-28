@@ -21,8 +21,7 @@ To enhance token classification and identification, we've introduced a field `pa
 
 #### Categories (Tokens are segregated on Panora UI based on their category):
 
-- **Native**: Tokens that are native to the chain and issued directly on it (excludes emojicoin and meme)
-- **Emojicoin**: Tokens launched on emojicoin.fun (includes both graduated and non-graduated emojicoins)
+- **Native**: Tokens that are native to the chain and issued directly on it (excludes meme)
 - **Meme**: Tokens primarily driven by community hype, memes, or trends
 - **Bridged**: Tokens that originate from another chain and are bridged for use
 
@@ -39,8 +38,6 @@ Projects can apply for the Verified label by submitting a Pull Request (PR) on t
 
 **Note:**
 Not all projects may receive Verified status immediately and may remain as Recognized or Unverified after community review. Additionally, Verified label and/or default visibility of any token on Panora UI may be revoked due to factors such as updated verification criteria, community concerns or lack of transparency from the token project's development team, instability or significant drops in key metrics over a period of time. This is solely to protect the community and you are welcome to re-apply and re-tweet once your project gains more traction and community support. Projects within private Aptos Ecosystem Telegram groups or recognized by other Aptos Ecosystem projects and community members are prioritized for faster verification.
-
-Emojicoins launched on emojicoin.fun are currently not assigned any labels. All graduated emojicoins are automatically set as panoraUI = true.
 
 **Recognized**
 Tokens that have logo-to-address mapping, but may not be tradable or recognized by the community yet, or have had their verified label revoked. Recognized tokens might also include niche or new tokens that are still in the early stages of establishing community support or demonstrating stability.
@@ -245,8 +242,8 @@ The response object contains the following fields:
 
 ## Logging Requirements
 
-- ALWAYS use the pino logger from lib/utils/logger.ts instead of console.log, console.warn, or console.error
-- Import the logger like: `import { logger, apiLogger, serviceLogger } from '@/lib/utils/logger'`
+- ALWAYS use the pino logger from lib/utils/core/logger.ts instead of console.log, console.warn, or console.error
+- Import the logger like: `import { logger, apiLogger, serviceLogger } from '@/lib/utils/core/logger'`
 - Use appropriate log levels: logger.debug(), logger.info(), logger.warn(), logger.error()
 - Use specialized loggers for different modules: apiLogger for API routes, serviceLogger for business logic, etc.
 - The CI pipeline will fail if console.\* methods are used in source code (excluding tests and scripts)

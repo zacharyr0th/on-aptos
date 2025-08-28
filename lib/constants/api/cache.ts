@@ -4,12 +4,12 @@
  */
 
 export const CACHE_TTL = {
-  // Asset services - consolidated from asset services constants
-  BTC_SUPPLY: 15 * 60 * 1000, // 15 minutes (from asset services)
-  LST_SUPPLY: 10 * 60 * 1000, // 10 minutes (from asset services)
-  STABLECOIN_SUPPLY: 15 * 60 * 1000, // 15 minutes (from asset services)
-  RWA_DATA: 30 * 60 * 1000, // 30 minutes (from asset services)
-  PRICE_DATA: 5 * 60 * 1000, // 5 minutes (from asset services)
+  // Asset services - longer caches for stable data
+  BTC_SUPPLY: 300, // 5 minutes
+  LST_SUPPLY: 300, // 5 minutes
+  STABLECOIN_SUPPLY: 600, // 10 minutes
+  RWA_SUPPLY: 900, // 15 minutes
+  FARMING_APR: 180, // 3 minutes
 
   // Portfolio services - shorter caches for dynamic data
   ASSETS: 60, // 1 minute
@@ -20,7 +20,7 @@ export const CACHE_TTL = {
   ANS: 3600, // 1 hour
 
   // Default fallback
-  DEFAULT: 5 * 60 * 1000, // 5 minutes (from asset services)
+  DEFAULT: 300, // 5 minutes
 } as const;
 
 /**

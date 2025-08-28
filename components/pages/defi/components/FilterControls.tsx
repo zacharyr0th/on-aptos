@@ -16,13 +16,20 @@ import {
   TooltipContent,
 } from "@/components/ui/tooltip";
 import { usePageTranslation } from "@/hooks/useTranslation";
+import { BaseFilterProps } from "@/lib/types/ui";
 
 import {
   categoryDefinitions,
   getSortedSubcategories,
 } from "../data/categories";
 
-interface FilterControlsProps {
+interface FilterState {
+  selectedCategory: string;
+  selectedSubcategory?: string;
+}
+
+interface FilterControlsProps
+  extends Omit<BaseFilterProps<FilterState>, "filters" | "onChange"> {
   categories: string[];
   selectedCategory: string;
   selectedSubcategory?: string;

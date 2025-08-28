@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { debounce } from "@/lib/utils";
 
 interface ResponsiveState {
@@ -50,22 +50,23 @@ export function useResponsive(): ResponsiveState {
     };
   });
 
-  // Debounced resize handler for better performance
-  const handleResize = useCallback(
-    debounce(() => {
-      const width = window.innerWidth;
-      const height = window.innerHeight;
+  // Memoized debounced resize handler for better performance
+  const handleResize = useMemo(
+    () =>
+      debounce(() => {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
 
-      setState({
-        width,
-        height,
-        isMobile: width < BREAKPOINTS.mobile,
-        isTablet: width >= BREAKPOINTS.mobile && width < BREAKPOINTS.tablet,
-        isDesktop:
-          width >= BREAKPOINTS.tablet && width < BREAKPOINTS.largeDesktop,
-        isLargeDesktop: width >= BREAKPOINTS.largeDesktop,
-      });
-    }, 150), // 150ms debounce delay
+        setState({
+          width,
+          height,
+          isMobile: width < BREAKPOINTS.mobile,
+          isTablet: width >= BREAKPOINTS.mobile && width < BREAKPOINTS.tablet,
+          isDesktop:
+            width >= BREAKPOINTS.tablet && width < BREAKPOINTS.largeDesktop,
+          isLargeDesktop: width >= BREAKPOINTS.largeDesktop,
+        });
+      }, 150), // 150ms debounce delay
     [],
   );
 

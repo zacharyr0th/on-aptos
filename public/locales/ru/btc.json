@@ -78,7 +78,6 @@
   "protocols": {
     "aries": "Aries",
     "echelon": "Echelon",
-    "aptin": "Aptin",
     "thala": "Thala",
     "echo": "Echo",
     "protocol": "Протокол",

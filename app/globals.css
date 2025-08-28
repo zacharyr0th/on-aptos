@@ -45,12 +45,44 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
+/* Mobile Touch Targets & Responsive Utilities */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 /* NFT Grid Mobile Scrolling Fix */
 @media (max-width: 768px) {
   .nft-grid-container {
     -webkit-overflow-scrolling: touch;
     overflow-y: auto;
   }
+}
+
+/* Premium textured background for header and other elements */
+.textured-bg {
+  background-color: hsl(var(--background));
+  background-image:
+    url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"),
+    linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.01) 100%);
+  background-size:
+    60px 60px,
+    100% 100%;
+  background-position:
+    0 0,
+    0 0;
 }
 
 /* === Light Theme === */
@@ -86,6 +118,12 @@
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
+
+  /* Semantic colors for UI components */
+  --color-success: oklch(0.7 0.15 142); /* green */
+  --color-warning: oklch(0.8 0.15 85); /* yellow */
+  --color-error: oklch(0.6 0.21 29); /* red */
+  --color-info: oklch(0.6 0.118 245); /* blue */
 
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
@@ -127,6 +165,12 @@
   --chart-3: oklch(0.769 0.188 70.08);
   --chart-4: oklch(0.627 0.265 303.9);
   --chart-5: oklch(0.645 0.246 16.439);
+
+  /* Semantic colors for UI components */
+  --color-success: oklch(0.696 0.17 162); /* green */
+  --color-warning: oklch(0.769 0.188 70); /* yellow */
+  --color-error: oklch(0.645 0.246 16); /* red */
+  --color-info: oklch(0.488 0.243 264); /* blue */
 
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
@@ -174,29 +218,15 @@
     -webkit-overflow-scrolling: touch;
     transform: translateZ(0); /* Force hardware acceleration */
 
-    /* Premium textured background with grain and gradient */
+    /* Premium textured background with grain and subtle gradient */
     background-color: hsl(var(--background));
     background-image:
       url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"),
-      linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.01) 100%),
-      radial-gradient(
-        ellipse at top left,
-        rgba(120, 119, 198, 0.15),
-        transparent 50%
-      ),
-      radial-gradient(
-        ellipse at bottom right,
-        rgba(255, 119, 198, 0.15),
-        transparent 50%
-      );
+      linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.01) 100%);
     background-size:
       60px 60px,
-      100% 100%,
-      100% 100%,
       100% 100%;
     background-position:
-      0 0,
-      0 0,
       0 0,
       0 0;
   }
@@ -327,7 +357,7 @@
   }
 
   /* === High-Contrast Polygonal Professional Background === */
-  
+
   /* Radial gradient for depth */
   .bg-gradient-radial {
     background: radial-gradient(
@@ -340,7 +370,7 @@
 
   /* Ultra deep grid - massive squares */
   .bg-grid-ultra-deep {
-    background-image: 
+    background-image:
       linear-gradient(rgba(0, 0, 0, 0.006) 2px, transparent 2px),
       linear-gradient(90deg, rgba(0, 0, 0, 0.006) 2px, transparent 2px);
     background-size: 200px 200px;
@@ -348,7 +378,7 @@
   }
 
   .dark .bg-grid-ultra-deep {
-    background-image: 
+    background-image:
       linear-gradient(rgba(255, 255, 255, 0.01) 1.5px, transparent 1.5px),
       linear-gradient(90deg, rgba(255, 255, 255, 0.01) 1.5px, transparent 1.5px);
     background-size: 200px 200px;
@@ -356,7 +386,7 @@
 
   /* Deep grid - large squares */
   .bg-grid-deep {
-    background-image: 
+    background-image:
       linear-gradient(rgba(0, 0, 0, 0.005) 1px, transparent 1px),
       linear-gradient(90deg, rgba(0, 0, 0, 0.005) 1px, transparent 1px);
     background-size: 80px 80px;
@@ -364,15 +394,19 @@
   }
 
   .dark .bg-grid-deep {
-    background-image: 
+    background-image:
       linear-gradient(rgba(255, 255, 255, 0.012) 0.8px, transparent 0.8px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.012) 0.8px, transparent 0.8px);
+      linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.012) 0.8px,
+        transparent 0.8px
+      );
     background-size: 80px 80px;
   }
 
   /* Fine grid - medium squares */
   .bg-grid-fine {
-    background-image: 
+    background-image:
       linear-gradient(rgba(0, 0, 0, 0.003) 0.5px, transparent 0.5px),
       linear-gradient(90deg, rgba(0, 0, 0, 0.003) 0.5px, transparent 0.5px);
     background-size: 24px 24px;
@@ -380,15 +414,19 @@
   }
 
   .dark .bg-grid-fine {
-    background-image: 
+    background-image:
       linear-gradient(rgba(255, 255, 255, 0.006) 0.4px, transparent 0.4px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.006) 0.4px, transparent 0.4px);
+      linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.006) 0.4px,
+        transparent 0.4px
+      );
     background-size: 24px 24px;
   }
 
   /* Micro grid - tiny squares */
   .bg-grid-micro {
-    background-image: 
+    background-image:
       linear-gradient(rgba(0, 0, 0, 0.002) 0.25px, transparent 0.25px),
       linear-gradient(90deg, rgba(0, 0, 0, 0.002) 0.25px, transparent 0.25px);
     background-size: 8px 8px;
@@ -396,15 +434,19 @@
   }
 
   .dark .bg-grid-micro {
-    background-image: 
+    background-image:
       linear-gradient(rgba(255, 255, 255, 0.004) 0.25px, transparent 0.25px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.004) 0.25px, transparent 0.25px);
+      linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.004) 0.25px,
+        transparent 0.25px
+      );
     background-size: 8px 8px;
   }
 
   /* Complex directional lighting */
   .bg-light-complex {
-    background: 
+    background:
       linear-gradient(
         115deg,
         transparent 0%,
@@ -424,7 +466,7 @@
   }
 
   .dark .bg-light-complex {
-    background: 
+    background:
       linear-gradient(
         115deg,
         transparent 0%,
@@ -445,7 +487,7 @@
 
   /* Geometric pattern */
   .bg-geometric-pattern {
-    background-image: 
+    background-image:
       repeating-linear-gradient(
         45deg,
         transparent,
@@ -463,7 +505,7 @@
   }
 
   .dark .bg-geometric-pattern {
-    background-image: 
+    background-image:
       repeating-linear-gradient(
         45deg,
         transparent,
@@ -482,41 +524,47 @@
 
   /* Micro dot pattern */
   .bg-micro-dots {
-    background-image: radial-gradient(circle, rgba(0, 0, 0, 0.008) 0.5px, transparent 0.5px);
+    background-image: radial-gradient(
+      circle,
+      rgba(0, 0, 0, 0.008) 0.5px,
+      transparent 0.5px
+    );
     background-size: 11px 11px;
   }
 
   .dark .bg-micro-dots {
-    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.015) 0.3px, transparent 0.3px);
+    background-image: radial-gradient(
+      circle,
+      rgba(255, 255, 255, 0.015) 0.3px,
+      transparent 0.3px
+    );
     background-size: 11px 11px;
   }
 
   /* Micro lines pattern */
   .bg-micro-lines {
-    background-image: 
-      repeating-linear-gradient(
-        0deg,
-        transparent,
-        transparent 50px,
-        rgba(0, 0, 0, 0.003) 50px,
-        rgba(0, 0, 0, 0.003) 51px
-      );
+    background-image: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 50px,
+      rgba(0, 0, 0, 0.003) 50px,
+      rgba(0, 0, 0, 0.003) 51px
+    );
   }
 
   .dark .bg-micro-lines {
-    background-image: 
-      repeating-linear-gradient(
-        0deg,
-        transparent,
-        transparent 50px,
-        rgba(255, 255, 255, 0.005) 50px,
-        rgba(255, 255, 255, 0.005) 51px
-      );
+    background-image: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 50px,
+      rgba(255, 255, 255, 0.005) 50px,
+      rgba(255, 255, 255, 0.005) 51px
+    );
   }
 
   /* Ultra deep vignette */
   .bg-vignette-ultra-deep {
-    background: 
+    background:
       radial-gradient(
         ellipse at center,
         transparent 0%,
@@ -552,7 +600,7 @@
   }
 
   .dark .bg-vignette-ultra-deep {
-    background: 
+    background:
       radial-gradient(
         ellipse at center,
         transparent 0%,
@@ -589,13 +637,12 @@
 
   /* Premium grain texture */
   .bg-grain-premium {
-    background-image: 
-      url("data:image/svg+xml,%3Csvg viewBox='0 0 1024 1024' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='2.5' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)' opacity='0.3'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 1024 1024' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='2.5' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)' opacity='0.3'/%3E%3C/svg%3E");
     background-size: 256px 256px;
   }
 
   /* === Minimal Pastel Background === */
-  
+
   .bg-sepia-white {
     background-color: hsl(40 15% 98%);
   }
@@ -603,10 +650,10 @@
   .bg-muted-black {
     background-color: hsl(0 0% 8%);
   }
-  
+
   /* Soft pastel wash */
   .bg-pastel-wash {
-    background: 
+    background:
       radial-gradient(
         ellipse at top left,
         hsl(280 60% 95% / 0.15) 0%,
@@ -620,7 +667,7 @@
   }
 
   :global(.dark) .bg-pastel-wash {
-    background: 
+    background:
       radial-gradient(
         ellipse at top left,
         hsl(280 30% 20% / 0.08) 0%,
@@ -632,182 +679,218 @@
         transparent 50%
       );
   }
-  
+
   /* Pastel vignette */
   .bg-pastel-vignette {
-    background: 
-      radial-gradient(
-        ellipse at center,
-        transparent 0%,
-        transparent 40%,
-        hsl(260 40% 80% / 0.03) 100%
-      );
+    background: radial-gradient(
+      ellipse at center,
+      transparent 0%,
+      transparent 40%,
+      hsl(260 40% 80% / 0.03) 100%
+    );
   }
 
   :global(.dark) .bg-pastel-vignette {
-    background: 
-      radial-gradient(
-        ellipse at center,
-        transparent 0%,
-        transparent 40%,
-        hsl(260 20% 10% / 0.1) 100%
-      );
+    background: radial-gradient(
+      ellipse at center,
+      transparent 0%,
+      transparent 40%,
+      hsl(260 20% 10% / 0.1) 100%
+    );
   }
-  
+
   /* Minimal grain */
   .bg-minimal-grain {
-    background-image: 
-      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='minGrain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='1' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23minGrain)' opacity='0.5'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='minGrain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='1' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23minGrain)' opacity='0.5'/%3E%3C/svg%3E");
     background-size: 100px 100px;
   }
 
   /* Light beam 2 - Angled from left */
   .bg-light-beam-2 {
-    background: 
-      linear-gradient(
-        165deg,
-        hsl(40 7% 93% / 0.12) 0%,
-        hsl(40 5% 89% / 0.06) 25%,
-        hsl(40 3% 84% / 0.03) 50%,
-        transparent 75%
-      );
+    background: linear-gradient(
+      165deg,
+      hsl(40 7% 93% / 0.12) 0%,
+      hsl(40 5% 89% / 0.06) 25%,
+      hsl(40 3% 84% / 0.03) 50%,
+      transparent 75%
+    );
   }
 
   :global(.dark) .bg-light-beam-2 {
-    background: 
-      linear-gradient(
-        165deg,
-        hsl(0 0% 80% / 0.06) 0%,
-        hsl(0 0% 70% / 0.03) 25%,
-        hsl(0 0% 60% / 0.015) 50%,
-        transparent 75%
-      );
+    background: linear-gradient(
+      165deg,
+      hsl(0 0% 80% / 0.06) 0%,
+      hsl(0 0% 70% / 0.03) 25%,
+      hsl(0 0% 60% / 0.015) 50%,
+      transparent 75%
+    );
   }
 
   /* Light beam 3 - Angled from right */
   .bg-light-beam-3 {
-    background: 
-      linear-gradient(
-        195deg,
-        hsl(40 6% 91% / 0.1) 0%,
-        hsl(40 4% 87% / 0.05) 30%,
-        hsl(40 2% 82% / 0.025) 60%,
-        transparent 90%
-      );
+    background: linear-gradient(
+      195deg,
+      hsl(40 6% 91% / 0.1) 0%,
+      hsl(40 4% 87% / 0.05) 30%,
+      hsl(40 2% 82% / 0.025) 60%,
+      transparent 90%
+    );
   }
 
   :global(.dark) .bg-light-beam-3 {
-    background: 
-      linear-gradient(
-        195deg,
-        hsl(0 0% 75% / 0.05) 0%,
-        hsl(0 0% 65% / 0.025) 30%,
-        hsl(0 0% 55% / 0.012) 60%,
-        transparent 90%
-      );
+    background: linear-gradient(
+      195deg,
+      hsl(0 0% 75% / 0.05) 0%,
+      hsl(0 0% 65% / 0.025) 30%,
+      hsl(0 0% 55% / 0.012) 60%,
+      transparent 90%
+    );
   }
 
   /* Light beam 4 - Wide gentle beam */
   .bg-light-beam-4 {
-    background: 
-      linear-gradient(
-        170deg,
-        hsl(40 5% 89% / 0.08) 0%,
-        hsl(40 3% 85% / 0.04) 40%,
-        hsl(40 2% 80% / 0.02) 70%,
-        transparent 100%
-      );
+    background: linear-gradient(
+      170deg,
+      hsl(40 5% 89% / 0.08) 0%,
+      hsl(40 3% 85% / 0.04) 40%,
+      hsl(40 2% 80% / 0.02) 70%,
+      transparent 100%
+    );
   }
 
   :global(.dark) .bg-light-beam-4 {
-    background: 
-      linear-gradient(
-        170deg,
-        hsl(0 0% 70% / 0.04) 0%,
-        hsl(0 0% 60% / 0.02) 40%,
-        hsl(0 0% 50% / 0.01) 70%,
-        transparent 100%
-      );
+    background: linear-gradient(
+      170deg,
+      hsl(0 0% 70% / 0.04) 0%,
+      hsl(0 0% 60% / 0.02) 40%,
+      hsl(0 0% 50% / 0.01) 70%,
+      transparent 100%
+    );
   }
 
   /* Light beam 5 - Narrow focused beam */
   .bg-light-beam-5 {
-    background: 
-      linear-gradient(
-        185deg,
-        hsl(40 6% 90% / 0.1) 0%,
-        hsl(40 4% 86% / 0.06) 20%,
-        hsl(40 2% 81% / 0.03) 40%,
-        transparent 60%
-      );
+    background: linear-gradient(
+      185deg,
+      hsl(40 6% 90% / 0.1) 0%,
+      hsl(40 4% 86% / 0.06) 20%,
+      hsl(40 2% 81% / 0.03) 40%,
+      transparent 60%
+    );
   }
 
   :global(.dark) .bg-light-beam-5 {
-    background: 
-      linear-gradient(
-        185deg,
-        hsl(0 0% 73% / 0.05) 0%,
-        hsl(0 0% 63% / 0.03) 20%,
-        hsl(0 0% 53% / 0.015) 40%,
-        transparent 60%
-      );
+    background: linear-gradient(
+      185deg,
+      hsl(0 0% 73% / 0.05) 0%,
+      hsl(0 0% 63% / 0.03) 20%,
+      hsl(0 0% 53% / 0.015) 40%,
+      transparent 60%
+    );
   }
 
   /* Atmospheric particles in the light */
   .bg-light-particles {
-    background-image: 
-      radial-gradient(circle at 20% 10%, hsl(40 4% 88% / 0.03) 1px, transparent 2px),
-      radial-gradient(circle at 40% 15%, hsl(40 3% 85% / 0.02) 0.5px, transparent 1px),
-      radial-gradient(circle at 60% 8%, hsl(40 5% 90% / 0.025) 1.5px, transparent 2.5px),
-      radial-gradient(circle at 80% 12%, hsl(40 2% 83% / 0.02) 0.8px, transparent 1.5px),
-      radial-gradient(circle at 30% 25%, hsl(40 3% 86% / 0.015) 1px, transparent 2px);
-    background-size: 200px 200px, 150px 150px, 180px 180px, 120px 120px, 160px 160px;
+    background-image:
+      radial-gradient(
+        circle at 20% 10%,
+        hsl(40 4% 88% / 0.03) 1px,
+        transparent 2px
+      ),
+      radial-gradient(
+        circle at 40% 15%,
+        hsl(40 3% 85% / 0.02) 0.5px,
+        transparent 1px
+      ),
+      radial-gradient(
+        circle at 60% 8%,
+        hsl(40 5% 90% / 0.025) 1.5px,
+        transparent 2.5px
+      ),
+      radial-gradient(
+        circle at 80% 12%,
+        hsl(40 2% 83% / 0.02) 0.8px,
+        transparent 1.5px
+      ),
+      radial-gradient(
+        circle at 30% 25%,
+        hsl(40 3% 86% / 0.015) 1px,
+        transparent 2px
+      );
+    background-size:
+      200px 200px,
+      150px 150px,
+      180px 180px,
+      120px 120px,
+      160px 160px;
   }
 
   :global(.dark) .bg-light-particles {
-    background-image: 
-      radial-gradient(circle at 20% 10%, hsl(0 0% 68% / 0.015) 1px, transparent 2px),
-      radial-gradient(circle at 40% 15%, hsl(0 0% 64% / 0.01) 0.5px, transparent 1px),
-      radial-gradient(circle at 60% 8%, hsl(0 0% 72% / 0.012) 1.5px, transparent 2.5px),
-      radial-gradient(circle at 80% 12%, hsl(0 0% 66% / 0.01) 0.8px, transparent 1.5px),
-      radial-gradient(circle at 30% 25%, hsl(0 0% 70% / 0.008) 1px, transparent 2px);
-    background-size: 200px 200px, 150px 150px, 180px 180px, 120px 120px, 160px 160px;
+    background-image:
+      radial-gradient(
+        circle at 20% 10%,
+        hsl(0 0% 68% / 0.015) 1px,
+        transparent 2px
+      ),
+      radial-gradient(
+        circle at 40% 15%,
+        hsl(0 0% 64% / 0.01) 0.5px,
+        transparent 1px
+      ),
+      radial-gradient(
+        circle at 60% 8%,
+        hsl(0 0% 72% / 0.012) 1.5px,
+        transparent 2.5px
+      ),
+      radial-gradient(
+        circle at 80% 12%,
+        hsl(0 0% 66% / 0.01) 0.8px,
+        transparent 1.5px
+      ),
+      radial-gradient(
+        circle at 30% 25%,
+        hsl(0 0% 70% / 0.008) 1px,
+        transparent 2px
+      );
+    background-size:
+      200px 200px,
+      150px 150px,
+      180px 180px,
+      120px 120px,
+      160px 160px;
   }
 
   /* Heavenly vignette */
   .bg-heavenly-vignette {
-    background: 
-      radial-gradient(
-        ellipse at center top,
-        transparent 0%,
-        transparent 30%,
-        hsl(30 2% 15% / 0.02) 60%,
-        hsl(30 3% 12% / 0.05) 85%,
-        hsl(30 4% 8% / 0.08) 100%
-      );
+    background: radial-gradient(
+      ellipse at center top,
+      transparent 0%,
+      transparent 30%,
+      hsl(30 2% 15% / 0.02) 60%,
+      hsl(30 3% 12% / 0.05) 85%,
+      hsl(30 4% 8% / 0.08) 100%
+    );
   }
 
   :global(.dark) .bg-heavenly-vignette {
-    background: 
-      radial-gradient(
-        ellipse at center top,
-        transparent 0%,
-        transparent 30%,
-        hsl(30 2% 5% / 0.1) 60%,
-        hsl(30 3% 3% / 0.2) 85%,
-        hsl(30 4% 2% / 0.3) 100%
-      );
+    background: radial-gradient(
+      ellipse at center top,
+      transparent 0%,
+      transparent 30%,
+      hsl(30 2% 5% / 0.1) 60%,
+      hsl(30 3% 3% / 0.2) 85%,
+      hsl(30 4% 2% / 0.3) 100%
+    );
   }
 
   /* Atmospheric grain texture */
   .bg-atmospheric-grain {
-    background-image: 
-      url("data:image/svg+xml,%3Csvg viewBox='0 0 300 300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='atmGrain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23atmGrain)' opacity='0.3'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 300 300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='atmGrain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23atmGrain)' opacity='0.3'/%3E%3C/svg%3E");
     background-size: 120px 120px;
   }
 
   /* === Divine Light Beam Animations === */
-  
+
   /* Slow swaying beam animation */
   @keyframes beam-slow {
     0% {
@@ -1012,6 +1095,13 @@
     min-height: 100svh;
   }
 
+  /* Portfolio page specific - enforce single viewport */
+  body:has(.portfolio-single-viewport) {
+    overflow: hidden !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+  }
+
   /* Mobile-specific grid improvements */
   @media (max-width: 640px) {
     .mobile-grid-single {
@@ -1197,17 +1287,5 @@
 
   .animate-spin-slow {
     animation: spin-slow 30s linear infinite;
-  }
-
-  /* Sonner Toast Positioning Fix */
-  [data-sonner-toaster] {
-    position: fixed !important;
-    bottom: 20px !important;
-    right: 20px !important;
-    z-index: 999999 !important;
-  }
-
-  [data-sonner-toaster] [data-sonner-toast] {
-    --initial-height: auto;
   }
 }

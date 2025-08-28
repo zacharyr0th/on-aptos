@@ -6,10 +6,23 @@ import { StaticImageData } from "next/image";
 
 import { TokenMetadata } from "./tokens";
 
-// Dialog props
-export interface BaseTokenDialogProps {
+// Base Dialog/Modal Props
+export interface BaseDialogProps {
   isOpen: boolean;
   onClose: () => void;
+}
+
+export interface BaseModalProps extends BaseDialogProps {
+  title?: string;
+  children?: React.ReactNode;
+  size?: "sm" | "md" | "lg" | "xl";
+  closeOnOverlayClick?: boolean;
+  showCloseButton?: boolean;
+  className?: string;
+}
+
+// Dialog props
+export interface BaseTokenDialogProps extends BaseDialogProps {
   symbol: string;
   name: string;
   decimals: number;
@@ -28,6 +41,41 @@ export interface ExtendedTokenDialogProps extends BaseTokenDialogProps {
   suppliesData?: Record<string, string>;
 }
 
+// Generic Dialog Props for different content types
+export interface GenericDialogProps<T = any> extends BaseDialogProps {
+  data: T | null;
+  loading?: boolean;
+  error?: string | null;
+}
+
+export interface NFTDialogProps extends BaseDialogProps {
+  nft: any | null; // Can be typed more specifically based on NFT type
+}
+
+export interface ProtocolDialogProps extends BaseDialogProps {
+  protocolName: string;
+  protocolLogo: string;
+  defiPosition?: any;
+}
+
+// Base Loading/Error State Props
+export interface BaseLoadingProps {
+  loading?: boolean;
+  loadingMessage?: string;
+  className?: string;
+}
+
+export interface BaseErrorProps {
+  error?: string | null;
+  errorMessage?: string;
+  onRetry?: () => void;
+  className?: string;
+}
+
+export interface BaseLoadingErrorProps
+  extends BaseLoadingProps,
+    BaseErrorProps {}
+
 // Loading states
 export type LoadingSkeletonVariant =
   | "nft-grid"
@@ -40,11 +88,21 @@ export type LoadingSkeletonVariant =
   | "yield-table"
   | "yield-opportunities";
 
-export interface LoadingSkeletonProps {
+export interface LoadingSkeletonProps extends BaseLoadingProps {
   variant: LoadingSkeletonVariant;
-  className?: string;
   count?: number;
+  columns?: number;
+  rows?: number;
   [key: string]: any; // For variant-specific props
+}
+
+// Error Fallback Props
+export interface ErrorFallbackProps extends BaseErrorProps {
+  onCloseDialog?: () => void;
+}
+
+export interface DialogErrorFallbackProps {
+  onCloseDialog?: () => void;
 }
 
 // Chart types
@@ -64,6 +122,22 @@ export interface ChartConfig {
   formatLabel?: (label: string | number) => string;
 }
 
+// Base Table/List Props
+export interface BaseTableProps<T = any> {
+  selectedItem?: T;
+  onItemSelect: (item: T) => void;
+  loading?: boolean;
+  error?: string | null;
+  emptyMessage?: string;
+  className?: string;
+}
+
+export interface SortableTableProps<T = any> extends BaseTableProps<T> {
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
+  onSortChange: (sortBy: string, order: "asc" | "desc") => void;
+}
+
 // Table types
 export interface TableColumn<T = any> {
   key: string;
@@ -74,16 +148,30 @@ export interface TableColumn<T = any> {
   render?: (value: any, row: T) => React.ReactNode;
 }
 
-export interface TableProps<T = any> {
+export interface TableProps<T = any> extends BaseTableProps<T> {
   data: T[];
   columns: TableColumn<T>[];
   onRowClick?: (row: T) => void;
   sortBy?: string;
   sortOrder?: "asc" | "desc";
   onSort?: (key: string) => void;
-  loading?: boolean;
-  emptyMessage?: string;
-  className?: string;
+}
+
+// Specific Table Props
+export interface AssetsTableProps extends BaseTableProps {
+  visibleAssets: any[];
+  showOnlyVerified: boolean;
+  portfolioAssets: any[];
+}
+
+export interface DeFiTableProps extends SortableTableProps {
+  groupedDeFiPositions: any[] | null;
+  defiPositionsLoading: boolean;
+  getProtocolLogo: (protocol: string) => string;
+}
+
+export interface YieldTableProps {
+  walletAddress?: string;
 }
 
 // Card types
@@ -201,16 +289,48 @@ export interface PaginationProps {
   className?: string;
 }
 
-// Search types
-export interface SearchProps {
+// Base Search/Filter Props
+export interface BaseSearchProps {
   value: string;
   onChange: (value: string) => void;
-  onSearch?: () => void;
   placeholder?: string;
+  className?: string;
+}
+
+export interface BaseFilterProps<T = any> {
+  filters: T;
+  onChange: (filters: T) => void;
+  onReset?: () => void;
+  className?: string;
+}
+
+// Search types
+export interface SearchProps extends BaseSearchProps {
+  onSearch?: () => void;
   loading?: boolean;
   suggestions?: string[];
   onSuggestionClick?: (suggestion: string) => void;
-  className?: string;
+}
+
+// Filter types
+export interface FilterOption<T = string> {
+  label: string;
+  value: T;
+  count?: number;
+  disabled?: boolean;
+}
+
+export interface FilterControlsProps<T = any> extends BaseFilterProps<T> {
+  options?: FilterOption[];
+  multiSelect?: boolean;
+  showClearAll?: boolean;
+}
+
+// Search Bar specific props
+export interface SearchBarProps extends BaseSearchProps {
+  onSubmit?: (value: string) => void;
+  showButton?: boolean;
+  buttonText?: string;
 }
 
 // Badge types

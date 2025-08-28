@@ -1,33 +1,46 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+
 import { BitcoinService } from "@/lib/services/asset-types/bitcoin-service";
-import { withErrorHandling, type ErrorContext } from "@/lib/utils";
+import {
+  successResponse,
+  errorResponse,
+  CACHE_DURATIONS,
+} from "@/lib/utils/api/common";
+import { withRateLimit, RATE_LIMIT_TIERS } from "@/lib/utils/api/rate-limiter";
+import { logger } from "@/lib/utils/core/logger";
 
-export async function GET(request: NextRequest) {
-  const errorContext: ErrorContext = {
-    operation: "Bitcoin Supply API",
-    service: "BTC-API",
-    details: {
-      endpoint: "/api/aptos/btc",
-      userAgent: request.headers.get("user-agent") || "unknown",
-    },
-  };
-
-  return withErrorHandling(async () => {
+async function handler(request: NextRequest) {
+  try {
     const forceRefresh = request.nextUrl.searchParams.get("refresh") === "true";
     const data = await BitcoinService.getBTCSupplyDetailed(forceRefresh);
 
-    return NextResponse.json(data, {
-      headers: {
-        "Cache-Control": data.success
-          ? "public, s-maxage=300, stale-while-revalidate=600" 
-          : "public, max-age=60, stale-while-revalidate=120",
-        "X-Content-Type": "application/json",
-        "X-Service": "btc-supply",
-        "X-API-Version": "2.0",
-        "X-Data-Source": "Aptos Indexer",
-        Vary: "Accept-Encoding",
-      },
-      status: data.success ? 200 : 503,
+    const headers = {
+      "X-Content-Type": "application/json",
+      "X-Service": "btc-supply",
+      "X-API-Version": "2.0",
+      "X-Data-Source": "Aptos Indexer",
+      Vary: "Accept-Encoding",
+    };
+
+    if (!data.success) {
+      return errorResponse("Failed to fetch Bitcoin data", 503, data);
+    }
+
+    return successResponse(data, CACHE_DURATIONS.MEDIUM, headers);
+  } catch (error) {
+    logger.error("Bitcoin Supply API error", {
+      error: error instanceof Error ? error.message : String(error),
+      endpoint: "/api/aptos/btc",
     });
-  }, errorContext);
+    return errorResponse(
+      "Failed to fetch Bitcoin supply data",
+      500,
+      error instanceof Error ? error.message : undefined,
+    );
+  }
 }
+
+export const GET = withRateLimit(handler, {
+  name: "btc-supply",
+  ...RATE_LIMIT_TIERS.PUBLIC,
+});

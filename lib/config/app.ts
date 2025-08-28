@@ -26,12 +26,12 @@ export const APP_CONFIG = {
 } as const;
 
 export const DEVELOPER_CONFIG = {
-  name: process.env.DEVELOPER_NAME || "Zachary Roth",
-  email: process.env.DEVELOPER_EMAIL || "zacharyroth@pm.me",
-  website: process.env.DEVELOPER_WEBSITE || "https://zacharyr0th.com",
-  twitter: process.env.DEVELOPER_TWITTER || "https://x.com/zacharyr0th",
-  twitterHandle: process.env.DEVELOPER_TWITTER_HANDLE || "zacharyr0th",
-  github: process.env.DEVELOPER_GITHUB || "https://github.com/zacharyr0th",
+  name: process.env.DEVELOPER_NAME || "Your Team",
+  email: process.env.DEVELOPER_EMAIL || "hello@your-domain.com",
+  website: process.env.DEVELOPER_WEBSITE || "https://your-domain.com",
+  twitter: process.env.DEVELOPER_TWITTER || "https://x.com/yourhandle",
+  twitterHandle: process.env.DEVELOPER_TWITTER_HANDLE || "yourhandle",
+  github: process.env.DEVELOPER_GITHUB || "https://github.com/yourusername/on-aptos",
   linkedin: process.env.DEVELOPER_LINKEDIN || "",
 } as const;
 

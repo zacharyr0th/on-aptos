@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+
 import { logger } from "@/lib/utils/core/logger";
 
 export function useAptPrice(refreshInterval = 60000) {
@@ -10,16 +11,16 @@ export function useAptPrice(refreshInterval = 60000) {
     const fetchAptPrice = async () => {
       setIsLoading(true);
       setError(null);
-      
+
       try {
         const response = await fetch(
-          "/api/analytics/token-latest-price?address=0x1::aptos_coin::AptosCoin"
+          "/api/analytics/token-latest-price?address=0x1::aptos_coin::AptosCoin",
         );
-        
+
         if (!response.ok) {
           throw new Error("Failed to fetch APT price");
         }
-        
+
         const data = await response.json();
         if (data.data && data.data.length > 0) {
           setAptPrice(data.data[0].price_usd);

@@ -1,9 +1,13 @@
 "use client";
 
-import React, { useEffect, useRef, useCallback } from "react";
+import React from "react";
 
+import { useOnScreen } from "@/hooks";
 import { cn } from "@/lib/utils";
-import { sanitizeNFTMetadata, sanitizeImageUrl } from "@/lib/utils/core/security";
+import {
+  sanitizeNFTMetadata,
+  sanitizeImageUrl,
+} from "@/lib/utils/core/security";
 
 import { NFTImage } from "./shared/SmartImage";
 import { NFT } from "./types";
@@ -28,31 +32,18 @@ export const MinimalNFTGrid = ({
   onNFTSelect,
 }: MinimalNFTGridProps) => {
   const filteredNFTs = nfts || [];
-  const loadMoreRef = useRef<HTMLDivElement>(null);
 
-  // Intersection Observer for infinite scroll
-  const handleLoadMore = useCallback(() => {
-    if (hasMoreNFTs && !isLoadingMore && onLoadMore) {
+  // Use intersection observer hook for infinite scroll
+  const [loadMoreRef, isLoadMoreVisible] = useOnScreen<HTMLDivElement>({
+    threshold: 0.1,
+  });
+
+  // Trigger load more when the sentinel becomes visible
+  React.useEffect(() => {
+    if (hasMoreNFTs && !isLoadingMore && onLoadMore && isLoadMoreVisible) {
       onLoadMore();
     }
-  }, [hasMoreNFTs, isLoadingMore, onLoadMore]);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          handleLoadMore();
-        }
-      },
-      { threshold: 0.1 },
-    );
-
-    if (loadMoreRef.current) {
-      observer.observe(loadMoreRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, [handleLoadMore]);
+  }, [hasMoreNFTs, isLoadingMore, onLoadMore, isLoadMoreVisible]);
 
   // Show loading skeleton only when no NFTs are available yet
   if (nftsLoading && filteredNFTs.length === 0) {
@@ -113,9 +104,9 @@ export const MinimalNFTGrid = ({
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-200" />
 
               {/* Amount badge - only if more than 1 */}
-              {nft.amount > 1 && (
+              {(nft.amount || 1) > 1 && (
                 <div className="absolute top-2 right-2 bg-white/90 dark:bg-black/90 backdrop-blur-sm px-2 py-0.5 text-xs">
-                  {nft.amount}
+                  {nft.amount || 1}
                 </div>
               )}
             </div>

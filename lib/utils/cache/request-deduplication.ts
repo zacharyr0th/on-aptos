@@ -134,7 +134,10 @@ export class RequestDeduplicator {
   /**
    * Static method for compatibility with services that expect the old interface
    */
-  static async deduplicate<T>(key: string, requestFn: () => Promise<T>): Promise<T> {
+  static async deduplicate<T>(
+    key: string,
+    requestFn: () => Promise<T>,
+  ): Promise<T> {
     return dedupeAsyncCall(key, requestFn);
   }
 }
@@ -187,4 +190,3 @@ export function createDedupedEndpoint<TArgs extends unknown[], TReturn>(
 ) {
   return withDeduplication(endpoint, keyGenerator, ttl);
 }
-

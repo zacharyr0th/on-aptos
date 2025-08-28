@@ -33,27 +33,8 @@ export interface ResponseMeta {
   };
 }
 
-// Portfolio Types (matching service output)
-export interface PortfolioAsset {
-  asset_type: string;
-  amount: string;
-  metadata?: {
-    name: string;
-    symbol: string;
-    decimals: number;
-    icon_uri?: string;
-  };
-  price?: number;
-  value?: number;
-  balance?: number;
-  isVerified?: boolean;
-  protocolInfo?: {
-    protocol: string;
-    protocolLabel: string;
-    protocolType: string;
-    isPhantomAsset: boolean;
-  };
-}
+// Import PortfolioAsset from consolidated location
+import type { PortfolioAsset } from "@/lib/services/portfolio/types";
 
 export interface PortfolioAssetsResponse {
   assets: PortfolioAsset[];
@@ -61,41 +42,11 @@ export interface PortfolioAssetsResponse {
   assetCount: number;
 }
 
-// DeFi Types
-export interface DeFiPosition {
-  protocol: string;
-  protocolType: string;
-  totalValue: number;
-  address: string;
-  position: {
-    supplied?: Array<{
-      asset: string;
-      amount: string;
-      value: number;
-    }>;
-    borrowed?: Array<{
-      asset: string;
-      amount: string;
-      value: number;
-    }>;
-    staked?: Array<{
-      asset: string;
-      amount: string;
-      value: number;
-    }>;
-    liquidity?: Array<{
-      poolId: string;
-      lpTokens: string;
-      token0?: { symbol: string; amount: string };
-      token1?: { symbol: string; amount: string };
-    }>;
-  };
-  protocolInfo?: {
-    name: string;
-    category: string;
-    logo?: string;
-  };
-}
+// Import shared DeFi types
+import type { DeFiPosition } from "./defi";
+
+// API-specific DeFi position alias
+export type ApiDeFiPosition = DeFiPosition;
 
 export interface DeFiPositionsResponse {
   positions: DeFiPosition[];
@@ -103,27 +54,22 @@ export interface DeFiPositionsResponse {
   protocolCount: number;
 }
 
-// NFT Types (matching service output)
-export interface NFT {
-  token_data_id: string;
-  token_name: string;
-  collection_name: string;
-  token_uri: string;
-  description?: string;
+// Import shared NFT type and extend for API responses
+import type { NFT } from "./consolidated";
+
+// API-specific NFT extension
+export interface ApiNFT extends Omit<NFT, "last_transaction_version"> {
   property_version_v1: number;
-  amount: number;
-  cdn_image_uri?: string;
   cdn_animation_uri?: string;
   collection_description?: string;
   creator_address?: string;
+  last_transaction_version?: number | string; // API might return as number or string
   collection_uri?: string;
-  last_transaction_version?: number;
-  last_transaction_timestamp?: string;
   token_standard?: "v1" | "v2";
 }
 
 export interface NFTsResponse {
-  nfts: NFT[];
+  nfts: ApiNFT[];
   totalCount: number;
   hasMore: boolean;
 }

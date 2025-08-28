@@ -1,13 +1,14 @@
 import React from "react";
-import { Eye, EyeOff } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { PortfolioSidebar } from "../PortfolioSidebar";
+
 import { PortfolioMainContent } from "../PortfolioMainContent";
-import { WalletSummary } from "../WalletSummary";
-import { AssetsTable, DeFiPositionsTable } from "../PortfolioTables";
-import { NFTSummaryView } from "../SummaryViews";
-import { YieldTable } from "../YieldTable";
+import { PortfolioSidebar } from "../PortfolioSidebar";
+import { DeFiPositionsTable } from "../PortfolioTables";
+import { MobileTransactionsList } from "../MobileTransactionsList";
 import { getProtocolLogo } from "../shared/PortfolioMetrics";
+import { NFTSummaryView } from "../SummaryViews";
+import { TransactionHistoryTable } from "../TransactionHistoryTable";
+import { WalletSummary } from "../WalletSummary";
+
 import { PriceList } from "./PriceList";
 
 interface PortfolioLayoutProps {
@@ -34,16 +35,19 @@ interface PortfolioLayoutProps {
   accountNames: any;
   aptPrice: number | null;
   selectedItem: any;
-  activeTab: 'portfolio' | 'transactions' | 'yield';
-  sidebarView: 'assets' | 'nfts' | 'defi';
+  activeTab: "portfolio" | "transactions" | "yield";
+  sidebarView: "assets" | "nfts";
   hideFilteredAssets: boolean;
-  defiSortBy: 'protocol' | 'value' | 'type';
-  defiSortOrder: 'asc' | 'desc';
-  onItemSelect: (type: 'asset' | 'nft' | 'defi' | null, data: any) => void;
-  onTabChange: (tab: string) => void;
-  onSidebarViewChange: (view: 'assets' | 'nfts' | 'defi') => void;
+  defiSortBy: "protocol" | "value" | "type";
+  defiSortOrder: "asc" | "desc";
+  onItemSelect: (type: "asset" | "nft" | "defi" | null, data: any) => void;
+  onTabChange: (tab: "portfolio" | "transactions" | "yield") => void;
+  onSidebarViewChange: (view: "assets" | "nfts") => void;
   onToggleFilteredAssets: () => void;
-  onDeFiSort: (sortBy: 'protocol' | 'value' | 'type', sortOrder: 'asc' | 'desc') => void;
+  onDeFiSort: (
+    sortBy: "protocol" | "value" | "type",
+    sortOrder: "asc" | "desc",
+  ) => void;
 }
 
 export function PortfolioLayout({
@@ -81,23 +85,26 @@ export function PortfolioLayout({
   onToggleFilteredAssets,
   onDeFiSort,
 }: PortfolioLayoutProps) {
-  const selectedAsset = selectedItem?.type === 'asset' ? selectedItem.data : null;
-  const selectedNFT = selectedItem?.type === 'nft' ? selectedItem.data : null;
-  const selectedDeFiPosition = selectedItem?.type === 'defi' ? selectedItem.data : null;
+  const selectedAsset =
+    selectedItem?.type === "asset" ? selectedItem.data : null;
+  const selectedNFT = selectedItem?.type === "nft" ? selectedItem.data : null;
+  const selectedDeFiPosition =
+    selectedItem?.type === "defi" ? selectedItem.data : null;
 
   return (
-    <>
+    <div className="h-full flex flex-col">
       {/* Desktop Layout - Optimized Grid */}
-      <div className="hidden lg:grid grid-cols-10 gap-2">
-        {/* Sidebar - 3 columns (30%) */}
-        <div className="col-span-3 min-h-0">
+      <div className="hidden lg:grid grid-cols-12 gap-2 h-full">
+        {/* Sidebar - 3 columns (25%) */}
+        <div className="col-span-3 h-full overflow-hidden">
           <PortfolioSidebar
             sidebarView={sidebarView}
             setSidebarView={onSidebarViewChange}
             visibleAssets={visibleAssets}
             selectedAsset={selectedAsset}
-            handleAssetSelect={(asset) => onItemSelect(asset ? 'asset' : null, asset)}
-            assets={assets}
+            handleAssetSelect={(asset) =>
+              onItemSelect(asset ? "asset" : null, asset)
+            }
             nfts={nfts}
             dataLoading={dataLoading}
             nftsLoading={nftsLoading}
@@ -106,15 +113,22 @@ export function PortfolioLayout({
             isLoadingMore={isLoadingMore}
             loadMoreNFTs={loadMoreNFTs}
             selectedNFT={selectedNFT}
-            setSelectedNFT={(nft) => onItemSelect(nft ? 'nft' : null, nft)}
+            setSelectedNFT={(nft) => onItemSelect(nft ? "nft" : null, nft)}
             accountNames={accountNames}
             groupedDeFiPositions={groupedDeFiPositions}
             selectedDeFiPosition={selectedDeFiPosition}
             defiSortBy={defiSortBy}
             defiSortOrder={defiSortOrder}
             getProtocolLogo={getProtocolLogo}
-            handleDeFiPositionSelect={(pos) => onItemSelect(pos ? 'defi' : null, pos)}
-            handleDeFiSort={(sortBy, sortOrder) => onDeFiSort(sortBy as 'protocol' | 'value' | 'type', sortOrder as 'asc' | 'desc')}
+            handleDeFiPositionSelect={(pos) =>
+              onItemSelect(pos ? "defi" : null, pos)
+            }
+            handleDeFiSort={(sortBy: string, sortOrder: string) =>
+              onDeFiSort(
+                sortBy as "protocol" | "value" | "type",
+                sortOrder as "asc" | "desc",
+              )
+            }
             totalValue={portfolioMetrics?.totalPortfolioValue || 0}
             walletAddress={normalizedAddress}
             hideFilteredAssets={hideFilteredAssets}
@@ -126,24 +140,23 @@ export function PortfolioLayout({
           />
         </div>
 
-        {/* Main Content - 5 columns (50%) */}
-        <div className="col-span-5 min-h-0">
+        {/* Main Content - 6 columns (50%) */}
+        <div className="col-span-6 h-full overflow-hidden">
           <PortfolioMainContent
             activeTab={activeTab}
-            setActiveTab={onTabChange}
+            setActiveTab={onTabChange as any}
             selectedAsset={selectedAsset}
-            handleAssetSelect={(asset) => onItemSelect(asset ? 'asset' : null, asset)}
-            selectedDeFiPosition={selectedDeFiPosition}
-            handleDeFiPositionSelect={(pos) => onItemSelect(pos ? 'defi' : null, pos)}
+            handleAssetSelect={(asset) =>
+              onItemSelect(asset ? "asset" : null, asset)
+            }
             selectedNFT={selectedNFT}
-            setSelectedNFT={(nft) => onItemSelect(nft ? 'nft' : null, nft)}
+            setSelectedNFT={(nft) => onItemSelect(nft ? "nft" : null, nft)}
             sidebarView={sidebarView}
             setSidebarView={onSidebarViewChange}
             nfts={nfts}
             currentNFTs={nfts}
             normalizedAddress={normalizedAddress}
             assets={visibleAssets}
-            groupedDeFiPositions={groupedDeFiPositions}
             portfolioMetrics={portfolioMetrics}
             dataLoading={dataLoading}
             pieChartData={pieChartData}
@@ -159,107 +172,115 @@ export function PortfolioLayout({
           />
         </div>
 
-        {/* Price List - 2 columns (20%) */}
-        <div className="col-span-2 min-h-0">
-          <PriceList />
+        {/* Price List - 3 columns (25%) */}
+        <div className="col-span-3 h-full overflow-hidden">
+          <PriceList className="h-full" />
         </div>
       </div>
 
-      {/* Mobile Layout - Streamlined */}
-      <div className="lg:hidden space-y-3">
-        <WalletSummary
-          walletAddress={normalizedAddress}
-          assets={visibleAssets}
-          totalValue={portfolioMetrics?.totalPortfolioValue || 0}
-          isLoading={dataLoading}
-          selectedAsset={selectedAsset}
-          onAssetSelect={(asset) => onItemSelect(asset ? 'asset' : null, asset)}
-          pieChartData={pieChartData}
-          pieChartColors={pieChartColors}
-          nfts={nfts}
-          totalNFTCount={totalNFTCount}
-          aptPrice={aptPrice || undefined}
-        />
-
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-lg font-semibold">
-              Tokens ({visibleAssets?.length || 0})
-            </h3>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onToggleFilteredAssets}
-              className="text-xs"
-            >
-              {hideFilteredAssets ? (
-                <>
-                  <Eye className="h-3 w-3 mr-1" />
-                  Show All
-                </>
-              ) : (
-                <>
-                  <EyeOff className="h-3 w-3 mr-1" />
-                  Hide Small
-                </>
-              )}
-            </Button>
+      {/* Mobile Layout - Following BTC/Stables Pattern */}
+      <div className="lg:hidden h-full flex flex-col overflow-hidden">
+        {/* Mobile: Show portfolio value at top like BTC/Stables */}
+        <div className="flex-none px-4 py-4">
+          <div className="md:hidden mb-6">
+            <div className="flex items-center justify-between mb-1">
+              <h2 className="text-sm text-muted-foreground">Portfolio Value</h2>
+            </div>
+            <p className="text-xl font-bold font-mono">
+              {portfolioMetrics?.totalPortfolioValue
+                ? `$${portfolioMetrics.totalPortfolioValue.toLocaleString(
+                    undefined,
+                    {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    },
+                  )}`
+                : "$0.00"}
+            </p>
           </div>
-          <AssetsTable
-            visibleAssets={visibleAssets}
-            selectedItem={selectedAsset}
-            showOnlyVerified={false}
-            portfolioAssets={visibleAssets}
-            onItemSelect={(asset: any) => onItemSelect(asset ? 'asset' : null, asset)}
-          />
         </div>
 
-        {groupedDeFiPositions && groupedDeFiPositions.length > 0 && (
-          <div>
-            <h3 className="text-lg font-semibold mb-2">
-              DeFi Positions ({groupedDeFiPositions.length})
-            </h3>
-            <DeFiPositionsTable
-              positions={groupedDeFiPositions}
-              selectedPosition={selectedDeFiPosition}
-              onPositionSelect={(pos: any) => onItemSelect(pos ? 'defi' : null, pos)}
-              isLoading={defiLoading}
-              sortBy={defiSortBy}
-              sortOrder={defiSortOrder}
-              onSort={(sortBy: any, sortOrder: any) => onDeFiSort(sortBy as 'protocol' | 'value' | 'type', sortOrder as 'asc' | 'desc')}
-              getProtocolLogo={getProtocolLogo}
-              className="defi-table-container"
-            />
-          </div>
-        )}
+        {/* Mobile Content - Scrollable */}
+        <div className="flex-1 overflow-y-auto px-4 pb-4">
+          <div className="space-y-6">
+            {/* Wallet Summary Section */}
+            <div className="space-y-4">
+              <WalletSummary
+                walletAddress={normalizedAddress}
+                assets={visibleAssets}
+                totalValue={portfolioMetrics?.totalPortfolioValue || 0}
+                isLoading={dataLoading}
+                selectedAsset={selectedAsset}
+                onAssetSelect={(asset) =>
+                  onItemSelect(asset ? "asset" : null, asset)
+                }
+                nfts={nfts}
+                totalNFTCount={totalNFTCount}
+                nftCollectionStats={nftCollectionStats}
+              />
+            </div>
 
-        {((nfts && nfts.length > 0) || (totalNFTCount && totalNFTCount > 0)) && (
-          <div>
-            <h3 className="text-lg font-semibold mb-2">
-              NFTs ({totalNFTCount !== null ? totalNFTCount : nfts?.length || 0})
-            </h3>
-            <NFTSummaryView
-              nfts={nfts}
-              totalNFTCount={totalNFTCount}
-              nftCollectionStats={nftCollectionStats}
-              accountNames={accountNames}
-              isLoading={nftsLoading}
-              onNFTSelect={(nft) => onItemSelect(nft ? 'nft' : null, nft)}
-              selectedNFT={selectedNFT}
-              hasMoreNFTs={hasMoreNFTs}
-              isLoadingMore={isLoadingMore}
-              loadMoreNFTs={loadMoreNFTs}
-            />
-          </div>
-        )}
+            {/* NFTs Section - Only show if user has NFTs */}
+            {((nfts && nfts.length > 0) ||
+              (totalNFTCount && totalNFTCount > 0)) && (
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">
+                  NFTs ({totalNFTCount || nfts?.length || 0})
+                </h3>
+                <NFTSummaryView
+                  nfts={nfts}
+                  totalNFTCount={totalNFTCount}
+                  nftCollectionStats={nftCollectionStats}
+                  accountNames={accountNames}
+                  isLoading={nftsLoading}
+                  onNFTSelect={(nft) => onItemSelect(nft ? "nft" : null, nft)}
+                  selectedNFT={selectedNFT}
+                  hasMoreNFTs={hasMoreNFTs}
+                  isLoadingMore={isLoadingMore}
+                  loadMoreNFTs={loadMoreNFTs}
+                />
+              </div>
+            )}
 
-        <div>
-          <h3 className="text-lg font-semibold mb-2">Yield Opportunities</h3>
-          <YieldTable walletAddress={normalizedAddress} />
+            {/* DeFi Section - Only show if user has DeFi positions */}
+            {groupedDeFiPositions && groupedDeFiPositions.length > 0 && (
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">
+                  DeFi ({groupedDeFiPositions.length})
+                </h3>
+                <DeFiPositionsTable
+                  positions={groupedDeFiPositions}
+                  selectedPosition={selectedDeFiPosition}
+                  onPositionSelect={(pos: any) =>
+                    onItemSelect(pos ? "defi" : null, pos)
+                  }
+                  isLoading={defiLoading}
+                  sortBy={defiSortBy}
+                  sortOrder={defiSortOrder}
+                  onSort={(sortBy: any, sortOrder: any) =>
+                    onDeFiSort(
+                      sortBy as "protocol" | "value" | "type",
+                      sortOrder as "asc" | "desc",
+                    )
+                  }
+                  getProtocolLogo={getProtocolLogo}
+                  className="defi-table-container rounded-lg border bg-card"
+                />
+              </div>
+            )}
+
+            {/* Transactions Section */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Recent Transactions</h3>
+              <MobileTransactionsList
+                transactions={transactions}
+                isLoading={transactionsLoading}
+                walletAddress={normalizedAddress}
+              />
+            </div>
+          </div>
         </div>
-
-        <PriceList className="mt-3" />
       </div>
-    </>
+    </div>
   );
 }

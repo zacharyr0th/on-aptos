@@ -21,37 +21,37 @@ import {
   TooltipTrigger,
   TooltipProvider,
 } from "@/components/ui/tooltip";
+import {
+  BaseTableProps,
+  SortableTableProps,
+  AssetsTableProps as BaseAssetsTableProps,
+  DeFiTableProps as BaseDeFiTableProps,
+} from "@/lib/types/ui";
 import { cn } from "@/lib/utils";
-import { formatCurrency, formatTokenAmount } from "@/lib/utils/format/format";
+import { formatCurrency, formatTokenAmount } from "@/lib/utils/format";
 import { getTokenLogoUrlWithFallbackSync } from "@/lib/utils/token/token-utils";
 
-import { cleanProtocolName, getDetailedProtocolInfo } from "./shared/PortfolioMetrics";
+import {
+  cleanProtocolName,
+  getDetailedProtocolInfo,
+} from "./shared/PortfolioMetrics";
 
-interface BaseTableProps {
-  selectedItem: any;
-  onItemSelect: (item: any) => void;
+interface AssetsTableProps extends BaseAssetsTableProps {
+  // visibleAssets, showOnlyVerified, portfolioAssets are inherited from BaseAssetsTableProps
 }
 
-interface AssetsTableProps extends BaseTableProps {
-  visibleAssets: any[];
-  showOnlyVerified: boolean;
-  portfolioAssets: any[];
-}
-
-interface DeFiTableProps extends BaseTableProps {
-  groupedDeFiPositions: any[] | null;
-  defiPositionsLoading: boolean;
+interface DeFiTableProps extends BaseDeFiTableProps {
   defiSortBy: string;
   defiSortOrder: "asc" | "desc";
-  getProtocolLogo: (protocol: string) => string;
-  onSortChange: (sortBy: string, order: "asc" | "desc") => void;
+  // groupedDeFiPositions, defiPositionsLoading, getProtocolLogo are inherited from BaseDeFiTableProps
 }
 
 export const AssetsTable = (props: any) => {
   // Handle both prop formats
   const visibleAssets = props.visibleAssets || props.assets || [];
   const selectedItem = props.selectedItem || props.selectedAsset;
-  const showOnlyVerified = props.showOnlyVerified || props.hideFilteredAssets || false;
+  const showOnlyVerified =
+    props.showOnlyVerified || props.hideFilteredAssets || false;
   const portfolioAssets = props.portfolioAssets || props.assets || [];
   const onItemSelect = props.onItemSelect || props.onAssetSelect;
   const isLoading = props.isLoading || false;
@@ -90,34 +90,41 @@ export const AssetsTable = (props: any) => {
     if (isMobile || isLoading) return;
 
     const handleScroll = () => {
-      const container = document.querySelector('.asset-table-scroll-container');
+      const container = document.querySelector(".asset-table-scroll-container");
       if (!container) return;
 
       const { scrollTop, scrollHeight, clientHeight } = container;
       const scrollPercentage = (scrollTop + clientHeight) / scrollHeight;
 
       // Load more when user scrolls to 80% of the content
-      if (scrollPercentage > 0.8 && displayedCount <= otherAssets.length && !isLoadingMore) {
+      if (
+        scrollPercentage > 0.8 &&
+        displayedCount <= otherAssets.length &&
+        !isLoadingMore
+      ) {
         setIsLoadingMore(true);
-        
+
         // Simulate loading delay for smooth UX
         setTimeout(() => {
-          setDisplayedCount(prevCount => Math.min(prevCount + 100, otherAssets.length + 1));
+          setDisplayedCount((prevCount) =>
+            Math.min(prevCount + 100, otherAssets.length + 1),
+          );
           setIsLoadingMore(false);
         }, 300);
       }
     };
 
-    const container = document.querySelector('.asset-table-scroll-container');
+    const container = document.querySelector(".asset-table-scroll-container");
     if (container) {
-      container.addEventListener('scroll', handleScroll);
-      return () => container.removeEventListener('scroll', handleScroll);
+      container.addEventListener("scroll", handleScroll);
+      return () => container.removeEventListener("scroll", handleScroll);
     }
   }, [displayedCount, otherAssets.length, isLoading, isMobile, isLoadingMore]);
 
   // Show assets based on displayedCount, or all on mobile
-  const limitedOtherAssets = isMobile ? otherAssets : otherAssets.slice(0, Math.min(displayedCount - 1, otherAssets.length));
-  
+  const limitedOtherAssets = isMobile
+    ? otherAssets
+    : otherAssets.slice(0, Math.min(displayedCount - 1, otherAssets.length));
 
   // Mobile card component
   const AssetCard = ({
@@ -138,10 +145,13 @@ export const AssetsTable = (props: any) => {
         <div className="flex items-center gap-4">
           <div className="h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0">
             <Image
-              src={getTokenLogoUrlWithFallbackSync(
-                asset.asset_type,
-                asset.metadata,
-              )}
+              src={
+                asset.logoUrl ||
+                getTokenLogoUrlWithFallbackSync(
+                  asset.asset_type,
+                  asset.metadata,
+                )
+              }
               alt={asset.metadata?.symbol || "Asset"}
               width={48}
               height={48}
@@ -169,6 +179,14 @@ export const AssetsTable = (props: any) => {
                 <span className="font-semibold text-base">
                   {asset.metadata?.symbol || "Unknown"}
                 </span>
+                {!asset.isVerified && (
+                  <span
+                    className="text-xs text-amber-500 dark:text-amber-400"
+                    title="Unverified token"
+                  >
+                    ⚠
+                  </span>
+                )}
                 {asset.protocolInfo && (
                   <Badge
                     variant="secondary"
@@ -179,7 +197,9 @@ export const AssetsTable = (props: any) => {
                 )}
               </div>
               <div className={`font-bold text-base ${GeistMono.className}`}>
-                {asset.price ? formatCurrency(asset.value || 0) : "—"}
+                {asset.price && asset.price > 0
+                  ? formatCurrency(asset.value || 0)
+                  : "—"}
               </div>
             </div>
 
@@ -189,11 +209,12 @@ export const AssetsTable = (props: any) => {
               </span>
               <div className="flex items-center gap-3 flex-shrink-0">
                 <span className={GeistMono.className}>
-                  {formatTokenAmount(asset.balance || 0, undefined, {
+                  {formatTokenAmount(asset.balance || 0, asset.symbol, {
                     showSymbol: false,
+                    useCompact: true,
                   })}
                 </span>
-                {asset.price && (
+                {asset.price && asset.price > 0 && (
                   <>
                     <span>•</span>
                     <span className={GeistMono.className}>
@@ -210,121 +231,173 @@ export const AssetsTable = (props: any) => {
     </React.Fragment>
   );
 
-  const renderAssetRow = (asset: any, showDivider = false) => (
-    <React.Fragment key={`asset-${asset.asset_type}-${asset.amount}`}>
-      <TableRow
-        className={cn(
-          "cursor-pointer hover:bg-muted/30 transition-colors h-14 border-b-0",
-          selectedItem?.asset_type === asset.asset_type &&
-            "bg-muted/40 rounded-lg",
-        )}
-        onClick={() => onItemSelect(asset)}
-      >
-        <TableCell className="py-2 w-1/2 sm:w-2/5">
-          <div className="flex items-center gap-3">
-            <div className="h-8 w-8 rounded-full flex items-center justify-center flex-shrink-0">
-              <Image
-                src={getTokenLogoUrlWithFallbackSync(
-                  asset.asset_type,
-                  asset.metadata,
-                )}
-                alt={asset.metadata?.symbol || "Asset"}
-                width={32}
-                height={32}
-                className={`rounded-full object-cover w-full h-full ${
-                  asset.metadata?.symbol?.toUpperCase() === "APT" ||
-                  asset.asset_type.includes("aptos_coin")
-                    ? "dark:invert"
-                    : ""
-                }`}
-                onError={(e) => {
-                  const img = e.target as HTMLImageElement;
-                  const symbol = asset.metadata?.symbol;
-                  if (img.src.includes(".svg") && symbol) {
-                    img.src = `https://raw.githubusercontent.com/PanoraExchange/Aptos-Tokens/main/logos/${symbol}.png`;
-                  } else {
-                    img.src = "/placeholder.jpg";
+  const renderAssetRow = (asset: any, showDivider = false) => {
+    // Calculate 24h and 7d changes (placeholder values - you'll need to get real data)
+    const change24h = asset.priceChange24h || 0;
+    const change7d = asset.priceChange7d || 0;
+
+    return (
+      <React.Fragment key={`asset-${asset.asset_type}-${asset.amount}`}>
+        <TableRow
+          className={cn(
+            "cursor-pointer hover:bg-muted/30 transition-colors h-14 border-b-0",
+            selectedItem?.asset_type === asset.asset_type &&
+              "bg-muted/40 rounded-lg",
+          )}
+          onClick={() => onItemSelect(asset)}
+        >
+          <TableCell className="py-2 w-[30%]">
+            <div className="flex items-center gap-3">
+              <div className="h-8 w-8 rounded-full flex items-center justify-center flex-shrink-0">
+                <Image
+                  src={
+                    asset.logoUrl ||
+                    getTokenLogoUrlWithFallbackSync(
+                      asset.asset_type,
+                      asset.metadata,
+                    )
                   }
-                }}
-              />
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2">
-                <span className="font-medium text-sm">
-                  {asset.metadata?.symbol || "Unknown"}
-                </span>
-                {asset.protocolInfo && (
-                  <Badge
-                    variant="secondary"
-                    className="text-[10px] px-1.5 py-0 h-4 font-normal"
-                  >
-                    {asset.protocolInfo.protocolLabel}
-                  </Badge>
-                )}
+                  alt={asset.metadata?.symbol || "Asset"}
+                  width={32}
+                  height={32}
+                  className={`rounded-full object-cover w-full h-full ${
+                    asset.metadata?.symbol?.toUpperCase() === "APT" ||
+                    asset.asset_type.includes("aptos_coin")
+                      ? "dark:invert"
+                      : ""
+                  }`}
+                  onError={(e) => {
+                    const img = e.target as HTMLImageElement;
+                    const symbol = asset.metadata?.symbol;
+                    if (img.src.includes(".svg") && symbol) {
+                      img.src = `https://raw.githubusercontent.com/PanoraExchange/Aptos-Tokens/main/logos/${symbol}.png`;
+                    } else {
+                      img.src = "/placeholder.jpg";
+                    }
+                  }}
+                />
               </div>
-              <div className="text-xs text-muted-foreground">
-                {asset.metadata?.name || "Unknown Asset"}
-              </div>
-            </div>
-          </div>
-        </TableCell>
-        <TableCell className="py-2 w-1/4 sm:w-1/5 text-center sm:text-right pr-2">
-          <div
-            className={`text-sm text-muted-foreground text-center sm:text-right ${GeistMono.className}`}
-          >
-            {formatTokenAmount(asset.balance || 0, undefined, {
-              showSymbol: false,
-            })}
-          </div>
-        </TableCell>
-        <TableCell className="hidden sm:table-cell py-2 w-1/5 text-right pr-2">
-          <div
-            className={`text-sm text-muted-foreground ${GeistMono.className}`}
-          >
-            {asset.price ? (
-              formatCurrency(asset.price)
-            ) : (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <span className="flex items-center justify-end gap-1 cursor-help">
-                      <span>—</span>
-                      <HelpCircle className="h-3 w-3" />
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <span className="font-medium text-sm">
+                    {asset.metadata?.symbol || "Unknown"}
+                  </span>
+                  {!asset.isVerified && (
+                    <span
+                      className="text-xs text-amber-500 dark:text-amber-400"
+                      title="Unverified token"
+                    >
+                      ⚠
                     </span>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p className="text-sm">
-                      Price data unavailable for this token.
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      This token may be new or not yet tracked by price feeds.
-                    </p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            )}
-          </div>
-        </TableCell>
-        <TableCell className="py-2 w-1/4 sm:w-1/5 text-right pr-4">
-          <div
-            className={`font-medium text-sm text-right ${GeistMono.className}`}
-          >
-            {asset.price ? formatCurrency(asset.value || 0) : "—"}
-          </div>
-        </TableCell>
-      </TableRow>
-      {showDivider && (
-        <TableRow className="h-0">
-          <TableCell colSpan={4} className="p-0 sm:table-cell">
-            <div className="w-full border-b-2 border-border/50" />
+                  )}
+                  {asset.protocolInfo && (
+                    <Badge
+                      variant="secondary"
+                      className="text-[10px] px-1.5 py-0 h-4 font-normal"
+                    >
+                      {asset.protocolInfo.protocolLabel}
+                    </Badge>
+                  )}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {asset.metadata?.name || "Unknown Asset"}
+                </div>
+              </div>
+            </div>
           </TableCell>
-          <TableCell colSpan={3} className="p-0 table-cell sm:hidden">
-            <div className="w-full border-b-2 border-border/50" />
+          <TableCell className="py-2 w-[15%] text-right pr-2">
+            <div
+              className={`text-sm text-muted-foreground ${GeistMono.className}`}
+            >
+              {formatTokenAmount(asset.balance || 0, undefined, {
+                showSymbol: false,
+              })}
+            </div>
+          </TableCell>
+          <TableCell className="hidden lg:table-cell py-2 w-[15%] text-right pr-2">
+            <div
+              className={`text-sm text-muted-foreground ${GeistMono.className}`}
+            >
+              {asset.price && asset.price > 0 ? (
+                formatCurrency(asset.price)
+              ) : (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="flex items-center justify-end gap-1 cursor-help">
+                        <span>—</span>
+                        <HelpCircle className="h-3 w-3" />
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="text-sm">
+                        Price data unavailable for this token.
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        This token may be new or not yet tracked by price feeds.
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+            </div>
+          </TableCell>
+          <TableCell className="py-2 w-[15%] text-right pr-2">
+            <div className={`font-medium text-sm ${GeistMono.className}`}>
+              {asset.price && asset.price > 0
+                ? formatCurrency(asset.value || 0)
+                : "—"}
+            </div>
+          </TableCell>
+          <TableCell className="hidden md:table-cell py-2 w-[12.5%] text-right pr-2">
+            <div
+              className={cn(
+                "text-sm font-medium",
+                GeistMono.className,
+                change24h > 0
+                  ? "text-green-600 dark:text-green-400"
+                  : change24h < 0
+                    ? "text-red-600 dark:text-red-400"
+                    : "text-muted-foreground",
+              )}
+            >
+              {asset.price && asset.price > 0
+                ? change24h !== 0
+                  ? `${change24h > 0 ? "+" : ""}${change24h.toFixed(2)}%`
+                  : "—"
+                : "—"}
+            </div>
+          </TableCell>
+          <TableCell className="hidden md:table-cell py-2 w-[12.5%] text-right pr-4">
+            <div
+              className={cn(
+                "text-sm font-medium",
+                GeistMono.className,
+                change7d > 0
+                  ? "text-green-600 dark:text-green-400"
+                  : change7d < 0
+                    ? "text-red-600 dark:text-red-400"
+                    : "text-muted-foreground",
+              )}
+            >
+              {asset.price && asset.price > 0
+                ? change7d !== 0
+                  ? `${change7d > 0 ? "+" : ""}${change7d.toFixed(2)}%`
+                  : "—"
+                : "—"}
+            </div>
           </TableCell>
         </TableRow>
-      )}
-    </React.Fragment>
-  );
+        {showDivider && (
+          <TableRow className="h-0">
+            <TableCell colSpan={6} className="p-0">
+              <div className="w-full border-b-2 border-border/50" />
+            </TableCell>
+          </TableRow>
+        )}
+      </React.Fragment>
+    );
+  };
 
   // Show loading state
   if (isLoading) {
@@ -368,54 +441,67 @@ export const AssetsTable = (props: any) => {
             </div>
           ) : (
             /* Desktop Table Layout with scroll container */
-            <div className="flex flex-col">
+            <div
+              className="asset-table-scroll-container overflow-y-auto"
+              style={{ height: "36rem", maxHeight: "70vh" }}
+            >
               <Table>
                 <TableHeader>
                   <TableRow className="border-b border-border/50">
-                    <TableHead className="w-1/2 sm:w-2/5 text-left font-medium text-muted-foreground text-xs">
+                    <TableHead className="w-[30%] text-left font-medium text-muted-foreground text-xs">
                       Ticker
                     </TableHead>
-                    <TableHead className="w-1/4 sm:w-1/5 font-medium text-muted-foreground text-xs text-center sm:text-right pr-2 [&>div]:justify-center sm:[&>div]:justify-end">
+                    <TableHead className="w-[15%] font-medium text-muted-foreground text-xs text-right pr-2">
                       Quantity
                     </TableHead>
-                    <TableHead className="hidden sm:table-cell w-1/5 font-medium text-muted-foreground text-xs text-right pr-2 [&>div]:justify-end">
+                    <TableHead className="hidden lg:table-cell w-[15%] font-medium text-muted-foreground text-xs text-right pr-2">
                       Price
                     </TableHead>
-                    <TableHead className="w-1/4 sm:w-1/5 font-medium text-muted-foreground text-xs text-right pr-4 [&>div]:justify-end">
+                    <TableHead className="w-[15%] font-medium text-muted-foreground text-xs text-right pr-2">
                       Value
+                    </TableHead>
+                    <TableHead className="hidden md:table-cell w-[12.5%] font-medium text-muted-foreground text-xs text-right pr-2">
+                      24h
+                    </TableHead>
+                    <TableHead className="hidden md:table-cell w-[12.5%] font-medium text-muted-foreground text-xs text-right pr-4">
+                      7d
                     </TableHead>
                   </TableRow>
                 </TableHeader>
+                <TableBody>
+                  {aptAsset &&
+                    renderAssetRow(aptAsset, limitedOtherAssets.length > 0)}
+                  {limitedOtherAssets.map((asset: any) =>
+                    renderAssetRow(asset),
+                  )}
+                </TableBody>
               </Table>
-              <div className="asset-table-scroll-container overflow-y-auto" style={{ height: '36rem', maxHeight: '70vh' }}>
-                <Table>
-                  <TableBody>
-                    {aptAsset && renderAssetRow(aptAsset, limitedOtherAssets.length > 0)}
-                    {limitedOtherAssets.map((asset: any) => renderAssetRow(asset))}
-                  </TableBody>
-                </Table>
-                {/* Loading indicator */}
-                {isLoadingMore && (
+              {/* Loading indicator */}
+              {isLoadingMore && (
+                <div className="text-center py-3 text-sm text-muted-foreground">
+                  <div className="inline-flex items-center gap-2">
+                    <div className="h-4 w-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+                    Loading more assets...
+                  </div>
+                </div>
+              )}
+              {/* Show indicator if there are more assets to load */}
+              {!isLoadingMore &&
+                displayedCount <= otherAssets.length &&
+                otherAssets.length > 49 && (
                   <div className="text-center py-3 text-sm text-muted-foreground">
-                    <div className="inline-flex items-center gap-2">
-                      <div className="h-4 w-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
-                      Loading more assets...
-                    </div>
+                    Showing {limitedOtherAssets.length + (aptAsset ? 1 : 0)} of{" "}
+                    {safeVisibleAssets.length} assets • Scroll to load more
                   </div>
                 )}
-                {/* Show indicator if there are more assets to load */}
-                {!isLoadingMore && displayedCount <= otherAssets.length && otherAssets.length > 49 && (
-                  <div className="text-center py-3 text-sm text-muted-foreground">
-                    Showing {limitedOtherAssets.length + (aptAsset ? 1 : 0)} of {safeVisibleAssets.length} assets • Scroll to load more
-                  </div>
-                )}
-                {/* Show when all assets are loaded */}
-                {!isLoadingMore && displayedCount > otherAssets.length && safeVisibleAssets.length > 50 && (
+              {/* Show when all assets are loaded */}
+              {!isLoadingMore &&
+                displayedCount > otherAssets.length &&
+                safeVisibleAssets.length > 50 && (
                   <div className="text-center py-3 text-sm text-muted-foreground">
                     All {safeVisibleAssets.length} assets loaded
                   </div>
                 )}
-              </div>
             </div>
           )}
         </>
@@ -441,11 +527,13 @@ export const AssetsTable = (props: any) => {
 
 export const DeFiPositionsTable = (props: any) => {
   // Handle both prop formats
-  const groupedDeFiPositions = props.groupedDeFiPositions || props.positions || [];
-  const defiPositionsLoading = props.defiPositionsLoading || props.isLoading || false;
+  const groupedDeFiPositions =
+    props.groupedDeFiPositions || props.positions || [];
+  const defiPositionsLoading =
+    props.defiPositionsLoading || props.isLoading || false;
   const selectedItem = props.selectedItem || props.selectedPosition;
-  const defiSortBy = props.defiSortBy || props.sortBy || 'value';
-  const defiSortOrder = props.defiSortOrder || props.sortOrder || 'desc';
+  const defiSortBy = props.defiSortBy || props.sortBy || "value";
+  const defiSortOrder = props.defiSortOrder || props.sortOrder || "desc";
   const getProtocolLogo = props.getProtocolLogo;
   const onItemSelect = props.onItemSelect || props.onPositionSelect;
   const onSortChange = props.onSortChange || props.onSort;
@@ -554,16 +642,28 @@ export const DeFiPositionsTable = (props: any) => {
   if (defiSortBy === "type" && defiSortOrder) {
     sortedPositions.sort((a, b) => {
       if (!a || !b) return 0;
-      
-      const typeA = a?.protocolTypes ? Array.from(a.protocolTypes)[0] as string : undefined;
-      const typeB = b?.protocolTypes ? Array.from(b.protocolTypes)[0] as string : undefined;
-      const displayA = typeA ? (typeA === "derivatives" ? "perps" : typeA) : "unknown";
-      const displayB = typeB ? (typeB === "derivatives" ? "perps" : typeB) : "unknown";
 
-      if (typeof displayA !== 'string' || typeof displayB !== 'string') {
+      const typeA = a?.protocolTypes
+        ? (Array.from(a.protocolTypes)[0] as string)
+        : undefined;
+      const typeB = b?.protocolTypes
+        ? (Array.from(b.protocolTypes)[0] as string)
+        : undefined;
+      const displayA = typeA
+        ? typeA === "derivatives"
+          ? "perps"
+          : typeA
+        : "unknown";
+      const displayB = typeB
+        ? typeB === "derivatives"
+          ? "perps"
+          : typeB
+        : "unknown";
+
+      if (typeof displayA !== "string" || typeof displayB !== "string") {
         return 0;
       }
-      
+
       if (!defiSortOrder || defiSortOrder === "asc") {
         return displayA.localeCompare(displayB);
       } else {
@@ -575,7 +675,7 @@ export const DeFiPositionsTable = (props: any) => {
       if (!a || !b) return 0;
       const aValue = a.totalValue || 0;
       const bValue = b.totalValue || 0;
-      
+
       if (defiSortOrder === "asc") {
         return aValue - bValue;
       } else {
@@ -594,7 +694,8 @@ export const DeFiPositionsTable = (props: any) => {
   }) => {
     const positionId = `defi-card-${groupedPosition.protocol}-${index}`;
     const isSelected = selectedItem?.protocol === groupedPosition.protocol;
-    const primaryType = Array.from(groupedPosition.protocolTypes)[0] as string || "";
+    const primaryType =
+      (Array.from(groupedPosition.protocolTypes)[0] as string) || "";
     const protocolInfo = getDetailedProtocolInfo(groupedPosition.protocol);
 
     return (
@@ -629,23 +730,6 @@ export const DeFiPositionsTable = (props: any) => {
                 <span className="font-semibold text-base">
                   {cleanProtocolName(groupedPosition.protocol)}
                 </span>
-                {groupedPosition.protocol.toLowerCase() === "aptin" && (
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <AlertTriangle className="h-4 w-4 text-red-500 dark:text-red-400 cursor-help" />
-                      </TooltipTrigger>
-                      <TooltipContent className="bg-red-500 dark:bg-red-600 text-white border-red-600 dark:border-red-700">
-                        <p className="text-sm font-medium">
-                          This protocol is deprecated
-                        </p>
-                        <p className="text-sm">
-                          It's recommended to remove your assets
-                        </p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                )}
               </div>
               <div className={`font-bold text-base ${GeistMono.className}`}>
                 {formatCurrency(groupedPosition.totalValue)}
@@ -663,15 +747,15 @@ export const DeFiPositionsTable = (props: any) => {
                     : primaryType === "derivatives"
                       ? "Perps"
                       : primaryType
-                          ? primaryType
-                              .replace("_", " ")
-                              .split(" ")
-                              .map(
-                                (word) =>
-                                  word.charAt(0).toUpperCase() + word.slice(1),
-                              )
-                              .join(" ")
-                          : "Unknown"}
+                        ? primaryType
+                            .replace("_", " ")
+                            .split(" ")
+                            .map(
+                              (word) =>
+                                word.charAt(0).toUpperCase() + word.slice(1),
+                            )
+                            .join(" ")
+                        : "Unknown"}
                 </Badge>
                 <span>•</span>
                 <span>
@@ -715,11 +799,11 @@ export const DeFiPositionsTable = (props: any) => {
         <Table>
           <TableHeader>
             <TableRow className="border-b border-border/50">
-              <TableHead className="h-10 text-xs font-medium text-muted-foreground">
+              <TableHead className="w-[35%] h-10 text-xs font-medium text-muted-foreground">
                 Protocol
               </TableHead>
               <TableHead
-                className="hidden sm:table-cell h-10 text-xs font-medium text-muted-foreground cursor-pointer hover:text-foreground transition-colors"
+                className="hidden sm:table-cell w-[20%] h-10 text-xs font-medium text-muted-foreground cursor-pointer hover:text-foreground transition-colors"
                 onClick={handleSortByType}
               >
                 Type{" "}
@@ -730,7 +814,7 @@ export const DeFiPositionsTable = (props: any) => {
                 )}
               </TableHead>
               <TableHead
-                className="h-10 text-xs font-medium text-muted-foreground text-right cursor-pointer hover:text-foreground transition-colors"
+                className="w-[15%] h-10 text-xs font-medium text-muted-foreground text-right cursor-pointer hover:text-foreground transition-colors pr-2"
                 onClick={handleSortByValue}
               >
                 Value{" "}
@@ -740,6 +824,12 @@ export const DeFiPositionsTable = (props: any) => {
                   </span>
                 )}
               </TableHead>
+              <TableHead className="hidden md:table-cell w-[15%] h-10 text-xs font-medium text-muted-foreground text-right pr-2">
+                24h
+              </TableHead>
+              <TableHead className="hidden md:table-cell w-[15%] h-10 text-xs font-medium text-muted-foreground text-right pr-4">
+                7d
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -747,9 +837,12 @@ export const DeFiPositionsTable = (props: any) => {
               const positionId = `defi-${groupedPosition.protocol}-${index}`;
               const isSelected =
                 selectedItem?.protocol === groupedPosition.protocol;
-              const primaryType = Array.from(
-                groupedPosition.protocolTypes,
-              )[0] as string || "";
+              const primaryType =
+                (Array.from(groupedPosition.protocolTypes)[0] as string) || "";
+
+              // Calculate 24h and 7d changes (placeholder values - you'll need to get real data)
+              const change24h = groupedPosition.priceChange24h || 0;
+              const change7d = groupedPosition.priceChange7d || 0;
 
               return (
                 <TableRow
@@ -760,7 +853,7 @@ export const DeFiPositionsTable = (props: any) => {
                   )}
                   onClick={() => onItemSelect(groupedPosition)}
                 >
-                  <TableCell className="py-2">
+                  <TableCell className="py-2 w-[35%]">
                     <div className="flex items-center gap-3">
                       <div className="flex-shrink-0">
                         {(() => {
@@ -804,30 +897,9 @@ export const DeFiPositionsTable = (props: any) => {
                       <span className="font-medium text-sm">
                         {cleanProtocolName(groupedPosition.protocol)}
                       </span>
-                      {groupedPosition.protocol.toLowerCase() === "aptin" && (
-                        <div className="hidden xs:block">
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <div className="flex items-center">
-                                  <AlertTriangle className="h-4 w-4 text-red-500 dark:text-red-400 ml-1 cursor-help" />
-                                </div>
-                              </TooltipTrigger>
-                              <TooltipContent className="bg-red-500 dark:bg-red-600 text-white border-red-600 dark:border-red-700">
-                                <p className="text-sm font-medium">
-                                  This protocol is deprecated
-                                </p>
-                                <p className="text-sm">
-                                  It&apos;s recommended to remove your assets
-                                </p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                        </div>
-                      )}
                     </div>
                   </TableCell>
-                  <TableCell className="hidden sm:table-cell py-2">
+                  <TableCell className="hidden sm:table-cell py-2 w-[20%]">
                     <Badge
                       variant="secondary"
                       className="text-[10px] px-1.5 py-0 h-4 font-normal"
@@ -837,23 +909,59 @@ export const DeFiPositionsTable = (props: any) => {
                         : primaryType === "derivatives"
                           ? "Perps"
                           : primaryType
-                              ? primaryType.replace("_", " ")
-                                  .split(" ")
-                                  .map(
-                                    (word) =>
-                                      word.charAt(0).toUpperCase() + word.slice(1),
-                                  )
-                                  .join(" ")
-                              : "Unknown"}
+                            ? primaryType
+                                .replace("_", " ")
+                                .split(" ")
+                                .map(
+                                  (word) =>
+                                    word.charAt(0).toUpperCase() +
+                                    word.slice(1),
+                                )
+                                .join(" ")
+                            : "Unknown"}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-right py-2">
+                  <TableCell className="py-2 w-[15%] text-right pr-2">
                     <div className="flex items-center justify-end gap-1">
                       <div
                         className={`font-medium text-sm ${GeistMono.className}`}
                       >
                         {formatCurrency(groupedPosition.totalValue)}
                       </div>
+                    </div>
+                  </TableCell>
+                  <TableCell className="hidden md:table-cell py-2 w-[15%] text-right pr-2">
+                    <div
+                      className={cn(
+                        "text-sm font-medium",
+                        GeistMono.className,
+                        change24h > 0
+                          ? "text-green-600 dark:text-green-400"
+                          : change24h < 0
+                            ? "text-red-600 dark:text-red-400"
+                            : "text-muted-foreground",
+                      )}
+                    >
+                      {change24h !== 0
+                        ? `${change24h > 0 ? "+" : ""}${change24h.toFixed(2)}%`
+                        : "—"}
+                    </div>
+                  </TableCell>
+                  <TableCell className="hidden md:table-cell py-2 w-[15%] text-right pr-4">
+                    <div
+                      className={cn(
+                        "text-sm font-medium",
+                        GeistMono.className,
+                        change7d > 0
+                          ? "text-green-600 dark:text-green-400"
+                          : change7d < 0
+                            ? "text-red-600 dark:text-red-400"
+                            : "text-muted-foreground",
+                      )}
+                    >
+                      {change7d !== 0
+                        ? `${change7d > 0 ? "+" : ""}${change7d.toFixed(2)}%`
+                        : "—"}
                     </div>
                   </TableCell>
                 </TableRow>

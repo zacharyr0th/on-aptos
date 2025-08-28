@@ -69,8 +69,8 @@ export function LanguageToggle() {
       <button
         onClick={() => setShowMenu(!showMenu)}
         className={cn(
-          "flex flex-col items-center justify-center gap-0.5",
-          "px-2.5 py-2 rounded-md",
+          "flex items-center justify-center",
+          "p-2 rounded-md",
           "bg-primary border-border",
           "text-primary-foreground",
           "hover:bg-primary/80",
@@ -81,10 +81,6 @@ export function LanguageToggle() {
         aria-label="Change language"
       >
         <Globe className="h-4 w-4" />
-        <span className="text-[10px] font-medium leading-none">
-          {currentLang.toUpperCase()}
-          {currentLang !== "en" && " β"}
-        </span>
       </button>
 
       {showMenu && (

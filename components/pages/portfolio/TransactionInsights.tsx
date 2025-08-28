@@ -22,14 +22,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
+import { errorLogger } from "@/lib/utils/core/logger";
+import { formatTokenAmount } from "@/lib/utils/format";
 import {
-  EnhancedTransactionAnalyzer,
+  OptimizedTransactionAnalyzer as EnhancedTransactionAnalyzer,
   TransactionCategory,
   ActivityType,
-  type EnhancedTransactionInfo,
-} from "@/lib/utils/token/enhanced-transaction-analysis";
-import { formatTokenAmount } from "@/lib/utils/format/format";
-import { errorLogger } from "@/lib/utils/core/logger";
+  type OptimizedTransactionInfo as EnhancedTransactionInfo,
+} from "@/lib/utils/token/transaction-analysis";
 
 interface WalletTransaction {
   transaction_version: string;
@@ -88,7 +88,7 @@ export function TransactionInsights({
       const enhancedTransactions: EnhancedTransaction[] = rawTransactions.map(
         (tx: WalletTransaction) => ({
           ...tx,
-          analysis: EnhancedTransactionAnalyzer.analyzeTransaction(tx),
+          analysis: EnhancedTransactionAnalyzer.analyzeTransactionSync(tx),
         }),
       );
 
@@ -245,7 +245,7 @@ export function TransactionInsights({
         case ActivityType.LIQUIDITY_REMOVE:
           return DollarSign;
         case ActivityType.CEX_DEPOSIT:
-        case ActivityType.CEX_WITHDRAW:
+        case ActivityType.CEX_WITHDRAWAL:
           return Shuffle;
         default:
           return getCategoryIcon(tx.analysis.category);

@@ -108,6 +108,5 @@ const positions = await provider.scanPositions(walletAddress);
 
 - ❌ Aave lending adapter
 - ❌ TruFin liquid staking adapter
-- ❌ Aptin Finance lending adapter
 - ❌ Amnis liquid staking adapter (deleted)
 - ❌ Thala liquid staking (thAPT)

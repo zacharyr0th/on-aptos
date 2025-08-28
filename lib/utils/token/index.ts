@@ -24,5 +24,5 @@ export * from "./token-logos";
 // Portfolio utilities
 export * from "./portfolio-utils";
 
-// Transaction analysis
-export * from "./enhanced-transaction-analysis";
+// Transaction analysis - uses new protocol system
+export * from "./transaction-analysis";

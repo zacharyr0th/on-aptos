@@ -9,8 +9,9 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Input } from "@/components/ui/input";
 import { usePageTranslation } from "@/hooks/useTranslation";
+import { BaseSearchProps } from "@/lib/types/ui";
 
-interface SearchBarProps {
+interface SearchBarProps extends Omit<BaseSearchProps, "value" | "onChange"> {
   searchQuery: string;
   onSearchChange: (query: string) => void;
   filteredCount: number;

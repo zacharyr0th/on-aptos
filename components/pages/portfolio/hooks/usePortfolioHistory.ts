@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 
 import { logger } from "@/lib/utils/core/logger";
-import { PortfolioHistoryPoint } from "@/lib/utils/token/portfolio-utils";
+import type { PortfolioHistoryPoint } from "@/lib/services/portfolio/types";
 
 interface OptimizedPortfolioData {
   date: string;

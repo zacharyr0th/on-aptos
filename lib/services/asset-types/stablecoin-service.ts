@@ -7,8 +7,8 @@ import {
   ALGO_STABLECOINS,
 } from "@/lib/constants";
 import { TETHER_RESERVES } from "@/lib/constants/tokens/addresses";
-import { formatBigIntWithDecimals } from "@/lib/utils/format/format";
 import { logger } from "@/lib/utils/core/logger";
+import { formatBigIntWithDecimals } from "@/lib/utils/format";
 
 import type {
   StablecoinSupply,
@@ -169,7 +169,7 @@ export class StablecoinService extends BaseAssetService {
         }
         
         current_fungible_asset_balances(where: {
-          owner_address: {_in: ["${TETHER_RESERVES.PRIMARY}"${TETHER_RESERVES.SECONDARY ? `, "${TETHER_RESERVES.SECONDARY}"` : ''}]},
+          owner_address: {_in: ["${TETHER_RESERVES.PRIMARY}"${TETHER_RESERVES.SECONDARY ? `, "${TETHER_RESERVES.SECONDARY}"` : ""}]},
           asset_type: {_eq: "${STABLECOINS.USDT}"}
         }) {
           amount
@@ -181,7 +181,7 @@ export class StablecoinService extends BaseAssetService {
     const result = await this.executeGraphQLQuery<any>(query);
 
     const supplies: StablecoinSupply[] = [];
-    
+
     // Sum all USDT reserve balances
     let totalUsdtReserve = BigInt(0);
     if (result.current_fungible_asset_balances) {
@@ -203,7 +203,10 @@ export class StablecoinService extends BaseAssetService {
         // Extract supply from supply_v2 - it's a direct number
         let supply = BigInt(0);
         if (item.supply_v2) {
-          if (typeof item.supply_v2 === 'string' || typeof item.supply_v2 === 'number') {
+          if (
+            typeof item.supply_v2 === "string" ||
+            typeof item.supply_v2 === "number"
+          ) {
             supply = BigInt(item.supply_v2);
           }
         }
@@ -253,13 +256,12 @@ export class StablecoinService extends BaseAssetService {
     };
   }
 
-
   /**
    * Fetch bridged coin supplies using REST API (original working approach)
    */
   private static async fetchBridgedCoinSupplies(): Promise<StablecoinSupply[]> {
     const supplies: StablecoinSupply[] = [];
-    
+
     for (const coin of BRIDGED_COINS) {
       try {
         // Use REST API to get CoinInfo resource (original approach)
@@ -270,19 +272,21 @@ export class StablecoinService extends BaseAssetService {
           fetch(url, {
             headers: {
               "Content-Type": "application/json",
-              "Authorization": `Bearer ${process.env.APTOS_BUILD_SECRET}`,
+              Authorization: `Bearer ${process.env.APTOS_BUILD_SECRET}`,
             },
           }),
           10000,
         );
 
         if (!response.ok) {
-          logger.warn(`Failed to fetch ${coin.symbol}: HTTP ${response.status}`);
+          logger.warn(
+            `Failed to fetch ${coin.symbol}: HTTP ${response.status}`,
+          );
           continue;
         }
 
         const data = await response.json();
-        let supply = this.extractCoinSupply(data, coin);
+        const supply = this.extractCoinSupply(data, coin);
 
         const divisor = BigInt(10 ** coin.decimals);
         supplies.push({
@@ -313,7 +317,10 @@ export class StablecoinService extends BaseAssetService {
   /**
    * Extract coin supply from CoinInfo resource response
    */
-  private static extractCoinSupply(data: any, _coin: BridgedCoinConfig): bigint {
+  private static extractCoinSupply(
+    data: any,
+    _coin: BridgedCoinConfig,
+  ): bigint {
     // Try different paths for the supply data from CoinInfo resource
     if (data.data?.supply?.vec?.[0]?.integer?.vec?.[0]?.value) {
       return BigInt(data.data.supply.vec[0].integer.vec[0].value);
@@ -329,7 +336,6 @@ export class StablecoinService extends BaseAssetService {
 
     return BigInt(0);
   }
-
 
   /**
    * Process supplies to calculate totals and percentages

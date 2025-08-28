@@ -1,15 +1,17 @@
 // Development logger that uses console
-const isDevelopment = process.env.NODE_ENV === 'development';
+const isDevelopment = process.env.NODE_ENV === "development";
 
+/* eslint-disable no-console */
 export const logger = {
-  info: (...args: any[]) => isDevelopment && console.log('[INFO]', ...args),
-  debug: (...args: any[]) => isDevelopment && console.debug('[DEBUG]', ...args),
-  warn: (...args: any[]) => isDevelopment && console.warn('[WARN]', ...args),
-  error: (...args: any[]) => isDevelopment && console.error('[ERROR]', ...args),
-  fatal: (...args: any[]) => console.error('[FATAL]', ...args),
-  trace: (...args: any[]) => isDevelopment && console.trace('[TRACE]', ...args),
+  info: (...args: unknown[]) => isDevelopment && console.log("[INFO]", ...args),
+  debug: (...args: unknown[]) => isDevelopment && console.debug("[DEBUG]", ...args),
+  warn: (...args: unknown[]) => isDevelopment && console.warn("[WARN]", ...args),
+  error: (...args: unknown[]) => isDevelopment && console.error("[ERROR]", ...args),
+  fatal: (...args: unknown[]) => console.error("[FATAL]", ...args),
+  trace: (...args: unknown[]) => isDevelopment && console.trace("[TRACE]", ...args),
   child: () => logger,
 };
+/* eslint-enable no-console */
 
 // Create child loggers for different modules
 export const createLogger = (_module: string) => {
@@ -25,15 +27,15 @@ export const errorLogger = createLogger("error");
 export const perfLogger = createLogger("performance");
 
 // Backward compatibility exports
-export const log = (...args: any[]) => {
+export const log = (...args: unknown[]) => {
   logger.info(args.length === 1 ? args[0] : args.join(" "));
 };
 
-export const warn = (...args: any[]) => {
+export const warn = (...args: unknown[]) => {
   logger.warn(args.length === 1 ? args[0] : args.join(" "));
 };
 
-export const error = (...args: any[]) => {
+export const error = (...args: unknown[]) => {
   if (args[0] instanceof Error) {
     logger.error(args[0]);
   } else {

@@ -18,7 +18,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import React, { useState, useEffect, useMemo } from "react";
-import { toast } from "sonner";
+import { copyToClipboard } from "@/lib/utils/clipboard";
 
 import { defiProtocols } from "@/components/pages/defi/data/protocols";
 import { Badge } from "@/components/ui/badge";
@@ -32,6 +32,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { GitHubStarCount } from "@/components/ui/github-star-count";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -86,6 +87,12 @@ const HeaderComponent = (): React.ReactElement | null => {
         isActive: pathname === "/bitcoin",
       },
       {
+        href: "/lst",
+        icon: <TrendingUp className="h-4 w-4" />,
+        title: t("navigation.lst", "LSTs"),
+        isActive: pathname === "/lst",
+      },
+      {
         href: "/rwas",
         icon: <Building2 className="h-4 w-4" />,
         title: t("navigation.rwas", "RWAs"),
@@ -109,6 +116,7 @@ const HeaderComponent = (): React.ReactElement | null => {
         key: "page_titles.stablecoins",
         fallback: "Stablecoins",
       },
+      "/lst": { key: "page_titles.lst", fallback: "Liquid Staking" },
       "/defi": { key: "page_titles.defi", fallback: "DeFi" },
       "/rwas": { key: "page_titles.rwas", fallback: "RWAs" },
       "/tokens": { key: "page_titles.tokens", fallback: "Tokens" },
@@ -117,6 +125,7 @@ const HeaderComponent = (): React.ReactElement | null => {
         key: "page_titles.portfolio",
         fallback: "Your Portfolio",
       },
+      "/metrics": { key: "page_titles.metrics", fallback: "Metrics" },
     };
 
     const config = pageConfig[pathname] || {
@@ -137,15 +146,11 @@ const HeaderComponent = (): React.ReactElement | null => {
       return;
     }
 
-    try {
-      await navigator.clipboard.writeText(normalizedAddress);
-      toast.success("Address copied to clipboard");
+    const success = await copyToClipboard(normalizedAddress, "Address");
+    if (success) {
       logger.debug(`Successfully copied address: ${normalizedAddress}`);
-    } catch (error) {
-      logger.warn(
-        `Failed to copy address: ${error instanceof Error ? error.message : String(error)}`,
-      );
-      toast.error("Failed to copy address");
+    } else {
+      logger.warn("Failed to copy address");
     }
   };
 
@@ -203,21 +208,35 @@ const HeaderComponent = (): React.ReactElement | null => {
 
   return (
     <ErrorBoundary>
-      <header className="relative py-3 sm:py-4 z-[9999] isolate">
-        <div className="w-full px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20">
+      <header className="relative py-2 sm:py-3 md:py-4 z-[9999] isolate textured-bg">
+        <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20">
           <div className="flex items-center justify-between w-full">
-            {/* Logo */}
-            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold">
-              <Link
-                href="/"
-                className="hover:opacity-90 transition-opacity duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-sm"
-              >
-                <span className="text-primary">{title}</span>{" "}
-                <span className="text-muted-foreground">
-                  {t("landing.hero.title_suffix", "on Aptos")}
-                </span>
-              </Link>
-            </h1>
+            {/* Logo and GitHub Stars */}
+            <div className="flex items-center gap-4">
+              <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold">
+                <Link
+                  href="/"
+                  className="hover:opacity-90 transition-opacity duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-sm"
+                >
+                  <span className="text-primary">{title}</span>{" "}
+                  <span className="text-muted-foreground">
+                    {t("landing.hero.title_suffix", "on Aptos")}
+                  </span>
+                </Link>
+              </h1>
+              <GitHubStarCount
+                owner={
+                  process.env.DEVELOPER_GITHUB?.split("/").slice(-2, -1)[0] ||
+                  "yourusername"
+                }
+                repo={
+                  process.env.DEVELOPER_GITHUB?.split("/").slice(-1)[0] ||
+                  "on-aptos"
+                }
+                className="hidden sm:flex"
+                showGithubLogo={true}
+              />
+            </div>
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center gap-4">
@@ -296,98 +315,99 @@ const HeaderComponent = (): React.ReactElement | null => {
                                 </Link>
                               </div>
                               {/* Group protocols by category */}
-                              {["Trading", "Credit", "Yield", "Multiple"].map(
-                                (category) => {
-                                  const categoryProtocols =
-                                    defiProtocols.filter(
-                                      (p) =>
-                                        p.status === "Active" &&
-                                        p.category === category,
-                                    );
+                              {[
+                                "Trading",
+                                "Lending",
+                                "Yield",
+                                "Derivatives",
+                                "Launchpad",
+                                "Multiple",
+                              ].map((category) => {
+                                const categoryProtocols = defiProtocols.filter(
+                                  (p) => p.category === category,
+                                );
 
-                                  if (categoryProtocols.length === 0)
-                                    return null;
+                                if (categoryProtocols.length === 0) return null;
 
-                                  return (
-                                    <div key={category}>
-                                      <h4 className="sticky top-0 bg-popover z-10 text-xs font-semibold text-muted-foreground uppercase tracking-wider py-2 px-1">
-                                        {t(
-                                          `defi.categories.${category}.name`,
-                                          category,
-                                        )}
-                                      </h4>
-                                      <div className="grid gap-1 pb-2">
-                                        {categoryProtocols.map((protocol) => (
-                                          <Link
-                                            key={protocol.title}
-                                            href={protocol.href}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className={cn(
-                                              "flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-accent",
-                                              "border border-transparent hover:border-border",
-                                            )}
-                                          >
-                                            <div className="relative h-8 w-8 flex-shrink-0">
-                                              <Image
-                                                src={
-                                                  protocol.logo ||
-                                                  "/placeholder.jpg"
-                                                }
-                                                alt={`${protocol.title} logo`}
-                                                fill
-                                                className="object-contain rounded"
-                                                onError={(e) => {
-                                                  const img =
-                                                    e.target as HTMLImageElement;
-                                                  img.src = "/placeholder.jpg";
-                                                }}
-                                              />
+                                return (
+                                  <div key={category}>
+                                    <h4 className="sticky top-0 bg-popover z-10 text-xs font-semibold text-muted-foreground uppercase tracking-wider py-2 px-1">
+                                      {t(
+                                        `defi.categories.${category}.name`,
+                                        category,
+                                      )}
+                                    </h4>
+                                    <div className="grid gap-1 pb-2">
+                                      {categoryProtocols.map((protocol) => (
+                                        <Link
+                                          key={protocol.title}
+                                          href={protocol.href}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className={cn(
+                                            "flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-accent",
+                                            "border border-transparent hover:border-border",
+                                          )}
+                                        >
+                                          <div className="relative h-8 w-8 flex-shrink-0">
+                                            <Image
+                                              src={
+                                                protocol.logo ||
+                                                "/placeholder.jpg"
+                                              }
+                                              alt={`${protocol.title} logo`}
+                                              fill
+                                              className="object-contain rounded"
+                                              onError={(e) => {
+                                                const img =
+                                                  e.target as HTMLImageElement;
+                                                img.src = "/placeholder.jpg";
+                                              }}
+                                            />
+                                          </div>
+                                          <div className="flex-1 min-w-0">
+                                            <div className="flex items-center justify-between gap-2 flex-wrap">
+                                              <span className="font-medium truncate">
+                                                {protocol.title}
+                                              </span>
+                                              {protocol.category ===
+                                                "Multiple" &&
+                                              protocol.subcategory.includes(
+                                                ",",
+                                              ) ? (
+                                                protocol.subcategory
+                                                  .split(",")
+                                                  .map((sub, idx) => (
+                                                    <Badge
+                                                      key={idx}
+                                                      variant="outline"
+                                                      className="h-4 px-1 text-[10px] flex-shrink-0"
+                                                    >
+                                                      {t(
+                                                        `defi.subcategories.${sub.trim().toLowerCase().replace(/ /g, "_")}`,
+                                                        sub.trim(),
+                                                      )}
+                                                    </Badge>
+                                                  ))
+                                              ) : (
+                                                <Badge
+                                                  variant="outline"
+                                                  className="h-4 px-1 text-[10px] flex-shrink-0"
+                                                >
+                                                  {t(
+                                                    `defi.subcategories.${protocol.subcategory.toLowerCase().replace(/ /g, "_")}`,
+                                                    protocol.subcategory,
+                                                  )}
+                                                </Badge>
+                                              )}
                                             </div>
-                                            <div className="flex-1 min-w-0">
-                                              <div className="flex items-center justify-between gap-2 flex-wrap">
-                                                <span className="font-medium truncate">
-                                                  {protocol.title}
-                                                </span>
-                                                {protocol.category ===
-                                                  "Multiple" &&
-                                                protocol.subcategory.includes(
-                                                  ",",
-                                                ) ? (
-                                                  protocol.subcategory
-                                                    .split(",")
-                                                    .map((sub, idx) => (
-                                                      <Badge
-                                                        key={idx}
-                                                        variant="outline"
-                                                        className="h-4 px-1 text-[10px] flex-shrink-0"
-                                                      >
-                                                        {t(
-                                                          `defi.subcategories.${sub.trim().toLowerCase().replace(/ /g, "_")}`,
-                                                          sub.trim(),
-                                                        )}
-                                                      </Badge>
-                                                    ))
-                                                ) : (
-                                                  <Badge
-                                                    variant="outline"
-                                                    className="h-4 px-1 text-[10px] flex-shrink-0"
-                                                  >
-                                                    {t(
-                                                      `defi.subcategories.${protocol.subcategory.toLowerCase().replace(/ /g, "_")}`,
-                                                      protocol.subcategory,
-                                                    )}
-                                                  </Badge>
-                                                )}
-                                              </div>
-                                            </div>
-                                          </Link>
-                                        ))}
-                                      </div>
+                                          </div>
+                                        </Link>
+                                      ))}
                                     </div>
-                                  );
-                                },
-                              )}
+                                  </div>
+                                );
+                              })}
                             </div>
                           </ScrollArea>
                         </div>
@@ -494,7 +514,9 @@ const HeaderComponent = (): React.ReactElement | null => {
                           onClick={handlePortfolioClick}
                           className={navigationMenuTriggerStyle()}
                         >
-                          {t("navigation.portfolio", "Portfolio")}
+                          {pathname === "/"
+                            ? "Launch App"
+                            : t("navigation.portfolio", "Portfolio")}
                         </button>
                       )}
                     </NavigationMenuItem>
@@ -656,7 +678,9 @@ const HeaderComponent = (): React.ReactElement | null => {
                           active={pathname === "/portfolio"}
                           onClick={closeMenu}
                         >
-                          {t("navigation.portfolio", "Portfolio")}
+                          {pathname === "/"
+                            ? "Launch App"
+                            : t("navigation.portfolio", "Portfolio")}
                         </MobileNavLink>
                       )}
                     </div>

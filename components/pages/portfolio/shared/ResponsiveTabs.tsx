@@ -65,14 +65,14 @@ export const ResponsiveTabs: React.FC<ResponsiveTabsProps> = ({
       {/* Tab headers with optional eye toggle */}
       <div className={`flex justify-between items-end w-full ${borderClass}`}>
         <TabsList
-          className={`flex justify-start gap-8 rounded-none bg-transparent p-0 h-auto border-none ${tabsClassName}`}
+          className={`flex justify-start rounded-none bg-transparent p-0 h-auto border-none ${tabsClassName}`}
         >
-          {tabs.map((tab) => (
+          {tabs.map((tab, index) => (
             <TabsTrigger
               key={tab.value}
               value={tab.value}
               disabled={tab.disabled}
-              className={baseTabClass}
+              className={`${baseTabClass} ${index > 0 ? "ml-8" : ""}`}
             >
               {tab.label}
               {tab.count !== undefined && <> ({tab.count})</>}
@@ -123,7 +123,6 @@ interface PortfolioTabsProps {
   // Tab data
   tokensCount: number;
   nftsCount: number | string;
-  defiCount: number;
 
   // Active tab
   activeTab: string;
@@ -132,7 +131,6 @@ interface PortfolioTabsProps {
   // Content
   tokensContent: React.ReactNode;
   nftsContent: React.ReactNode;
-  defiContent: React.ReactNode;
 
   // Eye toggle (typically for tokens tab)
   eyeToggle?: EyeToggleConfig;
@@ -144,12 +142,10 @@ interface PortfolioTabsProps {
 export const PortfolioTabs: React.FC<PortfolioTabsProps> = ({
   tokensCount,
   nftsCount,
-  defiCount,
   activeTab,
   onTabChange,
   tokensContent,
   nftsContent,
-  defiContent,
   eyeToggle,
   className = "",
 }) => {
@@ -165,12 +161,6 @@ export const PortfolioTabs: React.FC<PortfolioTabsProps> = ({
       label: "NFTs",
       count: nftsCount,
       content: nftsContent,
-    },
-    {
-      value: "defi",
-      label: "DeFi",
-      count: defiCount,
-      content: defiContent,
     },
   ];
 

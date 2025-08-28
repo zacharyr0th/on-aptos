@@ -7,7 +7,10 @@
 
 // Re-export commonly used utilities from shared services
 export { UnifiedPriceService } from "../../shared/utils/unified-price-service";
-export type { UnifiedPriceData, AssetPrice } from "../../shared/utils/unified-price-service";
+export type {
+  UnifiedPriceData,
+  AssetPrice,
+} from "../../shared/utils/unified-price-service";
 
 export { TokenRegistry } from "../../shared/utils/token-registry";
 export {

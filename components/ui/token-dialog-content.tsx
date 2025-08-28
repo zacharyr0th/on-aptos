@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { InfoRow } from "@/components/ui/info-row";
 import { Separator } from "@/components/ui/separator";
 import { useTranslation } from "@/hooks/useTranslation";
-import { TokenMetadata, normalizeIssuer } from "@/lib/types";
+import { TokenMetadata, normalizeIssuer } from "@/lib/types/tokens";
 
 interface TokenDialogContentProps {
   metadata: TokenMetadata;

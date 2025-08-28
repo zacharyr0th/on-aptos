@@ -32,7 +32,6 @@ export const LIQUID_STAKING_ADDRESSES = {
     "0x111ae3e5bc816a5e63c2da97d0aa3886519e0cd5e4b046659fa35796bd11542a::stapt_token::StakedApt",
   amAPT:
     "0x111ae3e5bc816a5e63c2da97d0aa3886519e0cd5e4b046659fa35796bd11542a::amapt_token::AmnisApt",
-  tAPT: "0x84d7aeef42d38a5ffc3ccef853e1b82e4958659d16a7de736a29c55fbbeb0114::staked_aptos_coin::StakedAptosCoin",
 } as const;
 
 // All token addresses combined
@@ -104,6 +103,9 @@ export class TokenRegistry {
    * Get symbol from token address with comprehensive fallback logic
    */
   static getSymbolFromAddress(address: string): string {
+    // Handle null/undefined addresses
+    if (!address) return "UNKNOWN";
+
     // Check direct mapping first
     const knownSymbol = ADDRESS_TO_SYMBOL_MAP.get(address);
     if (knownSymbol) return knownSymbol;
@@ -115,12 +117,13 @@ export class TokenRegistry {
 
     // Handle liquid staking tokens (all derive from APT)
     if (
-      address.includes("::stapt_token::") ||
-      address.includes("::StakedApt") ||
-      address.includes("::amapt_token::") ||
-      address.includes("::AmnisApt") ||
-      address.includes("::staking::ThalaAPT") ||
-      address.includes("::staked_aptos_coin::")
+      address &&
+      (address.includes("::stapt_token::") ||
+        address.includes("::StakedApt") ||
+        address.includes("::amapt_token::") ||
+        address.includes("::AmnisApt") ||
+        address.includes("::staking::ThalaAPT") ||
+        address.includes("::staked_aptos_coin::"))
     ) {
       // Map to specific LST symbols if known
       for (const [symbol, addr] of Object.entries(LIQUID_STAKING_ADDRESSES)) {
@@ -130,19 +133,27 @@ export class TokenRegistry {
     }
 
     // Handle bridged tokens
-    if (address.includes("::asset::USDC")) return "USDC";
-    if (address.includes("::asset::USDT")) return "USDT";
-    if (address.includes("::asset::WETH")) return "WETH";
-    if (address.includes("::asset::WBTC")) return "WBTC";
-    if (address.includes("::asset::DAI")) return "DAI";
+    if (address && address.includes("::asset::USDC")) return "USDC";
+    if (address && address.includes("::asset::USDT")) return "USDT";
+    if (address && address.includes("::asset::WETH")) return "WETH";
+    if (address && address.includes("::asset::WBTC")) return "WBTC";
+    if (address && address.includes("::asset::DAI")) return "DAI";
 
     // Handle protocol tokens
-    if (address.includes("::thl_coin::") || address.includes("::THL"))
+    if (
+      address &&
+      (address.includes("::thl_coin::") || address.includes("::THL"))
+    )
       return "THL";
-    if (address.includes("::mod_coin::") || address.includes("::MOD"))
+    if (
+      address &&
+      (address.includes("::mod_coin::") || address.includes("::MOD"))
+    )
       return "MOD";
 
     // Extract from address structure as last resort
+    if (!address) return "UNKNOWN";
+
     const patterns = [
       /::([^:]+)::([^>]+)$/, // module::struct
       /::([^:]+)$/, // struct name only
@@ -218,6 +229,12 @@ export class TokenRegistry {
   static getTokenDecimals(address: string, symbol?: string): number {
     // Native APT tokens
     if (this.isNativeAPT(address)) return 8;
+
+    // Check symbol for known tokens
+    const upperSymbol = symbol?.toUpperCase();
+    if (upperSymbol === "APT") return 8;
+    if (upperSymbol === "MKLP") return 8; // Merkle LP token uses 8 decimals
+    if (upperSymbol === "UPT" || upperSymbol === "UPTOS") return 8; // Uptos token uses 8 decimals
 
     // Stablecoins typically use 6 decimals
     if (this.isStablecoin(address, symbol)) {

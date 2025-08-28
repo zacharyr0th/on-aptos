@@ -1,5 +1,5 @@
 import { getEnvVar } from "@/lib/config/validate-env";
-import { API_ENDPOINTS, ERROR_MESSAGES } from "@/lib/constants";
+import { ENDPOINTS, ERROR_MESSAGES } from "@/lib/constants";
 import { graphQLRequest } from "@/lib/utils/api/fetch-utils";
 import { logger } from "@/lib/utils/core/logger";
 
@@ -124,7 +124,7 @@ export async function executeGraphQLQuery<T>(
 
   try {
     const response = await graphQLRequest<GraphQLResponse<T>>(
-      API_ENDPOINTS.APTOS_INDEXER,
+      ENDPOINTS.APTOS_INDEXER,
       { query, variables },
       { headers },
     );

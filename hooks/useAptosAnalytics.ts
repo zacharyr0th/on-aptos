@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { logger } from "@/lib/utils/core/logger";
 
 interface GasUsageData {
@@ -141,7 +141,7 @@ export function useBalanceHistory(
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  const fetchBalanceHistory = async () => {
+  const fetchBalanceHistory = useCallback(async () => {
     if (!address) return;
 
     setLoading(true);
@@ -165,13 +165,16 @@ export function useBalanceHistory(
     } finally {
       setLoading(false);
     }
-  };
+  }, [address, lookback]);
 
   useEffect(() => {
     fetchBalanceHistory();
-  }, [address, lookback]);
+  }, [fetchBalanceHistory]);
 
-  return { data, loading, error, refetch: fetchBalanceHistory };
+  return useMemo(
+    () => ({ data, loading, error, refetch: fetchBalanceHistory }),
+    [data, loading, error, fetchBalanceHistory],
+  );
 }
 
 export function useTopPriceChanges(
@@ -231,8 +234,22 @@ export function useTransactionHistory(
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
+  // Memoize options to prevent unnecessary refetches
+  const optionsKey = useMemo(
+    () => JSON.stringify(options || {}),
+    [
+      options?.dateStart,
+      options?.dateEnd,
+      options?.assetSymbol,
+      options?.limit,
+      options?.offset,
+    ],
+  );
+
   useEffect(() => {
     if (!address) return;
+
+    const abortController = new AbortController();
 
     const fetchTransactionHistory = async () => {
       setLoading(true);
@@ -243,38 +260,43 @@ export function useTransactionHistory(
           account_address: address,
         });
 
-        if (options?.dateStart) params.append("date_start", options.dateStart);
-        if (options?.dateEnd) params.append("date_end", options.dateEnd);
-        if (options?.assetSymbol)
-          params.append("asset_symbol", options.assetSymbol);
-        if (options?.limit) params.append("limit", options.limit.toString());
-        if (options?.offset) params.append("offset", options.offset.toString());
+        const parsedOptions = JSON.parse(optionsKey);
+        if (parsedOptions.dateStart)
+          params.append("date_start", parsedOptions.dateStart);
+        if (parsedOptions.dateEnd)
+          params.append("date_end", parsedOptions.dateEnd);
+        if (parsedOptions.assetSymbol)
+          params.append("asset_symbol", parsedOptions.assetSymbol);
+        if (parsedOptions.limit)
+          params.append("limit", parsedOptions.limit.toString());
+        if (parsedOptions.offset)
+          params.append("offset", parsedOptions.offset.toString());
 
         const response = await fetch(
           `/api/analytics/transaction-history?${params}`,
+          { signal: abortController.signal },
         );
         const result = await response.json();
 
         if (!response.ok) throw new Error(result.error);
 
         setData(result.data || []);
-      } catch (err) {
-        logger.error("Failed to fetch transaction history:", err);
-        setError(err as Error);
+      } catch (err: any) {
+        if (err.name !== "AbortError") {
+          logger.error("Failed to fetch transaction history:", err);
+          setError(err as Error);
+        }
       } finally {
         setLoading(false);
       }
     };
 
     fetchTransactionHistory();
-  }, [
-    address,
-    options?.dateStart,
-    options?.dateEnd,
-    options?.assetSymbol,
-    options?.limit,
-    options?.offset,
-  ]);
 
-  return { data, loading, error };
+    return () => {
+      abortController.abort();
+    };
+  }, [address, optionsKey]);
+
+  return useMemo(() => ({ data, loading, error }), [data, loading, error]);
 }

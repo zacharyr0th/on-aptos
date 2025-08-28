@@ -4,12 +4,10 @@ import { GeistMono } from "geist/font/mono";
 import { AlertTriangle, Copy } from "lucide-react";
 import Image from "next/image";
 import React, { useState, useMemo, useCallback, memo, useEffect } from "react";
-import { toast } from "sonner";
+import { copyToClipboard } from "@/lib/utils/clipboard";
 
 import { ErrorBoundary } from "@/components/errors/ErrorBoundary";
-import { Footer } from "@/components/layout/Footer";
 import { MarketShareChart } from "@/components/shared/MarketShareChart";
-import { ChartDataItem, formatAssetValue, calculateMarketShare } from "@/lib/utils/format/chart-utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -28,6 +26,11 @@ import { BTC_METADATA, Token } from "@/lib/config";
 import { BTC_COLORS } from "@/lib/constants/ui/colors";
 import { formatCurrency, formatAmount, formatAmountFull } from "@/lib/utils";
 import { logger } from "@/lib/utils/core/logger";
+import {
+  ChartDataItem,
+  formatAssetValue,
+  calculateMarketShare,
+} from "@/lib/utils/format/chart-utils";
 
 // Removed unused imports
 // Removed complex suspense boundaries for simpler implementation
@@ -42,18 +45,7 @@ const truncateAddress = (address: string): string => {
   return `${address.slice(0, 8)}...${address.slice(-8)}`;
 };
 
-// Helper function to copy to clipboard with toast
-const copyToClipboard = async (
-  text: string,
-  label: string = "Address",
-): Promise<void> => {
-  try {
-    await navigator.clipboard.writeText(text);
-    toast.success(`${label} copied to clipboard`);
-  } catch {
-    toast.error("Failed to copy to clipboard");
-  }
-};
+// copyToClipboard is imported from centralized utility
 
 // Helper function to get token icon source
 const getTokenIcon = (symbol: string, metadata?: any): string => {
@@ -90,11 +82,9 @@ const TokenCard = memo(function TokenCard({
     };
   }, [token, totalBTC, bitcoinPrice]);
 
-
   const handleImageLoad = useCallback(() => {
     setImageLoaded(true);
   }, []);
-
 
   return (
     <>
@@ -141,7 +131,6 @@ const TokenCard = memo(function TokenCard({
           value={parseFloat(tokenData.marketSharePercent)}
         />
       </div>
-
     </>
   );
 });
@@ -287,9 +276,7 @@ export default function BitcoinPage(): React.ReactElement {
   const { t } = usePageTranslation("btc");
 
   // Use direct API call for BTC supply data
-  const [btcSupplyData, setBtcSupplyData] = useState<any | null>(
-    null,
-  );
+  const [btcSupplyData, setBtcSupplyData] = useState<any | null>(null);
   const [btcSupplyLoading, setBtcSupplyLoading] = useState(true);
   const [btcSupplyError, setBtcSupplyError] = useState<Error | null>(null);
   const [btcSupplyFetching, setBtcSupplyFetching] = useState(false);
@@ -391,7 +378,9 @@ export default function BitcoinPage(): React.ReactElement {
     }
 
     // Use total_supply_formatted from the API response
-    const totalBTCValue = parseFloat(processedData.total_supply_formatted || processedData.total || "0");
+    const totalBTCValue = parseFloat(
+      processedData.total_supply_formatted || processedData.total || "0",
+    );
     const totalUSDValue = bitcoinPriceData?.price
       ? totalBTCValue * bitcoinPriceData.price
       : 0;
@@ -412,14 +401,13 @@ export default function BitcoinPage(): React.ReactElement {
       <div
         className={`min-h-screen flex flex-col relative ${GeistMono.className}`}
       >
-        {/* Background gradient - fixed to viewport */}
-        <div className="fixed inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/10 pointer-events-none" />
+        {/* Background gradient removed - using global textured background */}
 
         <div className="fixed top-0 left-0 right-0 h-1 z-30">
           {refreshing && <div className="h-full bg-muted animate-pulse"></div>}
         </div>
 
-        <main className="w-full px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20 py-8 flex-1 relative">
+        <main className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20 py-8 flex-1 relative">
           {loading ? (
             <LoadingState />
           ) : error ? (
@@ -493,13 +481,16 @@ export default function BitcoinPage(): React.ReactElement {
                   >
                     <MarketShareChart
                       data={processedData.supplies.map((token: Token) => {
-                        const btcValue = parseFloat(token.formatted_supply || "0");
-                        const marketSharePercent = totalBTC > 0 ? (btcValue / totalBTC) * 100 : 0;
+                        const btcValue = parseFloat(
+                          token.formatted_supply || "0",
+                        );
+                        const marketSharePercent =
+                          totalBTC > 0 ? (btcValue / totalBTC) * 100 : 0;
                         return {
                           name: token.symbol,
                           value: marketSharePercent,
                           formattedSupply: formatAmount(btcValue, "BTC"),
-                          color: BTC_COLORS[token.symbol] || BTC_COLORS.default
+                          color: BTC_COLORS[token.symbol] || BTC_COLORS.default,
                         };
                       })}
                       totalValue={totalUSD || 0}
@@ -507,7 +498,9 @@ export default function BitcoinPage(): React.ReactElement {
                       topRightContent={
                         <div className="text-right">
                           <div className="flex items-center justify-end gap-3 mb-1">
-                            <h2 className="text-sm text-muted-foreground">Total Supply</h2>
+                            <h2 className="text-sm text-muted-foreground">
+                              Total Supply
+                            </h2>
                             {bitcoinPriceData?.price && (
                               <div className="flex items-center gap-1.5">
                                 <Image
@@ -518,7 +511,11 @@ export default function BitcoinPage(): React.ReactElement {
                                   className="object-contain"
                                 />
                                 <span className="text-sm text-muted-foreground font-mono">
-                                  {formatCurrency(bitcoinPriceData.price, "USD", { decimals: 0 })}
+                                  {formatCurrency(
+                                    bitcoinPriceData.price,
+                                    "USD",
+                                    { decimals: 0 },
+                                  )}
                                 </span>
                               </div>
                             )}
@@ -527,7 +524,10 @@ export default function BitcoinPage(): React.ReactElement {
                             {formatAmountFull(totalBTC, "BTC", { decimals: 2 })}
                             {totalUSD && (
                               <span className="text-sm font-normal text-muted-foreground ml-2 font-mono">
-                                ≈ {formatCurrency(totalUSD, "USD", { decimals: 0 })}
+                                ≈{" "}
+                                {formatCurrency(totalUSD, "USD", {
+                                  decimals: 0,
+                                })}
                               </span>
                             )}
                           </p>
@@ -637,8 +637,6 @@ export default function BitcoinPage(): React.ReactElement {
             </>
           ) : null}
         </main>
-
-        <Footer className="relative" />
       </div>
     </ErrorBoundary>
   );

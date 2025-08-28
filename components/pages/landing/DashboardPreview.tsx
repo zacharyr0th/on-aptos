@@ -5,8 +5,8 @@ import { useEffect, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { DEVELOPER_CONFIG } from "@/lib/config/app";
-import { formatAmount } from "@/lib/utils/format/format";
 import { logger } from "@/lib/utils/core/logger";
+import { formatAmount } from "@/lib/utils/format";
 
 export const DashboardPreview = () => {
   const [loading, setLoading] = useState(true);

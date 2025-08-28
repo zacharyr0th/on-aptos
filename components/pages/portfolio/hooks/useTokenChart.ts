@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
-import { logger } from "@/lib/utils/core/logger";
 import { dedupeFetch } from "@/lib/utils/cache/request-deduplication";
+import { logger } from "@/lib/utils/core/logger";
 
 interface TokenPriceData {
   bucketed_timestamp_minutes_utc: string;

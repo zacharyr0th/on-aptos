@@ -61,8 +61,7 @@ export interface BatchRequestOptions {
   delayBetween?: number;
 }
 
-// Currency types
-export type Currency = string;
-export type FiatCurrency = string;
+// Re-export currency types from consolidated
+export type { Currency, FiatCurrency } from "@/lib/types/consolidated";
 
 // Error types - use errors.ts for error classes

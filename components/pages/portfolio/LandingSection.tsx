@@ -5,7 +5,6 @@ import { Search } from "lucide-react";
 import Image from "next/image";
 import { useMemo, useState } from "react";
 
-import { Footer } from "@/components/layout/Footer";
 import { Input } from "@/components/ui/input";
 import { WalletConnectButton } from "@/components/wallet/WalletConnectButton";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -35,12 +34,9 @@ const protocolLogos = [
   { src: "/icons/protocols/agdex.webp", alt: "AGDEX" },
   { src: "/icons/protocols/amnis.avif", alt: "Amnis" },
   { src: "/icons/protocols/anqa.webp", alt: "ANQA" },
-  { src: "/icons/protocols/aptin.webp", alt: "Aptin" },
   { src: "/icons/protocols/aries.avif", alt: "Aries" },
   { src: "/icons/protocols/cellana.webp", alt: "Cellana" },
   { src: "/icons/protocols/echelon.avif", alt: "Echelon" },
-  { src: "/icons/protocols/econia.jpg", alt: "Econia" },
-  { src: "/icons/protocols/emojicoin.webp", alt: "Emojicoin" },
   { src: "/icons/protocols/hyperion.webp", alt: "Hyperion" },
   { src: "/icons/protocols/ichi.jpg", alt: "ICHI" },
   { src: "/icons/protocols/joule.webp", alt: "Joule" },
@@ -141,31 +137,28 @@ export const LandingSection = ({
   // Select a fixed set of logos to avoid hydration mismatch
   // Using a deterministic selection of logos from each category
   const orbitLogos = useMemo(() => {
-    // Pick 2-3 from each category in a deterministic way
+    // Pick 2-3 from each category in a deterministic way with safe array access
     const selectedLogos = [
       btcLogos[0], // WBTC
       btcLogos[1], // Bitcoin
       stableLogos[4], // USDC
       stableLogos[6], // USDT
       stableLogos[5], // USDe
-      protocolLogos[19], // Panora
-      protocolLogos[14], // Liquidswap
-      protocolLogos[24], // Thala
-    ];
+      protocolLogos[17], // Panora (correct index)
+      protocolLogos[11], // Liquidswap (correct index)
+      protocolLogos[20], // Thala (correct index)
+    ].filter(Boolean); // Remove any undefined entries
     return selectedLogos;
   }, []);
 
   return (
     <div
       className={cn(
-        "h-screen flex flex-col relative overflow-hidden",
+        "min-h-[calc(100vh-4rem)] flex flex-col relative overflow-hidden",
         GeistMono.className,
       )}
     >
-      {/* Background gradient - fixed to viewport */}
-      <div className="fixed inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/10 pointer-events-none z-0" />
-
-      <main className="flex-grow relative z-10 flex flex-col justify-center pt-4 pb-8">
+      <main className="flex-grow relative z-10 flex flex-col justify-center py-4 -mt-8">
         <div className="container-layout w-full">
           {/* Mobile background logo */}
           <div className="absolute top-8 right-8 w-32 h-32 opacity-5 dark:opacity-10 md:hidden">
@@ -323,8 +316,6 @@ export const LandingSection = ({
           </div>
         </div>
       </main>
-
-      <Footer className="relative z-20 flex-shrink-0" />
     </div>
   );
 };

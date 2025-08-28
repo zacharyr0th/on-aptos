@@ -165,35 +165,46 @@ const generateStructuredData = () => ({
 });
 
 export async function GET(request: NextRequest) {
-  // Input validation and security
-  const userAgent = request.headers.get("user-agent") || "";
-  if (userAgent.length > 300) {
-    return new NextResponse("Invalid request", { status: 400 });
-  }
+  try {
+    // Input validation and security
+    const userAgent = request.headers.get("user-agent") || "";
+    if (userAgent.length > 300) {
+      return new NextResponse("Invalid request", { status: 400 });
+    }
 
-  const structuredData = generateStructuredData();
+    const structuredData = generateStructuredData();
 
-  // Ensure identifier and language are explicitly set at the top level
-  // (generateStructuredData already sets inLanguage but we ensure identifier here)
-  if (!("identifier" in structuredData)) {
-    (structuredData as any).identifier = "https://onaptos.com";
-  }
-  if (!("inLanguage" in structuredData)) {
-    (structuredData as any).inLanguage = "en";
-  }
+    return NextResponse.json(structuredData, {
+      headers: {
+        "Content-Type": "application/ld+json",
+        "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400",
+        "X-Robots-Tag": "index, follow",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+      },
+    });
+  } catch (error) {
+    // Fallback structured data for error cases
+    const fallbackData = {
+      "@context": "https://schema.org",
+      "@type": "WebAPI",
+      name: "On Aptos API",
+      description: "API service for Aptos blockchain analytics",
+      url: "https://onaptos.com",
+      error: "Unable to generate complete metadata",
+    };
 
-  return NextResponse.json(structuredData, {
-    headers: {
-      "Content-Type": "application/ld+json",
-      "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400",
-      "X-Robots-Tag": "index, follow",
-      "X-Content-Type-Options": "nosniff",
-      "Access-Control-Allow-Origin": "*",
-    },
-  });
+    return NextResponse.json(fallbackData, {
+      status: 503,
+      headers: {
+        "Content-Type": "application/ld+json",
+        "Cache-Control": "no-cache",
+        "Retry-After": "60",
+      },
+    });
+  }
 }
 
-// Provide a lightweight HEAD implementation for quicker crawler validation
 export async function HEAD() {
   return new NextResponse(null, {
     status: 200,

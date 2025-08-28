@@ -1,31 +1,18 @@
 /**
  * Liquid staking tokens and their derivatives
- * These should be shown separately from regular tokens
- * Moved from aptos-constants.ts
+ * Central source of truth for all LST tokens
  */
+
+import { PROTOCOLS } from "@/lib/constants/protocols/protocol-registry";
 
 /**
- * Liquid staking tokens and their derivatives
+ * Liquid staking protocol addresses
+ * References the centralized protocol registry
  */
-export const LIQUID_STAKING_TOKENS = {
-  // Thala
-  THAPT: "0xfaf4e633ae9eb31366c9ca24214231760926576c7b625313b3688b5e900731f6",
-
-  // Amnis
-  AMAPT: "0x111ae3e5bc816a5e63c2da97d0aa3886519e0cd5e4b046659fa35796bd11542a",
-  STAPT:
-    "0x111ae3e5bc816a5e63c2da97d0aa3886519e0cd5e4b046659fa35796bd11542a::stapt_token::StakedApt",
-  VSTAPT:
-    "0x3c1d4a86594d681ff7e5d5a233965daeabdc6a15fe5672ceeda5260038857183::vcoins::V<0x111ae3e5bc816a5e63c2da97d0aa3886519e0cd5e4b046659fa35796bd11542a::stapt_token::StakedApt>",
-
-  // Tortuga
-  TAPT: "0x84d7aeef42d38a5ffc3ccef853e1b82e4958659d16a7de736a29c55fbbeb0114::staked_aptos_coin::StakedAptosCoin",
-
-  // TruFin
-  TRUFIN: "0x6f8ca77dd0a4c65362f475adb1c26ae921b1d75aa6b70e53d0e340efd7d8bc80",
-
-  // Vested/Locked APT variants
-  VAPT: "0xb7d960e5f0a58cc0817774e611d7e3ae54c6843816521f02d7ced583d6434896::vcoins::V<0x1::aptos_coin::AptosCoin>",
+export const LIQUID_STAKING_PROTOCOLS = {
+  THALA: PROTOCOLS.THALA_LSD.addresses[0],
+  AMNIS: PROTOCOLS.AMNIS_FINANCE.addresses[0],
+  TRUFIN: PROTOCOLS.TRUFIN.addresses[0],
 } as const;
 
 /**
@@ -76,7 +63,25 @@ export const LST_TOKEN_ADDRESSES = {
 
 /**
  * Set of all liquid staking tokens for O(1) lookup
+ * Includes both coin and FA addresses
  */
-export const LIQUID_STAKING_TOKEN_SET = new Set(
-  Object.values(LIQUID_STAKING_TOKENS),
-) as Set<string>;
+export const LIQUID_STAKING_TOKEN_SET = new Set<string>([
+  // Amnis tokens
+  LST_TOKEN_ADDRESSES.AMNIS.STAPT.coin,
+  LST_TOKEN_ADDRESSES.AMNIS.STAPT.fa,
+  LST_TOKEN_ADDRESSES.AMNIS.AMAPT.coin,
+  LST_TOKEN_ADDRESSES.AMNIS.AMAPT.fa,
+
+  // Thala tokens
+  LST_TOKEN_ADDRESSES.THALA.THAPT.coin,
+  LST_TOKEN_ADDRESSES.THALA.THAPT.fa,
+  LST_TOKEN_ADDRESSES.THALA.STHAPT.coin,
+  LST_TOKEN_ADDRESSES.THALA.STHAPT.fa,
+
+  // Kofi tokens
+  LST_TOKEN_ADDRESSES.KOFI.KAPT.fa,
+  LST_TOKEN_ADDRESSES.KOFI.STKAPT.fa,
+
+  // Protocol addresses
+  ...Object.values(LIQUID_STAKING_PROTOCOLS),
+]);

@@ -1,7 +1,7 @@
 import { aptosAnalytics } from "@/lib/services/blockchain/aptos-analytics";
 import { logger } from "@/lib/utils/core/logger";
 
-import { PanoraService } from "../../portfolio/panora-service";
+import { UnifiedPanoraService } from "../../portfolio/unified-panora-service";
 
 export interface UnifiedPriceData {
   price: number;
@@ -91,15 +91,17 @@ export class UnifiedPriceService {
 
       // Try Panora API first (better coverage)
       try {
-        const panoraPrices = await PanoraService.getTokenPrices([assetType]);
+        const panoraPrices = await UnifiedPanoraService.getTokenPrices([
+          assetType,
+        ]);
 
-        if (panoraPrices && panoraPrices.length > 0) {
-          const panoraPrice = panoraPrices[0];
+        const price = panoraPrices.get(assetType);
+        if (price !== undefined && price > 0) {
           const priceData: UnifiedPriceData = {
-            price: parseFloat(panoraPrice.usdPrice) || 0,
+            price: price,
             change24h: 0, // Panora doesn't provide 24h change
-            symbol: panoraPrice.symbol || symbol || "Unknown",
-            decimals: panoraPrice.decimals,
+            symbol: symbol || "Unknown",
+            decimals: 8, // Default decimals
             source: "panora",
           };
 
@@ -203,17 +205,16 @@ export class UnifiedPriceService {
         // Try Panora for batch fetch first
         try {
           const panoraPrices =
-            await PanoraService.getTokenPrices(uncachedTypes);
+            await UnifiedPanoraService.getTokenPrices(uncachedTypes);
 
           const foundPanoraAssets = new Set<string>();
-          for (const panoraPrice of panoraPrices) {
-            const assetType = panoraPrice.faAddress || panoraPrice.tokenAddress;
+          for (const [assetType, price] of panoraPrices.entries()) {
             if (assetType && uncachedTypes.includes(assetType)) {
               const priceData: UnifiedPriceData = {
-                price: parseFloat(panoraPrice.usdPrice) || 0,
+                price: price || 0,
                 change24h: 0,
-                symbol: panoraPrice.symbol || "Unknown",
-                decimals: panoraPrice.decimals,
+                symbol: "Unknown", // We don't have symbol from the Map
+                decimals: 8, // Default decimals
                 source: "panora",
               };
               results.set(assetType, priceData);

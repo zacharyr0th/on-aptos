@@ -1,10 +1,10 @@
 import { getEnvVar } from "@/lib/config/validate-env";
-import { PROTOCOL_ADDRESSES, PROTOCOLS_BY_TYPE } from "@/lib/constants";
 import {
   PROTOCOLS,
-  ProtocolType,
-  getProtocolByAddress,
+  getProtocolsByType,
 } from "@/lib/constants/protocols/protocol-registry";
+import { ProtocolType } from "@/lib/protocols/types";
+import type { DeFiPosition } from "@/lib/types/defi";
 import { graphQLRequest } from "@/lib/utils/api/fetch-utils";
 import { logger } from "@/lib/utils/core/logger";
 
@@ -12,49 +12,6 @@ import { AssetService } from "../../portfolio/services/asset-service";
 
 const INDEXER = "https://indexer.mainnet.aptoslabs.com/v1/graphql";
 const APTOS_API_KEY = getEnvVar("APTOS_BUILD_SECRET");
-
-export interface DeFiPosition {
-  protocol: string;
-  protocolLabel: string;
-  protocolType: ProtocolType;
-  address: string;
-  position: {
-    supplied?: {
-      asset: string;
-      symbol: string;
-      amount: string;
-      value?: number;
-    }[];
-    borrowed?: {
-      asset: string;
-      symbol: string;
-      amount: string;
-      value?: number;
-    }[];
-    liquidity?: {
-      poolId: string;
-      token0: { asset: string; symbol: string; amount: string };
-      token1: { asset: string; symbol: string; amount: string };
-      lpTokens: string;
-      value?: number;
-    }[];
-    staked?: {
-      asset: string;
-      symbol: string;
-      amount: string;
-      rewards?: string;
-      value?: number;
-    }[];
-    derivatives?: {
-      asset: string;
-      symbol: string;
-      amount: string;
-      type: "long" | "short" | "option";
-      value?: number;
-    }[];
-  };
-  totalValue: number;
-}
 
 interface DetailedPosition {
   protocol: string;
@@ -143,7 +100,7 @@ export class DeFiBalanceService {
         // Always include LP tokens regardless of value
         if (this.isLPToken(position)) {
           logger.info(
-            `Including LP token regardless of value: ${position.protocol} - ${position.position.supplied?.[0]?.symbol || "Unknown"}`,
+            `Including LP token regardless of value: ${position.protocol}`,
           );
           return true;
         }
@@ -233,8 +190,8 @@ export class DeFiBalanceService {
 
         // Convert comprehensive position to DeFi position format with real prices
         const defiPosition: DeFiPosition = {
+          positionId: `${position.protocol}-${position.type}-${position.protocolAddress}`,
           protocol: position.protocol,
-          protocolLabel: position.description,
           protocolType: this.mapPositionTypeToProtocolType(position.type),
           address: position.protocolAddress,
           position: this.buildPositionDetailsWithPrices(
@@ -280,11 +237,11 @@ export class DeFiBalanceService {
       case "staking":
         return ProtocolType.LIQUID_STAKING;
       case "nft":
-        return ProtocolType.NFT_MARKETPLACE;
+        return ProtocolType.NFT;
       case "derivatives":
         return ProtocolType.DERIVATIVES;
       default:
-        return ProtocolType.INFRASTRUCTURE;
+        return ProtocolType.UNKNOWN;
     }
   }
 
@@ -495,7 +452,6 @@ export class DeFiBalanceService {
       details.supplied = [
         {
           asset: position.protocolAddress,
-          symbol: position.protocol,
           amount: "1",
           value: 0.001, // Small value to indicate active position
         },
@@ -580,7 +536,9 @@ export class DeFiBalanceService {
       );
 
       // Import the getWalletAssets function
-      const { AssetService } = await import("../../portfolio/services/asset-service");
+      const { AssetService } = await import(
+        "../../portfolio/services/asset-service"
+      );
 
       // Get wallet assets (including unverified ones to catch LP tokens)
       const walletAssets = await AssetService.getWalletAssets(walletAddress);
@@ -601,8 +559,8 @@ export class DeFiBalanceService {
 
               // Create a DeFi position for this asset
               const position: DeFiPosition = {
+                positionId: `${protocol.name}_${assetType}_${asset.metadata?.symbol || "UNKNOWN"}`,
                 protocol: protocol.name,
-                protocolLabel: protocol.description || protocol.label,
                 protocolType: this.mapProtocolTypeToDefiType(protocol.type),
                 address: address,
                 position: await this.buildLPTokenPosition(asset, assetType),
@@ -638,17 +596,18 @@ export class DeFiBalanceService {
   }
 
   /**
-   * Check if a position is an LP token based on symbol or protocol type
+   * Check if a position is an LP token based on asset type or protocol type
    */
   private static isLPToken(position: DeFiPosition): boolean {
-    const symbol = position.position.supplied?.[0]?.symbol?.toLowerCase() || "";
+    const assetType =
+      position.position.supplied?.[0]?.asset?.toLowerCase() || "";
     const protocol = position.protocol.toLowerCase();
 
     return (
-      symbol.includes("lp") ||
-      symbol.includes("pool") ||
-      symbol.includes("thala-lp") ||
-      symbol.includes("mklp") ||
+      assetType.includes("lp") ||
+      assetType.includes("pool") ||
+      assetType.includes("thala-lp") ||
+      assetType.includes("mklp") ||
       protocol.includes("farm") ||
       protocol.includes("liquidity") ||
       protocol.includes("pool")
@@ -702,7 +661,6 @@ export class DeFiBalanceService {
       supplied: [
         {
           asset: assetType,
-          symbol: symbol,
           amount: asset.balance?.toString() || "0",
           value: asset.value || 0,
         },
@@ -921,19 +879,21 @@ export class DeFiBalanceService {
 
       // Process liquid staking positions
       for (const balance of response.current_fungible_asset_balances || []) {
-        const protocol = getProtocolByAddress(balance.asset_type);
+        // Skip this section for now - needs proper protocol detection implementation
+        continue;
+        const protocol = null; // Use new protocol system
         if (protocol && protocol.type === ProtocolType.LIQUID_STAKING) {
           positions.push({
+            positionId: `${protocol.name}-${balance.asset_type}`,
             protocol: protocol.name,
-            protocolLabel: protocol.label,
             protocolType: protocol.type,
             address: balance.asset_type,
             position: {
               staked: [
                 {
                   asset: balance.asset_type,
-                  symbol: balance.metadata.symbol,
                   amount: balance.amount,
+                  value: 0,
                 },
               ],
             },
@@ -949,7 +909,7 @@ export class DeFiBalanceService {
   }
 
   /**
-   * Get lending positions (Aries, Aptin, Thala CDP, etc.)
+   * Get lending positions (Aries, Thala CDP, etc.)
    */
   private static async getLendingPositions(
     walletAddress: string,
@@ -958,7 +918,8 @@ export class DeFiBalanceService {
 
     try {
       // Query for lending protocol balances and table items
-      const lendingAddresses = PROTOCOLS_BY_TYPE.LENDING;
+      const lendingProtocols = getProtocolsByType(ProtocolType.LENDING);
+      const lendingAddresses = lendingProtocols.flatMap((p) => p.addresses);
       const addressPattern = lendingAddresses
         .map((addr) => `.*${addr}.*`)
         .join("|");
@@ -998,7 +959,9 @@ export class DeFiBalanceService {
 
       // Process lending positions
       for (const balance of response.current_fungible_asset_balances || []) {
-        const protocol = getProtocolByAddress(balance.asset_type);
+        // Skip this section for now - needs proper protocol detection implementation
+        continue;
+        const protocol = null; // Use new protocol system
         if (protocol && protocol.type === ProtocolType.LENDING) {
           const isCollateral =
             balance.metadata.symbol.toLowerCase().includes("a") ||
@@ -1008,8 +971,8 @@ export class DeFiBalanceService {
             balance.metadata.symbol.toLowerCase().includes("borrow");
 
           const position: DeFiPosition = {
+            positionId: `${protocol.name}-${balance.asset_type}`,
             protocol: protocol.name,
-            protocolLabel: protocol.label,
             protocolType: protocol.type,
             address: balance.asset_type,
             position: {},
@@ -1020,16 +983,16 @@ export class DeFiBalanceService {
             position.position.supplied = [
               {
                 asset: balance.asset_type,
-                symbol: balance.metadata.symbol,
                 amount: balance.amount,
+                value: 0,
               },
             ];
           } else if (isDebt) {
             position.position.borrowed = [
               {
                 asset: balance.asset_type,
-                symbol: balance.metadata.symbol,
                 amount: balance.amount,
+                value: 0,
               },
             ];
           }
@@ -1053,7 +1016,8 @@ export class DeFiBalanceService {
     const positions: DeFiPosition[] = [];
 
     try {
-      const dexAddresses = PROTOCOLS_BY_TYPE.DEX;
+      const dexProtocols = getProtocolsByType(ProtocolType.DEX);
+      const dexAddresses = dexProtocols.flatMap((p) => p.addresses);
       const addressPattern = dexAddresses
         .map((addr) => `.*${addr}.*`)
         .join("|");
@@ -1093,7 +1057,9 @@ export class DeFiBalanceService {
 
       // Process DEX positions (LP tokens)
       for (const balance of response.current_fungible_asset_balances || []) {
-        const protocol = getProtocolByAddress(balance.asset_type);
+        // Skip this section for now - needs proper protocol detection implementation
+        continue;
+        const protocol = null; // Use new protocol system
         if (protocol && protocol.type === ProtocolType.DEX) {
           const isLPToken =
             balance.metadata.symbol.toLowerCase().includes("lp") ||
@@ -1102,16 +1068,16 @@ export class DeFiBalanceService {
 
           if (isLPToken) {
             positions.push({
+              positionId: `${protocol.name}-${balance.asset_type}`,
               protocol: protocol.name,
-              protocolLabel: protocol.label,
               protocolType: protocol.type,
               address: balance.asset_type,
               position: {
                 liquidity: [
                   {
                     poolId: balance.asset_type,
-                    token0: { asset: "", symbol: "", amount: "0" },
-                    token1: { asset: "", symbol: "", amount: "0" },
+                    token0: { symbol: "", amount: "0" },
+                    token1: { symbol: "", amount: "0" },
                     lpTokens: balance.amount,
                   },
                 ],
@@ -1137,7 +1103,8 @@ export class DeFiBalanceService {
     const positions: DeFiPosition[] = [];
 
     try {
-      const farmingAddresses = PROTOCOLS_BY_TYPE.FARMING;
+      const farmingProtocols = getProtocolsByType(ProtocolType.FARMING);
+      const farmingAddresses = farmingProtocols.flatMap((p) => p.addresses);
       const addressPattern = farmingAddresses
         .map((addr) => `.*${addr}.*`)
         .join("|");
@@ -1177,19 +1144,21 @@ export class DeFiBalanceService {
 
       // Process farming positions
       for (const balance of response.current_fungible_asset_balances || []) {
-        const protocol = getProtocolByAddress(balance.asset_type);
+        // Skip this section for now - needs proper protocol detection implementation
+        continue;
+        const protocol = null; // Use new protocol system
         if (protocol && protocol.type === ProtocolType.FARMING) {
           positions.push({
+            positionId: `${protocol.name}-${balance.asset_type}`,
             protocol: protocol.name,
-            protocolLabel: protocol.label,
             protocolType: protocol.type,
             address: balance.asset_type,
             position: {
               staked: [
                 {
                   asset: balance.asset_type,
-                  symbol: balance.metadata.symbol,
                   amount: balance.amount,
+                  value: 0,
                 },
               ],
             },
@@ -1213,7 +1182,10 @@ export class DeFiBalanceService {
     const positions: DeFiPosition[] = [];
 
     try {
-      const derivativesAddresses = PROTOCOLS_BY_TYPE.DERIVATIVES;
+      const derivativesProtocols = getProtocolsByType(ProtocolType.DERIVATIVES);
+      const derivativesAddresses = derivativesProtocols.flatMap(
+        (p) => p.addresses,
+      );
       const addressPattern = derivativesAddresses
         .map((addr) => `.*${addr}.*`)
         .join("|");
@@ -1253,20 +1225,21 @@ export class DeFiBalanceService {
 
       // Process derivatives positions
       for (const balance of response.current_fungible_asset_balances || []) {
-        const protocol = getProtocolByAddress(balance.asset_type);
+        // Skip this section for now - needs proper protocol detection implementation
+        continue;
+        const protocol = null; // Use new protocol system
         if (protocol && protocol.type === ProtocolType.DERIVATIVES) {
           positions.push({
+            positionId: `${protocol.name}-${balance.asset_type}`,
             protocol: protocol.name,
-            protocolLabel: protocol.label,
             protocolType: protocol.type,
             address: balance.asset_type,
             position: {
-              derivatives: [
+              staked: [
                 {
                   asset: balance.asset_type,
-                  symbol: balance.metadata.symbol,
                   amount: balance.amount,
-                  type: "long", // Default, would need more analysis to determine
+                  value: 0,
                 },
               ],
             },
@@ -1290,7 +1263,8 @@ export class DeFiBalanceService {
     const positions: DeFiPosition[] = [];
 
     try {
-      const bridgeAddresses = PROTOCOLS_BY_TYPE.BRIDGE;
+      const bridgeProtocols = getProtocolsByType(ProtocolType.BRIDGE);
+      const bridgeAddresses = bridgeProtocols.flatMap((p) => p.addresses);
       const addressPattern = bridgeAddresses
         .map((addr) => `.*${addr}.*`)
         .join("|");
@@ -1330,21 +1304,23 @@ export class DeFiBalanceService {
 
       // Process bridge positions (typically locked/wrapped tokens)
       for (const balance of response.current_fungible_asset_balances || []) {
-        const protocol = getProtocolByAddress(balance.asset_type);
+        // Skip this section for now - needs proper protocol detection implementation
+        continue;
+        const protocol = null; // Use new protocol system
         if (protocol && protocol.type === ProtocolType.BRIDGE) {
           // Bridge tokens are usually considered phantom/locked assets
           // but we still track them for transparency
           positions.push({
+            positionId: `${protocol.name}-${balance.asset_type}`,
             protocol: protocol.name,
-            protocolLabel: protocol.label,
             protocolType: protocol.type,
             address: balance.asset_type,
             position: {
               supplied: [
                 {
                   asset: balance.asset_type,
-                  symbol: balance.metadata.symbol,
                   amount: balance.amount,
+                  value: 0,
                 },
               ],
             },
@@ -1512,10 +1488,12 @@ export class DeFiBalanceService {
         }
 
         // Find the protocol address from the registry
-        const protocolAddress =
-          Object.keys(PROTOCOL_ADDRESSES).find((addr) =>
+        const matchedProtocol = Object.values(PROTOCOLS).find((protocol) =>
+          protocol.addresses.some((addr) =>
             protocolResourceList.some((r) => r.type.includes(addr)),
-          ) || "";
+          ),
+        );
+        const protocolAddress = matchedProtocol?.addresses[0] || "";
 
         // Determine if position is active
         const isActive =
@@ -1697,19 +1675,15 @@ export class DeFiBalanceService {
     description: string;
   } {
     // Check all protocol addresses from the registry
-    for (const [address, protocolName] of Object.entries(PROTOCOL_ADDRESSES)) {
-      if (resourceType.includes(address)) {
-        const protocol = Object.values(PROTOCOLS).find(
-          (p) => p.name === protocolName || p.addresses.includes(address),
-        );
-
-        if (protocol) {
-          const type = this.mapProtocolTypeToPositionType(protocol.type);
+    for (const protocolInfo of Object.values(PROTOCOLS)) {
+      for (const address of protocolInfo.addresses) {
+        if (resourceType.includes(address)) {
+          const type = this.mapProtocolTypeToPositionType(protocolInfo.type);
           return {
-            protocol: protocol.name,
+            protocol: protocolInfo.name,
             type,
             description:
-              protocol.description || this.getDescriptionForType(type),
+              protocolInfo.description || this.getDescriptionForType(type),
           };
         }
       }
@@ -1756,7 +1730,7 @@ export class DeFiBalanceService {
         return "lending";
       case ProtocolType.LIQUID_STAKING:
         return "staking";
-      case ProtocolType.NFT_MARKETPLACE:
+      case ProtocolType.NFT:
         return "nft";
       case ProtocolType.DERIVATIVES:
         return "derivatives";

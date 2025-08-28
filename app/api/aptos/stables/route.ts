@@ -1,29 +1,41 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+
 import { StablecoinService } from "@/lib/services/asset-types/stablecoin-service";
-import { withErrorHandling, type ErrorContext } from "@/lib/utils";
+import {
+  successResponse,
+  errorResponse,
+  CACHE_DURATIONS,
+} from "@/lib/utils/api/common";
+import { withRateLimit, RATE_LIMIT_TIERS } from "@/lib/utils/api/rate-limiter";
+import { logger } from "@/lib/utils/core/logger";
 
-export async function GET(request: NextRequest) {
-  const errorContext: ErrorContext = {
-    operation: "Stablecoin Supply API",
-    service: "Stables-API",
-    details: {
-      endpoint: "/api/aptos/stables",
-      userAgent: request.headers.get("user-agent") || "unknown",
-    },
-  };
-
-  return withErrorHandling(async () => {
+async function handler(request: NextRequest) {
+  try {
     const data = await StablecoinService.getStablecoinSupplies();
 
-    return NextResponse.json(data, {
-      headers: {
-        "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
-        "X-Content-Type": "application/json",
-        "X-Service": "stables-data",
-        "X-API-Version": "2.0",
-        "X-Data-Source": "Aptos Indexer",
-        Vary: "Accept-Encoding",
-      },
+    const headers = {
+      "X-Content-Type": "application/json",
+      "X-Service": "stables-data",
+      "X-API-Version": "2.0",
+      "X-Data-Source": "Aptos Indexer",
+      Vary: "Accept-Encoding",
+    };
+
+    return successResponse(data, CACHE_DURATIONS.MEDIUM, headers);
+  } catch (error) {
+    logger.error("Stablecoin Supply API error", {
+      error: error instanceof Error ? error.message : String(error),
+      endpoint: "/api/aptos/stables",
     });
-  }, errorContext);
+    return errorResponse(
+      "Failed to fetch stablecoin data",
+      500,
+      error instanceof Error ? error.message : undefined,
+    );
+  }
 }
+
+export const GET = withRateLimit(handler, {
+  name: "stables-supply",
+  ...RATE_LIMIT_TIERS.PUBLIC,
+});

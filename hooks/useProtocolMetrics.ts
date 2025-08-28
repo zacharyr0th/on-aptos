@@ -80,7 +80,8 @@ export function useProtocolMetrics(protocols: DefiProtocol[]): {
                 tvl: metrics.tvl
                   ? {
                       ...protocol.tvl,
-                      current: metrics.tvl.current?.toString() || protocol.tvl.current,
+                      current:
+                        metrics.tvl.current?.toString() || protocol.tvl.current,
                       change7d: metrics.tvl.change7d?.toFixed(2),
                       defiLlama: metrics.tvl.current?.toString(),
                       lastUpdated: new Date().toISOString(),
@@ -88,17 +89,20 @@ export function useProtocolMetrics(protocols: DefiProtocol[]): {
                     }
                   : protocol.tvl,
                 // Update volume data
-                volume: metrics.volume || metrics.optionsVolume
-                  ? {
-                      ...protocol.volume,
-                      daily: metrics.volume?.daily || protocol.volume?.daily,
-                      change24h: metrics.volume?.change24h || protocol.volume?.change24h,
-                      options: metrics.optionsVolume?.daily,
-                      optionsChange24h: metrics.optionsVolume?.change24h,
-                      lastUpdated: new Date().toISOString(),
-                      source: { provider: "DefiLlama" as const },
-                    }
-                  : protocol.volume,
+                volume:
+                  metrics.volume || metrics.optionsVolume
+                    ? {
+                        ...protocol.volume,
+                        daily: metrics.volume?.daily || protocol.volume?.daily,
+                        change24h:
+                          metrics.volume?.change24h ||
+                          protocol.volume?.change24h,
+                        options: metrics.optionsVolume?.daily,
+                        optionsChange24h: metrics.optionsVolume?.change24h,
+                        lastUpdated: new Date().toISOString(),
+                        source: { provider: "DefiLlama" as const },
+                      }
+                    : protocol.volume,
                 // Update financials
                 financials: metrics.fees
                   ? {
@@ -117,52 +121,80 @@ export function useProtocolMetrics(protocols: DefiProtocol[]): {
                     }
                   : protocol.financials,
                 // Update yields if available
-                yields: metrics.yields && metrics.yields.length > 0
-                  ? {
-                      ...protocol.yields,
-                      pools: metrics.yields.map((pool: any) => ({
-                        poolId: pool.pool,
-                        symbol: pool.symbol,
-                        apy: pool.apy,
-                        apyBase: pool.apyBase,
-                        apyReward: pool.apyReward,
-                        tvlUsd: pool.tvlUsd,
-                        underlyingTokens: pool.underlyingTokens,
-                        rewardTokens: pool.rewardTokens,
-                        ilRisk: pool.ilRisk === "yes",
-                      })),
-                      max: metrics.yields.reduce((max: number, pool: any) => 
-                        Math.max(max, pool.apy || 0), 0).toFixed(2),
-                      average: (metrics.yields.reduce((sum: number, pool: any) => 
-                        sum + (pool.apy || 0), 0) / metrics.yields.length).toFixed(2),
-                      lastUpdated: new Date().toISOString(),
-                      source: { provider: "DefiLlama" as const },
-                    }
-                  : protocol.yields,
+                yields:
+                  metrics.yields && metrics.yields.length > 0
+                    ? {
+                        ...protocol.yields,
+                        pools: metrics.yields.map((pool: any) => ({
+                          poolId: pool.pool,
+                          symbol: pool.symbol,
+                          apy: pool.apy,
+                          apyBase: pool.apyBase,
+                          apyReward: pool.apyReward,
+                          tvlUsd: pool.tvlUsd,
+                          underlyingTokens: pool.underlyingTokens,
+                          rewardTokens: pool.rewardTokens,
+                          ilRisk: pool.ilRisk === "yes",
+                        })),
+                        max: metrics.yields
+                          .reduce(
+                            (max: number, pool: any) =>
+                              Math.max(max, pool.apy || 0),
+                            0,
+                          )
+                          .toFixed(2),
+                        average: (
+                          metrics.yields.reduce(
+                            (sum: number, pool: any) => sum + (pool.apy || 0),
+                            0,
+                          ) / metrics.yields.length
+                        ).toFixed(2),
+                        lastUpdated: new Date().toISOString(),
+                        source: { provider: "DefiLlama" as const },
+                      }
+                    : protocol.yields,
                 // Update token data if available - keep as numbers/strings for formatting
-                token: metrics.tokenPrice || metrics.mcap || metrics.fdv || metrics.staking
-                  ? {
-                      ...protocol.token,
-                      price: metrics.tokenPrice?.toFixed(4) || protocol.token?.price,
-                      marketCap: metrics.mcap?.toString() || protocol.token?.marketCap,
-                      fdv: metrics.fdv?.toString() || protocol.token?.fdv,
-                      supply: {
-                        ...protocol.token?.supply,
-                        staked: metrics.staking?.toString(),
-                      },
-                      lastUpdated: new Date().toISOString(),
-                      source: { provider: "DefiLlama" as const },
-                    }
-                  : protocol.token,
+                token:
+                  metrics.tokenPrice ||
+                  metrics.mcap ||
+                  metrics.fdv ||
+                  metrics.staking
+                    ? {
+                        ...protocol.token,
+                        price:
+                          metrics.tokenPrice?.toFixed(4) ||
+                          protocol.token?.price,
+                        marketCap:
+                          metrics.mcap?.toString() || protocol.token?.marketCap,
+                        fdv: metrics.fdv?.toString() || protocol.token?.fdv,
+                        supply: {
+                          ...protocol.token?.supply,
+                          staked: metrics.staking?.toString(),
+                        },
+                        lastUpdated: new Date().toISOString(),
+                        source: { provider: "DefiLlama" as const },
+                      }
+                    : protocol.token,
                 // Add lending/borrowing metrics
-                lending: metrics.borrowRates || metrics.supplyRates
-                  ? {
-                      borrowRates: metrics.borrowRates,
-                      supplyRates: metrics.supplyRates,
-                      totalBorrowed: metrics.borrowRates?.reduce((sum: number, r: any) => sum + r.totalBorrowUsd, 0).toString(),
-                      totalSupplied: metrics.supplyRates?.reduce((sum: number, r: any) => sum + r.totalSupplyUsd, 0).toString(),
-                    }
-                  : protocol.lending,
+                lending:
+                  metrics.borrowRates || metrics.supplyRates
+                    ? {
+                        borrowRates: metrics.borrowRates,
+                        supplyRates: metrics.supplyRates,
+                        totalBorrowed: metrics.borrowRates
+                          ?.reduce(
+                            (sum: number, r: any) => sum + r.totalBorrowUsd,
+                            0,
+                          )
+                          .toString(),
+                        totalSupplied: metrics.supplyRates
+                          ?.reduce(
+                            (sum: number, r: any) => sum + r.totalSupplyUsd,
+                            0,
+                          )
+                          .toString(),
+                      }
+                    : protocol.lending,
               };
             } catch (err) {
               serviceLogger.debug(

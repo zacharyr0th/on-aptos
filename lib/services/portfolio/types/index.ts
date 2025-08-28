@@ -1,56 +1,13 @@
-// Portfolio service type definitions
+// Re-export common types from consolidated
+import type {
+  FungibleAsset,
+  NFT,
+  TokenMetadata,
+  Transaction,
+} from "@/lib/types/consolidated";
 
-export interface FungibleAsset {
-  asset_type: string;
-  amount: string;
-  metadata?: {
-    name: string;
-    symbol: string;
-    decimals: number;
-    icon_uri?: string;
-    project_uri?: string;
-    creator_address?: string;
-  };
-  price?: number;
-  value?: number;
-  balance?: number;
-  isVerified?: boolean;
-  protocolInfo?: {
-    protocol: string;
-    protocolLabel: string;
-    protocolType: string;
-    isPhantomAsset: boolean;
-  };
-  is_frozen?: boolean;
-  is_primary?: boolean;
-  last_transaction_timestamp?: string;
-  last_transaction_version?: number;
-  token_standard?: string;
-}
-
-export interface NFT {
-  token_data_id: string;
-  token_name: string;
-  collection_name: string;
-  token_uri: string;
-  description?: string;
-  property_version_v1: number;
-  amount: number;
-  cdn_image_uri?: string;
-  cdn_animation_uri?: string;
-  collection_description?: string;
-  creator_address?: string;
-  collection_uri?: string;
-  last_transaction_version?: number;
-  last_transaction_timestamp?: string;
-  token_standard?: string;
-  is_soulbound?: boolean;
-  collection_id?: string;
-  supply?: number;
-  maximum?: number;
-  current_supply?: number;
-  max_supply?: number;
-}
+export type { FungibleAsset, NFT, TokenMetadata, Transaction };
+export type { DeFiPosition } from "@/lib/types/defi";
 
 export interface PortfolioHistoryPoint {
   date: string;
@@ -100,7 +57,8 @@ export interface WalletTransaction {
   payload?: any;
 }
 
-export interface DeFiPosition {
+// Legacy DeFi position for specific portfolio service compatibility
+export interface LegacyDeFiPosition {
   protocol: string;
   protocolType: string;
   poolName: string;
@@ -150,6 +108,32 @@ export interface PortfolioSummary {
   totalValue: number;
   fungibleAssets: FungibleAsset[];
   nfts: NFT[];
-  defiPositions: DeFiPosition[];
+  defiPositions: LegacyDeFiPosition[];
   metrics: PortfolioMetrics;
+}
+
+export interface PortfolioAsset {
+  asset_type: string;
+  amount: string;
+  balance?: number;
+  price?: number;
+  value?: number;
+  metadata?: TokenMetadata;
+  isVerified?: boolean;
+  change24h?: number;
+  changePercentage24h?: number;
+  protocolInfo?: {
+    protocol: string;
+    protocolLabel: string;
+    protocolType: string;
+    isPhantomAsset: boolean;
+  };
+}
+
+export interface ChartDataPoint {
+  name: string;
+  value: number;
+  percentage: number;
+  color?: string;
+  metadata?: any;
 }

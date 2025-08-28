@@ -31,15 +31,22 @@ export function useAnsName() {
         const response = await fetch(
           `/api/portfolio/ans?address=${account.address}`,
         );
-        if (response.ok) {
-          const result = await response.json();
-          if (result.success && result.data) {
-            setAnsName(result.data.name);
-            setAnsData(result.data);
-          } else {
-            setAnsName(null);
-            setAnsData(null);
-          }
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(
+            errorData.details ||
+              `HTTP ${response.status}: ${response.statusText}`,
+          );
+        }
+
+        const result = await response.json();
+        if (result.success && result.data) {
+          setAnsName(result.data.name);
+          setAnsData(result.data);
+        } else {
+          setAnsName(null);
+          setAnsData(null);
         }
       } catch (error) {
         logger.error(

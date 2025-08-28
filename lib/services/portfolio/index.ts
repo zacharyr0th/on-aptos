@@ -1,6 +1,6 @@
 // Main portfolio services
 export { DeFiBalanceService } from "../defi/services/defi-balance-service";
-export * from "./panora-service";
+export { UnifiedPanoraService } from "./unified-panora-service";
 export * from "./panora-token-list";
 export * from "./portfolio-service";
 

@@ -1,13 +1,18 @@
 import { useMemo } from "react";
-import { toast } from "sonner";
 
 import { defiProtocols } from "@/components/pages/defi/data";
 import { normalizeProtocolName } from "@/lib/constants";
-import { isPhantomAsset as isPhantomAssetFromRegistry } from "@/lib/constants/protocols/protocol-registry";
 
 // Re-export main types from portfolio service
-export type { FungibleAsset, DeFiPosition, NFT } from "@/lib/services/portfolio/types";
-import type { FungibleAsset, DeFiPosition } from "@/lib/services/portfolio/types";
+export type {
+  FungibleAsset,
+  DeFiPosition,
+  NFT,
+} from "@/lib/services/portfolio/types";
+import type {
+  FungibleAsset,
+  DeFiPosition,
+} from "@/lib/services/portfolio/types";
 
 // Local type aliases for backwards compatibility
 export interface NFTAsset {
@@ -89,18 +94,7 @@ export const calculatePortfolioMetrics = (
   };
 };
 
-// React hook for portfolio metrics
-export const usePortfolioMetrics = (
-  assets: FungibleAsset[] = [],
-  defiPositions: DeFiPosition[] = [],
-  nfts: NFTAsset[] = [],
-  nftValue: number = 0,
-): PortfolioMetrics => {
-  return useMemo(
-    () => calculatePortfolioMetrics(assets, defiPositions, nfts, nftValue),
-    [assets, defiPositions, nfts, nftValue],
-  );
-};
+// Note: usePortfolioMetrics hook removed - use MetricsService from @/lib/services/portfolio/services/metrics-service.ts instead
 
 // NFT collection statistics
 export interface NFTCollectionStats {
@@ -203,8 +197,6 @@ export const getProtocolLogo = (protocol: string): string => {
     // Lending Protocols
     aries: "/icons/protocols/aries.avif",
     "aries markets": "/icons/protocols/aries.avif",
-    aptin: "/icons/protocols/aptin.webp",
-    "aptin finance": "/icons/protocols/aptin.webp",
     echelon: "/icons/protocols/echelon.avif",
     "echelon market": "/icons/protocols/echelon.avif",
     echo: "/icons/protocols/echo.webp",
@@ -230,10 +222,6 @@ export const getProtocolLogo = (protocol: string): string => {
     kana: "/icons/protocols/kana.webp",
     kanalabs: "/icons/protocols/kana.webp",
     hyperion: "/icons/protocols/hyperion.webp",
-    econia: "/icons/protocols/econia.jpg",
-    vibrantx: "/icons/protocols/vibrantx.png",
-    "uptos pump": "/icons/protocols/pump-uptos.jpg",
-    "pump-uptos": "/icons/protocols/pump-uptos.jpg",
     defy: "/placeholder.jpg",
     "lucid finance": "/placeholder.jpg",
     "pact labs": "/placeholder.jpg",
@@ -258,7 +246,6 @@ export const getProtocolLogo = (protocol: string): string => {
     // Other Protocols
     agdex: "/icons/protocols/agdex.webp",
     anqa: "/icons/protocols/anqa.webp",
-    emojicoin: "/icons/protocols/emojicoin.webp",
     ichi: "/icons/protocols/ichi.jpg",
     metamove: "/icons/protocols/metamove.png",
     mirage: "/icons/protocols/mirage.webp",
@@ -309,17 +296,11 @@ export const formatTimestamp = (timestamp: string | undefined) => {
 
 // Use the centralized protocol registry for phantom asset detection and DeFi TVL filtering
 export const isPhantomAsset = (assetType: string, metadata?: any): boolean => {
-  return isPhantomAssetFromRegistry(assetType, metadata);
+  return false; // Phantom asset detection removed - use new protocol system
 };
 
-export const copyToClipboard = async (text: string, label: string) => {
-  try {
-    await navigator.clipboard.writeText(text);
-    toast.success(`${label} copied to clipboard!`);
-  } catch {
-    toast.error(`Failed to copy ${label}`);
-  }
-};
+// Export copyToClipboard from centralized utility
+export { copyToClipboard } from "@/lib/utils/clipboard";
 
 // Helper function to get detailed protocol information
 export const getDetailedProtocolInfo = (protocolName: string) => {

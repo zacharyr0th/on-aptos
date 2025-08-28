@@ -9,8 +9,12 @@ import {
 } from "recharts";
 
 import { useResponsive } from "@/hooks/useResponsive";
-import { formatAssetValue, CHART_DIMENSIONS, ChartDataItem } from "@/lib/utils/format/chart-utils";
 import { logger, errorLogger } from "@/lib/utils/core/logger";
+import {
+  formatAssetValue,
+  CHART_DIMENSIONS,
+  ChartDataItem,
+} from "@/lib/utils/format/chart-utils";
 
 export interface MarketShareChartProps {
   data: ChartDataItem[];
@@ -23,19 +27,21 @@ export interface MarketShareChartProps {
 }
 
 // Custom tooltip component
-const CustomTooltip = memo<TooltipProps<number, string> & { 
-  customRenderer?: (data: any) => React.ReactNode;
-}>((props) => {
+const CustomTooltip = memo<
+  TooltipProps<number, string> & {
+    customRenderer?: (data: any) => React.ReactNode;
+  }
+>((props) => {
   const { active, payload, customRenderer } = props as any;
   if (!active || !payload?.length) return null;
 
   try {
     const data = payload[0].payload as ChartDataItem;
-    
+
     if (customRenderer) {
       return customRenderer(data);
     }
-    
+
     const { name, value, formattedSupply, provider } = data;
     const isProvider = !provider || provider === name;
 
@@ -50,13 +56,9 @@ const CustomTooltip = memo<TooltipProps<number, string> & {
             {isProvider ? "Total Value" : "Value"}: {formattedSupply}
           </p>
         )}
-        <p className="text-muted-foreground">
-          Share: {value.toFixed(2)}%
-        </p>
+        <p className="text-muted-foreground">Share: {value.toFixed(2)}%</p>
         {!isProvider && provider && (
-          <p className="text-muted-foreground text-xs">
-            Provider: {provider}
-          </p>
+          <p className="text-muted-foreground text-xs">Provider: {provider}</p>
         )}
       </div>
     );
@@ -82,10 +84,15 @@ const CustomLegend = memo<{
   if (!chartData.length) return null;
 
   const shouldShowAll = chartData.length <= maxItems;
-  const itemsToShow = shouldShowAll ? chartData : chartData.slice(0, maxItems - 1);
+  const itemsToShow = shouldShowAll
+    ? chartData
+    : chartData.slice(0, maxItems - 1);
   const remainingItems = shouldShowAll ? [] : chartData.slice(maxItems - 1);
   const remainingCount = remainingItems.length;
-  const remainingPercentage = remainingItems.reduce((sum, item) => sum + item.value, 0);
+  const remainingPercentage = remainingItems.reduce(
+    (sum, item) => sum + item.value,
+    0,
+  );
 
   return (
     <div className="flex flex-col gap-4">
@@ -94,11 +101,17 @@ const CustomLegend = memo<{
           return customRenderer(item, i);
         }
 
-        const displayValue = Number.isFinite(item.value) ? item.value.toFixed(2) : "0.00";
-        const color = item.color || colors[item.name] || colors.default || "#888";
+        const displayValue = Number.isFinite(item.value)
+          ? item.value.toFixed(2)
+          : "0.00";
+        const color =
+          item.color || colors[item.name] || colors.default || "#888";
 
         return (
-          <div key={`legend-${item.name}-${i}`} className="flex items-center gap-3">
+          <div
+            key={`legend-${item.name}-${i}`}
+            className="flex items-center gap-3"
+          >
             <div
               className="w-3 h-3 rounded-sm flex-shrink-0"
               style={{ backgroundColor: color }}
@@ -148,12 +161,59 @@ export const MarketShareChart = memo<MarketShareChartProps>(
   }) => {
     const { isMobile } = useResponsive();
 
-    // Process data if custom processor provided
+    // Process data if custom processor provided, otherwise apply default 2% threshold grouping
     const chartData = useMemo(() => {
       if (onDataProcessed) {
         return onDataProcessed(data);
       }
-      return data;
+
+      // Default behavior: group items under 2% into "Others"
+      const sortedData = [...data].sort((a, b) => b.value - a.value);
+      const mainItems = sortedData.filter((item) => item.value >= 2.0);
+      const otherItems = sortedData.filter((item) => item.value < 2.0);
+
+      const result = [...mainItems];
+
+      if (otherItems.length > 0) {
+        const othersValue = otherItems.reduce(
+          (sum, item) => sum + item.value,
+          0,
+        );
+
+        // Calculate total supply more robustly - try multiple field formats
+        const othersSupply = otherItems.reduce((sum, item) => {
+          let itemSupply = 0;
+
+          // Try different ways to get numeric supply value
+          if (typeof item.value === "number") {
+            itemSupply = item.value;
+          } else if (item.formattedSupply) {
+            // Extract number from formatted string (handles $1.2B, $500M, etc.)
+            const matches = item.formattedSupply.match(/[\d.]+/g);
+            if (matches && matches.length > 0) {
+              let num = parseFloat(matches[0]);
+              if (item.formattedSupply.toLowerCase().includes("b")) {
+                num *= 1_000_000_000;
+              } else if (item.formattedSupply.toLowerCase().includes("m")) {
+                num *= 1_000_000;
+              } else if (item.formattedSupply.toLowerCase().includes("k")) {
+                num *= 1_000;
+              }
+              itemSupply = num;
+            }
+          }
+
+          return sum + itemSupply;
+        }, 0);
+
+        result.push({
+          name: "Others",
+          value: othersValue,
+          formattedSupply: formatAssetValue(othersSupply, "USD"),
+        } as ChartDataItem);
+      }
+
+      return result;
     }, [data, onDataProcessed]);
 
     // Optimized chart configuration
@@ -171,12 +231,15 @@ export const MarketShareChart = memo<MarketShareChartProps>(
     );
 
     // Memoized color getter for cells
-    const getCellColor = useCallback((entry: ChartDataItem) => {
-      if (entry.name === "Other") {
-        return "#d4d4d8";
-      }
-      return entry.color || colors[entry.name] || colors.default || "#888";
-    }, [colors]);
+    const getCellColor = useCallback(
+      (entry: ChartDataItem) => {
+        if (entry.name === "Other") {
+          return "#d4d4d8";
+        }
+        return entry.color || colors[entry.name] || colors.default || "#888";
+      },
+      [colors],
+    );
 
     // Error boundary fallback
     if (!chartData.length) {

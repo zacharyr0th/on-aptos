@@ -2,11 +2,11 @@ import { cacheFirst } from "@/lib/utils";
 import { logger } from "@/lib/utils/core/logger";
 
 const PANORA_TOKEN_LIST_ENDPOINT = "https://api.panora.exchange/tokenlist";
-const PANORA_API_KEY = process.env.PANORA_API_KEY!;
 
-if (!process.env.PANORA_API_KEY) {
-  throw new Error("PANORA_API_KEY environment variable is required");
-}
+// Use default API key if not provided
+const PANORA_API_KEY =
+  process.env.PANORA_API_KEY ||
+  "a4^KV_EaTf4MW#ZdvgGKX#HUD^3IFEAOV_kzpIE^3BQGA8pDnrkT7JcIy#HNlLGi";
 
 export interface PanoraToken {
   chainId: number;

@@ -15,7 +15,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { formatCurrency } from "@/lib/utils/format/format";
+import { formatCurrency } from "@/lib/utils/format";
 
 import { useTokenChart } from "./hooks/useTokenChart";
 

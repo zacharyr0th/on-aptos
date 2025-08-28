@@ -1,11 +1,11 @@
 import { PORTFOLIO_QUERY_LIMITS } from "@/lib/constants";
 import { logger } from "@/lib/utils/core/logger";
 
-import type { NFT, PaginatedResponse } from "../types";
 import {
   UnifiedGraphQLClient,
   UNIFIED_QUERIES,
 } from "../../shared/utils/unified-graphql-client";
+import type { NFT, PaginatedResponse } from "../types";
 import { extractNFTImageUrl } from "../utils/nft-metadata-helper";
 
 // Rate limiting configuration
@@ -83,10 +83,8 @@ export class NFTService {
       logger.info(
         `[NFTService] Getting NFTs for address: ${address}, page: ${page}, limit: ${limit}`,
       );
-      const { limit: queryLimit, offset } = UnifiedGraphQLClient.buildPaginationVariables(
-        page,
-        limit,
-      );
+      const { limit: queryLimit, offset } =
+        UnifiedGraphQLClient.buildPaginationVariables(page, limit);
 
       // Only add delay if we're approaching rate limits
       const now = Date.now();

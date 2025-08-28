@@ -1,11 +1,6 @@
 // Formatting utilities
 export {
   formatNumber,
-  formatCurrencyValue,
-  formatQuantity,
-  formatQuantityValue,
-  formatCurrencyBigInt,
-  formatNumberBigInt,
   formatBigIntWithDecimals,
   formatPercentage,
   formatRelativeTime,
@@ -22,7 +17,12 @@ export {
   isValidCurrencyCode,
   getSupportedFiatCurrencies,
   isFiatCurrency,
-} from "./format";
+  // Legacy exports (deprecated)
+  formatCurrencyValue,
+  formatCurrencyBigInt,
+  formatNumberBigInt,
+  formatPercent,
+} from "../format";
 
 // Currency types are re-exported from format.ts
 

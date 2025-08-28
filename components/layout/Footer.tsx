@@ -1,3 +1,4 @@
+import { GeistMono } from "geist/font/mono";
 import { Clock } from "lucide-react";
 import Image from "next/image";
 import { useTheme } from "next-themes";
@@ -307,8 +308,10 @@ const FooterComponent: FC<FooterProps> = ({
 
   return (
     <ErrorBoundary>
-      <footer className={`w-full py-3 sm:py-4 ${className || ""}`}>
-        <div className="w-full px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20">
+      <footer
+        className={`w-full py-3 sm:py-4 ${GeistMono.className} ${className || ""}`}
+      >
+        <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20">
           {/* Desktop Layout */}
           <div className="hidden lg:flex lg:items-center lg:justify-between">
             {/* Left: Controls & Live Data */}
@@ -318,7 +321,19 @@ const FooterComponent: FC<FooterProps> = ({
                 <ThemeToggle />
               </div>
               <div className="w-px h-4 bg-border"></div>
-              <AptPrice />
+              <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] xs:text-xs sm:text-sm text-muted-foreground">
+                <span>
+                  Built by{" "}
+                  <a
+                    href={DEVELOPER_CONFIG.twitter}
+                    target="__blank"
+                    rel="noopener noreferrer"
+                    className="text-foreground hover:text-foreground/80 transition-colors"
+                  >
+                    {DEVELOPER_CONFIG.twitterHandle}
+                  </a>
+                </span>
+              </div>
             </div>
 
             {/* Center: Empty for balance */}
@@ -341,7 +356,19 @@ const FooterComponent: FC<FooterProps> = ({
                   <ThemeToggle />
                 </div>
                 <div className="w-px h-4 bg-border"></div>
-                <AptPrice />
+                <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] xs:text-xs sm:text-sm text-muted-foreground">
+                  <span>
+                    Built by{" "}
+                    <a
+                      href={DEVELOPER_CONFIG.twitter}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-foreground hover:text-foreground/80 transition-colors"
+                    >
+                      {DEVELOPER_CONFIG.twitterHandle}
+                    </a>
+                  </span>
+                </div>
               </div>
               <div className="flex items-center gap-4">
                 <CurrentUTCTime />
@@ -361,7 +388,19 @@ const FooterComponent: FC<FooterProps> = ({
               </div>
               <div className="w-px h-4 bg-border flex-shrink-0 hidden xs:block"></div>
               <div className="min-w-0">
-                <AptPrice />
+                <div className="flex items-center gap-1.5 text-[10px] xs:text-xs text-muted-foreground">
+                  <span>
+                    Built by{" "}
+                    <a
+                      href={DEVELOPER_CONFIG.twitter}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-foreground hover:text-foreground/80 transition-colors"
+                    >
+                      {DEVELOPER_CONFIG.twitterHandle}
+                    </a>
+                  </span>
+                </div>
               </div>
             </div>
 

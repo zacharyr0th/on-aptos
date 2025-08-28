@@ -53,6 +53,15 @@ export interface DeFiPosition {
   totalValue: number;
   address: string;
 
+  // Backward compatibility fields
+  totalValueUSD?: number; // Alias for totalValue
+  protocol_type?: string; // Alias for protocolType
+  tvl_usd?: number; // Alternative name for totalValue
+  id?: string; // Alternative name for positionId
+  type?: string; // Position type
+  assets?: any[]; // Position assets
+  metadata?: any; // Additional metadata
+
   // Position details
   position: {
     supplied?: Array<{

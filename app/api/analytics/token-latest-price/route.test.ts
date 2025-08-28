@@ -1,12 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 import { aptosAnalytics } from "@/lib/services/blockchain/aptos-analytics";
-import { PanoraService } from "@/lib/services/portfolio/panora-service";
+import { UnifiedPanoraService } from "@/lib/services/portfolio/unified-panora-service";
 
 import { GET } from "./route";
 
 // Mock the services
-vi.mock("@/lib/services/portfolio/panora-service");
+vi.mock("@/lib/services/portfolio/unified-panora-service");
 vi.mock("@/lib/services/blockchain/aptos-analytics");
 
 describe("GET /api/analytics/token-latest-price", () => {
@@ -38,9 +38,9 @@ describe("GET /api/analytics/token-latest-price", () => {
       nativePrice: "1",
     };
 
-    vi.mocked(PanoraService.getTokenPrices).mockResolvedValueOnce([
+    vi.mocked(UnifiedPanoraService.getTokenPrices).mockResolvedValueOnce(new Map([
       mockPriceData,
-    ]);
+    ]));
 
     const request = new Request(
       `http://localhost:3000/api/analytics/token-latest-price?tokenAddress=${mockTokenAddress}`,
@@ -53,7 +53,7 @@ describe("GET /api/analytics/token-latest-price", () => {
     expect(data.data).toHaveLength(1);
     expect(data.data[0].price_usd).toBe(5.53);
     expect(data.data[0].token_address).toBe(mockTokenAddress);
-    expect(PanoraService.getTokenPrices).toHaveBeenCalledWith([
+    expect(UnifiedPanoraService.getTokenPrices).toHaveBeenCalledWith([
       mockTokenAddress,
     ]);
   });
@@ -61,7 +61,7 @@ describe("GET /api/analytics/token-latest-price", () => {
   it("should handle empty price data", async () => {
     const mockTokenAddress = "0x1::unknown::Token";
 
-    vi.mocked(PanoraService.getTokenPrices).mockResolvedValueOnce([]);
+    vi.mocked(UnifiedPanoraService.getTokenPrices).mockResolvedValueOnce(new Map());
     vi.mocked(aptosAnalytics.getTokenLatestPrice).mockResolvedValueOnce([]);
 
     const request = new Request(
@@ -86,7 +86,7 @@ describe("GET /api/analytics/token-latest-price", () => {
       },
     ];
 
-    vi.mocked(PanoraService.getTokenPrices).mockRejectedValueOnce(
+    vi.mocked(UnifiedPanoraService.getTokenPrices).mockRejectedValueOnce(
       new Error("Panora API error"),
     );
     vi.mocked(aptosAnalytics.getTokenLatestPrice).mockResolvedValueOnce(
@@ -108,7 +108,7 @@ describe("GET /api/analytics/token-latest-price", () => {
     const mockTokenAddress = "0x1::aptos_coin::AptosCoin";
     const error = new Error("Network error");
 
-    vi.mocked(PanoraService.getTokenPrices).mockRejectedValueOnce(error);
+    vi.mocked(UnifiedPanoraService.getTokenPrices).mockRejectedValueOnce(error);
     vi.mocked(aptosAnalytics.getTokenLatestPrice).mockRejectedValueOnce(error);
 
     const request = new Request(
@@ -135,9 +135,9 @@ describe("GET /api/analytics/token-latest-price", () => {
       nativePrice: "1",
     };
 
-    vi.mocked(PanoraService.getTokenPrices).mockResolvedValueOnce([
+    vi.mocked(UnifiedPanoraService.getTokenPrices).mockResolvedValueOnce(new Map([
       mockPriceData,
-    ]);
+    ]));
 
     const request = new Request(
       `http://localhost:3000/api/analytics/token-latest-price?tokenAddress=${mockTokenAddress}`,

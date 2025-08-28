@@ -30,22 +30,46 @@ export interface TokenValue {
   isSignificant: boolean;
 }
 
+// Cache for decimal conversions
+const conversionCache = new Map<string, number>();
+const CONVERSION_CACHE_SIZE = 500;
+
 export class UnifiedDecimalUtils {
   /**
-   * Convert raw amount to decimal format
+   * Convert raw amount to decimal format - OPTIMIZED
    */
   static convertToDecimal(
     amount: string | number,
     options: ConversionOptions = {},
   ): number {
+    // Early return for zero/invalid
+    if (!amount || amount === "0" || amount === 0) return 0;
+
     const decimals = options.decimals || DECIMALS.DEFAULT;
-    const value = typeof amount === "string" ? parseFloat(amount) : amount;
 
-    if (isNaN(value) || value === 0) {
-      return 0;
+    // Check cache
+    const cacheKey = `${amount}-${decimals}`;
+    const cached = conversionCache.get(cacheKey);
+    if (cached !== undefined) return cached;
+
+    // Convert to number efficiently
+    const value = typeof amount === "string" ? +amount : amount;
+    if (isNaN(value)) return 0;
+
+    // Use bit shifting for power of 2 decimals when possible
+    const result =
+      decimals === 8 ? value / 100000000 : value / Math.pow(10, decimals);
+
+    // Cache result
+    if (conversionCache.size > CONVERSION_CACHE_SIZE) {
+      const firstKey = conversionCache.keys().next().value;
+      if (firstKey !== undefined) {
+        conversionCache.delete(firstKey);
+      }
     }
+    conversionCache.set(cacheKey, result);
 
-    return value / Math.pow(10, decimals);
+    return result;
   }
 
   /**

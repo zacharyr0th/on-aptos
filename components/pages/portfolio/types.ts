@@ -1,6 +1,12 @@
-// Re-export types from the main portfolio service types
-export type { NFT, FungibleAsset, DeFiPosition } from "@/lib/services/portfolio/types";
+// Re-export types from consolidated types
+export type {
+  NFT,
+  FungibleAsset,
+  Transaction,
+  SortField,
+  SortDirection,
+  ViewMode,
+  TimeFrame,
+} from "@/lib/types/consolidated";
 
-// Portfolio-specific types
-export type SortField = "timestamp" | "type" | "amount" | "asset";
-export type SortDirection = "asc" | "desc";
+export type { DeFiPosition } from "@/lib/types/defi";

@@ -1,33 +1,48 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 
 import { aptosAnalytics } from "@/lib/services/blockchain/aptos-analytics";
+import {
+  extractParams,
+  errorResponse,
+  successResponse,
+  validateRequiredParams,
+  CACHE_DURATIONS,
+} from "@/lib/utils/api/common";
+import { withRateLimit, RATE_LIMIT_TIERS } from "@/lib/utils/api/rate-limiter";
 
-export async function GET(request: NextRequest) {
+async function handler(request: NextRequest) {
+  const searchParams = request.nextUrl.searchParams;
+  const params = extractParams(request);
+
+  const account_address = params.address || searchParams.get("account_address");
+  const lookback = searchParams.get("lookback") as "year" | "all";
+
+  const validationError = validateRequiredParams(
+    { account_address, lookback },
+    ["account_address", "lookback"],
+  );
+
+  if (validationError) {
+    return errorResponse(validationError, 400);
+  }
+
   try {
-    const searchParams = request.nextUrl.searchParams;
-
-    const account_address =
-      searchParams.get("address") || searchParams.get("account_address");
-    const lookback = searchParams.get("lookback") as "year" | "all";
-
-    if (!account_address || !lookback) {
-      return NextResponse.json(
-        { error: "Missing required parameters" },
-        { status: 400 },
-      );
-    }
-
     const data = await aptosAnalytics.getHistoricalStoreBalances({
-      account_address,
-      lookback,
+      account_address: account_address!,
+      lookback: lookback!,
     });
 
-    return NextResponse.json({ data });
-  } catch {
-    // Error handled
-    return NextResponse.json(
-      { error: "Failed to fetch balance history" },
-      { status: 500 },
+    return successResponse({ data }, CACHE_DURATIONS.MEDIUM);
+  } catch (error) {
+    return errorResponse(
+      "Failed to fetch balance history",
+      500,
+      error instanceof Error ? error.message : undefined,
     );
   }
 }
+
+export const GET = withRateLimit(handler, {
+  name: "balance-history",
+  ...RATE_LIMIT_TIERS.STANDARD,
+});

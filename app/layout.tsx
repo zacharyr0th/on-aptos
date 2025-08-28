@@ -250,10 +250,10 @@ export default async function RootLayout({
                     <LayoutContent>{children}</LayoutContent>
                   </ErrorBoundary>
                 </TooltipProvider>
-                <Toaster />
                 <Analytics />
               </WalletProvider>
             </QueryProvider>
+            <Toaster />
           </ThemeProvider>
         </I18nProvider>
       </body>

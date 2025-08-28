@@ -1,151 +1,48 @@
 "use client";
 
-import { TrendingUp, DollarSign, Building2, PieChart } from "lucide-react";
-import Image from "next/image";
-import React from "react";
 import {
-  ResponsiveContainer,
-  Tooltip as RechartsTooltip,
-  Treemap,
-} from "recharts";
+  Grid3x3,
+  List,
+  Loader2,
+  ChevronDown,
+  ChevronRight,
+  ExternalLink,
+  Coins,
+  X,
+  Copy,
+  Check,
+} from "lucide-react";
+import Image from "next/image";
+import React, { useMemo, useState, useCallback, useEffect } from "react";
 
-import { formatCurrency } from "@/lib/utils/format/format";
-import { sanitizeNFTMetadata, sanitizeImageUrl } from "@/lib/utils/core/security";
+import { Badge } from "@/components/ui/badge";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { unifiedScanner } from "@/lib/services/defi/unified-scanner";
+import type { DeFiPosition } from "@/lib/services/defi/unified-scanner";
+import { cn } from "@/lib/utils";
+import {
+  sanitizeNFTMetadata,
+  sanitizeImageUrl,
+} from "@/lib/utils/core/security";
+import { formatCurrency, formatTokenAmount } from "@/lib/utils/format";
+import { logger } from "@/lib/utils/core/logger";
 
 import { MinimalNFTGrid } from "./MinimalNFTGrid";
-import { NFT } from "./types";
-import { cleanProtocolName } from "./shared/PortfolioMetrics";
 import { NFTTreemapSkeleton } from "./shared/LoadingSkeletons";
-
-// Custom tooltip component for the pie charts
-const CustomTooltip = React.memo(({ active, payload }: any) => {
-  if (!active || !payload?.length) return null;
-
-  const data = payload[0].payload;
-
-  return (
-    <div className="bg-popover/95 backdrop-blur-sm border border-border/50 rounded-md shadow-md p-2 z-[9999] text-xs space-y-0.5">
-      <div className="flex items-center gap-1.5">
-        <div
-          className="w-2 h-2 rounded-full"
-          style={{ backgroundColor: data.color }}
-        />
-        <p className="font-medium text-popover-foreground">
-          {data.fullName || data.name}
-        </p>
-      </div>
-      {/* Show value for DeFi protocols, count for NFT collections */}
-      {data.value !== undefined &&
-      typeof data.value === "number" &&
-      data.value > 100 ? (
-        <p className="text-muted-foreground/80 text-[10px]">
-          Value: {formatCurrency(data.value)}
-        </p>
-      ) : (
-        <p className="text-muted-foreground/80 text-[10px]">
-          Count: {data.value} {data.value === 1 ? "item" : "items"}
-        </p>
-      )}
-      <p className="text-muted-foreground/80 text-[10px]">
-        Allocation: {data.percentage.toFixed(1)}%
-      </p>
-    </div>
-  );
-});
-
-CustomTooltip.displayName = "CustomTooltip";
-
-// Custom shape renderer for Treemap to use our colors
-const CustomTreemapContent = (props: any) => {
-  const { x, y, width, height, index, name, value, root } = props;
-
-  // Get the fill color from the data
-  const fillColor = root?.children?.[index]?.fill || props.fill || "#8884d8";
-
-  // More aggressive mobile-friendly thresholds
-  const minWidth = 40;
-  const minHeight = 25;
-
-  // Show text only if rectangle is large enough to avoid overlapping
-  const canShowText = width >= minWidth && height >= minHeight;
-  const canShowBothLines = width >= 60 && height >= 40;
-
-  if (!canShowText) {
-    return (
-      <rect
-        x={x}
-        y={y}
-        width={width}
-        height={height}
-        style={{
-          fill: fillColor,
-          stroke: "rgba(255,255,255,0.2)",
-          strokeWidth: 0.5,
-        }}
-      />
-    );
-  }
-
-  // Calculate font sizes based on available space
-  const maxNameLength = Math.floor(width / 6); // Rough estimate of characters that fit
-  const nameFontSize = Math.max(7, Math.min(12, width / 8));
-  const valueFontSize = Math.max(6, Math.min(10, width / 10));
-
-  // Smart text truncation
-  let displayName = name;
-  if (name.length > maxNameLength) {
-    displayName = name.substring(0, Math.max(3, maxNameLength - 3)) + "...";
-  }
-
-  return (
-    <g>
-      <rect
-        x={x}
-        y={y}
-        width={width}
-        height={height}
-        style={{
-          fill: fillColor,
-          stroke: "rgba(255,255,255,0.2)",
-          strokeWidth: 0.5,
-        }}
-      />
-
-      {/* Collection name */}
-      <text
-        x={x + width / 2}
-        y={canShowBothLines ? y + height / 2 - 4 : y + height / 2}
-        textAnchor="middle"
-        fill="#1a1a1a"
-        style={{
-          fontSize: `${nameFontSize}px`,
-          fontFamily:
-            "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-          fontWeight: 600,
-        }}
-      >
-        {displayName}
-      </text>
-
-      {/* Value - only show if there's enough space */}
-      {canShowBothLines && (
-        <text
-          x={x + width / 2}
-          y={y + height / 2 + 8}
-          textAnchor="middle"
-          fill="rgba(26,26,26,0.7)"
-          style={{
-            fontSize: `${valueFontSize}px`,
-            fontFamily:
-              "-apple-system, BlinkMacSystemFont, 'Segoe UI', monospace",
-          }}
-        >
-          {value}
-        </text>
-      )}
-    </g>
-  );
-};
+import { cleanProtocolName, getProtocolLogo } from "./shared/PortfolioMetrics";
+import { NFTTreemap } from "./shared/WalletSummaryComponents";
+import { NFT } from "./types";
 
 interface DeFiSummaryViewProps {
   groupedDeFiPositions: any[];
@@ -154,6 +51,9 @@ interface DeFiSummaryViewProps {
   onProtocolClick: (position: any) => void;
   selectedDeFiPosition?: any;
   accountNames?: any;
+  walletAddress: string;
+  onDialogOpenChange?: (open: boolean) => void;
+  setSidebarView?: (view: "assets" | "nfts" | "defi") => void;
 }
 
 interface NFTSummaryViewProps {
@@ -182,152 +82,560 @@ export const DeFiSummaryView: React.FC<DeFiSummaryViewProps> = ({
   totalDefiValue,
   getProtocolLogo,
   onProtocolClick,
+  walletAddress,
+  onDialogOpenChange,
+  setSidebarView,
 }) => {
-  // Calculate additional metrics
-  const totalPositions = (groupedDeFiPositions || []).reduce(
-    (sum, pos) => sum + (pos.positions?.length || 1),
-    0,
+  const [defiData, setDefiData] = useState<any | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const [expandedProtocols, setExpandedProtocols] = useState<Set<string>>(
+    new Set(),
   );
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [selectedPosition, setSelectedPosition] = useState<any | null>(null);
+  const [copiedAddress, setCopiedAddress] = useState(false);
 
-  const averagePositionValue =
-    groupedDeFiPositions && groupedDeFiPositions.length > 0
-      ? totalDefiValue / groupedDeFiPositions.length
-      : 0;
+  const fetchDefiData = useCallback(async () => {
+    if (!walletAddress) return;
 
-  // Don't render anything if there are no DeFi positions
-  if (!groupedDeFiPositions || groupedDeFiPositions.length === 0) {
-    return null;
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const response = await fetch(
+        `/api/aptos/defi?walletAddress=${walletAddress}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          cache: "no-cache",
+        },
+      ).catch((fetchError) => {
+        // Handle network errors specifically
+        if (
+          fetchError.name === "TypeError" &&
+          fetchError.message === "Failed to fetch"
+        ) {
+          logger.warn("Network request blocked, possibly by browser extension");
+          return null;
+        }
+        throw fetchError;
+      });
+
+      if (!response) {
+        // Silently fail if blocked by extension
+        setDefiData(null);
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setDefiData(data);
+    } catch (error) {
+      setError(error instanceof Error ? error : new Error(String(error)));
+      logger.warn("Failed to fetch DeFi data:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [walletAddress]);
+
+  // Fetch data on mount and when wallet address changes
+  useEffect(() => {
+    fetchDefiData();
+  }, [fetchDefiData]);
+
+  const toggleProtocol = (protocol: string) => {
+    setExpandedProtocols((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(protocol)) {
+        newSet.delete(protocol);
+      } else {
+        newSet.add(protocol);
+      }
+      return newSet;
+    });
+  };
+
+  const handleCopyAddress = async (address: string) => {
+    try {
+      await navigator.clipboard.writeText(address);
+      setCopiedAddress(true);
+      setTimeout(() => setCopiedAddress(false), 2000);
+    } catch (err) {
+      logger.warn("Failed to copy address:", err);
+    }
+  };
+
+  const handlePositionClick = (position: any) => {
+    setSelectedPosition(position);
+    onDialogOpenChange?.(true);
+  };
+
+  // Show protocol showcase if no DeFi positions and not loading
+  if (!isLoading && (!defiData || defiData.assetCount === 0)) {
+    const { DeFiProtocolShowcase } = require("./DeFiProtocolShowcase");
+    return <DeFiProtocolShowcase />;
   }
 
-  return (
-    <div>
-      {/* DeFi Portfolio Overview */}
-      <div>
-        <h2 className="text-base font-medium tracking-tight mb-3">
-          DeFi Portfolio Overview
-        </h2>
-        <div>
-          {/* Stats Row */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 border-b border-border/30">
-            <div className="p-2 sm:p-3 border-r border-border/30">
-              <div className="space-y-1">
-                <div className="flex items-center gap-1.5">
-                  <DollarSign className="h-3 w-3 text-muted-foreground/70" />
-                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-medium">
-                    Total Value
-                  </span>
-                </div>
-                <p className="text-lg sm:text-xl font-mono font-semibold tracking-tight">
-                  {formatCurrency(totalDefiValue)}
-                </p>
-              </div>
-            </div>
+  // Show error state
+  if (error) {
+    return (
+      <div className="text-center py-8">
+        <div className="text-red-500 mb-2">Failed to load DeFi data</div>
+        <button
+          onClick={fetchDefiData}
+          className="px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90"
+        >
+          Try Again
+        </button>
+      </div>
+    );
+  }
 
-            <div className="p-2 sm:p-3 border-r border-border/30 lg:border-r">
-              <div className="space-y-1">
-                <div className="flex items-center gap-1.5">
-                  <Building2 className="h-3 w-3 text-muted-foreground/70" />
-                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-medium">
-                    Protocols
-                  </span>
-                </div>
-                <p className="text-lg sm:text-xl font-mono font-semibold tracking-tight">
-                  {(groupedDeFiPositions || []).length}
-                </p>
-              </div>
-            </div>
-
-            <div className="p-2 sm:p-3 border-r border-border/30">
-              <div className="space-y-1">
-                <div className="flex items-center gap-1.5">
-                  <PieChart className="h-3 w-3 text-muted-foreground/70" />
-                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-medium">
-                    Positions
-                  </span>
-                </div>
-                <p className="text-lg sm:text-xl font-mono font-semibold tracking-tight">
-                  {totalPositions}
-                </p>
-              </div>
-            </div>
-
-            <div className="p-2 sm:p-3">
-              <div className="space-y-1">
-                <div className="flex items-center gap-1.5">
-                  <TrendingUp className="h-3 w-3 text-muted-foreground/70" />
-                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-medium">
-                    Avg. Position
-                  </span>
-                </div>
-                <p className="text-lg sm:text-xl font-mono font-semibold tracking-tight">
-                  {formatCurrency(averagePositionValue)}
-                </p>
-              </div>
-            </div>
+  // Show loading state
+  if (isLoading || !defiData) {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-base font-medium tracking-tight">
+            DeFi Positions
+          </h2>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Loading...
           </div>
-
-          {/* Protocol Logos */}
-          {groupedDeFiPositions && groupedDeFiPositions.length > 0 && (
-            <div className="p-3">
-              <div className="flex flex-col">
-                <h4 className="text-[10px] font-medium text-muted-foreground/70 mb-2 uppercase tracking-wider">
-                  Protocols
-                </h4>
-                <div className="flex items-center justify-between">
-                  <div className="flex flex-wrap gap-2">
-                    {(groupedDeFiPositions || [])
-                      .sort((a, b) => b.totalValue - a.totalValue)
-                      .map((position, index) => (
-                        <div
-                          key={index}
-                          className="w-8 h-8 rounded-lg bg-background/50 border border-border/30 flex items-center justify-center overflow-hidden hover:border-border/60 transition-colors cursor-pointer"
-                          onClick={() => onProtocolClick(position)}
-                          title={cleanProtocolName(position.protocol)}
-                        >
-                          <Image
-                            src={getProtocolLogo(position.protocol)}
-                            alt={`${position.protocol} logo`}
-                            width={24}
-                            height={24}
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              const img = e.target as HTMLImageElement;
-                              img.src = "/placeholder.jpg";
-                            }}
-                          />
-                        </div>
-                      ))}
-                  </div>
-
-                  {/* Explore DeFi Button */}
-                  <a
-                    href="/defi"
-                    className="flex items-center gap-2 px-3 py-2 text-xs font-medium bg-primary text-primary-foreground hover:bg-primary/90 rounded-md transition-colors ml-4"
-                  >
-                    Explore Aptos DeFi
-                  </a>
-                </div>
+        </div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 border rounded-lg">
+          {[...Array(4)].map((_, i) => (
+            <div
+              key={i}
+              className="p-3 border-r border-border/30 last:border-r-0"
+            >
+              <div className="space-y-2">
+                <div className="h-4 bg-muted rounded animate-pulse" />
+                <div className="h-6 bg-muted rounded animate-pulse" />
               </div>
             </div>
-          )}
-
-          {/* Empty state for no positions */}
-          {(!groupedDeFiPositions || groupedDeFiPositions.length === 0) && (
-            <div className=" rounded-xl p-8 text-center">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted/20 flex items-center justify-center">
-                <Building2 className="h-8 w-8 text-muted-foreground/50" />
-              </div>
-              <h3 className="text-lg font-semibold mb-2">
-                No DeFi Positions Found
-              </h3>
-              <p className="text-muted-foreground max-w-sm mx-auto">
-                Start exploring DeFi protocols on Aptos to see your positions
-                tracked here automatically.
-              </p>
-            </div>
-          )}
+          ))}
         </div>
       </div>
+    );
+  }
+
+  const protocols = defiData.protocols || [];
+  const totalValue = defiData.totalValue || 0;
+  const assetCount = defiData.assetCount || 0;
+  const protocolCount = defiData.protocolCount || 0;
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-semibold">DeFi Portfolio</h2>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setViewMode("grid")}
+            className={cn(
+              "p-2 rounded-lg transition-colors",
+              viewMode === "grid"
+                ? "bg-primary text-primary-foreground"
+                : "bg-muted text-muted-foreground hover:bg-muted/80",
+            )}
+            title="Grid view"
+          >
+            <Grid3x3 className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => setViewMode("list")}
+            className={cn(
+              "p-2 rounded-lg transition-colors",
+              viewMode === "list"
+                ? "bg-primary text-primary-foreground"
+                : "bg-muted text-muted-foreground hover:bg-muted/80",
+            )}
+            title="List view"
+          >
+            <List className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+
+      {/* Simple Stats Grid - like main summary */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 pb-6 border-b">
+        <div>
+          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-1">
+            Total Value
+          </p>
+          <p className="text-2xl font-normal">{formatCurrency(totalValue)}</p>
+        </div>
+
+        <div>
+          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-1">
+            Protocols
+          </p>
+          <p className="text-2xl font-normal">{protocolCount}</p>
+        </div>
+
+        <div>
+          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-1">
+            Positions
+          </p>
+          <p className="text-2xl font-normal">{assetCount}</p>
+        </div>
+
+        <div>
+          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-1">
+            Avg. Value
+          </p>
+          <p className="text-2xl font-normal">
+            {formatCurrency(assetCount > 0 ? totalValue / assetCount : 0)}
+          </p>
+        </div>
+      </div>
+
+      {/* Detailed Positions by Protocol */}
+      {protocols.length > 0 && viewMode === "grid" ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {protocols.map((protocol: any, index: number) => (
+            <div
+              key={index}
+              className="bg-card border rounded-xl p-4 hover:shadow-lg transition-all hover:-translate-y-1"
+            >
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex items-center gap-3">
+                  <div
+                    className="relative cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      // Don't call onProtocolClick for icon clicks in DeFi summary
+                      // This prevents the view from changing
+                    }}
+                  >
+                    <Image
+                      src={getProtocolLogo(protocol.name)}
+                      alt={`${protocol.name} logo`}
+                      width={40}
+                      height={40}
+                      className="rounded-lg hover:opacity-80 transition-opacity"
+                      onError={(e) => {
+                        const img = e.target as HTMLImageElement;
+                        img.src = "/placeholder.jpg";
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <div className="font-semibold">
+                      {cleanProtocolName(protocol.name)}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {protocol.assets.length} position
+                      {protocol.assets.length !== 1 ? "s" : ""}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex justify-between items-baseline">
+                  <span className="text-sm text-muted-foreground">
+                    Total Value
+                  </span>
+                  <span className="font-mono font-bold text-lg">
+                    {formatCurrency(protocol.totalValue)}
+                  </span>
+                </div>
+
+                {/* Show clickable asset positions */}
+                <div className="pt-2 border-t space-y-1">
+                  {protocol.assets.map((asset: any, i: number) => (
+                    <div
+                      key={i}
+                      className="flex justify-between text-xs p-1.5 rounded hover:bg-muted/50 cursor-pointer transition-colors"
+                      onClick={() =>
+                        handlePositionClick({
+                          ...asset,
+                          protocol: protocol.name,
+                        })
+                      }
+                    >
+                      <span className="text-muted-foreground">
+                        {asset.metadata.symbol}
+                      </span>
+                      <span className="font-mono">
+                        {formatCurrency(asset.value)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : protocols.length > 0 && viewMode === "list" ? (
+        <div className="space-y-2">
+          {protocols.map((protocol: any, index: number) => (
+            <Collapsible
+              key={index}
+              open={expandedProtocols.has(protocol.name)}
+              onOpenChange={() => toggleProtocol(protocol.name)}
+            >
+              <CollapsibleTrigger className="w-full">
+                <div className="flex items-center justify-between p-4 bg-card border rounded-lg hover:bg-muted/30 transition-colors">
+                  <div className="flex items-center gap-3">
+                    <Image
+                      src={getProtocolLogo(protocol.name)}
+                      alt={`${protocol.name} logo`}
+                      width={32}
+                      height={32}
+                      className="rounded-lg"
+                      onError={(e) => {
+                        const img = e.target as HTMLImageElement;
+                        img.src = "/placeholder.jpg";
+                      }}
+                    />
+                    <div className="text-left">
+                      <div className="font-semibold">
+                        {cleanProtocolName(protocol.name)}
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        {protocol.assets.length} position
+                        {protocol.assets.length !== 1 ? "s" : ""}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="text-right">
+                      <div className="font-mono font-bold text-lg">
+                        {formatCurrency(protocol.totalValue)}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        Total Value
+                      </div>
+                    </div>
+                    {expandedProtocols.has(protocol.name) ? (
+                      <ChevronDown className="h-5 w-5 text-muted-foreground" />
+                    ) : (
+                      <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                    )}
+                  </div>
+                </div>
+              </CollapsibleTrigger>
+
+              <CollapsibleContent className="px-4 pb-2">
+                <div className="space-y-2 mt-2">
+                  {protocol.assets.map((asset: any, assetIndex: number) => (
+                    <div
+                      key={assetIndex}
+                      className="flex items-center justify-between p-3 ml-11 bg-muted/20 rounded-lg hover:bg-muted/30 cursor-pointer transition-colors"
+                      onClick={() =>
+                        handlePositionClick({
+                          ...asset,
+                          protocol: protocol.name,
+                        })
+                      }
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="p-1.5 bg-background rounded">
+                          <Coins className="h-3 w-3 text-muted-foreground" />
+                        </div>
+                        <div>
+                          <div className="font-medium">
+                            {asset.metadata.symbol}
+                            {asset.defiType && (
+                              <Badge
+                                variant="outline"
+                                className="ml-2 text-xs capitalize"
+                              >
+                                {asset.defiType}
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {asset.metadata.name}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-mono font-semibold">
+                          {formatTokenAmount(asset.balance)}{" "}
+                          {asset.metadata.symbol}
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          {formatCurrency(asset.value)}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
+          ))}
+        </div>
+      ) : null}
+
+      {/* Explore DeFi Button */}
+      <div className="flex justify-center pt-4">
+        <a
+          href="/defi"
+          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 rounded-md transition-colors"
+        >
+          <ExternalLink className="h-4 w-4" />
+          Explore Aptos DeFi
+        </a>
+      </div>
+
+      {/* Position Detail Dialog */}
+      <Dialog
+        open={!!selectedPosition}
+        onOpenChange={(open) => {
+          if (!open) {
+            setSelectedPosition(null);
+            // Ensure we stay in DeFi view when closing the dialog
+            setSidebarView?.("defi");
+          }
+          onDialogOpenChange?.(open);
+        }}
+      >
+        <DialogContent
+          className="max-w-2xl"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-3">
+              {selectedPosition && (
+                <>
+                  <Image
+                    src={getProtocolLogo(selectedPosition.protocol)}
+                    alt={selectedPosition.protocol}
+                    width={32}
+                    height={32}
+                    className="rounded-lg"
+                  />
+                  <span>{selectedPosition.metadata?.symbol} Position</span>
+                </>
+              )}
+            </DialogTitle>
+            <DialogDescription>
+              {selectedPosition?.protocol &&
+                `${cleanProtocolName(selectedPosition.protocol)} DeFi Position`}
+            </DialogDescription>
+          </DialogHeader>
+
+          {selectedPosition && (
+            <div className="space-y-4 mt-4">
+              {/* Token Info */}
+              <div className="bg-muted/30 rounded-lg p-4 space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Token</span>
+                  <span className="font-medium">
+                    {selectedPosition.metadata?.name}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Symbol</span>
+                  <span className="font-mono">
+                    {selectedPosition.metadata?.symbol}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Type</span>
+                  <Badge variant="outline" className="capitalize">
+                    {selectedPosition.defiType || "Unknown"}
+                  </Badge>
+                </div>
+              </div>
+
+              {/* Balance & Value */}
+              <div className="bg-muted/30 rounded-lg p-4 space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Balance</span>
+                  <span className="font-mono font-semibold">
+                    {formatTokenAmount(
+                      selectedPosition.balance,
+                      selectedPosition.metadata?.decimals,
+                    )}{" "}
+                    {selectedPosition.metadata?.symbol}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Price</span>
+                  <span className="font-mono">
+                    {selectedPosition.price
+                      ? formatCurrency(selectedPosition.price)
+                      : "N/A"}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center border-t pt-3">
+                  <span className="text-sm font-medium">Total Value</span>
+                  <span className="font-mono font-bold text-lg">
+                    {formatCurrency(selectedPosition.value || 0)}
+                  </span>
+                </div>
+              </div>
+
+              {/* Contract Address */}
+              {selectedPosition.asset_type && (
+                <div className="bg-muted/30 rounded-lg p-4">
+                  <div className="flex justify-between items-start gap-2">
+                    <span className="text-sm text-muted-foreground">
+                      Contract
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-xs break-all">
+                        {selectedPosition.asset_type.length > 20
+                          ? `${selectedPosition.asset_type.slice(0, 10)}...${selectedPosition.asset_type.slice(-10)}`
+                          : selectedPosition.asset_type}
+                      </span>
+                      <button
+                        onClick={() =>
+                          handleCopyAddress(selectedPosition.asset_type)
+                        }
+                        className="p-1 hover:bg-muted rounded transition-colors"
+                        title="Copy address"
+                      >
+                        {copiedAddress ? (
+                          <Check className="h-3 w-3 text-green-500" />
+                        ) : (
+                          <Copy className="h-3 w-3" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Additional Metadata */}
+              {selectedPosition.metadata?.decimals && (
+                <div className="bg-muted/30 rounded-lg p-4 space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-muted-foreground">
+                      Decimals
+                    </span>
+                    <span className="font-mono">
+                      {selectedPosition.metadata.decimals}
+                    </span>
+                  </div>
+                  {selectedPosition.token_standard && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">
+                        Standard
+                      </span>
+                      <span className="font-mono text-xs">
+                        {selectedPosition.token_standard}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
@@ -343,6 +651,7 @@ export const NFTSummaryView: React.FC<NFTSummaryViewProps> = ({
   nftsLoading = false,
   hasMoreNFTs = false,
   isLoadingMore = false,
+  loadMoreNFTs,
   selectedNFT,
   onNFTSelect,
 }) => {
@@ -372,38 +681,48 @@ export const NFTSummaryView: React.FC<NFTSummaryViewProps> = ({
     }
   }, [nfts, nftCollectionStats]);
 
-  // Prepare data for Treemap
-  const treemapData = React.useMemo(() => {
-    // Monet-inspired soft, muted pastels - slightly darker for better visibility
-    const monetPastels = [
-      "hsl(210, 38%, 76%)", // Soft sky blue
-      "hsl(260, 33%, 79%)", // Lavender mist
-      "hsl(340, 28%, 81%)", // Blush pink
-      "hsl(150, 28%, 77%)", // Sage green
-      "hsl(30, 33%, 79%)", // Warm beige
-      "hsl(190, 31%, 78%)", // Seafoam
-      "hsl(50, 28%, 80%)", // Soft butter
-      "hsl(280, 28%, 80%)", // Lilac
-      "hsl(110, 23%, 78%)", // Celadon
-      "hsl(20, 28%, 80%)", // Peachy nude
-    ];
-    return collections.map(([name, count], index) => ({
-      name: name || "Unnamed Collection",
-      size: count as number,
-      percentage: ((count as number) / actualNFTCount) * 100,
-      fill: monetPastels[index % monetPastels.length],
-    }));
-  }, [collections, actualNFTCount]);
+  // Check if dark mode for treemap colors
+  const [isDarkMode, setIsDarkMode] = React.useState(false);
+  React.useEffect(() => {
+    const checkDark = () =>
+      setIsDarkMode(document.documentElement.classList.contains("dark"));
+    checkDark();
+    const observer = new MutationObserver(checkDark);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+    return () => observer.disconnect();
+  }, []);
+
+  // Prepare NFT stats for NFTTreemap component
+  const nftStats = useMemo(() => {
+    if (nftCollectionStats) {
+      return nftCollectionStats;
+    }
+    // Create stats from collections array
+    return {
+      collections: collections.map(([name, count]) => ({
+        name: name || "Unnamed Collection",
+        count: count as number,
+      })),
+      totalCollections: collections.length,
+    };
+  }, [nftCollectionStats, collections]);
 
   const totalCollections =
     nftCollectionStats?.totalCollections ??
     new Set(nfts.map((nft) => nft.collection_name)).size;
 
   // Determine if we should show skeleton for treemap
-  const shouldShowTreemapSkeleton = nftsLoading || (
+  const shouldShowTreemapSkeleton =
+    nftsLoading ||
     // Show skeleton if we don't have collection stats and we know there should be NFTs
-    !nftCollectionStats && totalNFTCount !== null && totalNFTCount > 0 && nfts.length === 0
-  );
+    (!nftCollectionStats &&
+      totalNFTCount !== null &&
+      totalNFTCount !== undefined &&
+      totalNFTCount > 0 &&
+      nfts.length === 0);
 
   if (nfts.length === 0 && totalNFTCount === 0) {
     return (
@@ -505,49 +824,11 @@ export const NFTSummaryView: React.FC<NFTSummaryViewProps> = ({
       ) : shouldShowTreemapSkeleton ? (
         <NFTTreemapSkeleton />
       ) : (
-        <div className="h-52 sm:h-64 w-full bg-neutral-50 dark:bg-neutral-900/50 rounded-lg overflow-hidden">
-          <ResponsiveContainer width="100%" height="100%" minHeight={200}>
-            <Treemap
-              data={treemapData}
-              dataKey="size"
-              nameKey="name"
-              aspectRatio={4 / 3}
-              stroke="none"
-              content={<CustomTreemapContent />}
-              onClick={(data: any) => {
-                if (onCollectionClick && data && data.name) {
-                  // Find the original collection name from the treemap data
-                  const originalName = collections.find(
-                    ([name]: [string, number]) =>
-                      (name || "Unnamed Collection") === data.name,
-                  )?.[0];
-                  if (originalName !== undefined) {
-                    onCollectionClick(String(originalName));
-                  }
-                }
-              }}
-            >
-              <RechartsTooltip
-                content={({ active, payload }) => {
-                  if (active && payload && payload.length) {
-                    const data = payload[0].payload;
-                    return (
-                      <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-lg shadow-lg p-2 sm:p-3 z-50">
-                        <p className="font-medium text-xs sm:text-sm">
-                          {data.name}
-                        </p>
-                        <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400">
-                          {data.size} NFTs ({data.percentage.toFixed(1)}%)
-                        </p>
-                      </div>
-                    );
-                  }
-                  return null;
-                }}
-              />
-            </Treemap>
-          </ResponsiveContainer>
-        </div>
+        <NFTTreemap
+          stats={nftStats}
+          totalCount={actualNFTCount}
+          isDarkMode={isDarkMode}
+        />
       )}
 
       {/* NFT Grid - only on mobile */}
@@ -558,7 +839,7 @@ export const NFTSummaryView: React.FC<NFTSummaryViewProps> = ({
             nftsLoading={nftsLoading}
             hasMoreNFTs={hasMoreNFTs}
             isLoadingMore={isLoadingMore}
-            onLoadMore={loadMoreNFTs}
+            onLoadMore={loadMoreNFTs || (() => {})}
             selectedNFT={selectedNFT || null}
             onNFTSelect={onNFTSelect || (() => {})}
           />

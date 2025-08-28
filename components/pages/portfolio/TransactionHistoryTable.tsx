@@ -9,8 +9,6 @@ import {
   SortingState,
   getFilteredRowModel,
   ColumnFiltersState,
-  getPaginationRowModel,
-  PaginationState,
 } from "@tanstack/react-table";
 import { GeistMono } from "geist/font/mono";
 import {
@@ -22,10 +20,6 @@ import {
   ArrowDownRight,
   Search,
   X,
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
   ArrowLeftRight,
   Coins,
   Zap,
@@ -61,15 +55,15 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { CATEGORY_COLORS } from "@/lib/constants/ui/colors";
 import { cn } from "@/lib/utils";
 import { getCachedData, setCachedData } from "@/lib/utils";
-import {
-  EnhancedTransactionAnalyzer,
-  TransactionCategory,
-  ActivityType,
-  type EnhancedTransactionInfo,
-} from "@/lib/utils/token/enhanced-transaction-analysis";
-import { convertRawTokenAmount } from "@/lib/utils/format/format";
 import { logger } from "@/lib/utils/core/logger";
 import { safeWindowOpen } from "@/lib/utils/core/security";
+import { convertRawTokenAmount } from "@/lib/utils/format";
+import {
+  OptimizedTransactionAnalyzer as EnhancedTransactionAnalyzer,
+  TransactionCategory,
+  ActivityType,
+  type OptimizedTransactionInfo as EnhancedTransactionInfo,
+} from "@/lib/utils/token/transaction-analysis";
 
 interface Transaction {
   transaction_version: string;
@@ -171,7 +165,7 @@ const getTransactionTypeIcon = (transaction: Transaction) => {
 
 // Enhanced transaction analysis function
 const getTransactionAnalysis = (tx: Transaction): EnhancedTransactionInfo => {
-  return EnhancedTransactionAnalyzer.analyzeTransaction(tx);
+  return EnhancedTransactionAnalyzer.analyzeTransactionSync(tx);
 };
 
 // Map protocol names to local icon paths
@@ -187,21 +181,17 @@ const getProtocolLogoPath = (protocolName: string): string | null => {
     echelon: "/icons/protocols/echelon.avif",
     superposition: "/icons/protocols/superposition.webp",
     amnis: "/icons/protocols/amnis.avif",
-    emojicoin: "/icons/protocols/emojicoin.webp",
     sushi: "/icons/protocols/sushi.webp",
     wormhole: "/icons/protocols/wormhole.png",
     layerzero: "/icons/protocols/lz.png",
     celer: "/icons/protocols/celer.jpg",
-    aptin: "/icons/protocols/aptin.webp",
     kana: "/icons/protocols/kana.webp",
     echo: "/icons/protocols/echo.webp",
     joule: "/icons/protocols/joule.webp",
     thetis: "/icons/protocols/thetis.webp",
-    econia: "/icons/protocols/econia.jpg",
     tradeport: "/icons/protocols/tradeport.jpg",
     hyperion: "/icons/protocols/hyperion.webp",
     mirage: "/icons/protocols/mirage.webp",
-    vibrantx: "/icons/protocols/vibrantx.png",
     metamove: "/icons/protocols/metamove.png",
   };
 
@@ -282,24 +272,22 @@ export const TransactionHistoryTable: React.FC<TransactionHistoryTableProps> =
       const [allTransactions, setAllTransactions] = React.useState<
         Transaction[]
       >([]);
-      const [isLoading, setIsLoading] = React.useState(false);
+      const [isLoading, setIsLoading] = React.useState(
+        preloadedTransactions === null && walletAddress !== undefined,
+      );
       const [isLoadingMore, setIsLoadingMore] = React.useState(false);
       const [error, setError] = React.useState<string | null>(null);
-      const [hasLoadedAll, setHasLoadedAll] = React.useState(false);
+      // Start with 100 to show all preloaded transactions
+      const [displayedCount, setDisplayedCount] = React.useState(100);
       const [totalCount, setTotalCount] = React.useState(0);
-      const [, setHasMore] = React.useState(true);
-      const [, setCurrentOffset] = React.useState(0);
+      const scrollContainerRef = React.useRef<HTMLDivElement>(null);
 
-      // Table state with pagination
+      // Table state without pagination (using scroll-based loading)
       const [sorting, setSorting] = React.useState<SortingState>([
         { id: "date", desc: true }, // Default sort by date, newest first
       ]);
       const [columnFilters, setColumnFilters] =
         React.useState<ColumnFiltersState>([]);
-      const [pagination, setPagination] = React.useState<PaginationState>({
-        pageIndex: 0,
-        pageSize: 10,
-      });
       const [searchQuery, setSearchQuery] = React.useState("");
       const [selectedCategory, setSelectedCategory] =
         React.useState<string>("all");
@@ -308,8 +296,8 @@ export const TransactionHistoryTable: React.FC<TransactionHistoryTableProps> =
 
       const tableRef = React.useRef<HTMLDivElement>(null);
 
-      // Enhanced category options for filtering
-      const categoryOptions = [
+      // All available category options with counts
+      const allCategoryOptions = [
         { value: "all", label: "All", count: 0 },
         { value: "received", label: "Received", count: 0 },
         { value: "sent", label: "Sent", count: 0 },
@@ -317,6 +305,11 @@ export const TransactionHistoryTable: React.FC<TransactionHistoryTableProps> =
         { value: "staking", label: "Staking", count: 0 },
         { value: "liquidity", label: "LP", count: 0 },
         { value: "rewards", label: "Rewards", count: 0 },
+        { value: "cex", label: "CEX", count: 0 },
+        { value: "bridge", label: "Bridge", count: 0 },
+        { value: "nft", label: "NFT", count: 0 },
+        { value: "rwa", label: "RWA", count: 0 },
+        { value: "system", label: "System", count: 0 },
         { value: "other", label: "Other", count: 0 },
       ];
 
@@ -360,6 +353,11 @@ export const TransactionHistoryTable: React.FC<TransactionHistoryTableProps> =
           staking: 0,
           liquidity: 0,
           rewards: 0,
+          cex: 0,
+          bridge: 0,
+          nft: 0,
+          rwa: 0,
+          system: 0,
           other: 0,
         };
 
@@ -371,39 +369,48 @@ export const TransactionHistoryTable: React.FC<TransactionHistoryTableProps> =
         return counts;
       }, [allTransactions]);
 
-      const fetchInitialTransactions = async () => {
-        if (!walletAddress || isLoading) return;
+      // Split categories into top categories (buttons) and dropdown categories
+      const { topCategories, dropdownCategories } = React.useMemo(() => {
+        // Update counts for all categories
+        const categoriesWithCounts = allCategoryOptions.map((option) => ({
+          ...option,
+          count: categoryCounts[option.value] || 0,
+        }));
 
-        setIsLoading(true);
-        setError(null);
+        // Filter out categories with zero count (except "All")
+        const nonZeroCategories = categoriesWithCounts.filter(
+          (cat) => cat.value === "all" || cat.count > 0,
+        );
+
+        // Sort by count (descending) but keep "All" first
+        const sortedCategories = nonZeroCategories.sort((a, b) => {
+          if (a.value === "all") return -1;
+          if (b.value === "all") return 1;
+          return b.count - a.count;
+        });
+
+        // Top 5 categories as buttons (including "All")
+        const topCategories = sortedCategories.slice(0, 5);
+
+        // Remaining categories for dropdown
+        const dropdownCategories = sortedCategories.slice(5);
+
+        return { topCategories, dropdownCategories };
+      }, [categoryCounts]);
+
+      // Simplified transaction fetching - loads more only when needed
+      const loadMoreTransactions = async () => {
+        if (!walletAddress || isLoadingMore) return;
+
+        setIsLoadingMore(true);
 
         try {
-          const cacheKey = `initial-${walletAddress}`;
-
-          // Check cache first
-          const cachedData = getCachedData<Transaction[]>(
-            "portfolio",
-            cacheKey,
+          const offset = allTransactions.length;
+          logger.info(
+            `Loading more transactions: offset=${offset}, current count=${allTransactions.length}`,
           );
-          if (cachedData && cachedData.length > 0) {
-            setAllTransactions(cachedData);
-            logger.info(
-              `Loaded ${cachedData.length} cached initial transactions for wallet ${walletAddress}`,
-            );
-
-            // Start loading the rest in the background
-            if (cachedData.length === 50) {
-              fetchRemainingTransactions();
-            } else {
-              setHasLoadedAll(true);
-            }
-            setIsLoading(false);
-            return;
-          }
-
-          // Fetch the first page of transactions (100 per page for better performance)
           const response = await fetch(
-            `/api/portfolio/transactions?address=${walletAddress}&limit=100&offset=0`,
+            `/api/portfolio/transactions?address=${walletAddress}&limit=100&offset=${offset}`,
           );
 
           if (!response.ok) {
@@ -411,209 +418,171 @@ export const TransactionHistoryTable: React.FC<TransactionHistoryTableProps> =
           }
 
           const result = await response.json();
-          const transactions = result.data || [];
+          const newTransactions = result.data || [];
 
-          // Update pagination state
-          setTotalCount(result.totalCount || 0);
-          setHasMore(result.hasMore || false);
-          setCurrentOffset(result.nextOffset || transactions.length);
-          setHasLoadedAll(!result.hasMore);
-
-          // Cache the initial transactions for 2 minutes
-          if (transactions.length > 0) {
-            setCachedData("portfolio", cacheKey, result);
-          }
-
-          setAllTransactions(transactions);
-          logger.info(
-            `Loaded initial ${transactions.length} of ${result.totalCount || "unknown"} transactions for wallet ${walletAddress}`,
-          );
-        } catch (err) {
-          const errorMessage =
-            err instanceof Error ? err.message : "Unknown error";
-          setError(errorMessage);
-          logger.error(
-            `Transaction fetch error: ${err instanceof Error ? err.message : String(err)}`,
-          );
-        } finally {
-          setIsLoading(false);
-        }
-      };
-
-      const fetchRemainingTransactions = async () => {
-        if (!walletAddress || isLoadingMore) return;
-
-        setIsLoadingMore(true);
-
-        try {
-          const cacheKey = `remaining-${walletAddress}`;
-
-          // Check cache first
-          const cachedData = getCachedData<Transaction[]>(
-            "portfolio",
-            cacheKey,
-          );
-          if (cachedData && cachedData.length > 0) {
-            // Prevent double counting by checking for duplicates
+          if (newTransactions.length > 0) {
             setAllTransactions((prev) => {
+              // Prevent duplicates
               const existingVersions = new Set(
                 prev.map((tx) => tx.transaction_version),
               );
-              const newTransactions = cachedData.filter(
+              const uniqueTransactions = newTransactions.filter(
                 (tx: Transaction) =>
                   !existingVersions.has(tx.transaction_version),
               );
               logger.info(
-                `Loaded ${newTransactions.length} cached remaining transactions (${cachedData.length - newTransactions.length} duplicates filtered)`,
+                `Adding ${uniqueTransactions.length} unique transactions (${newTransactions.length} fetched, ${newTransactions.length - uniqueTransactions.length} duplicates removed)`,
               );
-              return [...prev, ...newTransactions];
+              return [...prev, ...uniqueTransactions];
             });
-            setHasLoadedAll(true);
-            setIsLoadingMore(false);
-            return;
+            setTotalCount(result.totalCount || 0);
           }
-
-          // Fetch next page of transactions
-          const response = await fetch(
-            `/api/portfolio/transactions?address=${walletAddress}&limit=100&offset=${allTransactions.length}`,
-          );
-
-          if (!response.ok) {
-            throw new Error(
-              `Failed to fetch remaining transactions: ${response.status}`,
-            );
-          }
-
-          const result = await response.json();
-          const newTransactions = result.data || [];
-
-          // Update pagination state
-          setHasMore(result.hasMore || false);
-          setCurrentOffset(
-            result.nextOffset ||
-              allTransactions.length + newTransactions.length,
-          );
-          setHasLoadedAll(!result.hasMore);
-
-          // Cache the page for 2 minutes
-          if (newTransactions.length > 0) {
-            setCachedData("portfolio", cacheKey, result);
-          }
-
-          // Prevent double counting by checking for duplicates
-          setAllTransactions((prev) => {
-            const existingVersions = new Set(
-              prev.map((tx) => tx.transaction_version),
-            );
-            const uniqueTransactions = newTransactions.filter(
-              (tx: Transaction) =>
-                !existingVersions.has(tx.transaction_version),
-            );
-            logger.info(
-              `Loaded ${uniqueTransactions.length} more transactions (total: ${prev.length + uniqueTransactions.length}/${totalCount})`,
-            );
-            return [...prev, ...uniqueTransactions];
-          });
-
-          logger.info(
-            `Loaded ${newTransactions.length} additional transactions for wallet ${walletAddress}`,
-          );
         } catch (err) {
           logger.error(
-            `Error loading remaining transactions: ${err instanceof Error ? err.message : String(err)}`,
+            `Error loading more transactions: ${err instanceof Error ? err.message : String(err)}`,
           );
-          // Don't set error state for background loading failures
         } finally {
           setIsLoadingMore(false);
         }
       };
 
-      const fetchAllTransactions = async () => {
-        // Force reload all transactions - clear cache
-        if (walletAddress) {
-          setCachedData("portfolio", `initial-${walletAddress}`, []);
-          setCachedData("portfolio", `remaining-${walletAddress}`, []);
+      // Filter and limit transactions based on search, category, protocol, and displayedCount
+      const { filteredTransactions, displayTransactions } =
+        React.useMemo(() => {
+          let filtered = allTransactions;
+
+          // Filter by protocol
+          if (selectedProtocol !== "all") {
+            filtered = filtered.filter((tx) => {
+              const analysis = getTransactionAnalysis(tx);
+              const protocolKey = analysis.protocol?.name || "none";
+              return protocolKey === selectedProtocol;
+            });
+          }
+
+          // Filter by category
+          if (selectedCategory !== "all") {
+            filtered = filtered.filter((tx) => {
+              const category = getTransactionCategory(tx);
+              return category === selectedCategory;
+            });
+          }
+
+          // Filter by search query using enhanced analysis
+          if (searchQuery) {
+            const query = searchQuery.toLowerCase();
+            filtered = filtered.filter((tx) => {
+              const analysis = getTransactionAnalysis(tx);
+              const typeLabel = analysis.displayName.toLowerCase();
+              const category = getTransactionCategory(tx);
+              const version = String(tx.transaction_version || "");
+              const assetSymbol =
+                analysis.assetInfo?.displaySymbol?.toLowerCase() || "apt";
+              const protocolName = analysis.protocol?.name?.toLowerCase() || "";
+              const protocolLabel = analysis.protocolLabel?.toLowerCase() || "";
+              const activityType =
+                EnhancedTransactionAnalyzer.getActivityTypeDisplayName(
+                  analysis.activityType,
+                ).toLowerCase();
+
+              return (
+                typeLabel.includes(query) ||
+                category.includes(query) ||
+                version.includes(query) ||
+                assetSymbol.includes(query) ||
+                protocolName.includes(query) ||
+                protocolLabel.includes(query) ||
+                activityType.includes(query) ||
+                analysis.description.toLowerCase().includes(query) ||
+                (tx.type || "").toLowerCase().includes(query)
+              );
+            });
+          }
+
+          // Apply displayedCount limit for scroll-based pagination
+          const displayTransactions = filtered.slice(0, displayedCount);
+
+          return { filteredTransactions: filtered, displayTransactions };
+        }, [
+          allTransactions,
+          searchQuery,
+          selectedCategory,
+          selectedProtocol,
+          displayedCount,
+        ]);
+
+      // Handle scroll-based loading similar to PriceList
+      React.useEffect(() => {
+        const handleScroll = () => {
+          const container = scrollContainerRef.current;
+          if (!container || isLoadingMore) return;
+
+          const { scrollTop, scrollHeight, clientHeight } = container;
+          const scrollPercentage = (scrollTop + clientHeight) / scrollHeight;
+
+          // Check if we need to load more data or increase display count
+          if (scrollPercentage > 0.8 && !isLoadingMore) {
+            if (displayedCount < filteredTransactions.length) {
+              // Show more from existing data (100 at a time for smoother experience)
+              setDisplayedCount((prev) =>
+                Math.min(prev + 100, filteredTransactions.length),
+              );
+            } else if (
+              allTransactions.length < totalCount ||
+              totalCount === 0
+            ) {
+              // Fetch more data from API - no limit, load all 1965 if needed
+              loadMoreTransactions();
+            }
+          }
+        };
+
+        const container = scrollContainerRef.current;
+        if (container) {
+          container.addEventListener("scroll", handleScroll);
+          return () => container.removeEventListener("scroll", handleScroll);
         }
-        setAllTransactions([]);
-        setHasLoadedAll(false);
-        setCurrentOffset(0);
-        setHasMore(true);
-        await fetchInitialTransactions();
-      };
+      }, [
+        displayedCount,
+        filteredTransactions.length,
+        isLoadingMore,
+        allTransactions.length,
+        totalCount,
+      ]);
 
-      // Filter transactions based on search, category, and protocol
-      const filteredTransactions = React.useMemo(() => {
-        let filtered = allTransactions;
-
-        // Filter by protocol
-        if (selectedProtocol !== "all") {
-          filtered = filtered.filter((tx) => {
-            const analysis = getTransactionAnalysis(tx);
-            const protocolKey = analysis.protocol?.name || "none";
-            return protocolKey === selectedProtocol;
-          });
-        }
-
-        // Filter by category
-        if (selectedCategory !== "all") {
-          filtered = filtered.filter((tx) => {
-            const category = getTransactionCategory(tx);
-            return category === selectedCategory;
-          });
-        }
-
-        // Filter by search query using enhanced analysis
-        if (searchQuery) {
-          const query = searchQuery.toLowerCase();
-          filtered = filtered.filter((tx) => {
-            const analysis = getTransactionAnalysis(tx);
-            const typeLabel = analysis.displayName.toLowerCase();
-            const category = getTransactionCategory(tx);
-            const version = String(tx.transaction_version || "");
-            const assetSymbol =
-              analysis.assetInfo?.displaySymbol?.toLowerCase() || "apt";
-            const protocolName = analysis.protocol?.name?.toLowerCase() || "";
-            const protocolLabel = analysis.protocolLabel?.toLowerCase() || "";
-            const activityType =
-              EnhancedTransactionAnalyzer.getActivityTypeDisplayName(
-                analysis.activityType,
-              ).toLowerCase();
-
-            return (
-              typeLabel.includes(query) ||
-              category.includes(query) ||
-              version.includes(query) ||
-              assetSymbol.includes(query) ||
-              protocolName.includes(query) ||
-              protocolLabel.includes(query) ||
-              activityType.includes(query) ||
-              analysis.description.toLowerCase().includes(query) ||
-              (tx.type || "").toLowerCase().includes(query)
-            );
-          });
-        }
-
-        return filtered;
-      }, [allTransactions, searchQuery, selectedCategory, selectedProtocol]);
+      // Reset displayed count when search or filters change
+      React.useEffect(() => {
+        // Reset to initial amount when filters change
+        setDisplayedCount(100);
+      }, [searchQuery, selectedCategory, selectedProtocol]);
 
       // Initialize with preloaded transactions if available
       React.useEffect(() => {
         if (
           preloadedTransactions !== null &&
-          preloadedTransactions !== undefined
+          preloadedTransactions !== undefined &&
+          preloadedTransactions.length > 0
         ) {
-          // Use preloaded transactions
+          // Use preloaded transactions - these are typically just the first 100
           setAllTransactions(preloadedTransactions || []);
           setIsLoading(preloadedTransactionsLoading || false);
+          // Keep displayed count at 100 initially, user can scroll for more
+          setDisplayedCount(100);
+          // Set total count if we know it from the batch API
+          if (preloadedTransactions.length === 100) {
+            // If we have exactly 100, there are likely more
+            setTotalCount(0); // Will be set when we fetch more
+          }
           logger.info(
             `Using ${(preloadedTransactions || []).length} preloaded transactions for wallet ${walletAddress}`,
           );
-
-          // Since we're loading all transactions in background, mark as loaded when loading is complete
-          setHasLoadedAll(!preloadedTransactionsLoading);
-        } else if (walletAddress) {
-          // Fallback to original loading
-          fetchInitialTransactions();
+        } else if (
+          walletAddress &&
+          allTransactions.length === 0 &&
+          !preloadedTransactions
+        ) {
+          // Only load if we don't have any transactions yet
+          loadMoreTransactions();
         }
       }, [walletAddress, preloadedTransactions, preloadedTransactionsLoading]);
 
@@ -886,34 +855,29 @@ export const TransactionHistoryTable: React.FC<TransactionHistoryTableProps> =
       );
 
       const table = useReactTable({
-        data: filteredTransactions,
+        data: displayTransactions,
         columns,
         onSortingChange: setSorting,
         onColumnFiltersChange: setColumnFilters,
-        onPaginationChange: setPagination,
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
         enableColumnResizing: false,
         columnResizeMode: "onChange",
+        manualPagination: true, // Disable automatic pagination
+        pageCount: 1, // Single page with all data
         state: {
           sorting,
           columnFilters,
-          pagination,
         },
       });
 
-      if (isLoading) {
+      if (
+        isLoading ||
+        (preloadedTransactionsLoading && allTransactions.length === 0)
+      ) {
         return (
           <div className={className}>
-            <div className="flex items-center gap-2 mb-6">
-              <History className="h-4 w-4" />
-              <h2 className="text-base font-medium">
-                {t("transactions.history") || "Transaction History"}
-              </h2>
-            </div>
-
             {/* Filter skeletons */}
             <div className="space-y-4 mb-6">
               <div className="flex flex-col lg:flex-row lg:items-center gap-4">
@@ -1112,7 +1076,7 @@ export const TransactionHistoryTable: React.FC<TransactionHistoryTableProps> =
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={fetchAllTransactions}
+                  onClick={() => window.location.reload()}
                 >
                   {t("actions.refresh")}
                 </Button>
@@ -1149,18 +1113,18 @@ export const TransactionHistoryTable: React.FC<TransactionHistoryTableProps> =
       }
 
       return (
-        <div ref={tableRef} className={cn("space-y-4 -mb-4", className)}>
+        <div className={cn("flex flex-col h-full", className)}>
           {/* Mobile: Transaction History Header */}
-          <div className="flex items-center gap-2 mb-6 lg:hidden">
+          <div className="flex items-center gap-2 mb-6 lg:hidden flex-shrink-0">
             <History className="h-4 w-4" />
             <h2 className="text-base font-medium">
               {t("transactions.history") || "Transaction History"}
             </h2>
           </div>
 
-          <div className="space-y-4 mb-6">
+          <div className="space-y-3 mb-4 flex-shrink-0">
             {/* Mobile Layout */}
-            <div className="block lg:hidden space-y-4">
+            <div className="block lg:hidden space-y-3">
               {/* Protocol Dropdown */}
               <Select
                 value={selectedProtocol}
@@ -1188,7 +1152,7 @@ export const TransactionHistoryTable: React.FC<TransactionHistoryTableProps> =
                 </SelectContent>
               </Select>
 
-              {/* Category Dropdown */}
+              {/* Category Dropdown - Mobile */}
               <Select
                 value={selectedCategory}
                 onValueChange={setSelectedCategory}
@@ -1197,7 +1161,8 @@ export const TransactionHistoryTable: React.FC<TransactionHistoryTableProps> =
                   <SelectValue placeholder="All Categories" />
                 </SelectTrigger>
                 <SelectContent>
-                  {categoryOptions.map((option) => (
+                  {/* Show all categories on mobile, but only non-zero ones */}
+                  {[...topCategories, ...dropdownCategories].map((option) => (
                     <SelectItem key={option.value} value={option.value}>
                       <div className="flex items-center justify-between w-full">
                         <span>{option.label}</span>
@@ -1205,24 +1170,13 @@ export const TransactionHistoryTable: React.FC<TransactionHistoryTableProps> =
                           variant="secondary"
                           className="ml-2 h-4 px-2 text-xs"
                         >
-                          {categoryCounts[option.value] || 0}
+                          {option.count}
                         </Badge>
                       </div>
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-
-              {/* Search Input */}
-              <div className="relative">
-                <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  placeholder="Search transactions..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-8 w-full bg-transparent"
-                />
-              </div>
 
               {/* Clear Filters */}
               {hasActiveFilters && (
@@ -1238,89 +1192,109 @@ export const TransactionHistoryTable: React.FC<TransactionHistoryTableProps> =
               )}
             </div>
 
-            {/* Desktop Layout */}
-            <div className="hidden lg:flex lg:items-center lg:justify-between gap-4">
-              <div className="flex items-center gap-4">
-                {/* Protocol Dropdown */}
-                <div className="flex items-center gap-2">
-                  <label className="text-sm font-medium text-muted-foreground">
-                    Protocol:
-                  </label>
-                  <Select
-                    value={selectedProtocol}
-                    onValueChange={setSelectedProtocol}
+            {/* Desktop Layout - Clear filters only */}
+            <div className="hidden lg:flex lg:items-center lg:justify-start gap-4">
+              {hasActiveFilters && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearFilters}
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  <X className="h-4 w-4 mr-2" />
+                  Clear filters
+                </Button>
+              )}
+            </div>
+          </div>
+
+          {/* Category Filter - Top categories as buttons + dropdowns */}
+          <div className="w-full">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              {/* Left side - Category filters */}
+              <div className="flex flex-wrap items-center gap-2 flex-1 min-w-0">
+                {/* Top category buttons */}
+                {topCategories.map((option) => (
+                  <Button
+                    key={option.value}
+                    variant={
+                      selectedCategory === option.value ? "default" : "outline"
+                    }
+                    size="sm"
+                    onClick={() => setSelectedCategory(option.value)}
+                    className={cn(
+                      "text-xs h-10 border transition-colors",
+                      selectedCategory === option.value
+                        ? "bg-primary text-primary-foreground border-primary hover:bg-primary/90"
+                        : "bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground",
+                    )}
                   >
-                    <SelectTrigger className="w-[200px] bg-transparent border-border hover:bg-accent hover:text-accent-foreground">
-                      <SelectValue placeholder="Select protocol" />
+                    {option.label} ({option.count})
+                  </Button>
+                ))}
+
+                {/* Dropdown for additional categories */}
+                {dropdownCategories.length > 0 && (
+                  <Select
+                    value={
+                      dropdownCategories.find(
+                        (cat) => cat.value === selectedCategory,
+                      )
+                        ? selectedCategory
+                        : ""
+                    }
+                    onValueChange={setSelectedCategory}
+                  >
+                    <SelectTrigger className="w-[140px] h-10 text-xs">
+                      <SelectValue placeholder="More..." />
                     </SelectTrigger>
                     <SelectContent>
-                      {protocolOptions.map((option) => (
+                      {dropdownCategories.map((option) => (
                         <SelectItem key={option.value} value={option.value}>
                           <div className="flex items-center justify-between w-full">
                             <span>{option.label}</span>
-                            {option.count > 0 && (
-                              <Badge
-                                variant="secondary"
-                                className="ml-2 h-4 px-2 text-xs"
-                              >
-                                {option.count}
-                              </Badge>
-                            )}
+                            <Badge
+                              variant="secondary"
+                              className="ml-2 h-4 px-2 text-xs"
+                            >
+                              {option.count}
+                            </Badge>
                           </div>
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-                </div>
-
-                {/* Clear Filters */}
-                {hasActiveFilters && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={clearFilters}
-                    className="text-muted-foreground hover:text-foreground"
-                  >
-                    <X className="h-4 w-4 mr-2" />
-                    Clear filters
-                  </Button>
                 )}
               </div>
 
-              {/* Search Input */}
-              <div className="relative">
-                <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  placeholder="Search transactions..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-8 w-64 bg-transparent"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Category Filter - Full Width */}
-          <div className="w-full">
-            <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
-              {categoryOptions.map((option) => (
-                <Button
-                  key={option.value}
-                  variant={
-                    selectedCategory === option.value ? "default" : "outline"
-                  }
-                  size="sm"
-                  onClick={() => setSelectedCategory(option.value)}
-                  className={cn(
-                    "text-xs h-10 border transition-colors",
-                    selectedCategory === option.value
-                      ? "bg-primary text-primary-foreground border-primary hover:bg-primary/90"
-                      : "bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground",
-                  )}
+              {/* Right side - Protocol dropdown */}
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <Select
+                  value={selectedProtocol}
+                  onValueChange={setSelectedProtocol}
                 >
-                  {option.label} ({categoryCounts[option.value] || 0})
-                </Button>
-              ))}
+                  <SelectTrigger className="w-[160px] lg:w-[180px] h-10 text-xs bg-transparent border-border hover:bg-accent hover:text-accent-foreground">
+                    <SelectValue placeholder="All Protocols" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {protocolOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        <div className="flex items-center justify-between w-full">
+                          <span>{option.label}</span>
+                          {option.count > 0 && (
+                            <Badge
+                              variant="secondary"
+                              className="ml-2 h-4 px-2 text-xs"
+                            >
+                              {option.count}
+                            </Badge>
+                          )}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
 
@@ -1334,116 +1308,132 @@ export const TransactionHistoryTable: React.FC<TransactionHistoryTableProps> =
             </div>
           )}
 
-          {/* Divider */}
-          <div className="border-b border-border"></div>
+          {/* Scrollable Transaction Container */}
+          <div
+            ref={scrollContainerRef}
+            className="flex-1 overflow-y-auto min-h-0"
+            style={{ scrollBehavior: "smooth" }}
+          >
+            {/* Mobile Card View - Only on small screens */}
+            <div className="block sm:hidden space-y-3 pb-4">
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => {
+                  const transaction = row.original;
+                  const date = new Date(transaction.transaction_timestamp);
+                  const analysis = getTransactionAnalysis(transaction);
+                  const IconComponent = getTransactionTypeIcon(transaction);
+                  const rawAmount = transaction.amount || "0";
+                  const amount =
+                    transaction.asset_type === "APT"
+                      ? convertRawTokenAmount(rawAmount, 8)
+                      : parseFloat(rawAmount);
+                  const isIncoming = amount > 0;
+                  const isOutgoing = amount < 0;
 
-          {/* Mobile Card View - Only on small screens */}
-          <div className="block sm:hidden space-y-3">
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => {
-                const transaction = row.original;
-                const date = new Date(transaction.transaction_timestamp);
-                const analysis = getTransactionAnalysis(transaction);
-                const IconComponent = getTransactionTypeIcon(transaction);
-                const rawAmount = transaction.amount || "0";
-                const amount =
-                  transaction.asset_type === "APT"
-                    ? convertRawTokenAmount(rawAmount, 8)
-                    : parseFloat(rawAmount);
-                const isIncoming = amount > 0;
-                const isOutgoing = amount < 0;
+                  const getCategoryBadgeInfo = () => {
+                    const category = getTransactionCategory(transaction);
+                    const colors = getCategoryColors(category);
 
-                const getCategoryBadgeInfo = () => {
-                  const category = getTransactionCategory(transaction);
-                  const colors = getCategoryColors(category);
-
-                  switch (analysis.category) {
-                    case TransactionCategory.DEFI:
-                      return {
-                        label:
-                          EnhancedTransactionAnalyzer.getActivityTypeDisplayName(
-                            analysis.activityType,
-                          ),
-                        colors,
-                      };
-                    case TransactionCategory.STAKING:
-                      return {
-                        label:
-                          analysis.activityType === ActivityType.CLAIM_REWARDS
-                            ? "Rewards"
-                            : "Staking",
-                        colors,
-                      };
-                    case TransactionCategory.CEX:
-                      return { label: "CEX", colors };
-                    case TransactionCategory.BRIDGE:
-                      return { label: "Bridge", colors };
-                    case TransactionCategory.NFT:
-                      return { label: "NFT", colors };
-                    case TransactionCategory.RWA:
-                      return { label: "RWA", colors };
-                    case TransactionCategory.SYSTEM:
-                      return { label: "System", colors };
-                    case TransactionCategory.TRANSFER:
-                    default:
-                      return {
-                        label:
-                          analysis.direction === "incoming"
-                            ? "Received"
-                            : "Sent",
-                        colors,
-                      };
-                  }
-                };
-
-                const badgeInfo = getCategoryBadgeInfo();
-                const logoPath = analysis.protocol?.name
-                  ? getProtocolLogoPath(analysis.protocol.name)
-                  : null;
-
-                return (
-                  <Card
-                    key={row.id}
-                    className="p-4 cursor-pointer hover:bg-muted/50 transition-colors"
-                    onClick={() =>
-                      safeWindowOpen(
-                        `https://explorer.aptoslabs.com/txn/${transaction.transaction_version}?network=mainnet`,
-                        "_blank",
-                      )
+                    switch (analysis.category) {
+                      case TransactionCategory.DEFI:
+                        return {
+                          label:
+                            EnhancedTransactionAnalyzer.getActivityTypeDisplayName(
+                              analysis.activityType,
+                            ),
+                          colors,
+                        };
+                      case TransactionCategory.STAKING:
+                        return {
+                          label:
+                            analysis.activityType === ActivityType.CLAIM_REWARDS
+                              ? "Rewards"
+                              : "Staking",
+                          colors,
+                        };
+                      case TransactionCategory.CEX:
+                        return { label: "CEX", colors };
+                      case TransactionCategory.BRIDGE:
+                        return { label: "Bridge", colors };
+                      case TransactionCategory.NFT:
+                        return { label: "NFT", colors };
+                      case TransactionCategory.RWA:
+                        return { label: "RWA", colors };
+                      case TransactionCategory.SYSTEM:
+                        return { label: "System", colors };
+                      case TransactionCategory.TRANSFER:
+                      default:
+                        return {
+                          label:
+                            analysis.direction === "incoming"
+                              ? "Received"
+                              : "Sent",
+                          colors,
+                        };
                     }
-                  >
-                    <div className="space-y-3">
-                      {/* Header Row - Fixed height container */}
-                      <div className="flex items-start justify-between min-h-[56px]">
-                        <div className="flex items-start gap-3 flex-1 min-w-0">
-                          <div
-                            className={cn(
-                              "rounded-full p-2 flex-shrink-0 w-10 h-10 flex items-center justify-center",
-                              isIncoming
-                                ? "bg-green-100 dark:bg-green-900/20"
-                                : isOutgoing
-                                  ? "bg-red-100 dark:bg-red-900/20"
-                                  : "bg-muted",
-                            )}
-                          >
-                            {logoPath ? (
-                              <>
-                                <img
-                                  src={logoPath}
-                                  alt={analysis.protocol?.label || "Protocol"}
-                                  className="h-5 w-5 rounded-full object-cover"
-                                  onError={(e) => {
-                                    const target = e.target as HTMLImageElement;
-                                    target.style.display = "none";
-                                    const iconSpan =
-                                      target.nextElementSibling as HTMLElement;
-                                    if (iconSpan)
-                                      iconSpan.style.display = "block";
-                                  }}
-                                />
+                  };
+
+                  const badgeInfo = getCategoryBadgeInfo();
+                  const logoPath = analysis.protocol?.name
+                    ? getProtocolLogoPath(analysis.protocol.name)
+                    : null;
+
+                  return (
+                    <Card
+                      key={row.id}
+                      className="p-4 cursor-pointer hover:bg-muted/50 transition-colors"
+                      onClick={() =>
+                        safeWindowOpen(
+                          `https://explorer.aptoslabs.com/txn/${transaction.transaction_version}?network=mainnet`,
+                          "_blank",
+                        )
+                      }
+                    >
+                      <div className="space-y-3">
+                        {/* Header Row - Fixed height container */}
+                        <div className="flex items-start justify-between min-h-[56px]">
+                          <div className="flex items-start gap-3 flex-1 min-w-0">
+                            <div
+                              className={cn(
+                                "rounded-full p-2 flex-shrink-0 w-10 h-10 flex items-center justify-center",
+                                isIncoming
+                                  ? "bg-green-100 dark:bg-green-900/20"
+                                  : isOutgoing
+                                    ? "bg-red-100 dark:bg-red-900/20"
+                                    : "bg-muted",
+                              )}
+                            >
+                              {logoPath ? (
+                                <>
+                                  <img
+                                    src={logoPath}
+                                    alt={analysis.protocol?.label || "Protocol"}
+                                    className="h-5 w-5 rounded-full object-cover"
+                                    onError={(e) => {
+                                      const target =
+                                        e.target as HTMLImageElement;
+                                      target.style.display = "none";
+                                      const iconSpan =
+                                        target.nextElementSibling as HTMLElement;
+                                      if (iconSpan)
+                                        iconSpan.style.display = "block";
+                                    }}
+                                  />
+                                  <IconComponent
+                                    className={cn(
+                                      "h-5 w-5 hidden",
+                                      isIncoming
+                                        ? "text-green-600 dark:text-green-400"
+                                        : isOutgoing
+                                          ? "text-red-600 dark:text-red-400"
+                                          : "text-muted-foreground",
+                                    )}
+                                  />
+                                </>
+                              ) : (
                                 <IconComponent
                                   className={cn(
-                                    "h-5 w-5 hidden",
+                                    "h-5 w-5",
                                     isIncoming
                                       ? "text-green-600 dark:text-green-400"
                                       : isOutgoing
@@ -1451,257 +1441,188 @@ export const TransactionHistoryTable: React.FC<TransactionHistoryTableProps> =
                                         : "text-muted-foreground",
                                   )}
                                 />
-                              </>
-                            ) : (
-                              <IconComponent
-                                className={cn(
-                                  "h-5 w-5",
-                                  isIncoming
-                                    ? "text-green-600 dark:text-green-400"
-                                    : isOutgoing
-                                      ? "text-red-600 dark:text-red-400"
-                                      : "text-muted-foreground",
-                                )}
-                              />
-                            )}
-                          </div>
-                          <div className="flex-1 min-w-0 py-1">
-                            <div className="font-medium text-sm truncate">
-                              {analysis.displayName}
+                              )}
                             </div>
-                            {analysis.protocol && (
-                              <div className="text-xs text-muted-foreground truncate">
-                                {analysis.protocolLabel ||
-                                  analysis.protocol.label}
+                            <div className="flex-1 min-w-0 py-1">
+                              <div className="font-medium text-sm truncate">
+                                {analysis.displayName}
+                              </div>
+                              {analysis.protocol && (
+                                <div className="text-xs text-muted-foreground truncate">
+                                  {analysis.protocolLabel ||
+                                    analysis.protocol.label}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex-shrink-0 ml-2">
+                            <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                          </div>
+                        </div>
+
+                        {/* Details Row - Fixed spacing */}
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2 flex-1 min-w-0">
+                            <Badge
+                              variant="outline"
+                              className={cn(
+                                "text-xs border flex-shrink-0",
+                                badgeInfo.colors,
+                              )}
+                            >
+                              {badgeInfo.label}
+                            </Badge>
+                            <span className="text-xs text-muted-foreground font-mono flex-shrink-0">
+                              {analysis.assetInfo?.displaySymbol || "APT"}
+                            </span>
+                          </div>
+                          <div className="text-right flex-shrink-0 ml-2">
+                            <div className="text-xs whitespace-nowrap">
+                              {date.toLocaleDateString()}
+                            </div>
+                            <div className="text-xs text-muted-foreground whitespace-nowrap">
+                              {date.toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Asset badges - Fixed height container */}
+                        <div className="min-h-[24px] flex items-start">
+                          {analysis.assetInfo &&
+                            (analysis.assetInfo.isStablecoin ||
+                              analysis.assetInfo.isLST ||
+                              analysis.assetInfo.isRWA) && (
+                              <div className="flex gap-1 flex-wrap">
+                                {analysis.assetInfo.isStablecoin && (
+                                  <Badge
+                                    variant="secondary"
+                                    className="text-xs px-2 py-0.5"
+                                  >
+                                    Stable
+                                  </Badge>
+                                )}
+                                {analysis.assetInfo.isLST && (
+                                  <Badge
+                                    variant="outline"
+                                    className="text-xs px-2 py-0.5"
+                                  >
+                                    LST
+                                  </Badge>
+                                )}
+                                {analysis.assetInfo.isRWA && (
+                                  <Badge
+                                    variant="default"
+                                    className="text-xs px-2 py-0.5"
+                                  >
+                                    RWA
+                                  </Badge>
+                                )}
                               </div>
                             )}
-                          </div>
-                        </div>
-                        <div className="flex-shrink-0 ml-2">
-                          <ExternalLink className="h-4 w-4 text-muted-foreground" />
                         </div>
                       </div>
+                    </Card>
+                  );
+                })
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  No transactions found.
+                </div>
+              )}
+            </div>
 
-                      {/* Details Row - Fixed spacing */}
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2 flex-1 min-w-0">
-                          <Badge
-                            variant="outline"
-                            className={cn(
-                              "text-xs border flex-shrink-0",
-                              badgeInfo.colors,
-                            )}
-                          >
-                            {badgeInfo.label}
-                          </Badge>
-                          <span className="text-xs text-muted-foreground font-mono flex-shrink-0">
-                            {analysis.assetInfo?.displaySymbol || "APT"}
-                          </span>
-                        </div>
-                        <div className="text-right flex-shrink-0 ml-2">
-                          <div className="text-xs whitespace-nowrap">
-                            {date.toLocaleDateString()}
-                          </div>
-                          <div className="text-xs text-muted-foreground whitespace-nowrap">
-                            {date.toLocaleTimeString([], {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Asset badges - Fixed height container */}
-                      <div className="min-h-[24px] flex items-start">
-                        {analysis.assetInfo &&
-                          (analysis.assetInfo.isStablecoin ||
-                            analysis.assetInfo.isLST ||
-                            analysis.assetInfo.isRWA) && (
-                            <div className="flex gap-1 flex-wrap">
-                              {analysis.assetInfo.isStablecoin && (
-                                <Badge
-                                  variant="secondary"
-                                  className="text-xs px-2 py-0.5"
-                                >
-                                  Stable
-                                </Badge>
-                              )}
-                              {analysis.assetInfo.isLST && (
-                                <Badge
-                                  variant="outline"
-                                  className="text-xs px-2 py-0.5"
-                                >
-                                  LST
-                                </Badge>
-                              )}
-                              {analysis.assetInfo.isRWA && (
-                                <Badge
-                                  variant="default"
-                                  className="text-xs px-2 py-0.5"
-                                >
-                                  RWA
-                                </Badge>
-                              )}
-                            </div>
-                          )}
-                      </div>
-                    </div>
-                  </Card>
-                );
-              })
-            ) : (
-              <div className="text-center py-8 text-muted-foreground">
-                No transactions found.
-              </div>
-            )}
-          </div>
-
-          {/* Desktop Table View - sm and larger screens */}
-          <div className="hidden sm:block overflow-x-auto">
-            <Table
-              className="min-w-[800px] lg:min-w-full"
-              style={{ tableLayout: "fixed" }}
-            >
-              <TableHeader>
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => (
-                      <TableHead
-                        key={header.id}
-                        style={{ width: `${header.getSize()}px` }}
-                        className="overflow-hidden"
-                      >
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext(),
-                            )}
-                      </TableHead>
-                    ))}
-                  </TableRow>
-                ))}
-              </TableHeader>
-              <TableBody>
-                {table.getRowModel().rows?.length ? (
-                  table.getRowModel().rows.map((row) => (
-                    <TableRow
-                      key={row.id}
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={() =>
-                        safeWindowOpen(
-                          `https://explorer.aptoslabs.com/txn/${row.original.transaction_version}?network=mainnet`,
-                          "_blank",
-                        )
-                      }
-                    >
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell
-                          key={cell.id}
-                          style={{ width: `${cell.column.getSize()}px` }}
+            {/* Desktop Table View - sm and larger screens */}
+            <div className="hidden sm:block overflow-x-auto pb-4">
+              <Table
+                className="min-w-[800px] lg:min-w-full"
+                style={{ tableLayout: "fixed" }}
+              >
+                <TableHeader>
+                  {table.getHeaderGroups().map((headerGroup) => (
+                    <TableRow key={headerGroup.id}>
+                      {headerGroup.headers.map((header) => (
+                        <TableHead
+                          key={header.id}
+                          style={{ width: `${header.getSize()}px` }}
                           className="overflow-hidden"
                         >
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext(),
-                          )}
-                        </TableCell>
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(
+                                header.column.columnDef.header,
+                                header.getContext(),
+                              )}
+                        </TableHead>
                       ))}
                     </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell
-                      colSpan={columns.length}
-                      className="h-24 text-center"
-                    >
-                      No transactions found.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-
-          {/* Pagination and Load More Controls */}
-          <div className="px-4 py-2">
-            {/* Pagination Controls for current loaded data */}
-            {filteredTransactions.length > 10 && (
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-                <div className="flex-1 text-sm text-muted-foreground text-left">
-                  Page {table.getState().pagination.pageIndex + 1} of{" "}
-                  {table.getPageCount()}
-                  {totalCount > 0 && (
-                    <span className="ml-2">
-                      • Showing {allTransactions.length} of{" "}
-                      {totalCount.toLocaleString()} total transactions
-                    </span>
+                  ))}
+                </TableHeader>
+                <TableBody>
+                  {table.getRowModel().rows?.length ? (
+                    table.getRowModel().rows.map((row) => (
+                      <TableRow
+                        key={row.id}
+                        className="cursor-pointer hover:bg-muted/50"
+                        onClick={() =>
+                          safeWindowOpen(
+                            `https://explorer.aptoslabs.com/txn/${row.original.transaction_version}?network=mainnet`,
+                            "_blank",
+                          )
+                        }
+                      >
+                        {row.getVisibleCells().map((cell) => (
+                          <TableCell
+                            key={cell.id}
+                            style={{ width: `${cell.column.getSize()}px` }}
+                            className="overflow-hidden"
+                          >
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext(),
+                            )}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell
+                        colSpan={columns.length}
+                        className="h-24 text-center"
+                      >
+                        No transactions found.
+                      </TableCell>
+                    </TableRow>
                   )}
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => table.setPageIndex(0)}
-                    disabled={!table.getCanPreviousPage()}
-                  >
-                    <ChevronsLeft className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => table.previousPage()}
-                    disabled={!table.getCanPreviousPage()}
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => table.nextPage()}
-                    disabled={!table.getCanNextPage()}
-                  >
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-                    disabled={!table.getCanNextPage()}
-                  >
-                    <ChevronsRight className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            )}
+                </TableBody>
+              </Table>
+            </div>
 
-            {/* Background loading indicator */}
+            {/* Loading more indicator */}
             {isLoadingMore && (
-              <div className="flex items-center justify-center py-3 border-t">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
-                  Loading more transactions in background...
+              <div className="px-4 py-3 text-center text-sm text-muted-foreground">
+                <div className="inline-flex items-center gap-2">
+                  <div className="h-4 w-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+                  Loading more transactions...
                 </div>
               </div>
             )}
 
-            {/* All loaded message */}
-            {hasLoadedAll && totalCount > 0 && (
-              <div className="text-center py-4 border-t text-sm text-muted-foreground">
-                All {totalCount.toLocaleString()} transactions loaded
-              </div>
-            )}
+            {/* Transaction count display - always show for debugging */}
+            <div className="px-4 py-2 text-xs text-muted-foreground text-center border-t border-border/30">
+              Showing {displayedCount} of {filteredTransactions.length} filtered
+              {" | "}Total loaded: {allTransactions.length}
+              {totalCount > 0 && (
+                <span> of {totalCount.toLocaleString()} total</span>
+              )}
+              {allTransactions.length < totalCount && (
+                <span> (scroll for more)</span>
+              )}
+            </div>
           </div>
-
-          {/* Transaction Summary for small result sets */}
-          {filteredTransactions.length > 0 &&
-            filteredTransactions.length <= 10 && (
-              <div className="px-4 py-2 text-center text-sm text-muted-foreground">
-                {hasActiveFilters
-                  ? `Showing all ${filteredTransactions.length} matching transactions`
-                  : `Showing all ${filteredTransactions.length} transactions`}
-              </div>
-            )}
         </div>
       );
     },

@@ -1,20 +1,10 @@
 /**
- * Protocol Registry Re-exports
- * Re-exports from the main protocol registry for organized access
+ * Protocol Registry - Temporary compatibility layer
+ * This file will be deprecated. Use @/lib/protocols instead.
  */
 
-export {
-  PROTOCOLS,
-  ProtocolType,
-  type ProtocolInfo,
-  getProtocolByAddress,
-  getProtocolLabel,
-  shouldShowProtocolBadge,
-  isPhantomAsset,
-  getPhantomReason,
-  getProtocolsByType,
-  getAllProtocolAddresses,
-} from "./protocol-registry";
+// Re-export protocol types from new system for backward compatibility
+export { ProtocolType } from "@/lib/protocols/types";
 
 /**
  * DeFi Protocol Name Mappings
@@ -34,8 +24,6 @@ export const DEFI_PROTOCOL_NAME_MAPPINGS: Record<string, string> = {
   // Liquid staking variations
   amnis: "Amnis",
   "amnis finance": "Amnis",
-  tortuga: "Tortuga",
-  "tortuga finance": "Tortuga",
 
   // DEX variations
   liquidswap: "LiquidSwap",
@@ -57,11 +45,8 @@ export const DEFI_PROTOCOL_NAME_MAPPINGS: Record<string, string> = {
   // Lending variations
   aries: "Aries Markets",
   "aries markets": "Aries Markets",
-  econia: "Econia",
 
   // Other protocols
-  aptin: "Aptin Finance",
-  "aptin finance": "Aptin Finance",
   hippo: "Hippo Labs",
   "hippo labs": "Hippo Labs",
   aux: "AUX",

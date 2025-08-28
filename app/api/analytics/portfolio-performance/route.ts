@@ -1,5 +1,14 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 
+import {
+  extractParams,
+  errorResponse,
+  successResponse,
+  CACHE_DURATIONS,
+  getAptosAuthHeaders,
+  validateRequiredParams,
+} from "@/lib/utils/api/common";
+import { withRateLimit, RATE_LIMIT_TIERS } from "@/lib/utils/api/rate-limiter";
 import { apiLogger } from "@/lib/utils/core/logger";
 
 const APTOS_ANALYTICS_API = "https://api.mainnet.aptoslabs.com/v1/analytics";
@@ -11,165 +20,171 @@ interface PerformanceData {
   balance: number;
 }
 
-export async function GET(request: NextRequest) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const walletAddress = searchParams.get("address");
-    const timeframe = searchParams.get("timeframe") || "7d";
+async function portfolioPerformanceHandler(request: NextRequest) {
+  const params = extractParams(request);
+  const timeframe = new URL(request.url).searchParams.get("timeframe") || "7d";
 
-    if (!walletAddress) {
-      return NextResponse.json(
-        { error: "Wallet address is required" },
-        { status: 400 },
-      );
-    }
+  // Validate required parameters
+  const validation = validateRequiredParams(params, ["address"]);
+  if (validation) {
+    return errorResponse(validation, 400);
+  }
 
-    // Map timeframe to appropriate lookback and granularity
-    const lookbackConfig = getTimeframeConfig(timeframe);
+  const walletAddress = params.address!;
 
-    // Fetch both balance history and price history in parallel
-    const [balanceData, priceData] = await Promise.all([
-      fetchBalanceHistory(walletAddress, lookbackConfig),
-      fetchPriceHistory(lookbackConfig),
-    ]);
+  // Map timeframe to appropriate lookback and granularity
+  const lookbackConfig = getTimeframeConfig(timeframe);
 
-    // If we're getting flat data, try the balance-history API directly
-    if (balanceData && balanceData.length > 1) {
-      const uniqueValues = [
-        ...new Set(
-          balanceData.map(
-            (item: any) =>
-              item.total_store_balance_usd ||
-              item.total_balance_usd ||
-              item.balance_usd ||
-              0,
-          ),
+  // Fetch both balance history and price history in parallel
+  const [balanceData, priceData] = await Promise.all([
+    fetchBalanceHistory(walletAddress, lookbackConfig),
+    fetchPriceHistory(lookbackConfig),
+  ]);
+
+  // If we're getting flat data, try the balance-history API directly
+  if (balanceData && balanceData.length > 1) {
+    const uniqueValues = [
+      ...new Set(
+        balanceData.map(
+          (item: any) =>
+            item.total_store_balance_usd ||
+            item.total_balance_usd ||
+            item.balance_usd ||
+            0,
         ),
-      ];
+      ),
+    ];
 
-      if (uniqueValues.length <= 1) {
-        // Try fetching via the internal balance-history API
-        try {
-          const balanceHistoryUrl = `${request.nextUrl.origin}/api/analytics/balance-history?address=${walletAddress}&lookback=${lookbackConfig.balanceLookback}`;
-          const balanceHistoryResponse = await fetch(balanceHistoryUrl);
+    if (uniqueValues.length <= 1) {
+      // Try fetching via the internal balance-history API
+      try {
+        const balanceHistoryUrl = `${request.nextUrl.origin}/api/analytics/balance-history?address=${walletAddress}&lookback=${lookbackConfig.balanceLookback}`;
+        const balanceHistoryResponse = await fetch(balanceHistoryUrl);
 
-          if (balanceHistoryResponse.ok) {
-            const balanceHistoryResult = await balanceHistoryResponse.json();
-            if (
-              balanceHistoryResult.data &&
-              balanceHistoryResult.data.length > 0
-            ) {
-              apiLogger.info(
-                "[Portfolio Performance] Using balance-history API data",
-              );
-              const alternativeData = balanceHistoryResult.data;
+        if (balanceHistoryResponse.ok) {
+          const balanceHistoryResult = await balanceHistoryResponse.json();
+          if (
+            balanceHistoryResult.data &&
+            balanceHistoryResult.data.length > 0
+          ) {
+            apiLogger.info(
+              "[Portfolio Performance] Using balance-history API data",
+            );
+            const alternativeData = balanceHistoryResult.data;
 
-              // Check if this data is also flat
-              const altUniqueValues = [
-                ...new Set(
-                  alternativeData.map(
-                    (item: any) =>
-                      item.total_store_balance_usd ||
-                      item.total_balance_usd ||
-                      item.balance_usd ||
-                      0,
-                  ),
+            // Check if this data is also flat
+            const altUniqueValues = [
+              ...new Set(
+                alternativeData.map(
+                  (item: any) =>
+                    item.total_store_balance_usd ||
+                    item.total_balance_usd ||
+                    item.balance_usd ||
+                    0,
                 ),
-              ];
+              ),
+            ];
 
-              if (altUniqueValues.length > 1) {
-                // Use the alternative data since it has variation
-                balanceData.splice(0, balanceData.length, ...alternativeData);
-              }
+            if (altUniqueValues.length > 1) {
+              // Use the alternative data since it has variation
+              balanceData.splice(0, balanceData.length, ...alternativeData);
             }
           }
-        } catch (altError) {
-          apiLogger.warn(
-            { error: altError },
-            "[Portfolio Performance] Alternative balance fetch failed",
-          );
         }
+      } catch (altError) {
+        apiLogger.warn(
+          { error: altError },
+          "[Portfolio Performance] Alternative balance fetch failed",
+        );
       }
     }
+  }
 
-    // Check if we have any data
-    if (!balanceData || balanceData.length === 0) {
-      apiLogger.warn(
-        { walletAddress },
-        "[Portfolio Performance] No balance data returned for wallet",
-      );
-      return NextResponse.json({
+  // Check if we have any data
+  if (!balanceData || balanceData.length === 0) {
+    apiLogger.warn(
+      { walletAddress },
+      "[Portfolio Performance] No balance data returned for wallet",
+    );
+    return successResponse(
+      {
         success: true,
         data: [],
         timeframe,
         dataPoints: 0,
         message: "No balance history found for this wallet",
-      });
-    }
+      },
+      CACHE_DURATIONS.SHORT,
+    );
+  }
 
-    if (!priceData || priceData.length === 0) {
-      apiLogger.warn("[Portfolio Performance] No price data returned");
-      return NextResponse.json({
+  if (!priceData || priceData.length === 0) {
+    apiLogger.warn("[Portfolio Performance] No price data returned");
+    return successResponse(
+      {
         success: true,
         data: [],
         timeframe,
         dataPoints: 0,
         message: "No price data available",
-      });
-    }
-
-    // Combine and interpolate data
-    const performanceData = combineData(balanceData, priceData, lookbackConfig);
-
-    // If we have flat data, just return it as-is (real data only)
-    if (performanceData.length > 1) {
-      const uniqueValues = [
-        ...new Set(performanceData.map((item) => item.value)),
-      ];
-
-      if (uniqueValues.length <= 1) {
-        apiLogger.info(
-          "[Portfolio Performance] Wallet has flat balance history - returning real data",
-        );
-      }
-    }
-
-    // Debug the combined data
-    apiLogger.info(
-      {
-        firstItem: performanceData[0],
-        lastItem: performanceData[performanceData.length - 1],
-        totalItems: performanceData.length,
-        allValuesSame:
-          performanceData.length > 1
-            ? performanceData.every(
-                (item) => item.value === performanceData[0].value,
-              )
-            : false,
-        uniqueValues: [...new Set(performanceData.map((item) => item.value))]
-          .length,
-        valueRange: {
-          min: Math.min(...performanceData.map((item) => item.value)),
-          max: Math.max(...performanceData.map((item) => item.value)),
-        },
       },
-      "[Portfolio Performance] Combined data sample",
+      CACHE_DURATIONS.SHORT,
     );
+  }
 
-    return NextResponse.json({
+  // Combine and interpolate data
+  const performanceData = combineData(balanceData, priceData, lookbackConfig);
+
+  // If we have flat data, just return it as-is (real data only)
+  if (performanceData.length > 1) {
+    const uniqueValues = [
+      ...new Set(performanceData.map((item) => item.value)),
+    ];
+
+    if (uniqueValues.length <= 1) {
+      apiLogger.info(
+        "[Portfolio Performance] Wallet has flat balance history - returning real data",
+      );
+    }
+  }
+
+  // Debug the combined data
+  apiLogger.info(
+    {
+      firstItem: performanceData[0],
+      lastItem: performanceData[performanceData.length - 1],
+      totalItems: performanceData.length,
+      allValuesSame:
+        performanceData.length > 1
+          ? performanceData.every(
+              (item) => item.value === performanceData[0].value,
+            )
+          : false,
+      uniqueValues: [...new Set(performanceData.map((item) => item.value))]
+        .length,
+      valueRange: {
+        min: Math.min(...performanceData.map((item) => item.value)),
+        max: Math.max(...performanceData.map((item) => item.value)),
+      },
+    },
+    "[Portfolio Performance] Combined data sample",
+  );
+
+  return successResponse(
+    {
       success: true,
       data: performanceData,
       timeframe,
       dataPoints: performanceData.length,
-    });
-  } catch (error) {
-    apiLogger.error({ error }, "[Portfolio Performance] Error");
-    return NextResponse.json(
-      { error: "Failed to fetch portfolio performance data" },
-      { status: 500 },
-    );
-  }
+    },
+    CACHE_DURATIONS.SHORT,
+  );
 }
+
+export const GET = withRateLimit(portfolioPerformanceHandler, {
+  name: "portfolio-performance",
+  ...RATE_LIMIT_TIERS.STANDARD,
+});
 
 function getTimeframeConfig(timeframe: string) {
   switch (timeframe) {
@@ -244,14 +259,10 @@ async function fetchBalanceHistory(walletAddress: string, config: any) {
 
   apiLogger.info(`[fetchBalanceHistory] Fetching from: ${url}`);
 
-  const headers: HeadersInit = {
+  const headers = {
     Accept: "application/json",
+    ...getAptosAuthHeaders(),
   };
-
-  const apiKey = process.env.APTOS_BUILD_KEY || process.env.APTOS_BUILD_SECRET;
-  if (apiKey) {
-    headers["Authorization"] = `Bearer ${apiKey}`;
-  }
 
   const response = await fetch(url, { headers });
 
@@ -282,14 +293,10 @@ async function fetchBalanceHistory(walletAddress: string, config: any) {
 async function fetchPriceHistory(config: any) {
   const url = `${APTOS_ANALYTICS_API}/token/historical_prices?address=0x1::aptos_coin::AptosCoin&lookback=${config.priceLookback}`;
 
-  const headers: HeadersInit = {
+  const headers = {
     Accept: "application/json",
+    ...getAptosAuthHeaders(),
   };
-
-  const apiKey = process.env.APTOS_BUILD_KEY || process.env.APTOS_BUILD_SECRET;
-  if (apiKey) {
-    headers["Authorization"] = `Bearer ${apiKey}`;
-  }
 
   const response = await fetch(url, { headers });
 

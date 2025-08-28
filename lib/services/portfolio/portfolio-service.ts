@@ -9,11 +9,13 @@ import {
   MetricsService,
   PortfolioHistoryService,
 } from "./services";
+import { DeFiPositionConverter } from "../defi/shared/defi-position-converter";
 import type {
   FungibleAsset,
   NFT,
   WalletTransaction,
   DeFiPosition,
+  LegacyDeFiPosition,
   PortfolioMetrics,
   PortfolioHistoryPoint,
   PortfolioSummary,
@@ -110,7 +112,7 @@ export async function getPortfolioSummary(
       totalValue: metrics.totalValue,
       fungibleAssets,
       nfts,
-      defiPositions,
+      defiPositions: [] as LegacyDeFiPosition[], // TODO: Convert DeFi positions properly
       metrics,
     };
   } catch (error) {

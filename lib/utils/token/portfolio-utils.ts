@@ -117,5 +117,5 @@ export interface UsePortfolioHistoryResult {
 
 // Duplicate exports removed - use from core modules instead
 // - RetryOptions and withRetry: use from core/types
-// - validateWalletAddress: use from core/validation  
+// - validateWalletAddress: use from core/validation
 // - createErrorResponse/createSuccessResponse: use from api/response-builder

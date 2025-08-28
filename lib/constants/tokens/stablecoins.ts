@@ -5,6 +5,8 @@
  * Moved from aptos-constants.ts
  */
 
+import { BRIDGE_UTILS } from "./bridges";
+
 export const STABLECOINS = {
   // Native Fungible Assets
   USDC: "0xbae207659db88bea0cbead6da0ed00aac12edcdda169e591cd41c94180b46f3b",
@@ -17,10 +19,8 @@ export const STABLECOINS = {
 
 // LayerZero bridged coins (separate because they use coin_info table)
 export const LAYERZERO_STABLECOINS = {
-  LZ_USDC:
-    "0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDC",
-  LZ_USDT:
-    "0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDT",
+  LZ_USDC: BRIDGE_UTILS.createLayerZeroToken("USDC"),
+  LZ_USDT: BRIDGE_UTILS.createLayerZeroToken("USDT"),
 } as const;
 
 // Wormhole bridged coins

@@ -16,7 +16,6 @@
   "providers": {
     "all": "Wote",
     "amnis": "Amnis Finance",
-    "tortuga": "Tortuga Finance",
     "ditto": "Ditto Finance",
     "thala": "Thala Labs",
     "other": "Wengine"

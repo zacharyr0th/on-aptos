@@ -399,14 +399,7 @@ export class YieldAggregatorService {
     const opportunities: YieldOpportunity[] = [];
 
     try {
-      const [tortuga, amnis] = await Promise.allSettled([
-        this.fetchProtocolOpportunities("Tortuga", PROTOCOL_ADDRESSES.TORTUGA, {
-          resourceFilters: [`${PROTOCOL_ADDRESSES.TORTUGA}::staked_aptos_coin`],
-          opportunityType: "staking",
-          protocolType: "liquid_staking",
-          risk: "low",
-          features: ["Liquid staking", "tAPT token"],
-        }),
+      const [amnis] = await Promise.allSettled([
         this.fetchProtocolOpportunities("Amnis", PROTOCOL_ADDRESSES.AMNIS, {
           resourceFilters: [`${PROTOCOL_ADDRESSES.AMNIS}::amapt_token`],
           opportunityType: "staking",
@@ -417,7 +410,7 @@ export class YieldAggregatorService {
       ]);
 
       // Process results
-      const allResults = [tortuga, amnis].filter(
+      const allResults = [amnis].filter(
         (result) => result.status === "fulfilled",
       );
       for (const result of allResults) {

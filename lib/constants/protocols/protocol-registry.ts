@@ -3,23 +3,18 @@
  * This is the single source of truth for all protocol-related information
  */
 
+import { ProtocolType } from "@/lib/types/defi";
+import { BRIDGE_ADDRESSES } from "../tokens/bridges";
+
+// Re-export ProtocolType from defi types
+export { ProtocolType };
+
 export interface ProtocolInfo {
   name: string;
   label: string; // Short label for UI display (e.g., "MKLP", "amAPT")
   type: ProtocolType;
   description?: string;
   addresses: string[];
-}
-
-export enum ProtocolType {
-  LIQUID_STAKING = "liquid_staking",
-  LENDING = "lending",
-  BRIDGE = "bridge",
-  FARMING = "farming",
-  DEX = "dex",
-  DERIVATIVES = "derivatives",
-  INFRASTRUCTURE = "infrastructure",
-  NFT_MARKETPLACE = "nft_marketplace",
 }
 
 /**
@@ -30,7 +25,7 @@ export const PROTOCOLS: Record<string, ProtocolInfo> = {
   APTOS_FRAMEWORK: {
     name: "Aptos Framework",
     label: "0x1",
-    type: ProtocolType.INFRASTRUCTURE,
+    type: ProtocolType.UNKNOWN,
     description: "Core Aptos framework",
     addresses: [
       "0x0000000000000000000000000000000000000000000000000000000000000001",
@@ -39,7 +34,7 @@ export const PROTOCOLS: Record<string, ProtocolInfo> = {
   APTOS_TOKEN_V2: {
     name: "Digital Assets",
     label: "0x4",
-    type: ProtocolType.INFRASTRUCTURE,
+    type: ProtocolType.UNKNOWN,
     description: "Aptos token v2 standard",
     addresses: [
       "0x0000000000000000000000000000000000000000000000000000000000000004",
@@ -99,16 +94,6 @@ export const PROTOCOLS: Record<string, ProtocolInfo> = {
       "0x9770fa9c725cbd97eb50b2be5f7416efdfd1f1554beb0750d4dae4c64e860da3",
     ],
   },
-  APTIN_FINANCE: {
-    name: "Aptin",
-    label: "Aptin",
-    type: ProtocolType.LENDING,
-    description: "Lending protocol",
-    addresses: [
-      "0x3c1d4a86594d681ff7e5d5a233965daeabdc6a15fe5672ceeda5260038857183",
-      "0xb7d960e5f0a58cc0817774e611d7e3ae54c6843816521f02d7ced583d6434896",
-    ],
-  },
   THALA_FARM: {
     name: "Thala Farm",
     label: "Thala Farm",
@@ -132,15 +117,6 @@ export const PROTOCOLS: Record<string, ProtocolInfo> = {
       "0xc7efb4076dbe143cbcd98cfaaa929ecfc8f299203dfff63b95ccb6bfe19850fa",
     ],
   },
-  // ECONIA: {
-  //   name: 'Econia',
-  //   label: 'Econia',
-  //   type: ProtocolType.DEX,
-  //   description: 'Order book DEX',
-  //   addresses: [
-  //     '0xc0deb00c405f84c85dc13442e305df75d1288100cdd82675695f6148c7ece51c',
-  //   ],
-  // },
   VIBRANTX: {
     name: "VibrantX",
     label: "VibrantX",
@@ -153,7 +129,7 @@ export const PROTOCOLS: Record<string, ProtocolInfo> = {
   THALA_INFRA: {
     name: "Thala Infrastructure",
     label: "Thala",
-    type: ProtocolType.INFRASTRUCTURE,
+    type: ProtocolType.UNKNOWN,
     description: "Thala protocol infrastructure",
     addresses: [
       "0x9c6d58fa009e08dfb2f5928ded14b3a790a94131da89891466b41ba1e61d83e1",
@@ -394,7 +370,7 @@ export const PROTOCOLS: Record<string, ProtocolInfo> = {
   WAPAL: {
     name: "Wapal",
     label: "Wapal",
-    type: ProtocolType.NFT_MARKETPLACE,
+    type: ProtocolType.NFT,
     description: "Wapal NFT marketplace",
     addresses: [
       "0x584b50b999c78ade62f8359c91b5165ff390338d45f8e55969a04e65d76258c9",
@@ -403,7 +379,7 @@ export const PROTOCOLS: Record<string, ProtocolInfo> = {
   MERCATO: {
     name: "Mercato",
     label: "Mercato",
-    type: ProtocolType.NFT_MARKETPLACE,
+    type: ProtocolType.NFT,
     description: "Mercato NFT marketplace",
     addresses: [
       "0xe11c12ec495f3989c35e1c6a0af414451223305b579291fc8f3d9d0575a23c26",
@@ -412,7 +388,7 @@ export const PROTOCOLS: Record<string, ProtocolInfo> = {
   BLUEMOVE_MARKETPLACE: {
     name: "BlueMove",
     label: "BlueMove",
-    type: ProtocolType.NFT_MARKETPLACE,
+    type: ProtocolType.NFT,
     description: "BlueMove NFT marketplace",
     addresses: [
       "0xd1fd99c1944b84d1670a2536417e997864ad12303d19eac725891691b04d614e",
@@ -439,8 +415,8 @@ export const STAKED_ASSET_SYMBOLS = [
  * Asset type regex patterns that indicate locked/phantom assets
  */
 export const PHANTOM_ASSET_PATTERNS = [
-  // LayerZero assets (often locked in bridge)
-  /0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::.*/,
+  // LayerZero bridged assets (often locked in bridge)
+  new RegExp(`${BRIDGE_ADDRESSES.LAYERZERO}::asset::.*`),
   // Amnis staked assets
   /0x111ae3e5bc816a5e63c2da97d0aa3886519e0cd5e4b046659fa35796bd11542a::stapt_token::.*/,
   /0x7e783b349d3e89cf5931af376ebeadbfab855b3fa239b7ada8f5a92fbea6b387::staking::.*/,

@@ -1,9 +1,4 @@
 import { ENDPOINTS } from "@/lib/constants";
-import {
-  getProtocolByAddress,
-  getProtocolLabel,
-  isPhantomAsset,
-} from "@/lib/constants/protocols/protocol-registry";
 import { graphQLRequest } from "@/lib/utils/api/fetch-utils";
 import { logger } from "@/lib/utils/core/logger";
 
@@ -113,25 +108,15 @@ export class AssetService {
             asset.amount,
             asset.asset_type,
             asset.metadata?.symbol,
+            { decimals: asset.metadata?.decimals },
           );
           const balance = formattedBalance.formatted;
 
           // Get price data
           const price = priceData.get(asset.asset_type);
 
-          // Calculate protocol info
-          const protocol = getProtocolByAddress(asset.asset_type);
-          const protocolInfo = protocol
-            ? {
-                protocol: protocol.name,
-                protocolLabel: getProtocolLabel(asset.asset_type) || "",
-                protocolType: protocol.type as string,
-                isPhantomAsset: isPhantomAsset(
-                  asset.asset_type,
-                  asset.metadata,
-                ),
-              }
-            : undefined;
+          // Protocol info removed - use new protocol system if needed
+          const protocolInfo = undefined;
 
           // Calculate value using unified utilities
           const tokenValue = UnifiedDecimalUtils.calculateTokenValue(

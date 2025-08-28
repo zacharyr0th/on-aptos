@@ -1,8 +1,13 @@
 import BitcoinPage from "@/components/pages/btc/Page";
+import { createPage } from "@/lib/utils/page-factory";
 
-// Static generation with 1-hour revalidation for better performance
+const pageConfig = createPage({
+  title: "Bitcoin Analytics",
+  description:
+    "Track Bitcoin on Aptos blockchain. Monitor wrapped BTC tokens, liquidity, and cross-chain activity with real-time analytics.",
+  Component: BitcoinPage,
+});
+
+export const metadata = pageConfig.metadata;
 export const revalidate = 3600;
-
-export default function Page() {
-  return <BitcoinPage />;
-}
+export default pageConfig.default;

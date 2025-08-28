@@ -80,9 +80,10 @@ export const formatPercentage = (value: number): string => {
 export const formatAssetValue = (
   value: number,
   assetType: "USD" | "BTC",
-  options: { decimals?: number; prefix?: string } = {}
+  options: { decimals?: number; prefix?: string } = {},
 ): string => {
-  if (!value || !Number.isFinite(value)) return assetType === "BTC" ? "0 BTC" : "$0";
+  if (!value || !Number.isFinite(value))
+    return assetType === "BTC" ? "0 BTC" : "$0";
 
   const { decimals = assetType === "BTC" ? 8 : 2, prefix = "" } = options;
   const cacheKey = `${assetType}:${value}:${decimals}:${prefix}`;
@@ -91,7 +92,7 @@ export const formatAssetValue = (
 
   try {
     let result: string;
-    
+
     if (assetType === "BTC") {
       if (value >= 1000) {
         result = `${prefix}${(value / 1000).toFixed(1)}k BTC`;
@@ -125,7 +126,10 @@ export const formatAssetValue = (
 // Market share calculation with memoization
 export const calculateMarketShare = (
   supply: number | bigint,
-  totalSupply: number | bigint | Array<{ btcValue?: number; usdValue?: number }>,
+  totalSupply:
+    | number
+    | bigint
+    | Array<{ btcValue?: number; usdValue?: number }>,
   precision = 2,
 ): number => {
   // Handle array case (for complex calculations)
@@ -134,18 +138,20 @@ export const calculateMarketShare = (
       return sum + (item.btcValue || item.usdValue || 0);
     }, 0);
     if (total === 0) return 0;
-    return Number(supply) / total * 100;
+    return (Number(supply) / total) * 100;
   }
 
   // Handle bigint case
-  if (typeof supply === 'bigint' && typeof totalSupply === 'bigint') {
+  if (typeof supply === "bigint" && typeof totalSupply === "bigint") {
     if (totalSupply === 0n) return 0;
     const cacheKey = `ms:${supply.toString()}:${totalSupply.toString()}:${precision}`;
     if (marketShareCache.has(cacheKey)) {
       return marketShareCache.get(cacheKey)!;
     }
     const percentage = Number((supply * 10000n) / totalSupply) / 100;
-    const rounded = Math.round(percentage * Math.pow(10, precision)) / Math.pow(10, precision);
+    const rounded =
+      Math.round(percentage * Math.pow(10, precision)) /
+      Math.pow(10, precision);
     const result = Number.isFinite(rounded) ? rounded : 0;
     marketShareCache.set(cacheKey, result);
     return result;
@@ -162,7 +168,7 @@ export const calculateMarketShare = (
 export const groupSmallItems = <T extends ChartDataItem>(
   items: T[],
   threshold = 1.0,
-  otherColor = "hsl(240 5% 45%)"
+  otherColor = "hsl(240 5% 45%)",
 ): T[] => {
   const result: T[] = [];
   const otherItems: T[] = [];
@@ -178,16 +184,23 @@ export const groupSmallItems = <T extends ChartDataItem>(
   // Add "Other" category if we have small items
   if (otherItems.length > 0) {
     const otherValue = otherItems.reduce((sum, item) => sum + item.value, 0);
-    const otherUsdValue = otherItems.reduce((sum, item) => sum + (item._usdValue || 0), 0);
-    const otherBtcValue = otherItems.reduce((sum, item) => sum + (item._btcValue || 0), 0);
+    const otherUsdValue = otherItems.reduce(
+      (sum, item) => sum + (item._usdValue || 0),
+      0,
+    );
+    const otherBtcValue = otherItems.reduce(
+      (sum, item) => sum + (item._btcValue || 0),
+      0,
+    );
 
     result.push({
       name: "Other",
       originalSymbol: "Other",
       value: otherValue,
-      formattedSupply: otherUsdValue > 0 
-        ? formatAssetValue(otherUsdValue, "USD")
-        : formatAssetValue(otherBtcValue, "BTC"),
+      formattedSupply:
+        otherUsdValue > 0
+          ? formatAssetValue(otherUsdValue, "USD")
+          : formatAssetValue(otherBtcValue, "BTC"),
       _usdValue: otherUsdValue || undefined,
       _btcValue: otherBtcValue || undefined,
       color: otherColor,

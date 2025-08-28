@@ -5,7 +5,7 @@ import React from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { formatCurrency } from "@/lib/utils/format/format";
+import { formatCurrency } from "@/lib/utils/format";
 
 // Reusable stat card component
 interface StatCardProps {

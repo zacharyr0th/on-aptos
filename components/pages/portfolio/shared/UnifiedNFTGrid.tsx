@@ -1,13 +1,7 @@
 "use client";
 
 import { ImageIcon, ChevronDown, ChevronUp } from "lucide-react";
-import React, {
-  useState,
-  useMemo,
-  useEffect,
-  useRef,
-  useCallback,
-} from "react";
+import React, { useState, useMemo, useEffect, useCallback } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -16,9 +10,13 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { useOnScreen } from "@/hooks";
 import { cn } from "@/lib/utils";
 import { logger } from "@/lib/utils/core/logger";
-import { sanitizeNFTMetadata, sanitizeImageUrl } from "@/lib/utils/core/security";
+import {
+  sanitizeNFTMetadata,
+  sanitizeImageUrl,
+} from "@/lib/utils/core/security";
 
 import { NFT } from "../types";
 
@@ -81,35 +79,21 @@ export const UnifiedNFTGrid: React.FC<UnifiedNFTGridProps> = ({
   const [expandedCollections, setExpandedCollections] = useState<Set<string>>(
     new Set(),
   );
-  const loadMoreRef = useRef<HTMLDivElement>(null);
 
   const filteredNFTs = nfts || [];
 
-  // Intersection Observer for infinite scroll
-  const handleLoadMore = useCallback(() => {
-    if (hasMoreNFTs && !isLoadingMore && onLoadMore) {
+  // Use intersection observer hook for infinite scroll
+  const [loadMoreRef, isLoadMoreVisible] = useOnScreen<HTMLDivElement>({
+    threshold: 0.1,
+    freezeOnceVisible: false,
+  });
+
+  // Auto load more when scrolling near bottom
+  useEffect(() => {
+    if (hasMoreNFTs && !isLoadingMore && onLoadMore && isLoadMoreVisible) {
       onLoadMore();
     }
-  }, [hasMoreNFTs, isLoadingMore, onLoadMore]);
-
-  useEffect(() => {
-    if (!onLoadMore) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          handleLoadMore();
-        }
-      },
-      { threshold: 0.1 },
-    );
-
-    if (loadMoreRef.current) {
-      observer.observe(loadMoreRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, [handleLoadMore, onLoadMore]);
+  }, [hasMoreNFTs, isLoadingMore, onLoadMore, isLoadMoreVisible]);
 
   // Group NFTs by collection for collection view
   const groupedNFTs = useMemo(() => {
@@ -195,7 +179,7 @@ export const UnifiedNFTGrid: React.FC<UnifiedNFTGridProps> = ({
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-200" />
 
           {/* Amount badge - only if more than 1 */}
-          {nft.amount > 1 && (
+          {nft.amount && nft.amount > 1 && (
             <div className="absolute top-2 right-2 bg-white/90 dark:bg-black/90 backdrop-blur-sm px-2 py-0.5 text-xs">
               {nft.amount}
             </div>
@@ -224,7 +208,7 @@ export const UnifiedNFTGrid: React.FC<UnifiedNFTGridProps> = ({
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
               className="object-cover transition-transform duration-300 group-hover:scale-110"
             />
-            {nft.amount > 1 && (
+            {nft.amount && nft.amount > 1 && (
               <Badge className="absolute top-2 right-2 bg-background/90 backdrop-blur-sm">
                 ×{nft.amount}
               </Badge>
@@ -254,7 +238,7 @@ export const UnifiedNFTGrid: React.FC<UnifiedNFTGridProps> = ({
             sizes="(max-width: 640px) 50vw, 33vw"
             className="object-cover group-hover:scale-105 transition-transform duration-200"
           />
-          {nft.amount > 1 && (
+          {nft.amount && nft.amount > 1 && (
             <div className="absolute top-2 right-2 bg-background/80 backdrop-blur-sm rounded px-2 py-1 text-xs font-medium">
               x{nft.amount}
             </div>

@@ -14,12 +14,16 @@ export * from "./external/defi-llama";
 export * from "./external/price-service";
 
 // DeFi Services - Ultra-simplified!
-export { scanDeFiPositions, createDeFiProvider, DeFiPositionProvider } from "./defi";
+export {
+  scanDeFiPositions,
+  createDeFiProvider,
+  DeFiPositionProvider,
+} from "./defi";
 export type { DeFiPosition } from "./defi";
 
 // Portfolio Services
 export { DeFiBalanceService } from "./defi/services/defi-balance-service";
-export * from "./portfolio/panora-service";
+export { UnifiedPanoraService } from "./portfolio/unified-panora-service";
 export * from "./portfolio/panora-token-list";
 export * from "./portfolio/portfolio-service";
 export * from "./portfolio/services";

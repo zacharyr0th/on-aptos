@@ -5,7 +5,6 @@ import { Search } from "lucide-react";
 import React, { useState } from "react";
 
 import { ErrorBoundary } from "@/components/errors/ErrorBoundary";
-import { Footer } from "@/components/layout/Footer";
 import { Input } from "@/components/ui/input";
 import { useProtocolMetrics } from "@/hooks/useProtocolMetrics";
 import { usePageTranslation } from "@/hooks/useTranslation";
@@ -81,14 +80,13 @@ export default function DefiPage(): React.ReactElement {
       <div
         className={`min-h-screen flex flex-col relative ${GeistMono.className}`}
       >
-        {/* Background gradient - fixed to viewport */}
-        <div className="fixed inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/10 pointer-events-none" />
+        {/* Background gradient removed - using global textured background */}
 
         <div className="fixed top-0 left-0 right-0 h-1 z-30">
           {refreshing && <div className="h-full bg-muted animate-pulse"></div>}
         </div>
 
-        <main className="w-full px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20 py-8 flex-1 relative">
+        <main className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20 py-8 flex-1 relative">
           {metricsLoading ? (
             <LoadingState />
           ) : (
@@ -205,8 +203,6 @@ export default function DefiPage(): React.ReactElement {
             </>
           )}
         </main>
-
-        <Footer className="relative" />
       </div>
     </ErrorBoundary>
   );

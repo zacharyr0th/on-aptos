@@ -1,791 +1,627 @@
-import { NextRequest, NextResponse } from "next/server";
+import { LRUCache } from "lru-cache";
+import { NextRequest } from "next/server";
 
-import { STABLECOINS } from "@/lib/constants/tokens/stablecoins";
-import { TETHER_RESERVES } from "@/lib/constants/tokens/addresses";
+import {
+  extractParams,
+  errorResponse,
+  successResponse,
+  validateRequiredParams,
+  CACHE_DURATIONS,
+  parseNumericParam,
+  getAptosAuthHeaders,
+} from "@/lib/utils/api/common";
+import { fetchFromPanora } from "@/lib/utils/api/panora-client";
+import { withRateLimit, RATE_LIMIT_TIERS } from "@/lib/utils/api/rate-limiter";
 import { apiLogger } from "@/lib/utils/core/logger";
-import { createErrorResponse } from "@/lib/utils/api/response-builder";
 
-// Environment variables for API keys
-const PANORA_API_KEY = process.env.PANORA_API_KEY;
-const APTOS_BUILD_SECRET = process.env.APTOS_BUILD_SECRET;
+// Constants
+const DEFAULT_LIMIT = 50;
+const MAX_LIMIT = 5000; // Increased to handle all 3000+ tokens
+const CACHE_NAMESPACE = "tokens-api";
+const PANORA_API_URL = "https://api.panora.exchange";
+const GRAPHQL_URL = "https://api.mainnet.aptoslabs.com/v1/graphql";
 
-if (!PANORA_API_KEY) {
-  throw new Error(
-    "PANORA_API_KEY environment variable is required. Please check your .env file.",
-  );
-}
-if (!APTOS_BUILD_SECRET) {
-  throw new Error(
-    "APTOS_BUILD_SECRET environment variable is required. Please check your .env file.",
-  );
-}
-const APTOS_GRAPHQL_URL = "https://api.mainnet.aptoslabs.com/v1/graphql";
-
-interface PanoraToken {
-  chainId: number;
-  panoraId: string;
+// Token interfaces
+interface TokenInfo {
   tokenAddress: string | null;
   faAddress: string | null;
   name: string;
   symbol: string;
   decimals: number;
-  usdPrice: string;
-  nativePrice?: string;
+  price?: string;
+  usdPrice?: string;
+  priceChange24H?: number;
   logoUrl?: string;
+  panoraSymbol?: string;
   panoraTags?: string[];
+  panoraUI?: boolean;
+  websiteUrl?: string;
+  bridge?: string | null;
+  coinGeckoId?: string;
+  coinMarketCapId?: number;
 }
 
-interface TokenMetadata {
-  asset_type: string;
-  supply_v2?: string;
-  maximum_v2?: string;
-  decimals?: number;
-}
-
-interface TokenMarketData {
-  symbol: string;
-  name: string;
-  price: number;
-  supply: number;
-  marketCap: number;
-  decimals: number;
-  faAddress?: string;
-  tokenAddress?: string;
-  logoUrl?: string;
-  priceChange24h?: number;
-  volume24h?: number;
-  holders?: number;
-  panoraTags?: string[];
+interface TokenMarketData extends TokenInfo {
+  supply?: number;
+  marketCap?: number;
+  fullyDilutedValuation?: number;
+  priceChangePercentage24h?: number;
+  priceChange24H?: number;
+  category?: string;
+  rank?: number;
   isVerified?: boolean;
 }
 
-// Cache for 5 minutes
-const CACHE_TTL = 5 * 60 * 1000;
-let cache: { data: any; timestamp: number } | null = null;
+interface TokensResponse {
+  tokens: TokenMarketData[];
+  totalMarketCap: number;
+  aptPrice: number;
+  totalTokens: number;
+  categories: {
+    native: number;
+    emojicoin: number;
+    meme: number;
+    bridged: number;
+    other: number;
+  };
+  distribution: {
+    range: string;
+    count: number;
+    percentage: number;
+  }[];
+  lastUpdated: string;
+}
 
-// Clear cache to force fresh data with verified tokens only
-cache = null;
+// Initialize cache with larger capacity for 3000+ tokens
+const tokenCache = new LRUCache<string, any>({
+  max: 500, // Increased cache size
+  ttl: 1000 * 60 * 10, // 10 minutes cache for stability
+});
 
-async function fetchPanoraPrices(): Promise<PanoraToken[]> {
+// Use unified Panora client instead of local implementation
+
+/**
+ * Fetch token prices from Panora
+ */
+async function fetchPanoraPrices(): Promise<Map<string, string>> {
+  const cacheKey = `${CACHE_NAMESPACE}:prices`;
+  const cached = tokenCache.get(cacheKey);
+  if (cached) return cached;
+
   try {
-    // Fetch both verified tokens (panoraUI=true) and all tokens (panoraUI=false)
-    const [verifiedResponse, allResponse] = await Promise.all([
-      fetch("https://api.panora.exchange/tokenlist", {
-        headers: {
-          "x-api-key": PANORA_API_KEY!,
-          Accept: "application/json",
-          "Accept-Encoding": "gzip, deflate",
-        },
-      }),
-      fetch("https://api.panora.exchange/tokenlist?panoraUI=false", {
-        headers: {
-          "x-api-key": PANORA_API_KEY!,
-          Accept: "application/json",
-          "Accept-Encoding": "gzip, deflate",
-        },
-      }),
-    ]);
+    const pricesResponse = await fetchFromPanora("/prices");
+    const prices =
+      pricesResponse?.data && Array.isArray(pricesResponse.data)
+        ? pricesResponse.data
+        : [];
+    const priceMap = new Map<string, string>();
 
-    // Parse responses
-    const [verifiedResult, allResult] = await Promise.all([
-      verifiedResponse.json(),
-      allResponse.json(),
-    ]);
-
-    // Check if the API returned data properly
-    if (!verifiedResult || !allResult) {
-      throw new Error(`Panora API returned invalid data`);
-    }
-
-    // Handle both wrapped and unwrapped responses
-    const verifiedTokens = verifiedResult.data || verifiedResult;
-    const allTokens = allResult.data || allResult;
-
-    apiLogger.info(
-      `Fetched ${Array.isArray(verifiedTokens) ? verifiedTokens.length : 0} verified tokens and ${Array.isArray(allTokens) ? allTokens.length : 0} total tokens from Panora`,
-    );
-
-    // Create a Map to deduplicate tokens by address
-    const tokenMap = new Map();
-
-    // Add verified tokens first (they have priority)
-    if (Array.isArray(verifiedTokens)) {
-      verifiedTokens.forEach((token) => {
-        const key = token.faAddress || token.tokenAddress || token.panoraId;
-        if (key) {
-          tokenMap.set(key, { ...token, isVerified: true });
+    prices.forEach((token: any) => {
+      if (token.usdPrice) {
+        if (token.tokenAddress) {
+          priceMap.set(token.tokenAddress.toLowerCase(), token.usdPrice);
         }
-      });
-    }
-
-    // Add all tokens, but don't override verified ones
-    if (Array.isArray(allTokens)) {
-      allTokens.forEach((token) => {
-        const key = token.faAddress || token.tokenAddress || token.panoraId;
-        if (key && !tokenMap.has(key)) {
-          tokenMap.set(key, {
-            ...token,
-            isVerified: token.panoraTags?.includes("Verified") || false,
-          });
+        if (token.faAddress) {
+          priceMap.set(token.faAddress.toLowerCase(), token.usdPrice);
         }
-      });
+      }
+    });
+
+    tokenCache.set(cacheKey, priceMap);
+    return priceMap;
+  } catch (error) {
+    apiLogger.error("Failed to fetch Panora prices", { error });
+    return new Map();
+  }
+}
+
+/**
+ * Process tokens from Panora - no mock data, only real tokens from Panora's list
+ */
+function processTokensFromPanora(tokens: TokenInfo[]): TokenInfo[] {
+  // Only use real tokens from Panora - no mock/fallback data
+  // APT should be included naturally from Panora's token list
+  const APT_ADDRESS = "0x1::aptos_coin::AptosCoin";
+
+  // Ensure APT has the correct address format if it exists
+  const aptToken = tokens.find(
+    (t) =>
+      t.symbol === "APT" ||
+      t.tokenAddress?.toLowerCase() === APT_ADDRESS.toLowerCase(),
+  );
+
+  if (aptToken && !aptToken.tokenAddress) {
+    // If APT is found but missing the standard address, add it
+    aptToken.tokenAddress = APT_ADDRESS;
+  }
+
+  return tokens;
+}
+
+/**
+ * Fetch comprehensive token supply data from GraphQL for all tokens
+ */
+async function fetchTokenMetadata(
+  addresses: string[],
+): Promise<Map<string, any>> {
+  const metadataMap = new Map();
+  const batchSize = 30; // Reduced batch size to avoid overwhelming the API
+  const maxBatches = 20; // Limit to 600 tokens for metadata to keep it reasonable
+
+  apiLogger.info(
+    `Fetching supply data for up to ${Math.min(addresses.length, batchSize * maxBatches)} of ${addresses.length} tokens`,
+  );
+
+  const addressesToFetch = addresses.slice(0, batchSize * maxBatches);
+
+  for (let i = 0; i < addressesToFetch.length; i += batchSize) {
+    const batch = addressesToFetch.slice(i, i + batchSize);
+
+    // Add a small delay between batches to avoid rate limiting
+    if (i > 0) {
+      await new Promise((resolve) => setTimeout(resolve, 100));
     }
 
-    const allAvailableTokens = Array.from(tokenMap.values());
+    try {
+      const queries = batch
+        .map((address, index) => {
+          if (address.includes("::")) {
+            // Coin standard tokens (like APT)
+            return `
+            coin_${index}: coin_supply(
+              where: {coin_type: {_eq: "${address}"}}
+              limit: 1
+            ) {
+              coin_type
+              supply
+              coin_info {
+                decimals
+                name
+                symbol
+              }
+            }
+          `;
+          } else {
+            // Fungible Asset tokens - use supply_v2 from metadata
+            return `
+            fa_metadata_${index}: fungible_asset_metadata(
+              where: {
+                asset_type: {_eq: "${address}"}
+              }
+              limit: 1
+            ) {
+              asset_type
+              decimals
+              name
+              symbol
+              supply_v2
+            }
+          `;
+          }
+        })
+        .join("\n");
 
-    // Keep tokens with prices for market cap calculation
-    let tokensWithPrices = allAvailableTokens.filter(
-      (token: any) => token.usdPrice && parseFloat(token.usdPrice) > 0,
-    );
+      const response = await fetch(GRAPHQL_URL, {
+        method: "POST",
+        headers: getAptosAuthHeaders(),
+        body: JSON.stringify({
+          query: `query GetTokenSupplies { ${queries} }`,
+        }),
+      });
 
-    // Also include tokens without prices but set price to 0 for display
-    const tokensWithoutPrices = allAvailableTokens
-      .filter(
-        (token: any) => !token.usdPrice || parseFloat(token.usdPrice) <= 0,
-      )
-      .map((token: any) => ({
-        ...token,
-        usdPrice: "0",
-      }));
+      if (response.ok) {
+        const data = await response.json();
 
-    // Combine both arrays
-    tokensWithPrices = [...tokensWithPrices, ...tokensWithoutPrices];
+        Object.entries(data.data || {}).forEach(
+          ([key, value]: [string, any]) => {
+            const parts = key.split("_");
+            const index = parseInt(parts[parts.length - 1]); // Get last part as index
+            const address = batch[index];
 
-    // Ensure APT is included even if it's not in the Verified tag response
-    // Fetch APT separately if not found in verified tokens
-    const hasAPT = tokensWithPrices.some(
-      (token) =>
-        token.symbol === "APT" ||
-        token.tokenAddress === "0x1::aptos_coin::AptosCoin",
-    );
-
-    if (!hasAPT) {
-      try {
-        // Fetch APT specifically
-        const aptResponse = await fetch(
-          "https://api.panora.exchange/tokenlist?tokenAddress=0x1::aptos_coin::AptosCoin",
-          {
-            headers: {
-              "x-api-key": PANORA_API_KEY!,
-              Accept: "application/json",
-              "Accept-Encoding": "gzip, deflate",
-            },
+            if (key.startsWith("coin_") && Array.isArray(value) && value[0]) {
+              metadataMap.set(address, {
+                supply: value[0].supply,
+                decimals: value[0].coin_info?.decimals || 0,
+                name: value[0].coin_info?.name,
+                symbol: value[0].coin_info?.symbol,
+              });
+            } else if (
+              key.startsWith("fa_metadata_") &&
+              Array.isArray(value) &&
+              value[0]
+            ) {
+              // For Fungible Assets, get supply_v2 directly from metadata
+              metadataMap.set(address, {
+                supply: value[0].supply_v2 || "0",
+                decimals: value[0].decimals || 0,
+                name: value[0].name,
+                symbol: value[0].symbol,
+              });
+            }
           },
         );
+      } else {
+        apiLogger.warn(
+          `GraphQL request failed with status: ${response.status}`,
+        );
+      }
+    } catch (error) {
+      apiLogger.error("Failed to fetch token metadata batch", {
+        error,
+        batchSize: batch.length,
+      });
+    }
+  }
 
-        if (aptResponse.ok) {
-          const aptResult = await aptResponse.json();
-          const aptTokens = aptResult.data || aptResult;
-          const aptToken = (Array.isArray(aptTokens) ? aptTokens : []).find(
-            (token: any) => token.symbol === "APT",
-          );
+  apiLogger.info(
+    `Successfully fetched metadata for ${metadataMap.size} tokens`,
+  );
+  return metadataMap;
+}
 
-          if (
-            aptToken &&
-            aptToken.usdPrice &&
-            parseFloat(aptToken.usdPrice) > 0
-          ) {
-            tokensWithPrices.push(aptToken);
-            apiLogger.info(
-              "Added APT token separately since it was not in verified tokens",
-            );
-          }
-        }
-      } catch (aptError) {
-        apiLogger.warn("Failed to fetch APT token separately", {
-          error: aptError,
-        });
+/**
+ * Sort tokens by market cap and apply pagination
+ */
+function sortAndPaginateTokens(
+  tokens: TokenInfo[],
+  limit: number,
+  offset: number,
+): TokenInfo[] {
+  // Don't sort here - we'll sort after calculating market caps
+  return tokens.slice(offset, offset + limit);
+}
+
+/**
+ * Create token market data
+ */
+function createTokenMarketData(
+  token: TokenInfo,
+  price: number | undefined,
+  supply: number | undefined,
+  rank?: number,
+): TokenMarketData {
+  const marketCap = price && supply ? price * supply : undefined;
+
+  // Determine if token is verified based on panoraTags
+  // Only consider "Verified" tag as truly verified
+  const isVerified =
+    token.panoraTags?.some((tag) => tag === "Verified") || false;
+
+  return {
+    ...token,
+    price: price?.toString(),
+    supply,
+    marketCap,
+    fullyDilutedValuation: marketCap,
+    priceChange24H: token.priceChange24H,
+    rank,
+    category: categorizeToken(token),
+    isVerified,
+  };
+}
+
+/**
+ * Categorize token based on tags
+ */
+function categorizeToken(token: TokenInfo): string {
+  if (!token.panoraTags) return "other";
+
+  if (token.panoraTags.includes("Emojicoin")) return "emojicoin";
+  if (token.panoraTags.includes("Meme")) return "meme";
+  if (token.panoraTags.includes("Bridged")) return "bridged";
+  if (token.panoraTags.includes("Native")) return "native";
+
+  return "other";
+}
+
+/**
+ * Process tokens with real data from Panora prices and on-chain supplies
+ */
+async function processTokensBatch(
+  tokens: TokenInfo[],
+  metadataMap: Map<string, any>,
+): Promise<TokenMarketData[]> {
+  return tokens.map((token, index) => {
+    // Use real USD price from Panora
+    const price = token.usdPrice ? parseFloat(token.usdPrice) : 0;
+
+    // Get real supply data from on-chain
+    const metadata = metadataMap.get(
+      token.faAddress || token.tokenAddress || "",
+    );
+    const rawSupply = metadata?.supply;
+    const decimals =
+      metadata?.decimals !== undefined ? metadata.decimals : token.decimals;
+
+    // Convert raw supply to human-readable format
+    let supply: number | undefined = undefined;
+    if (rawSupply) {
+      try {
+        const supplyBN = BigInt(rawSupply);
+        const divisor = BigInt(10 ** decimals);
+        supply = Number(supplyBN) / Number(divisor);
+      } catch (error) {
+        apiLogger.warn(
+          `Failed to parse supply for ${token.symbol}: ${rawSupply}`,
+          { error },
+        );
+        // Fallback to simpler parsing
+        supply = parseInt(rawSupply) / Math.pow(10, decimals);
       }
     }
 
-    return tokensWithPrices;
+    return createTokenMarketData(token, price, supply, index + 1);
+  });
+}
+
+/**
+ * Calculate market cap distribution
+ */
+function calculateDistribution(tokens: TokenMarketData[]): any[] {
+  const ranges = [
+    { min: 1000000000, label: "> $1B" },
+    { min: 100000000, max: 1000000000, label: "$100M - $1B" },
+    { min: 10000000, max: 100000000, label: "$10M - $100M" },
+    { min: 1000000, max: 10000000, label: "$1M - $10M" },
+    { min: 100000, max: 1000000, label: "$100K - $1M" },
+    { min: 0, max: 100000, label: "< $100K" },
+  ];
+
+  const distribution = ranges.map((range) => {
+    const count = tokens.filter((t) => {
+      if (!t.marketCap) return false;
+      if (range.max) {
+        return t.marketCap >= range.min && t.marketCap < range.max;
+      }
+      return t.marketCap >= range.min;
+    }).length;
+
+    return {
+      range: range.label,
+      count,
+      percentage: tokens.length > 0 ? (count / tokens.length) * 100 : 0,
+    };
+  });
+
+  return distribution;
+}
+
+/**
+ * Calculate market caps for all tokens
+ */
+async function calculateMarketCaps(
+  limit: number,
+  offset: number,
+  fetchAll: boolean = false,
+): Promise<TokensResponse> {
+  try {
+    // Fetch UI tokens first (has most verified tokens)
+    const uiTokensResponse = await fetchFromPanora("/tokenlist", {
+      panoraUI: "true", // Get UI tokens (verified ones)
+    });
+    const uiTokens = uiTokensResponse?.data || uiTokensResponse || [];
+
+    // Fetch ALL tokens for completeness
+    const allTokensResponse = await fetchFromPanora("/tokenlist", {
+      panoraUI: "false", // Get ALL tokens including emojicoins
+    });
+    const allTokens = allTokensResponse?.data || allTokensResponse || [];
+
+    // Create a Set of addresses from UI tokens to avoid duplicates
+    const uiAddresses = new Set(
+      uiTokens.map((t: any) => t.faAddress || t.tokenAddress).filter(Boolean),
+    );
+
+    // Filter out UI tokens from the all tokens list to avoid duplicates
+    const additionalTokens = allTokens.filter(
+      (token: any) =>
+        !uiAddresses.has(token.faAddress) &&
+        !uiAddresses.has(token.tokenAddress),
+    );
+
+    // Combine: UI tokens first (verified), then additional tokens
+    const combinedTokens = [...uiTokens, ...additionalTokens];
+
+    apiLogger.info(
+      `Fetched ${combinedTokens.length} tokens from Panora (${uiTokens.length} UI + ${additionalTokens.length} additional)`,
+    );
+
+    // Process tokens from Panora - no mock data, only real tokens
+    const tokens = processTokensFromPanora(combinedTokens);
+
+    // For sorting by FDV, we need to fetch supplies for all tokens first
+    // Then sort and paginate
+    if (!fetchAll) {
+      // Fetch metadata for a reasonable batch to sort properly
+      // For the portfolio page, we want to return all requested tokens
+      // But only fetch metadata for the first 600 for performance
+      const metadataLimit = 600;
+      const tokensForMetadata = tokens.slice(0, metadataLimit);
+      const addresses = tokensForMetadata
+        .map((t) => t.faAddress || t.tokenAddress)
+        .filter(Boolean) as string[];
+      const metadataMap = await fetchTokenMetadata(addresses);
+
+      // Process tokens with metadata
+      const tokensWithMetadata = await processTokensBatch(
+        tokensForMetadata,
+        metadataMap,
+      );
+
+      // For remaining tokens, just use basic data without supply/FDV
+      const remainingTokens = tokens.slice(metadataLimit).map((token, index) =>
+        createTokenMarketData(
+          token,
+          token.usdPrice ? parseFloat(token.usdPrice) : 0,
+          undefined, // No supply data for these
+          metadataLimit + index + 1,
+        ),
+      );
+
+      // Combine all tokens
+      const allProcessedTokens = [...tokensWithMetadata, ...remainingTokens];
+
+      // Sort by FDV/market cap descending (tokens with FDV will be at top)
+      allProcessedTokens.sort((a, b) => {
+        // First, sort by verification status (verified tokens first)
+        if (a.isVerified && !b.isVerified) return -1;
+        if (!a.isVerified && b.isVerified) return 1;
+
+        // Then sort by FDV within each group
+        const aFdv = a.fullyDilutedValuation || a.marketCap || 0;
+        const bFdv = b.fullyDilutedValuation || b.marketCap || 0;
+        return bFdv - aFdv;
+      });
+
+      // Apply pagination after sorting
+      const processedTokens = allProcessedTokens.slice(offset, offset + limit);
+
+      // Re-rank based on position
+      processedTokens.forEach((token, index) => {
+        token.rank = offset + index + 1;
+      });
+
+      return {
+        tokens: processedTokens,
+        totalMarketCap: allProcessedTokens.reduce(
+          (sum, t) => sum + (t.marketCap || 0),
+          0,
+        ),
+        aptPrice: allProcessedTokens.find((t) => t.symbol === "APT")?.price
+          ? parseFloat(
+              allProcessedTokens.find((t) => t.symbol === "APT")!.price!,
+            )
+          : 0,
+        totalTokens: tokens.length,
+        categories: {
+          native: allProcessedTokens.filter((t) => t.category === "native")
+            .length,
+          emojicoin: allProcessedTokens.filter(
+            (t) => t.category === "emojicoin",
+          ).length,
+          meme: allProcessedTokens.filter((t) => t.category === "meme").length,
+          bridged: allProcessedTokens.filter((t) => t.category === "bridged")
+            .length,
+          other: allProcessedTokens.filter((t) => t.category === "other")
+            .length,
+        },
+        distribution: calculateDistribution(allProcessedTokens),
+        lastUpdated: new Date().toISOString(),
+      };
+    }
+
+    // If fetchAll is true, process all tokens
+    const selectedTokens = tokens;
+    const addresses = selectedTokens
+      .map((t) => t.faAddress || t.tokenAddress)
+      .filter(Boolean) as string[];
+    const metadataMap = await fetchTokenMetadata(addresses);
+    const processedTokens = await processTokensBatch(
+      selectedTokens,
+      metadataMap,
+    );
+
+    // Calculate totals and distribution
+    const totalMarketCap = processedTokens.reduce(
+      (sum, t) => sum + (t.marketCap || 0),
+      0,
+    );
+
+    const aptToken = processedTokens.find((t) => t.symbol === "APT");
+    const aptPrice = aptToken?.price ? parseFloat(aptToken.price) : 0;
+
+    const categories = {
+      native: processedTokens.filter((t) => t.category === "native").length,
+      emojicoin: processedTokens.filter((t) => t.category === "emojicoin")
+        .length,
+      meme: processedTokens.filter((t) => t.category === "meme").length,
+      bridged: processedTokens.filter((t) => t.category === "bridged").length,
+      other: processedTokens.filter((t) => t.category === "other").length,
+    };
+
+    const distribution = calculateDistribution(processedTokens);
+
+    return {
+      tokens: processedTokens,
+      totalMarketCap,
+      aptPrice,
+      totalTokens: tokens.length,
+      categories,
+      distribution,
+      lastUpdated: new Date().toISOString(),
+    };
   } catch (error) {
-    apiLogger.error("Failed to fetch Panora prices", { error });
+    apiLogger.error("Failed to calculate market caps", { error });
     throw error;
   }
 }
 
-async function fetchTokenMetadata(addresses: string[]): Promise<{
-  metadataMap: Map<string, TokenMetadata>;
-  usdtReserveBalance: string;
-}> {
-  try {
-    // Check if USDT is in the batch to also fetch reserve balance
-    const hasUsdt = addresses.includes(STABLECOINS.USDT);
-
-    const query = `
-      query GetTokensMetadata($addresses: [String!]!) {
-        fungible_asset_metadata(
-          where: {asset_type: {_in: $addresses}}
-        ) {
-          asset_type
-          supply_v2
-          maximum_v2
-          decimals
-        }
-        ${
-          hasUsdt
-            ? `
-        # Get USDT Tether reserve balance if USDT is in this batch
-        current_fungible_asset_balances(where: {
-          owner_address: {_eq: "${TETHER_RESERVES.SECONDARY}"},
-          asset_type: {_eq: "${STABLECOINS.USDT}"}
-        }) {
-          amount
-        }
-        `
-            : ""
-        }
-      }
-    `;
-
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 30000); // 30 second timeout
-
-    const response = await fetch(APTOS_GRAPHQL_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${APTOS_BUILD_SECRET}`,
-      },
-      body: JSON.stringify({
-        query,
-        variables: { addresses },
-      }),
-      signal: controller.signal,
-    });
-
-    clearTimeout(timeout);
-
-    if (!response.ok) {
-      throw new Error(`GraphQL error: ${response.status}`);
-    }
-
-    const result = await response.json();
-    const metadataMap = new Map<string, TokenMetadata>();
-
-    if (result.data?.fungible_asset_metadata) {
-      result.data.fungible_asset_metadata.forEach((item: TokenMetadata) => {
-        metadataMap.set(item.asset_type, item);
-      });
-    }
-
-    // Get USDT reserve balance
-    const usdtReserveBalance =
-      result.data?.current_fungible_asset_balances?.[0]?.amount || "0";
-
-    return { metadataMap, usdtReserveBalance };
-  } catch (error) {
-    apiLogger.warn("Failed to fetch token metadata", {
-      error: error instanceof Error ? error.message : String(error),
-      addressCount: addresses.length,
-    });
-    return { metadataMap: new Map(), usdtReserveBalance: "0" };
-  }
-}
-
-async function calculateMarketCaps(
-  includeAPT = true,
-  maxTokens = 0,
-): Promise<{
-  tokens: TokenMarketData[];
-  totalMarketCap: number;
-  totalMarketCapWithAPT: number;
-  aptMarketCap: number;
-  tokensWithSupply: number;
-  totalTokensAnalyzed: number;
-}> {
-  // Fetch ALL prices from Panora (no limit)
-  const panoraPrices = await fetchPanoraPrices();
-
-  // Get all tokens (including those with zero prices) and separate APT
-  const allValidTokens = panoraPrices;
-  const aptToken = allValidTokens.find(
-    (t) =>
-      t.symbol === "APT" ||
-      t.tokenAddress === "0x1::aptos_coin::AptosCoin" ||
-      t.name?.toLowerCase().includes("aptos"),
-  );
-
-  // Get all non-APT tokens
-  let nonAptTokens = allValidTokens.filter(
-    (t) =>
-      t.symbol !== "APT" &&
-      t.tokenAddress !== "0x1::aptos_coin::AptosCoin" &&
-      !t.name?.toLowerCase().includes("aptos coin"),
-  );
-
-  // Store remaining tokens for later processing
-  let remainingTokens: any[] = [];
-
-  // Apply max tokens limit - use reasonable default for supply lookups
-  if (maxTokens > 0) {
-    nonAptTokens = nonAptTokens.slice(0, maxTokens);
-  } else {
-    // Default limit for supply lookups to prevent timeouts (prioritize verified tokens)
-    const verifiedTokens = nonAptTokens.filter((t) =>
-      t.panoraTags?.includes("Verified"),
-    );
-    const unverifiedTokens = nonAptTokens.filter(
-      (t) => !t.panoraTags?.includes("Verified"),
-    );
-
-    // Take first 500 verified + first 1000 unverified for supply analysis
-    nonAptTokens = [
-      ...verifiedTokens.slice(0, 500),
-      ...unverifiedTokens.slice(0, 1000),
-    ];
-
-    // Store remaining tokens without supply data for completeness
-    remainingTokens = [
-      ...verifiedTokens.slice(500),
-      ...unverifiedTokens.slice(1000),
-    ];
-  }
-
-  apiLogger.info(
-    `Processing ${nonAptTokens.length} non-APT tokens and APT separately`,
-  );
-
-  // Get FA addresses for metadata query (non-APT only)
-  const faAddresses = nonAptTokens
-    .filter((t) => t.faAddress && t.faAddress !== "null")
-    .map((t) => t.faAddress as string);
-
-  // Note: Legacy v1 coins (tokenAddress) are processed separately below
-
-  // Batch fetch metadata
-  const marketCapData: TokenMarketData[] = [];
-  let totalMarketCap = 0;
-  let tokensWithSupply = 0;
-
-  // Process FA tokens in batches
-  const batchSize = 25; // Smaller batch size for stability
-  const totalBatches = Math.ceil(faAddresses.length / batchSize);
-
-  apiLogger.info(
-    `Processing ${faAddresses.length} FA tokens in ${totalBatches} batches`,
-  );
-
-  for (let i = 0; i < faAddresses.length; i += batchSize) {
-    const batchNum = Math.floor(i / batchSize) + 1;
-    const batch = faAddresses.slice(
-      i,
-      Math.min(i + batchSize, faAddresses.length),
-    );
-
-    if (batchNum % 10 === 0) {
-      apiLogger.info(`Processing batch ${batchNum}/${totalBatches}`);
-    }
-
-    try {
-      const { metadataMap, usdtReserveBalance } =
-        await fetchTokenMetadata(batch);
-
-      // Calculate market caps for this batch
-      for (const token of nonAptTokens.filter((t) =>
-        batch.includes(t.faAddress as string),
-      )) {
-        const metadata = metadataMap.get(token.faAddress as string);
-
-        const price = parseFloat(token.usdPrice) || 0;
-        const decimals = token.decimals || metadata?.decimals || 8;
-
-        if (metadata && metadata.supply_v2) {
-          let supply = parseFloat(metadata.supply_v2);
-
-          // For USDT, subtract the reserve balance to get circulating supply
-          if (
-            token.faAddress === STABLECOINS.USDT &&
-            usdtReserveBalance !== "0"
-          ) {
-            const reserveAmount = parseFloat(usdtReserveBalance);
-            supply = supply - reserveAmount;
-            apiLogger.info(
-              `USDT: Total supply ${metadata.supply_v2}, Reserve ${usdtReserveBalance}, Circulating ${supply}`,
-            );
-          }
-
-          const actualSupply = supply / Math.pow(10, decimals);
-          const marketCap = actualSupply * price;
-
-          // Filter out obvious outliers (price > $1M per token or market cap > $1T)
-          // But include tokens with zero prices for display
-          if (
-            (price === 0 ||
-              (price < 1000000 &&
-                marketCap >= 0 &&
-                marketCap < 1000000000000)) &&
-            !isNaN(marketCap) &&
-            isFinite(marketCap)
-          ) {
-            if (price > 0) {
-              tokensWithSupply++;
-              totalMarketCap += marketCap;
-            }
-
-            marketCapData.push({
-              symbol: token.symbol,
-              name: token.name,
-              price: price,
-              supply: actualSupply,
-              marketCap: marketCap,
-              decimals: decimals,
-              faAddress: token.faAddress || undefined,
-              tokenAddress: token.tokenAddress || undefined,
-              logoUrl: token.logoUrl || undefined,
-              panoraTags: token.panoraTags || [],
-              isVerified: token.panoraTags?.includes("Verified") || false,
-            });
-          }
-        } else {
-          // Include tokens without supply data but with address info for completeness
-          marketCapData.push({
-            symbol: token.symbol,
-            name: token.name,
-            price: price,
-            supply: 0,
-            marketCap: 0,
-            decimals: decimals,
-            faAddress: token.faAddress || undefined,
-            tokenAddress: token.tokenAddress || undefined,
-            logoUrl: token.logoUrl || undefined,
-            panoraTags: token.panoraTags || [],
-            isVerified: token.panoraTags?.includes("Verified") || false,
-          });
-        }
-      }
-    } catch (error) {
-      apiLogger.warn(
-        `Batch ${batchNum}/${totalBatches} failed, continuing...`,
-        { error },
-      );
-    }
-
-    // Add a small delay between batches to avoid rate limiting
-    if (i + batchSize < faAddresses.length) {
-      await new Promise((resolve) => setTimeout(resolve, 50)); // Reduced delay
-    }
-  }
-
-  apiLogger.info(
-    `Processed ${tokensWithSupply} tokens with supply data out of ${faAddresses.length} FA tokens`,
-  );
-
-  // Process legacy tokens (v1 coins) that only have tokenAddress
-  const legacyTokens = nonAptTokens.filter(
-    (t) =>
-      t.tokenAddress &&
-      t.tokenAddress !== "null" &&
-      (!t.faAddress || t.faAddress === "null"),
-  );
-
-  apiLogger.info(
-    `Processing ${legacyTokens.length} legacy tokens with tokenAddress only`,
-  );
-
-  for (const token of legacyTokens) {
-    const price = parseFloat(token.usdPrice) || 0;
-    const decimals = token.decimals || 8;
-
-    marketCapData.push({
-      symbol: token.symbol,
-      name: token.name,
-      price: price,
-      supply: 0, // Legacy tokens often don't have accessible supply data
-      marketCap: 0,
-      decimals: decimals,
-      tokenAddress: token.tokenAddress || undefined,
-      logoUrl: token.logoUrl || undefined,
-    });
-  }
-
-  // Process tokens that have neither FA address nor token address (rare case)
-  const tokensWithoutAddresses = nonAptTokens.filter(
-    (t) =>
-      (!t.faAddress || t.faAddress === "null") &&
-      (!t.tokenAddress || t.tokenAddress === "null"),
-  );
-
-  apiLogger.info(
-    `Processing ${tokensWithoutAddresses.length} tokens without addresses`,
-  );
-
-  for (const token of tokensWithoutAddresses) {
-    const price = parseFloat(token.usdPrice) || 0;
-    const decimals = token.decimals || 8;
-
-    marketCapData.push({
-      symbol: token.symbol,
-      name: token.name,
-      price: price,
-      supply: 0,
-      marketCap: 0,
-      decimals: decimals,
-      logoUrl: token.logoUrl || undefined,
-    });
-  }
-
-  // Calculate APT market cap separately
-  let aptMarketCap = 0;
-  if (includeAPT && aptToken) {
-    const aptPrice = parseFloat(aptToken.usdPrice);
-    // APT has a known supply of ~1.1B tokens
-    const aptSupply = 1_100_000_000;
-    aptMarketCap = aptSupply * aptPrice;
-
-    marketCapData.push({
-      symbol: "APT",
-      name: "Aptos",
-      price: aptPrice,
-      supply: aptSupply,
-      marketCap: aptMarketCap,
-      decimals: 8,
-      tokenAddress: "0x1::aptos_coin::AptosCoin",
-      logoUrl: "/icons/apt.png",
-      panoraTags: ["Native", "Verified"],
-      isVerified: true,
-    });
-
-    apiLogger.info(`APT market cap: $${aptMarketCap.toLocaleString()}`);
-  }
-
-  // Add remaining tokens without supply data
-  for (const token of remainingTokens) {
-    const price = parseFloat(token.usdPrice) || 0;
-    const decimals = token.decimals || 8;
-
-    marketCapData.push({
-      symbol: token.symbol,
-      name: token.name,
-      price: price,
-      supply: 0,
-      marketCap: 0,
-      decimals: decimals,
-      faAddress: token.faAddress || undefined,
-      tokenAddress: token.tokenAddress || undefined,
-      logoUrl: token.logoUrl || undefined,
-      panoraTags: token.panoraTags || [],
-      isVerified: token.panoraTags?.includes("Verified") || false,
-    });
-  }
-
-  // Sort by verification status first (verified first), then by market cap
-  marketCapData.sort((a, b) => {
-    // First sort by verification status - verified tokens first
-    if (a.isVerified !== b.isVerified) {
-      return b.isVerified ? 1 : -1;
-    }
-    // Then sort by market cap (descending)
-    return b.marketCap - a.marketCap;
-  });
+/**
+ * Parse and validate request parameters
+ */
+function parseTokensParams(request: NextRequest) {
+  const params = extractParams(request);
 
   return {
-    tokens: marketCapData,
-    totalMarketCap,
-    totalMarketCapWithAPT: totalMarketCap + aptMarketCap,
-    aptMarketCap,
-    tokensWithSupply,
-    totalTokensAnalyzed: nonAptTokens.length,
+    limit: parseNumericParam(
+      request.nextUrl.searchParams.get("limit"),
+      DEFAULT_LIMIT,
+      1,
+      MAX_LIMIT,
+    ),
+    offset: parseNumericParam(
+      request.nextUrl.searchParams.get("offset"),
+      0,
+      0,
+      10000,
+    ),
+    fetchAll: request.nextUrl.searchParams.get("all") === "true",
   };
 }
 
-export async function GET(request: NextRequest) {
-  const startTime = Date.now();
+/**
+ * Main handler function
+ */
+async function handleTokensRequest(request: NextRequest) {
+  const { limit, offset, fetchAll } = parseTokensParams(request);
+
+  // Check cache
+  const cacheKey = `${CACHE_NAMESPACE}:${limit}:${offset}:${fetchAll}`;
+  const cached = tokenCache.get(cacheKey);
+
+  if (cached) {
+    apiLogger.debug("Returning cached token data");
+    return successResponse(cached, CACHE_DURATIONS.MEDIUM);
+  }
 
   try {
-    // Parse query parameters
-    const searchParams = request.nextUrl.searchParams;
-    const includeAPT = searchParams.get("include_apt") !== "false"; // Default true
-    const minMarketCap = parseFloat(searchParams.get("min_market_cap") || "0");
-    const maxMarketCap = parseFloat(
-      searchParams.get("max_market_cap") || "1000000000000",
-    );
-    const useCache = searchParams.get("no_cache") !== "true"; // Default use cache
-    const maxTokens = parseInt(searchParams.get("max_tokens") || "0"); // 0 means no limit
-    const offset = parseInt(searchParams.get("offset") || "0"); // For pagination
-    const limit = parseInt(searchParams.get("limit") || "0"); // 0 means return all
+    const data = await calculateMarketCaps(limit, offset, fetchAll);
 
-    // Check cache
-    if (useCache && cache && Date.now() - cache.timestamp < CACHE_TTL) {
-      apiLogger.info("Returning cached tokens data");
-      return NextResponse.json(cache.data, {
-        headers: {
-          "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
-        },
-      });
-    }
+    // Cache the result
+    tokenCache.set(cacheKey, data);
 
-    apiLogger.info("Fetching Aptos tokens market data", {
-      includeAPT,
-      minMarketCap,
-      maxMarketCap,
-      maxTokens: maxTokens || "ALL",
-    });
-
-    // Calculate market caps for ALL tokens (or limited for testing)
-    const {
-      tokens,
-      totalMarketCap,
-      totalMarketCapWithAPT,
-      aptMarketCap,
-      tokensWithSupply,
-      totalTokensAnalyzed,
-    } = await calculateMarketCaps(includeAPT, maxTokens);
-
-    // Apply filters
-    const filteredTokens = tokens.filter(
-      (t) => t.marketCap >= minMarketCap && t.marketCap <= maxMarketCap,
-    );
-
-    // Calculate market cap distribution
-    const distribution = {
-      above1B: filteredTokens.filter((t) => t.marketCap >= 1000000000).length,
-      from100MTo1B: filteredTokens.filter(
-        (t) => t.marketCap >= 100000000 && t.marketCap < 1000000000,
-      ).length,
-      from10MTo100M: filteredTokens.filter(
-        (t) => t.marketCap >= 10000000 && t.marketCap < 100000000,
-      ).length,
-      from1MTo10M: filteredTokens.filter(
-        (t) => t.marketCap >= 1000000 && t.marketCap < 10000000,
-      ).length,
-      from100KTo1M: filteredTokens.filter(
-        (t) => t.marketCap >= 100000 && t.marketCap < 1000000,
-      ).length,
-      below100K: filteredTokens.filter((t) => t.marketCap < 100000).length,
-    };
-
-    // Calculate statistics
-    const avgMarketCap =
-      filteredTokens.length > 0
-        ? filteredTokens.reduce((sum, t) => sum + t.marketCap, 0) /
-          filteredTokens.length
-        : 0;
-
-    const medianMarketCap =
-      filteredTokens.length > 0
-        ? filteredTokens[Math.floor(filteredTokens.length / 2)]?.marketCap || 0
-        : 0;
-
-    // Find key tokens
-    const keyTokens = {
-      stablecoins: filteredTokens.filter((t) =>
-        ["USDC", "USDT", "USDt", "USDA", "DAI", "BUSD"].includes(t.symbol),
-      ),
-      bitcoin: filteredTokens.filter(
-        (t) =>
-          t.symbol.includes("BTC") ||
-          t.symbol.includes("WBTC") ||
-          t.symbol === "aBTC",
-      ),
-      defi: filteredTokens.filter((t) =>
-        ["AMI", "RION", "THL", "ECHO", "LSD", "CELL"].includes(t.symbol),
-      ),
-      liquid_staking: filteredTokens.filter(
-        (t) =>
-          t.symbol.includes("APT") &&
-          (t.symbol.includes("st") || t.symbol.includes("am")),
-      ),
-    };
-
-    const executionTime = Date.now() - startTime;
-
-    // Apply pagination to tokens if requested
-    let paginatedTokens = filteredTokens;
-    if (limit > 0) {
-      paginatedTokens = filteredTokens.slice(offset, offset + limit);
-      apiLogger.info(
-        `Returning paginated tokens: offset=${offset}, limit=${limit}, returned=${paginatedTokens.length}`,
-      );
-    }
-
-    const responseData = {
-      success: true,
-      data: {
-        summary: {
-          total_market_cap_non_apt: totalMarketCap,
-          total_market_cap_with_apt: totalMarketCapWithAPT,
-          apt_market_cap: aptMarketCap,
-          tokens_with_supply: tokensWithSupply,
-          tokens_analyzed: totalTokensAnalyzed,
-          tokens_returned: paginatedTokens.length,
-          total_tokens: filteredTokens.length, // Total available tokens
-          average_market_cap: avgMarketCap,
-          median_market_cap: medianMarketCap,
-          execution_time_ms: executionTime,
-          timestamp: new Date().toISOString(),
-        },
-        distribution,
-        categories: {
-          stablecoins: {
-            count: keyTokens.stablecoins.length,
-            total_market_cap: keyTokens.stablecoins.reduce(
-              (sum, t) => sum + t.marketCap,
-              0,
-            ),
-            tokens: keyTokens.stablecoins.slice(0, 5),
-          },
-          bitcoin: {
-            count: keyTokens.bitcoin.length,
-            total_market_cap: keyTokens.bitcoin.reduce(
-              (sum, t) => sum + t.marketCap,
-              0,
-            ),
-            tokens: keyTokens.bitcoin.slice(0, 5),
-          },
-          defi: {
-            count: keyTokens.defi.length,
-            total_market_cap: keyTokens.defi.reduce(
-              (sum, t) => sum + t.marketCap,
-              0,
-            ),
-            tokens: keyTokens.defi.slice(0, 10),
-          },
-          liquid_staking: {
-            count: keyTokens.liquid_staking.length,
-            total_market_cap: keyTokens.liquid_staking.reduce(
-              (sum, t) => sum + t.marketCap,
-              0,
-            ),
-            tokens: keyTokens.liquid_staking.slice(0, 5),
-          },
-        },
-        tokens: paginatedTokens, // Return paginated tokens
-        hasMore: offset + limit < filteredTokens.length,
-        nextOffset: offset + limit,
+    return successResponse(
+      {
+        success: true,
+        data,
       },
-    };
-
-    // Update cache
-    cache = {
-      data: responseData,
-      timestamp: Date.now(),
-    };
-
-    apiLogger.info("Tokens market data fetched successfully", {
-      tokensReturned: filteredTokens.length,
-      totalMarketCap,
-      executionTimeMs: executionTime,
-    });
-
-    return NextResponse.json(responseData, {
-      headers: {
-        "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
+      CACHE_DURATIONS.MEDIUM,
+      {
+        "X-Total-Tokens": data.totalTokens.toString(),
+        "X-APT-Price": data.aptPrice.toString(),
       },
-    });
+    );
   } catch (error) {
-    const executionTime = Date.now() - startTime;
-
-    apiLogger.error("Failed to fetch tokens data", {
-      error: error instanceof Error ? error.message : String(error),
-      executionTimeMs: executionTime,
-    });
-
-    return createErrorResponse(
-      "Failed to fetch tokens market data",
-      error instanceof Error ? error.message : "Unknown error",
+    return errorResponse(
+      "Failed to fetch token data",
       500,
+      error instanceof Error ? error.message : undefined,
     );
   }
 }
+
+// Export with rate limiting
+export const GET = withRateLimit(handleTokensRequest, {
+  name: "tokens-api",
+  ...RATE_LIMIT_TIERS.STANDARD,
+});

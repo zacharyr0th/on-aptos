@@ -1,123 +1,70 @@
 import { readFile } from "fs/promises";
 import { join } from "path";
 
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 
-// Enterprise-grade headers for maximum LLM and SEO visibility
-const ENTERPRISE_HEADERS = {
-  // Core content headers
+// Optimized headers for LLM and SEO visibility
+const HEADERS = {
   "Content-Type": "text/plain; charset=utf-8",
-
-  // Advanced caching strategy for optimal performance
-  "Cache-Control":
-    "public, max-age=3600, stale-while-revalidate=86400, stale-if-error=604800",
-  "CDN-Cache-Control": "public, max-age=7200",
-  "Surrogate-Control": "max-age=86400",
-
-  // SEO and crawler directives
-  "X-Robots-Tag":
-    "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1",
+  "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400",
+  "X-Robots-Tag": "index, follow",
   "X-Content-Type-Options": "nosniff",
-
-  // LLM-specific headers
-  "X-LLM-Documentation": "true",
-  "X-AI-Friendly": "true",
-  "X-Content-Source": "llms-documentation",
-  "X-Document-Type": "llm-instructions",
-  "X-Document-Version": "2.0",
-  "X-Document-Language": "en",
-
-  // Structured data hints
-  "X-Schema-Type": "TechArticle",
-  "X-Content-Category": "API Documentation",
-  "X-Primary-Topic": "Aptos Blockchain Analytics",
-
-  // Security headers
-  "X-Frame-Options": "SAMEORIGIN",
-  "X-XSS-Protection": "1; mode=block",
-  "Referrer-Policy": "strict-origin-when-cross-origin",
-
-  // Performance headers
-  "X-DNS-Prefetch-Control": "on",
+  "X-Frame-Options": "DENY",
   "Content-Language": "en",
-
-  // Timestamp and freshness
-  "Last-Modified": new Date().toUTCString(),
-  "X-Generation-Timestamp": new Date().toISOString(),
 };
 
-// Monitoring and analytics
-async function logAccess(_userAgent: string | null, _referer: string | null) {
-  // In production, you'd send this to your analytics service
-}
-
-export async function GET(_request: Request) {
+export async function GET(request: NextRequest) {
   try {
-    // Extract request metadata for monitoring
-    const userAgent = _request.headers.get("user-agent");
-    const referer = _request.headers.get("referer");
+    // Basic input validation
+    const userAgent = request.headers.get("user-agent") || "";
+    if (userAgent.length > 300) {
+      return new NextResponse("Invalid request", { status: 400 });
+    }
 
-    // Log access for analytics
-    await logAccess(userAgent, referer);
+    // Get environment variables with fallbacks
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://onaptos.com";
+    const developerName = process.env.DEVELOPER_NAME || "On Aptos Team";
+    const developerEmail = process.env.DEVELOPER_EMAIL || "hello@onaptos.com";
+    const developerWebsite =
+      process.env.DEVELOPER_WEBSITE || "https://onaptos.com";
+    const developerTwitter =
+      process.env.DEVELOPER_TWITTER || "https://x.com/onaptos";
+    const githubRepo =
+      process.env.DEVELOPER_GITHUB || "https://github.com/onaptos/on-aptos";
 
-    // Read the llms.txt file from the root directory
+    // Read the llms.txt file from the public directory and replace placeholders
     const filePath = join(process.cwd(), "public", "llms.txt");
-    const content = await readFile(filePath, "utf-8");
+    let content = await readFile(filePath, "utf-8");
 
-    // Add dynamic metadata to content
+    // Replace dynamic content
+    content = content
+      .replace(/Built by — [^(]*/g, `Built by — ${developerName} `)
+      .replace(/zacharyroth@pm\.me/g, developerEmail)
+      .replace(/https:\/\/github\.com\/zacharytylerroth\/on-aptos/g, githubRepo)
+      .replace(/https:\/\/www\.zacharyr0th\.com\//g, developerWebsite)
+      .replace(/https:\/\/x\.com\/zacharyr0th/g, developerTwitter);
+
+    // Add minimal dynamic metadata
     const enhancedContent = `${content}
 
 ---
-# Metadata for LLMs and Crawlers
 Generated: ${new Date().toISOString()}
-Version: 2.0
-Source: https://onaptos.com/llms.txt
-API Status: https://onaptos.com/api/health
-Documentation: https://onaptos.com/api-spec
+Source: ${siteUrl}/llms.txt
 `;
 
-    const headers = { ...ENTERPRISE_HEADERS } as Record<string, string>;
-    // Ensure content length header for stronger crawl hints
-    headers["Content-Length"] = Buffer.byteLength(
-      enhancedContent,
-      "utf-8",
-    ).toString();
-
-    // Remove any stale encoding header that might slip through
-    delete headers["X-Content-Encoding"];
-
-    // Create response with enterprise headers
-    const response = new NextResponse(enhancedContent, {
+    return new NextResponse(enhancedContent, {
       status: 200,
-      headers,
+      headers: {
+        ...HEADERS,
+        "Last-Modified": new Date().toUTCString(),
+      },
     });
-
-    // Add conditional headers based on user agent
-    if (
-      userAgent &&
-      /googlebot|bingbot|slurp|duckduckbot|baiduspider|yandexbot/i.test(
-        userAgent,
-      )
-    ) {
-      response.headers.set(
-        "X-Crawler-Hints",
-        "priority:high,update-frequency:weekly",
-      );
-    }
-
-    if (userAgent && /gpt|claude|anthropic|openai|llm/i.test(userAgent)) {
-      response.headers.set("X-LLM-Priority", "critical");
-      response.headers.set("X-LLM-Context", "aptos-blockchain-analytics-api");
-    }
-
-    return response;
-  } catch {
-    // Failed to serve
-
+  } catch (error) {
     // Fallback content for error cases
     const fallbackContent = `# On Aptos - API Documentation
-    
-This is the fallback documentation for On Aptos.
+
+On Aptos is an open analytics project that surfaces real-time token supplies, prices, and DeFi metrics for the Aptos blockchain.
+
 Visit https://onaptos.com for the full documentation.
 
 Error: Unable to load complete documentation.
@@ -125,12 +72,11 @@ Timestamp: ${new Date().toISOString()}
 `;
 
     return new NextResponse(fallbackContent, {
-      status: 503, // Service Unavailable
+      status: 503,
       headers: {
         "Content-Type": "text/plain; charset=utf-8",
-        "Cache-Control": "no-cache, no-store, must-revalidate",
-        "Retry-After": "60", // Retry after 60 seconds
-        "X-Error": "documentation-load-failed",
+        "Cache-Control": "no-cache",
+        "Retry-After": "60",
       },
     });
   }
@@ -143,7 +89,6 @@ export async function HEAD() {
     headers: {
       "Content-Type": "text/plain; charset=utf-8",
       "X-Document-Available": "true",
-      "X-Document-Type": "llm-instructions",
     },
   });
 }

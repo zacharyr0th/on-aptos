@@ -2,22 +2,21 @@ import withBundleAnalyzer from '@next/bundle-analyzer';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Environment variables - only set if they exist
-  env: {
-    APTOS_BUILD_SECRET: process.env.APTOS_BUILD_SECRET || '',
-    CMC_API_KEY: process.env.CMC_API_KEY || '',
-    RWA_API_KEY: process.env.RWA_API_KEY || '',
-    PANORA_API_KEY: process.env.PANORA_API_KEY || '',
-  },
+  // Server-side environment variables - removed client exposure for security
   
   // Basic settings
   poweredByHeader: false,
   reactStrictMode: true,
   compress: true,
   
-  // Skip ESLint during builds
+  // Temporarily disable ESLint during builds for deployment
   eslint: {
     ignoreDuringBuilds: true,
+  },
+  
+  // Enable TypeScript error checking
+  typescript: {
+    ignoreBuildErrors: false,
   },
   
   // Redirects

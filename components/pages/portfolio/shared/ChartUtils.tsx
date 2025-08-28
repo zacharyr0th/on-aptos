@@ -9,21 +9,41 @@ import {
   Tooltip,
 } from "recharts";
 
-import { formatCurrency } from "@/lib/utils/format/format";
+import { formatCurrency } from "@/lib/utils/format";
 
-// Shared color schemes
-export const CHART_COLORS = [
-  "#93c5fd", // Light Blue
-  "#c4b5fd", // Light Purple
-  "#f9a8d4", // Light Pink
-  "#fed7aa", // Light Orange
-  "#a7f3d0", // Light Green
-  "#a5f3fc", // Light Cyan
-  "#fca5a5", // Light Red
-  "#c7d2fe", // Light Indigo
-  "#d9f99d", // Light Lime
-  "#fdba74", // Light Amber
+// Shared color schemes - Modern gradient palette that adapts to light/dark mode
+export const CHART_COLORS_DARK = [
+  "#6366f1", // Indigo-500 - primary accent
+  "#8b5cf6", // Violet-500 - secondary accent
+  "#ec4899", // Pink-500 - tertiary accent
+  "#06b6d4", // Cyan-500 - quaternary accent
+  "#10b981", // Emerald-500 - success
+  "#f59e0b", // Amber-500 - warning
+  "#ef4444", // Red-500 - danger
+  "#3b82f6", // Blue-500 - info
+  "#a855f7", // Purple-500 - special
+  "#14b8a6", // Teal-500 - alternative
+  "#f97316", // Orange-500 - alternative warning
+  "#84cc16", // Lime-500 - alternative success
 ];
+
+export const CHART_COLORS_LIGHT = [
+  "#a5b4fc", // Indigo-300 - lighter primary
+  "#c4b5fd", // Violet-300 - lighter secondary
+  "#f9a8d4", // Pink-300 - lighter tertiary
+  "#67e8f9", // Cyan-300 - lighter quaternary
+  "#6ee7b7", // Emerald-300 - lighter success
+  "#fcd34d", // Amber-300 - lighter warning
+  "#fca5a5", // Red-300 - lighter danger
+  "#93c5fd", // Blue-300 - lighter info
+  "#d8b4fe", // Purple-300 - lighter special
+  "#5eead4", // Teal-300 - lighter alternative
+  "#fdba74", // Orange-300 - lighter alt warning
+  "#bef264", // Lime-300 - lighter alt success
+];
+
+// Export a default that can be used without theme detection
+export const CHART_COLORS = CHART_COLORS_LIGHT;
 
 export const MINIMAL_CHART_COLORS = [
   "#1f2937", // Gray-800

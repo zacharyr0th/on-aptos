@@ -1,59 +1,13 @@
 import { useState, useEffect } from "react";
 
+import type { FungibleAsset, NFT, Transaction } from "@/lib/types/consolidated";
+import type { DeFiPosition } from "@/lib/types/defi";
 import {
   enhancedFetch,
   isRateLimited,
   getRetryDelay,
 } from "@/lib/utils/api/fetch-utils";
 import { logger } from "@/lib/utils/core/logger";
-
-import { NFT } from "../types";
-
-interface FungibleAsset {
-  asset_type: string;
-  amount: string;
-  metadata?: {
-    name: string;
-    symbol: string;
-    decimals: number;
-    icon_uri?: string;
-  };
-  price?: number;
-  value?: number;
-  balance?: number;
-  isVerified?: boolean;
-  protocolInfo?: {
-    protocol: string;
-    protocolLabel: string;
-    protocolType: string;
-    isPhantomAsset: boolean;
-  };
-}
-
-interface DeFiPosition {
-  protocol: string;
-  protocol_type?: string;
-  protocolType?: string; // Support camelCase from API
-  position_type?: string;
-  position: any;
-  tvl_usd?: number;
-  totalValue?: number; // Support legacy field names
-  totalValueUSD?: number; // New field from updated API
-  tokens?: any[];
-  protocolLabel?: string;
-  address?: string;
-}
-
-interface Transaction {
-  transaction_version: string;
-  transaction_timestamp: string;
-  type: string;
-  amount: string;
-  asset_type: string;
-  success: boolean;
-  function?: string;
-  gas_fee?: string;
-}
 
 interface UsePortfolioDataResult {
   assets: FungibleAsset[] | null;
@@ -103,7 +57,7 @@ export function usePortfolioData(
   } | null>(null);
   const [useBatchApi] = useState(true); // Feature flag for batch API
 
-  // Load remaining transactions in background (starting from a specific offset)
+  // Load ALL transactions in background (ignore offset, just load everything)
   const loadRemainingTransactions = async (startOffset: number) => {
     if (!walletAddress || transactionsLoading) return;
 
@@ -117,42 +71,80 @@ export function usePortfolioData(
         walletAddress,
       );
 
-      const allTransactions: Transaction[] = transactions || [];
-      let offset = startOffset;
+      // Load ALL transactions from offset 0, ignoring what we already have
+      const allTransactions: Transaction[] = [];
+      let offset = 0; // ALWAYS start from 0
       const batchSize = 100;
       let hasMore = true;
 
       // Load remaining transactions in batches of 100
       while (hasMore) {
-        const response = await enhancedFetch(
-          `/api/portfolio/transactions?address=${walletAddress}&limit=${batchSize}&offset=${offset}`,
-          {
-            retries: 3,
-            retryDelay: 2000,
-          },
-        );
-
-        if (!response.ok) {
-          throw new Error(
-            `Failed to fetch transactions at offset ${offset}: ${response.status}`,
+        let response: Response;
+        try {
+          response = await enhancedFetch(
+            `/api/portfolio/transactions?address=${walletAddress}&limit=${batchSize}&offset=${offset}`,
+            {
+              retries: 3,
+              retryDelay: 2000,
+              timeout: 30000, // 30 second timeout
+            },
           );
+        } catch (fetchError) {
+          // Network or timeout error - log but don't throw, just stop loading
+          logger.warn(
+            `Network error loading transactions at offset ${offset}: ${fetchError instanceof Error ? fetchError.message : String(fetchError)}. Stopping background load.`,
+          );
+          break; // Exit the loop but keep existing transactions
         }
 
-        const result = await response.json();
+        if (!response.ok) {
+          // Server returned an error - log but don't throw
+          logger.warn(
+            `Server error loading transactions at offset ${offset}: ${response.status} ${response.statusText}. Stopping background load.`,
+          );
+          break; // Exit the loop but keep existing transactions
+        }
+
+        let result;
+        try {
+          result = await response.json();
+        } catch (parseError) {
+          logger.warn(
+            `Failed to parse transaction response at offset ${offset}: ${parseError instanceof Error ? parseError.message : String(parseError)}. Stopping background load.`,
+          );
+          break; // Exit the loop but keep existing transactions
+        }
         const batchTransactions = result.data || [];
 
         if (batchTransactions.length === 0) {
           // No more transactions
           hasMore = false;
         } else {
-          allTransactions.push(...batchTransactions);
-          offset += batchSize;
+          // Prevent duplicates by checking transaction versions
+          const existingVersions = new Set(
+            allTransactions.map((tx) => tx.transaction_version),
+          );
+          const uniqueTransactions = batchTransactions.filter(
+            (tx: Transaction) => !existingVersions.has(tx.transaction_version),
+          );
+
+          if (uniqueTransactions.length === 0) {
+            // All transactions in this batch were duplicates
+            logger.warn(
+              `All ${batchTransactions.length} transactions at offset ${offset} were duplicates. This might be normal if transactions overlap. Continuing...`,
+            );
+            // Don't stop! Just increment offset and continue
+            offset += batchSize;
+          } else {
+            allTransactions.push(...uniqueTransactions);
+            offset += batchSize;
+          }
 
           // Update UI with current transactions for progressive loading
           setTransactions([...allTransactions]);
 
           logger.debug(
-            `Loaded batch: ${batchTransactions.length} transactions (total: ${allTransactions.length}) for wallet ${walletAddress}`,
+            `Loaded batch: ${uniqueTransactions.length} unique transactions from ${batchTransactions.length} fetched (total: ${allTransactions.length}) for wallet ${walletAddress}`,
           );
 
           // If we got fewer than the batch size, we've reached the end
@@ -167,14 +159,18 @@ export function usePortfolioData(
         }
       }
 
+      // Just set all transactions - we loaded everything from offset 0
+      setTransactions(allTransactions);
+
       logger.info(
         `Completed loading all ${allTransactions.length} transactions for wallet ${walletAddress}`,
       );
     } catch (error) {
-      logger.error(
-        `Failed to load remaining transactions: ${error instanceof Error ? error.message : String(error)}`,
+      // This catch block handles any unexpected errors
+      logger.warn(
+        `Background transaction loading stopped: ${error instanceof Error ? error.message : String(error)}`,
       );
-      // Don't set error for background loading - just log it
+      // Don't set error state for background loading - UI continues to work with partial data
     } finally {
       setTransactionsLoading(false);
     }
@@ -230,35 +226,72 @@ export function usePortfolioData(
 
       // Load remaining transactions in batches of 100
       while (hasMore) {
-        const response = await enhancedFetch(
-          `/api/portfolio/transactions?address=${walletAddress}&limit=${batchSize}&offset=${offset}`,
-          {
-            retries: 3,
-            retryDelay: 2000,
-          },
-        );
-
-        if (!response.ok) {
-          throw new Error(
-            `Failed to fetch transactions at offset ${offset}: ${response.status}`,
+        let response: Response;
+        try {
+          response = await enhancedFetch(
+            `/api/portfolio/transactions?address=${walletAddress}&limit=${batchSize}&offset=${offset}`,
+            {
+              retries: 3,
+              retryDelay: 2000,
+              timeout: 30000, // 30 second timeout
+            },
           );
+        } catch (fetchError) {
+          // Network or timeout error - log but don't throw, just stop loading
+          logger.warn(
+            `Network error loading transactions at offset ${offset}: ${fetchError instanceof Error ? fetchError.message : String(fetchError)}. Stopping background load.`,
+          );
+          break; // Exit the loop but keep existing transactions
         }
 
-        const result = await response.json();
+        if (!response.ok) {
+          // Server returned an error - log but don't throw
+          logger.warn(
+            `Server error loading transactions at offset ${offset}: ${response.status} ${response.statusText}. Stopping background load.`,
+          );
+          break; // Exit the loop but keep existing transactions
+        }
+
+        let result;
+        try {
+          result = await response.json();
+        } catch (parseError) {
+          logger.warn(
+            `Failed to parse transaction response at offset ${offset}: ${parseError instanceof Error ? parseError.message : String(parseError)}. Stopping background load.`,
+          );
+          break; // Exit the loop but keep existing transactions
+        }
         const batchTransactions = result.data || [];
 
         if (batchTransactions.length === 0) {
           // No more transactions
           hasMore = false;
         } else {
-          allTransactions.push(...batchTransactions);
-          offset += batchSize;
+          // Prevent duplicates by checking transaction versions
+          const existingVersions = new Set(
+            allTransactions.map((tx) => tx.transaction_version),
+          );
+          const uniqueTransactions = batchTransactions.filter(
+            (tx: Transaction) => !existingVersions.has(tx.transaction_version),
+          );
+
+          if (uniqueTransactions.length === 0) {
+            // All transactions in this batch were duplicates
+            logger.warn(
+              `All ${batchTransactions.length} transactions at offset ${offset} were duplicates. This might be normal if transactions overlap. Continuing...`,
+            );
+            // Don't stop! Just increment offset and continue
+            offset += batchSize;
+          } else {
+            allTransactions.push(...uniqueTransactions);
+            offset += batchSize;
+          }
 
           // Update UI with current transactions for progressive loading
           setTransactions([...allTransactions]);
 
           logger.debug(
-            `Loaded batch: ${batchTransactions.length} transactions (total: ${allTransactions.length}) for wallet ${walletAddress}`,
+            `Loaded batch: ${uniqueTransactions.length} unique transactions from ${batchTransactions.length} fetched (total: ${allTransactions.length}) for wallet ${walletAddress}`,
           );
 
           // If we got fewer than the batch size, we've reached the end
@@ -277,11 +310,12 @@ export function usePortfolioData(
         `Completed loading ${allTransactions.length} transactions in background for wallet ${walletAddress}`,
       );
     } catch (error) {
-      logger.error(
-        `Failed to load background transactions: ${error instanceof Error ? error.message : String(error)}`,
+      // This catch block handles any unexpected errors
+      logger.warn(
+        `Background transaction loading stopped: ${error instanceof Error ? error.message : String(error)}`,
       );
-      // Don't set error for background loading - just log it
-      setTransactions([]); // Set empty array so we know loading is complete
+      // Don't set error state for background loading - UI continues to work with partial data
+      // Keep existing transactions if any were loaded
     } finally {
       setTransactionsLoading(false);
     }
@@ -303,14 +337,19 @@ export function usePortfolioData(
         return;
       }
 
-      logger.debug("[usePortfolioData] Fetching portfolio data for wallet:", walletAddress);
+      logger.debug(
+        "[usePortfolioData] Fetching portfolio data for wallet:",
+        walletAddress,
+      );
       logger.info(`Fetching portfolio data for wallet: ${walletAddress}`);
       setIsLoading(true);
       setTransactionsLoading(true); // Start loading transactions immediately
       setError(null);
 
       try {
-        logger.debug(`Using batch API: ${useBatchApi} for wallet: ${walletAddress}`);
+        logger.debug(
+          `Using batch API: ${useBatchApi} for wallet: ${walletAddress}`,
+        );
 
         if (useBatchApi) {
           // Use new batch API endpoint
@@ -348,7 +387,7 @@ export function usePortfolioData(
             defiPositions: data.defiPositions?.length || 0,
             nfts: data.nfts?.length || 0,
             nftTotalCount: data.nftTotalCount,
-            transactions: data.transactions?.length || 0
+            transactions: data.transactions?.length || 0,
           });
           setAssets(data.assets || []);
           setDefiPositions(data.defiPositions || []);
@@ -358,46 +397,58 @@ export function usePortfolioData(
           setNftCollectionStats(data.nftCollectionStats || null);
 
           // Always try to load all NFTs for accurate collection stats if total > 50
-          logger.debug('[usePortfolioData] Collection stats check:', {
+          logger.debug("[usePortfolioData] Collection stats check:", {
             hasCollectionStats: !!data.nftCollectionStats,
             totalCount: data.nftTotalCount,
             nftCount: data.nfts?.length,
-            willTriggerFallback: data.nftTotalCount && data.nftTotalCount > 50
+            willTriggerFallback: data.nftTotalCount && data.nftTotalCount > 50,
           });
-          
+
           // If we have more than 50 NFTs total, always load all NFTs for accurate collection stats
           if (data.nftTotalCount && data.nftTotalCount > 50) {
-            logger.warn(`Loading all ${data.nftTotalCount} NFTs for accurate collection calculation`);
-            logger.debug('[usePortfolioData] Triggering background load of all NFTs for collection stats');
-            
+            logger.warn(
+              `Loading all ${data.nftTotalCount} NFTs for accurate collection calculation`,
+            );
+            logger.debug(
+              "[usePortfolioData] Triggering background load of all NFTs for collection stats",
+            );
+
             // Load all NFTs in the background for collection stats
             setTimeout(async () => {
               try {
                 const { NFTService } = await import(
                   "@/lib/services/portfolio/services/nft-service"
                 );
-                const allNFTs = await NFTService.getAllWalletNFTs(walletAddress);
-                
+                const allNFTs =
+                  await NFTService.getAllWalletNFTs(walletAddress);
+
                 // Calculate collection stats from all NFTs
                 const collectionMap: Record<string, number> = {};
-                allNFTs.forEach(nft => {
-                  const collectionName = nft.collection_name || 'Unknown Collection';
-                  collectionMap[collectionName] = (collectionMap[collectionName] || 0) + 1;
+                allNFTs.forEach((nft) => {
+                  const collectionName =
+                    nft.collection_name || "Unknown Collection";
+                  collectionMap[collectionName] =
+                    (collectionMap[collectionName] || 0) + 1;
                 });
-                
+
                 const collections = Object.entries(collectionMap)
                   .map(([name, count]) => ({ name, count }))
                   .sort((a, b) => b.count - a.count);
-                
+
                 const calculatedStats = {
                   collections,
                   totalCollections: collections.length,
                 };
-                
+
                 setNftCollectionStats(calculatedStats);
-                logger.info(`Successfully calculated collection stats from ${allNFTs.length} NFTs: ${collections.length} collections`);
+                logger.info(
+                  `Successfully calculated collection stats from ${allNFTs.length} NFTs: ${collections.length} collections`,
+                );
               } catch (error) {
-                logger.error('Failed to load all NFTs for collection stats:', error);
+                logger.error(
+                  "Failed to load all NFTs for collection stats:",
+                  error,
+                );
               }
             }, 1000);
           }
@@ -419,6 +470,7 @@ export function usePortfolioData(
               logger.info(
                 `📋 BACKGROUND LOAD: Starting to load remaining transactions after ${data.transactions.length}`,
               );
+              setTransactionsLoading(true);
               loadRemainingTransactions(data.transactions.length);
             } else {
               logger.info(
@@ -441,7 +493,9 @@ export function usePortfolioData(
             setAllNFTs(data.nfts || []); // Use initial batch for now
           }
 
-          logger.debug(`Batch API response - assets: ${data.assets?.length || 0}, defi: ${data.defiPositions?.length || 0}, nfts: ${data.nfts?.length || 0}, totalNFTs: ${data.nftTotalCount}, transactions: ${data.transactions?.length || 0}`);
+          logger.debug(
+            `Batch API response - assets: ${data.assets?.length || 0}, defi: ${data.defiPositions?.length || 0}, nfts: ${data.nfts?.length || 0}, totalNFTs: ${data.nftTotalCount}, transactions: ${data.transactions?.length || 0}`,
+          );
         } else {
           // Fallback to original implementation if batch API fails
           // ... (keeping original code as fallback)
@@ -532,7 +586,9 @@ export function usePortfolioData(
             // Only use initial batch for metrics to avoid redundant loading
             setAllNFTs(initialNFTs.data);
 
-            logger.debug(`NFTs loaded - count: ${initialNFTs.data.length}, hasMore: ${initialNFTs.hasMore}, totalCount: ${totalCount}`);
+            logger.debug(
+              `NFTs loaded - count: ${initialNFTs.data.length}, hasMore: ${initialNFTs.hasMore}, totalCount: ${totalCount}`,
+            );
           } catch (nftError: any) {
             logger.error(
               `Failed to fetch NFTs: ${nftError instanceof Error ? nftError.message : String(nftError)}`,
@@ -541,8 +597,34 @@ export function usePortfolioData(
             setNftsLoading(false);
           }
 
-          // Load transactions in background for fallback path too
-          loadTransactions();
+          // Load transactions separately for fallback path
+          setTransactionsLoading(true);
+          try {
+            const txResponse = await enhancedFetch(
+              `/api/portfolio/transactions?address=${walletAddress}&limit=100&offset=0`,
+              {
+                retries: 3,
+                retryDelay: 2000,
+              },
+            );
+
+            if (txResponse.ok) {
+              const txResult = await txResponse.json();
+              setTransactions(txResult.data || []);
+
+              // Load remaining if needed
+              if (txResult.hasMore) {
+                loadRemainingTransactions(100);
+              }
+            }
+          } catch (error) {
+            logger.error(
+              `Failed to fetch transactions: ${error instanceof Error ? error.message : String(error)}`,
+            );
+            setTransactions([]);
+          } finally {
+            setTransactionsLoading(false);
+          }
         }
       } catch (err) {
         const errorMessage =
@@ -579,7 +661,9 @@ export function usePortfolioData(
       setHasMoreNFTs(moreNFTs.hasMore);
       setNftPage(nextPage);
 
-      logger.debug(`Loaded more NFTs - page: ${nextPage}, count: ${moreNFTs.data.length}, hasMore: ${moreNFTs.hasMore}, total: ${(nfts?.length || 0) + moreNFTs.data.length}`);
+      logger.debug(
+        `Loaded more NFTs - page: ${nextPage}, count: ${moreNFTs.data.length}, hasMore: ${moreNFTs.hasMore}, total: ${(nfts?.length || 0) + moreNFTs.data.length}`,
+      );
     } catch (error) {
       logger.error(
         `Failed to load more NFTs: ${error instanceof Error ? error.message : String(error)}`,
@@ -647,6 +731,7 @@ export function usePortfolioData(
 
           // If there might be more transactions, load them in background
           if (data.hasMoreTransactions) {
+            setTransactionsLoading(true);
             loadRemainingTransactions(data.transactions.length);
           }
         } else {
@@ -654,7 +739,9 @@ export function usePortfolioData(
           loadTransactions();
         }
 
-        logger.debug(`Refetch response - assets: ${data.assets?.length || 0}, defi: ${data.defiPositions?.length || 0}, nfts: ${data.nfts?.length || 0}, totalNFTs: ${data.nftTotalCount}, transactions: ${data.transactions?.length || 0}`);
+        logger.debug(
+          `Refetch response - assets: ${data.assets?.length || 0}, defi: ${data.defiPositions?.length || 0}, nfts: ${data.nfts?.length || 0}, totalNFTs: ${data.nftTotalCount}, transactions: ${data.transactions?.length || 0}`,
+        );
       } else {
         // Fallback to original refetch logic
         const { NFTService } = await import(
@@ -711,12 +798,38 @@ export function usePortfolioData(
           setAllNFTs([]);
         }
 
-        // Reload transactions
-        loadTransactions();
+        // Reload transactions separately for fallback path
+        try {
+          const txResponse = await enhancedFetch(
+            `/api/portfolio/transactions?address=${walletAddress}&limit=100&offset=0`,
+            {
+              retries: 3,
+              retryDelay: 2000,
+            },
+          );
+
+          if (txResponse.ok) {
+            const txResult = await txResponse.json();
+            setTransactions(txResult.data || []);
+
+            // Load remaining if needed
+            if (txResult.hasMore) {
+              setTransactionsLoading(true);
+              loadRemainingTransactions(100);
+            }
+          }
+        } catch (error) {
+          logger.error(
+            `Failed to refetch transactions: ${error instanceof Error ? error.message : String(error)}`,
+          );
+          setTransactions([]);
+        }
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Unknown error";
-      logger.error(`Refetch error for wallet ${walletAddress}: ${errorMessage}`);
+      logger.error(
+        `Refetch error for wallet ${walletAddress}: ${errorMessage}`,
+      );
       setError(errorMessage);
     } finally {
       setIsLoading(false);
