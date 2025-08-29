@@ -13,12 +13,13 @@ interface LSTTokenConfig {
   type: "FA";
 }
 
+// Token addresses are imported at the top of the file
+
 const LST_TOKEN_CONFIGS: LSTTokenConfig[] = [
   {
     symbol: "amAPT",
-    name: "Amnis APT",
-    asset_type:
-      "0x111ae3e5bc816a5e63c2da97d0aa3886519e0cd5e4b046659fa35796bd11542a",
+    name: "Amnis APT", 
+    asset_type: "0xa259be733b6a759909f92815927fa213904df6540519568692caf0b068fe8e62",
     decimals: 8,
     protocol: "Amnis",
     type: "FA",
@@ -26,35 +27,31 @@ const LST_TOKEN_CONFIGS: LSTTokenConfig[] = [
   {
     symbol: "stAPT",
     name: "Staked APT",
-    asset_type:
-      "0xf0995d360365bad80f9129f32c18bb7e636ed45a5ad96127be7e8e7f033e2ac9",
+    asset_type: "0xb614bfdf9edc39b330bbf9c3c5bcd0473eee2f6d4e21748629cc367869ece627",
     decimals: 8,
-    protocol: "Amnis",
+    protocol: "Amnis", 
     type: "FA",
   },
   {
     symbol: "sthAPT",
     name: "Staked Thala APT",
-    asset_type:
-      "0xb854b0367a3c0a014dfb3b4630ad06f8c2cbebd6c87b6b13b4c2b2ca88e0faa3",
+    asset_type: "0x0a9ce1bddf93b074697ec5e483bc5050bc64cff2acd31e1ccfd8ac8cae5e4abe",
     decimals: 8,
     protocol: "Thala",
     type: "FA",
   },
   {
-    symbol: "thAPT",
+    symbol: "thAPT", 
     name: "Thala APT",
-    asset_type:
-      "0xfaf4e633ae9eb31366c9ca24214231760926576c7b625313b3688b5e900731f6",
+    asset_type: "0xa0d9d647c5737a5aed08d2cfeb39c31cf901d44bc4aa024eaa7e5e68b804e011",
     decimals: 8,
     protocol: "Thala",
     type: "FA",
   },
   {
     symbol: "truAPT",
-    name: "Trustake APT",
-    asset_type:
-      "0xaef6a8c3182e076db72d64324617114cacf9a52f28325edc10b483f7f05da0e7",
+    name: "Trustake APT", 
+    asset_type: "0xaef6a8c3182e076db72d64324617114cacf9a52f28325edc10b483f7f05da0e7",
     decimals: 8,
     protocol: "Trustake",
     type: "FA",
@@ -62,19 +59,17 @@ const LST_TOKEN_CONFIGS: LSTTokenConfig[] = [
   {
     symbol: "stkAPT",
     name: "Staked Kofi APT",
-    asset_type:
-      "0x47c99173e2e2f5528ac6f0cf4ba7c7de0ab2b65b9f2e15fb672ac0933faa0b9b",
+    asset_type: "0x42556039b88593e768c97ab1a3ab0c6a17230825769304482dff8fdebe4c002b",
     decimals: 8,
     protocol: "Kofi",
     type: "FA",
   },
   {
     symbol: "kAPT",
-    name: "Kofi APT",
-    asset_type:
-      "0x24c75c96c7b9e6db4fa9a087f60c10bff19c49e96fb5bc0cf7b46b97ae685f49",
+    name: "Kofi APT", 
+    asset_type: "0x821c94e69bc7ca058c913b7b5e6b0a5c9fd1523d58723a966fb8c1f5ea888105",
     decimals: 8,
-    protocol: "Kofi",
+    protocol: "Kofi", 
     type: "FA",
   },
 ];
@@ -225,11 +220,19 @@ export class LiquidStakingService {
       const sumAmount =
         data.data?.current_fungible_asset_balances_aggregate?.aggregate?.sum
           ?.amount;
+      
+      // Handle null/undefined amounts (tokens with no current balances)
       const supply = sumAmount ? String(sumAmount) : "0";
-
+      
+      // If supply is 0, we might still want to show the token
       const supplyBigInt = BigInt(supply);
       const divisor = BigInt(10 ** token.decimals);
       const formattedSupply = Number(supplyBigInt) / Number(divisor);
+
+      // Log tokens with zero supply for debugging
+      if (supply === "0") {
+        logger.info(`Token ${token.symbol} has zero supply`);
+      }
 
       return {
         symbol: token.symbol,
@@ -251,8 +254,15 @@ export class LiquidStakingService {
   private static formatSupplyResponse(
     supplies: LSTTokenSupply[],
   ): LSTSuppliesResponse {
+    // Filter out tokens with zero supply to show only active LSTs
+    const activeSupplies = supplies.filter(supply => 
+      parseFloat(supply.formatted_supply) > 0
+    );
+
+    logger.info(`Filtered to ${activeSupplies.length} active LSTs out of ${supplies.length} total`);
+
     // Group supplies by protocol and maintain individual token breakdowns
-    const protocolGroups = supplies.reduce(
+    const protocolGroups = activeSupplies.reduce(
       (groups, supply) => {
         const protocol = supply.protocol;
         if (!groups[protocol]) {
