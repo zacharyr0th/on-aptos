@@ -89,12 +89,7 @@ export function getCachedData<T>(cache: SimpleCache, key: string): T | null {
   return cache.get<T>(key);
 }
 
-export function setCachedData<T>(
-  cache: SimpleCache,
-  key: string,
-  data: T,
-  ttl?: number,
-): void {
+export function setCachedData<T>(cache: SimpleCache, key: string, data: T, ttl?: number): void {
   cache.set(key, data, ttl);
 }
 
@@ -103,7 +98,7 @@ export async function cacheFirst<T>(
   cache: SimpleCache,
   key: string,
   fetchFn: () => Promise<T>,
-  ttl?: number,
+  ttl?: number
 ): Promise<T> {
   const cached = cache.get<T>(key);
   if (cached !== null) {
@@ -118,7 +113,7 @@ export async function cacheFirst<T>(
 // Cache-first with fallback for error handling
 export async function cacheFirstWithFallback<T>(
   options: CacheFirstOptions<T>,
-  fallbackData: T,
+  fallbackData: T
 ): Promise<{ data: T }> {
   // Determine which cache to use based on namespace
   let cache: SimpleCache;
@@ -153,10 +148,7 @@ export async function cacheFirstWithFallback<T>(
     cache.set(options.cacheKey, fresh);
     return { data: fresh };
   } catch (error) {
-    errorLogger.error(
-      { error },
-      `Cache fetch error for ${options.namespace}:${options.cacheKey}:`,
-    );
+    errorLogger.error({ error }, `Cache fetch error for ${options.namespace}:${options.cacheKey}:`);
     // Try to return stale cached data if available
     const stale = cache.get<T>(options.cacheKey);
     if (stale !== null) {

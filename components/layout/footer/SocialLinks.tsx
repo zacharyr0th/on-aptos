@@ -1,10 +1,11 @@
 "use client";
 
-import React, { memo, useMemo } from "react";
+import type React from "react";
+import { memo, useMemo } from "react";
 
-import { FaGlobe, FaGithub, FaXTwitter } from "@/components/icons/SocialIcons";
-import { useTranslation } from "@/lib/hooks/useTranslation";
+import { FaGithub, FaGlobe, FaXTwitter } from "@/components/icons/SocialIcons";
 import { DEVELOPER_CONFIG } from "@/lib/config/app";
+import { useTranslation } from "@/lib/hooks/useTranslation";
 
 const SocialLink = memo(function SocialLink({
   href,
@@ -32,9 +33,7 @@ interface SocialLinksProps {
   className?: string;
 }
 
-export const SocialLinks = memo(function SocialLinks({
-  className = "",
-}: SocialLinksProps) {
+export const SocialLinks = memo(function SocialLinks({ className = "" }: SocialLinksProps) {
   const { t } = useTranslation("common");
 
   const socialLinks = useMemo(
@@ -56,7 +55,7 @@ export const SocialLinks = memo(function SocialLinks({
           label: t("actions.follow_on_twitter"),
         },
       ].filter(Boolean),
-    [t],
+    [t]
   );
 
   return (

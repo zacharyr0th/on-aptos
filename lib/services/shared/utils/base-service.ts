@@ -1,9 +1,8 @@
 import { CACHE_CONFIG } from "@/lib/config/cache";
 import { RETRY_CONFIG, SERVICE_DEFAULTS } from "@/lib/constants";
-import { getCachedData, setCachedData } from "@/lib/utils/cache/unified-cache";
 import { RequestDeduplicator } from "@/lib/utils/cache/request-deduplication";
+import { getCachedData, setCachedData } from "@/lib/utils/cache/unified-cache";
 import { logger } from "@/lib/utils/core/logger";
-
 import type { ServiceConfig } from "../types";
 
 export abstract class BaseAssetService {
@@ -21,9 +20,9 @@ export abstract class BaseAssetService {
   protected static async getCachedOrFetch<T>(
     cacheKey: string,
     fetchFn: () => Promise<T>,
-    _ttl?: number,
+    _ttl?: number
   ): Promise<T> {
-    if (this.config.cacheEnabled) {
+    if (BaseAssetService.config.cacheEnabled) {
       try {
         // Use 'apiService' as the default cache instance for asset services
         const cached = getCachedData<T>("apiService", cacheKey);
@@ -39,10 +38,10 @@ export abstract class BaseAssetService {
     // Deduplicate concurrent requests for the same data
     return RequestDeduplicator.deduplicate(cacheKey, async () => {
       // Fetch fresh data
-      const data = await this.retryWithBackoff(fetchFn);
+      const data = await BaseAssetService.retryWithBackoff(fetchFn);
 
       // Cache the result
-      if (this.config.cacheEnabled && data) {
+      if (BaseAssetService.config.cacheEnabled && data) {
         try {
           setCachedData("apiService", cacheKey, data);
         } catch (error) {
@@ -57,40 +56,33 @@ export abstract class BaseAssetService {
   /**
    * Retry a function with exponential backoff
    */
-  protected static async retryWithBackoff<T>(
-    fn: () => Promise<T>,
-    attempt = 1,
-  ): Promise<T> {
+  protected static async retryWithBackoff<T>(fn: () => Promise<T>, attempt = 1): Promise<T> {
     try {
       return await fn();
     } catch (error) {
-      if (attempt >= this.config.retryAttempts) {
+      if (attempt >= BaseAssetService.config.retryAttempts) {
         throw error;
       }
 
       const delay = Math.min(
-        RETRY_CONFIG.BASE_DELAY *
-          Math.pow(RETRY_CONFIG.BACKOFF_FACTOR, attempt - 1),
-        RETRY_CONFIG.MAX_DELAY,
+        RETRY_CONFIG.BASE_DELAY * RETRY_CONFIG.BACKOFF_FACTOR ** (attempt - 1),
+        RETRY_CONFIG.MAX_DELAY
       );
 
       logger.warn(
-        `Retry attempt ${attempt}/${this.config.retryAttempts} after ${delay}ms`,
+        `Retry attempt ${attempt}/${BaseAssetService.config.retryAttempts} after ${delay}ms`
       );
-      await this.sleep(delay);
+      await BaseAssetService.sleep(delay);
 
-      return this.retryWithBackoff(fn, attempt + 1);
+      return BaseAssetService.retryWithBackoff(fn, attempt + 1);
     }
   }
 
   /**
    * Execute with timeout
    */
-  protected static async withTimeout<T>(
-    promise: Promise<T>,
-    timeoutMs?: number,
-  ): Promise<T> {
-    const timeout = timeoutMs || this.config.timeout;
+  protected static async withTimeout<T>(promise: Promise<T>, timeoutMs?: number): Promise<T> {
+    const timeout = timeoutMs || BaseAssetService.config.timeout;
 
     const timeoutPromise = new Promise<never>((_, reject) => {
       setTimeout(() => reject(new Error("Request timeout")), timeout);
@@ -104,12 +96,12 @@ export abstract class BaseAssetService {
    */
   protected static async withFallback<T>(
     primary: () => Promise<T>,
-    fallback: () => Promise<T>,
+    fallback: () => Promise<T>
   ): Promise<T> {
     try {
       return await primary();
     } catch (primaryError) {
-      if (!this.config.fallbackEnabled) {
+      if (!BaseAssetService.config.fallbackEnabled) {
         throw primaryError;
       }
 
@@ -134,7 +126,7 @@ export abstract class BaseAssetService {
     items: T[],
     processor: (batch: T[]) => Promise<R[]>,
     batchSize = 10,
-    delayMs = 100,
+    delayMs = 100
   ): Promise<R[]> {
     const results: R[] = [];
 
@@ -144,7 +136,7 @@ export abstract class BaseAssetService {
       results.push(...batchResults);
 
       if (i + batchSize < items.length) {
-        await this.sleep(delayMs);
+        await BaseAssetService.sleep(delayMs);
       }
     }
 
@@ -165,12 +157,12 @@ export abstract class BaseAssetService {
     operation: string,
     startTime: number,
     success: boolean,
-    metadata?: Record<string, any>,
+    metadata?: Record<string, any>
   ): void {
     const duration = Date.now() - startTime;
 
     logger.info("Service operation completed", {
-      service: this.name,
+      service: BaseAssetService.name,
       operation,
       success,
       duration,

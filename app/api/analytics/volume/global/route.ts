@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-
-import { apiLogger } from "@/lib/utils/core/logger";
 import { UnifiedCache } from "@/lib/utils/cache/unified-cache";
+import { apiLogger } from "@/lib/utils/core/logger";
 
 const cache = new UnifiedCache({ ttl: 5 * 60 * 1000 }); // 5 minutes
 
@@ -14,12 +13,9 @@ export async function GET() {
     }
 
     // Fetch global DEX volume data from DeFiLlama
-    const response = await fetch(
-      "https://api.llama.fi/overview/dexs?excludeTotalDataChart=true",
-      {
-        next: { revalidate: 300 },
-      },
-    );
+    const response = await fetch("https://api.llama.fi/overview/dexs?excludeTotalDataChart=true", {
+      next: { revalidate: 300 },
+    });
 
     if (!response.ok) {
       throw new Error(`DeFiLlama API error: ${response.status}`);
@@ -48,9 +44,6 @@ export async function GET() {
     return NextResponse.json(result);
   } catch (error) {
     apiLogger.error("Error fetching global DEX volume data:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch global DEX volume data" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Failed to fetch global DEX volume data" }, { status: 500 });
   }
 }

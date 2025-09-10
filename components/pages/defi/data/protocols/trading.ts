@@ -1,9 +1,5 @@
 import type { DefiProtocol } from "../types";
-import {
-  DexAggregatorImplementation,
-  DexImplementation,
-  PerpsImplementation,
-} from "../types";
+import { DexAggregatorImplementation, DexImplementation, PerpsImplementation } from "../types";
 
 // Trading protocols - DEX, DEX Aggregators, Perps, and Launchpads
 export const tradingProtocols: DefiProtocol[] = [

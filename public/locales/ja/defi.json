@@ -223,16 +223,7 @@
       "Protocol Suite": "プロトコルスイート"
     }
   },
-  "protocols": {
-    "mirage": {
-      "description": "Composable liquidity layer bringing next-gen DeFi. Deposit collateral and borrow self-repaying stablecoin loans powered by perpetuals with up to 100x leverage.",
-      "categoryBreakdown": "Trading • Perps",
-      "feeStructure": "Dynamic fee structure based on trading volume and position size. Competitive fees for perpetual futures trading.",
-      "integration": {
-        "description": "Fully on-chain perpetuals with CEX-like experience. All positions, vaults, and orders are represented as NFTs for secondary market trading."
-      }
-    }
-  },
+  "protocols": {},
   "protocol_descriptions": {
     "Panora": "オンチェーンオーダーブックえ10以上のAMMに接続する「メタDEX」で、プール間で注文を分割し、UIで自動更新される正規トークンリストを管理します。",
     "Kana": "9つのチェーン間でスワップをルーティング；Paymasterコントラクトにより、ユーザーはガス用のAPTを保有せずにAptosで取引可能；オーダーブックベースのperp エンジン。",
@@ -257,8 +248,7 @@
     "Kofi": "MEVブーストされたリキッドステーキングとレバレッジLSDボールト。",
     "Ichi": "自動流動性マネージャーボールトでプロジェクトが片側流動性を提供可能；スマートレンジがリバランシングしてインパーマネントロスを削減し、財務がネイティブトークンでスワップ手数料を獲得。",
     "Moar": "ユーザーが一方で借り、他方でデプロイできるクロスプロトコルクレジットアカウントでレバレッジファームレイヤーを構築。",
-    "Thala": "マルチプールAMM、超担保型MODステーブルコイン、sthAPTとthAPTによるリキッドステーキングを特徴とするDeFiアプリケーションスイート。",
-    "Mirage": "A composable liquidity layer powering DeFi's next frontier. Deposit collateral and borrow a self-repaying stablecoin loan powered by perpetuals. Features fully on-chain perps with CEX-like experience, instant execution, low fees, and up to 100x leverage."
+    "Thala": "マルチプールAMM、超担保型MODステーブルコイン、sthAPTとthAPTによるリキッドステーキングを特徴とするDeFiアプリケーションスイート。"
   },
   "protocol_category_breakdown": {
     "Thala": "トレーディング • イールド • クレジット"

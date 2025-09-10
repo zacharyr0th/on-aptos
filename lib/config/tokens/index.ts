@@ -23,7 +23,7 @@ export interface SupplyData {
   timestamp?: string;
 }
 
-// Re-export all token configurations
-export * from "./stablecoins";
 export * from "./btc";
 export * from "./lst";
+// Re-export all token configurations
+export * from "./stablecoins";

@@ -2,7 +2,7 @@
  * Data transformation utilities for page components
  */
 
-import type { MetricRow, ChartData, TimeSeriesData } from "@/lib/types/metrics";
+import type { ChartData, MetricRow, TimeSeriesData } from "@/lib/types/metrics";
 
 // Group data by a specific key
 export function groupBy<T>(data: T[], key: keyof T): Record<string, T[]> {
@@ -15,14 +15,12 @@ export function groupBy<T>(data: T[], key: keyof T): Record<string, T[]> {
       groups[groupKey].push(item);
       return groups;
     },
-    {} as Record<string, T[]>,
+    {} as Record<string, T[]>
   );
 }
 
 // Aggregate metrics by category
-export function aggregateMetrics(
-  metrics: MetricRow[],
-): Record<string, MetricRow[]> {
+export function aggregateMetrics(metrics: MetricRow[]): Record<string, MetricRow[]> {
   return groupBy(metrics, "category");
 }
 
@@ -31,7 +29,7 @@ export function toChartData(
   data: any[],
   labelField: string,
   valueField: string,
-  colorField?: string,
+  colorField?: string
 ): ChartData[] {
   return data.map((item) => ({
     label: item[labelField],
@@ -46,7 +44,7 @@ export function toTimeSeriesData(
   data: any[],
   timestampField: string,
   valueField: string,
-  labelField?: string,
+  labelField?: string
 ): TimeSeriesData[] {
   return data.map((item) => ({
     timestamp: item[timestampField],
@@ -78,9 +76,7 @@ export function normalizeValues(data: number[], min = 0, max = 100): number[] {
 
 // Get top N items by value
 export function getTopItems<T>(data: T[], valueField: keyof T, n: number): T[] {
-  return [...data]
-    .sort((a, b) => Number(b[valueField]) - Number(a[valueField]))
-    .slice(0, n);
+  return [...data].sort((a, b) => Number(b[valueField]) - Number(a[valueField])).slice(0, n);
 }
 
 // Aggregate summary statistics
@@ -115,7 +111,7 @@ export function abbreviateNumber(value: number): string {
 
   if (suffixIndex === 0) return value.toString();
 
-  const scaledValue = value / Math.pow(1000, suffixIndex);
+  const scaledValue = value / 1000 ** suffixIndex;
   return `${scaledValue.toFixed(1)}${suffixes[suffixIndex]}`;
 }
 
@@ -157,9 +153,7 @@ export function movingAverage(data: number[], windowSize: number): number[] {
 }
 
 // Convert flat data to tree structure
-export function toTreeStructure<T extends { id: string; parentId?: string }>(
-  data: T[],
-): T[] {
+export function toTreeStructure<T extends { id: string; parentId?: string }>(data: T[]): T[] {
   const map = new Map<string, T & { children?: T[] }>();
   const roots: T[] = [];
 

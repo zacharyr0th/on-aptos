@@ -10,22 +10,16 @@ export const AptosUtils = {
   /**
    * Check if address is a CEX
    */
-  isCEXAddress: (
-    address: string,
-    cexAddresses: Record<string, readonly string[]>,
-  ): boolean => {
+  isCEXAddress: (address: string, cexAddresses: Record<string, readonly string[]>): boolean => {
     return Object.values(cexAddresses).some((addresses: readonly string[]) =>
-      addresses.includes(address),
+      addresses.includes(address)
     );
   },
 
   /**
    * Check if address is an NFT platform
    */
-  isNFTPlatform: (
-    address: string,
-    nftPlatforms: Record<string, string>,
-  ): boolean => {
+  isNFTPlatform: (address: string, nftPlatforms: Record<string, string>): boolean => {
     return (Object.values(nftPlatforms) as readonly string[]).includes(address);
   },
 

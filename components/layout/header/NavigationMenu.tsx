@@ -1,10 +1,10 @@
 "use client";
 
-import { BarChart, TrendingUp } from "lucide-react";
+import { BarChart, BarChart3, GitBranch, TrendingUp } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React from "react";
+import type React from "react";
 
 import { defiProtocols } from "@/components/pages/protocols/defi/data/protocols";
 import { Badge } from "@/components/ui/badge";
@@ -32,10 +32,7 @@ interface NavigationMenuProps {
   onMenuClose: () => void;
 }
 
-export function DesktopNavigationMenu({
-  navigationItems,
-  onMenuClose,
-}: NavigationMenuProps) {
+export function DesktopNavigationMenu({ navigationItems, onMenuClose }: NavigationMenuProps) {
   const pathname = usePathname();
   const { t } = useTranslation(["common", "defi"]);
 
@@ -59,7 +56,7 @@ export function DesktopNavigationMenu({
                         className={cn(
                           "flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-accent",
                           "border border-transparent hover:border-border",
-                          item.isActive && "bg-accent border-border",
+                          item.isActive && "bg-accent border-border"
                         )}
                         onClick={onMenuClose}
                       >
@@ -88,8 +85,7 @@ export function DesktopNavigationMenu({
                           className={cn(
                             "flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent",
                             "border border-transparent hover:border-border",
-                            pathname === "/protocols/defi" &&
-                              "bg-accent border-border",
+                            pathname === "/protocols/defi" && "bg-accent border-border"
                           )}
                           onClick={onMenuClose}
                         >
@@ -102,8 +98,7 @@ export function DesktopNavigationMenu({
                           className={cn(
                             "flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent",
                             "border border-transparent hover:border-border",
-                            pathname === "/protocols/yields" &&
-                              "bg-accent border-border",
+                            pathname === "/protocols/yields" && "bg-accent border-border"
                           )}
                           onClick={onMenuClose}
                         >
@@ -112,60 +107,51 @@ export function DesktopNavigationMenu({
                         </Link>
                       </div>
                       {/* Group protocols by category */}
-                      {[
-                        "Trading",
-                        "Lending",
-                        "Yield",
-                        "Derivatives",
-                        "Launchpad",
-                        "Multiple",
-                      ].map((category) => {
-                        const categoryProtocols = defiProtocols.filter(
-                          (p) => p.category === category,
-                        );
+                      {["Trading", "Lending", "Yield", "Derivatives", "Launchpad", "Multiple"].map(
+                        (category) => {
+                          const categoryProtocols = defiProtocols.filter(
+                            (p) => p.category === category
+                          );
 
-                        if (categoryProtocols.length === 0) return null;
+                          if (categoryProtocols.length === 0) return null;
 
-                        return (
-                          <div key={category}>
-                            <h4 className="sticky top-0 bg-popover z-10 text-xs font-semibold text-muted-foreground uppercase tracking-wider py-2 px-1">
-                              {t(`defi.categories.${category}.name`, category)}
-                            </h4>
-                            <div className="grid gap-1 pb-2">
-                              {categoryProtocols.map((protocol) => (
-                                <Link
-                                  key={protocol.title}
-                                  href={protocol.href}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className={cn(
-                                    "flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-accent",
-                                    "border border-transparent hover:border-border",
-                                  )}
-                                >
-                                  <div className="relative h-8 w-8 flex-shrink-0">
-                                    <Image
-                                      src={protocol.logo || "/placeholder.jpg"}
-                                      alt={`${protocol.title} logo`}
-                                      fill
-                                      className="object-contain rounded"
-                                      onError={(e) => {
-                                        const img =
-                                          e.target as HTMLImageElement;
-                                        img.src = "/placeholder.jpg";
-                                      }}
-                                    />
-                                  </div>
-                                  <div className="flex-1 min-w-0">
-                                    <div className="flex items-center justify-between gap-2 flex-wrap">
-                                      <span className="font-medium truncate">
-                                        {protocol.title}
-                                      </span>
-                                      {protocol.category === "Multiple" &&
-                                      protocol.subcategory.includes(",") ? (
-                                        protocol.subcategory
-                                          .split(",")
-                                          .map((sub, idx) => (
+                          return (
+                            <div key={category}>
+                              <h4 className="sticky top-0 bg-popover z-10 text-xs font-semibold text-muted-foreground uppercase tracking-wider py-2 px-1">
+                                {t(`defi.categories.${category}.name`, category)}
+                              </h4>
+                              <div className="grid gap-1 pb-2">
+                                {categoryProtocols.map((protocol) => (
+                                  <Link
+                                    key={protocol.title}
+                                    href={protocol.href}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className={cn(
+                                      "flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-accent",
+                                      "border border-transparent hover:border-border"
+                                    )}
+                                  >
+                                    <div className="relative h-8 w-8 flex-shrink-0">
+                                      <Image
+                                        src={protocol.logo || "/placeholder.jpg"}
+                                        alt={`${protocol.title} logo`}
+                                        fill
+                                        className="object-contain rounded"
+                                        onError={(e) => {
+                                          const img = e.target as HTMLImageElement;
+                                          img.src = "/placeholder.jpg";
+                                        }}
+                                      />
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                      <div className="flex items-center justify-between gap-2 flex-wrap">
+                                        <span className="font-medium truncate">
+                                          {protocol.title}
+                                        </span>
+                                        {protocol.category === "Multiple" &&
+                                        protocol.subcategory.includes(",") ? (
+                                          protocol.subcategory.split(",").map((sub, idx) => (
                                             <Badge
                                               key={idx}
                                               variant="outline"
@@ -173,29 +159,30 @@ export function DesktopNavigationMenu({
                                             >
                                               {t(
                                                 `defi.subcategories.${sub.trim().toLowerCase().replace(/ /g, "_")}`,
-                                                sub.trim(),
+                                                sub.trim()
                                               )}
                                             </Badge>
                                           ))
-                                      ) : (
-                                        <Badge
-                                          variant="outline"
-                                          className="h-4 px-1 text-[10px] flex-shrink-0"
-                                        >
-                                          {t(
-                                            `defi.subcategories.${protocol.subcategory.toLowerCase().replace(/ /g, "_")}`,
-                                            protocol.subcategory,
-                                          )}
-                                        </Badge>
-                                      )}
+                                        ) : (
+                                          <Badge
+                                            variant="outline"
+                                            className="h-4 px-1 text-[10px] flex-shrink-0"
+                                          >
+                                            {t(
+                                              `defi.subcategories.${protocol.subcategory.toLowerCase().replace(/ /g, "_")}`,
+                                              protocol.subcategory
+                                            )}
+                                          </Badge>
+                                        )}
+                                      </div>
                                     </div>
-                                  </div>
-                                </Link>
-                              ))}
+                                  </Link>
+                                ))}
+                              </div>
                             </div>
-                          </div>
-                        );
-                      })}
+                          );
+                        }
+                      )}
                     </div>
                   </ScrollArea>
                 </div>

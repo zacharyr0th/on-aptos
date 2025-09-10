@@ -6,14 +6,12 @@
 export const ENDPOINTS = {
   // Aptos Infrastructure
   APTOS_INDEXER:
-    process.env.NEXT_PUBLIC_APTOS_INDEXER_URL ||
-    "https://api.mainnet.aptoslabs.com/v1/graphql",
+    process.env.NEXT_PUBLIC_APTOS_INDEXER_URL || "https://api.mainnet.aptoslabs.com/v1/graphql",
   APTOS_FULLNODE: "https://fullnode.mainnet.aptoslabs.com/v1",
 
   // Market Data APIs
   CMC_BASE: "https://pro-api.coinmarketcap.com/v1",
-  CMC_QUOTES:
-    "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest",
+  CMC_QUOTES: "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest",
   COINGECKO_BASE: "https://api.coingecko.com/api/v3",
 
   // DeFi Data

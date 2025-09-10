@@ -3,24 +3,18 @@
  * Provides clean access to commonly used components across the application
  */
 
-// Layout components
-export { Header } from "./layout/Header";
-export { Footer } from "./layout/Footer";
-export { ThemeProvider } from "./layout/theme-provider";
-export { ThemeToggle } from "./layout/theme-toggle";
-
 // Error handling
 export { ErrorBoundary } from "./errors/ErrorBoundary";
-export { RootErrorBoundary } from "./errors/RootErrorBoundary";
 export { ErrorFallback } from "./errors/ErrorFallback";
-
-// Wallet components
-export { WalletConnectButton } from "./wallet/WalletConnectButton";
-export { WalletProvider } from "./wallet/WalletProvider";
-
+export { RootErrorBoundary } from "./errors/RootErrorBoundary";
+export { Footer } from "./layout/Footer";
+// Layout components
+export { Header } from "./layout/Header";
+export { ThemeProvider } from "./layout/theme-provider";
+export { ThemeToggle } from "./layout/theme-toggle";
 // Shared page components
 export * from "./shared/pages";
-
+export { Badge } from "./ui/badge";
 // Common UI components (selective export)
 export { Button } from "./ui/button";
 export {
@@ -31,7 +25,6 @@ export {
   CardHeader,
   CardTitle,
 } from "./ui/card";
-export { Badge } from "./ui/badge";
 export {
   Dialog,
   DialogContent,
@@ -41,6 +34,7 @@ export {
   DialogTitle,
   DialogTrigger,
 } from "./ui/dialog";
+export { Skeleton } from "./ui/skeleton";
 export {
   Table,
   TableBody,
@@ -49,10 +43,12 @@ export {
   TableHeader,
   TableRow,
 } from "./ui/table";
-export { Skeleton } from "./ui/skeleton";
 export {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "./ui/tooltip";
+// Wallet components
+export { WalletConnectButton } from "./wallet/WalletConnectButton";
+export { WalletProvider } from "./wallet/WalletProvider";

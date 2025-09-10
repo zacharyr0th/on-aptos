@@ -3,9 +3,8 @@
  */
 
 import { logger } from "@/lib/utils/core/logger";
-
 import { protocolRegistry } from "./registry";
-import { ProtocolDefinition } from "./types";
+import type { ProtocolDefinition } from "./types";
 
 export class ProtocolLoader {
   private static loadPromise: Promise<void> | null = null;
@@ -14,16 +13,16 @@ export class ProtocolLoader {
    * Load all core protocols
    */
   static async loadCore(): Promise<void> {
-    if (this.loadPromise) {
-      return this.loadPromise;
+    if (ProtocolLoader.loadPromise) {
+      return ProtocolLoader.loadPromise;
     }
 
     if (protocolRegistry.isInitialized()) {
       return;
     }
 
-    this.loadPromise = this.performLoad();
-    return this.loadPromise;
+    ProtocolLoader.loadPromise = ProtocolLoader.performLoad();
+    return ProtocolLoader.loadPromise;
   }
 
   private static async performLoad(): Promise<void> {
@@ -71,7 +70,7 @@ export class ProtocolLoader {
       logger.error("Failed to load core protocols", error);
       throw error;
     } finally {
-      this.loadPromise = null;
+      ProtocolLoader.loadPromise = null;
     }
   }
 
@@ -108,7 +107,7 @@ export class ProtocolLoader {
    */
   static async loadByType(type: string): Promise<ProtocolDefinition[]> {
     // Ensure core protocols are loaded
-    await this.loadCore();
+    await ProtocolLoader.loadCore();
 
     // Could implement lazy loading of additional protocols by type
     // For now, return what's registered
@@ -119,7 +118,7 @@ export class ProtocolLoader {
    * Load all available protocols
    */
   static async loadAll(): Promise<void> {
-    await this.loadCore();
+    await ProtocolLoader.loadCore();
 
     // Could scan definitions directory and load all
     // For now, core protocols are sufficient
@@ -130,7 +129,7 @@ export class ProtocolLoader {
    */
   static async reload(): Promise<void> {
     protocolRegistry.clear();
-    this.loadPromise = null;
-    await this.loadCore();
+    ProtocolLoader.loadPromise = null;
+    await ProtocolLoader.loadCore();
   }
 }

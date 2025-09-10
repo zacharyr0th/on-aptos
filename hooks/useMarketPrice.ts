@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { dedupeFetch } from "@/lib/utils/cache/request-deduplication";
 
@@ -29,14 +29,10 @@ export function useMarketPrice(symbol: string): UseMarketPriceResult {
       setError(null);
 
       // For Bitcoin, use xBTC price from token-latest-price API
-      if (
-        symbol.toLowerCase() === "btc" ||
-        symbol.toLowerCase() === "bitcoin"
-      ) {
-        const xBTCAddress =
-          "0x81214a80d82035a190fcb76b6ff3c0145161c3a9f33d137f2bbaee4cfec8a387";
+      if (symbol.toLowerCase() === "btc" || symbol.toLowerCase() === "bitcoin") {
+        const xBTCAddress = "0x81214a80d82035a190fcb76b6ff3c0145161c3a9f33d137f2bbaee4cfec8a387";
         const response = await dedupeFetch(
-          `/api/analytics/token-latest-price?address=${xBTCAddress}`,
+          `/api/analytics/token-latest-price?address=${xBTCAddress}`
         );
 
         if (!response.ok) {
@@ -51,9 +47,7 @@ export function useMarketPrice(symbol: string): UseMarketPriceResult {
             symbol: "BTC",
             name: "Bitcoin",
             price: tokenData.price_usd,
-            updated:
-              tokenData.bucketed_timestamp_minutes_utc ||
-              new Date().toISOString(),
+            updated: tokenData.bucketed_timestamp_minutes_utc || new Date().toISOString(),
           });
           setLastUpdated(new Date());
         } else {

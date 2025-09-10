@@ -1,27 +1,27 @@
 // Formatting utilities
 export {
-  formatNumber,
-  formatBigIntWithDecimals,
-  formatPercentage,
-  formatRelativeTime,
-  convertRawTokenAmount,
   calculateMarketShare,
-  // Currency functions
-  formatCurrency,
-  formatCurrencyMobile,
+  convertRawTokenAmount,
   formatAmount,
   formatAmountFull,
-  formatLargeNumber,
+  formatBigIntWithDecimals,
   formatCompactNumber,
-  getDecimalPlaces,
-  isValidCurrencyCode,
-  getSupportedFiatCurrencies,
-  isFiatCurrency,
+  // Currency functions
+  formatCurrency,
+  formatCurrencyBigInt,
+  formatCurrencyMobile,
   // Legacy exports (deprecated)
   formatCurrencyValue,
-  formatCurrencyBigInt,
+  formatLargeNumber,
+  formatNumber,
   formatNumberBigInt,
   formatPercent,
+  formatPercentage,
+  formatRelativeTime,
+  getDecimalPlaces,
+  getSupportedFiatCurrencies,
+  isFiatCurrency,
+  isValidCurrencyCode,
 } from "../format";
 
 // Currency types are re-exported from format.ts

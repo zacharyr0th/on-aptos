@@ -1,9 +1,6 @@
 import { toast } from "sonner";
 
-export async function copyToClipboard(
-  text: string,
-  label?: string,
-): Promise<boolean> {
+export async function copyToClipboard(text: string, label?: string): Promise<boolean> {
   try {
     await navigator.clipboard.writeText(text);
     toast.success(label ? `${label} copied` : "Copied!");
@@ -17,7 +14,7 @@ export async function copyToClipboard(
 export async function copyWithCustomMessage(
   text: string,
   successMessage: string,
-  errorMessage: string,
+  errorMessage: string
 ): Promise<boolean> {
   try {
     await navigator.clipboard.writeText(text);

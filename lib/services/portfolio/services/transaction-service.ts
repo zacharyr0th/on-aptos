@@ -1,14 +1,8 @@
 import { getEnvVar } from "@/lib/config/validate-env";
-import { PORTFOLIO_QUERY_LIMITS } from "@/lib/constants";
-import { logger, apiLogger } from "@/lib/utils/core/logger";
-
-import {
-  UnifiedGraphQLClient,
-  UNIFIED_QUERIES,
-} from "../../shared/utils/unified-graphql-client";
+import { PORTFOLIO_INDEXER, PORTFOLIO_QUERY_LIMITS } from "@/lib/constants";
+import { apiLogger, logger } from "@/lib/utils/core/logger";
+import { UNIFIED_QUERIES, UnifiedGraphQLClient } from "../../shared/utils/unified-graphql-client";
 import type { WalletTransaction } from "../types";
-
-const APTOS_INDEXER_URL = "https://api.mainnet.aptoslabs.com/v1/graphql";
 
 interface TransactionData {
   transaction_version: string;
@@ -60,11 +54,11 @@ export class TransactionService {
   static async fetchTransactionsWithDetails(
     address: string,
     limit: number = 100,
-    offset: number = 0,
+    offset: number = 0
   ): Promise<TransactionResult> {
     try {
       apiLogger.info(
-        `Fetching ${limit} transactions starting at offset ${offset} for address ${address}`,
+        `Fetching ${limit} transactions starting at offset ${offset} for address ${address}`
       );
 
       // Step 1: Get transaction versions and total count
@@ -88,9 +82,9 @@ export class TransactionService {
         }
       `;
 
-      const versionsResponse = await fetch(APTOS_INDEXER_URL, {
+      const versionsResponse = await fetch(PORTFOLIO_INDEXER.URL, {
         method: "POST",
-        headers: this.getHeaders(),
+        headers: TransactionService.getHeaders(),
         body: JSON.stringify({
           query: versionsQuery,
           variables: { address, limit, offset },
@@ -104,18 +98,12 @@ export class TransactionService {
       const versionsResult = await versionsResponse.json();
 
       if (versionsResult.errors) {
-        apiLogger.error(
-          `GraphQL error: ${JSON.stringify(versionsResult.errors)}`,
-        );
-        throw new Error(
-          `GraphQL error: ${versionsResult.errors[0]?.message || "Unknown error"}`,
-        );
+        apiLogger.error(`GraphQL error: ${JSON.stringify(versionsResult.errors)}`);
+        throw new Error(`GraphQL error: ${versionsResult.errors[0]?.message || "Unknown error"}`);
       }
 
       const accountTxns = versionsResult.data?.account_transactions || [];
-      const totalCount =
-        versionsResult.data?.account_transactions_aggregate?.aggregate?.count ||
-        0;
+      const totalCount = versionsResult.data?.account_transactions_aggregate?.aggregate?.count || 0;
 
       if (accountTxns.length === 0) {
         return {
@@ -130,10 +118,10 @@ export class TransactionService {
       // Step 2: Get transaction details
       const txVersions = accountTxns.map((tx: any) => tx.transaction_version);
       const processedTransactions =
-        await this.fetchAndProcessTransactionDetails(txVersions);
+        await TransactionService.fetchAndProcessTransactionDetails(txVersions);
 
       apiLogger.info(
-        `Transaction fetch completed: ${processedTransactions.length} transactions, ${totalCount} total`,
+        `Transaction fetch completed: ${processedTransactions.length} transactions, ${totalCount} total`
       );
 
       return {
@@ -145,7 +133,7 @@ export class TransactionService {
       };
     } catch (error) {
       apiLogger.error(
-        `Failed to fetch transactions: ${error instanceof Error ? error.message : String(error)}`,
+        `Failed to fetch transactions: ${error instanceof Error ? error.message : String(error)}`
       );
       return {
         data: [],
@@ -160,9 +148,9 @@ export class TransactionService {
    * Helper method to fetch and process transaction details
    */
   private static async fetchAndProcessTransactionDetails(
-    txVersions: string[],
+    txVersions: string[]
   ): Promise<TransactionData[]> {
-    const headers = this.getHeaders();
+    const headers = TransactionService.getHeaders();
     const detailsBatchSize = 100;
     let allTransactions: any[] = [];
     let allEvents: any[] = [];
@@ -221,7 +209,7 @@ export class TransactionService {
         }
       `;
 
-      const detailsResponse = await fetch(APTOS_INDEXER_URL, {
+      const detailsResponse = await fetch(PORTFOLIO_INDEXER.URL, {
         method: "POST",
         headers,
         body: JSON.stringify({
@@ -233,37 +221,31 @@ export class TransactionService {
       const detailsResult = await detailsResponse.json();
 
       if (detailsResult.errors) {
-        apiLogger.error(
-          `GraphQL error for batch: ${JSON.stringify(detailsResult.errors)}`,
-        );
+        apiLogger.error(`GraphQL error for batch: ${JSON.stringify(detailsResult.errors)}`);
         continue;
       }
 
-      allTransactions = allTransactions.concat(
-        detailsResult.data?.user_transactions || [],
-      );
+      allTransactions = allTransactions.concat(detailsResult.data?.user_transactions || []);
       allEvents = allEvents.concat(detailsResult.data?.events || []);
-      allSignatures = allSignatures.concat(
-        detailsResult.data?.signatures || [],
-      );
+      allSignatures = allSignatures.concat(detailsResult.data?.signatures || []);
       allBlockMetadata = allBlockMetadata.concat(
-        detailsResult.data?.block_metadata_transactions || [],
+        detailsResult.data?.block_metadata_transactions || []
       );
 
       if (i > 0) {
         apiLogger.info(
-          `Fetched details for ${i + batchVersions.length}/${txVersions.length} transactions`,
+          `Fetched details for ${i + batchVersions.length}/${txVersions.length} transactions`
         );
       }
     }
 
     // Process and return transactions
-    return this.processTransactions(
+    return TransactionService.processTransactions(
       allTransactions,
       allBlockMetadata,
       allEvents,
       allSignatures,
-      txVersions,
+      txVersions
     );
   }
 
@@ -275,7 +257,7 @@ export class TransactionService {
     blockMetadata: any[],
     events: any[],
     signatures: any[],
-    txVersions: string[],
+    txVersions: string[]
   ): TransactionData[] {
     // Group events and signatures by transaction version
     const eventsByVersion = events.reduce((acc: any, event: any) => {
@@ -336,7 +318,7 @@ export class TransactionService {
 
     // Sort by version (descending)
     const sortedTransactions = Array.from(allTransactionsMap.values()).sort(
-      (a, b) => Number(b.version) - Number(a.version),
+      (a, b) => Number(b.version) - Number(a.version)
     );
 
     return sortedTransactions.map((tx: any) => {
@@ -348,10 +330,7 @@ export class TransactionService {
       for (const event of txEvents) {
         if (event.type && event.data) {
           try {
-            const eventData =
-              typeof event.data === "string"
-                ? JSON.parse(event.data)
-                : event.data;
+            const eventData = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
 
             if (
               event.type.includes("CoinWithdrawEvent") ||
@@ -362,9 +341,7 @@ export class TransactionService {
               amount = eventData.amount || "0";
               const typeMatch = event.type.match(/<([^>]+)>/);
               if (typeMatch) {
-                assetType = typeMatch[1].includes("aptos_coin")
-                  ? "APT"
-                  : typeMatch[1];
+                assetType = typeMatch[1].includes("aptos_coin") ? "APT" : typeMatch[1];
               }
               break;
             }
@@ -405,7 +382,7 @@ export class TransactionService {
 
   static async getWalletTransactions(
     address: string,
-    limit: number = PORTFOLIO_QUERY_LIMITS.TRANSACTIONS,
+    limit: number = PORTFOLIO_QUERY_LIMITS.TRANSACTIONS
   ): Promise<WalletTransaction[]> {
     try {
       // Fetch transactions directly with all required data in single query
@@ -432,7 +409,7 @@ export class TransactionService {
         },
         {
           includeAuth: true, // Use API key for auth
-        },
+        }
       );
 
       const accountTxns = response.account_transactions || [];
@@ -448,9 +425,7 @@ export class TransactionService {
         return {
           transaction_version: tx.transaction_version,
           transaction_timestamp: userTx?.timestamp || "",
-          type: userTx?.entry_function_id_str
-            ? "entry_function_payload"
-            : "unknown",
+          type: userTx?.entry_function_id_str ? "entry_function_payload" : "unknown",
           amount: "0", // Would need to parse from payload for token transfers
           asset_type: "APT", // Default, would need to parse from payload
           success: userTx?.success || false,
@@ -471,7 +446,7 @@ export class TransactionService {
 
   static async getHistoricalActivities(
     address: string,
-    startTime: string,
+    startTime: string
   ): Promise<{
     fungibleActivities: any[];
     coinActivities: any[];
@@ -488,7 +463,7 @@ export class TransactionService {
         },
         {
           includeAuth: true, // Use API key for auth
-        },
+        }
       );
 
       return {

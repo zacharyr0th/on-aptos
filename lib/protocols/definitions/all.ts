@@ -2,7 +2,7 @@
  * Export all protocol definitions
  */
 
-import { ProtocolDefinition } from "../types";
+import type { ProtocolDefinition } from "../types";
 
 // Import all protocol definitions
 import { AmnisProtocol } from "./amnis";

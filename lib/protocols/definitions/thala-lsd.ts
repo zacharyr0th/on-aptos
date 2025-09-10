@@ -2,7 +2,8 @@
  * Thala Liquid Staking Protocol Definition
  */
 
-import { ProtocolDefinition, ProtocolType, PositionType } from "../types";
+import { ProtocolType } from "@/lib/types/defi";
+import { PositionType, type ProtocolDefinition } from "../types";
 
 export const ThalaLSDProtocol: ProtocolDefinition = {
   metadata: {
@@ -17,9 +18,7 @@ export const ThalaLSDProtocol: ProtocolDefinition = {
     auditStatus: "audited",
   },
 
-  addresses: [
-    "0xfaf4e633ae9eb31366c9ca24214231760926576c7b625313b3688b5e900731f6",
-  ],
+  addresses: ["0xfaf4e633ae9eb31366c9ca24214231760926576c7b625313b3688b5e900731f6"],
 
   patterns: {
     resources: [
@@ -33,7 +32,7 @@ export const ThalaLSDProtocol: ProtocolDefinition = {
               "0xfaf4e633ae9eb31366c9ca24214231760926576c7b625313b3688b5e900731f6::staking::ThalaAPT",
             symbol: "thAPT",
             decimals: 8,
-            amount: data?.data?.balance || "0",
+            amount: (data as any)?.data?.balance || "0",
           },
         ],
       },

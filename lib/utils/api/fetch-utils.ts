@@ -3,10 +3,10 @@ import { errorLogger } from "@/lib/utils/core/logger";
 
 import { dedupeFetch } from "../cache/request-deduplication";
 import { ApiError, TimeoutError } from "../core/errors";
-import {
+import type {
+  BatchRequestOptions,
   FetchOptions,
   GraphQLRequest,
-  BatchRequestOptions,
   RateLimitInfo,
 } from "../core/types";
 
@@ -14,10 +14,7 @@ import {
  * Enhanced fetch with retry, timeout, and exponential backoff
  * This is the centralized HTTP client for the entire application
  */
-export async function enhancedFetch(
-  url: string,
-  options: FetchOptions = {},
-): Promise<Response> {
+export async function enhancedFetch(url: string, options: FetchOptions = {}): Promise<Response> {
   const {
     retries = CACHE_CONFIG.RETRY.MAX_ATTEMPTS,
     retryDelay = CACHE_CONFIG.RETRY.BASE_DELAY,
@@ -37,18 +34,14 @@ export async function enhancedFetch(
 
   try {
     // Use deduplicated fetch for GET requests, regular fetch for mutations
-    const isGetRequest =
-      !fetchOptions.method || fetchOptions.method.toUpperCase() === "GET";
+    const isGetRequest = !fetchOptions.method || fetchOptions.method.toUpperCase() === "GET";
     const response = isGetRequest
       ? await dedupeFetch(url, fetchWithTimeout)
       : await fetch(url, fetchWithTimeout);
     clearTimeout(timeoutId);
 
     // Don't retry client errors (4xx) or rate limits (429)
-    if (
-      response.status === 429 ||
-      (response.status >= 400 && response.status < 500)
-    ) {
+    if (response.status === 429 || (response.status >= 400 && response.status < 500)) {
       return response;
     }
 
@@ -56,7 +49,7 @@ export async function enhancedFetch(
     if (retryCondition(response) && retries > 0) {
       const nextDelay = Math.min(
         retryDelay * CACHE_CONFIG.RETRY.BACKOFF_FACTOR,
-        CACHE_CONFIG.RETRY.MAX_DELAY,
+        CACHE_CONFIG.RETRY.MAX_DELAY
       );
       await new Promise((resolve) => setTimeout(resolve, retryDelay));
       return enhancedFetch(url, {
@@ -77,7 +70,7 @@ export async function enhancedFetch(
     if (retries > 0) {
       const nextDelay = Math.min(
         retryDelay * CACHE_CONFIG.RETRY.BACKOFF_FACTOR,
-        CACHE_CONFIG.RETRY.MAX_DELAY,
+        CACHE_CONFIG.RETRY.MAX_DELAY
       );
       await new Promise((resolve) => setTimeout(resolve, retryDelay));
       return enhancedFetch(url, {
@@ -97,7 +90,7 @@ export async function enhancedFetch(
 export async function graphQLRequest<T = unknown>(
   endpoint: string,
   request: GraphQLRequest,
-  options: FetchOptions = {},
+  options: FetchOptions = {}
 ): Promise<T> {
   const response = await enhancedFetch(endpoint, {
     method: "POST",
@@ -114,7 +107,7 @@ export async function graphQLRequest<T = unknown>(
     throw new ApiError(
       `GraphQL request failed: ${response.status} ${response.statusText}`,
       response.status,
-      "GraphQL",
+      "GraphQL"
     );
   }
 
@@ -125,7 +118,7 @@ export async function graphQLRequest<T = unknown>(
     throw new ApiError(
       `GraphQL errors: ${result.errors.map((e: { message: string }) => e.message).join(", ")}`,
       undefined,
-      "GraphQL",
+      "GraphQL"
     );
   }
 
@@ -138,7 +131,7 @@ export async function graphQLRequest<T = unknown>(
 export async function apiRequest<T>(
   url: string,
   options: FetchOptions = {},
-  context: string = "API",
+  context: string = "API"
 ): Promise<T> {
   try {
     const response = await enhancedFetch(url, options);
@@ -150,13 +143,9 @@ export async function apiRequest<T>(
           status: response.status,
           statusText: response.statusText,
         },
-        `${context} request failed`,
+        `${context} request failed`
       );
-      throw new ApiError(
-        `${context} request failed: ${response.status}`,
-        response.status,
-        context,
-      );
+      throw new ApiError(`${context} request failed: ${response.status}`, response.status, context);
     }
 
     return await response.json();
@@ -166,12 +155,12 @@ export async function apiRequest<T>(
     }
 
     errorLogger.error(
-      `${context} request error: ${error instanceof Error ? error.message : String(error)}`,
+      `${context} request error: ${error instanceof Error ? error.message : String(error)}`
     );
     throw new ApiError(
       `${context} request failed: ${error instanceof Error ? error.message : "Unknown error"}`,
       undefined,
-      context,
+      context
     );
   }
 }
@@ -181,7 +170,7 @@ export async function apiRequest<T>(
  */
 export async function batchRequests<T>(
   requests: (() => Promise<T>)[],
-  options: BatchRequestOptions = {},
+  options: BatchRequestOptions = {}
 ): Promise<T[]> {
   const { concurrency = 3, delayBetween = 100 } = options;
   const results: T[] = [];
@@ -192,11 +181,11 @@ export async function batchRequests<T>(
       batch.map((request) =>
         request().catch((error) => {
           errorLogger.error(
-            `Batch request failed: ${error instanceof Error ? error.message : String(error)}`,
+            `Batch request failed: ${error instanceof Error ? error.message : String(error)}`
           );
           return null; // Return null for failed requests
-        }),
-      ),
+        })
+      )
     );
 
     results.push(...(batchResults.filter(Boolean) as T[]));
@@ -219,9 +208,7 @@ export const fetchWithRetry = enhancedFetch;
  * Get security headers for client-side responses
  * This is a simplified version for browser environments
  */
-export function getClientSecurityHeaders(
-  rateLimitInfo: RateLimitInfo,
-): Record<string, string> {
+export function getClientSecurityHeaders(rateLimitInfo: RateLimitInfo): Record<string, string> {
   return {
     "X-RateLimit-Limit": rateLimitInfo.remaining.toString(),
     "X-RateLimit-Remaining": rateLimitInfo.remaining.toString(),
@@ -241,10 +228,7 @@ export function parseRateLimitHeaders(headers: Headers): RateLimitInfo {
     allowed: true, // If we got a response, it was allowed
     remaining: parseInt(headers.get("X-RateLimit-Remaining") || "0", 10),
     resetInSeconds: parseInt(headers.get("X-RateLimit-Reset") || "60", 10),
-    burstRemaining: parseInt(
-      headers.get("X-RateLimit-Burst-Remaining") || "0",
-      10,
-    ),
+    burstRemaining: parseInt(headers.get("X-RateLimit-Burst-Remaining") || "0", 10),
   };
 }
 

@@ -16,16 +16,12 @@ export class ImageOptimizer {
   /**
    * Get optimized image URL with proper caching headers
    */
-  static getOptimizedUrl(
-    originalUrl: string,
-    width?: number,
-    format?: string,
-  ): string {
+  static getOptimizedUrl(originalUrl: string, width?: number, format?: string): string {
     if (!originalUrl) return "";
 
     // For external images, use a CDN or image optimization service
     if (originalUrl.startsWith("http")) {
-      return this.getExternalOptimizedUrl(originalUrl, width, format);
+      return ImageOptimizer.getExternalOptimizedUrl(originalUrl, width, format);
     }
 
     // For local images, use Next.js Image Optimization API
@@ -40,12 +36,9 @@ export class ImageOptimizer {
   /**
    * Get srcSet for responsive images
    */
-  static getSrcSet(
-    imageUrl: string,
-    sizes: number[] = DEFAULT_CONFIG.sizes,
-  ): string {
+  static getSrcSet(imageUrl: string, sizes: number[] = DEFAULT_CONFIG.sizes): string {
     return sizes
-      .map((size) => `${this.getOptimizedUrl(imageUrl, size)} ${size}w`)
+      .map((size) => `${ImageOptimizer.getOptimizedUrl(imageUrl, size)} ${size}w`)
       .join(", ");
   }
 
@@ -58,11 +51,11 @@ export class ImageOptimizer {
     const link = document.createElement("link");
     link.rel = "preload";
     link.as = "image";
-    link.href = this.getOptimizedUrl(imageUrl);
+    link.href = ImageOptimizer.getOptimizedUrl(imageUrl);
     if (sizes) link.setAttribute("sizes", sizes);
 
     // Add responsive images
-    link.setAttribute("imagesrcset", this.getSrcSet(imageUrl));
+    link.setAttribute("imagesrcset", ImageOptimizer.getSrcSet(imageUrl));
 
     document.head.appendChild(link);
   }
@@ -70,11 +63,7 @@ export class ImageOptimizer {
   /**
    * Get optimized URL for external images
    */
-  private static getExternalOptimizedUrl(
-    url: string,
-    width?: number,
-    format?: string,
-  ): string {
+  private static getExternalOptimizedUrl(url: string, width?: number, format?: string): string {
     // If using Cloudinary, imgix, or similar service
     // Example with imgix-style parameters
     const optimizedUrl = new URL(url);
@@ -113,7 +102,7 @@ export function useOptimizedImage(
     width?: number;
     sizes?: string;
     priority?: boolean;
-  },
+  }
 ) {
   const optimizedUrl = ImageOptimizer.getOptimizedUrl(imageUrl, options?.width);
   const srcSet = ImageOptimizer.getSrcSet(imageUrl);
@@ -126,8 +115,6 @@ export function useOptimizedImage(
   return {
     src: optimizedUrl,
     srcSet,
-    sizes:
-      options?.sizes ||
-      "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw",
+    sizes: options?.sizes || "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw",
   };
 }

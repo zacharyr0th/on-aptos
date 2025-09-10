@@ -1,12 +1,11 @@
 import i18n from "i18next";
 import HttpApi from "i18next-http-backend";
 import { initReactI18next } from "react-i18next";
-
 import { i18nEventManager } from "@/lib/i18n/events";
 import { logger } from "@/lib/utils/core/logger";
+import commonEn from "../../public/locales/en/common.json";
 
 // Only import English translations for SSR - other languages load on demand
-import commonEn from "../../public/locales/en/common.json";
 
 export const supportedLanguages = [
   "en",
@@ -32,14 +31,7 @@ export const supportedLanguages = [
 export type SupportedLanguage = (typeof supportedLanguages)[number];
 
 export const defaultLanguage: SupportedLanguage = "en";
-export const namespaces = [
-  "common",
-  "defi",
-  "rwas",
-  "stables",
-  "btc",
-  "lst",
-] as const;
+export const namespaces = ["common", "defi", "rwas", "stables", "btc", "lst"] as const;
 export type Namespace = (typeof namespaces)[number];
 
 // Critical namespaces that should be preloaded for better UX (currently unused)
@@ -184,17 +176,13 @@ if (isServer) {
   if (typeof window !== "undefined" && typeof localStorage !== "undefined") {
     try {
       const saved = localStorage.getItem("i18n-language") as SupportedLanguage;
-      if (
-        saved &&
-        supportedLanguages.includes(saved) &&
-        saved !== i18n.language
-      ) {
+      if (saved && supportedLanguages.includes(saved) && saved !== i18n.language) {
         logger.info(`Found saved language preference: ${saved}, applying...`);
         i18n.changeLanguage(saved);
       }
     } catch (error) {
       logger.warn(
-        `Failed to apply saved language preference: ${error instanceof Error ? error.message : String(error)}`,
+        `Failed to apply saved language preference: ${error instanceof Error ? error.message : String(error)}`
       );
     }
   }
@@ -223,7 +211,7 @@ export const initializeI18n = async (): Promise<boolean> => {
       currentLanguage: i18n.language,
       savedLanguage: localStorage.getItem("i18n-language"),
     },
-    "i18n already initialized",
+    "i18n already initialized"
   );
 
   return true;
@@ -237,22 +225,20 @@ export const preloadNamespace = async (namespace: Namespace): Promise<void> => {
     await i18n.loadNamespaces(namespace);
   } catch (error) {
     logger.warn(
-      `Failed to preload namespace ${namespace}: ${error instanceof Error ? error.message : String(error)}`,
+      `Failed to preload namespace ${namespace}: ${error instanceof Error ? error.message : String(error)}`
     );
   }
 };
 
 // Preload all namespaces for a specific page
-export const preloadPageTranslations = async (
-  pageNamespaces: Namespace[],
-): Promise<void> => {
+export const preloadPageTranslations = async (pageNamespaces: Namespace[]): Promise<void> => {
   if (isServer) return;
 
   try {
     await Promise.all(pageNamespaces.map((ns) => preloadNamespace(ns)));
   } catch (error) {
     logger.warn(
-      `Failed to preload page translations: ${error instanceof Error ? error.message : String(error)}`,
+      `Failed to preload page translations: ${error instanceof Error ? error.message : String(error)}`
     );
   }
 };

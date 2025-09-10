@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-
-import { apiLogger } from "@/lib/utils/core/logger";
 import { UnifiedCache } from "@/lib/utils/cache/unified-cache";
+import { apiLogger } from "@/lib/utils/core/logger";
 
 const cache = new UnifiedCache({ ttl: 5 * 60 * 1000 }); // 5 minutes
 
@@ -18,12 +17,9 @@ export async function GET() {
       fetch("https://api.llama.fi/overview/dexs?excludeTotalDataChart=true", {
         next: { revalidate: 300 },
       }),
-      fetch(
-        "https://api.llama.fi/overview/dexs/aptos?excludeTotalDataChart=true",
-        {
-          next: { revalidate: 300 },
-        },
-      ),
+      fetch("https://api.llama.fi/overview/dexs/aptos?excludeTotalDataChart=true", {
+        next: { revalidate: 300 },
+      }),
     ]);
 
     let globalVolume = null;
@@ -42,10 +38,7 @@ export async function GET() {
     }
 
     // Process Aptos volume data
-    if (
-      aptosProtocolsResponse.status === "fulfilled" &&
-      aptosProtocolsResponse.value.ok
-    ) {
+    if (aptosProtocolsResponse.status === "fulfilled" && aptosProtocolsResponse.value.ok) {
       const aptosData = await aptosProtocolsResponse.value.json();
       aptosVolume = {
         volume24h: aptosData.total24h || 0,
@@ -79,9 +72,6 @@ export async function GET() {
     return NextResponse.json(result);
   } catch (error) {
     apiLogger.error("Error fetching Aptos volume context data:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch volume context data" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Failed to fetch volume context data" }, { status: 500 });
   }
 }

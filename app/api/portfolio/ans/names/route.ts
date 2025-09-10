@@ -1,123 +1,131 @@
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
+import {
+  errorResponse,
+  extractParams,
+  successResponse,
+  validateRequiredParams,
+} from "@/lib/utils/api/common";
+import { RATE_LIMIT_TIERS, withRateLimit } from "@/lib/utils/api/rate-limiter";
 import { logger } from "@/lib/utils/core/logger";
 
-export async function GET(request: NextRequest) {
+import { PORTFOLIO_CACHE, PORTFOLIO_RATE_LIMIT_NAMES } from "../../constants";
+
+export const revalidate = 300;
+
+async function portfolioANSNamesHandler(request: NextRequest) {
+  const params = extractParams(request);
+
+  // Validate required parameters
+  const validation = validateRequiredParams(params, ["address"]);
+  if (validation) {
+    return errorResponse(validation, 400);
+  }
+
+  const address = params.address!;
+
+  // Validate address format
+  if (!/^0x[a-fA-F0-9]{1,64}$/.test(address)) {
+    return errorResponse("Invalid Aptos address format", 400);
+  }
+
+  // First try the ANS API
   try {
-    const searchParams = request.nextUrl.searchParams;
-    const address = searchParams.get("address");
+    const ansApiUrl = `https://www.aptosnames.com/api/mainnet/v1/name/${address}`;
 
-    if (!address) {
-      return NextResponse.json(
-        { error: "Address parameter is required" },
-        { status: 400 },
-      );
-    }
+    const ansResponse = await fetch(ansApiUrl, {
+      headers: {
+        Accept: "application/json",
+        "User-Agent": "On-Aptos/1.0",
+      },
+      signal: AbortSignal.timeout(5000),
+    });
 
-    // Validate address format
-    if (!/^0x[a-fA-F0-9]{1,64}$/.test(address)) {
-      return NextResponse.json(
-        { error: "Invalid Aptos address format" },
-        { status: 400 },
-      );
-    }
-
-    // First try the ANS API
-    try {
-      const ansApiUrl = `https://www.aptosnames.com/api/mainnet/v1/name/${address}`;
-      // apiLogger.info(`[ANS] Fetching names from ANS API for ${address}`);
-
-      const ansResponse = await fetch(ansApiUrl, {
-        headers: {
-          Accept: "application/json",
-          "User-Agent": "On-Aptos/1.0",
-        },
-        signal: AbortSignal.timeout(5000),
-      });
-
-      if (ansResponse.ok) {
-        const ansData = await ansResponse.json();
-        if (ansData?.name) {
-          // ANS API returns single name, convert to array format
-          const nameList = [ansData.name];
-          // apiLogger.info(`[ANS] Found ${nameList.length} names via ANS API`);
-          return NextResponse.json({
+    if (ansResponse.ok) {
+      const ansData = await ansResponse.json();
+      if (ansData?.name) {
+        // ANS API returns single name, convert to array format
+        const nameList = [ansData.name];
+        return successResponse(
+          {
             success: true,
             data: nameList,
             source: "ans-api",
-          });
-        }
+          },
+          PORTFOLIO_CACHE.ANS
+        );
       }
-    } catch {
-      logger.warn(`[ANS] ANS API failed for names, falling back to GraphQL`);
     }
+  } catch {
+    logger.warn(`[ANS] ANS API failed for names, falling back to GraphQL`);
+  }
 
-    // Fallback to GraphQL
-    const APTOS_GRAPHQL_URL = "https://api.mainnet.aptoslabs.com/v1/graphql";
+  // Fallback to GraphQL
+  const APTOS_GRAPHQL_URL = "https://api.mainnet.aptoslabs.com/v1/graphql";
 
-    const query = `
-      query GetAccountNames($owner_address: String!) {
-        current_aptos_names(
-          where: {
-            owner_address: { _eq: $owner_address }
-          }
-          order_by: {
-            is_primary: desc
-            last_transaction_version: desc
-          }
-        ) {
-          domain
-          subdomain
-          is_primary
+  const query = `
+    query GetAccountNames($owner_address: String!) {
+      current_aptos_names(
+        where: {
+          owner_address: { _eq: $owner_address }
         }
+        order_by: {
+          is_primary: desc
+          last_transaction_version: desc
+        }
+      ) {
+        domain
+        subdomain
+        is_primary
       }
-    `;
-
-    const response = await fetch(APTOS_GRAPHQL_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        query,
-        variables: { owner_address: address },
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`GraphQL request failed: ${response.statusText}`);
     }
+  `;
 
-    const result = await response.json();
+  const response = await fetch(APTOS_GRAPHQL_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      query,
+      variables: { owner_address: address },
+    }),
+  });
 
-    if (result.errors) {
-      throw new Error(`GraphQL errors: ${JSON.stringify(result.errors)}`);
-    }
+  if (!response.ok) {
+    throw new Error(`GraphQL request failed: ${response.statusText}`);
+  }
 
-    const names = result.data?.current_aptos_names || [];
+  const result = await response.json();
 
-    // Format the names as the ANS service does
-    const nameList = names
-      .filter((name: any) => name.domain && !name.subdomain)
-      .map((name: any) => `${name.domain}.apt`)
-      .concat(
-        names
-          .filter((name: any) => name.subdomain && name.domain)
-          .map((name: any) => `${name.subdomain}.${name.domain}.apt`),
-      );
+  if (result.errors) {
+    throw new Error(`GraphQL errors: ${JSON.stringify(result.errors)}`);
+  }
 
-    // apiLogger.info(`ANS: Found ${nameList.length} names for address ${address}`);
+  const names = result.data?.current_aptos_names || [];
 
-    return NextResponse.json({
+  // Format the names as the ANS service does
+  const nameList = names
+    .filter((name: any) => name.domain && !name.subdomain)
+    .map((name: any) => `${name.domain}.apt`)
+    .concat(
+      names
+        .filter((name: any) => name.subdomain && name.domain)
+        .map((name: any) => `${name.subdomain}.${name.domain}.apt`)
+    );
+
+  return successResponse(
+    {
       success: true,
       data: nameList,
       source: "graphql",
-    });
-  } catch {
-    logger.error(`Error fetching account names`);
-    return NextResponse.json(
-      { error: "Failed to fetch account names" },
-      { status: 500 },
-    );
-  }
+    },
+    PORTFOLIO_CACHE.ANS
+  );
 }
+
+export const GET = withRateLimit(portfolioANSNamesHandler, {
+  name: PORTFOLIO_RATE_LIMIT_NAMES.ANS_NAMES,
+  maxRequests: RATE_LIMIT_TIERS.STANDARD.maxRequests,
+  windowMs: RATE_LIMIT_TIERS.STANDARD.windowMs,
+});

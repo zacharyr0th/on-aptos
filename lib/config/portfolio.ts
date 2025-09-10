@@ -63,9 +63,7 @@ export const PORTFOLIO_CACHE_TTL = {
 
 // Aptos Indexer Configuration
 export const PORTFOLIO_INDEXER = {
-  URL:
-    process.env.NEXT_PUBLIC_APTOS_INDEXER_URL ||
-    "https://api.mainnet.aptoslabs.com/v1/graphql",
+  URL: process.env.NEXT_PUBLIC_APTOS_INDEXER_URL || "https://api.mainnet.aptoslabs.com/v1/graphql",
 } as const;
 
 // UI component dimensions and pagination settings

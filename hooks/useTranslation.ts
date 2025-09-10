@@ -1,16 +1,12 @@
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation as useI18NextTranslation } from "react-i18next";
-import { useEffect, useState, useCallback, useMemo } from "react";
-import {
-  preloadPageTranslations,
-  type Namespace,
-  type SupportedLanguage,
-} from "@/lib/i18n";
 import type {
   TranslatableString,
   TranslatableStringArray,
 } from "@/components/pages/defi/data/types";
-import { logger, errorLogger } from "@/lib/utils/core/logger";
+import { type Namespace, preloadPageTranslations, type SupportedLanguage } from "@/lib/i18n";
 import { i18nEventManager } from "@/lib/i18n/events";
+import { errorLogger, logger } from "@/lib/utils/core/logger";
 
 /**
  * Enhanced translation hook with automatic namespace preloading
@@ -24,10 +20,7 @@ export function useTranslation(namespace: Namespace | Namespace[] = "common") {
   const [translationsLoaded, setTranslationsLoaded] = useState(false);
 
   // Stable namespace key for dependencies
-  const namespaceKey = useMemo(
-    () => [...namespaces].sort().join(","),
-    [namespaces.join(",")],
-  );
+  const namespaceKey = useMemo(() => [...namespaces].sort().join(","), [namespaces.join(",")]);
 
   // Track when component is mounted (client-side only)
   useEffect(() => {
@@ -46,9 +39,7 @@ export function useTranslation(namespace: Namespace | Namespace[] = "common") {
           await new Promise((resolve) => setTimeout(resolve, 50));
 
           // Double-check that all namespaces are actually loaded
-          const allLoaded = namespaces.every((ns) =>
-            i18n.hasLoadedNamespace(ns),
-          );
+          const allLoaded = namespaces.every((ns) => i18n.hasLoadedNamespace(ns));
           if (mounted && allLoaded) {
             setIsReady(true);
             setTranslationsLoaded(true);
@@ -56,9 +47,7 @@ export function useTranslation(namespace: Namespace | Namespace[] = "common") {
             // More aggressive retry mechanism
             let retryCount = 0;
             const retryInterval = setInterval(() => {
-              const retryCheck = namespaces.every((ns) =>
-                i18n.hasLoadedNamespace(ns),
-              );
+              const retryCheck = namespaces.every((ns) => i18n.hasLoadedNamespace(ns));
               if (retryCheck || retryCount >= 10) {
                 clearInterval(retryInterval);
                 if (mounted) {
@@ -71,7 +60,7 @@ export function useTranslation(namespace: Namespace | Namespace[] = "common") {
           }
         } catch (error) {
           logger.warn(
-            `Failed to load namespaces: ${error instanceof Error ? error.message : String(error)}`,
+            `Failed to load namespaces: ${error instanceof Error ? error.message : String(error)}`
           );
           if (mounted) setIsReady(true); // Set ready anyway to avoid permanent loading state
         }
@@ -103,7 +92,7 @@ export function useTranslation(namespace: Namespace | Namespace[] = "common") {
   // Memoize namespace check function
   const hasLoadedNamespaces = useMemo(
     () => () => namespaces.every((ns) => i18n.hasLoadedNamespace(ns)),
-    [namespaces, i18n],
+    [namespaces, i18n]
   );
 
   // Safe translation with fallback - SSR compatible
@@ -117,8 +106,7 @@ export function useTranslation(namespace: Namespace | Namespace[] = "common") {
       try {
         // Always try to get the translation first, even if not "ready"
         const translated = i18nT(key, options);
-        const translatedStr =
-          typeof translated === "string" ? translated : String(translated);
+        const translatedStr = typeof translated === "string" ? translated : String(translated);
 
         // If we got a real translation (not the key back), use it
         if (translatedStr && translatedStr !== key) {
@@ -137,7 +125,7 @@ export function useTranslation(namespace: Namespace | Namespace[] = "common") {
         if (process.env.NODE_ENV === "development" && translatedStr === key) {
           logger.debug(
             `Translation missing for key: ${key}, namespaces loaded:`,
-            namespaces.map((ns) => `${ns}:${i18n.hasLoadedNamespace(ns)}`),
+            namespaces.map((ns) => `${ns}:${i18n.hasLoadedNamespace(ns)}`)
           );
         }
 
@@ -146,13 +134,13 @@ export function useTranslation(namespace: Namespace | Namespace[] = "common") {
       } catch (error) {
         if (process.env.NODE_ENV === "development") {
           logger.warn(
-            `Translation error for key "${key}": ${error instanceof Error ? error.message : String(error)}`,
+            `Translation error for key "${key}": ${error instanceof Error ? error.message : String(error)}`
           );
         }
         return fallback || key;
       }
     },
-    [i18nT, i18n, namespaces, isReady, isMounted, hasLoadedNamespaces],
+    [i18nT, i18n, namespaces, isReady, isMounted, hasLoadedNamespaces]
   );
 
   const changeLanguage = useCallback(
@@ -161,11 +149,11 @@ export function useTranslation(namespace: Namespace | Namespace[] = "common") {
         await i18n.changeLanguage(lng);
       } catch (error) {
         errorLogger.error(
-          `Failed to change language: ${error instanceof Error ? error.message : String(error)}`,
+          `Failed to change language: ${error instanceof Error ? error.message : String(error)}`
         );
       }
     },
-    [i18n],
+    [i18n]
   );
 
   // Helper function to get text from i18n objects
@@ -181,14 +169,11 @@ export function useTranslation(namespace: Namespace | Namespace[] = "common") {
       }
       return defaultText || "";
     },
-    [i18n.language],
+    [i18n.language]
   );
 
   // Helper to get current language - memoized
-  const getCurrentLanguage = useMemo(
-    () => i18n.language as SupportedLanguage,
-    [i18n.language],
-  );
+  const getCurrentLanguage = useMemo(() => i18n.language as SupportedLanguage, [i18n.language]);
 
   return useMemo(
     () => ({
@@ -212,13 +197,11 @@ export function useTranslation(namespace: Namespace | Namespace[] = "common") {
       getText,
       getCurrentLanguage,
       translationsLoaded,
-    ],
+    ]
   );
 }
 
 // Single hook for page-specific translations
-export function usePageTranslation(
-  page: "defi" | "btc" | "rwas" | "stables" | "lst",
-) {
+export function usePageTranslation(page: "defi" | "btc" | "rwas" | "stables" | "lst") {
   return useTranslation(["common", page]);
 }

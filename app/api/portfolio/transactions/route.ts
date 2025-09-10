@@ -1,64 +1,50 @@
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
 import { TransactionService } from "@/lib/services/portfolio/services/transaction-service";
+import {
+  errorResponse,
+  extractParams,
+  parseNumericParam,
+  successResponse,
+  validateRequiredParams,
+} from "@/lib/utils/api/common";
 import { apiLogger } from "@/lib/utils/core/logger";
 
+// Simple transactions endpoint for pagination
 export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const params = extractParams(request);
+
+  const walletAddress = params.address || params.walletAddress;
+  const limit = parseNumericParam(searchParams.get("limit"), 100, 1, 500);
+  const offset = parseNumericParam(searchParams.get("offset"), 0, 0, 10000);
+
+  const validation = validateRequiredParams({ walletAddress }, ["walletAddress"]);
+  if (validation) {
+    return errorResponse(validation, 400);
+  }
+
   try {
-    const { searchParams } = new URL(request.url);
-    const address = searchParams.get("address");
-    const limit = parseInt(searchParams.get("limit") || "100", 10);
-    const offset = parseInt(searchParams.get("offset") || "0", 10);
-
-    if (!address) {
-      apiLogger.warn("Transaction API: Missing address parameter");
-      return NextResponse.json(
-        { error: "Address parameter is required" },
-        { status: 400 },
-      );
-    }
-
-    // Use the shared TransactionService
-    const result = await TransactionService.fetchTransactionsWithDetails(
-      address,
-      limit,
-      offset,
-    );
-
-    if (!result.success) {
-      throw new Error("Failed to fetch transactions");
-    }
-
     apiLogger.info(
-      `Transaction fetch completed: ${result.data.length} transactions, ${result.totalCount} total`,
+      `Fetching transactions: address=${walletAddress}, limit=${limit}, offset=${offset}`
     );
 
-    return NextResponse.json(
-      {
-        success: result.success,
-        data: result.data,
-        count: result.data.length,
-        totalCount: result.totalCount,
-        hasMore: result.hasMore,
-        nextOffset: result.nextOffset,
-      },
-      {
-        status: 200,
-        headers: {
-          "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
-        },
-      },
+    const result = await TransactionService.fetchTransactionsWithDetails(
+      walletAddress!,
+      limit,
+      offset
     );
+
+    return successResponse({
+      success: true,
+      data: result.data || [],
+      totalCount: result.totalCount || 0,
+    });
   } catch (error) {
-    apiLogger.error("Transaction API error", error);
-
-    return NextResponse.json(
-      {
-        success: false,
-        error: "Failed to fetch transactions",
-        details: error instanceof Error ? error.message : "Unknown error",
-      },
-      { status: 500 },
+    apiLogger.error(`Failed to fetch transactions:`, error);
+    return errorResponse(
+      `Failed to fetch transactions: ${error instanceof Error ? error.message : "Unknown error"}`,
+      500
     );
   }
 }

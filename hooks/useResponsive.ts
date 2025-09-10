@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { debounce } from "@/lib/utils";
 
 interface ResponsiveState {
@@ -44,8 +44,7 @@ export function useResponsive(): ResponsiveState {
       height,
       isMobile: width < BREAKPOINTS.mobile,
       isTablet: width >= BREAKPOINTS.mobile && width < BREAKPOINTS.tablet,
-      isDesktop:
-        width >= BREAKPOINTS.tablet && width < BREAKPOINTS.largeDesktop,
+      isDesktop: width >= BREAKPOINTS.tablet && width < BREAKPOINTS.largeDesktop,
       isLargeDesktop: width >= BREAKPOINTS.largeDesktop,
     };
   });
@@ -62,12 +61,11 @@ export function useResponsive(): ResponsiveState {
           height,
           isMobile: width < BREAKPOINTS.mobile,
           isTablet: width >= BREAKPOINTS.mobile && width < BREAKPOINTS.tablet,
-          isDesktop:
-            width >= BREAKPOINTS.tablet && width < BREAKPOINTS.largeDesktop,
+          isDesktop: width >= BREAKPOINTS.tablet && width < BREAKPOINTS.largeDesktop,
           isLargeDesktop: width >= BREAKPOINTS.largeDesktop,
         });
       }, 150), // 150ms debounce delay
-    [],
+    []
   );
 
   useEffect(() => {
@@ -94,11 +92,7 @@ export function useIsMobile(): boolean {
   return isMobile;
 }
 
-export function useDeviceType():
-  | "mobile"
-  | "tablet"
-  | "desktop"
-  | "largeDesktop" {
+export function useDeviceType(): "mobile" | "tablet" | "desktop" | "largeDesktop" {
   const { isMobile, isTablet, isDesktop, isLargeDesktop } = useResponsive();
 
   if (isMobile) return "mobile";

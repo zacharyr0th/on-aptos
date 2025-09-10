@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-
-import { apiLogger } from "@/lib/utils/core/logger";
 import { UnifiedCache } from "@/lib/utils/cache/unified-cache";
+import { apiLogger } from "@/lib/utils/core/logger";
 
 const cache = new UnifiedCache({ ttl: 5 * 60 * 1000 }); // 5 minutes
 
@@ -14,12 +13,9 @@ export async function GET() {
     }
 
     // Fetch stablecoin market cap data
-    const stablecoinResponse = await fetch(
-      "https://stablecoins.llama.fi/stablecoins",
-      {
-        next: { revalidate: 300 },
-      },
-    );
+    const stablecoinResponse = await fetch("https://stablecoins.llama.fi/stablecoins", {
+      next: { revalidate: 300 },
+    });
 
     if (!stablecoinResponse.ok) {
       throw new Error(`Stablecoin API error: ${stablecoinResponse.status}`);
@@ -28,19 +24,15 @@ export async function GET() {
     const stablecoinsData = await stablecoinResponse.json();
 
     // Fetch Aptos-specific stablecoin data
-    const chainsResponse = await fetch(
-      "https://stablecoins.llama.fi/stablecoinchains",
-      {
-        next: { revalidate: 300 },
-      },
-    );
+    const chainsResponse = await fetch("https://stablecoins.llama.fi/stablecoinchains", {
+      next: { revalidate: 300 },
+    });
 
     let aptosStableData = null;
     if (chainsResponse.ok) {
       const chainsData = await chainsResponse.json();
       aptosStableData = chainsData.find(
-        (chain: any) =>
-          chain.name.toLowerCase() === "aptos" || chain.gecko_id === "aptos",
+        (chain: any) => chain.name.toLowerCase() === "aptos" || chain.gecko_id === "aptos"
       );
     }
 
@@ -54,8 +46,7 @@ export async function GET() {
             name: stable.name,
             symbol: stable.symbol,
             mcap: stable.mcap,
-            dominancePercentage:
-              (stable.mcap / stablecoinsData.totalMcap) * 100,
+            dominancePercentage: (stable.mcap / stablecoinsData.totalMcap) * 100,
           })) || [],
       },
       aptos: {
@@ -77,7 +68,7 @@ export async function GET() {
               const stability = 1 - Math.abs(1 - (stable.price || 1));
               return avg + stability / array.length;
             },
-            0,
+            0
           ) || 0,
       },
       growth: {
@@ -98,9 +89,6 @@ export async function GET() {
     return NextResponse.json(stablecoinMetrics);
   } catch (error) {
     apiLogger.error("Error fetching stablecoin metrics:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch stablecoin metrics" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Failed to fetch stablecoin metrics" }, { status: 500 });
   }
 }

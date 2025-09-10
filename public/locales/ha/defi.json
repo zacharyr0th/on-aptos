@@ -223,16 +223,7 @@
       "Protocol Suite": "Tsarin Ka'ida"
     }
   },
-  "protocols": {
-    "mirage": {
-      "description": "Layer ruwa mai hadeɗuwa wanda ke kunna DeFi mai zuwa. Ajiye haɗin gwiwa sannan aro lamuni na stablecoin mai biya kai tsaye ta hanyar perps tare da har zuwa 100x leverage.",
-      "categoryBreakdown": "Ciniki • Perps",
-      "feeStructure": "Tsarin kuɗi mai canji dangane da ƙarar ciniki da girman matsayi. Farashin gasa don cinikin perps futures.",
-      "integration": {
-        "description": "Perps gaba ɗaya na kan-chain tare da ƙwarewar CEX. Duk matsayi, vaults, da oda suna alamar NFT don cinikin kasuwar sakandare."
-      }
-    }
-  },
+  "protocols": {},
   "protocol_descriptions": {
     "Panora": "Wani \"meta-DEX\" wanda ke haɗuwa da littafin oda na kan-layi da AMMs 10+, yana rarraba oda tsakanin wuraren da ke sarrafa jerin alamomin da ke sabuntawa ta atomatik a cikin UI ɗinsa.",
     "Kana": "Tushen musayar ciniki a kan sarkakiya tara; kwangilar Paymaster yana ba masu amfani damar kasuwanci akan Aptos ba tare da riƙe APT azaman gas ba; injin kwangiloli masu dawwama na tushen littafin oda.",
@@ -257,8 +248,7 @@
     "Kofi": "Liquid staking da aka haɓaka da MEV tare da ɗakin ajiya na LSD mai leverage.",
     "Ichi": "Automated liquidity manager vaults yana ba wa ayyuka damar bayar da ruwa na gefe ɗaya; haɓakan range da ke dacewa don rage asarar da ba ta daɗe ba yayin da ma'ajin ke samun kuɗin ciniki a cikin alamarsa ta asali.",
     "Moar": "Yana ginin Layer na noma mai leverage tare da asusun credit na kan-protocols, yana ba masu amfani damar ari a wuri ɗaya, aiwatarwa a wani wuri.",
-    "Thala": "Suite na aikace-aikacen DeFi tare da AMM mai wuraren da yawa, stablecoin MOD mai haɗin gwiwa da liquid staking ta hanyar sthAPT da thAPT.",
-    "Mirage": "A composable liquidity layer powering DeFi's next frontier. Deposit collateral and borrow a self-repaying stablecoin loan powered by perpetuals. Features fully on-chain perps with CEX-like experience, instant execution, low fees, and up to 100x leverage."
+    "Thala": "Suite na aikace-aikacen DeFi tare da AMM mai wuraren da yawa, stablecoin MOD mai haɗin gwiwa da liquid staking ta hanyar sthAPT da thAPT."
   },
   "protocol_category_breakdown": {
     "Thala": "Ciniki • Samarwa • Kuɗi"

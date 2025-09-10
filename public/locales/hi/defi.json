@@ -223,16 +223,7 @@
       "Protocol Suite": "प्रोटोकॉल सूट"
     }
   },
-  "protocols": {
-    "mirage": {
-      "description": "Composable liquidity layer bringing next-gen DeFi. Deposit collateral and borrow self-repaying stablecoin loans powered by perpetuals with up to 100x leverage.",
-      "categoryBreakdown": "Trading • Perps",
-      "feeStructure": "Dynamic fee structure based on trading volume and position size. Competitive fees for perpetual futures trading.",
-      "integration": {
-        "description": "Fully on-chain perpetuals with CEX-like experience. All positions, vaults, and orders are represented as NFTs for secondary market trading."
-      }
-    }
-  },
+  "protocols": {},
   "protocol_descriptions": {
     "Panora": "एक \"मेटा-डेक्स\" जो ऑन-चेन ऑर्डर-बुक और 10+ एएऎऎ से जुड़ता है, पूल्स में ऑर्डर विभाजित करता है और एक कैनोनिकल टोकन सूची बनाता है जो अपने यूआई में स्वतः अपडेट होती है।",
     "Kana": "नौ चेन्स में स्वैप्स को रूट करता है; एक पेमास्टर कॉन्ट्रैक्ट उपयोगकर्ताओं को गैस के लिए APT रखे बिना Aptos पर ट्रेड करने देता है; एक ऑर्डरबुक-आधारित perp इंजन।",
@@ -257,8 +248,7 @@
     "Kofi": "MEV-boosted लिक्विड स्टेकिंग और leveraged-LSD vaults के साथ।",
     "Ichi": "Automated Liquidity Manager vaults प्रोजेक्ट्स को single-sided liquidity seed करने देते हैं; smart ranges impermanent loss काटने के लिए rebalance करते हैं जबकि treasuries अपने native token में swap fees कमाते हैं।",
     "Moar": "Cross-protocol credit accounts के साथ leveraged-farm layer बना रहा है जो users को एक जगह borrow करने और दूसरी जगह deploy करने की सुविधा देता है।",
-    "Thala": "DeFi अनुप्रयोगों का एक सूट जिसमें एक मल्टी-पूल AMM, अधिक-पार्श्विक MOD स्टेबलकॉइन, और sthAPT और thAPT के माध्यम से लिक्विड-स्टेकिंग है।",
-    "Mirage": "A composable liquidity layer powering DeFi's next frontier. Deposit collateral and borrow a self-repaying stablecoin loan powered by perpetuals. Features fully on-chain perps with CEX-like experience, instant execution, low fees, and up to 100x leverage."
+    "Thala": "DeFi अनुप्रयोगों का एक सूट जिसमें एक मल्टी-पूल AMM, अधिक-पार्श्विक MOD स्टेबलकॉइन, और sthAPT और thAPT के माध्यम से लिक्विड-स्टेकिंग है।"
   },
   "protocol_category_breakdown": {
     "Thala": "ट्रेडिंग • यील्ड • क्रेडिट"

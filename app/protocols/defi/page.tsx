@@ -1,5 +1,5 @@
-import { createPage } from "@/lib/utils/page-factory";
 import NextDynamic from "next/dynamic";
+import { createPage } from "@/lib/utils/page-factory";
 
 // Lazy load the DeFiPage component
 const DeFiPage = NextDynamic(() => import("@/components/pages/protocols/defi/Page"), {

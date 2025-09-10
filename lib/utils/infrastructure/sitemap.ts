@@ -1,16 +1,9 @@
-import { MetadataRoute } from "next";
+import type { MetadataRoute } from "next";
 
 export interface SitemapRoute {
   path: string;
   priority: number;
-  changeFrequency:
-    | "always"
-    | "hourly"
-    | "daily"
-    | "weekly"
-    | "monthly"
-    | "yearly"
-    | "never";
+  changeFrequency: "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never";
   lastModified?: Date;
 }
 
@@ -89,7 +82,7 @@ export const documentationRoutes: SitemapRoute[] = [
 // Helper function to generate sitemap entries with current timestamps
 export function generateSitemapEntries(
   routes: SitemapRoute[],
-  baseUrl: string,
+  baseUrl: string
 ): MetadataRoute.Sitemap {
   const currentDate = new Date();
 
@@ -123,22 +116,14 @@ export function validateSitemapEntry(entry: MetadataRoute.Sitemap[0]): boolean {
     entry.priority >= 0 &&
     entry.priority <= 1 &&
     entry.lastModified instanceof Date &&
-    [
-      "always",
-      "hourly",
-      "daily",
-      "weekly",
-      "monthly",
-      "yearly",
-      "never",
-    ].includes(entry.changeFrequency as string)
+    ["always", "hourly", "daily", "weekly", "monthly", "yearly", "never"].includes(
+      entry.changeFrequency as string
+    )
   );
 }
 
 // Helper function to prioritize routes for sitemap ordering
-export function sortBySEOPriority(
-  routes: MetadataRoute.Sitemap,
-): MetadataRoute.Sitemap {
+export function sortBySEOPriority(routes: MetadataRoute.Sitemap): MetadataRoute.Sitemap {
   return routes.sort((a, b) => {
     // Primary sort by priority
     if (b.priority !== a.priority) {
@@ -156,10 +141,8 @@ export function sortBySEOPriority(
       never: 0,
     };
 
-    const aFreq =
-      frequencyOrder[a.changeFrequency as keyof typeof frequencyOrder] || 0;
-    const bFreq =
-      frequencyOrder[b.changeFrequency as keyof typeof frequencyOrder] || 0;
+    const aFreq = frequencyOrder[a.changeFrequency as keyof typeof frequencyOrder] || 0;
+    const bFreq = frequencyOrder[b.changeFrequency as keyof typeof frequencyOrder] || 0;
 
     return bFreq - aFreq;
   });

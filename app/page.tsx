@@ -1,13 +1,15 @@
-import NewLandingPage from "@/components/pages/landing/NewLandingPage";
+"use client";
 
-// Static generation for fastest performance
-export const dynamic = "force-static";
-export const revalidate = 3600; // Revalidate hourly for fresh stats
+import { useRouter } from "next/navigation";
+import { LandingSection } from "@/components/pages/tools/portfolio/LandingSection";
 
 export default function Home() {
-  return (
-    <div className="min-h-screen w-full">
-      <NewLandingPage />
-    </div>
-  );
+  const router = useRouter();
+  
+  const handleManualAddressSubmit = (address: string) => {
+    // Navigate to portfolio with the wallet address as a query parameter
+    router.push(`/tools/portfolio?wallet=${address}`);
+  };
+
+  return <LandingSection onManualAddressSubmit={handleManualAddressSubmit} />;
 }

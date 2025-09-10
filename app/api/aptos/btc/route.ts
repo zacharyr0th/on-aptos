@@ -1,46 +1,56 @@
-import { NextRequest } from "next/server";
-
+import type { NextRequest } from "next/server";
+import { SERVICE_CONFIG } from "@/lib/config/cache";
 import { BitcoinService } from "@/lib/services/asset-types/bitcoin-service";
 import {
-  successResponse,
-  errorResponse,
-  CACHE_DURATIONS,
-} from "@/lib/utils/api/common";
-import { withRateLimit, RATE_LIMIT_TIERS } from "@/lib/utils/api/rate-limiter";
-import { logger } from "@/lib/utils/core/logger";
+  ApiError,
+  buildFreshResponse,
+  type ErrorContext,
+  formatApiError,
+  withErrorHandling,
+} from "@/lib/utils";
+import { apiLogger } from "@/lib/utils/core/logger";
+import { withApiEnhancements } from "@/lib/utils/server";
 
-async function handler(request: NextRequest) {
-  try {
-    const forceRefresh = request.nextUrl.searchParams.get("refresh") === "true";
-    const data = await BitcoinService.getBTCSupplyDetailed(forceRefresh);
-
-    const headers = {
-      "X-Content-Type": "application/json",
-      "X-Service": "btc-supply",
-      "X-API-Version": "2.0",
-      "X-Data-Source": "Aptos Indexer",
-      Vary: "Accept-Encoding",
-    };
-
-    if (!data.success) {
-      return errorResponse("Failed to fetch Bitcoin data", 503, data);
-    }
-
-    return successResponse(data, CACHE_DURATIONS.MEDIUM, headers);
-  } catch (error) {
-    logger.error("Bitcoin Supply API error", {
-      error: error instanceof Error ? error.message : String(error),
+export async function GET(request: NextRequest) {
+  const errorContext: ErrorContext = {
+    operation: "BTC API route",
+    service: "BTC-API",
+    details: {
       endpoint: "/api/aptos/btc",
-    });
-    return errorResponse(
-      "Failed to fetch Bitcoin supply data",
-      500,
-      error instanceof Error ? error.message : undefined,
-    );
-  }
-}
+      userAgent: request.headers.get("user-agent") || "unknown",
+    },
+  };
 
-export const GET = withRateLimit(handler, {
-  name: "btc-supply",
-  ...RATE_LIMIT_TIERS.PUBLIC,
-});
+  return withApiEnhancements(
+    () =>
+      withErrorHandling(async () => {
+        try {
+          const startTime = Date.now();
+          const data = await BitcoinService.getBTCSupplyDetailed(false);
+
+          // Return data directly - withApiEnhancements will wrap it
+          return data;
+        } catch (error) {
+          apiLogger.error("BTC API route error:", formatApiError(error));
+
+          if (error instanceof Error) {
+            throw new ApiError(
+              `BTC supplies fetch failed: ${error.message}`,
+              undefined,
+              "BTC-Route"
+            );
+          }
+          throw new ApiError("BTC supplies fetch failed: Unknown error", undefined, "BTC-Route");
+        }
+      }, errorContext),
+    {
+      customHeaders: {
+        "Cache-Control": `public, max-age=${Math.floor(SERVICE_CONFIG.btc.ttl / 1000)}, stale-while-revalidate=${Math.floor(SERVICE_CONFIG.btc.ttl / 2000)}`,
+        "X-Content-Type": "application/json",
+        "X-Service": "btc-supplies",
+        "X-API-Version": "1.0",
+        Vary: "Accept-Encoding",
+      },
+    }
+  );
+}

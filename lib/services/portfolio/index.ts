@@ -1,22 +1,17 @@
 // Main portfolio services
+
+export * from "@/lib/utils/api/panora-token-list";
 export { DeFiBalanceService } from "../defi/services/defi-balance-service";
-export { UnifiedPanoraService } from "./unified-panora-service";
-export * from "./panora-token-list";
+// Portfolio utilities
+export * from "./nft-metadata-helper";
 export * from "./portfolio-service";
 
 // Portfolio sub-services
 export * from "./services";
 
-// Shared portfolio utilities (selective export to avoid conflicts)
-export { UnifiedPriceService } from "../shared/utils/unified-price-service";
-export { UnifiedGraphQLClient } from "../shared/utils/unified-graphql-client";
-export { UnifiedDecimalUtils } from "../shared/utils/unified-decimal-utils";
-export { DeFiPositionConverter } from "../defi/shared/defi-position-converter";
-export { TokenRegistry } from "../shared/utils/token-registry";
-export { UnifiedAssetValidator } from "../shared/utils/unified-asset-validator";
+// Portfolio shared utilities (re-exported from shared)
+export * from "./shared";
 
 // Portfolio types
 export * from "./types";
-
-// Portfolio utilities
-export * from "./utils/nft-metadata-helper";
+export { UnifiedPanoraService } from "./unified-panora-service";

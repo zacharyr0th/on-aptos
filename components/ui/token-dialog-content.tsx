@@ -1,11 +1,11 @@
-import { ExternalLink, Copy } from "lucide-react";
+import { Copy, ExternalLink } from "lucide-react";
 import React from "react";
 
 import { Button } from "@/components/ui/button";
 import { InfoRow } from "@/components/ui/info-row";
 import { Separator } from "@/components/ui/separator";
-import { useTranslation } from "@/hooks/useTranslation";
-import { TokenMetadata, normalizeIssuer } from "@/lib/types/tokens";
+import { useTranslation } from "@/lib/hooks/useTranslation";
+import { normalizeIssuer, type TokenMetadata } from "@/lib/types/tokens";
 
 interface TokenDialogContentProps {
   metadata: TokenMetadata;
@@ -34,12 +34,8 @@ export const TokenDialogContent: React.FC<TokenDialogContentProps> = ({
     return name.split(" ")[0];
   }, [metadata.issuer]);
 
-  const addressLines = metadata.assetAddress
-    ? metadata.assetAddress.split("\n")
-    : [];
-  const explorerLines = metadata.explorerLink
-    ? metadata.explorerLink.split("\n")
-    : [];
+  const addressLines = metadata.assetAddress ? metadata.assetAddress.split("\n") : [];
+  const explorerLines = metadata.explorerLink ? metadata.explorerLink.split("\n") : [];
 
   const defaultAddressDisplay = (
     <div className="space-y-2">
@@ -54,9 +50,7 @@ export const TokenDialogContent: React.FC<TokenDialogContentProps> = ({
             variant="ghost"
             size="icon"
             className="h-6 w-6 shrink-0"
-            onClick={() =>
-              handleCopy(address, t("common:actions.copy", "address"))
-            }
+            onClick={() => handleCopy(address, t("common:actions.copy", "address"))}
             aria-label={t("common:actions.copy_address", "Copy address")}
           >
             <Copy className="h-3 w-3" />
@@ -76,8 +70,7 @@ export const TokenDialogContent: React.FC<TokenDialogContentProps> = ({
           rel="noopener noreferrer"
           className="flex items-center gap-1 text-sm hover:underline text-primary"
         >
-          {t("common:labels.aptos_explorer", "Aptos Explorer")}{" "}
-          {index > 0 ? `(${index + 1})` : ""}{" "}
+          {t("common:labels.aptos_explorer", "Aptos Explorer")} {index > 0 ? `(${index + 1})` : ""}{" "}
           <ExternalLink className="h-3 w-3" />
         </a>
       ))
@@ -88,17 +81,13 @@ export const TokenDialogContent: React.FC<TokenDialogContentProps> = ({
         rel="noopener noreferrer"
         className="flex items-center gap-1 text-sm hover:underline text-primary"
       >
-        {t("common:labels.aptos_explorer", "Aptos Explorer")}{" "}
-        <ExternalLink className="h-3 w-3" />
+        {t("common:labels.aptos_explorer", "Aptos Explorer")} <ExternalLink className="h-3 w-3" />
       </a>
     );
 
   return (
     <div className="space-y-6">
-      <InfoRow
-        label={`${t("common:labels.type", "Type")}:`}
-        value={String(metadata.type || "—")}
-      />
+      <InfoRow label={`${t("common:labels.type", "Type")}:`} value={String(metadata.type || "—")} />
       <InfoRow
         label={`${t("common:labels.asset_address", "Asset Address")}:`}
         value={formattedAddresses || defaultAddressDisplay}
@@ -108,13 +97,10 @@ export const TokenDialogContent: React.FC<TokenDialogContentProps> = ({
         value={String(
           normalizeIssuer(metadata.issuer)?.name ||
             (typeof metadata.issuer === "string" ? metadata.issuer : "") ||
-            "",
+            ""
         )}
       />
-      <InfoRow
-        label={`${t("common:labels.decimals", "Decimals")}:`}
-        value={metadata.decimals}
-      />
+      <InfoRow label={`${t("common:labels.decimals", "Decimals")}:`} value={metadata.decimals} />
       <InfoRow
         label={`${t("common:labels.total_supply", "Total Supply")}:`}
         value={formattedSupply}
@@ -133,8 +119,7 @@ export const TokenDialogContent: React.FC<TokenDialogContentProps> = ({
               rel="noopener noreferrer"
               className="flex items-center gap-1 text-sm hover:underline text-primary"
             >
-              {i18nT("common:labels.issuer_website", { issuerName }) ||
-                `${issuerName}'s Website`}{" "}
+              {i18nT("common:labels.issuer_website", { issuerName }) || `${issuerName}'s Website`}{" "}
               <ExternalLink className="h-3 w-3" />
             </a>
             <a
@@ -144,14 +129,8 @@ export const TokenDialogContent: React.FC<TokenDialogContentProps> = ({
               className="flex items-center gap-1 text-sm hover:underline text-primary"
             >
               {metadata.tags?.includes("stablecoin")
-                ? t(
-                    "common:labels.audit_proof_reserves",
-                    "Audit / Proof of Reserves",
-                  )
-                : t(
-                    "common:labels.audit_information",
-                    "Audit Information",
-                  )}{" "}
+                ? t("common:labels.audit_proof_reserves", "Audit / Proof of Reserves")
+                : t("common:labels.audit_information", "Audit Information")}{" "}
               <ExternalLink className="h-3 w-3" />
             </a>
           </div>

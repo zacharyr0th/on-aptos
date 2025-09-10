@@ -24,8 +24,7 @@ export const RWA_TOKENS: RWAToken[] = [
   {
     tokenId: 2838,
     name: "Aptos BSFG-EM-1",
-    address:
-      "0xa77082fb614041238be116fd57ef0f55a8150c87fe1547afbb9523ecedca7b49",
+    address: "0xa77082fb614041238be116fd57ef0f55a8150c87fe1547afbb9523ecedca7b49",
     standards: "",
     assetId: 7796,
     assetTicker: "BSFG-EM-1",
@@ -46,8 +45,7 @@ export const RWA_TOKENS: RWAToken[] = [
   {
     tokenId: 2564,
     name: "Aptos BUIDL",
-    address:
-      "0x50038be55be5b964cfa32cf128b5cf05f123959f286b4cc02b86cafd48945f89",
+    address: "0x50038be55be5b964cfa32cf128b5cf05f123959f286b4cc02b86cafd48945f89",
     standards: "Aptos-FA",
     assetId: 2331,
     assetTicker: "BUIDL",
@@ -68,8 +66,7 @@ export const RWA_TOKENS: RWAToken[] = [
   {
     tokenId: 2846,
     name: "Aptos BSFG-CAD-1",
-    address:
-      "0xd92c9c6bdf47ec597a8513cb7fb551cd9f56f54f4fb656b628a71846f74b09ae",
+    address: "0xd92c9c6bdf47ec597a8513cb7fb551cd9f56f54f4fb656b628a71846f74b09ae",
     standards: "",
     assetId: 7798,
     assetTicker: "BSFG-CAD-1",
@@ -90,8 +87,7 @@ export const RWA_TOKENS: RWAToken[] = [
   {
     tokenId: 2704,
     name: "Aptos BENJI",
-    address:
-      "0x7b5e9cac3433e9202f28527f707c89e1e47b19de2c33e4db9521a63ad219b739",
+    address: "0x7b5e9cac3433e9202f28527f707c89e1e47b19de2c33e4db9521a63ad219b739",
     standards: "Aptos-FA",
     assetId: 63,
     assetTicker: "BENJI",
@@ -112,8 +108,7 @@ export const RWA_TOKENS: RWAToken[] = [
   {
     tokenId: 2844,
     name: "Aptos ACRED",
-    address:
-      "0xe528f4df568eb9fff6398adc514bc9585fab397f478972bcbebf1e75dee40a88",
+    address: "0xe528f4df568eb9fff6398adc514bc9585fab397f478972bcbebf1e75dee40a88",
     standards: "Aptos-Coin",
     assetId: 7797,
     assetTicker: "ACRED",
@@ -134,8 +129,7 @@ export const RWA_TOKENS: RWAToken[] = [
   {
     tokenId: 2847,
     name: "Aptos BSFG-AD-1",
-    address:
-      "0xbe50a64f94294f8cf01a20efe301d54c944981d4a60d9abe77363992a415c1b5",
+    address: "0xbe50a64f94294f8cf01a20efe301d54c944981d4a60d9abe77363992a415c1b5",
     standards: "",
     assetId: 7806,
     assetTicker: "BSFG-AD-1",
@@ -156,8 +150,7 @@ export const RWA_TOKENS: RWAToken[] = [
   {
     tokenId: 2708,
     name: "Aptos UMA",
-    address:
-      "0xb78860ec33dd1343a723bbaae7ba9fc858ca59ecb936cab8ab3ee7f35aae7502",
+    address: "0xb78860ec33dd1343a723bbaae7ba9fc858ca59ecb936cab8ab3ee7f35aae7502",
     standards: "Aptos-FA",
     assetId: 7528,
     assetTicker: "UMA",
@@ -178,8 +171,7 @@ export const RWA_TOKENS: RWAToken[] = [
   {
     tokenId: 2243,
     name: "Aptos USDY",
-    address:
-      "0xcfea864b32833f157f042618bd845145256b1bf4c0da34a7013b76e42daa53cc::usdy::USDY",
+    address: "0xcfea864b32833f157f042618bd845145256b1bf4c0da34a7013b76e42daa53cc::usdy::USDY",
     standards: "ERC-20",
     assetId: 60,
     assetTicker: "USDY",
@@ -200,8 +192,7 @@ export const RWA_TOKENS: RWAToken[] = [
   {
     tokenId: 2707,
     name: "Aptos BHMA",
-    address:
-      "0xabd58a12ca7f20dd397787bd87b674cc2f8cd7168718d5b7a71daa5d89836079",
+    address: "0xabd58a12ca7f20dd397787bd87b674cc2f8cd7168718d5b7a71daa5d89836079",
     standards: "Aptos-FA",
     assetId: 7522,
     assetTicker: "BHMA",
@@ -222,8 +213,7 @@ export const RWA_TOKENS: RWAToken[] = [
   {
     tokenId: 2568,
     name: "Aptos BSFG-KES-1",
-    address:
-      "0x410e43c0e2f4f4ed45bf7af1016eaa268b0bc2fbdc43d87938f9a4278f9ab9cc",
+    address: "0x410e43c0e2f4f4ed45bf7af1016eaa268b0bc2fbdc43d87938f9a4278f9ab9cc",
     standards: "",
     assetId: 7154,
     assetTicker: "BSFG-KES-1",
@@ -244,8 +234,7 @@ export const RWA_TOKENS: RWAToken[] = [
   {
     tokenId: 2709,
     name: "Aptos HLSPCA",
-    address:
-      "0x7647a37bb1ee1f42953ca4a00f1cf347254d38a2aa31d2e37176bbb94c14cf75",
+    address: "0x7647a37bb1ee1f42953ca4a00f1cf347254d38a2aa31d2e37176bbb94c14cf75",
     standards: "Aptos-FA",
     assetId: 7516,
     assetTicker: "HLSPCA",
@@ -271,7 +260,7 @@ export const RWA_TOKEN_BY_ADDRESS = RWA_TOKENS.reduce(
     acc[token.address] = token;
     return acc;
   },
-  {} as Record<string, RWAToken>,
+  {} as Record<string, RWAToken>
 );
 
 export const RWA_TOKEN_BY_TICKER = RWA_TOKENS.reduce(
@@ -279,7 +268,7 @@ export const RWA_TOKEN_BY_TICKER = RWA_TOKENS.reduce(
     acc[token.assetTicker] = token;
     return acc;
   },
-  {} as Record<string, RWAToken>,
+  {} as Record<string, RWAToken>
 );
 
 export const RWA_TOKEN_BY_ID = RWA_TOKENS.reduce(
@@ -287,7 +276,7 @@ export const RWA_TOKEN_BY_ID = RWA_TOKENS.reduce(
     acc[token.tokenId] = token;
     return acc;
   },
-  {} as Record<number, RWAToken>,
+  {} as Record<number, RWAToken>
 );
 
 // Asset class constants

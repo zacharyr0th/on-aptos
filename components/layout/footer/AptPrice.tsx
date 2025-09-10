@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import React, { memo, useState, useEffect } from "react";
+import type React from "react";
+import { memo, useEffect, useState } from "react";
 
 import { useTranslation } from "@/lib/hooks/useTranslation";
 import { dedupeFetch } from "@/lib/utils/cache/request-deduplication";
@@ -17,8 +18,7 @@ export const AptPrice = memo(function AptPrice() {
     alt: "APT token",
     width: 16,
     height: 16,
-    className:
-      "w-3 h-3 xs:w-3.5 xs:h-3.5 sm:w-4 sm:h-4 flex-shrink-0 rounded-full dark:invert",
+    className: "w-3 h-3 xs:w-3.5 xs:h-3.5 sm:w-4 sm:h-4 flex-shrink-0 rounded-full dark:invert",
     priority: false,
     quality: 90,
     unoptimized: false,
@@ -32,7 +32,7 @@ export const AptPrice = memo(function AptPrice() {
     const fetchPrice = async () => {
       try {
         const currentResponse = await dedupeFetch(
-          "/api/unified/prices?tokens=0x1::aptos_coin::AptosCoin",
+          "/api/unified/prices?tokens=0x1::aptos_coin::AptosCoin"
         );
         if (!currentResponse.ok) {
           throw new Error("Failed to fetch current price");

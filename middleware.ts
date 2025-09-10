@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import { logger } from "@/lib/utils/core/logger";
 
 // Configuration
@@ -23,10 +23,7 @@ export function middleware(request: NextRequest) {
         url: request.url.substring(0, 100),
         length: request.url.length,
       });
-      return NextResponse.json(
-        { error: "Request URL too long" },
-        { status: 414 },
-      );
+      return NextResponse.json({ error: "Request URL too long" }, { status: 414 });
     }
 
     // 2. Check query parameters count
@@ -36,10 +33,7 @@ export function middleware(request: NextRequest) {
         count: paramCount,
         path: request.nextUrl.pathname,
       });
-      return NextResponse.json(
-        { error: "Too many query parameters" },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "Too many query parameters" }, { status: 400 });
     }
 
     // 3. Check header size
@@ -53,10 +47,7 @@ export function middleware(request: NextRequest) {
         size: totalHeaderSize,
         path: request.nextUrl.pathname,
       });
-      return NextResponse.json(
-        { error: "Request headers too large" },
-        { status: 431 },
-      );
+      return NextResponse.json({ error: "Request headers too large" }, { status: 431 });
     }
 
     // 4. Add security headers to response
@@ -71,14 +62,8 @@ export function middleware(request: NextRequest) {
     // CORS headers for API routes
     if (request.nextUrl.pathname.startsWith("/api/")) {
       response.headers.set("Access-Control-Allow-Origin", "*");
-      response.headers.set(
-        "Access-Control-Allow-Methods",
-        "GET, POST, OPTIONS",
-      );
-      response.headers.set(
-        "Access-Control-Allow-Headers",
-        "Content-Type, Authorization",
-      );
+      response.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+      response.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
       response.headers.set("Access-Control-Max-Age", "3600");
     }
 
@@ -89,10 +74,7 @@ export function middleware(request: NextRequest) {
       path: request.nextUrl.pathname,
     });
 
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 

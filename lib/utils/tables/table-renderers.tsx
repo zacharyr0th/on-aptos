@@ -1,36 +1,23 @@
-import Image from "next/image";
 import { HelpCircle } from "lucide-react";
+import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { getTokenLogoUrlWithFallbackSync } from "@/lib/utils/token/token-utils";
 
-export function renderAssetLogo(
-  asset: any,
-  size: number = 32,
-  className?: string,
-) {
+export function renderAssetLogo(asset: any, size: number = 32, className?: string) {
   return (
     <Image
-      src={
-        asset.logoUrl ||
-        getTokenLogoUrlWithFallbackSync(asset.asset_type, asset.metadata)
-      }
+      src={asset.logoUrl || getTokenLogoUrlWithFallbackSync(asset.asset_type, asset.metadata)}
       alt={asset.metadata?.symbol || "Asset"}
       width={size}
       height={size}
       className={cn(
         "rounded-full object-cover",
-        asset.metadata?.symbol?.toUpperCase() === "APT" ||
-          asset.asset_type?.includes("aptos_coin")
+        asset.metadata?.symbol?.toUpperCase() === "APT" || asset.asset_type?.includes("aptos_coin")
           ? "dark:invert"
           : "",
-        className,
+        className
       )}
       onError={(e) => {
         const img = e.target as HTMLImageElement;
@@ -48,10 +35,7 @@ export function renderAssetLogo(
 export function renderVerificationBadge(isVerified: boolean) {
   if (isVerified) return null;
   return (
-    <span
-      className="text-xs text-amber-500 dark:text-amber-400"
-      title="Unverified token"
-    >
+    <span className="text-xs text-amber-500 dark:text-amber-400" title="Unverified token">
       ⚠
     </span>
   );
@@ -60,10 +44,7 @@ export function renderVerificationBadge(isVerified: boolean) {
 export function renderProtocolBadge(protocolInfo: any) {
   if (!protocolInfo) return null;
   return (
-    <Badge
-      variant="secondary"
-      className="text-[10px] px-1.5 py-0 h-4 font-normal"
-    >
+    <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4 font-normal">
       {protocolInfo.protocolLabel}
     </Badge>
   );
@@ -94,10 +75,7 @@ export function renderPriceWithTooltip(price: number | null | undefined) {
   );
 }
 
-export function renderChangeValue(
-  value: number | null | undefined,
-  className?: string,
-) {
+export function renderChangeValue(value: number | null | undefined, className?: string) {
   if (!value) return "—";
 
   const changeClass = cn(
@@ -107,7 +85,7 @@ export function renderChangeValue(
       : value < 0
         ? "text-red-600 dark:text-red-400"
         : "text-muted-foreground",
-    className,
+    className
   );
 
   return (
@@ -121,7 +99,7 @@ export function renderChangeValue(
 export function renderProtocolLogo(
   protocol: string,
   getProtocolLogo: (protocol: string) => string,
-  size: number = 32,
+  size: number = 32
 ) {
   return (
     <div

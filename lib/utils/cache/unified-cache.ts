@@ -83,11 +83,7 @@ export class UnifiedCache<T = any> {
     const now = Date.now();
 
     // If at capacity and adding new key, evict LRU
-    if (
-      this.enableLRU &&
-      this.cache.size >= this.maxSize &&
-      !this.cache.has(key)
-    ) {
+    if (this.enableLRU && this.cache.size >= this.maxSize && !this.cache.has(key)) {
       this.evictLRU();
     }
 
@@ -235,10 +231,7 @@ export const cacheInstances = {
 export type CacheInstanceName = keyof typeof cacheInstances;
 
 // Helper functions
-export function getCachedData<T>(
-  cacheName: CacheInstanceName,
-  key: string,
-): T | null {
+export function getCachedData<T>(cacheName: CacheInstanceName, key: string): T | null {
   return cacheInstances[cacheName].get<T>(key);
 }
 
@@ -246,15 +239,12 @@ export function setCachedData<T>(
   cacheName: CacheInstanceName,
   key: string,
   data: T,
-  customTTL?: number,
+  customTTL?: number
 ): void {
   cacheInstances[cacheName].set(key, data, customTTL);
 }
 
-export function hasCachedData(
-  cacheName: CacheInstanceName,
-  key: string,
-): boolean {
+export function hasCachedData(cacheName: CacheInstanceName, key: string): boolean {
   return cacheInstances[cacheName].has(key);
 }
 
@@ -267,7 +257,7 @@ export function clearCache(cacheName?: CacheInstanceName): void {
 }
 
 export function getCacheStats(
-  cacheName?: CacheInstanceName,
+  cacheName?: CacheInstanceName
 ): CacheStats | Record<string, CacheStats> {
   if (cacheName) {
     return cacheInstances[cacheName].getStats();
@@ -289,9 +279,7 @@ export interface CacheFirstOptions<T> {
   forceRefresh?: boolean;
 }
 
-export async function cacheFirst<T>(
-  options: CacheFirstOptions<T>,
-): Promise<{ data: T }> {
+export async function cacheFirst<T>(options: CacheFirstOptions<T>): Promise<{ data: T }> {
   const { namespace, cacheKey, fetchFn, forceRefresh = false } = options;
 
   // Check cache first unless forcing refresh
@@ -324,7 +312,7 @@ export async function cacheFirst<T>(
 
 export async function cacheFirstWithFallback<T>(
   options: CacheFirstOptions<T>,
-  fallbackData: T,
+  fallbackData: T
 ): Promise<{ data: T }> {
   try {
     return await cacheFirst(options);
@@ -351,9 +339,7 @@ export function startCacheCleanup(): void {
         totalCleaned += cleaned;
 
         if (cleaned > 0) {
-          logger.debug(
-            `Cache cleanup: ${name} removed ${cleaned} expired entries`,
-          );
+          logger.debug(`Cache cleanup: ${name} removed ${cleaned} expired entries`);
         }
       }
 
@@ -361,7 +347,7 @@ export function startCacheCleanup(): void {
         logger.debug(`Total cache cleanup: ${totalCleaned} entries removed`);
       }
     },
-    5 * 60 * 1000,
+    5 * 60 * 1000
   ); // Run every 5 minutes
 }
 
@@ -389,10 +375,7 @@ export const SimpleCache = UnifiedCache;
 export const EnhancedLRUCache = UnifiedCache;
 
 // Add missing utility functions for backward compatibility
-export function isNearingExpiration(
-  cacheName: CacheInstanceName,
-  key: string,
-): boolean {
+export function isNearingExpiration(cacheName: CacheInstanceName, key: string): boolean {
   const entry = cacheInstances[cacheName]["cache"]?.get(key);
   if (!entry) return false;
 

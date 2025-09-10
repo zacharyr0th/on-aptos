@@ -1,7 +1,6 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
-
-import { logger } from "@/lib/utils/core/logger";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { PortfolioHistoryPoint } from "@/lib/services/portfolio/types";
+import { logger } from "@/lib/utils/core/logger";
 
 interface OptimizedPortfolioData {
   date: string;
@@ -57,7 +56,7 @@ function timeframeToDays(timeframe?: string): number {
 
 export function usePortfolioHistory(
   walletAddress: string | undefined | null,
-  options: UsePortfolioHistoryOptions = {},
+  options: UsePortfolioHistoryOptions = {}
 ): UsePortfolioHistoryResult {
   const {
     days = 7,
@@ -89,7 +88,7 @@ export function usePortfolioHistory(
 
     try {
       const response = await fetch(
-        `/api/wallet/ans/names?address=${encodeURIComponent(walletAddress)}`,
+        `/api/wallet/ans/names?address=${encodeURIComponent(walletAddress)}`
       );
       if (response.ok) {
         const result = await response.json();
@@ -99,7 +98,7 @@ export function usePortfolioHistory(
       }
     } catch (error) {
       logger.error(
-        `Failed to fetch ANS names: ${error instanceof Error ? error.message : String(error)}`,
+        `Failed to fetch ANS names: ${error instanceof Error ? error.message : String(error)}`
       );
       // Don't set error state as this is not critical
     }
@@ -120,28 +119,19 @@ export function usePortfolioHistory(
       let response;
       let result;
 
-      if (
-        timeframe &&
-        ["1h", "12h", "24h", "7d", "30d", "90d", "1y", "all"].includes(
-          timeframe,
-        )
-      ) {
+      if (timeframe && ["1h", "12h", "24h", "7d", "30d", "90d", "1y", "all"].includes(timeframe)) {
         // Use the performance endpoint for predefined timeframes
         const queryParams = new URLSearchParams({
           address: walletAddress,
           timeframe: timeframe,
         });
-        response = await fetch(
-          `/api/data/analytics/portfolio-performance?${queryParams}`,
-        );
+        response = await fetch(`/api/data/analytics/portfolio-performance?${queryParams}`);
         result = await response.json();
 
         // Transform the data to match the expected format
         if (result.success && result.data && result.data.length > 0) {
           const transformedData = result.data.map((item: any) => ({
-            date: item.timestamp.includes("T")
-              ? item.timestamp.split("T")[0]
-              : item.timestamp,
+            date: item.timestamp.includes("T") ? item.timestamp.split("T")[0] : item.timestamp,
             aptBalance: item.balance,
             aptPrice: item.price,
             totalValue: item.value,
@@ -150,10 +140,7 @@ export function usePortfolioHistory(
           setData(transformedData);
           return;
         } else {
-          logger.warn(
-            "[usePortfolioHistory] Performance API returned no data",
-            { timeframe },
-          );
+          logger.warn("[usePortfolioHistory] Performance API returned no data", { timeframe });
           // Fall through to use the history endpoint
         }
       }
@@ -169,10 +156,7 @@ export function usePortfolioHistory(
       result = await response.json();
 
       if (!response.ok) {
-        throw new Error(
-          result.error ||
-            `Failed to fetch portfolio history: ${response.status}`,
-        );
+        throw new Error(result.error || `Failed to fetch portfolio history: ${response.status}`);
       }
 
       if (!result.success) {
@@ -286,7 +270,7 @@ export function usePortfolioHistory(
 // Helper hook for chart-specific optimizations
 export function usePortfolioChartData(
   walletAddress: string | undefined,
-  options: UsePortfolioHistoryOptions = {},
+  options: UsePortfolioHistoryOptions = {}
 ) {
   const result = usePortfolioHistory(walletAddress, {
     ...options,

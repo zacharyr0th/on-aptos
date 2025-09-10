@@ -69,17 +69,12 @@ export function isValidUrl(url: string | null | undefined): boolean {
 
     // Only allow http and https protocols
     if (!["http:", "https:"].includes(parsed.protocol)) {
-      logger.warn(
-        `Blocked invalid URL protocol: ${parsed.protocol} in URL: ${url}`,
-      );
+      logger.warn(`Blocked invalid URL protocol: ${parsed.protocol} in URL: ${url}`);
       return false;
     }
 
     // Block javascript: and data: URLs (additional safety check)
-    if (
-      url.toLowerCase().includes("javascript:") ||
-      url.toLowerCase().includes("data:")
-    ) {
+    if (url.toLowerCase().includes("javascript:") || url.toLowerCase().includes("data:")) {
       logger.warn(`Blocked dangerous URL: ${url}`);
       return false;
     }
@@ -97,7 +92,7 @@ export function isValidUrl(url: string | null | undefined): boolean {
 export function safeWindowOpen(
   url: string | null | undefined,
   target: string = "_blank",
-  features?: string,
+  features?: string
 ): Window | null {
   if (!url) {
     logger.warn("Attempted to open null/undefined URL");
@@ -151,7 +146,7 @@ export function isValidImageUrl(url: string | null | undefined): boolean {
     // Check if the domain is in the trusted list (optional, can be disabled)
     const hostname = parsed.hostname.toLowerCase();
     const isTrusted = trustedDomains.some(
-      (domain) => hostname === domain || hostname.endsWith(`.${domain}`),
+      (domain) => hostname === domain || hostname.endsWith(`.${domain}`)
     );
 
     if (!isTrusted) {
@@ -171,7 +166,7 @@ export function isValidImageUrl(url: string | null | undefined): boolean {
  */
 export function sanitizeImageUrl(
   url: string | null | undefined,
-  fallback: string = "/placeholder.jpg",
+  fallback: string = "/placeholder.jpg"
 ): string {
   if (!url) return fallback;
 

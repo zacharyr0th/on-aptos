@@ -277,8 +277,7 @@ export function getAptosBenchmarkData(): AptosBenchmarkData {
         },
         {
           partner: "Bitso",
-          description:
-            "Instant USDT/USDC transfers across Mexico, Brazil, Colombia",
+          description: "Instant USDT/USDC transfers across Mexico, Brazil, Colombia",
         },
         {
           partner: "PACT",
@@ -307,14 +306,7 @@ export function getAptosBenchmarkData(): AptosBenchmarkData {
       priceTargets: [{ year: 2025, target: 20 }],
     },
     recentUpgrades: {
-      frameworkVersions: [
-        "1.25.0",
-        "1.26.0",
-        "1.27.0",
-        "1.28.0",
-        "1.29.0",
-        "1.30.2",
-      ],
+      frameworkVersions: ["1.25.0", "1.26.0", "1.27.0", "1.28.0", "1.29.0", "1.30.2"],
       performanceImprovements: [
         {
           aip: "AIP-107",
@@ -336,11 +328,7 @@ export function getAptosBenchmarkData(): AptosBenchmarkData {
       },
       stateSync: {
         targetTPS: 100000,
-        features: [
-          "Transaction batching",
-          "Network compression",
-          "Sub-second latency",
-        ],
+        features: ["Transaction batching", "Network compression", "Sub-second latency"],
       },
     },
     transactionCosts: {

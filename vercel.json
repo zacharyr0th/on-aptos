@@ -1,9 +1,9 @@
 {
   "version": 2,
   "framework": "nextjs",
-  "buildCommand": "pnpm build",
-  "devCommand": "pnpm dev",
-  "installCommand": "pnpm install --frozen-lockfile",
+  "buildCommand": "bun run build",
+  "devCommand": "bun dev",
+  "installCommand": "bun install --frozen-lockfile",
   "outputDirectory": ".next",
   "public": true,
   "regions": ["iad1"],

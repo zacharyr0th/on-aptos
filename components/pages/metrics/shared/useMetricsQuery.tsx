@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery, UseQueryResult } from "@tanstack/react-query";
+import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { logger } from "@/lib/utils/core/logger";
 
@@ -38,17 +38,18 @@ interface UseMultipleMetricsQueriesOptions {
   queries: UseMetricsQueryOptions[];
 }
 
-export const useMultipleMetricsQueries = ({
-  queries,
-}: UseMultipleMetricsQueriesOptions) => {
+export const useMultipleMetricsQueries = ({ queries }: UseMultipleMetricsQueriesOptions) => {
   const results = queries.map((queryOptions) => useMetricsQuery(queryOptions));
-  
+
   const isLoading = results.some((result) => result.isLoading);
   const isError = results.some((result) => result.isError);
-  const data = results.reduce((acc, result, index) => {
-    acc[queries[index].queryKey[0]] = result.data;
-    return acc;
-  }, {} as Record<string, any>);
+  const data = results.reduce(
+    (acc, result, index) => {
+      acc[queries[index].queryKey[0]] = result.data;
+      return acc;
+    },
+    {} as Record<string, any>
+  );
 
   return {
     isLoading,
@@ -74,7 +75,7 @@ export const useMetricsRefresh = ({
   const handleRefresh = async (customQueries?: UseMetricsQueryOptions[]) => {
     const queriesToRefresh = customQueries || queries;
     setIsRefreshing(true);
-    
+
     try {
       await Promise.all(
         queriesToRefresh.map(async (query) => {

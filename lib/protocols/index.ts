@@ -9,7 +9,7 @@
  * - Minimal memory footprint
  */
 
-export * from "./types";
-export * from "./registry";
-export * from "./loader";
 export * from "./detector";
+export * from "./loader";
+export * from "./registry";
+export * from "./types";

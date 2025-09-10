@@ -1,5 +1,5 @@
 import { LRUCache } from "lru-cache";
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest, NextResponse } from "next/server";
 
 import { logger } from "@/lib/utils/core/logger";
 
@@ -24,7 +24,7 @@ const rateLimiters = new Map<string, LRUCache<string, number[]>>();
  */
 export function createRateLimiter(
   name: string,
-  options: RateLimitOptions = {},
+  options: RateLimitOptions = {}
 ): LRUCache<string, number[]> {
   const { uniqueTokenPerInterval = 500, interval = 60000 } = options;
 
@@ -58,7 +58,7 @@ export function checkRateLimit(
   request: NextRequest,
   limiterName: string,
   maxRequests: number = 10,
-  windowMs: number = 60000,
+  windowMs: number = 60000
 ): RateLimitResult {
   let limiter = rateLimiters.get(limiterName);
 
@@ -113,7 +113,7 @@ export function withRateLimit(
     name: string;
     maxRequests?: number;
     windowMs?: number;
-  },
+  }
 ) {
   return async (request: NextRequest): Promise<NextResponse> => {
     const { name, maxRequests = 10, windowMs = 60000 } = options;
@@ -142,10 +142,7 @@ export function withRateLimit(
 
     response.headers.set("X-RateLimit-Limit", result.limit.toString());
     response.headers.set("X-RateLimit-Remaining", result.remaining.toString());
-    response.headers.set(
-      "X-RateLimit-Reset",
-      new Date(result.reset).toISOString(),
-    );
+    response.headers.set("X-RateLimit-Reset", new Date(result.reset).toISOString());
 
     return response;
   };

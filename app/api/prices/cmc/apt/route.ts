@@ -1,7 +1,7 @@
-import { NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 
-import { successResponse, CACHE_DURATIONS } from "@/lib/utils/api/common";
-import { withRateLimit, RATE_LIMIT_TIERS } from "@/lib/utils/api/rate-limiter";
+import { CACHE_DURATIONS, successResponse } from "@/lib/utils/api/common";
+import { RATE_LIMIT_TIERS, withRateLimit } from "@/lib/utils/api/rate-limiter";
 
 // Revalidate this route every 1 minute
 export const revalidate = 60;
@@ -22,7 +22,7 @@ async function cmcAPTHandler(_request: NextRequest) {
         Accept: "application/json",
         "User-Agent": "OnAptos-APT-Tracker/1.0",
       },
-    },
+    }
   );
 
   if (!response.ok) {

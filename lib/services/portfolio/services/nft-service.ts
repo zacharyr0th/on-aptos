@@ -1,12 +1,8 @@
 import { PORTFOLIO_QUERY_LIMITS } from "@/lib/constants";
 import { logger } from "@/lib/utils/core/logger";
-
-import {
-  UnifiedGraphQLClient,
-  UNIFIED_QUERIES,
-} from "../../shared/utils/unified-graphql-client";
+import { UNIFIED_QUERIES, UnifiedGraphQLClient } from "../../shared/utils/unified-graphql-client";
+import { extractNFTImageUrl } from "../nft-metadata-helper";
 import type { NFT, PaginatedResponse } from "../types";
-import { extractNFTImageUrl } from "../utils/nft-metadata-helper";
 
 // Rate limiting configuration
 const MAX_RETRIES = 5;
@@ -24,32 +20,24 @@ async function fetchWithRetry(
   url: string,
   options: RequestInit,
   retries = MAX_RETRIES,
-  attempt = 0,
+  attempt = 0
 ): Promise<Response> {
   try {
     const response = await fetch(url, options);
 
     if (response.status === 429 && retries > 0) {
       // Exponential backoff: 1s, 2s, 4s, 8s, 16s, 32s
-      const delay = Math.min(
-        INITIAL_RETRY_DELAY * Math.pow(2, attempt),
-        MAX_RETRY_DELAY,
-      );
-      logger.warn(
-        `Rate limited (429), retrying in ${delay}ms... (${retries} retries left)`,
-      );
+      const delay = Math.min(INITIAL_RETRY_DELAY * 2 ** attempt, MAX_RETRY_DELAY);
+      logger.warn(`Rate limited (429), retrying in ${delay}ms... (${retries} retries left)`);
       await sleep(delay);
       return fetchWithRetry(url, options, retries - 1, attempt + 1);
     }
 
     if (!response.ok && response.status >= 500 && retries > 0) {
       // Server errors - retry with backoff
-      const delay = Math.min(
-        INITIAL_RETRY_DELAY * Math.pow(2, attempt),
-        MAX_RETRY_DELAY,
-      );
+      const delay = Math.min(INITIAL_RETRY_DELAY * 2 ** attempt, MAX_RETRY_DELAY);
       logger.warn(
-        `Server error (${response.status}), retrying in ${delay}ms... (${retries} retries left)`,
+        `Server error (${response.status}), retrying in ${delay}ms... (${retries} retries left)`
       );
       await sleep(delay);
       return fetchWithRetry(url, options, retries - 1, attempt + 1);
@@ -58,14 +46,8 @@ async function fetchWithRetry(
     return response;
   } catch (error) {
     if (retries > 0) {
-      const delay = Math.min(
-        INITIAL_RETRY_DELAY * Math.pow(2, attempt),
-        MAX_RETRY_DELAY,
-      );
-      logger.warn(
-        `Request failed, retrying in ${delay}ms... (${retries} retries left)`,
-        error,
-      );
+      const delay = Math.min(INITIAL_RETRY_DELAY * 2 ** attempt, MAX_RETRY_DELAY);
+      logger.warn(`Request failed, retrying in ${delay}ms... (${retries} retries left)`, error);
       await sleep(delay);
       return fetchWithRetry(url, options, retries - 1, attempt + 1);
     }
@@ -77,14 +59,16 @@ export class NFTService {
   static async getWalletNFTs(
     address: string,
     page: number = 1,
-    limit: number = PORTFOLIO_QUERY_LIMITS.NFT,
+    limit: number = PORTFOLIO_QUERY_LIMITS.NFT
   ): Promise<PaginatedResponse<NFT>> {
     try {
       logger.info(
-        `[NFTService] Getting NFTs for address: ${address}, page: ${page}, limit: ${limit}`,
+        `[NFTService] Getting NFTs for address: ${address}, page: ${page}, limit: ${limit}`
       );
-      const { limit: queryLimit, offset } =
-        UnifiedGraphQLClient.buildPaginationVariables(page, limit);
+      const { limit: queryLimit, offset } = UnifiedGraphQLClient.buildPaginationVariables(
+        page,
+        limit
+      );
 
       // Only add delay if we're approaching rate limits
       const now = Date.now();
@@ -97,10 +81,7 @@ export class NFTService {
       requestCount++;
       if (requestCount > RATE_LIMIT_THRESHOLD) {
         // Progressive delay based on request count
-        const delay = Math.min(
-          (requestCount - RATE_LIMIT_THRESHOLD) * 500,
-          5000,
-        );
+        const delay = Math.min((requestCount - RATE_LIMIT_THRESHOLD) * 500, 5000);
         logger.info(`Rate limit threshold reached, delaying ${delay}ms`);
         await sleep(delay);
       }
@@ -116,21 +97,18 @@ export class NFTService {
       }
 
       // Use direct fetch with retry logic
-      const response = await fetchWithRetry(
-        "https://api.mainnet.aptoslabs.com/v1/graphql",
-        {
-          method: "POST",
-          headers,
-          body: JSON.stringify({
-            query: UNIFIED_QUERIES.WALLET_NFTS,
-            variables: {
-              ownerAddress: address,
-              limit: queryLimit + 1, // Fetch one extra to check if there are more
-              offset,
-            },
-          }),
-        },
-      );
+      const response = await fetchWithRetry("https://api.mainnet.aptoslabs.com/v1/graphql", {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          query: UNIFIED_QUERIES.WALLET_NFTS,
+          variables: {
+            ownerAddress: address,
+            limit: queryLimit + 1, // Fetch one extra to check if there are more
+            offset,
+          },
+        }),
+      });
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -139,9 +117,7 @@ export class NFTService {
       const result = await response.json();
 
       if (result.errors) {
-        throw new Error(
-          `GraphQL errors: ${result.errors.map((e: any) => e.message).join(", ")}`,
-        );
+        throw new Error(`GraphQL errors: ${result.errors.map((e: any) => e.message).join(", ")}`);
       }
 
       // Get v2 NFTs only
@@ -155,9 +131,7 @@ export class NFTService {
         nfts.pop();
       }
 
-      logger.info(
-        `[NFTService] Processing ${nfts.length} NFTs after pagination`,
-      );
+      logger.info(`[NFTService] Processing ${nfts.length} NFTs after pagination`);
 
       // Process NFTs
       const processedNFTs: NFT[] = await Promise.all(
@@ -168,14 +142,13 @@ export class NFTService {
           // Extract image URL from token URI
           const cdnImageUri = await extractNFTImageUrl(
             tokenData?.token_uri,
-            tokenData?.cdn_asset_uris?.cdn_image_uri,
+            tokenData?.cdn_asset_uris?.cdn_image_uri
           );
 
           return {
             token_data_id: ownership.token_data_id,
             token_name: tokenData?.token_name || "Unknown NFT",
-            collection_name:
-              collection?.collection_name || "Unknown Collection",
+            collection_name: collection?.collection_name || "Unknown Collection",
             token_uri: tokenData?.token_uri || "",
             description: tokenData?.description,
             property_version_v1: ownership.property_version_v1,
@@ -195,7 +168,7 @@ export class NFTService {
             current_supply: collection?.current_supply,
             max_supply: collection?.max_supply,
           };
-        }),
+        })
       );
 
       return {
@@ -225,17 +198,14 @@ export class NFTService {
       }
 
       // Use direct fetch with retry logic
-      const response = await fetchWithRetry(
-        "https://api.mainnet.aptoslabs.com/v1/graphql",
-        {
-          method: "POST",
-          headers,
-          body: JSON.stringify({
-            query: UNIFIED_QUERIES.WALLET_NFTS_COUNT,
-            variables: { ownerAddress: address },
-          }),
-        },
-      );
+      const response = await fetchWithRetry("https://api.mainnet.aptoslabs.com/v1/graphql", {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          query: UNIFIED_QUERIES.WALLET_NFTS_COUNT,
+          variables: { ownerAddress: address },
+        }),
+      });
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -244,9 +214,7 @@ export class NFTService {
       const result = await response.json();
 
       if (result.errors) {
-        throw new Error(
-          `GraphQL errors: ${result.errors.map((e: any) => e.message).join(", ")}`,
-        );
+        throw new Error(`GraphQL errors: ${result.errors.map((e: any) => e.message).join(", ")}`);
       }
 
       return result.data.current_token_ownerships_v2_aggregate.aggregate.count;
@@ -258,12 +226,10 @@ export class NFTService {
   }
 
   static async getAllWalletNFTs(address: string): Promise<NFT[]> {
-    logger.info(
-      `[NFTService] getAllWalletNFTs starting for address: ${address}`,
-    );
+    logger.info(`[NFTService] getAllWalletNFTs starting for address: ${address}`);
 
     // First get the total count
-    const totalCount = await this.getTotalNFTCount(address);
+    const totalCount = await NFTService.getTotalNFTCount(address);
     logger.info(`[NFTService] Total NFTs to fetch: ${totalCount}`);
 
     const allNFTs: NFT[] = [];
@@ -274,13 +240,11 @@ export class NFTService {
       try {
         const page = Math.floor(offset / limit) + 1;
         logger.info(
-          `[NFTService] Fetching NFTs ${offset + 1} to ${Math.min(offset + limit, totalCount)}...`,
+          `[NFTService] Fetching NFTs ${offset + 1} to ${Math.min(offset + limit, totalCount)}...`
         );
 
-        const response = await this.getWalletNFTs(address, page, limit);
-        logger.info(
-          `[NFTService] Page ${page} returned ${response.data.length} NFTs`,
-        );
+        const response = await NFTService.getWalletNFTs(address, page, limit);
+        logger.info(`[NFTService] Page ${page} returned ${response.data.length} NFTs`);
 
         // Add a delay between batches to avoid rate limiting
         if (offset + limit < totalCount) {
@@ -292,24 +256,17 @@ export class NFTService {
 
         // Safety check to prevent infinite loops
         if (page > 100) {
-          logger.warn(
-            `[NFTService] Breaking at page ${page} to prevent infinite loop`,
-          );
+          logger.warn(`[NFTService] Breaking at page ${page} to prevent infinite loop`);
           break;
         }
       } catch (error) {
-        logger.error(
-          `[NFTService] Failed to fetch NFTs at offset ${offset}:`,
-          error,
-        );
+        logger.error(`[NFTService] Failed to fetch NFTs at offset ${offset}:`, error);
         logger.error(`Failed to fetch NFTs at offset ${offset}:`, error);
         break;
       }
     }
 
-    logger.info(
-      `[NFTService] getAllWalletNFTs completed. Total NFTs: ${allNFTs.length}`,
-    );
+    logger.info(`[NFTService] getAllWalletNFTs completed. Total NFTs: ${allNFTs.length}`);
     return allNFTs;
   }
 
@@ -346,17 +303,14 @@ export class NFTService {
         }
       `;
 
-      const response = await fetchWithRetry(
-        "https://api.mainnet.aptoslabs.com/v1/graphql",
-        {
-          method: "POST",
-          headers,
-          body: JSON.stringify({
-            query,
-            variables: { ownerAddress: address },
-          }),
-        },
-      );
+      const response = await fetchWithRetry("https://api.mainnet.aptoslabs.com/v1/graphql", {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          query,
+          variables: { ownerAddress: address },
+        }),
+      });
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -365,9 +319,7 @@ export class NFTService {
       const result = await response.json();
 
       if (result.errors) {
-        throw new Error(
-          `GraphQL errors: ${result.errors.map((e: any) => e.message).join(", ")}`,
-        );
+        throw new Error(`GraphQL errors: ${result.errors.map((e: any) => e.message).join(", ")}`);
       }
 
       // Count NFTs by collection
@@ -375,15 +327,13 @@ export class NFTService {
       const ownerships = result.data.current_token_ownerships_v2 || [];
 
       logger.info(
-        `[NFTService.getCollectionStats] Processing ${ownerships.length} NFT ownerships for collection stats for address: ${address}`,
+        `[NFTService.getCollectionStats] Processing ${ownerships.length} NFT ownerships for collection stats for address: ${address}`
       );
 
       ownerships.forEach((ownership: any) => {
         const collectionName =
-          ownership.current_token_data?.current_collection?.collection_name ||
-          "Unknown Collection";
-        collectionMap[collectionName] =
-          (collectionMap[collectionName] || 0) + 1;
+          ownership.current_token_data?.current_collection?.collection_name || "Unknown Collection";
+        collectionMap[collectionName] = (collectionMap[collectionName] || 0) + 1;
       });
 
       const collections = Object.entries(collectionMap)
@@ -391,7 +341,7 @@ export class NFTService {
         .sort((a, b) => b.count - a.count);
 
       logger.info(
-        `[NFTService.getCollectionStats] Calculated stats for ${collections.length} collections, total NFTs processed: ${ownerships.length} for address: ${address}`,
+        `[NFTService.getCollectionStats] Calculated stats for ${collections.length} collections, total NFTs processed: ${ownerships.length} for address: ${address}`
       );
 
       return {
@@ -425,7 +375,7 @@ export class NFTService {
         },
         {
           includeAuth: true, // Use API key for auth
-        },
+        }
       );
 
       return response.token_activities_v2 || [];

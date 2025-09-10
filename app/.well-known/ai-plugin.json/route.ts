@@ -24,22 +24,25 @@ export async function GET() {
       {
         url: `${siteUrl}/api/aptos/btc`,
         method: "GET",
-        description: "Retrieve supply data for Bitcoin tokens on Aptos",
+        description:
+          "Retrieve real-time supply and pricing data for Bitcoin tokens (xBTC, SBTC, aBTC) on Aptos",
       },
       {
         url: `${siteUrl}/api/aptos/stables`,
         method: "GET",
-        description: "Retrieve supply data for stablecoins on Aptos",
+        description:
+          "Retrieve real-time supply and pricing data for stablecoins (USDT, USDC, USDe, sUSDe) on Aptos",
       },
       {
         url: `${siteUrl}/api/aptos/lst`,
         method: "GET",
-        description: "Retrieve supply data for liquid staking tokens on Aptos",
+        description:
+          "Retrieve real-time supply and pricing data for liquid staking tokens (amAPT, stAPT, thAPT) on Aptos",
       },
       {
-        url: `${siteUrl}/api/aptos/rwas`,
+        url: `${siteUrl}/api/aptos/rwa`,
         method: "GET",
-        description: "Retrieve supply data for real world assets on Aptos",
+        description: "Retrieve real-time supply and pricing data for real world assets on Aptos",
       },
       {
         url: `${siteUrl}/api/aptos/defi`,

@@ -1,4 +1,4 @@
-import { TokenMetadata } from "@/lib/types/tokens";
+import type { TokenMetadata } from "@/lib/types/tokens";
 
 // Utility functions
 const generateExplorerLink = (address: string) =>
@@ -25,8 +25,7 @@ const BTC_CONFIGS: Record<string, BaseTokenConfig> = {
     thumbnail: "/icons/btc/okx.webp",
     type: "Bridged via OKX Bridge",
     issuer: "OKX",
-    assetAddress:
-      "0x81214a80d82035a190fcb76b6ff3c0145161c3a9f33d137f2bbaee4cfec8a387",
+    assetAddress: "0x81214a80d82035a190fcb76b6ff3c0145161c3a9f33d137f2bbaee4cfec8a387",
     decimals: 8,
     website: "https://www.okx.com",
     auditLink: "https://www.okx.com/proof-of-reserves",
@@ -51,8 +50,7 @@ const BTC_CONFIGS: Record<string, BaseTokenConfig> = {
     thumbnail: "/icons/btc/echo.webp",
     type: "Bridged via Echo",
     issuer: "Echo Protocol",
-    assetAddress:
-      "0x4e1854f6d332c9525e258fb6e66f84b6af8aba687bbcb832a24768c4e175feec::abtc::ABTC",
+    assetAddress: "0x4e1854f6d332c9525e258fb6e66f84b6af8aba687bbcb832a24768c4e175feec::abtc::ABTC",
     decimals: 10,
     website: "https://aptoslabs.com",
     auditLink: "https://aptoslabs.com",
@@ -64,8 +62,7 @@ const BTC_CONFIGS: Record<string, BaseTokenConfig> = {
     thumbnail: "/icons/btc/WBTC.webp",
     type: "Bridged via LayerZero OFT",
     issuer: "BitGo",
-    assetAddress:
-      "0x68844a0d7f2587e726ad0579f3d640865bb4162c08a4589eeda3f9689ec52a3d",
+    assetAddress: "0x68844a0d7f2587e726ad0579f3d640865bb4162c08a4589eeda3f9689ec52a3d",
     decimals: 8,
     website: "https://wbtc.network",
     auditLink: "https://www.bitgo.com/resources/learn/wbtc-audit",
@@ -77,8 +74,7 @@ const BTC_CONFIGS: Record<string, BaseTokenConfig> = {
     thumbnail: "/icons/btc/fiatbtc.webp",
     type: "Bridged Bitcoin",
     issuer: "Fiamma",
-    assetAddress:
-      "0x75de592a7e62e6224d13763c392190fda8635ebb79c798a5e9dd0840102f3f93",
+    assetAddress: "0x75de592a7e62e6224d13763c392190fda8635ebb79c798a5e9dd0840102f3f93",
     decimals: 8,
     website: "https://fiamma.io",
     auditLink: "https://fiamma.io/audit",
@@ -93,20 +89,15 @@ const generateMetadata = (config: BaseTokenConfig): TokenMetadata => ({
 });
 
 export const BTC_METADATA: Record<string, TokenMetadata> = Object.fromEntries(
-  Object.entries(BTC_CONFIGS).map(([key, config]) => [
-    key,
-    generateMetadata(config),
-  ]),
+  Object.entries(BTC_CONFIGS).map(([key, config]) => [key, generateMetadata(config)])
 );
 
 // Router configurations
-export const BTC_ASSETS = Object.entries(BTC_CONFIGS).map(
-  ([symbol, config]) => ({
-    symbol,
-    assetAddress: config.assetAddress,
-    description: config.name,
-  }),
-);
+export const BTC_ASSETS = Object.entries(BTC_CONFIGS).map(([symbol, config]) => ({
+  symbol,
+  assetAddress: config.assetAddress,
+  description: config.name,
+}));
 
 export const BTC_TOKENS = Object.fromEntries(
   Object.entries(BTC_CONFIGS).map(([symbol, config]) => [
@@ -116,5 +107,5 @@ export const BTC_TOKENS = Object.fromEntries(
       description: config.name,
       decimals: config.decimals,
     },
-  ]),
+  ])
 );

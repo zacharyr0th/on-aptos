@@ -1,15 +1,11 @@
-import type { DeFiPosition as NewDeFiPosition } from "@/lib/services/defi";
-import { scanDeFiPositions } from "@/lib/services/defi";
+import type { DeFiPosition } from "@/lib/types/defi";
 import { logger } from "@/lib/utils/core/logger";
-
-import type { DeFiPosition } from "../../portfolio/types";
 import { DeFiPositionConverter } from "../shared/defi-position-converter";
-import { unifiedScanner } from "../unified-scanner";
+import type { DeFiPosition as NewDeFiPosition } from "../unified-scanner";
+import { scanDeFiPositions, unifiedScanner } from "../unified-scanner";
 
 export class DeFiService {
-  static async getWalletDeFiPositions(
-    address: string,
-  ): Promise<DeFiPosition[]> {
+  static async getWalletDeFiPositions(address: string): Promise<DeFiPosition[]> {
     try {
       // Use unified scanner for accurate values
       const enhancedResult = await unifiedScanner.scan(address, {
@@ -26,23 +22,18 @@ export class DeFiService {
 
         // Convert enhanced positions to portfolio format
         return enhancedResult.positions.map((pos: NewDeFiPosition) =>
-          this.convertNewPosition(pos),
+          DeFiService.convertNewPosition(pos)
         );
       }
 
       // Fallback to original scanner if enhanced fails
-      logger.warn(
-        "Enhanced scanner returned no positions, falling back to original",
-        { address },
-      );
+      logger.warn("Enhanced scanner returned no positions, falling back to original", { address });
       const result = await scanDeFiPositions(address, {
         minValueUSD: 0, // Show ALL positions regardless of value
       });
 
       // Convert from new format to existing portfolio format
-      return result.positions.map((pos: NewDeFiPosition) =>
-        this.convertNewPosition(pos),
-      );
+      return result.positions.map((pos: NewDeFiPosition) => DeFiService.convertNewPosition(pos));
     } catch (error) {
       logger.error("Failed to fetch DeFi positions:", error);
 
@@ -52,7 +43,7 @@ export class DeFiService {
           minValueUSD: 0,
         });
         return fallbackResult.positions.map((pos: NewDeFiPosition) =>
-          this.convertNewPosition(pos),
+          DeFiService.convertNewPosition(pos)
         );
       } catch (fallbackError) {
         logger.error("Fallback scanner also failed:", fallbackError);
@@ -61,9 +52,7 @@ export class DeFiService {
     }
   }
 
-  private static convertNewPosition(
-    newPosition: NewDeFiPosition,
-  ): DeFiPosition {
+  private static convertNewPosition(newPosition: NewDeFiPosition): DeFiPosition {
     // Use unified converter for consistent transformation
     const unified = DeFiPositionConverter.fromNewDeFiPosition(newPosition);
     const legacy = DeFiPositionConverter.toLegacyDeFiPosition(unified);
@@ -95,18 +84,12 @@ export class DeFiService {
 
       // Calculate supplied value - handle undefined arrays
       const suppliedValue =
-        position.position.supplied?.reduce(
-          (sum: number, asset: any) => sum + asset.value,
-          0,
-        ) ?? 0;
+        position.position.supplied?.reduce((sum: number, asset: any) => sum + asset.value, 0) ?? 0;
       totalSupplied += suppliedValue;
 
       // Calculate borrowed value - handle undefined arrays
       const borrowedValue =
-        position.position.borrowed?.reduce(
-          (sum: number, asset: any) => sum + asset.value,
-          0,
-        ) ?? 0;
+        position.position.borrowed?.reduce((sum: number, asset: any) => sum + asset.value, 0) ?? 0;
       totalBorrowed += borrowedValue;
 
       // Calculate weighted APY - handle undefined arrays
@@ -156,10 +139,7 @@ export class DeFiService {
         .map(([protocol, valueUSD]) => ({
           protocol,
           valueUSD,
-          percentage:
-            result.totalValueUSD > 0
-              ? (valueUSD / result.totalValueUSD) * 100
-              : 0,
+          percentage: result.totalValueUSD > 0 ? (valueUSD / result.totalValueUSD) * 100 : 0,
         }))
         .sort((a, b) => b.valueUSD - a.valueUSD)
         .slice(0, 5);
@@ -194,7 +174,7 @@ export class DeFiService {
   } {
     // Convert to unified format for consistent processing
     const unifiedPositions = positions.map((pos) =>
-      DeFiPositionConverter.fromLegacyDeFiPosition(pos),
+      DeFiPositionConverter.fromLegacyDeFiPosition(pos)
     );
 
     return DeFiPositionConverter.generateSummary(unifiedPositions);

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { dedupeFetch } from "@/lib/utils/cache/request-deduplication";
 import { logger } from "@/lib/utils/core/logger";
@@ -13,10 +13,7 @@ interface UseTokenChartProps {
   timeframe?: "hour" | "day" | "week" | "month" | "year" | "all";
 }
 
-export function useTokenChart({
-  tokenAddress,
-  timeframe = "month",
-}: UseTokenChartProps) {
+export function useTokenChart({ tokenAddress, timeframe = "month" }: UseTokenChartProps) {
   const [data, setData] = useState<TokenPriceData[]>([]);
   const [latestPrice, setLatestPrice] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -41,11 +38,9 @@ export function useTokenChart({
               address: tokenAddress,
               lookback: timeframe,
               downsample_to: "100",
-            })}`,
+            })}`
           ),
-          dedupeFetch(
-            `/api/unified/prices?tokens=${encodeURIComponent(tokenAddress)}`,
-          ),
+          dedupeFetch(`/api/unified/prices?tokens=${encodeURIComponent(tokenAddress)}`),
         ]);
 
         if (!historyResponse.ok) {
@@ -86,9 +81,7 @@ export function useTokenChart({
         setData(historyData);
         setLatestPrice(currentPrice);
       } catch (err) {
-        logger.error(
-          `Token data fetch error: ${err instanceof Error ? err.message : String(err)}`,
-        );
+        logger.error(`Token data fetch error: ${err instanceof Error ? err.message : String(err)}`);
         setError(err instanceof Error ? err.message : "Failed to fetch data");
         setData([]);
         setLatestPrice(null);
@@ -112,8 +105,7 @@ export function useTokenChart({
             previous,
             get percentage() {
               if (this.previous === 0) return 0;
-              const pct =
-                ((this.current - this.previous) / this.previous) * 100;
+              const pct = ((this.current - this.previous) / this.previous) * 100;
               logger.debug({
                 current: this.current,
                 previous: this.previous,

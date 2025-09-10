@@ -1,7 +1,7 @@
 "use client";
 
-import type { PageContainerProps } from "./types";
 import { cn } from "@/lib/utils";
+import type { PageContainerProps } from "./types";
 
 export function PageContainer({
   children,
@@ -32,7 +32,7 @@ export function PageContainer({
         maxWidthClasses[maxWidth],
         paddingClasses[padding],
         "mx-auto",
-        className,
+        className
       )}
     >
       {children}

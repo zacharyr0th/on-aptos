@@ -3,26 +3,19 @@
  * Provides much better categorization and labeling than basic transaction parsing
  */
 
-import {
-  RWA_TOKENS,
-  STABLECOINS,
-  LIQUID_STAKING_TOKEN_SET,
-  CEX_ADDRESSES,
-} from "@/lib/constants";
-import { TransactionCategory, ActivityType } from "@/lib/types/consolidated";
+import { CEX_ADDRESSES, LIQUID_STAKING_TOKEN_SET, RWA_TOKENS, STABLECOINS } from "@/lib/constants";
+import { ActivityType, TransactionCategory } from "@/lib/types/consolidated";
 import { logger } from "@/lib/utils/core/logger";
 
 import {
   getProtocolByAddress,
   getProtocolLabel,
-  ProtocolType,
   type ProtocolInfo,
+  ProtocolType,
 } from "../constants/protocols/protocol-registry";
 
 // Create lookup for backward compatibility
-const RWA_TOKEN_BY_ADDRESS = Object.fromEntries(
-  RWA_TOKENS.map((token) => [token.address, token]),
-);
+const RWA_TOKEN_BY_ADDRESS = Object.fromEntries(RWA_TOKENS.map((token) => [token.address, token]));
 
 export interface Transaction {
   transaction_version: string;
@@ -56,7 +49,7 @@ export interface EnhancedTransactionInfo {
 }
 
 // Re-export from consolidated types
-export { TransactionCategory, ActivityType } from "@/lib/types/consolidated";
+export { ActivityType, TransactionCategory } from "@/lib/types/consolidated";
 
 // Constants for mapped ActivityTypes to avoid repetition
 const MAPPED_ACTIVITY_TYPES = {
@@ -107,22 +100,22 @@ export class EnhancedTransactionAnalyzer {
       category: TransactionCategory.UNKNOWN,
       subcategory: "unknown",
       displayName: "Transaction",
-      direction: this.determineDirection(tx),
+      direction: EnhancedTransactionAnalyzer.determineDirection(tx),
       activityType: ActivityType.UNKNOWN,
       description: "Unknown transaction",
       confidence: 0,
-      assetInfo: this.analyzeAsset(tx.asset_type),
+      assetInfo: EnhancedTransactionAnalyzer.analyzeAsset(tx.asset_type),
     };
 
     // Analyze in order of specificity (most specific first)
     const analyzed =
-      this.analyzeProtocolInteraction(tx, analysis) ||
-      this.analyzeRWAActivity(tx, analysis) ||
-      this.analyzeCEXInteraction(tx, analysis) ||
-      this.analyzeNFTActivity(tx, analysis) ||
-      this.analyzeBridgeActivity(tx, analysis) ||
-      this.analyzeSystemActivity(tx, analysis) ||
-      this.analyzeBasicTransfer(tx, analysis);
+      EnhancedTransactionAnalyzer.analyzeProtocolInteraction(tx, analysis) ||
+      EnhancedTransactionAnalyzer.analyzeRWAActivity(tx, analysis) ||
+      EnhancedTransactionAnalyzer.analyzeCEXInteraction(tx, analysis) ||
+      EnhancedTransactionAnalyzer.analyzeNFTActivity(tx, analysis) ||
+      EnhancedTransactionAnalyzer.analyzeBridgeActivity(tx, analysis) ||
+      EnhancedTransactionAnalyzer.analyzeSystemActivity(tx, analysis) ||
+      EnhancedTransactionAnalyzer.analyzeBasicTransfer(tx, analysis);
 
     // Use the result to avoid unused variable warning
     if (!analyzed) {
@@ -131,8 +124,8 @@ export class EnhancedTransactionAnalyzer {
     }
 
     // Final cleanup and description generation
-    this.generateDescription(tx, analysis);
-    this.adjustConfidence(tx, analysis);
+    EnhancedTransactionAnalyzer.generateDescription(tx, analysis);
+    EnhancedTransactionAnalyzer.adjustConfidence(tx, analysis);
 
     logger.debug(
       {
@@ -142,7 +135,7 @@ export class EnhancedTransactionAnalyzer {
         activityType: analysis.activityType,
         confidence: analysis.confidence,
       },
-      "Transaction analysis result",
+      "Transaction analysis result"
     );
 
     return analysis;
@@ -153,7 +146,7 @@ export class EnhancedTransactionAnalyzer {
    */
   private static analyzeProtocolInteraction(
     tx: Transaction,
-    analysis: EnhancedTransactionInfo,
+    analysis: EnhancedTransactionInfo
   ): boolean {
     if (!tx.type) return false;
 
@@ -162,29 +155,29 @@ export class EnhancedTransactionAnalyzer {
 
     analysis.protocol = protocol;
     analysis.protocolLabel = getProtocolLabel(tx.type) || undefined;
-    analysis.confidence = this.CONFIDENCE_THRESHOLDS.HIGH;
+    analysis.confidence = EnhancedTransactionAnalyzer.CONFIDENCE_THRESHOLDS.HIGH;
 
     switch (protocol.type) {
       case ProtocolType.LIQUID_STAKING:
-        return this.analyzeLiquidStaking(tx, analysis, protocol);
+        return EnhancedTransactionAnalyzer.analyzeLiquidStaking(tx, analysis, protocol);
 
       case ProtocolType.LENDING:
-        return this.analyzeLending(tx, analysis, protocol);
+        return EnhancedTransactionAnalyzer.analyzeLending(tx, analysis, protocol);
 
       case ProtocolType.DEX:
-        return this.analyzeDEX(tx, analysis, protocol);
+        return EnhancedTransactionAnalyzer.analyzeDEX(tx, analysis, protocol);
 
       case ProtocolType.FARMING:
-        return this.analyzeFarming(tx, analysis, protocol);
+        return EnhancedTransactionAnalyzer.analyzeFarming(tx, analysis, protocol);
 
       case ProtocolType.BRIDGE:
-        return this.analyzeBridge(tx, analysis, protocol);
+        return EnhancedTransactionAnalyzer.analyzeBridge(tx, analysis, protocol);
 
       case ProtocolType.DERIVATIVES:
-        return this.analyzeDerivatives(tx, analysis, protocol);
+        return EnhancedTransactionAnalyzer.analyzeDerivatives(tx, analysis, protocol);
 
       case ProtocolType.NFT:
-        return this.analyzeNFTMarketplace(tx, analysis, protocol);
+        return EnhancedTransactionAnalyzer.analyzeNFTMarketplace(tx, analysis, protocol);
 
       default:
         analysis.category = TransactionCategory.DEFI;
@@ -200,7 +193,7 @@ export class EnhancedTransactionAnalyzer {
   private static analyzeLiquidStaking(
     tx: Transaction,
     analysis: EnhancedTransactionInfo,
-    protocol: ProtocolInfo,
+    protocol: ProtocolInfo
   ): boolean {
     analysis.category = TransactionCategory.STAKING;
     analysis.subcategory = protocol.name.toLowerCase();
@@ -211,10 +204,7 @@ export class EnhancedTransactionAnalyzer {
       analysis.activityType = ActivityType.STAKE;
       analysis.displayName = `Stake with ${protocol.label}`;
       analysis.description = `Staked APT for ${protocol.label} liquid staking tokens`;
-    } else if (
-      lowerType.includes("unstake") ||
-      lowerType.includes("withdraw")
-    ) {
+    } else if (lowerType.includes("unstake") || lowerType.includes("withdraw")) {
       analysis.activityType = ActivityType.UNSTAKE;
       analysis.displayName = `Unstake from ${protocol.label}`;
       analysis.description = `Unstaked ${protocol.label} tokens for APT`;
@@ -237,7 +227,7 @@ export class EnhancedTransactionAnalyzer {
   private static analyzeLending(
     tx: Transaction,
     analysis: EnhancedTransactionInfo,
-    protocol: ProtocolInfo,
+    protocol: ProtocolInfo
   ): boolean {
     analysis.category = TransactionCategory.DEFI;
     analysis.subcategory = "lending";
@@ -275,7 +265,7 @@ export class EnhancedTransactionAnalyzer {
   private static analyzeDEX(
     tx: Transaction,
     analysis: EnhancedTransactionInfo,
-    protocol: ProtocolInfo,
+    protocol: ProtocolInfo
   ): boolean {
     analysis.category = TransactionCategory.DEFI;
     analysis.subcategory = "dex";
@@ -286,17 +276,11 @@ export class EnhancedTransactionAnalyzer {
       analysis.activityType = ActivityType.SWAP;
       analysis.displayName = `Swap on ${protocol.label}`;
       analysis.description = `Token swap on ${protocol.label}`;
-    } else if (
-      lowerType.includes("add_liquidity") ||
-      lowerType.includes("provide_liquidity")
-    ) {
+    } else if (lowerType.includes("add_liquidity") || lowerType.includes("provide_liquidity")) {
       analysis.activityType = ActivityType.LIQUIDITY_ADD;
       analysis.displayName = `Add Liquidity to ${protocol.label}`;
       analysis.description = `Added liquidity to ${protocol.label} pool`;
-    } else if (
-      lowerType.includes("remove_liquidity") ||
-      lowerType.includes("withdraw_liquidity")
-    ) {
+    } else if (lowerType.includes("remove_liquidity") || lowerType.includes("withdraw_liquidity")) {
       analysis.activityType = ActivityType.LIQUIDITY_REMOVE;
       analysis.displayName = `Remove Liquidity from ${protocol.label}`;
       analysis.description = `Removed liquidity from ${protocol.label} pool`;
@@ -315,7 +299,7 @@ export class EnhancedTransactionAnalyzer {
   private static analyzeFarming(
     tx: Transaction,
     analysis: EnhancedTransactionInfo,
-    protocol: ProtocolInfo,
+    protocol: ProtocolInfo
   ): boolean {
     analysis.category = TransactionCategory.DEFI;
     analysis.subcategory = "farming";
@@ -326,10 +310,7 @@ export class EnhancedTransactionAnalyzer {
       analysis.activityType = MAPPED_ACTIVITY_TYPES.FARMING_STAKE;
       analysis.displayName = `Stake in ${protocol.label}`;
       analysis.description = `Staked tokens in ${protocol.label} farm`;
-    } else if (
-      lowerType.includes("unstake") ||
-      lowerType.includes("withdraw")
-    ) {
+    } else if (lowerType.includes("unstake") || lowerType.includes("withdraw")) {
       analysis.activityType = MAPPED_ACTIVITY_TYPES.FARMING_UNSTAKE;
       analysis.displayName = `Unstake from ${protocol.label}`;
       analysis.description = `Unstaked tokens from ${protocol.label} farm`;
@@ -352,7 +333,7 @@ export class EnhancedTransactionAnalyzer {
   private static analyzeBridge(
     tx: Transaction,
     analysis: EnhancedTransactionInfo,
-    protocol: ProtocolInfo,
+    protocol: ProtocolInfo
   ): boolean {
     analysis.category = TransactionCategory.BRIDGE;
     analysis.subcategory = protocol.name.toLowerCase();
@@ -371,7 +352,7 @@ export class EnhancedTransactionAnalyzer {
   private static analyzeDerivatives(
     tx: Transaction,
     analysis: EnhancedTransactionInfo,
-    protocol: ProtocolInfo,
+    protocol: ProtocolInfo
   ): boolean {
     analysis.category = TransactionCategory.DEFI;
     analysis.subcategory = "derivatives";
@@ -386,7 +367,7 @@ export class EnhancedTransactionAnalyzer {
   private static analyzeNFTMarketplace(
     tx: Transaction,
     analysis: EnhancedTransactionInfo,
-    protocol: ProtocolInfo,
+    protocol: ProtocolInfo
   ): boolean {
     analysis.category = TransactionCategory.NFT;
     analysis.subcategory = protocol.name.toLowerCase();
@@ -411,16 +392,13 @@ export class EnhancedTransactionAnalyzer {
   /**
    * Analyze RWA token activities
    */
-  private static analyzeRWAActivity(
-    tx: Transaction,
-    analysis: EnhancedTransactionInfo,
-  ): boolean {
+  private static analyzeRWAActivity(tx: Transaction, analysis: EnhancedTransactionInfo): boolean {
     if (!tx.asset_type || !RWA_TOKEN_BY_ADDRESS[tx.asset_type]) return false;
 
     const rwaToken = RWA_TOKEN_BY_ADDRESS[tx.asset_type];
     analysis.category = TransactionCategory.RWA;
     analysis.subcategory = rwaToken.assetClass;
-    analysis.confidence = this.CONFIDENCE_THRESHOLDS.HIGH;
+    analysis.confidence = EnhancedTransactionAnalyzer.CONFIDENCE_THRESHOLDS.HIGH;
 
     const lowerType = tx.type.toLowerCase();
 
@@ -450,16 +428,16 @@ export class EnhancedTransactionAnalyzer {
    */
   private static analyzeCEXInteraction(
     tx: Transaction,
-    analysis: EnhancedTransactionInfo,
+    analysis: EnhancedTransactionInfo
   ): boolean {
     if (!tx.sender) return false;
 
-    const cexName = this.identifyCEX(tx.sender);
+    const cexName = EnhancedTransactionAnalyzer.identifyCEX(tx.sender);
     if (!cexName) return false;
 
     analysis.category = TransactionCategory.CEX;
     analysis.subcategory = cexName.toLowerCase();
-    analysis.confidence = this.CONFIDENCE_THRESHOLDS.HIGH;
+    analysis.confidence = EnhancedTransactionAnalyzer.CONFIDENCE_THRESHOLDS.HIGH;
 
     if (analysis.direction === "incoming") {
       analysis.activityType = MAPPED_ACTIVITY_TYPES.CEX_WITHDRAW;
@@ -477,10 +455,7 @@ export class EnhancedTransactionAnalyzer {
   /**
    * Analyze NFT activities
    */
-  private static analyzeNFTActivity(
-    tx: Transaction,
-    analysis: EnhancedTransactionInfo,
-  ): boolean {
+  private static analyzeNFTActivity(tx: Transaction, analysis: EnhancedTransactionInfo): boolean {
     if (!tx.type) return false;
 
     const lowerType = tx.type.toLowerCase();
@@ -492,7 +467,7 @@ export class EnhancedTransactionAnalyzer {
       analysis.activityType = ActivityType.NFT_MINT;
       analysis.displayName = "Mint NFT";
       analysis.description = "Minted a new NFT";
-      analysis.confidence = this.CONFIDENCE_THRESHOLDS.MEDIUM;
+      analysis.confidence = EnhancedTransactionAnalyzer.CONFIDENCE_THRESHOLDS.MEDIUM;
       return true;
     }
 
@@ -504,7 +479,7 @@ export class EnhancedTransactionAnalyzer {
    */
   private static analyzeBridgeActivity(
     tx: Transaction,
-    analysis: EnhancedTransactionInfo,
+    analysis: EnhancedTransactionInfo
   ): boolean {
     if (!tx.type) return false;
 
@@ -519,7 +494,7 @@ export class EnhancedTransactionAnalyzer {
           : MAPPED_ACTIVITY_TYPES.BRIDGE_OUT;
       analysis.displayName = "Cross-chain Bridge";
       analysis.description = "Cross-chain bridge transaction";
-      analysis.confidence = this.CONFIDENCE_THRESHOLDS.MEDIUM;
+      analysis.confidence = EnhancedTransactionAnalyzer.CONFIDENCE_THRESHOLDS.MEDIUM;
       return true;
     }
 
@@ -531,7 +506,7 @@ export class EnhancedTransactionAnalyzer {
    */
   private static analyzeSystemActivity(
     tx: Transaction,
-    analysis: EnhancedTransactionInfo,
+    analysis: EnhancedTransactionInfo
   ): boolean {
     if (!tx.type) return false;
 
@@ -543,7 +518,7 @@ export class EnhancedTransactionAnalyzer {
       analysis.activityType = ActivityType.ACCOUNT_CREATION;
       analysis.displayName = "Create Account";
       analysis.description = "Created new account";
-      analysis.confidence = this.CONFIDENCE_THRESHOLDS.HIGH;
+      analysis.confidence = EnhancedTransactionAnalyzer.CONFIDENCE_THRESHOLDS.HIGH;
       return true;
     }
 
@@ -553,7 +528,7 @@ export class EnhancedTransactionAnalyzer {
       analysis.activityType = MAPPED_ACTIVITY_TYPES.COIN_REGISTER;
       analysis.displayName = "Register Coin";
       analysis.description = "Registered new coin type";
-      analysis.confidence = this.CONFIDENCE_THRESHOLDS.HIGH;
+      analysis.confidence = EnhancedTransactionAnalyzer.CONFIDENCE_THRESHOLDS.HIGH;
       return true;
     }
 
@@ -563,10 +538,7 @@ export class EnhancedTransactionAnalyzer {
   /**
    * Analyze basic transfers
    */
-  private static analyzeBasicTransfer(
-    tx: Transaction,
-    analysis: EnhancedTransactionInfo,
-  ): boolean {
+  private static analyzeBasicTransfer(tx: Transaction, analysis: EnhancedTransactionInfo): boolean {
     analysis.category = TransactionCategory.TRANSFER;
     analysis.subcategory = "basic";
 
@@ -580,16 +552,14 @@ export class EnhancedTransactionAnalyzer {
       analysis.description = `Sent ${analysis.assetInfo?.displaySymbol || "tokens"}`;
     }
 
-    analysis.confidence = this.CONFIDENCE_THRESHOLDS.LOW;
+    analysis.confidence = EnhancedTransactionAnalyzer.CONFIDENCE_THRESHOLDS.LOW;
     return true;
   }
 
   /**
    * Determine transaction direction based on amount
    */
-  private static determineDirection(
-    tx: Transaction,
-  ): "incoming" | "outgoing" | "neutral" {
+  private static determineDirection(tx: Transaction): "incoming" | "outgoing" | "neutral" {
     const amount = parseFloat(tx.amount || "0");
     if (amount > 0) return "incoming";
     if (amount < 0) return "outgoing";
@@ -599,9 +569,7 @@ export class EnhancedTransactionAnalyzer {
   /**
    * Analyze asset information
    */
-  private static analyzeAsset(
-    assetType: string,
-  ): EnhancedTransactionInfo["assetInfo"] {
+  private static analyzeAsset(assetType: string): EnhancedTransactionInfo["assetInfo"] {
     const isStablecoin = Object.values(STABLECOINS).includes(assetType as any);
     const isLST = LIQUID_STAKING_TOKEN_SET.has(assetType);
     const isRWA = !!RWA_TOKEN_BY_ADDRESS[assetType];
@@ -610,8 +578,7 @@ export class EnhancedTransactionAnalyzer {
 
     if (isStablecoin) {
       displaySymbol =
-        Object.entries(STABLECOINS).find(([addr]) => addr === assetType)?.[0] ||
-        "Stablecoin";
+        Object.entries(STABLECOINS).find(([addr]) => addr === assetType)?.[0] || "Stablecoin";
     } else if (isLST) {
       displaySymbol = "LST"; // Generic LST label since we use a Set now
     } else if (isRWA) {
@@ -645,10 +612,7 @@ export class EnhancedTransactionAnalyzer {
   /**
    * Generate human-readable description
    */
-  private static generateDescription(
-    tx: Transaction,
-    analysis: EnhancedTransactionInfo,
-  ): void {
+  private static generateDescription(tx: Transaction, analysis: EnhancedTransactionInfo): void {
     // Description is already set in specific analyzers, just add amount info if available
     if (tx.amount && parseFloat(tx.amount) !== 0) {
       const amount = parseFloat(tx.amount);
@@ -664,13 +628,10 @@ export class EnhancedTransactionAnalyzer {
   /**
    * Adjust confidence based on various factors
    */
-  private static adjustConfidence(
-    tx: Transaction,
-    analysis: EnhancedTransactionInfo,
-  ): void {
+  private static adjustConfidence(tx: Transaction, analysis: EnhancedTransactionInfo): void {
     // Start with existing confidence or medium if not set
     if (analysis.confidence === 0) {
-      analysis.confidence = this.CONFIDENCE_THRESHOLDS.MEDIUM;
+      analysis.confidence = EnhancedTransactionAnalyzer.CONFIDENCE_THRESHOLDS.MEDIUM;
     }
 
     // Boost confidence for protocol matches

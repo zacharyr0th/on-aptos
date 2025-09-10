@@ -2,11 +2,8 @@
  * Hook for fetching and managing DeFi metrics from DeFi Llama
  */
 
-import { useState, useEffect, useCallback, useMemo } from "react";
-import {
-  defiLlamaService,
-  type AptosDefiMetrics,
-} from "@/lib/services/external/defi-llama";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { type AptosDefiMetrics, defiLlamaService } from "@/lib/services/external/defi-llama";
 import { serviceLogger } from "@/lib/utils/core/logger";
 
 interface UseDefiMetricsReturn {
@@ -40,9 +37,7 @@ export function useDefiMetrics(): UseDefiMetricsReturn {
         // Service returned null but didn't throw - likely API unavailable
         setError("DeFi data is temporarily unavailable");
         setIsOffline(true);
-        serviceLogger.warn(
-          "DeFi metrics service returned null - API likely unavailable",
-        );
+        serviceLogger.warn("DeFi metrics service returned null - API likely unavailable");
       }
     } catch (err) {
       let errorMessage = "Failed to fetch DeFi metrics";
@@ -72,10 +67,7 @@ export function useDefiMetrics(): UseDefiMetricsReturn {
 
   // Memoize computed properties
   const hasData = useMemo(() => !!metrics && !error, [metrics, error]);
-  const isEmpty = useMemo(
-    () => !isLoading && !metrics && !error,
-    [isLoading, metrics, error],
-  );
+  const isEmpty = useMemo(() => !isLoading && !metrics && !error, [isLoading, metrics, error]);
 
   return useMemo(
     () => ({
@@ -87,6 +79,6 @@ export function useDefiMetrics(): UseDefiMetricsReturn {
       isOffline,
       isEmpty,
     }),
-    [metrics, isLoading, error, fetchMetrics, hasData, isOffline, isEmpty],
+    [metrics, isLoading, error, fetchMetrics, hasData, isOffline, isEmpty]
   );
 }

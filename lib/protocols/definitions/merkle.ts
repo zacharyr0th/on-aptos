@@ -2,7 +2,7 @@
  * Merkle Trade Protocol Definition
  */
 
-import { ProtocolDefinition, ProtocolType, PositionType } from "../types";
+import { PositionType, type ProtocolDefinition, ProtocolType } from "../types";
 
 export const MerkleProtocol: ProtocolDefinition = {
   metadata: {
@@ -17,9 +17,7 @@ export const MerkleProtocol: ProtocolDefinition = {
     auditStatus: "audited",
   },
 
-  addresses: [
-    "0x5ae6789dd2fec1a9ec9cccfb3acaf12e93d432f0a3a42c92fe1a9d490b7bbc06",
-  ],
+  addresses: ["0x5ae6789dd2fec1a9ec9cccfb3acaf12e93d432f0a3a42c92fe1a9d490b7bbc06"],
 
   patterns: {
     resources: [
@@ -36,7 +34,7 @@ export const MerkleProtocol: ProtocolDefinition = {
           lpType: "house_lp",
           protocolName: "Merkle Trade",
           requiresFungibleAssetQuery: true,
-          faAddress: data.type, // Store the FA address for later query
+          faAddress: (data as any).type, // Store the FA address for later query
           positionType: "Liquidity Provider",
           protocol: "Merkle",
           isDerivatives: true,
@@ -48,11 +46,11 @@ export const MerkleProtocol: ProtocolDefinition = {
         positionType: PositionType.LP,
         priority: 105,
         extractAssets: (data) => {
-          const withdrawAmount = data?.withdraw_amount || "0";
+          const withdrawAmount = (data as any)?.withdraw_amount || "0";
           if (withdrawAmount === "0") return [];
 
           // Extract the underlying asset from the type
-          const typeMatch = data.type?.match(/MKLP<([^>]+)>/);
+          const typeMatch = (data as any).type?.match(/MKLP<([^>]+)>/);
           const underlyingAsset = typeMatch
             ? typeMatch[1]
             : "0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDC";
@@ -62,20 +60,20 @@ export const MerkleProtocol: ProtocolDefinition = {
               address: underlyingAsset,
               symbol: "USDC", // Pending withdrawals are in USDC
               decimals: 6,
-              amount: (parseFloat(withdrawAmount) / Math.pow(10, 6)).toString(), // Convert from raw to decimal
+              amount: (parseFloat(withdrawAmount) / 10 ** 6).toString(), // Convert from raw to decimal
             },
           ];
         },
         extractMetadata: (data) => ({
           withdrawPending: true,
-          withdrawAmount: data?.withdraw_amount || "0",
-          withdrawLimit: data?.withdraw_limit || "0",
-          lastResetTimestamp: data?.last_withdraw_reset_timestamp,
-          withdrawAvailable: data?.withdraw_amount || "0",
+          withdrawAmount: (data as any)?.withdraw_amount || "0",
+          withdrawLimit: (data as any)?.withdraw_limit || "0",
+          lastResetTimestamp: (data as any)?.last_withdraw_reset_timestamp,
+          withdrawAvailable: (data as any)?.withdraw_amount || "0",
           protocolName: "Merkle Trade",
           positionType: "Pending Withdrawal",
           timeUntilWithdraw: calculateTimeUntilWithdraw(
-            data?.last_withdraw_reset_timestamp,
+            (data as any)?.last_withdraw_reset_timestamp
           ),
         }),
       },
@@ -90,9 +88,9 @@ export const MerkleProtocol: ProtocolDefinition = {
         },
         extractMetadata: (data) => ({
           rewardType: "protocol_reward",
-          claimedEpochs: data?.claimed_epoch || [],
+          claimedEpochs: (data as any)?.claimed_epoch || [],
           requiresRewardQuery: true,
-          lastClaimedEpoch: data?.claimed_epoch?.slice(-1)[0],
+          lastClaimedEpoch: (data as any)?.claimed_epoch?.slice(-1)[0],
           protocolName: "Merkle Trade",
           positionType: "Rewards",
         }),
@@ -108,7 +106,7 @@ export const MerkleProtocol: ProtocolDefinition = {
               "0x5ae6789dd2fec1a9ec9cccfb3acaf12e93d432f0a3a42c92fe1a9d490b7bbc06::merkle_trade::MKLP",
             symbol: "MKLP",
             decimals: 8,
-            amount: data?.data?.value || "0",
+            amount: (data as any)?.data?.value || "0",
           },
         ],
       },

@@ -4,13 +4,10 @@ import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { LogOut, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React, { useEffect } from "react";
+import type React from "react";
+import { useEffect } from "react";
 
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useAnsName } from "@/lib/hooks/useAnsName";
 import { useTranslation } from "@/lib/hooks/useTranslation";
 
@@ -40,21 +37,14 @@ const MobileNavLink = ({
     href={href}
     onClick={onClick}
     className={`block text-base font-medium py-4 px-6 transition-colors duration-200 hover:bg-muted focus:outline-none focus:bg-muted ${
-      active
-        ? "text-primary bg-muted/70 border-r-2 border-primary"
-        : "text-foreground"
+      active ? "text-primary bg-muted/70 border-r-2 border-primary" : "text-foreground"
     }`}
   >
     {children}
   </Link>
 );
 
-export function MobileMenu({
-  isOpen,
-  onToggle,
-  onClose,
-  navigationItems,
-}: MobileMenuProps) {
+export function MobileMenu({ isOpen, onToggle, onClose, navigationItems }: MobileMenuProps) {
   const pathname = usePathname();
   const { account, disconnect } = useWallet();
   const { ansName } = useAnsName();
@@ -62,9 +52,7 @@ export function MobileMenu({
 
   const walletAddress = account?.address?.toString();
   const normalizedAddress =
-    walletAddress && !walletAddress.startsWith("0x")
-      ? `0x${walletAddress}`
-      : walletAddress;
+    walletAddress && !walletAddress.startsWith("0x") ? `0x${walletAddress}` : walletAddress;
 
   // Prevent body scroll when menu is open
   useEffect(() => {
@@ -92,11 +80,7 @@ export function MobileMenu({
               aria-expanded={isOpen}
               aria-controls="mobile-navigation"
             >
-              {isOpen ? (
-                <X className="w-6 h-6" />
-              ) : (
-                <Menu className="w-6 h-6" />
-              )}
+              {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </TooltipTrigger>
           <TooltipContent>
@@ -133,10 +117,7 @@ export function MobileMenu({
                     <button
                       onClick={onClose}
                       className="p-2 -mr-2 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-md transition-colors hover:bg-muted"
-                      aria-label={t(
-                        "navigation.close_menu",
-                        "Close navigation menu",
-                      )}
+                      aria-label={t("navigation.close_menu", "Close navigation menu")}
                     >
                       <X className="w-5 h-5" />
                     </button>
@@ -149,7 +130,7 @@ export function MobileMenu({
 
               {/* Navigation Links */}
               <div className="flex-1 overflow-y-auto">
-                <div className="py-2">
+                <div className="py-2 border-t border-border">
                   <div className="px-4 py-2">
                     <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                       Assets
@@ -197,7 +178,7 @@ export function MobileMenu({
                         active={pathname === "/tools/portfolio"}
                         onClick={onClose}
                       >
-                        Portfolio Analytics
+                        Portfolio
                       </MobileNavLink>
                       <div className="px-4 py-2">
                         <p className="text-xs text-muted-foreground">
@@ -228,7 +209,7 @@ export function MobileMenu({
                       active={pathname === "/tools/portfolio"}
                       onClick={onClose}
                     >
-                      {pathname === "/" ? "Launch App" : "View Portfolio"}
+                      {pathname === "/" ? "Launch App" : "Portfolio"}
                     </MobileNavLink>
                   )}
                 </div>

@@ -11,11 +11,7 @@ export interface SortConfig<T> {
 }
 
 // Basic sort function
-export function sortData<T>(
-  data: T[],
-  key: keyof T,
-  direction: SortDirection = "asc",
-): T[] {
+export function sortData<T>(data: T[], key: keyof T, direction: SortDirection = "asc"): T[] {
   return [...data].sort((a, b) => {
     const aValue = a[key];
     const bValue = b[key];
@@ -79,11 +75,7 @@ export function multiSort<T>(data: T[], sortConfigs: SortConfig<T>[]): T[] {
 }
 
 // Natural sort for alphanumeric strings
-export function naturalSort<T>(
-  data: T[],
-  key: keyof T,
-  direction: SortDirection = "asc",
-): T[] {
+export function naturalSort<T>(data: T[], key: keyof T, direction: SortDirection = "asc"): T[] {
   const collator = new Intl.Collator(undefined, {
     numeric: true,
     sensitivity: "base",
@@ -101,7 +93,7 @@ export function naturalSort<T>(
 export function caseInsensitiveSort<T>(
   data: T[],
   key: keyof T,
-  direction: SortDirection = "asc",
+  direction: SortDirection = "asc"
 ): T[] {
   return [...data].sort((a, b) => {
     const aValue = String(a[key] || "").toLowerCase();
@@ -116,7 +108,7 @@ export function sortWithNulls<T>(
   data: T[],
   key: keyof T,
   direction: SortDirection = "asc",
-  nullsFirst = false,
+  nullsFirst = false
 ): T[] {
   return [...data].sort((a, b) => {
     const aValue = a[key];
@@ -175,7 +167,7 @@ export class SortState<T> {
   constructor(
     initialKey?: keyof T,
     initialDirection?: SortDirection,
-    onChange?: (key: keyof T | null, direction: SortDirection) => void,
+    onChange?: (key: keyof T | null, direction: SortDirection) => void
   ) {
     this.sortKey = initialKey || null;
     this.sortDirection = initialDirection || "asc";
@@ -225,7 +217,7 @@ export class SortState<T> {
 export function getSortIndicator(
   currentKey: string | null,
   currentDirection: SortDirection,
-  columnKey: string,
+  columnKey: string
 ): "asc" | "desc" | null {
   if (currentKey !== columnKey) return null;
   return currentDirection;

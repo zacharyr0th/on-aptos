@@ -2,6 +2,155 @@
  * Comprehensive types for metrics and dashboard pages
  */
 
+// Main metrics data type used across the app
+export interface MetricsData {
+  totalTransactions?: number;
+  totalAccounts?: number;
+  totalValidators?: number;
+  networkUptime?: number | string;
+  totalTransactionsChange?: number;
+  totalAccountsChange?: number;
+  totalValidatorsChange?: number;
+  totalProtocols?: number;
+  totalTVL?: number;
+  averageGasPrice?: number;
+  // Comprehensive metrics from all 9 working queries
+  dailyActiveAddresses?: number;
+  dailyTransactions?: number;
+  dailyGasFeesUSD?: number;
+  dailyGasFeesAPT?: number;
+  netGasAPT?: number;
+  recentTransactionCount?: number;
+  recentGasFeesAPT?: number;
+  // NEW: User behavior analytics
+  behaviorDailyActiveUsers?: number;
+  totalSignatures?: number;
+  behaviorTransactions?: number;
+  // NEW: Network performance
+  maxTPS?: number;
+  // NEW: Protocol analytics
+  totalProtocolTransactions?: number;
+  totalProtocolGas?: number;
+  totalExtendedTransactions?: number;
+  totalExtendedGas?: number;
+  protocolBreakdown?: any[];
+  extendedProtocolData?: any[];
+
+  // Activity patterns
+  activityPatterns?: any;
+  peakHourlyTransactions?: number;
+  peakHourlyUsers?: number;
+  totalSwapEvents?: number;
+  uniqueSwappers?: number;
+  totalTokenHolders?: number;
+  swapVolume24h?: number;
+
+  // COMPREHENSIVE DEEP ANALYTICS - All expanded categories
+  enhancedProtocolAnalytics?: {
+    protocolDominance: {
+      topProtocol: string;
+      concentrationRatio: number;
+      totalProtocolVolume: number;
+    };
+    gasEconomics: {
+      totalNetworkGasConsumed: number;
+      avgGasEfficiency: number;
+      gasConcentration: number;
+    };
+  };
+  enhancedUserAnalytics?: {
+    userEngagement: {
+      avgTransactionsPerUser: number;
+      userActivityRatio: number;
+      estimatedPowerUsers: number;
+    };
+    transactionPatterns: {
+      peakToPeakVariation: number;
+      networkUtilization: number;
+      avgTransactionsPerHour: number;
+    };
+  };
+  enhancedTokenEconomics?: {
+    tokenDistribution: {
+      totalTokenValue: number;
+      largeHolders: number;
+      concentrationIndex: number;
+    };
+    liquidityAnalysis: {
+      totalSwapEvents: number;
+      liquidityProviders: number;
+      avgSwapsPerHour: number;
+    };
+  };
+  whaleAnalytics?: {
+    totalLargeHolders: number;
+    whaleConcentration: number;
+    topHolders: Array<{
+      holder: string;
+      balance: number;
+      tokenType: string;
+    }>;
+    distributionAnalysis?: {
+      giniCoefficient: number;
+    };
+  };
+  protocolRevenues?: {
+    totalEcosystemRevenue: number;
+    revenueDistribution: Array<{
+      protocol: string;
+      revenue: number;
+      marketShare: number;
+      efficiency: number;
+    }>;
+    topProtocolShare: number;
+  };
+  mevAnalytics?: {
+    gasVolatility: {
+      avgGasPrice: number;
+      gasSpread: number;
+      highGasPeriods: number;
+      mevOpportunityScore: number;
+    };
+  };
+  marketMicrostructure?: {
+    transactionFlow: {
+      transactionDensity: number;
+      networkThroughputRatio: number;
+      avgTransactionsPerHour: number;
+    };
+    liquidityMetrics: {
+      totalLiquidityProvided: number;
+      avgTradeSize: number;
+      marketEfficiencyScore: number;
+    };
+  };
+}
+
+export interface TableData {
+  name: string;
+  value: string;
+  change?: string;
+  category: string;
+  queryUrl?: string;
+  queryId?: string;
+  query?: string;
+}
+
+export interface ComprehensiveMetricsResponse {
+  metrics: MetricsData;
+  tableData: TableData[];
+  dataSource: string;
+  queriesUsed: string[];
+  lastUpdated: string;
+}
+
+export interface AdvancedMetrics extends MetricsData {
+  // Ensures all base properties are required for advanced metrics
+  totalTransactions: number;
+  totalAccounts: number;
+  totalValidators: number;
+}
+
 // Base metric types
 export interface MetricRow {
   category: string;
@@ -136,7 +285,7 @@ export function getMetricChangeIcon(changeType?: MetricChangeType): string {
 
 export function formatMetricValue(
   value: string | number,
-  type?: "number" | "currency" | "percentage" | "bytes",
+  type?: "number" | "currency" | "percentage" | "bytes"
 ): string {
   if (typeof value === "string") return value;
 
@@ -148,7 +297,7 @@ export function formatMetricValue(
       }).format(value);
     case "percentage":
       return `${value.toFixed(2)}%`;
-    case "bytes":
+    case "bytes": {
       const units = ["B", "KB", "MB", "GB", "TB"];
       let unitIndex = 0;
       let displayValue = value;
@@ -157,6 +306,7 @@ export function formatMetricValue(
         unitIndex++;
       }
       return `${displayValue.toFixed(2)} ${units[unitIndex]}`;
+    }
     default:
       return new Intl.NumberFormat("en-US").format(value);
   }

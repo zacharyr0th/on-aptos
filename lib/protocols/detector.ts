@@ -3,10 +3,9 @@
  */
 
 import { logger } from "@/lib/utils/core/logger";
-
 import { ProtocolLoader } from "./loader";
 import { protocolRegistry } from "./registry";
-import { ProtocolDefinition, ProtocolPattern, PositionType } from "./types";
+import type { PositionType, ProtocolDefinition, ProtocolPattern } from "./types";
 
 export interface DetectionResult {
   protocol: ProtocolDefinition;
@@ -24,9 +23,7 @@ export class ProtocolDetector {
   /**
    * Detect protocol from a resource
    */
-  static async detectFromResource(
-    resource: any,
-  ): Promise<DetectionResult | null> {
+  static async detectFromResource(resource: any): Promise<DetectionResult | null> {
     // Ensure protocols are loaded
     await ProtocolLoader.loadCore();
 
@@ -34,32 +31,30 @@ export class ProtocolDetector {
     if (!resourceType) return null;
 
     // Check cache
-    const cached = this.cache.get(resourceType);
+    const cached = ProtocolDetector.cache.get(resourceType);
     if (cached !== undefined) return cached;
 
     // Try address-based detection first
-    const protocol = await this.detectByAddress(resourceType);
+    const protocol = await ProtocolDetector.detectByAddress(resourceType);
     if (protocol) {
       // Check if this protocol has patterns that match
-      const result = await this.analyzeResourceWithProtocol(resource, protocol);
+      const result = await ProtocolDetector.analyzeResourceWithProtocol(resource, protocol);
       if (result) {
-        this.cache.set(resourceType, result);
+        ProtocolDetector.cache.set(resourceType, result);
         return result;
       }
     }
 
     // Try pattern-based detection across all protocols
-    const patternResult = await this.detectByPattern(resource);
-    this.cache.set(resourceType, patternResult);
+    const patternResult = await ProtocolDetector.detectByPattern(resource);
+    ProtocolDetector.cache.set(resourceType, patternResult);
     return patternResult;
   }
 
   /**
    * Detect protocol by address
    */
-  private static async detectByAddress(
-    resourceType: string,
-  ): Promise<ProtocolDefinition | null> {
+  private static async detectByAddress(resourceType: string): Promise<ProtocolDefinition | null> {
     // Extract address from resource type
     const addressMatch = resourceType.match(/0x[a-f0-9]+/i);
     if (!addressMatch) return null;
@@ -73,9 +68,7 @@ export class ProtocolDetector {
   /**
    * Detect protocol by pattern matching
    */
-  private static async detectByPattern(
-    resource: any,
-  ): Promise<DetectionResult | null> {
+  private static async detectByPattern(resource: any): Promise<DetectionResult | null> {
     const resourceType = resource.type;
     const protocols = protocolRegistry.getAll();
 
@@ -93,7 +86,7 @@ export class ProtocolDetector {
         : await protocol.patterns.resources();
 
       for (const pattern of patterns) {
-        const score = this.scorePattern(resourceType, pattern);
+        const score = ProtocolDetector.scorePattern(resourceType, pattern);
         if (score > 0 && (!bestMatch || score > bestMatch.score)) {
           bestMatch = { protocol, pattern, score };
         }
@@ -123,18 +116,11 @@ export class ProtocolDetector {
   /**
    * Score a pattern match
    */
-  private static scorePattern(
-    resourceType: string,
-    pattern: ProtocolPattern,
-  ): number {
+  private static scorePattern(resourceType: string, pattern: ProtocolPattern): number {
     const patternStr =
-      typeof pattern.pattern === "string"
-        ? pattern.pattern
-        : pattern.pattern.source;
+      typeof pattern.pattern === "string" ? pattern.pattern : pattern.pattern.source;
     const regex =
-      typeof pattern.pattern === "string"
-        ? new RegExp(pattern.pattern)
-        : pattern.pattern;
+      typeof pattern.pattern === "string" ? new RegExp(pattern.pattern) : pattern.pattern;
 
     if (!regex.test(resourceType)) return 0;
 
@@ -146,10 +132,7 @@ export class ProtocolDetector {
     }
 
     // Bonus for specific patterns
-    if (
-      patternStr.includes("::") &&
-      resourceType.includes(patternStr.split("::")[1])
-    ) {
+    if (patternStr.includes("::") && resourceType.includes(patternStr.split("::")[1])) {
       score += 20;
     }
 
@@ -161,7 +144,7 @@ export class ProtocolDetector {
    */
   private static async analyzeResourceWithProtocol(
     resource: any,
-    protocol: ProtocolDefinition,
+    protocol: ProtocolDefinition
   ): Promise<DetectionResult | null> {
     if (!protocol.patterns?.resources) {
       return {
@@ -180,9 +163,7 @@ export class ProtocolDetector {
 
     for (const pattern of patterns) {
       const regex =
-        typeof pattern.pattern === "string"
-          ? new RegExp(pattern.pattern)
-          : pattern.pattern;
+        typeof pattern.pattern === "string" ? new RegExp(pattern.pattern) : pattern.pattern;
 
       if (regex.test(resource.type)) {
         const assets = pattern.extractAssets(resource.data);
@@ -209,15 +190,13 @@ export class ProtocolDetector {
   /**
    * Detect protocol from transaction
    */
-  static async detectFromTransaction(
-    tx: any,
-  ): Promise<ProtocolDefinition | null> {
+  static async detectFromTransaction(tx: any): Promise<ProtocolDefinition | null> {
     await ProtocolLoader.loadCore();
 
     if (!tx.type) return null;
 
     // Try direct address detection
-    const protocol = await this.detectByAddress(tx.type);
+    const protocol = await ProtocolDetector.detectByAddress(tx.type);
     if (protocol) return protocol;
 
     // Try function-based detection
@@ -232,9 +211,7 @@ export class ProtocolDetector {
 
       for (const pattern of patterns) {
         const regex =
-          typeof pattern.pattern === "string"
-            ? new RegExp(pattern.pattern)
-            : pattern.pattern;
+          typeof pattern.pattern === "string" ? new RegExp(pattern.pattern) : pattern.pattern;
 
         if (regex.test(functionName)) {
           return protocol;
@@ -248,16 +225,14 @@ export class ProtocolDetector {
   /**
    * Batch detect from multiple resources
    */
-  static async detectBatch(
-    resources: any[],
-  ): Promise<Map<string, DetectionResult>> {
+  static async detectBatch(resources: any[]): Promise<Map<string, DetectionResult>> {
     await ProtocolLoader.loadCore();
 
     const results = new Map<string, DetectionResult>();
 
     // Process in parallel for speed
     const detectionPromises = resources.map(async (resource) => {
-      const result = await this.detectFromResource(resource);
+      const result = await ProtocolDetector.detectFromResource(resource);
       if (result) {
         results.set(resource.type, result);
       }
@@ -272,7 +247,7 @@ export class ProtocolDetector {
    * Clear detection cache
    */
   static clearCache(): void {
-    this.cache.clear();
+    ProtocolDetector.cache.clear();
   }
 
   /**
@@ -280,7 +255,7 @@ export class ProtocolDetector {
    */
   static getCacheStats(): { size: number; hits: number; misses: number } {
     return {
-      size: this.cache.size,
+      size: ProtocolDetector.cache.size,
       hits: 0, // Would need to track this
       misses: 0, // Would need to track this
     };

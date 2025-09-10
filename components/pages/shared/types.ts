@@ -85,7 +85,7 @@ export interface PerformanceMetrics {
 export class AssetFormattingError extends Error {
   constructor(
     message: string,
-    public readonly context?: Record<string, unknown>,
+    public readonly context?: Record<string, unknown>
   ) {
     super(message);
     this.name = "AssetFormattingError";
@@ -95,7 +95,7 @@ export class AssetFormattingError extends Error {
 export class AssetDataError extends Error {
   constructor(
     message: string,
-    public readonly code?: string,
+    public readonly code?: string
   ) {
     super(message);
     this.name = "AssetDataError";
@@ -134,9 +134,7 @@ export const isValidMarket = (market: unknown): market is Market => {
   );
 };
 
-export const isValidProtocolData = <T = Market>(
-  data: unknown,
-): data is ProtocolData<T> => {
+export const isValidProtocolData = <T = Market>(data: unknown): data is ProtocolData<T> => {
   return (
     typeof data === "object" &&
     data !== null &&

@@ -10,26 +10,18 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Tooltip,
-  TooltipTrigger,
-  TooltipContent,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { usePageTranslation } from "@/hooks/useTranslation";
-import { BaseFilterProps } from "@/lib/types/ui";
+import type { BaseFilterProps } from "@/lib/types/ui";
 
-import {
-  categoryDefinitions,
-  getSortedSubcategories,
-} from "../data/categories";
+import { categoryDefinitions, getSortedSubcategories } from "../data/categories";
 
 interface FilterState {
   selectedCategory: string;
   selectedSubcategory?: string;
 }
 
-interface FilterControlsProps
-  extends Omit<BaseFilterProps<FilterState>, "filters" | "onChange"> {
+interface FilterControlsProps extends Omit<BaseFilterProps<FilterState>, "filters" | "onChange"> {
   categories: string[];
   selectedCategory: string;
   selectedSubcategory?: string;
@@ -87,10 +79,7 @@ export function FilterControls({
   const MobileFilterDropdown = () => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="outline"
-          className="w-full justify-between gap-2 h-12 px-4 text-left"
-        >
+        <Button variant="outline" className="w-full justify-between gap-2 h-12 px-4 text-left">
           <div className="flex items-center gap-3 min-w-0">
             <Filter className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
             <div className="min-w-0 flex-1">
@@ -173,18 +162,12 @@ export function FilterControls({
                   categoryDef.subcategories &&
                   getSortedSubcategories(category)
                     .map((subcategory) => {
-                      const subcategories = categoryDef.subcategories as Record<
-                        string,
-                        any
-                      >;
+                      const subcategories = categoryDef.subcategories as Record<string, any>;
                       const description = subcategories?.[subcategory];
                       return description ? { subcategory, description } : null;
                     })
                     .filter(
-                      (
-                        item,
-                      ): item is { subcategory: string; description: any } =>
-                        item !== null,
+                      (item): item is { subcategory: string; description: any } => item !== null
                     )
                     .map(({ subcategory, description }) => (
                       <DropdownMenuItem
@@ -198,9 +181,7 @@ export function FilterControls({
                         <div className="flex items-start gap-3 w-full">
                           <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground flex-shrink-0 mt-2" />
                           <div className="flex flex-col gap-1 flex-1 min-w-0">
-                            <span className="font-medium text-sm">
-                              {subcategory}
-                            </span>
+                            <span className="font-medium text-sm">{subcategory}</span>
                             <span className="text-xs text-muted-foreground leading-tight">
                               {getText(description)}
                             </span>
@@ -241,9 +222,7 @@ export function FilterControls({
                       : "bg-secondary/60 hover:bg-secondary text-secondary-foreground hover:shadow-sm"
                   }`}
                 >
-                  {category === "All"
-                    ? t("filters.all")
-                    : t(`categories.${category}.name`)}
+                  {category === "All" ? t("filters.all") : t(`categories.${category}.name`)}
                   {hasSubcategories && (
                     <div className="transition-transform duration-200">
                       {isExpanded ? (
@@ -260,9 +239,7 @@ export function FilterControls({
                 className="max-w-xs bg-popover text-popover-foreground border border-border shadow-md [&>svg]:hidden"
               >
                 <p className="text-sm font-medium mb-1">
-                  {category === "All"
-                    ? t("filters.all")
-                    : t(`categories.${category}.name`)}
+                  {category === "All" ? t("filters.all") : t(`categories.${category}.name`)}
                 </p>
                 <p className="text-xs text-muted-foreground leading-relaxed">
                   {category === "All"
@@ -303,28 +280,23 @@ export function FilterControls({
                     ) {
                       return getSortedSubcategories(expandedCategory)
                         .map((subcategory) => {
-                          const subcategories =
-                            categoryDef.subcategories as Record<string, any>;
+                          const subcategories = categoryDef.subcategories as Record<string, any>;
                           const description = subcategories?.[subcategory];
-                          return description
-                            ? { subcategory, description }
-                            : null;
+                          return description ? { subcategory, description } : null;
                         })
                         .filter(
                           (
-                            item,
+                            item
                           ): item is {
                             subcategory: string;
                             description: any;
-                          } => item !== null,
+                          } => item !== null
                         )
                         .map(({ subcategory, description }) => (
                           <Tooltip key={subcategory}>
                             <TooltipTrigger asChild>
                               <button
-                                onClick={() =>
-                                  handleSubcategoryClick(subcategory)
-                                }
+                                onClick={() => handleSubcategoryClick(subcategory)}
                                 className={`px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
                                   selectedSubcategory === subcategory
                                     ? "bg-primary text-primary-foreground shadow-sm"
@@ -338,9 +310,7 @@ export function FilterControls({
                               side="bottom"
                               className="max-w-xs bg-popover text-popover-foreground border border-border shadow-md [&>svg]:hidden"
                             >
-                              <p className="text-sm font-medium mb-1">
-                                {subcategory}
-                              </p>
+                              <p className="text-sm font-medium mb-1">{subcategory}</p>
                               <p className="text-xs text-muted-foreground leading-relaxed">
                                 {getText(description)}
                               </p>

@@ -71,18 +71,20 @@
   }
 }
 
-/* Premium textured background for header and other elements */
+/* Clean minimal background for header and other elements */
 .textured-bg {
   background-color: hsl(var(--background));
-  background-image:
-    url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"),
-    linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.01) 100%);
-  background-size:
-    60px 60px,
-    100% 100%;
-  background-position:
-    0 0,
-    0 0;
+}
+
+/* Clean inverted background - light mode style in dark mode and vice versa */
+.textured-bg-inverted {
+  background-color: oklch(0.145 0 0); /* Dark background in light mode */
+  color: oklch(0.985 0 0); /* Light text in light mode */
+}
+
+.dark .textured-bg-inverted {
+  background-color: oklch(1 0 0); /* Light background in dark mode */
+  color: oklch(0.145 0 0); /* Dark text in dark mode */
 }
 
 /* === Light Theme === */
@@ -218,56 +220,26 @@
     -webkit-overflow-scrolling: touch;
     transform: translateZ(0); /* Force hardware acceleration */
 
-    /* Premium textured background with grain and subtle gradient */
-    background-color: hsl(var(--background));
-    background-image:
-      url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"),
-      linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.01) 100%);
-    background-size:
-      60px 60px,
-      100% 100%;
-    background-position:
-      0 0,
-      0 0;
+    /* Soft pastel gradient background with muted tones */
+    background: 
+      radial-gradient(ellipse at top left, hsl(220 15% 96% / 0.4) 0%, transparent 50%),
+      radial-gradient(ellipse at bottom right, hsl(200 20% 94% / 0.3) 0%, transparent 50%),
+      radial-gradient(ellipse at center bottom, hsl(240 10% 98% / 0.2) 0%, transparent 60%),
+      hsl(var(--background));
   }
 
   .dark body {
-    /* Premium textured background for dark mode */
-    background-color: hsl(var(--background));
-    background-image:
-      url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.01'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"),
-      linear-gradient(180deg, transparent 0%, rgba(255, 255, 255, 0.01) 100%),
-      radial-gradient(
-        ellipse at top left,
-        rgba(120, 119, 198, 0.08),
-        transparent 50%
-      ),
-      radial-gradient(
-        ellipse at bottom right,
-        rgba(255, 119, 198, 0.08),
-        transparent 50%
-      );
-    background-size:
-      60px 60px,
-      100% 100%,
-      100% 100%,
-      100% 100%;
-    background-position:
-      0 0,
-      0 0,
-      0 0,
-      0 0;
+    /* Soft muted dark mode background with pastel undertones */
+    background: 
+      radial-gradient(ellipse at top left, hsl(240 8% 15% / 0.6) 0%, transparent 50%),
+      radial-gradient(ellipse at bottom right, hsl(220 6% 18% / 0.4) 0%, transparent 50%),
+      radial-gradient(ellipse at center bottom, hsl(200 4% 12% / 0.3) 0%, transparent 60%),
+      hsl(var(--background));
   }
 
   /* Removed fixed layout that was causing scrolling issues */
 
-  /* Apply Geist Mono to all numbers */
-  /* Using font-feature-settings to target numeric characters */
-  * {
-    font-variant-numeric: tabular-nums;
-  }
-
-  /* Target elements that typically contain numbers */
+  /* Optimized numeric font rendering */
   .font-mono,
   .tabular-nums,
   [data-numeric],
@@ -275,6 +247,9 @@
   .supply,
   .percentage,
   .metric-value,
+  .amount,
+  .metric,
+  .statistic,
   .table-cell-numeric,
   td:has(.text-right),
   .text-right {
@@ -299,12 +274,23 @@
     }
   }
 
-  /* Background grid pattern */
-  .bg-grid-pattern {
-    background-image:
-      linear-gradient(to right, hsl(var(--border)) 1px, transparent 1px),
-      linear-gradient(to bottom, hsl(var(--border)) 1px, transparent 1px);
-    background-size: 40px 40px;
+  /* Muted pastel background utilities */
+  .bg-sophisticated {
+    background: 
+      radial-gradient(ellipse at top, hsl(210 25% 95% / 0.3) 0%, transparent 60%),
+      hsl(var(--background));
+  }
+
+  .bg-elegant-card {
+    background: 
+      linear-gradient(135deg, hsl(var(--card)) 0%, hsl(230 12% 97% / 0.8) 100%),
+      radial-gradient(ellipse at bottom right, hsl(190 15% 92% / 0.2) 0%, transparent 50%);
+  }
+
+  .bg-premium-surface {
+    background: 
+      linear-gradient(180deg, hsl(var(--background)) 0%, hsl(250 8% 96% / 0.4) 100%),
+      radial-gradient(ellipse at center, hsl(180 12% 94% / 0.15) 0%, transparent 70%);
   }
 
   /* Enhanced focus styles for accessibility */
@@ -317,21 +303,13 @@
     @apply transition-all duration-300 hover:shadow-lg hover:shadow-primary/10;
   }
 
-  /* Professional gradient backgrounds */
+  /* Clean professional gradients */
   .gradient-primary {
-    background: linear-gradient(
-      135deg,
-      hsl(var(--primary)) 0%,
-      hsl(var(--primary) / 0.8) 100%
-    );
+    background: hsl(var(--primary));
   }
 
   .gradient-muted {
-    background: linear-gradient(
-      135deg,
-      hsl(var(--muted)) 0%,
-      hsl(var(--muted) / 0.5) 100%
-    );
+    background: hsl(var(--muted));
   }
 
   /* Line clamp utilities */
@@ -356,701 +334,48 @@
     -webkit-line-clamp: 3;
   }
 
-  /* === High-Contrast Polygonal Professional Background === */
+  /* === Clean Professional Background Utilities === */
 
-  /* Radial gradient for depth */
+  /* Subtle gradient for depth */
   .bg-gradient-radial {
-    background: radial-gradient(
-      ellipse at top left,
-      var(--tw-gradient-from) 0%,
-      var(--tw-gradient-via) 50%,
-      var(--tw-gradient-to) 100%
-    );
+    background: hsl(var(--background));
   }
 
-  /* Ultra deep grid - massive squares */
-  .bg-grid-ultra-deep {
-    background-image:
-      linear-gradient(rgba(0, 0, 0, 0.006) 2px, transparent 2px),
-      linear-gradient(90deg, rgba(0, 0, 0, 0.006) 2px, transparent 2px);
-    background-size: 200px 200px;
-    background-position: -1px -1px;
+
+  /* Clean solid backgrounds */
+  .bg-clean {
+    background: hsl(var(--background));
   }
 
-  .dark .bg-grid-ultra-deep {
-    background-image:
-      linear-gradient(rgba(255, 255, 255, 0.01) 1.5px, transparent 1.5px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.01) 1.5px, transparent 1.5px);
-    background-size: 200px 200px;
+  .bg-clean-muted {
+    background: hsl(var(--muted));
   }
 
-  /* Deep grid - large squares */
-  .bg-grid-deep {
-    background-image:
-      linear-gradient(rgba(0, 0, 0, 0.005) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0, 0, 0, 0.005) 1px, transparent 1px);
-    background-size: 80px 80px;
-    opacity: 0.8;
+  .bg-clean-card {
+    background: hsl(var(--card));
   }
 
-  .dark .bg-grid-deep {
-    background-image:
-      linear-gradient(rgba(255, 255, 255, 0.012) 0.8px, transparent 0.8px),
-      linear-gradient(
-        90deg,
-        rgba(255, 255, 255, 0.012) 0.8px,
-        transparent 0.8px
-      );
-    background-size: 80px 80px;
-  }
-
-  /* Fine grid - medium squares */
-  .bg-grid-fine {
-    background-image:
-      linear-gradient(rgba(0, 0, 0, 0.003) 0.5px, transparent 0.5px),
-      linear-gradient(90deg, rgba(0, 0, 0, 0.003) 0.5px, transparent 0.5px);
-    background-size: 24px 24px;
-    opacity: 0.6;
-  }
-
-  .dark .bg-grid-fine {
-    background-image:
-      linear-gradient(rgba(255, 255, 255, 0.006) 0.4px, transparent 0.4px),
-      linear-gradient(
-        90deg,
-        rgba(255, 255, 255, 0.006) 0.4px,
-        transparent 0.4px
-      );
-    background-size: 24px 24px;
-  }
-
-  /* Micro grid - tiny squares */
-  .bg-grid-micro {
-    background-image:
-      linear-gradient(rgba(0, 0, 0, 0.002) 0.25px, transparent 0.25px),
-      linear-gradient(90deg, rgba(0, 0, 0, 0.002) 0.25px, transparent 0.25px);
-    background-size: 8px 8px;
-    opacity: 0.4;
-  }
-
-  .dark .bg-grid-micro {
-    background-image:
-      linear-gradient(rgba(255, 255, 255, 0.004) 0.25px, transparent 0.25px),
-      linear-gradient(
-        90deg,
-        rgba(255, 255, 255, 0.004) 0.25px,
-        transparent 0.25px
-      );
-    background-size: 8px 8px;
-  }
-
-  /* Complex directional lighting */
-  .bg-light-complex {
-    background:
-      linear-gradient(
-        115deg,
-        transparent 0%,
-        rgba(255, 255, 255, 0.015) 25%,
-        rgba(255, 255, 255, 0.02) 40%,
-        rgba(255, 255, 255, 0.015) 55%,
-        transparent 100%
-      ),
-      linear-gradient(
-        205deg,
-        transparent 0%,
-        rgba(0, 0, 0, 0.01) 30%,
-        rgba(0, 0, 0, 0.015) 50%,
-        rgba(0, 0, 0, 0.01) 70%,
-        transparent 100%
-      );
-  }
-
-  .dark .bg-light-complex {
-    background:
-      linear-gradient(
-        115deg,
-        transparent 0%,
-        rgba(255, 255, 255, 0.008) 25%,
-        rgba(255, 255, 255, 0.012) 40%,
-        rgba(255, 255, 255, 0.008) 55%,
-        transparent 100%
-      ),
-      linear-gradient(
-        205deg,
-        transparent 0%,
-        rgba(255, 255, 255, 0.005) 30%,
-        rgba(255, 255, 255, 0.008) 50%,
-        rgba(255, 255, 255, 0.005) 70%,
-        transparent 100%
-      );
-  }
-
-  /* Geometric pattern */
-  .bg-geometric-pattern {
-    background-image:
-      repeating-linear-gradient(
-        45deg,
-        transparent,
-        transparent 100px,
-        rgba(0, 0, 0, 0.002) 100px,
-        rgba(0, 0, 0, 0.002) 200px
-      ),
-      repeating-linear-gradient(
-        -45deg,
-        transparent,
-        transparent 100px,
-        rgba(0, 0, 0, 0.002) 100px,
-        rgba(0, 0, 0, 0.002) 200px
-      );
-  }
-
-  .dark .bg-geometric-pattern {
-    background-image:
-      repeating-linear-gradient(
-        45deg,
-        transparent,
-        transparent 100px,
-        rgba(255, 255, 255, 0.003) 100px,
-        rgba(255, 255, 255, 0.003) 200px
-      ),
-      repeating-linear-gradient(
-        -45deg,
-        transparent,
-        transparent 100px,
-        rgba(255, 255, 255, 0.003) 100px,
-        rgba(255, 255, 255, 0.003) 200px
-      );
-  }
-
-  /* Micro dot pattern */
-  .bg-micro-dots {
-    background-image: radial-gradient(
-      circle,
-      rgba(0, 0, 0, 0.008) 0.5px,
-      transparent 0.5px
-    );
-    background-size: 11px 11px;
-  }
-
-  .dark .bg-micro-dots {
-    background-image: radial-gradient(
-      circle,
-      rgba(255, 255, 255, 0.015) 0.3px,
-      transparent 0.3px
-    );
-    background-size: 11px 11px;
-  }
-
-  /* Micro lines pattern */
-  .bg-micro-lines {
-    background-image: repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 50px,
-      rgba(0, 0, 0, 0.003) 50px,
-      rgba(0, 0, 0, 0.003) 51px
-    );
-  }
-
-  .dark .bg-micro-lines {
-    background-image: repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 50px,
-      rgba(255, 255, 255, 0.005) 50px,
-      rgba(255, 255, 255, 0.005) 51px
-    );
-  }
-
-  /* Ultra deep vignette */
-  .bg-vignette-ultra-deep {
-    background:
-      radial-gradient(
-        ellipse at center,
-        transparent 0%,
-        transparent 20%,
-        rgba(0, 0, 0, 0.008) 50%,
-        rgba(0, 0, 0, 0.02) 80%,
-        rgba(0, 0, 0, 0.04) 100%
-      ),
-      radial-gradient(
-        circle at 20% 80%,
-        transparent 0%,
-        transparent 40%,
-        rgba(0, 0, 0, 0.015) 100%
-      ),
-      radial-gradient(
-        circle at 80% 20%,
-        transparent 0%,
-        transparent 40%,
-        rgba(0, 0, 0, 0.015) 100%
-      ),
-      radial-gradient(
-        circle at 80% 80%,
-        transparent 0%,
-        transparent 40%,
-        rgba(0, 0, 0, 0.015) 100%
-      ),
-      radial-gradient(
-        circle at 20% 20%,
-        transparent 0%,
-        transparent 40%,
-        rgba(0, 0, 0, 0.015) 100%
-      );
-  }
-
-  .dark .bg-vignette-ultra-deep {
-    background:
-      radial-gradient(
-        ellipse at center,
-        transparent 0%,
-        transparent 20%,
-        rgba(0, 0, 0, 0.05) 50%,
-        rgba(0, 0, 0, 0.15) 80%,
-        rgba(0, 0, 0, 0.25) 100%
-      ),
-      radial-gradient(
-        circle at 20% 80%,
-        transparent 0%,
-        transparent 40%,
-        rgba(0, 0, 0, 0.1) 100%
-      ),
-      radial-gradient(
-        circle at 80% 20%,
-        transparent 0%,
-        transparent 40%,
-        rgba(0, 0, 0, 0.1) 100%
-      ),
-      radial-gradient(
-        circle at 80% 80%,
-        transparent 0%,
-        transparent 40%,
-        rgba(0, 0, 0, 0.1) 100%
-      ),
-      radial-gradient(
-        circle at 20% 20%,
-        transparent 0%,
-        transparent 40%,
-        rgba(0, 0, 0, 0.1) 100%
-      );
-  }
-
-  /* Premium grain texture */
-  .bg-grain-premium {
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 1024 1024' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='2.5' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)' opacity='0.3'/%3E%3C/svg%3E");
-    background-size: 256px 256px;
-  }
-
-  /* === Minimal Pastel Background === */
-
-  .bg-sepia-white {
-    background-color: hsl(40 15% 98%);
-  }
-
-  .bg-muted-black {
-    background-color: hsl(0 0% 8%);
-  }
-
-  /* Soft pastel wash */
-  .bg-pastel-wash {
-    background:
-      radial-gradient(
-        ellipse at top left,
-        hsl(280 60% 95% / 0.15) 0%,
-        transparent 50%
-      ),
-      radial-gradient(
-        ellipse at bottom right,
-        hsl(220 70% 95% / 0.15) 0%,
-        transparent 50%
-      );
-  }
-
-  :global(.dark) .bg-pastel-wash {
-    background:
-      radial-gradient(
-        ellipse at top left,
-        hsl(280 30% 20% / 0.08) 0%,
-        transparent 50%
-      ),
-      radial-gradient(
-        ellipse at bottom right,
-        hsl(220 35% 25% / 0.08) 0%,
-        transparent 50%
-      );
-  }
-
-  /* Pastel vignette */
-  .bg-pastel-vignette {
+  /* Clean subtle vignette */
+  .bg-vignette-subtle {
     background: radial-gradient(
       ellipse at center,
-      transparent 0%,
-      transparent 40%,
-      hsl(260 40% 80% / 0.03) 100%
+      hsl(var(--background)) 0%,
+      hsl(var(--background) / 0.98) 100%
     );
   }
 
-  :global(.dark) .bg-pastel-vignette {
-    background: radial-gradient(
-      ellipse at center,
-      transparent 0%,
-      transparent 40%,
-      hsl(260 20% 10% / 0.1) 100%
-    );
+  /* === Clean Background Alternatives === */
+
+  /* Professional clean backgrounds */
+  .bg-professional-light {
+    background-color: hsl(var(--background));
   }
 
-  /* Minimal grain */
-  .bg-minimal-grain {
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='minGrain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='1' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23minGrain)' opacity='0.5'/%3E%3C/svg%3E");
-    background-size: 100px 100px;
+  .bg-professional-dark {
+    background-color: hsl(var(--card));
   }
 
-  /* Light beam 2 - Angled from left */
-  .bg-light-beam-2 {
-    background: linear-gradient(
-      165deg,
-      hsl(40 7% 93% / 0.12) 0%,
-      hsl(40 5% 89% / 0.06) 25%,
-      hsl(40 3% 84% / 0.03) 50%,
-      transparent 75%
-    );
-  }
 
-  :global(.dark) .bg-light-beam-2 {
-    background: linear-gradient(
-      165deg,
-      hsl(0 0% 80% / 0.06) 0%,
-      hsl(0 0% 70% / 0.03) 25%,
-      hsl(0 0% 60% / 0.015) 50%,
-      transparent 75%
-    );
-  }
-
-  /* Light beam 3 - Angled from right */
-  .bg-light-beam-3 {
-    background: linear-gradient(
-      195deg,
-      hsl(40 6% 91% / 0.1) 0%,
-      hsl(40 4% 87% / 0.05) 30%,
-      hsl(40 2% 82% / 0.025) 60%,
-      transparent 90%
-    );
-  }
-
-  :global(.dark) .bg-light-beam-3 {
-    background: linear-gradient(
-      195deg,
-      hsl(0 0% 75% / 0.05) 0%,
-      hsl(0 0% 65% / 0.025) 30%,
-      hsl(0 0% 55% / 0.012) 60%,
-      transparent 90%
-    );
-  }
-
-  /* Light beam 4 - Wide gentle beam */
-  .bg-light-beam-4 {
-    background: linear-gradient(
-      170deg,
-      hsl(40 5% 89% / 0.08) 0%,
-      hsl(40 3% 85% / 0.04) 40%,
-      hsl(40 2% 80% / 0.02) 70%,
-      transparent 100%
-    );
-  }
-
-  :global(.dark) .bg-light-beam-4 {
-    background: linear-gradient(
-      170deg,
-      hsl(0 0% 70% / 0.04) 0%,
-      hsl(0 0% 60% / 0.02) 40%,
-      hsl(0 0% 50% / 0.01) 70%,
-      transparent 100%
-    );
-  }
-
-  /* Light beam 5 - Narrow focused beam */
-  .bg-light-beam-5 {
-    background: linear-gradient(
-      185deg,
-      hsl(40 6% 90% / 0.1) 0%,
-      hsl(40 4% 86% / 0.06) 20%,
-      hsl(40 2% 81% / 0.03) 40%,
-      transparent 60%
-    );
-  }
-
-  :global(.dark) .bg-light-beam-5 {
-    background: linear-gradient(
-      185deg,
-      hsl(0 0% 73% / 0.05) 0%,
-      hsl(0 0% 63% / 0.03) 20%,
-      hsl(0 0% 53% / 0.015) 40%,
-      transparent 60%
-    );
-  }
-
-  /* Atmospheric particles in the light */
-  .bg-light-particles {
-    background-image:
-      radial-gradient(
-        circle at 20% 10%,
-        hsl(40 4% 88% / 0.03) 1px,
-        transparent 2px
-      ),
-      radial-gradient(
-        circle at 40% 15%,
-        hsl(40 3% 85% / 0.02) 0.5px,
-        transparent 1px
-      ),
-      radial-gradient(
-        circle at 60% 8%,
-        hsl(40 5% 90% / 0.025) 1.5px,
-        transparent 2.5px
-      ),
-      radial-gradient(
-        circle at 80% 12%,
-        hsl(40 2% 83% / 0.02) 0.8px,
-        transparent 1.5px
-      ),
-      radial-gradient(
-        circle at 30% 25%,
-        hsl(40 3% 86% / 0.015) 1px,
-        transparent 2px
-      );
-    background-size:
-      200px 200px,
-      150px 150px,
-      180px 180px,
-      120px 120px,
-      160px 160px;
-  }
-
-  :global(.dark) .bg-light-particles {
-    background-image:
-      radial-gradient(
-        circle at 20% 10%,
-        hsl(0 0% 68% / 0.015) 1px,
-        transparent 2px
-      ),
-      radial-gradient(
-        circle at 40% 15%,
-        hsl(0 0% 64% / 0.01) 0.5px,
-        transparent 1px
-      ),
-      radial-gradient(
-        circle at 60% 8%,
-        hsl(0 0% 72% / 0.012) 1.5px,
-        transparent 2.5px
-      ),
-      radial-gradient(
-        circle at 80% 12%,
-        hsl(0 0% 66% / 0.01) 0.8px,
-        transparent 1.5px
-      ),
-      radial-gradient(
-        circle at 30% 25%,
-        hsl(0 0% 70% / 0.008) 1px,
-        transparent 2px
-      );
-    background-size:
-      200px 200px,
-      150px 150px,
-      180px 180px,
-      120px 120px,
-      160px 160px;
-  }
-
-  /* Heavenly vignette */
-  .bg-heavenly-vignette {
-    background: radial-gradient(
-      ellipse at center top,
-      transparent 0%,
-      transparent 30%,
-      hsl(30 2% 15% / 0.02) 60%,
-      hsl(30 3% 12% / 0.05) 85%,
-      hsl(30 4% 8% / 0.08) 100%
-    );
-  }
-
-  :global(.dark) .bg-heavenly-vignette {
-    background: radial-gradient(
-      ellipse at center top,
-      transparent 0%,
-      transparent 30%,
-      hsl(30 2% 5% / 0.1) 60%,
-      hsl(30 3% 3% / 0.2) 85%,
-      hsl(30 4% 2% / 0.3) 100%
-    );
-  }
-
-  /* Atmospheric grain texture */
-  .bg-atmospheric-grain {
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 300 300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='atmGrain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23atmGrain)' opacity='0.3'/%3E%3C/svg%3E");
-    background-size: 120px 120px;
-  }
-
-  /* === Divine Light Beam Animations === */
-
-  /* Slow swaying beam animation */
-  @keyframes beam-slow {
-    0% {
-      transform: rotate(-0.5deg) scale(1);
-      opacity: 0.6;
-    }
-    25% {
-      transform: rotate(0.3deg) scale(1.02);
-      opacity: 0.7;
-    }
-    50% {
-      transform: rotate(-0.2deg) scale(1);
-      opacity: 0.5;
-    }
-    75% {
-      transform: rotate(0.4deg) scale(0.98);
-      opacity: 0.65;
-    }
-    100% {
-      transform: rotate(-0.5deg) scale(1);
-      opacity: 0.6;
-    }
-  }
-
-  /* Medium beam movement */
-  @keyframes beam-medium {
-    0% {
-      transform: rotate(0.3deg) scale(1);
-      opacity: 0.4;
-    }
-    33% {
-      transform: rotate(-0.4deg) scale(1.03);
-      opacity: 0.5;
-    }
-    66% {
-      transform: rotate(0.2deg) scale(0.97);
-      opacity: 0.3;
-    }
-    100% {
-      transform: rotate(0.3deg) scale(1);
-      opacity: 0.4;
-    }
-  }
-
-  /* Fast subtle beam shimmer */
-  @keyframes beam-fast {
-    0% {
-      transform: rotate(-0.2deg) scale(1);
-      opacity: 0.5;
-    }
-    20% {
-      transform: rotate(0.1deg) scale(1.01);
-      opacity: 0.6;
-    }
-    40% {
-      transform: rotate(-0.3deg) scale(0.99);
-      opacity: 0.4;
-    }
-    60% {
-      transform: rotate(0.2deg) scale(1.02);
-      opacity: 0.55;
-    }
-    80% {
-      transform: rotate(-0.1deg) scale(0.98);
-      opacity: 0.45;
-    }
-    100% {
-      transform: rotate(-0.2deg) scale(1);
-      opacity: 0.5;
-    }
-  }
-
-  /* Gentle beam sway */
-  @keyframes beam-gentle {
-    0% {
-      transform: rotate(0.1deg) scale(1);
-      opacity: 0.3;
-    }
-    50% {
-      transform: rotate(-0.2deg) scale(1.01);
-      opacity: 0.4;
-    }
-    100% {
-      transform: rotate(0.1deg) scale(1);
-      opacity: 0.3;
-    }
-  }
-
-  /* Beam drift animation */
-  @keyframes beam-drift {
-    0% {
-      transform: translate(0, 0) rotate(0deg) scale(1);
-      opacity: 0.35;
-    }
-    25% {
-      transform: translate(2px, -1px) rotate(0.2deg) scale(1.01);
-      opacity: 0.4;
-    }
-    50% {
-      transform: translate(-1px, 2px) rotate(-0.1deg) scale(0.99);
-      opacity: 0.3;
-    }
-    75% {
-      transform: translate(-2px, -1px) rotate(0.15deg) scale(1.02);
-      opacity: 0.38;
-    }
-    100% {
-      transform: translate(0, 0) rotate(0deg) scale(1);
-      opacity: 0.35;
-    }
-  }
-
-  /* Floating particles animation */
-  @keyframes particle-float {
-    0% {
-      transform: translateY(0) scale(1);
-      opacity: 0.8;
-    }
-    25% {
-      transform: translateY(-10px) scale(1.05);
-      opacity: 1;
-    }
-    50% {
-      transform: translateY(-5px) scale(0.95);
-      opacity: 0.6;
-    }
-    75% {
-      transform: translateY(-15px) scale(1.02);
-      opacity: 0.9;
-    }
-    100% {
-      transform: translateY(0) scale(1);
-      opacity: 0.8;
-    }
-  }
-
-  /* Animation classes */
-  .animate-beam-slow {
-    animation: beam-slow 45s ease-in-out infinite;
-  }
-
-  .animate-beam-medium {
-    animation: beam-medium 35s ease-in-out infinite;
-  }
-
-  .animate-beam-fast {
-    animation: beam-fast 25s ease-in-out infinite;
-  }
-
-  .animate-beam-gentle {
-    animation: beam-gentle 60s ease-in-out infinite;
-  }
-
-  .animate-beam-drift {
-    animation: beam-drift 50s ease-in-out infinite;
-  }
-
-  .animate-particle-float {
-    animation: particle-float 30s ease-in-out infinite;
-  }
 
   /* === Mobile App-like Optimizations === */
 
@@ -1197,22 +522,7 @@
     @apply container mx-auto px-4 sm:px-6 lg:px-8;
   }
 
-  /* Apply mono font to numeric content */
-  .font-numeric {
-    font-family: var(--font-mono), monospace;
-    font-variant-numeric: tabular-nums;
-  }
-
-  /* Common numeric patterns */
-  .amount,
-  .price,
-  .percentage,
-  .supply,
-  .metric,
-  .statistic {
-    font-family: var(--font-mono), monospace;
-    font-variant-numeric: tabular-nums;
-  }
+  /* Consolidated in base layer above */
 
   /* Floating animations for dashboard buttons */
   @keyframes float-slow {

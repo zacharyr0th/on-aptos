@@ -2,14 +2,14 @@ import { Search } from "lucide-react";
 
 import {
   Breadcrumb,
-  BreadcrumbList,
   BreadcrumbItem,
+  BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Input } from "@/components/ui/input";
 import { usePageTranslation } from "@/hooks/useTranslation";
-import { BaseSearchProps } from "@/lib/types/ui";
+import type { BaseSearchProps } from "@/lib/types/ui";
 
 interface SearchBarProps extends Omit<BaseSearchProps, "value" | "onChange"> {
   searchQuery: string;
@@ -106,25 +106,15 @@ export function SearchBar({
           <div className="flex items-center flex-shrink-0">
             <div className="flex items-center gap-3">
               {/* Only show count when there's an active filter */}
-              {(selectedCategory !== "All" ||
-                selectedSubcategory ||
-                searchQuery) && (
+              {(selectedCategory !== "All" || selectedSubcategory || searchQuery) && (
                 <p className="text-sm text-muted-foreground">
-                  {t("search.results").replace(
-                    "{{count}}",
-                    filteredCount.toString(),
-                  )}{" "}
-                  {t("search.results_of").replace(
-                    "{{total}}",
-                    totalCount.toString(),
-                  )}
+                  {t("search.results").replace("{{count}}", filteredCount.toString())}{" "}
+                  {t("search.results_of").replace("{{total}}", totalCount.toString())}
                 </p>
               )}
 
               {/* Breadcrumb Navigation */}
-              {(selectedCategory !== "All" ||
-                selectedSubcategory ||
-                searchQuery) && (
+              {(selectedCategory !== "All" || selectedSubcategory || searchQuery) && (
                 <Breadcrumb>
                   <BreadcrumbList>
                     {selectedCategory !== "All" && (

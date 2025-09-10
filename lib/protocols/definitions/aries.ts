@@ -2,7 +2,7 @@
  * Aries Markets Protocol Definition
  */
 
-import { ProtocolDefinition, ProtocolType, PositionType } from "../types";
+import { PositionType, type ProtocolDefinition, ProtocolType } from "../types";
 
 export const AriesProtocol: ProtocolDefinition = {
   metadata: {
@@ -17,9 +17,7 @@ export const AriesProtocol: ProtocolDefinition = {
     auditStatus: "audited",
   },
 
-  addresses: [
-    "0x9770fa9c725cbd97eb50b2be5f7416efdfd1f1554beb0750d4dae4c64e860da3",
-  ],
+  addresses: ["0x9770fa9c725cbd97eb50b2be5f7416efdfd1f1554beb0750d4dae4c64e860da3"],
 
   patterns: {
     resources: [
@@ -29,27 +27,27 @@ export const AriesProtocol: ProtocolDefinition = {
         positionType: PositionType.LENDING_SUPPLY,
         priority: 100,
         extractAssets: (data) => {
-          const amount = data?.supplied_amount || data?.deposit_amount || "0";
+          const amount = (data as any)?.supplied_amount || (data as any)?.deposit_amount || "0";
           if (amount === "0") return [];
 
           // Extract actual asset type from the resource type
-          const assetMatch = data.type?.match(/<([^>]+)>/);
-          const assetType = assetMatch ? assetMatch[1] : data.type;
+          const assetMatch = (data as any).type?.match(/<([^>]+)>/);
+          const assetType = assetMatch ? assetMatch[1] : (data as any).type;
 
           return [
             {
               address: assetType,
               symbol: extractSymbol(assetType),
               decimals: 8,
-              amount,
+              amount: String(amount),
             },
           ];
         },
         extractMetadata: (data) => ({
-          supplyApy: data?.supply_apy
-            ? parseFloat(data.supply_apy) / 100
+          supplyApy: (data as any)?.supply_apy
+            ? parseFloat(String((data as any).supply_apy)) / 100
             : undefined,
-          totalSupplied: data?.supplied_amount,
+          totalSupplied: (data as any)?.supplied_amount,
           protocolName: "Aries Markets",
           positionType: "Lending Supply",
         }),
@@ -60,28 +58,28 @@ export const AriesProtocol: ProtocolDefinition = {
         positionType: PositionType.LENDING_BORROW,
         priority: 100,
         extractAssets: (data) => {
-          const amount = data?.borrowed_amount || data?.debt_amount || "0";
+          const amount = (data as any)?.borrowed_amount || (data as any)?.debt_amount || "0";
           if (amount === "0") return [];
 
           // Extract actual asset type from the resource type
-          const assetMatch = data.type?.match(/<([^>]+)>/);
-          const assetType = assetMatch ? assetMatch[1] : data.type;
+          const assetMatch = (data as any).type?.match(/<([^>]+)>/);
+          const assetType = assetMatch ? assetMatch[1] : (data as any).type;
 
           return [
             {
               address: assetType,
               symbol: extractSymbol(assetType),
               decimals: 8,
-              amount,
+              amount: String(amount),
             },
           ];
         },
         extractMetadata: (data) => ({
-          borrowApy: data?.borrow_apy
-            ? parseFloat(data.borrow_apy) / 100
+          borrowApy: (data as any)?.borrow_apy
+            ? parseFloat(String((data as any).borrow_apy)) / 100
             : undefined,
-          totalBorrowed: data?.borrowed_amount,
-          healthFactor: data?.health_factor,
+          totalBorrowed: (data as any)?.borrowed_amount,
+          healthFactor: (data as any)?.health_factor,
           protocolName: "Aries Markets",
           positionType: "Lending Borrow",
         }),

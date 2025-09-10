@@ -223,62 +223,7 @@
       "Protocol Suite": "Pakiet protokołów"
     }
   },
-  "protocols": {
-    "names": {
-      "Panora": "Panora",
-      "Kana": "Kana",
-      "Thetis": "Thetis",
-      "Anqa": "Anqa",
-      "LiquidSwap": "LiquidSwap",
-      "Cellana": "Cellana",
-      "PancakeSwap": "PancakeSwap",
-      "SushiSwap": "SushiSwap",
-      "Hyperion": "Hyperion",
-      "Tapp": "Tapp",
-      "Merkle": "Merkle",
-      "AGDEX": "AGDEX",
-      "Pump": "Pump",
-      "Aries": "Aries",
-      "Superposition": "Superposition",
-      "Joule": "Joule",
-      "Echelon": "Echelon",
-      "Meso": "Meso",
-      "TruFin": "TruFin",
-      "Amnis": "Amnis",
-      "Kofi": "Kofi",
-      "Ichi": "Ichi",
-      "Moar": "Moar",
-      "Thala": "Thala",
-      "Mirage": "Mirage"
-    },
-    "short_descriptions": {
-      "Panora": "Meta-agregator DEX",
-      "Kana": "Router wymiany międzyłańcuchowej",
-      "Thetis": "Wieloproduktowa platforma handlowa",
-      "Anqa": "Zaawansowany agregator DEX",
-      "LiquidSwap": "Pierwszy DEX na Aptos",
-      "Cellana": "AMM ve(3,3)",
-      "PancakeSwap": "Popularny DEX wielołańcuchowy",
-      "SushiSwap": "Międzyłańcuchowa platforma DeFi",
-      "Hyperion": "Hybrydowa platforma handlowa",
-      "Tapp": "Modularny DEX z hakami",
-      "Merkle": "Grywalizowane perpetuals",
-      "AGDEX": "Perps cross-margin",
-      "Pump": "Launchpad tokenów meme",
-      "Aries": "Pożyczanie w stylu Compound",
-      "Superposition": "Zaawansowane zarządzanie ryzykiem",
-      "Joule": "Izolowane pule pożyczkowe",
-      "Echelon": "Wielotrybowy hub pożyczkowy",
-      "Meso": "Pożyczanie efektywne kapitałowo",
-      "TruFin": "Płynny staking dla przedsiębiorstw",
-      "Amnis": "Płynny staking z dwoma tokenami",
-      "Kofi": "Staking wzmocniony MEV",
-      "Ichi": "Automatyczny menedżer płynności",
-      "Moar": "Warstwa farmingu z dźwignią",
-      "Thala": "Pakiet protokołów DeFi",
-      "Mirage": "Kompozowalna warstwa płynności"
-    }
-  },
+  "protocols": {},
   "protocol_descriptions": {
     "Panora": "\"Meta-DEX\" podłączający się do księgi zleceń on-chain i ponad 10 AMM-ów, dzieląc zlecenia między pule i kuratorując kanoniczną listę tokenów, która automatycznie aktualizuje się w UI.",
     "Kana": "Kieruje wymiany przez dziewięć łańcuchów; kontrakt Paymaster pozwala użytkownikom handlować na Aptos bez posiadania APT na gaz; silnik perp oparty na księdze zleceń.",
@@ -303,21 +248,10 @@
     "Kofi": "Płynny staking wzmocniony MEV ze skarbcami LSD z dźwignią.",
     "Ichi": "Automatyczne skarbce Menedżera Płynności pozwalają projektom zasilać jednostronną płynność; inteligentne zakresy równoważą się, aby zmniejszyć nietrwałą stratę, podczas gdy skarby zarabiają opłaty swap w swoim natywnym tokenie.",
     "Moar": "Buduje warstwę farmy z dźwignią z kontami kredytowymi między protokołami, umożliwiając użytkownikom pożyczanie w jednym miejscu i wdrażanie w innym.",
-    "Thala": "Pakiet aplikacji DeFi zawierający wielopulowy AMM, nadmiernie zabezpieczony stablecoin MOD i płynny staking poprzez sthAPT i thAPT.",
-    "Mirage": "Kompozowalna warstwa płynności napędzająca następną granicę DeFi. Zdeponuj zabezpieczenie i pożycz samospłacającą się pożyczkę stablecoin zasilaną przez perpetuals. Oferuje w pełni on-chain perps z doświadczeniem podobnym do CEX, natychmiastową egzekucję, niskie opłaty i dźwignię do 100x."
+    "Thala": "Pakiet aplikacji DeFi zawierający wielopulowy AMM, nadmiernie zabezpieczony stablecoin MOD i płynny staking poprzez sthAPT i thAPT."
   },
   "protocol_category_breakdown": {
     "Thala": "Handel • Zysk • Kredyt"
-  },
-  "protocols": {
-    "mirage": {
-      "description": "Kompozowalna warstwa płynności napędzająca następną granicę DeFi. Zdeponuj zabezpieczenie i pożycz samospłacającą się pożyczkę stablecoin zasilaną przez perpetuals z dźwignią do 100x.",
-      "categoryBreakdown": "Handel • Perps",
-      "feeStructure": "Dynamiczna struktura opłat oparta na wolumenie handlu i wielkości pozycji. Konkurencyjne stawki dla handlu kontraktami perpetual futures.",
-      "integration": {
-        "description": "W pełni on-chain perpetuals z doświadczeniem podobnym do CEX. Wszystkie pozycje, skarbce i zlecenia są tokenizowane jako NFT do handlu na rynku wtórnym."
-      }
-    }
   },
   "table": {
     "protocol": "Protokół",

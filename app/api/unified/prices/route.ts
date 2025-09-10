@@ -1,20 +1,20 @@
-import { NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 
 import { aptosAnalytics } from "@/lib/services/blockchain/aptos-analytics";
 import { UnifiedPanoraService } from "@/lib/services/portfolio/unified-panora-service";
 import {
-  errorResponse,
-  successResponse,
   CACHE_DURATIONS,
+  errorResponse,
   getPanoraAuthHeaders,
+  successResponse,
 } from "@/lib/utils/api/common";
-import { withRateLimit, RATE_LIMIT_TIERS } from "@/lib/utils/api/rate-limiter";
+import { RATE_LIMIT_TIERS, withRateLimit } from "@/lib/utils/api/rate-limiter";
 import { apiLogger } from "@/lib/utils/core/logger";
 import {
-  PANORA_API_ENDPOINT,
   extractTokensFromParams,
   getResponseTimeHeaders,
   OPTIONS,
+  PANORA_API_ENDPOINT,
 } from "../shared";
 
 // Cache price data for 5 minutes
@@ -72,7 +72,7 @@ async function unifiedPricesHandler(request: NextRequest) {
         {
           ...getResponseTimeHeaders(startTime),
           "X-Data-Source": "panora",
-        },
+        }
       );
     }
 
@@ -91,10 +91,7 @@ async function unifiedPricesHandler(request: NextRequest) {
         }
       } catch (panoraError) {
         apiLogger.warn("Panora price fetch failed", {
-          error:
-            panoraError instanceof Error
-              ? panoraError.message
-              : String(panoraError),
+          error: panoraError instanceof Error ? panoraError.message : String(panoraError),
         });
 
         if (source === "panora") {
@@ -104,10 +101,7 @@ async function unifiedPricesHandler(request: NextRequest) {
     }
 
     // Fallback to analytics if needed
-    if (
-      (source === "analytics" || source === "auto") &&
-      Object.keys(priceData).length === 0
-    ) {
+    if ((source === "analytics" || source === "auto") && Object.keys(priceData).length === 0) {
       try {
         const analyticsPromises = tokens.map(async (token) => {
           const priceArray = await aptosAnalytics.getTokenLatestPrice({
@@ -116,9 +110,7 @@ async function unifiedPricesHandler(request: NextRequest) {
           });
           // Extract the price from the first element of the array
           const price =
-            Array.isArray(priceArray) && priceArray.length > 0
-              ? priceArray[0]?.price_usd
-              : null;
+            Array.isArray(priceArray) && priceArray.length > 0 ? priceArray[0]?.price_usd : null;
           return { token, price };
         });
 
@@ -139,10 +131,7 @@ async function unifiedPricesHandler(request: NextRequest) {
         }
       } catch (analyticsError) {
         apiLogger.warn("Analytics price fetch failed", {
-          error:
-            analyticsError instanceof Error
-              ? analyticsError.message
-              : String(analyticsError),
+          error: analyticsError instanceof Error ? analyticsError.message : String(analyticsError),
         });
       }
     }
@@ -169,7 +158,7 @@ async function unifiedPricesHandler(request: NextRequest) {
 
     return errorResponse(
       error instanceof Error ? error.message : "Failed to fetch price data",
-      500,
+      500
     );
   }
 }

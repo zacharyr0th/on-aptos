@@ -1,7 +1,7 @@
 import { PERFORMANCE_THRESHOLDS, SERVICE_CONFIG } from "@/lib/config/cache";
 import { logger } from "@/lib/utils/core/logger";
 
-import { CacheEntry, CacheStats } from "./types";
+import type { CacheEntry, CacheStats } from "./types";
 
 export class EnhancedLRUCache<T = unknown> {
   private map = new Map<string, CacheEntry<T>>();
@@ -49,10 +49,8 @@ export class EnhancedLRUCache<T = unknown> {
     this.map.delete(key);
     this.map.set(key, entry);
 
-    const isNearingExpiration =
-      age >= this.ttl * PERFORMANCE_THRESHOLDS.CACHE_NEAR_EXPIRATION;
-    const isStale =
-      age >= this.ttl * PERFORMANCE_THRESHOLDS.STALE_WHILE_REVALIDATE;
+    const isNearingExpiration = age >= this.ttl * PERFORMANCE_THRESHOLDS.CACHE_NEAR_EXPIRATION;
+    const isStale = age >= this.ttl * PERFORMANCE_THRESHOLDS.STALE_WHILE_REVALIDATE;
 
     return {
       value: entry.value,
@@ -180,19 +178,13 @@ export class EnhancedLRUCache<T = unknown> {
 
 // Global cache instances for different services - now using SERVICE_CONFIG
 export const cacheInstances = {
-  stables: new EnhancedLRUCache(
-    SERVICE_CONFIG.stables.maxSize,
-    SERVICE_CONFIG.stables.ttl,
-  ),
-  prices: new EnhancedLRUCache(
-    SERVICE_CONFIG.prices.maxSize,
-    SERVICE_CONFIG.prices.ttl,
-  ),
+  stables: new EnhancedLRUCache(SERVICE_CONFIG.stables.maxSize, SERVICE_CONFIG.stables.ttl),
+  prices: new EnhancedLRUCache(SERVICE_CONFIG.prices.maxSize, SERVICE_CONFIG.prices.ttl),
   btc: new EnhancedLRUCache(SERVICE_CONFIG.btc.maxSize, SERVICE_CONFIG.btc.ttl),
   lst: new EnhancedLRUCache(SERVICE_CONFIG.lst.maxSize, SERVICE_CONFIG.lst.ttl),
   apiService: new EnhancedLRUCache(
     SERVICE_CONFIG.apiService.maxSize,
-    SERVICE_CONFIG.apiService.ttl,
+    SERVICE_CONFIG.apiService.ttl
   ),
 } as const;
 
@@ -213,9 +205,7 @@ export function startCacheCleanup(): void {
         totalCleaned += cleaned;
 
         if (cleaned > 0) {
-          logger.debug(
-            `Cache cleanup: ${name} removed ${cleaned} expired entries`,
-          );
+          logger.debug(`Cache cleanup: ${name} removed ${cleaned} expired entries`);
         }
       }
 
@@ -223,7 +213,7 @@ export function startCacheCleanup(): void {
         logger.debug(`Total cache cleanup: ${totalCleaned} entries removed`);
       }
     },
-    5 * 60 * 1000,
+    5 * 60 * 1000
   ); // Run every 5 minutes
 }
 
@@ -235,33 +225,20 @@ export function stopCacheCleanup(): void {
 }
 
 // Helper functions with improved type safety
-export function getCachedData<T>(
-  cacheName: CacheInstanceName,
-  key: string,
-): T | null {
+export function getCachedData<T>(cacheName: CacheInstanceName, key: string): T | null {
   const cached = cacheInstances[cacheName].get(key);
   return cached ? (cached.value as T) : null;
 }
 
-export function setCachedData<T>(
-  cacheName: CacheInstanceName,
-  key: string,
-  data: T,
-): void {
+export function setCachedData<T>(cacheName: CacheInstanceName, key: string, data: T): void {
   cacheInstances[cacheName].set(key, data);
 }
 
-export function hasCachedData(
-  cacheName: CacheInstanceName,
-  key: string,
-): boolean {
+export function hasCachedData(cacheName: CacheInstanceName, key: string): boolean {
   return cacheInstances[cacheName].has(key);
 }
 
-export function isNearingExpiration(
-  cacheName: CacheInstanceName,
-  key: string,
-): boolean {
+export function isNearingExpiration(cacheName: CacheInstanceName, key: string): boolean {
   const cached = cacheInstances[cacheName].get(key);
   return cached?.isNearingExpiration === true;
 }
@@ -272,7 +249,7 @@ export function isStale(cacheName: CacheInstanceName, key: string): boolean {
 }
 
 export function getCacheStats(
-  cacheName?: CacheInstanceName,
+  cacheName?: CacheInstanceName
 ): CacheStats | Record<string, CacheStats> {
   if (cacheName) {
     return cacheInstances[cacheName].getStats();
@@ -358,17 +335,11 @@ export async function cacheFirst<T>(options: CacheFirstOptions<T>) {
 /**
  * Cache-first pattern with fallback data for critical endpoints
  */
-export async function cacheFirstWithFallback<T>(
-  options: CacheFirstOptions<T>,
-  fallbackData: T,
-) {
+export async function cacheFirstWithFallback<T>(options: CacheFirstOptions<T>, fallbackData: T) {
   try {
     return await cacheFirst(options);
   } catch (error) {
-    logger.error(
-      error,
-      `Failed to fetch data for ${options.cacheKey}, using fallback:`,
-    );
+    logger.error(error, `Failed to fetch data for ${options.cacheKey}, using fallback:`);
     const { buildFallbackResponse } = await import("./api/response");
     return buildFallbackResponse(fallbackData, options.startTime);
   }

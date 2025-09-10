@@ -5,6 +5,9 @@
 
 import type { TokenMetadata } from "./tokens";
 
+// Re-export TokenMetadata explicitly
+export type { TokenMetadata };
+
 // Export validation schemas (commented out to prevent duplicate exports)
 // export * from './validation';
 
@@ -107,8 +110,7 @@ export interface FungibleAsset {
   token_standard?: string;
 }
 
-// Re-export comprehensive TokenMetadata from tokens.ts
-export type { TokenMetadata } from "./tokens";
+// TokenMetadata is already exported above
 
 // Token price data
 export interface TokenPrice {
@@ -136,21 +138,21 @@ export interface TokenBalance {
 export type {
   DeFiPosition,
   GroupedDeFiPosition,
-  ProtocolInfo,
-  YieldInfo,
-  PoolInfo,
   LendingMarket,
+  PoolInfo,
+  ProtocolInfo,
   VaultInfo,
+  YieldInfo,
 } from "./defi";
 
 export {
-  ProtocolType,
-  isDeFiPosition,
-  hasHealthStatus,
-  hasRewards,
-  getProtocolTypeLabel,
   calculateHealthRatio,
   getHealthStatus,
+  getProtocolTypeLabel,
+  hasHealthStatus,
+  hasRewards,
+  isDeFiPosition,
+  ProtocolType,
 } from "./defi";
 
 // Additional DeFi asset type for portfolio service
@@ -373,12 +375,7 @@ export type SortField =
   | "apy";
 
 // Additional common types
-export type PortfolioTab =
-  | "assets"
-  | "nfts"
-  | "defi"
-  | "transactions"
-  | "history";
+export type PortfolioTab = "assets" | "nfts" | "defi" | "transactions" | "history";
 export type AssetType = "fungible" | "nft" | "defi";
 export type TimeFrame = "1h" | "24h" | "7d" | "30d" | "90d" | "1y" | "all";
 
@@ -518,25 +515,15 @@ export interface HealthCheck {
 // =============================================================================
 
 export function isNFT(obj: any): obj is NFT {
-  return (
-    obj &&
-    typeof obj.token_data_id === "string" &&
-    typeof obj.collection_name === "string"
-  );
+  return obj && typeof obj.token_data_id === "string" && typeof obj.collection_name === "string";
 }
 
 export function isFungibleAsset(obj: any): obj is FungibleAsset {
-  return (
-    obj && typeof obj.asset_type === "string" && typeof obj.amount === "string"
-  );
+  return obj && typeof obj.asset_type === "string" && typeof obj.amount === "string";
 }
 
 export function isTransaction(obj: any): obj is Transaction {
-  return (
-    obj &&
-    typeof obj.transaction_version === "string" &&
-    typeof obj.hash === "string"
-  );
+  return obj && typeof obj.transaction_version === "string" && typeof obj.hash === "string";
 }
 
 export function isTokenMetadata(obj: any): obj is TokenMetadata {

@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 
 import type { NFT, SortDirection, ViewMode } from "@/lib/types/consolidated";
 
@@ -40,42 +40,26 @@ interface UsePortfolioMetricsProps {
   previousPrice?: number;
 }
 
-export const usePortfolio = (
-  nfts?: NFT[],
-  metricsProps?: UsePortfolioMetricsProps,
-) => {
+export const usePortfolio = (nfts?: NFT[], metricsProps?: UsePortfolioMetricsProps) => {
   // State management
   const [showAccountSwitcher, setShowAccountSwitcher] = useState(false);
-  const [nftViewMode, setNftViewMode] = useState<ViewMode | "collection">(
-    "grid",
-  );
+  const [nftViewMode, setNftViewMode] = useState<ViewMode | "collection">("grid");
   const [selectedNFT, setSelectedNFT] = useState<NFT | null>(null);
   const [nftShuffle, setNftShuffle] = useState(0);
   const [nftPage, setNftPage] = useState(0);
-  const [hoveredCollection, setHoveredCollection] = useState<string | null>(
-    null,
-  );
+  const [hoveredCollection, setHoveredCollection] = useState<string | null>(null);
   const [selectedAsset, setSelectedAsset] = useState<any>(null);
   const [selectedDeFiPosition, setSelectedDeFiPosition] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState<
-    "portfolio" | "transactions" | "yield"
-  >("portfolio");
-  const [sidebarView, setSidebarView] = useState<"assets" | "nfts" | "defi">(
-    "assets",
-  );
-  const [defiSortBy, setDefiSortBy] = useState<"protocol" | "type" | "value">(
-    "value",
-  );
+  const [activeTab, setActiveTab] = useState<"portfolio" | "transactions" | "yield">("portfolio");
+  const [sidebarView, setSidebarView] = useState<"assets" | "nfts" | "defi">("assets");
+  const [defiSortBy, setDefiSortBy] = useState<"protocol" | "type" | "value">("value");
   const [defiSortOrder, setDefiSortOrder] = useState<SortDirection>("desc");
   const [filterBySymbol, setFilterBySymbol] = useState<string[]>([]);
   const [filterByProtocol, setFilterByProtocol] = useState<string[]>([]);
   const [nftSortField, setNftSortField] = useState<string>("name");
-  const [nftSortDirection, setNftSortDirection] =
-    useState<SortDirection>("asc");
+  const [nftSortDirection, setNftSortDirection] = useState<SortDirection>("asc");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [selectedDialogProtocol, setSelectedDialogProtocol] = useState<
-    string | null
-  >(null);
+  const [selectedDialogProtocol, setSelectedDialogProtocol] = useState<string | null>(null);
 
   // NFT Shuffle logic
   const shuffleNFTs = () => {
@@ -105,37 +89,24 @@ export const usePortfolio = (
   const portfolioMetrics = useMemo(() => {
     if (!metricsProps) return null;
 
-    const {
-      portfolioAssets,
-      groupedDeFiPositions,
-      history,
-      currentPrice,
-      previousPrice,
-    } = metricsProps;
+    const { portfolioAssets, groupedDeFiPositions, history, currentPrice, previousPrice } =
+      metricsProps;
 
     const totalAssetsValue =
       portfolioAssets?.reduce((sum, asset) => sum + (asset.value || 0), 0) || 0;
 
     const totalDefiValue =
-      groupedDeFiPositions?.reduce(
-        (sum, position) => sum + (position.totalValue || 0),
-        0,
-      ) || 0;
+      groupedDeFiPositions?.reduce((sum, position) => sum + (position.totalValue || 0), 0) || 0;
 
     const totalPortfolioValue = totalAssetsValue + totalDefiValue;
 
     const priceChange24h =
-      currentPrice && previousPrice
-        ? ((currentPrice - previousPrice) / previousPrice) * 100
-        : 0;
+      currentPrice && previousPrice ? ((currentPrice - previousPrice) / previousPrice) * 100 : 0;
 
     const last24hValue =
-      history && history.length > 0
-        ? history[history.length - 1]?.total_balance || 0
-        : 0;
+      history && history.length > 0 ? history[history.length - 1]?.total_balance || 0 : 0;
 
-    const firstValue =
-      history && history.length > 0 ? history[0]?.total_balance || 0 : 0;
+    const firstValue = history && history.length > 0 ? history[0]?.total_balance || 0 : 0;
 
     const portfolioChange24h =
       firstValue > 0 ? ((last24hValue - firstValue) / firstValue) * 100 : 0;
@@ -152,11 +123,7 @@ export const usePortfolio = (
   }, [metricsProps]);
 
   const chartData = useMemo(() => {
-    if (
-      !metricsProps?.averageHistory ||
-      metricsProps.averageHistory.length === 0
-    )
-      return [];
+    if (!metricsProps?.averageHistory || metricsProps.averageHistory.length === 0) return [];
 
     return metricsProps.averageHistory
       .map((item: any) => ({
@@ -171,40 +138,30 @@ export const usePortfolio = (
   }, [metricsProps?.averageHistory]);
 
   const pieChartData = useMemo(() => {
-    if (
-      !metricsProps?.portfolioAssets ||
-      metricsProps.portfolioAssets.length === 0
-    )
-      return [];
+    if (!metricsProps?.portfolioAssets || metricsProps.portfolioAssets.length === 0) return [];
 
-    const aggregatedAssets = metricsProps.portfolioAssets.reduce(
-      (acc: any, asset) => {
-        const symbol = asset.metadata?.symbol || "Unknown";
-        if (!acc[symbol]) {
-          acc[symbol] = {
-            symbol,
-            value: 0,
-            percentage: 0,
-          };
-        }
-        acc[symbol].value += asset.value || 0;
-        return acc;
-      },
-      {},
-    );
+    const aggregatedAssets = metricsProps.portfolioAssets.reduce((acc: any, asset) => {
+      const symbol = asset.metadata?.symbol || "Unknown";
+      if (!acc[symbol]) {
+        acc[symbol] = {
+          symbol,
+          value: 0,
+          percentage: 0,
+        };
+      }
+      acc[symbol].value += asset.value || 0;
+      return acc;
+    }, {});
 
     const totalValue = Object.values(aggregatedAssets).reduce(
       (sum: number, asset: any) => sum + Number(asset.value || 0),
-      0,
+      0
     );
 
     return Object.values(aggregatedAssets)
       .map((asset: any) => ({
         ...asset,
-        percentage:
-          Number(totalValue) > 0
-            ? (Number(asset.value) / Number(totalValue)) * 100
-            : 0,
+        percentage: Number(totalValue) > 0 ? (Number(asset.value) / Number(totalValue)) * 100 : 0,
       }))
       .sort((a: any, b: any) => Number(b.value) - Number(a.value))
       .slice(0, 8);

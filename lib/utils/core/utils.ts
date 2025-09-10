@@ -29,10 +29,7 @@ export function delay(ms: number): Promise<void> {
 /**
  * Utility function to safely parse JSON
  */
-export function safeJsonParse<T = unknown>(
-  str: string,
-  fallback?: T,
-): T | null {
+export function safeJsonParse<T = unknown>(str: string, fallback?: T): T | null {
   try {
     return JSON.parse(str);
   } catch {
@@ -61,7 +58,7 @@ export function capitalize(str: string): string {
  */
 export function debounce<T extends (...args: unknown[]) => unknown>(
   func: T,
-  wait: number,
+  wait: number
 ): (...args: Parameters<T>) => void {
   let timeout: NodeJS.Timeout;
 
@@ -76,7 +73,7 @@ export function debounce<T extends (...args: unknown[]) => unknown>(
  */
 export function throttle<T extends (...args: unknown[]) => unknown>(
   func: T,
-  limit: number,
+  limit: number
 ): (...args: Parameters<T>) => void {
   let inThrottle: boolean;
 
@@ -105,7 +102,7 @@ export function isEmpty(value: unknown): boolean {
  */
 export function pick<T extends Record<string, unknown>, K extends keyof T>(
   obj: T,
-  keys: K[],
+  keys: K[]
 ): Pick<T, K> {
   const result = {} as Pick<T, K>;
   for (const key of keys) {
@@ -121,7 +118,7 @@ export function pick<T extends Record<string, unknown>, K extends keyof T>(
  */
 export function omit<T extends Record<string, unknown>, K extends keyof T>(
   obj: T,
-  keys: K[],
+  keys: K[]
 ): Omit<T, K> {
   const result = { ...obj };
   for (const key of keys) {
@@ -134,8 +131,7 @@ export function omit<T extends Record<string, unknown>, K extends keyof T>(
  * Utility function to generate a random ID
  */
 export function generateId(length: number = 8): string {
-  const chars =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   let result = "";
   for (let i = 0; i < length; i++) {
     result += chars.charAt(Math.floor(Math.random() * chars.length));

@@ -1,6 +1,5 @@
 import { aptosAnalytics } from "@/lib/services/blockchain/aptos-analytics";
 import { logger } from "@/lib/utils/core/logger";
-
 import { UnifiedPanoraService } from "../../portfolio/unified-panora-service";
 
 export interface UnifiedPriceData {
@@ -25,19 +24,13 @@ export interface AssetPrice {
  * Replaces PriceService and PriceAggregator with a single source of truth
  */
 export class UnifiedPriceService {
-  private static priceCache = new Map<
-    string,
-    { data: UnifiedPriceData; timestamp: number }
-  >();
+  private static priceCache = new Map<string, { data: UnifiedPriceData; timestamp: number }>();
   private static readonly CACHE_TTL = 30 * 1000; // 30 seconds
 
   /**
    * Hardcoded prices for special tokens that don't have market prices
    */
-  private static readonly HARDCODED_PRICES: Record<
-    string,
-    Omit<UnifiedPriceData, "source">
-  > = {
+  private static readonly HARDCODED_PRICES: Record<string, Omit<UnifiedPriceData, "source">> = {
     // MKLP tokens
     "::house_lp::MKLP": {
       price: 1.05,
@@ -63,25 +56,20 @@ export class UnifiedPriceService {
   /**
    * Get price for a single asset
    */
-  static async getAssetPrice(
-    assetType: string,
-    symbol?: string,
-  ): Promise<UnifiedPriceData | null> {
+  static async getAssetPrice(assetType: string, symbol?: string): Promise<UnifiedPriceData | null> {
     const cacheKey = `${assetType}:${symbol || ""}`;
-    const cached = this.priceCache.get(cacheKey);
+    const cached = UnifiedPriceService.priceCache.get(cacheKey);
 
-    if (cached && Date.now() - cached.timestamp < this.CACHE_TTL) {
+    if (cached && Date.now() - cached.timestamp < UnifiedPriceService.CACHE_TTL) {
       return { ...cached.data, source: "cached" };
     }
 
     try {
       // Check hardcoded prices first
-      for (const [pattern, priceData] of Object.entries(
-        this.HARDCODED_PRICES,
-      )) {
+      for (const [pattern, priceData] of Object.entries(UnifiedPriceService.HARDCODED_PRICES)) {
         if (assetType.includes(pattern) || assetType === pattern) {
           const result = { ...priceData, source: "hardcoded" as const };
-          this.priceCache.set(cacheKey, {
+          UnifiedPriceService.priceCache.set(cacheKey, {
             data: result,
             timestamp: Date.now(),
           });
@@ -91,9 +79,7 @@ export class UnifiedPriceService {
 
       // Try Panora API first (better coverage)
       try {
-        const panoraPrices = await UnifiedPanoraService.getTokenPrices([
-          assetType,
-        ]);
+        const panoraPrices = await UnifiedPanoraService.getTokenPrices([assetType]);
 
         const price = panoraPrices.get(assetType);
         if (price !== undefined && price > 0) {
@@ -105,14 +91,12 @@ export class UnifiedPriceService {
             source: "panora",
           };
 
-          this.priceCache.set(cacheKey, {
+          UnifiedPriceService.priceCache.set(cacheKey, {
             data: priceData,
             timestamp: Date.now(),
           });
 
-          logger.info(
-            `Price fetched from Panora for ${assetType}: $${priceData.price}`,
-          );
+          logger.info(`Price fetched from Panora for ${assetType}: $${priceData.price}`);
           return priceData;
         }
       } catch (panoraError) {
@@ -134,21 +118,16 @@ export class UnifiedPriceService {
             source: "aptos_analytics",
           };
 
-          this.priceCache.set(cacheKey, {
+          UnifiedPriceService.priceCache.set(cacheKey, {
             data: priceData,
             timestamp: Date.now(),
           });
 
-          logger.info(
-            `Price fetched from Aptos Analytics for ${assetType}: $${priceData.price}`,
-          );
+          logger.info(`Price fetched from Aptos Analytics for ${assetType}: $${priceData.price}`);
           return priceData;
         }
       } catch (aptosError) {
-        logger.warn(
-          `Aptos Analytics price fetch failed for ${assetType}:`,
-          aptosError,
-        );
+        logger.warn(`Aptos Analytics price fetch failed for ${assetType}:`, aptosError);
       }
 
       // No price found
@@ -163,30 +142,26 @@ export class UnifiedPriceService {
   /**
    * Get prices for multiple assets efficiently
    */
-  static async getBatchPrices(
-    assetTypes: string[],
-  ): Promise<Map<string, UnifiedPriceData>> {
+  static async getBatchPrices(assetTypes: string[]): Promise<Map<string, UnifiedPriceData>> {
     try {
       const results = new Map<string, UnifiedPriceData>();
       const uncachedTypes: string[] = [];
 
       // Check cache and hardcoded prices first
       for (const assetType of assetTypes) {
-        const cached = this.priceCache.get(assetType);
-        if (cached && Date.now() - cached.timestamp < this.CACHE_TTL) {
+        const cached = UnifiedPriceService.priceCache.get(assetType);
+        if (cached && Date.now() - cached.timestamp < UnifiedPriceService.CACHE_TTL) {
           results.set(assetType, { ...cached.data, source: "cached" });
           continue;
         }
 
         // Check hardcoded prices
         let foundHardcoded = false;
-        for (const [pattern, priceData] of Object.entries(
-          this.HARDCODED_PRICES,
-        )) {
+        for (const [pattern, priceData] of Object.entries(UnifiedPriceService.HARDCODED_PRICES)) {
           if (assetType.includes(pattern) || assetType === pattern) {
             const result = { ...priceData, source: "hardcoded" as const };
             results.set(assetType, result);
-            this.priceCache.set(assetType, {
+            UnifiedPriceService.priceCache.set(assetType, {
               data: result,
               timestamp: Date.now(),
             });
@@ -204,8 +179,7 @@ export class UnifiedPriceService {
       if (uncachedTypes.length > 0) {
         // Try Panora for batch fetch first
         try {
-          const panoraPrices =
-            await UnifiedPanoraService.getTokenPrices(uncachedTypes);
+          const panoraPrices = await UnifiedPanoraService.getTokenPrices(uncachedTypes);
 
           const foundPanoraAssets = new Set<string>();
           for (const [assetType, price] of panoraPrices.entries()) {
@@ -218,7 +192,7 @@ export class UnifiedPriceService {
                 source: "panora",
               };
               results.set(assetType, priceData);
-              this.priceCache.set(assetType, {
+              UnifiedPriceService.priceCache.set(assetType, {
                 data: priceData,
                 timestamp: Date.now(),
               });
@@ -228,14 +202,12 @@ export class UnifiedPriceService {
 
           // Remove found assets from uncached list
           const stillUncached = uncachedTypes.filter(
-            (assetType) => !foundPanoraAssets.has(assetType),
+            (assetType) => !foundPanoraAssets.has(assetType)
           );
 
           // Try Aptos Analytics for remaining assets
           if (stillUncached.length > 0) {
-            logger.info(
-              `Trying Aptos Analytics for ${stillUncached.length} remaining assets`,
-            );
+            logger.info(`Trying Aptos Analytics for ${stillUncached.length} remaining assets`);
 
             const batchResults = await Promise.allSettled(
               stillUncached.map(async (assetType) => {
@@ -253,9 +225,7 @@ export class UnifiedPriceService {
                       source: "aptos_analytics" as const,
                     };
 
-                    logger.info(
-                      `Found price for ${assetType}: $${priceData.price}`,
-                    );
+                    logger.info(`Found price for ${assetType}: $${priceData.price}`);
 
                     return {
                       assetType,
@@ -263,20 +233,17 @@ export class UnifiedPriceService {
                     };
                   }
                 } catch (error) {
-                  logger.warn(
-                    `Aptos Analytics failed for ${assetType}:`,
-                    error,
-                  );
+                  logger.warn(`Aptos Analytics failed for ${assetType}:`, error);
                 }
                 return null;
-              }),
+              })
             );
 
             batchResults.forEach((result) => {
               if (result.status === "fulfilled" && result.value) {
                 const { assetType, priceData } = result.value;
                 results.set(assetType, priceData);
-                this.priceCache.set(assetType, {
+                UnifiedPriceService.priceCache.set(assetType, {
                   data: priceData,
                   timestamp: Date.now(),
                 });
@@ -299,7 +266,7 @@ export class UnifiedPriceService {
    * Convert to AssetPrice format for backward compatibility
    */
   static async getAssetPrices(assetTypes: string[]): Promise<AssetPrice[]> {
-    const priceData = await this.getBatchPrices(assetTypes);
+    const priceData = await UnifiedPriceService.getBatchPrices(assetTypes);
 
     return assetTypes.map((assetType) => {
       const price = priceData.get(assetType);
@@ -317,7 +284,7 @@ export class UnifiedPriceService {
    * Clear price cache
    */
   static clearCache(): void {
-    this.priceCache.clear();
+    UnifiedPriceService.priceCache.clear();
   }
 
   /**
@@ -328,16 +295,14 @@ export class UnifiedPriceService {
     entries: Array<{ assetType: string; age: number; source: string }>;
   } {
     const now = Date.now();
-    const entries = Array.from(this.priceCache.entries()).map(
-      ([key, value]) => ({
-        assetType: key,
-        age: now - value.timestamp,
-        source: value.data.source,
-      }),
-    );
+    const entries = Array.from(UnifiedPriceService.priceCache.entries()).map(([key, value]) => ({
+      assetType: key,
+      age: now - value.timestamp,
+      source: value.data.source,
+    }));
 
     return {
-      size: this.priceCache.size,
+      size: UnifiedPriceService.priceCache.size,
       entries,
     };
   }

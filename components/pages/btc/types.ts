@@ -1,4 +1,7 @@
-import { Currency } from "@/lib/utils";
+// Import existing types from centralized locations
+
+import type { SupplyData, Token } from "@/lib/config/data";
+import type { Currency } from "@/lib/types/consolidated";
 
 // Enhanced Market interface with better typing
 export interface Market {
@@ -36,18 +39,11 @@ export interface ProtocolData {
   };
 }
 
-// Enhanced Token supply interface
-export interface TokenSupply {
-  symbol: string;
-  supply: string;
-  formatted_supply: string;
-  currency?: Currency;
-}
+// Re-export Token and SupplyData from centralized config
+export type { Token, SupplyData };
 
-// Enhanced BTC supply data
-export interface BtcSupplyData {
-  supplies: TokenSupply[];
-  total: string;
+// BTC-specific supply data interface
+export interface BtcSupplyData extends SupplyData {
   total_formatted: string;
   total_decimals: number;
 }
@@ -74,7 +70,7 @@ export interface PerformanceMetrics {
 export class BTCFormattingError extends Error {
   constructor(
     message: string,
-    public readonly context?: Record<string, unknown>,
+    public readonly context?: Record<string, unknown>
   ) {
     super(message);
     this.name = "BTCFormattingError";
@@ -84,7 +80,7 @@ export class BTCFormattingError extends Error {
 export class BTCDataError extends Error {
   constructor(
     message: string,
-    public readonly code?: string,
+    public readonly code?: string
   ) {
     super(message);
     this.name = "BTCDataError";

@@ -1,14 +1,12 @@
 import { logger } from "@/lib/utils/core/logger";
-
-import type { PortfolioHistoryPoint, FungibleAsset } from "../types";
-
+import type { FungibleAsset, PortfolioHistoryPoint } from "../types";
 import { AssetService } from "./asset-service";
 import { TransactionService } from "./transaction-service";
 
 export class PortfolioHistoryService {
   static async getPortfolioHistory(
     address: string,
-    days: number = 30,
+    days: number = 30
   ): Promise<PortfolioHistoryPoint[]> {
     try {
       const endDate = new Date();
@@ -17,10 +15,7 @@ export class PortfolioHistoryService {
 
       // Get historical activities
       const { fungibleActivities, coinActivities } =
-        await TransactionService.getHistoricalActivities(
-          address,
-          startDate.toISOString(),
-        );
+        await TransactionService.getHistoricalActivities(address, startDate.toISOString());
 
       // Get current portfolio
       const currentAssets = await AssetService.getWalletAssets(address);
@@ -32,11 +27,11 @@ export class PortfolioHistoryService {
         const date = new Date(startDate);
         date.setDate(startDate.getDate() + d);
 
-        const portfolio = await this.reconstructPortfolioAtDate(
+        const portfolio = await PortfolioHistoryService.reconstructPortfolioAtDate(
           currentAssets,
           fungibleActivities,
           coinActivities,
-          date,
+          date
         );
 
         history.push(portfolio);
@@ -53,7 +48,7 @@ export class PortfolioHistoryService {
     currentAssets: FungibleAsset[],
     fungibleActivities: any[],
     coinActivities: any[],
-    targetDate: Date,
+    targetDate: Date
   ): Promise<PortfolioHistoryPoint> {
     const assetBalances = new Map<string, number>();
 
@@ -64,16 +59,11 @@ export class PortfolioHistoryService {
 
     // Reverse apply activities after target date
     const activitiesAfterDate = [
-      ...fungibleActivities.filter(
-        (a) => new Date(a.transaction_timestamp) > targetDate,
-      ),
-      ...coinActivities.filter(
-        (a) => new Date(a.transaction_timestamp) > targetDate,
-      ),
+      ...fungibleActivities.filter((a) => new Date(a.transaction_timestamp) > targetDate),
+      ...coinActivities.filter((a) => new Date(a.transaction_timestamp) > targetDate),
     ].sort(
       (a, b) =>
-        new Date(b.transaction_timestamp).getTime() -
-        new Date(a.transaction_timestamp).getTime(),
+        new Date(b.transaction_timestamp).getTime() - new Date(a.transaction_timestamp).getTime()
     );
 
     activitiesAfterDate.forEach((activity) => {
@@ -84,18 +74,15 @@ export class PortfolioHistoryService {
       // Reverse the activity
       if (activity.type === "deposit" || activity.activity_type === "deposit") {
         assetBalances.set(assetType, currentBalance - amount);
-      } else if (
-        activity.type === "withdraw" ||
-        activity.activity_type === "withdraw"
-      ) {
+      } else if (activity.type === "withdraw" || activity.activity_type === "withdraw") {
         assetBalances.set(assetType, currentBalance + amount);
       }
     });
 
     // Get historical prices (would need a price history service)
-    const prices = await this.getHistoricalPrices(
+    const prices = await PortfolioHistoryService.getHistoricalPrices(
       Array.from(assetBalances.keys()),
-      targetDate,
+      targetDate
     );
 
     // Calculate portfolio value
@@ -110,9 +97,7 @@ export class PortfolioHistoryService {
 
         assets.push({
           assetType,
-          symbol:
-            currentAssets.find((a) => a.asset_type === assetType)?.metadata
-              ?.symbol || "",
+          symbol: currentAssets.find((a) => a.asset_type === assetType)?.metadata?.symbol || "",
           balance,
           value,
           price,
@@ -129,7 +114,7 @@ export class PortfolioHistoryService {
 
   private static async getHistoricalPrices(
     assetTypes: string[],
-    _date: Date,
+    _date: Date
   ): Promise<Map<string, number>> {
     // TODO: Implement historical price fetching
     // For now, return current prices as placeholder

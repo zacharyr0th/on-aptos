@@ -1,6 +1,6 @@
 "use client";
 
-import { Star, Github } from "lucide-react";
+import { Github, Star } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -30,9 +30,7 @@ export function GitHubStarCount({
         setIsLoading(true);
         setError(false);
 
-        const response = await fetch(
-          `https://api.github.com/repos/${owner}/${repo}`,
-        );
+        const response = await fetch(`https://api.github.com/repos/${owner}/${repo}`);
 
         if (!response.ok) {
           throw new Error(`GitHub API error: ${response.status}`);
@@ -40,10 +38,7 @@ export function GitHubStarCount({
 
         const data = await response.json();
         setStarCount(data.stargazers_count);
-        logger.debug(
-          `Fetched star count for ${owner}/${repo}:`,
-          data.stargazers_count,
-        );
+        logger.debug(`Fetched star count for ${owner}/${repo}:`, data.stargazers_count);
       } catch (err) {
         logger.warn(`Failed to fetch star count for ${owner}/${repo}:`, err);
         setError(true);

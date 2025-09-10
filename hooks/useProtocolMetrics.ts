@@ -1,6 +1,6 @@
-import { useEffect, useState, useRef, useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import type { DataProvider, DefiProtocol } from "@/components/pages/defi/data";
 import { defiLlamaService } from "@/lib/services/external/defi-llama";
-import type { DefiProtocol, DataProvider } from "@/components/pages/defi/data";
 import { serviceLogger } from "@/lib/utils/core/logger";
 
 type EnrichedProtocol = DefiProtocol;
@@ -14,17 +14,13 @@ export function useProtocolMetrics(protocols: DefiProtocol[]): {
   loading: boolean;
   error: Error | null;
 } {
-  const [enrichedProtocols, setEnrichedProtocols] =
-    useState<EnrichedProtocol[]>(protocols);
+  const [enrichedProtocols, setEnrichedProtocols] = useState<EnrichedProtocol[]>(protocols);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
   // Memoize protocols to prevent unnecessary re-renders
-  const protocolsKey = useMemo(
-    () => protocols.map((p) => p.title).join(","),
-    [protocols],
-  );
+  const protocolsKey = useMemo(() => protocols.map((p) => p.title).join(","), [protocols]);
 
   useEffect(() => {
     async function fetchMetrics() {
@@ -56,7 +52,7 @@ export function useProtocolMetrics(protocols: DefiProtocol[]): {
             if (!protocolMetricsCache.has(cacheKey)) {
               protocolMetricsCache.set(
                 cacheKey,
-                defiLlamaService.getProtocolMetrics(protocol.title),
+                defiLlamaService.getProtocolMetrics(protocol.title)
               );
 
               // Clean up cache after duration
@@ -80,8 +76,7 @@ export function useProtocolMetrics(protocols: DefiProtocol[]): {
                 tvl: metrics.tvl
                   ? {
                       ...protocol.tvl,
-                      current:
-                        metrics.tvl.current?.toString() || protocol.tvl.current,
+                      current: metrics.tvl.current?.toString() || protocol.tvl.current,
                       change7d: metrics.tvl.change7d?.toFixed(2),
                       defiLlama: metrics.tvl.current?.toString(),
                       lastUpdated: new Date().toISOString(),
@@ -94,9 +89,7 @@ export function useProtocolMetrics(protocols: DefiProtocol[]): {
                     ? {
                         ...protocol.volume,
                         daily: metrics.volume?.daily || protocol.volume?.daily,
-                        change24h:
-                          metrics.volume?.change24h ||
-                          protocol.volume?.change24h,
+                        change24h: metrics.volume?.change24h || protocol.volume?.change24h,
                         options: metrics.optionsVolume?.daily,
                         optionsChange24h: metrics.optionsVolume?.change24h,
                         lastUpdated: new Date().toISOString(),
@@ -137,16 +130,12 @@ export function useProtocolMetrics(protocols: DefiProtocol[]): {
                           ilRisk: pool.ilRisk === "yes",
                         })),
                         max: metrics.yields
-                          .reduce(
-                            (max: number, pool: any) =>
-                              Math.max(max, pool.apy || 0),
-                            0,
-                          )
+                          .reduce((max: number, pool: any) => Math.max(max, pool.apy || 0), 0)
                           .toFixed(2),
                         average: (
                           metrics.yields.reduce(
                             (sum: number, pool: any) => sum + (pool.apy || 0),
-                            0,
+                            0
                           ) / metrics.yields.length
                         ).toFixed(2),
                         lastUpdated: new Date().toISOString(),
@@ -155,17 +144,11 @@ export function useProtocolMetrics(protocols: DefiProtocol[]): {
                     : protocol.yields,
                 // Update token data if available - keep as numbers/strings for formatting
                 token:
-                  metrics.tokenPrice ||
-                  metrics.mcap ||
-                  metrics.fdv ||
-                  metrics.staking
+                  metrics.tokenPrice || metrics.mcap || metrics.fdv || metrics.staking
                     ? {
                         ...protocol.token,
-                        price:
-                          metrics.tokenPrice?.toFixed(4) ||
-                          protocol.token?.price,
-                        marketCap:
-                          metrics.mcap?.toString() || protocol.token?.marketCap,
+                        price: metrics.tokenPrice?.toFixed(4) || protocol.token?.price,
+                        marketCap: metrics.mcap?.toString() || protocol.token?.marketCap,
                         fdv: metrics.fdv?.toString() || protocol.token?.fdv,
                         supply: {
                           ...protocol.token?.supply,
@@ -182,25 +165,16 @@ export function useProtocolMetrics(protocols: DefiProtocol[]): {
                         borrowRates: metrics.borrowRates,
                         supplyRates: metrics.supplyRates,
                         totalBorrowed: metrics.borrowRates
-                          ?.reduce(
-                            (sum: number, r: any) => sum + r.totalBorrowUsd,
-                            0,
-                          )
+                          ?.reduce((sum: number, r: any) => sum + r.totalBorrowUsd, 0)
                           .toString(),
                         totalSupplied: metrics.supplyRates
-                          ?.reduce(
-                            (sum: number, r: any) => sum + r.totalSupplyUsd,
-                            0,
-                          )
+                          ?.reduce((sum: number, r: any) => sum + r.totalSupplyUsd, 0)
                           .toString(),
                       }
                     : protocol.lending,
               };
             } catch (err) {
-              serviceLogger.debug(
-                `Failed to fetch metrics for ${protocol.title}`,
-                err,
-              );
+              serviceLogger.debug(`Failed to fetch metrics for ${protocol.title}`, err);
               return protocol;
             }
           });
@@ -209,7 +183,7 @@ export function useProtocolMetrics(protocols: DefiProtocol[]): {
           const resolvedResults = batchResults
             .filter(
               (result): result is PromiseFulfilledResult<EnrichedProtocol> =>
-                result.status === "fulfilled",
+                result.status === "fulfilled"
             )
             .map((result) => result.value);
 
@@ -217,10 +191,7 @@ export function useProtocolMetrics(protocols: DefiProtocol[]): {
 
           // Exponential backoff: longer delays for later batches
           if (i + batchSize < protocols.length && !signal.aborted) {
-            const delay = Math.min(
-              200 * Math.pow(1.5, Math.floor(i / batchSize)),
-              2000,
-            );
+            const delay = Math.min(200 * 1.5 ** Math.floor(i / batchSize), 2000);
             await new Promise((resolve) => setTimeout(resolve, delay));
           }
         }
@@ -230,11 +201,7 @@ export function useProtocolMetrics(protocols: DefiProtocol[]): {
         }
       } catch (err) {
         if (!signal.aborted) {
-          setError(
-            err instanceof Error
-              ? err
-              : new Error("Failed to fetch protocol metrics"),
-          );
+          setError(err instanceof Error ? err : new Error("Failed to fetch protocol metrics"));
           serviceLogger.error("Error fetching protocol metrics:", err);
         }
       } finally {

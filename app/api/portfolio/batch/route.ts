@@ -1,23 +1,24 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
 import { DeFiService } from "@/lib/services/defi/services/defi-service";
 import { AssetService } from "@/lib/services/portfolio/services/asset-service";
 import { NFTService } from "@/lib/services/portfolio/services/nft-service";
 import { TransactionService } from "@/lib/services/portfolio/services/transaction-service";
-import { TokenEnrichmentService } from "@/lib/services/portfolio/token-enrichment-service";
+import { UnifiedPanoraService } from "@/lib/services/portfolio/unified-panora-service";
 import type { BatchResponse } from "@/lib/types/consolidated";
 import {
-  extractParams,
-  errorResponse,
-  successResponse,
   CACHE_DURATIONS,
-  validateRequiredParams,
+  errorResponse,
+  extractParams,
   parseNumericParam,
+  successResponse,
+  validateRequiredParams,
 } from "@/lib/utils/api/common";
-import { withRateLimit, RATE_LIMIT_TIERS } from "@/lib/utils/api/rate-limiter";
+import { RATE_LIMIT_TIERS, withRateLimit } from "@/lib/utils/api/rate-limiter";
 import { apiLogger } from "@/lib/utils/core/logger";
 
-// Revalidate cache every 5 minutes
+import { PORTFOLIO_CACHE, PORTFOLIO_RATE_LIMIT_NAMES } from "../constants";
+
 export const revalidate = 300;
 
 async function portfolioBatchHandler(request: NextRequest) {
@@ -35,7 +36,7 @@ async function portfolioBatchHandler(request: NextRequest) {
   }
 
   apiLogger.info(
-    `🚀 [Portfolio Batch API] Fetching ALL portfolio data INCLUDING TRANSACTIONS for: ${walletAddress}`,
+    `🚀 [Portfolio Batch API] Fetching ALL portfolio data INCLUDING TRANSACTIONS for: ${walletAddress}`
   );
 
   // Parallel fetch all portfolio data
@@ -55,8 +56,8 @@ async function portfolioBatchHandler(request: NextRequest) {
       ? NFTService.getAllWalletNFTs(walletAddress!)
       : NFTService.getWalletNFTs(walletAddress!, 1, nftLimit),
     NFTService.getCollectionStats(walletAddress!),
-    // Fetch first 100 transactions immediately using shared service
-    TransactionService.fetchTransactionsWithDetails(walletAddress!, 100, 0),
+    // Fetch only first 25 transactions for efficiency with massive wallets
+    TransactionService.fetchTransactionsWithDetails(walletAddress!, 25, 0),
   ]);
 
   // Process results with error handling
@@ -70,18 +71,15 @@ async function portfolioBatchHandler(request: NextRequest) {
     transactions: null,
   };
 
-  // Handle assets and enrich with Panora data
+  // Handle assets - they come pre-priced from AssetService, no need for double enrichment
   if (assetsResult.status === "fulfilled") {
-    // Enrich assets with Panora token data for consistent pricing and logos
-    response.assets = await TokenEnrichmentService.enrichAssetsWithPanoraData(
-      assetsResult.value,
-    );
-    apiLogger.info(
-      `Enriched ${response.assets?.length || 0} assets with Panora data`,
-    );
+    // Assets from AssetService already include prices and basic metadata
+    // Just use them directly to avoid double price fetching
+    response.assets = assetsResult.value;
+    apiLogger.info(`Using ${response.assets?.length || 0} pre-processed assets from AssetService`);
   } else {
     apiLogger.error(
-      `Failed to fetch assets: ${assetsResult.reason instanceof Error ? assetsResult.reason.message : String(assetsResult.reason)}`,
+      `Failed to fetch assets: ${assetsResult.reason instanceof Error ? assetsResult.reason.message : String(assetsResult.reason)}`
     );
   }
 
@@ -102,19 +100,17 @@ async function portfolioBatchHandler(request: NextRequest) {
     }
   } else {
     apiLogger.error(
-      `Failed to fetch DeFi data: ${defiPositionsResult.reason instanceof Error ? defiPositionsResult.reason.message : String(defiPositionsResult.reason)}`,
+      `Failed to fetch DeFi data: ${defiPositionsResult.reason instanceof Error ? defiPositionsResult.reason.message : String(defiPositionsResult.reason)}`
     );
   }
 
   // Handle NFT count
   if (nftCountResult.status === "fulfilled") {
     response.nftTotalCount = nftCountResult.value;
-    apiLogger.info(
-      `[Portfolio Batch API] NFT count fetched: ${nftCountResult.value}`,
-    );
+    apiLogger.info(`[Portfolio Batch API] NFT count fetched: ${nftCountResult.value}`);
   } else {
     apiLogger.error(
-      `Failed to fetch NFT count: ${nftCountResult.reason instanceof Error ? nftCountResult.reason.message : String(nftCountResult.reason)}`,
+      `Failed to fetch NFT count: ${nftCountResult.reason instanceof Error ? nftCountResult.reason.message : String(nftCountResult.reason)}`
     );
   }
 
@@ -128,7 +124,7 @@ async function portfolioBatchHandler(request: NextRequest) {
     }
   } else {
     apiLogger.error(
-      `Failed to fetch NFTs: ${nftResult.reason instanceof Error ? nftResult.reason.message : String(nftResult.reason)}`,
+      `Failed to fetch NFTs: ${nftResult.reason instanceof Error ? nftResult.reason.message : String(nftResult.reason)}`
     );
   }
 
@@ -136,11 +132,11 @@ async function portfolioBatchHandler(request: NextRequest) {
   if (nftStatsResult.status === "fulfilled") {
     response.nftCollectionStats = nftStatsResult.value;
     apiLogger.info(
-      `[Portfolio Batch API] NFT collection stats fetched: ${nftStatsResult.value?.totalCollections || 0} collections`,
+      `[Portfolio Batch API] NFT collection stats fetched: ${nftStatsResult.value?.totalCollections || 0} collections`
     );
   } else {
     apiLogger.error(
-      `Failed to fetch NFT collection stats: ${nftStatsResult.reason instanceof Error ? nftStatsResult.reason.message : String(nftStatsResult.reason)}`,
+      `Failed to fetch NFT collection stats: ${nftStatsResult.reason instanceof Error ? nftStatsResult.reason.message : String(nftStatsResult.reason)}`
     );
   }
 
@@ -149,11 +145,11 @@ async function portfolioBatchHandler(request: NextRequest) {
     const transactionData = transactionsResult.value;
     response.transactions = (transactionData.data || []) as any[];
     apiLogger.info(
-      `[Portfolio Batch API] Transactions fetched: ${response.transactions?.length || 0}`,
+      `[Portfolio Batch API] Transactions fetched: ${response.transactions?.length || 0}`
     );
   } else {
     apiLogger.error(
-      `Failed to fetch transactions: ${transactionsResult.reason instanceof Error ? transactionsResult.reason.message : String(transactionsResult.reason)}`,
+      `Failed to fetch transactions: ${transactionsResult.reason instanceof Error ? transactionsResult.reason.message : String(transactionsResult.reason)}`
     );
   }
 
@@ -165,7 +161,7 @@ async function portfolioBatchHandler(request: NextRequest) {
       nftTotalCount: response.nftTotalCount,
       transactions: response.transactions?.length || 0,
     },
-    `[Portfolio Batch API] Response summary`,
+    `[Portfolio Batch API] Response summary`
   );
 
   // Return with shorter cache for fresher transaction data
@@ -174,11 +170,11 @@ async function portfolioBatchHandler(request: NextRequest) {
       success: true,
       data: response,
     },
-    CACHE_DURATIONS.VERY_SHORT, // 1 minute cache for fresh transaction data
+    PORTFOLIO_CACHE.BATCH // 5 minutes cache for batch data
   );
 }
 
 export const GET = withRateLimit(portfolioBatchHandler, {
-  name: "portfolio-batch",
+  name: PORTFOLIO_RATE_LIMIT_NAMES.BATCH,
   ...RATE_LIMIT_TIERS.STRICT, // More restrictive due to expensive operations
 });

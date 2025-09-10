@@ -16,7 +16,7 @@ export interface RateLimitInfo {
 export class RateLimitError extends Error {
   constructor(
     message: string,
-    public resetInSeconds?: number,
+    public resetInSeconds?: number
   ) {
     super(message);
     this.name = "RateLimitError";

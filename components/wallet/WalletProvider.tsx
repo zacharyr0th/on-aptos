@@ -2,7 +2,7 @@
 
 import { Network } from "@aptos-labs/ts-sdk";
 import { AptosWalletAdapterProvider } from "@aptos-labs/wallet-adapter-react";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 
 import { logger } from "@/lib/utils/core/logger";
 
@@ -27,9 +27,7 @@ export function WalletProvider({ children }: WalletProviderProps) {
         if (process.env.NODE_ENV === "development") {
           // Only log significant errors, not connection attempts
           if (!error.message?.includes("Could not establish connection")) {
-            logger.warn(
-              `Wallet error: ${error instanceof Error ? error.message : String(error)}`,
-            );
+            logger.warn(`Wallet error: ${error instanceof Error ? error.message : String(error)}`);
           }
         }
       }}

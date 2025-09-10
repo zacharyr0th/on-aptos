@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "target": "ES2022",
+    "lib": ["dom", "dom.iterable", "esnext", "ES2022"],
     "allowJs": true,
     "skipLibCheck": true,
     "noUnusedLocals": false,
@@ -13,10 +13,19 @@
     "incremental": true,
     "module": "esnext",
     "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": false,
+    "removeComments": false,
+    "importHelpers": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "forceConsistentCasingInFileNames": true,
     "paths": {
       "@/*": ["./*"]
     },
@@ -24,7 +33,8 @@
       {
         "name": "next"
       }
-    ]
+    ],
+    "types": ["node"]
   },
   "include": ["**/*.ts", "**/*.tsx", "next-env.d.ts", ".next/types/**/*.ts"],
   "exclude": [
@@ -38,6 +48,7 @@
     "**/*.spec.ts",
     "**/*.spec.tsx",
     "test/**/*",
-    "vitest.config.ts"
+    "vitest.config.ts",
+    "node_modules/@types/d3-dispatch/**/*"
   ]
 }

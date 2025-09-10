@@ -1,18 +1,7 @@
 "use client";
 
+import { ArrowDown, ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
-import {
-  ArrowUpDown,
-  ArrowUp,
-  ArrowDown,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
-import { LoadingState } from "./LoadingState";
-import { EmptyState } from "./EmptyState";
-import { ErrorState } from "./ErrorState";
-import type { DataTableProps, TableColumn } from "./types";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -22,6 +11,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { cn } from "@/lib/utils";
+import { EmptyState } from "./EmptyState";
+import { ErrorState } from "./ErrorState";
+import { LoadingState } from "./LoadingState";
+import type { DataTableProps, TableColumn } from "./types";
 
 export function DataTable<T extends Record<string, any>>({
   columns,
@@ -37,9 +31,7 @@ export function DataTable<T extends Record<string, any>>({
   stickyHeader = false,
 }: DataTableProps<T>) {
   const [localSortBy, setLocalSortBy] = useState(sorting?.sortBy);
-  const [localSortOrder, setLocalSortOrder] = useState(
-    sorting?.sortOrder || "asc",
-  );
+  const [localSortOrder, setLocalSortOrder] = useState(sorting?.sortOrder || "asc");
 
   const handleSort = (key: string) => {
     if (!sorting?.onSort) return;
@@ -71,78 +63,87 @@ export function DataTable<T extends Record<string, any>>({
   }
 
   if (!data || data.length === 0) {
-    return (
-      <EmptyState
-        title={emptyTitle}
-        description={emptyDescription}
-        className={className}
-      />
-    );
+    return <EmptyState title={emptyTitle} description={emptyDescription} className={className} />;
   }
 
   return (
     <div className={cn("space-y-4", className)}>
-      <div className="rounded-md border overflow-hidden">
-        <Table>
-          <TableHeader
-            className={cn(stickyHeader && "sticky top-0 bg-background z-10")}
-          >
-            <TableRow>
-              {columns.map((column) => (
-                <TableHead
-                  key={column.key}
-                  className={cn(
-                    column.className,
-                    column.sortable && "cursor-pointer hover:bg-muted/50",
-                    column.align === "center" && "text-center",
-                    column.align === "right" && "text-right",
-                  )}
-                  style={{ width: column.width }}
-                  onClick={() => column.sortable && handleSort(column.key)}
-                >
-                  <div className="flex items-center">
-                    {column.label}
-                    {column.sortable && getSortIcon(column.key)}
-                  </div>
-                </TableHead>
-              ))}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {data.map((row, index) => (
-              <TableRow
-                key={index}
-                className={cn(onRowClick && "cursor-pointer hover:bg-muted/50")}
-                onClick={() => onRowClick?.(row, index)}
-              >
-                {columns.map((column) => (
-                  <TableCell
-                    key={column.key}
-                    className={cn(
-                      column.align === "center" && "text-center",
-                      column.align === "right" && "text-right",
-                    )}
+      <div className="w-full">
+        <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
+          <div className="rounded-md border overflow-hidden">
+            <Table className="w-full min-w-[700px]">
+              <TableHeader className={cn(stickyHeader && "sticky top-0 bg-background z-10")}>
+                <TableRow>
+                  {columns.map((column) => (
+                    <TableHead
+                      key={column.key}
+                      className={cn(
+                        column.className,
+                        column.sortable && "cursor-pointer hover:bg-muted/50",
+                        column.align === "center" && "text-center",
+                        column.align === "right" && "text-right"
+                      )}
+                      style={{
+                        width: column.width,
+                        minWidth:
+                          column.key === "symbol"
+                            ? "200px"
+                            : column.key === "balance"
+                              ? "120px"
+                              : column.key === "price"
+                                ? "100px"
+                                : column.key === "value"
+                                  ? "120px"
+                                  : column.key === "change24h"
+                                    ? "100px"
+                                    : column.key === "change7d"
+                                      ? "100px"
+                                      : "80px",
+                      }}
+                      onClick={() => column.sortable && handleSort(column.key)}
+                    >
+                      <div className="flex items-center">
+                        {column.label}
+                        {column.sortable && getSortIcon(column.key)}
+                      </div>
+                    </TableHead>
+                  ))}
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {data.map((row, index) => (
+                  <TableRow
+                    key={index}
+                    className={cn(onRowClick && "cursor-pointer hover:bg-muted/50")}
+                    onClick={() => onRowClick?.(row, index)}
                   >
-                    {column.render
-                      ? column.render(row[column.key], row, index)
-                      : row[column.key]}
-                  </TableCell>
+                    {columns.map((column) => (
+                      <TableCell
+                        key={column.key}
+                        className={cn(
+                          column.align === "center" && "text-center",
+                          column.align === "right" && "text-right"
+                        )}
+                      >
+                        {column.render
+                          ? column.render(row[column.key], row, index)
+                          : row[column.key]}
+                      </TableCell>
+                    ))}
+                  </TableRow>
                 ))}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+              </TableBody>
+            </Table>
+          </div>
+        </div>
       </div>
 
       {pagination && (
         <div className="flex items-center justify-between">
           <div className="text-sm text-muted-foreground">
             Showing {(pagination.page - 1) * pagination.pageSize + 1} to{" "}
-            {Math.min(
-              pagination.page * pagination.pageSize,
-              pagination.totalItems,
-            )}{" "}
-            of {pagination.totalItems} results
+            {Math.min(pagination.page * pagination.pageSize, pagination.totalItems)} of{" "}
+            {pagination.totalItems} results
           </div>
           <div className="flex items-center gap-2">
             <Button
@@ -155,17 +156,12 @@ export function DataTable<T extends Record<string, any>>({
               Previous
             </Button>
             <div className="flex items-center gap-1">
-              {[
-                ...Array(
-                  Math.ceil(pagination.totalItems / pagination.pageSize),
-                ),
-              ].map((_, i) => {
+              {[...Array(Math.ceil(pagination.totalItems / pagination.pageSize))].map((_, i) => {
                 const pageNum = i + 1;
                 const isCurrentPage = pageNum === pagination.page;
                 const showPage =
                   pageNum === 1 ||
-                  pageNum ===
-                    Math.ceil(pagination.totalItems / pagination.pageSize) ||
+                  pageNum === Math.ceil(pagination.totalItems / pagination.pageSize) ||
                   Math.abs(pageNum - pagination.page) <= 1;
 
                 if (!showPage && pageNum !== pagination.page - 2) return null;
@@ -188,10 +184,7 @@ export function DataTable<T extends Record<string, any>>({
               variant="outline"
               size="sm"
               onClick={() => pagination.onPageChange(pagination.page + 1)}
-              disabled={
-                pagination.page >=
-                Math.ceil(pagination.totalItems / pagination.pageSize)
-              }
+              disabled={pagination.page >= Math.ceil(pagination.totalItems / pagination.pageSize)}
             >
               Next
               <ChevronRight className="h-4 w-4" />

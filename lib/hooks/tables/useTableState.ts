@@ -1,5 +1,5 @@
-import { useState, useCallback, useMemo, useEffect } from "react";
-import { sortData, filterData, paginateData } from "@/lib/utils/tables";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { filterData, paginateData, sortData } from "@/lib/utils/tables";
 
 export interface UseTableStateOptions<T> {
   data: T[];
@@ -65,9 +65,7 @@ export function useTableState<T extends Record<string, any>>({
 }: UseTableStateOptions<T>): UseTableStateReturn<T> {
   // State
   const [sortBy, setSortBy] = useState<string | null>(initialSort?.key || null);
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">(
-    initialSort?.order || "desc",
-  );
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">(initialSort?.order || "desc");
   const [filters, setFilters] = useState<Record<string, any>>(initialFilters);
   const [page, setPage] = useState(1);
   const [displayedCount, setDisplayedCount] = useState(pageSize);
@@ -89,17 +87,11 @@ export function useTableState<T extends Record<string, any>>({
   }, [data.length, pageSize]);
 
   // Process data
-  const filteredData = useMemo(
-    () => filterData(data, filters),
-    [data, filters],
-  );
+  const filteredData = useMemo(() => filterData(data, filters), [data, filters]);
 
   const sortedData = useMemo(
-    () =>
-      sortBy
-        ? sortData(filteredData, { key: sortBy, order: sortOrder })
-        : filteredData,
-    [filteredData, sortBy, sortOrder],
+    () => (sortBy ? sortData(filteredData, { key: sortBy, order: sortOrder }) : filteredData),
+    [filteredData, sortBy, sortOrder]
   );
 
   const displayData = useMemo(() => {
@@ -111,15 +103,7 @@ export function useTableState<T extends Record<string, any>>({
       return sortedData.slice(0, displayedCount);
     }
     return sortedData;
-  }, [
-    sortedData,
-    isMobile,
-    enablePagination,
-    enableVirtualScroll,
-    page,
-    pageSize,
-    displayedCount,
-  ]);
+  }, [sortedData, isMobile, enablePagination, enableVirtualScroll, page, pageSize, displayedCount]);
 
   // Sorting
   const handleSort = useCallback(
@@ -131,7 +115,7 @@ export function useTableState<T extends Record<string, any>>({
         setSortOrder("desc");
       }
     },
-    [sortBy],
+    [sortBy]
   );
 
   // Filtering
@@ -148,7 +132,7 @@ export function useTableState<T extends Record<string, any>>({
   // Pagination
   const totalPages = useMemo(
     () => Math.ceil(sortedData.length / pageSize),
-    [sortedData.length, pageSize],
+    [sortedData.length, pageSize]
   );
 
   const hasNextPage = page < totalPages;
@@ -160,7 +144,7 @@ export function useTableState<T extends Record<string, any>>({
         setPage(newPage);
       }
     },
-    [totalPages],
+    [totalPages]
   );
 
   const nextPage = useCallback(() => {
@@ -180,9 +164,7 @@ export function useTableState<T extends Record<string, any>>({
     setIsLoadingMore(true);
     // Simulate loading delay for smooth UX
     setTimeout(() => {
-      setDisplayedCount((prev) =>
-        Math.min(prev + pageSize * 2, sortedData.length),
-      );
+      setDisplayedCount((prev) => Math.min(prev + pageSize * 2, sortedData.length));
       setIsLoadingMore(false);
     }, 300);
   }, [hasMore, isLoadingMore, pageSize, sortedData.length]);
@@ -208,14 +190,7 @@ export function useTableState<T extends Record<string, any>>({
       container.addEventListener("scroll", handleScroll);
       return () => container.removeEventListener("scroll", handleScroll);
     }
-  }, [
-    enableVirtualScroll,
-    isMobile,
-    hasMore,
-    scrollThreshold,
-    isLoadingMore,
-    loadMore,
-  ]);
+  }, [enableVirtualScroll, isMobile, hasMore, scrollThreshold, isLoadingMore, loadMore]);
 
   return {
     // Data

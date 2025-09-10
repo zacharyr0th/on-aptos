@@ -2,15 +2,8 @@
  * Common utilities for page components
  */
 
-import {
-  TrendingUp,
-  TrendingDown,
-  Minus,
-  CheckCircle,
-  AlertTriangle,
-  XCircle,
-} from "lucide-react";
-import type { MetricStatus, MetricChangeType } from "@/lib/types/metrics";
+import { AlertTriangle, CheckCircle, Minus, TrendingDown, TrendingUp, XCircle } from "lucide-react";
+import type { MetricChangeType, MetricStatus } from "@/lib/types/metrics";
 
 // Icon utilities
 export const getChangeIcon = (changeType?: MetricChangeType) => {
@@ -84,7 +77,7 @@ export const getStatusTextColor = (status?: MetricStatus): string => {
 export const calculatePageRange = (
   currentPage: number,
   totalPages: number,
-  displayRange = 5,
+  displayRange = 5
 ): number[] => {
   const halfRange = Math.floor(displayRange / 2);
   let start = Math.max(1, currentPage - halfRange);
@@ -104,7 +97,7 @@ export const calculatePageRange = (
 // Debounce utility
 export const debounce = <T extends (...args: any[]) => any>(
   func: T,
-  wait: number,
+  wait: number
 ): ((...args: Parameters<T>) => void) => {
   let timeout: NodeJS.Timeout;
   return (...args: Parameters<T>) => {
@@ -116,7 +109,7 @@ export const debounce = <T extends (...args: any[]) => any>(
 // Throttle utility
 export const throttle = <T extends (...args: any[]) => any>(
   func: T,
-  limit: number,
+  limit: number
 ): ((...args: Parameters<T>) => void) => {
   let inThrottle: boolean;
   return (...args: Parameters<T>) => {
@@ -130,7 +123,7 @@ export const throttle = <T extends (...args: any[]) => any>(
 
 // URL utilities
 export const updateQueryParams = (
-  params: Record<string, string | number | boolean | undefined>,
+  params: Record<string, string | number | boolean | undefined>
 ): string => {
   const searchParams = new URLSearchParams(window.location.search);
 
@@ -149,10 +142,7 @@ export const updateQueryParams = (
   return newUrl;
 };
 
-export const getQueryParam = (
-  key: string,
-  defaultValue?: string,
-): string | undefined => {
+export const getQueryParam = (key: string, defaultValue?: string): string | undefined => {
   if (typeof window === "undefined") return defaultValue;
   const searchParams = new URLSearchParams(window.location.search);
   return searchParams.get(key) || defaultValue;
@@ -178,11 +168,9 @@ export const exportToCSV = (data: any[], filename: string) => {
       headers
         .map((header) => {
           const value = row[header];
-          return typeof value === "string" && value.includes(",")
-            ? `"${value}"`
-            : value;
+          return typeof value === "string" && value.includes(",") ? `"${value}"` : value;
         })
-        .join(","),
+        .join(",")
     ),
   ].join("\n");
 

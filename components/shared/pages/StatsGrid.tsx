@@ -1,10 +1,10 @@
 "use client";
 
-import { TrendingUp, TrendingDown, Minus } from "lucide-react";
-import type { StatsGridProps, StatItem } from "./types";
+import { Minus, TrendingDown, TrendingUp } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import type { StatItem, StatsGridProps } from "./types";
 
 function StatCard({ stat }: { stat: StatItem }) {
   const getChangeIcon = (changeType?: "increase" | "decrease" | "stable") => {
@@ -40,15 +40,13 @@ function StatCard({ stat }: { stat: StatItem }) {
           <div className="space-y-2 flex-1">
             <div className="flex items-center gap-2">
               {stat.icon}
-              <p className="text-sm font-medium text-muted-foreground">
-                {stat.title}
-              </p>
+              <p className="text-sm font-medium text-muted-foreground">{stat.title}</p>
             </div>
             <div className="flex items-baseline gap-2">
               <p
                 className={cn(
                   "text-2xl font-bold",
-                  stat.valueClassName || getStatusColor(stat.status),
+                  stat.valueClassName || getStatusColor(stat.status)
                 )}
               >
                 {stat.value}
@@ -63,7 +61,7 @@ function StatCard({ stat }: { stat: StatItem }) {
                         ? "text-green-500"
                         : stat.changeType === "decrease"
                           ? "text-red-500"
-                          : "text-gray-500",
+                          : "text-gray-500"
                     )}
                   >
                     {stat.changeType === "increase" ? "+" : ""}
@@ -72,9 +70,7 @@ function StatCard({ stat }: { stat: StatItem }) {
                 </div>
               )}
             </div>
-            {stat.subtitle && (
-              <p className="text-xs text-muted-foreground">{stat.subtitle}</p>
-            )}
+            {stat.subtitle && <p className="text-xs text-muted-foreground">{stat.subtitle}</p>}
           </div>
         </div>
       </CardContent>
@@ -82,12 +78,7 @@ function StatCard({ stat }: { stat: StatItem }) {
   );
 }
 
-export function StatsGrid({
-  stats,
-  columns = 4,
-  isLoading,
-  className,
-}: StatsGridProps) {
+export function StatsGrid({ stats, columns = 4, isLoading, className }: StatsGridProps) {
   const gridColumns = {
     1: "grid-cols-1",
     2: "grid-cols-1 md:grid-cols-2",

@@ -1,19 +1,6 @@
-import {
-  TrendingUp,
-  TrendingDown,
-  Minus,
-  AlertTriangle,
-  CheckCircle,
-} from "lucide-react";
-import {
-  formatAmount,
-  formatTokenAmount,
-  formatPercentage,
-} from "@/lib/utils/format";
-import type {
-  MetricStatus,
-  MetricChangeType,
-} from "@/lib/types/metrics";
+import { AlertTriangle, CheckCircle, Minus, TrendingDown, TrendingUp } from "lucide-react";
+import type { MetricChangeType, MetricStatus } from "@/lib/types/metrics";
+import { formatAmount, formatPercentage, formatTokenAmount } from "@/lib/utils/format";
 
 // Icon utilities
 export const getChangeIcon = (changeType?: MetricChangeType) => {
@@ -44,8 +31,7 @@ export const getStatusIcon = (status?: MetricStatus) => {
 
 // Formatter utilities
 export const formatUSD = (amount: number): string => formatAmount(amount, "USD");
-export const formatAPT = (amount: number): string =>
-  formatTokenAmount(amount / 1e8, "APT");
+export const formatAPT = (amount: number): string => formatTokenAmount(amount / 1e8, "APT");
 export const formatPercent = (percent: number): string => formatPercentage(percent);
 
 // Badge variant utilities

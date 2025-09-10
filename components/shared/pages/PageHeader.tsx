@@ -1,10 +1,10 @@
 "use client";
 
 import { RefreshCw } from "lucide-react";
-import type { PageHeaderProps } from "./types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import type { PageHeaderProps } from "./types";
 
 export function PageHeader({
   title,
@@ -22,14 +22,8 @@ export function PageHeader({
     <div className={cn("space-y-4", className)}>
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="space-y-2">
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
-            {title}
-          </h1>
-          {subtitle && (
-            <p className="text-sm sm:text-base text-muted-foreground">
-              {subtitle}
-            </p>
-          )}
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">{title}</h1>
+          {subtitle && <p className="text-sm sm:text-base text-muted-foreground">{subtitle}</p>}
           {badges && badges.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-2">
               {badges.map((badge) => (
@@ -49,12 +43,7 @@ export function PageHeader({
               disabled={isLoading || isRefreshing}
               className="gap-2"
             >
-              <RefreshCw
-                className={cn(
-                  "h-4 w-4",
-                  (isLoading || isRefreshing) && "animate-spin",
-                )}
-              />
+              <RefreshCw className={cn("h-4 w-4", (isLoading || isRefreshing) && "animate-spin")} />
               {refreshLabel}
             </Button>
           )}

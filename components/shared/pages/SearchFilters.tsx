@@ -1,10 +1,9 @@
 "use client";
 
 import { Search, X } from "lucide-react";
-import type { SearchFiltersProps } from "./types";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -13,6 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import type { SearchFiltersProps } from "./types";
 
 export function SearchFilters({
   searchQuery = "",
@@ -25,9 +25,7 @@ export function SearchFilters({
   orientation = "horizontal",
 }: SearchFiltersProps) {
   const containerClass =
-    orientation === "vertical"
-      ? "flex flex-col gap-4"
-      : "flex flex-col sm:flex-row gap-4";
+    orientation === "vertical" ? "flex flex-col gap-4" : "flex flex-col sm:flex-row gap-4";
 
   return (
     <div className={cn(containerClass, className)}>
@@ -55,18 +53,9 @@ export function SearchFilters({
       )}
 
       {showFilters && filters.length > 0 && (
-        <div
-          className={cn(
-            "flex gap-2",
-            orientation === "vertical" ? "flex-col" : "flex-wrap",
-          )}
-        >
+        <div className={cn("flex gap-2", orientation === "vertical" ? "flex-col" : "flex-wrap")}>
           {filters.map((filter) => (
-            <Select
-              key={filter.id}
-              value={filter.value}
-              onValueChange={filter.onChange}
-            >
+            <Select key={filter.id} value={filter.value} onValueChange={filter.onChange}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder={filter.label} />
               </SelectTrigger>

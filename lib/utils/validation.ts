@@ -41,13 +41,10 @@ export async function validateWalletAddress(address: string | null): Promise<{
 export function validatePagination(
   page?: string | null,
   limit?: string | null,
-  maxLimit: number = 100,
+  maxLimit: number = 100
 ): { page: number; limit: number; offset: number } {
   const parsedPage = Math.max(1, parseInt(page || "1", 10));
-  const parsedLimit = Math.min(
-    maxLimit,
-    Math.max(1, parseInt(limit || "30", 10)),
-  );
+  const parsedLimit = Math.min(maxLimit, Math.max(1, parseInt(limit || "30", 10)));
   const offset = (parsedPage - 1) * parsedLimit;
 
   return {
@@ -119,7 +116,7 @@ export function isInteger(value: string | number): boolean {
 export function isValidLength(
   value: string,
   minLength: number = 0,
-  maxLength: number = Infinity,
+  maxLength: number = Infinity
 ): boolean {
   return value.length >= minLength && value.length <= maxLength;
 }
@@ -138,7 +135,7 @@ export function isRequired(value: unknown): boolean {
  */
 export function sanitizeString(input: string): string {
   return input
-    .replace(/[<>\"'&]/g, "") // Remove potentially dangerous HTML/XSS characters
+    .replace(/[<>"'&]/g, "") // Remove potentially dangerous HTML/XSS characters
     .trim();
 }
 
@@ -148,7 +145,7 @@ export function sanitizeString(input: string): string {
 export function validateQueryParam(
   param: string | string[] | undefined,
   required: boolean = false,
-  maxLength: number = 1000,
+  maxLength: number = 1000
 ): string | null {
   if (!param) {
     return required ? null : "";

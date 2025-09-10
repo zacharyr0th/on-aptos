@@ -1,13 +1,10 @@
 // Re-export common types from consolidated
-import type {
-  FungibleAsset,
-  NFT,
-  TokenMetadata,
-  Transaction,
-} from "@/lib/types/consolidated";
+import type { FungibleAsset, NFT, TokenMetadata, Transaction } from "@/lib/types/consolidated";
+import type { AssetPrice } from "../shared";
 
 export type { FungibleAsset, NFT, TokenMetadata, Transaction };
 export type { DeFiPosition } from "@/lib/types/defi";
+export type { AssetPrice };
 
 export interface PortfolioHistoryPoint {
   date: string;
@@ -21,13 +18,8 @@ export interface PortfolioHistoryPoint {
   }[];
 }
 
-export interface AssetPrice {
-  assetType: string;
-  symbol: string;
-  price: number | null;
-  change24h: number;
-  marketCap?: number;
-}
+// AssetPrice is now exported from shared/unified-price-service
+// Use: import { AssetPrice } from '../shared'
 
 export interface PortfolioMetrics {
   totalValue: number;
@@ -57,32 +49,7 @@ export interface WalletTransaction {
   payload?: any;
 }
 
-// Legacy DeFi position for specific portfolio service compatibility
-export interface LegacyDeFiPosition {
-  protocol: string;
-  protocolType: string;
-  poolName: string;
-  positionType: string;
-  suppliedAssets: Array<{
-    asset: string;
-    amount: number;
-    value: number;
-    apy?: number;
-  }>;
-  borrowedAssets: Array<{
-    asset: string;
-    amount: number;
-    value: number;
-    apy?: number;
-  }>;
-  totalValueUSD: number;
-  healthFactor?: number;
-  claimableRewards?: Array<{
-    asset: string;
-    amount: number;
-    value: number;
-  }>;
-}
+// LegacyDeFiPosition moved to @/lib/types/defi for better organization
 
 export interface ANSNameResponse {
   owner_address: string;
@@ -108,7 +75,7 @@ export interface PortfolioSummary {
   totalValue: number;
   fungibleAssets: FungibleAsset[];
   nfts: NFT[];
-  defiPositions: LegacyDeFiPosition[];
+  defiPositions: import("@/lib/types/defi").LegacyDeFiPosition[];
   metrics: PortfolioMetrics;
 }
 

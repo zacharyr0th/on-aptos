@@ -1,10 +1,9 @@
 "use client";
 
-import { ReactNode } from "react";
 import { RefreshCw } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
+import type { ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 interface MetricsHeaderProps {
   title: string;
@@ -34,9 +33,7 @@ export const MetricsHeader: React.FC<MetricsHeaderProps> = ({
           <h1 className="text-3xl font-bold">{title}</h1>
           {children}
         </div>
-        {subtitle && (
-          <p className="text-muted-foreground">{subtitle}</p>
-        )}
+        {subtitle && <p className="text-muted-foreground">{subtitle}</p>}
         {badges.length > 0 && (
           <div className="flex gap-2 mt-2 flex-wrap">
             {badges.map((badge, index) => (
@@ -53,9 +50,7 @@ export const MetricsHeader: React.FC<MetricsHeaderProps> = ({
           disabled={isRefreshing || isLoading}
           className="flex items-center gap-2"
         >
-          <RefreshCw
-            className={`h-4 w-4 ${isRefreshing || isLoading ? "animate-spin" : ""}`}
-          />
+          <RefreshCw className={`h-4 w-4 ${isRefreshing || isLoading ? "animate-spin" : ""}`} />
           {isRefreshing ? "Refreshing..." : refreshLabel}
         </Button>
       )}

@@ -2,9 +2,9 @@
  * Protocol Registry - Central management system
  */
 
+import type { ProtocolType } from "@/lib/types/defi";
 import { logger } from "@/lib/utils/core/logger";
-
-import { ProtocolDefinition, ProtocolType } from "./types";
+import type { ProtocolDefinition } from "./types";
 
 export class ProtocolRegistry {
   private static instance: ProtocolRegistry;
@@ -16,10 +16,10 @@ export class ProtocolRegistry {
   private constructor() {}
 
   static getInstance(): ProtocolRegistry {
-    if (!this.instance) {
-      this.instance = new ProtocolRegistry();
+    if (!ProtocolRegistry.instance) {
+      ProtocolRegistry.instance = new ProtocolRegistry();
     }
-    return this.instance;
+    return ProtocolRegistry.instance;
   }
 
   /**
@@ -46,9 +46,7 @@ export class ProtocolRegistry {
 
     logger.debug(`Registered protocol: ${id}`, {
       type: protocol.metadata.type,
-      addresses: Array.isArray(protocol.addresses)
-        ? protocol.addresses.length
-        : "lazy",
+      addresses: Array.isArray(protocol.addresses) ? protocol.addresses.length : "lazy",
     });
   }
 
@@ -114,7 +112,7 @@ export class ProtocolRegistry {
       (p) =>
         p.metadata.name.toLowerCase().includes(q) ||
         p.metadata.displayName.toLowerCase().includes(q) ||
-        p.metadata.tags?.some((tag) => tag.toLowerCase().includes(q)),
+        p.metadata.tags?.some((tag) => tag.toLowerCase().includes(q))
     );
   }
 
@@ -144,8 +142,7 @@ export class ProtocolRegistry {
     return {
       total: protocols.length,
       byType,
-      audited: protocols.filter((p) => p.metadata.auditStatus === "audited")
-        .length,
+      audited: protocols.filter((p) => p.metadata.auditStatus === "audited").length,
       withPatterns: protocols.filter((p) => p.patterns?.resources).length,
     };
   }

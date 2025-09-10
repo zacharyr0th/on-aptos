@@ -8,13 +8,7 @@ const isProduction = process.env.NODE_ENV === "production";
 const logger = pino({
   level:
     process.env.LOG_LEVEL ||
-    (isTest
-      ? "silent"
-      : isDevelopment
-        ? "debug"
-        : isProduction
-          ? "silent"
-          : "info"),
+    (isTest ? "silent" : isDevelopment ? "debug" : isProduction ? "silent" : "info"),
   // Disable pretty transport due to Next.js/Turbopack compatibility issues
   // transport: isDevelopment ? {
   //   target: 'pino-pretty',

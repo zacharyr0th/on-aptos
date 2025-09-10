@@ -1,4 +1,5 @@
-import { MetadataRoute } from "next";
+import type { MetadataRoute } from "next";
+import { APP_ROUTES } from "@/lib/config/routes";
 
 // Force Node.js runtime instead of edge runtime
 export const runtime = "nodejs";
@@ -6,27 +7,28 @@ export const runtime = "nodejs";
 export default function robots(): MetadataRoute.Robots {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
+  const allowedPaths = [
+    APP_ROUTES.HOME,
+    APP_ROUTES.API.BTC,
+    APP_ROUTES.API.STABLES,
+    APP_ROUTES.API.RWAS,
+    APP_ROUTES.API.PRICES,
+    "/api/seo/",
+    "/api/seo/*",
+    "/.well-known/ai-plugin.json",
+    "/llms.txt",
+    APP_ROUTES.BITCOIN,
+    APP_ROUTES.DEFI,
+    APP_ROUTES.STABLES,
+    APP_ROUTES.RWAS,
+    APP_ROUTES.BTC,
+  ];
+
   return {
     rules: [
       {
         userAgent: "*",
-        allow: [
-          "/",
-          "/api/aptos/btc",
-          "/api/aptos/stables",
-          "/api/aptos/rwas",
-          "/api/prices",
-          "/api/seo/",
-          "/api/seo/*",
-          "/.well-known/ai-plugin.json",
-          "/llms.txt", // Specifically allow LLM documentation
-          "/bitcoin",
-          "/defi",
-          "/stablecoins",
-          "/rwas",
-          "/btc",
-          "/stables",
-        ],
+        allow: allowedPaths,
         disallow: [
           "/_next/", // Still disallow Next.js internal files
           "/admin/", // Disallow any admin routes (if you add them later)

@@ -1,9 +1,8 @@
 "use client";
 
 import React, { memo } from "react";
-
-import { useTranslation } from "@/lib/hooks/useTranslation";
 import { DEVELOPER_CONFIG } from "@/lib/config/app";
+import { useTranslation } from "@/lib/hooks/useTranslation";
 
 export const DeveloperCredit = memo(function DeveloperCredit() {
   const { t } = useTranslation("common");

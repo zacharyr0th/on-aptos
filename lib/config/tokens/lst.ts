@@ -1,4 +1,4 @@
-import { TokenMetadata } from "@/lib/types/tokens";
+import type { TokenMetadata } from "@/lib/types/tokens";
 
 // Utility functions
 const generateAccountLink = (address: string) =>
@@ -85,8 +85,7 @@ const LST_CONFIGS: Record<string, BaseTokenConfig> = {
     thumbnail: "/icons/lst/kofi-kAPT.png",
     type: "Liquid Staking Token",
     issuer: "Kofi Finance",
-    assetAddress:
-      "0x821c94e69bc7ca058c913b7b5e6b0a5c9fd1523d58723a966fb8c1f5ea888105",
+    assetAddress: "0x821c94e69bc7ca058c913b7b5e6b0a5c9fd1523d58723a966fb8c1f5ea888105",
     decimals: 8,
     website: "https://kofi.finance",
     auditLink: "https://docs.kofi.finance/protocol/security",
@@ -99,8 +98,7 @@ const LST_CONFIGS: Record<string, BaseTokenConfig> = {
     thumbnail: "/icons/lst/kofi-stkAPT.png",
     type: "Liquid Staking Token",
     issuer: "Kofi Finance",
-    assetAddress:
-      "0x42556039b88593e768c97ab1a3ab0c6a17230825769304482dff8fdebe4c002b",
+    assetAddress: "0x42556039b88593e768c97ab1a3ab0c6a17230825769304482dff8fdebe4c002b",
     decimals: 8,
     website: "https://kofi.finance",
     auditLink: "https://docs.kofi.finance/protocol/security",
@@ -113,8 +111,7 @@ const LST_CONFIGS: Record<string, BaseTokenConfig> = {
     thumbnail: "/icons/lst/TruAPT.png",
     type: "Liquid Staking Token",
     issuer: "TruFin",
-    assetAddress:
-      "0xaef6a8c3182e076db72d64324617114cacf9a52f28325edc10b483f7f05da0e7",
+    assetAddress: "0xaef6a8c3182e076db72d64324617114cacf9a52f28325edc10b483f7f05da0e7",
     decimals: 8,
     website: "https://trufin.io",
     auditLink: "https://trufin.io/security",
@@ -132,10 +129,7 @@ const generateMetadata = (config: BaseTokenConfig): TokenMetadata => ({
 });
 
 export const LST_METADATA: Record<string, TokenMetadata> = Object.fromEntries(
-  Object.entries(LST_CONFIGS).map(([key, config]) => [
-    key,
-    generateMetadata(config),
-  ]),
+  Object.entries(LST_CONFIGS).map(([key, config]) => [key, generateMetadata(config)])
 );
 
 // Add LST combined tokens
@@ -149,9 +143,7 @@ lstCombined.forEach(({ key, tokens, base }) => {
   const baseConfig = LST_CONFIGS[base];
   LST_METADATA[key] = {
     ...generateMetadata(baseConfig),
-    name: tokens
-      .map((token) => LST_CONFIGS[token].name.split(" ").slice(-1)[0])
-      .join(" / "),
+    name: tokens.map((token) => LST_CONFIGS[token].name.split(" ").slice(-1)[0]).join(" / "),
     symbol: key,
   };
 });
@@ -169,8 +161,7 @@ export const LST_TOKENS = [
     symbol: "amAPT-FA",
     name: `${LST_CONFIGS.amAPT.name} (FA)`,
     decimals: LST_CONFIGS.amAPT.decimals,
-    asset_type:
-      "0xa259be733b6a759909f92815927fa213904df6540519568692caf0b068fe8e62",
+    asset_type: "0xa259be733b6a759909f92815927fa213904df6540519568692caf0b068fe8e62",
   },
   // Amnis - stAPT
   {
@@ -199,8 +190,7 @@ export const LST_TOKENS = [
     symbol: "thAPT-FA",
     name: `${LST_CONFIGS.thAPT.name} (FA)`,
     decimals: LST_CONFIGS.thAPT.decimals,
-    asset_type:
-      "0xa0d9d647c5737a5aed08d2cfeb39c31cf901d44bc4aa024eaa7e5e68b804e011",
+    asset_type: "0xa0d9d647c5737a5aed08d2cfeb39c31cf901d44bc4aa024eaa7e5e68b804e011",
   },
   // Thala - sthAPT
   {
@@ -214,32 +204,28 @@ export const LST_TOKENS = [
     symbol: "sthAPT-FA",
     name: `${LST_CONFIGS.sthAPT.name} (FA)`,
     decimals: LST_CONFIGS.sthAPT.decimals,
-    asset_type:
-      "0x0a9ce1bddf93b074697ec5e483bc5050bc64cff2acd31e1ccfd8ac8cae5e4abe",
+    asset_type: "0x0a9ce1bddf93b074697ec5e483bc5050bc64cff2acd31e1ccfd8ac8cae5e4abe",
   },
   // Kofi - kAPT (FA only)
   {
     symbol: "kAPT",
     name: LST_CONFIGS.kAPT.name,
     decimals: LST_CONFIGS.kAPT.decimals,
-    asset_type:
-      "0x821c94e69bc7ca058c913b7b5e6b0a5c9fd1523d58723a966fb8c1f5ea888105",
+    asset_type: "0x821c94e69bc7ca058c913b7b5e6b0a5c9fd1523d58723a966fb8c1f5ea888105",
   },
   // Kofi - stkAPT (FA only)
   {
     symbol: "stkAPT",
     name: LST_CONFIGS.stkAPT.name,
     decimals: LST_CONFIGS.stkAPT.decimals,
-    asset_type:
-      "0x42556039b88593e768c97ab1a3ab0c6a17230825769304482dff8fdebe4c002b",
+    asset_type: "0x42556039b88593e768c97ab1a3ab0c6a17230825769304482dff8fdebe4c002b",
   },
   // TruFin - truAPT (FA only)
   {
     symbol: "truAPT",
     name: "TruFin truAPT",
     decimals: 8,
-    asset_type:
-      "0xaef6a8c3182e076db72d64324617114cacf9a52f28325edc10b483f7f05da0e7",
+    asset_type: "0xaef6a8c3182e076db72d64324617114cacf9a52f28325edc10b483f7f05da0e7",
   },
 ];
 
@@ -269,14 +255,12 @@ export const PANORA_TOKENS = {
     decimals: LST_CONFIGS.sthAPT.decimals,
   },
   kAPT: {
-    asset_type:
-      "0x821c94e69bc7ca058c913b7b5e6b0a5c9fd1523d58723a966fb8c1f5ea888105::coin::T",
+    asset_type: "0x821c94e69bc7ca058c913b7b5e6b0a5c9fd1523d58723a966fb8c1f5ea888105::coin::T",
     description: LST_CONFIGS.kAPT.name,
     decimals: LST_CONFIGS.kAPT.decimals,
   },
   stkAPT: {
-    asset_type:
-      "0x42556039b88593e768c97ab1a3ab0c6a17230825769304482dff8fdebe4c002b::coin::T",
+    asset_type: "0x42556039b88593e768c97ab1a3ab0c6a17230825769304482dff8fdebe4c002b::coin::T",
     description: LST_CONFIGS.stkAPT.name,
     decimals: LST_CONFIGS.stkAPT.decimals,
   },

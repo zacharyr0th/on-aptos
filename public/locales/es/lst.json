@@ -16,7 +16,6 @@
   "providers": {
     "all": "All",
     "amnis": "Amnis",
-    "ditto": "Ditto",
     "thala": "Thala Labs",
     "other": "Other"
   },

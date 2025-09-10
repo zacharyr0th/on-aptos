@@ -1,27 +1,10 @@
 import { logger } from "@/lib/utils/core/logger";
-
-export interface CompoundablePosition {
-  id: string;
-  protocol: string;
-  asset: string;
-  pendingRewards: number;
-  rewardToken: string;
-  lastCompounded?: Date;
-  gasEstimate: number;
-  minRewardThreshold: number;
-}
-
-export interface HarvestablePosition {
-  id: string;
-  protocol: string;
-  rewards: Array<{
-    token: string;
-    amount: number;
-    valueUSD: number;
-  }>;
-  gasEstimate: number;
-  profitable: boolean;
-}
+import type { CompoundablePosition, HarvestablePosition } from "./types";
+import {
+  sanitizeWalletAddress,
+  validateCompoundablePosition,
+  validateHarvestablePosition,
+} from "./validation";
 
 export class AutoCompoundService {
   private static instance: AutoCompoundService;
@@ -29,19 +12,25 @@ export class AutoCompoundService {
   private constructor() {}
 
   static getInstance(): AutoCompoundService {
-    if (!this.instance) {
-      this.instance = new AutoCompoundService();
+    if (!AutoCompoundService.instance) {
+      AutoCompoundService.instance = new AutoCompoundService();
     }
-    return this.instance;
+    return AutoCompoundService.instance;
   }
 
   /**
    * Scan for positions that can be auto-compounded
    */
-  async scanCompoundablePositions(
-    _walletAddress: string,
-  ): Promise<CompoundablePosition[]> {
+  async scanCompoundablePositions(walletAddress: string): Promise<CompoundablePosition[]> {
+    const sanitizedWallet = sanitizeWalletAddress(walletAddress);
+    if (!sanitizedWallet) {
+      logger.warn("Invalid wallet address provided to scanCompoundablePositions");
+      return [];
+    }
+
     try {
+      logger.debug(`Scanning compoundable positions for wallet: ${sanitizedWallet}`);
+
       // This would integrate with DeFi adapters to find positions with pending rewards
       const positions: CompoundablePosition[] = [];
 
@@ -49,9 +38,27 @@ export class AutoCompoundService {
       // Example: Check PancakeSwap MasterChef positions
       // Example: Check lending protocol rewards
 
-      return positions.filter((p) => this.isCompoundProfitable(p));
+      // Validate all positions before filtering
+      const validPositions = positions.filter((p) => {
+        const isValid = validateCompoundablePosition(p);
+        if (!isValid) {
+          logger.warn(`Invalid compoundable position found for ${sanitizedWallet}:`, p);
+        }
+        return isValid;
+      });
+
+      const profitablePositions = validPositions.filter((p) => this.isCompoundProfitable(p));
+
+      logger.info(
+        `Found ${profitablePositions.length} profitable compoundable positions out of ${validPositions.length} total`
+      );
+      return profitablePositions;
     } catch (error) {
-      logger.error("Failed to scan compoundable positions:", error);
+      logger.error(`Failed to scan compoundable positions for ${sanitizedWallet}:`, {
+        error: error instanceof Error ? error.message : String(error),
+        walletAddress: sanitizedWallet,
+        stack: error instanceof Error ? error.stack : undefined,
+      });
       return [];
     }
   }
@@ -64,9 +71,7 @@ export class AutoCompoundService {
     const gasCost = position.gasEstimate * 0.01; // Assuming 0.01 APT per gas unit
 
     // Only compound if rewards > 2x gas cost
-    return (
-      rewardValue > gasCost * 2 && rewardValue >= position.minRewardThreshold
-    );
+    return rewardValue > gasCost * 2 && rewardValue >= position.minRewardThreshold;
   }
 
   /**
@@ -74,16 +79,14 @@ export class AutoCompoundService {
    */
   async executeCompound(
     position: CompoundablePosition,
-    _walletAddress: string,
+    _walletAddress: string
   ): Promise<{
     success: boolean;
     txHash?: string;
     error?: string;
   }> {
     try {
-      logger.info(
-        `Executing compound for ${position.protocol} position ${position.id}`,
-      );
+      logger.info(`Executing compound for ${position.protocol} position ${position.id}`);
 
       // This would:
       // 1. Claim rewards from the protocol
@@ -107,18 +110,38 @@ export class AutoCompoundService {
   /**
    * Scan for harvestable rewards across all positions
    */
-  async scanHarvestableRewards(
-    _walletAddress: string,
-  ): Promise<HarvestablePosition[]> {
+  async scanHarvestableRewards(walletAddress: string): Promise<HarvestablePosition[]> {
+    const sanitizedWallet = sanitizeWalletAddress(walletAddress);
+    if (!sanitizedWallet) {
+      logger.warn("Invalid wallet address provided to scanHarvestableRewards");
+      return [];
+    }
+
     try {
+      logger.debug(`Scanning harvestable rewards for wallet: ${sanitizedWallet}`);
+
       // Scan all DeFi positions for claimable rewards
       const harvestable: HarvestablePosition[] = [];
 
       // This would check each protocol adapter for pending rewards
 
-      return harvestable;
+      // Validate all positions
+      const validPositions = harvestable.filter((p) => {
+        const isValid = validateHarvestablePosition(p);
+        if (!isValid) {
+          logger.warn(`Invalid harvestable position found for ${sanitizedWallet}:`, p);
+        }
+        return isValid;
+      });
+
+      logger.info(`Found ${validPositions.length} harvestable positions`);
+      return validPositions;
     } catch (error) {
-      logger.error("Failed to scan harvestable rewards:", error);
+      logger.error(`Failed to scan harvestable rewards for ${sanitizedWallet}:`, {
+        error: error instanceof Error ? error.message : String(error),
+        walletAddress: sanitizedWallet,
+        stack: error instanceof Error ? error.stack : undefined,
+      });
       return [];
     }
   }
@@ -128,7 +151,7 @@ export class AutoCompoundService {
    */
   async executeBatchHarvest(
     positions: HarvestablePosition[],
-    _walletAddress: string,
+    _walletAddress: string
   ): Promise<{
     successful: string[];
     failed: string[];
@@ -145,10 +168,7 @@ export class AutoCompoundService {
 
         // This would claim rewards from the protocol
         successful.push(position.id);
-        totalHarvested += position.rewards.reduce(
-          (sum, r) => sum + r.valueUSD,
-          0,
-        );
+        totalHarvested += position.rewards.reduce((sum, r) => sum + r.valueUSD, 0);
       } catch (error) {
         logger.error(`Failed to harvest ${position.id}:`, error);
         failed.push(position.id);
@@ -164,7 +184,7 @@ export class AutoCompoundService {
   calculateOptimalCompoundFrequency(
     positionValue: number,
     apy: number,
-    gasEstimate: number,
+    gasEstimate: number
   ): {
     frequency: "daily" | "weekly" | "monthly" | "manual";
     estimatedGain: number;

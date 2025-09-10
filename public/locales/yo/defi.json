@@ -223,62 +223,7 @@
       "Protocol Suite": "Àkójọpọ̀ Ìlànà"
     }
   },
-  "protocols": {
-    "names": {
-      "Panora": "Panora",
-      "Kana": "Kana",
-      "Thetis": "Thetis",
-      "Anqa": "Anqa",
-      "LiquidSwap": "LiquidSwap",
-      "Cellana": "Cellana",
-      "PancakeSwap": "PancakeSwap",
-      "SushiSwap": "SushiSwap",
-      "Hyperion": "Hyperion",
-      "Tapp": "Tapp",
-      "Merkle": "Merkle",
-      "AGDEX": "AGDEX",
-      "Pump": "Pump",
-      "Aries": "Aries",
-      "Superposition": "Superposition",
-      "Joule": "Joule",
-      "Echelon": "Echelon",
-      "Meso": "Meso",
-      "TruFin": "TruFin",
-      "Amnis": "Amnis",
-      "Kofi": "Kofi",
-      "Ichi": "Ichi",
-      "Moar": "Moar",
-      "Thala": "Thala",
-      "Mirage": "Mirage"
-    },
-    "short_descriptions": {
-      "Panora": "Akójọpọ̀ Meta-DEX",
-      "Kana": "Olùdarí pàṣípààrọ̀ kọjá-chain",
-      "Thetis": "Pẹpẹ ìṣòwò ọjà-púpọ̀",
-      "Anqa": "Akójọpọ̀ DEX tó ga",
-      "LiquidSwap": "DEX Aptos àkọ́kọ́",
-      "Cellana": "ve(3,3) AMM",
-      "PancakeSwap": "DEX multichain olókìkí",
-      "SushiSwap": "Pẹpẹ DeFi kọjá-chain",
-      "Hyperion": "Pẹpẹ ìṣòwò àdàpọ̀",
-      "Tapp": "DEX módúlà tó ní hook",
-      "Merkle": "Perpetuals eré",
-      "AGDEX": "Perps kọjá-margin",
-      "Pump": "Ibi ìfilọ́lẹ̀ tókìn meme",
-      "Aries": "Yínìí bíi Compound",
-      "Superposition": "Ìṣàkóso ewu tó ga",
-      "Joule": "Àwọn àkójọpọ̀ yínìí ìyàsọ́tọ̀",
-      "Echelon": "Ilé-iṣẹ́ yínìí ọ̀nà-púpọ̀",
-      "Meso": "Yínìí tó ní agbára owó",
-      "TruFin": "Ìdókòwò olómi ilé-iṣẹ́",
-      "Amnis": "Ìdókòwò olómi tókìn-méjì",
-      "Kofi": "Ìdókòwò tó ní MEV",
-      "Ichi": "Alábòójútó olómi aládàáṣe",
-      "Moar": "Ìpele ọ̀gbìn alágbára",
-      "Thala": "Àkójọpọ̀ ìlànà DeFi",
-      "Mirage": "Ìpele olómi tí a lè sopọ̀"
-    }
-  },
+  "protocols": {},
   "protocol_descriptions": {
     "Panora": "\"Meta-DEX\" kan tó sopọ̀ mọ́ ìwé-àṣẹ lórí-chain àti 10+ AMMs, ń pín àwọn àṣẹ káàkiri àwọn àkójọpọ̀ bí ó ṣe ń ṣàkójọ àtòjọ tókìn tó ń sọ ara rẹ̀ di tuntun nínú UI rẹ̀.",
     "Kana": "Ń darí àwọn pàṣípààrọ̀ káàkiri chain mẹ́sàn-án; àdéhùn Paymaster jẹ́ kí àwọn òǹṣàmúlò ṣòwò lórí Aptos láìní APT fún gas; ẹ́ńjìnì perp tó dá lórí ìwé-àṣẹ.",
@@ -303,21 +248,10 @@
     "Kofi": "Ìdókòwò olómi tó ní MEV pẹ̀lú àwọn àgò LSD-alágbára.",
     "Ichi": "Àwọn àgò Alábòójútó Olómi Aládàáṣe jẹ́ kí àwọn iṣẹ́ àkànṣe gbin olómi ẹ̀gbẹ́-kan; àwọn ìwọ̀n ọlọ́gbọ́n tún ṣètò láti gé ìpàdánù aláìṣeé bí àwọn ilé-ìṣúra ṣe ń jèrè owó ìdíyelé pàṣípààrọ̀ nínú tókìn ìbílẹ̀ wọn.",
     "Moar": "Ń kọ́ ìpele ọ̀gbìn-alágbára pẹ̀lú àwọn àkáǹtì gbèsè kọjá-ìlànà tó ń jẹ́ kí àwọn òǹṣàmúlò yá ní ibìkan kí wọ́n sì lò ní ibòmíràn.",
-    "Thala": "Àkójọpọ̀ àwọn ohun èlò DeFi tó ní AMM àkójọpọ̀-púpọ̀, owó ìdúró MOD tó ní dúkìá ju, àti ìdókòwò-olómi nípa sthAPT àti thAPT.",
-    "Mirage": "Ìpele olómi tí a lè sopọ̀ tó ń mú ojú ọ̀nà DeFi tó tẹ̀lé ṣiṣẹ́. Fi dúkìá sílẹ̀ kí o sì yá ìyáwó owó ìdúró tó ń san ara rẹ̀ tí perpetuals ń ṣe agbára. Ó ní perps lórí-chain pátápátá pẹ̀lú ìrírí bíi CEX, ìṣiṣẹ́ lẹ́sẹ̀kẹsẹ̀, owó ìdíyelé kékeré, àti agbára tó tó 100x."
+    "Thala": "Àkójọpọ̀ àwọn ohun èlò DeFi tó ní AMM àkójọpọ̀-púpọ̀, owó ìdúró MOD tó ní dúkìá ju, àti ìdókòwò-olómi nípa sthAPT àti thAPT."
   },
   "protocol_category_breakdown": {
     "Thala": "Ìṣòwò • Èrè • Gbèsè"
-  },
-  "protocols": {
-    "mirage": {
-      "description": "Ìpele olómi tí a lè sopọ̀ tó ń mú ojú ọ̀nà DeFi tó tẹ̀lé ṣiṣẹ́. Fi dúkìá sílẹ̀ kí o sì yá ìyáwó owó ìdúró tó ń san ara rẹ̀ tí perpetuals ń ṣe agbára pẹ̀lú agbára tó tó 100x.",
-      "categoryBreakdown": "Ìṣòwò • Perps",
-      "feeStructure": "Ètò owó ìdíyelé tó ń yí padà tó dá lórí ìwọ̀n ìṣòwò àti ìwọ̀n ipò. Àwọn owó tó ń díjú fún ìṣòwò perpetual futures.",
-      "integration": {
-        "description": "Perpetuals lórí-chain pátápátá pẹ̀lú ìrírí bíi CEX. Gbogbo àwọn ipò, àgò, àti àṣẹ ni a sọ di NFTs fún ìṣòwò ọjà kejì."
-      }
-    }
   },
   "table": {
     "protocol": "Ìlànà",

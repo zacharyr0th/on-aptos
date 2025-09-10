@@ -3,5 +3,5 @@
  */
 
 export { ErrorBoundary } from "./ErrorBoundary";
-export { RootErrorBoundary } from "./RootErrorBoundary";
 export { ErrorFallback } from "./ErrorFallback";
+export { RootErrorBoundary } from "./RootErrorBoundary";

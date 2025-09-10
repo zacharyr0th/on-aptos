@@ -1,10 +1,10 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import {
-  formatNumber,
   formatCurrency,
-  formatPercentage,
   formatLargeNumber,
+  formatNumber,
+  formatPercentage,
   formatRelativeTime,
 } from "./format";
 

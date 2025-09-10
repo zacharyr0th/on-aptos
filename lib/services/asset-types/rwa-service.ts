@@ -3,7 +3,6 @@ import { CACHE_TTL } from "@/lib/constants/api/cache";
 import { enhancedFetch } from "@/lib/utils/api/fetch-utils";
 import { UnifiedCache } from "@/lib/utils/cache/unified-cache";
 import { logger } from "@/lib/utils/core/logger";
-
 import { BaseAssetService } from "../shared/utils/base-service";
 
 // RWA.xyz API Types
@@ -140,40 +139,38 @@ export class RWAService extends BaseAssetService {
   static async getRWAData(forceRefresh = false): Promise<RWAResponse> {
     // Check cache first
     if (!forceRefresh) {
-      const cached = this.cache.get(this.CACHE_KEY);
+      const cached = RWAService.cache.get(RWAService.CACHE_KEY);
       if (cached) {
         return cached;
       }
     }
 
     // Check circuit breaker
-    if (this.circuitBreaker.isOpen()) {
+    if (RWAService.circuitBreaker.isOpen()) {
       logger.warn("RWA circuit breaker is open, returning fallback");
-      return this.getFallbackResponse(
-        "Circuit breaker is open - too many recent failures",
-      );
+      return RWAService.getFallbackResponse("Circuit breaker is open - too many recent failures");
     }
 
     try {
-      const data = await this.fetchRealTimeRWAData();
+      const data = await RWAService.fetchRealTimeRWAData();
 
       // Cache successful response
-      this.cache.set(this.CACHE_KEY, data, this.CACHE_TTL);
-      this.circuitBreaker.reset();
+      RWAService.cache.set(RWAService.CACHE_KEY, data, RWAService.CACHE_TTL);
+      RWAService.circuitBreaker.reset();
 
       return data;
     } catch (error) {
-      this.circuitBreaker.recordFailure();
+      RWAService.circuitBreaker.recordFailure();
       logger.error("Failed to fetch RWA data", error);
 
       // Try to return cached data even if expired
-      const stale = this.cache.get<RWAResponse>(this.CACHE_KEY);
+      const stale = RWAService.cache.get<RWAResponse>(RWAService.CACHE_KEY);
       if (stale) {
         return { ...stale, dataSource: "RWA.xyz API (cached - stale)" };
       }
 
-      return this.getFallbackResponse(
-        error instanceof Error ? error.message : "Unknown error",
+      return RWAService.getFallbackResponse(
+        error instanceof Error ? error.message : "Unknown error"
       );
     }
   }
@@ -204,11 +201,11 @@ export class RWAService extends BaseAssetService {
                   {
                     field: "network_id",
                     operator: "equals" as const,
-                    value: this.APTOS_NETWORK_ID,
+                    value: RWAService.APTOS_NETWORK_ID,
                   },
                 ],
               },
-            }),
+            })
           )}`,
           {
             headers: {
@@ -217,7 +214,7 @@ export class RWAService extends BaseAssetService {
             },
             timeout: 15000,
             retries: 2,
-          },
+          }
         ),
         // Fetch asset metadata
         enhancedFetch(
@@ -230,11 +227,11 @@ export class RWAService extends BaseAssetService {
                   {
                     field: "network_ids",
                     operator: "includes" as const,
-                    value: this.APTOS_NETWORK_ID,
+                    value: RWAService.APTOS_NETWORK_ID,
                   },
                 ],
               },
-            }),
+            })
           )}`,
           {
             headers: {
@@ -243,13 +240,13 @@ export class RWAService extends BaseAssetService {
             },
             timeout: 15000,
             retries: 2,
-          },
+          }
         ),
       ]);
 
       if (!tokenResponse.ok || !assetResponse.ok) {
         throw new Error(
-          `RWA API error: Token ${tokenResponse.status}, Asset ${assetResponse.status}`,
+          `RWA API error: Token ${tokenResponse.status}, Asset ${assetResponse.status}`
         );
       }
 
@@ -259,13 +256,10 @@ export class RWAService extends BaseAssetService {
       ]);
 
       // Process the data
-      const protocols = this.processRWAData(
-        tokenData.results,
-        assetData.results,
-      );
+      const protocols = RWAService.processRWAData(tokenData.results, assetData.results);
       const totalValue = protocols.reduce((sum, p) => sum + p.totalValue, 0);
 
-      this.logMetrics("fetchRealTimeRWAData", startTime, true, {
+      RWAService.logMetrics("fetchRealTimeRWAData", startTime, true, {
         assetCount: protocols.length,
         totalValue,
       });
@@ -280,7 +274,7 @@ export class RWAService extends BaseAssetService {
         dataSource: "RWA.xyz API",
       };
     } catch (error) {
-      this.logMetrics("fetchRealTimeRWAData", startTime, false);
+      RWAService.logMetrics("fetchRealTimeRWAData", startTime, false);
       throw error;
     }
   }
@@ -288,10 +282,7 @@ export class RWAService extends BaseAssetService {
   /**
    * Process RWA tokens and assets into protocol format
    */
-  private static processRWAData(
-    tokens: RWAXyzToken[],
-    assets: RWAXyzAsset[],
-  ): RWAProtocol[] {
+  private static processRWAData(tokens: RWAXyzToken[], assets: RWAXyzAsset[]): RWAProtocol[] {
     // Create asset metadata map
     const assetMap = new Map<number, RWAXyzAsset>();
     assets.forEach((asset) => assetMap.set(asset.id, asset));
@@ -300,10 +291,7 @@ export class RWAService extends BaseAssetService {
 
     for (const token of tokens) {
       // Skip tokens without value
-      if (
-        !token.total_asset_value_dollar?.val ||
-        token.total_asset_value_dollar.val === 0
-      ) {
+      if (!token.total_asset_value_dollar?.val || token.total_asset_value_dollar.val === 0) {
         continue;
       }
 
@@ -311,11 +299,11 @@ export class RWAService extends BaseAssetService {
       if (!asset) continue;
 
       // Filter out stablecoins (but keep USDY as it's yield-bearing)
-      if (this.isStablecoin(token.asset.ticker, token.asset.name)) {
+      if (RWAService.isStablecoin(token.asset.ticker, token.asset.name)) {
         continue;
       }
 
-      const protocol = this.transformToProtocol(token, asset);
+      const protocol = RWAService.transformToProtocol(token, asset);
       if (protocol) {
         protocols.push(protocol);
       }
@@ -328,17 +316,14 @@ export class RWAService extends BaseAssetService {
   /**
    * Transform RWA token to protocol format
    */
-  private static transformToProtocol(
-    token: RWAXyzToken,
-    asset: RWAXyzAsset,
-  ): RWAProtocol {
+  private static transformToProtocol(token: RWAXyzToken, asset: RWAXyzAsset): RWAProtocol {
     const protocol = asset.protocol || "unknown";
-    const assetClass = this.formatAssetClass(asset.asset_class);
+    const assetClass = RWAService.formatAssetClass(asset.asset_class);
 
     return {
       id: token.asset_id.toString(),
       name: asset.name,
-      logoUrl: this.protocolLogos[protocol] || "/icons/rwas/rwa.webp",
+      logoUrl: RWAService.protocolLogos[protocol] || "/icons/rwas/rwa.webp",
       totalValue: token.total_asset_value_dollar?.val || 0,
       description: asset.description || `${asset.name} issued on Aptos`,
       tokenAddress: token.address,
@@ -352,9 +337,7 @@ export class RWAService extends BaseAssetService {
   /**
    * Format asset class from API response
    */
-  private static formatAssetClass(
-    assetClass?: string | { name?: string; slug?: string },
-  ): string {
+  private static formatAssetClass(assetClass?: string | { name?: string; slug?: string }): string {
     if (!assetClass) return "rwa";
 
     if (typeof assetClass === "object") {
@@ -380,7 +363,7 @@ export class RWAService extends BaseAssetService {
     const stableTokens = ["usdc", "usdt", "usd coin", "tether"];
 
     return stableTokens.some(
-      (stable) => tickerLower.includes(stable) || nameLower.includes(stable),
+      (stable) => tickerLower.includes(stable) || nameLower.includes(stable)
     );
   }
 
@@ -404,10 +387,9 @@ export class RWAService extends BaseAssetService {
    * Get RWA assets by asset class
    */
   static async getRWAAssetsByClass(assetClass: string): Promise<RWAProtocol[]> {
-    const data = await this.getRWAData();
+    const data = await RWAService.getRWAData();
     return data.protocols.filter(
-      (protocol) =>
-        protocol.assetClass.toLowerCase() === assetClass.toLowerCase(),
+      (protocol) => protocol.assetClass.toLowerCase() === assetClass.toLowerCase()
     );
   }
 
@@ -415,9 +397,9 @@ export class RWAService extends BaseAssetService {
    * Get RWA assets by issuer
    */
   static async getRWAAssetsByIssuer(issuer: string): Promise<RWAProtocol[]> {
-    const data = await this.getRWAData();
+    const data = await RWAService.getRWAData();
     return data.protocols.filter((protocol) =>
-      protocol.issuer?.toLowerCase().includes(issuer.toLowerCase()),
+      protocol.issuer?.toLowerCase().includes(issuer.toLowerCase())
     );
   }
 }

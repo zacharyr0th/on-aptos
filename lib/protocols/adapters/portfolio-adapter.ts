@@ -2,9 +2,8 @@
  * Portfolio Adapter - Bridges new protocol system with existing portfolio components
  */
 
-import type { DeFiPosition } from "@/lib/services/defi/unified-scanner";
+import type { DeFiPosition } from "@/lib/types/defi";
 import { logger } from "@/lib/utils/core/logger";
-
 import { ProtocolDetector } from "../detector";
 import { ProtocolLoader } from "../loader";
 import { protocolRegistry } from "../registry";
@@ -13,10 +12,7 @@ import { PositionType } from "../types";
 /**
  * Convert new protocol detection to DeFi position format
  */
-export function convertToDefiPosition(
-  detection: any,
-  walletAddress: string,
-): DeFiPosition | null {
+export function convertToDefiPosition(detection: any, walletAddress: string): DeFiPosition | null {
   if (!detection || !detection.positions.length) return null;
 
   const { protocol, positions } = detection;
@@ -36,10 +32,7 @@ export function convertToDefiPosition(
   };
 
   // Calculate total value
-  const totalValueUSD = assets.reduce(
-    (sum: number, asset: any) => sum + (asset.valueUSD || 0),
-    0,
-  );
+  const totalValueUSD = assets.reduce((sum: number, asset: any) => sum + (asset.valueUSD || 0), 0);
 
   return {
     positionId: `${protocol.metadata.id}-${firstPosition.type}-${Date.now()}`,
@@ -70,10 +63,7 @@ export function convertToDefiPosition(
           : [],
     },
     assets: assets.map((asset: any) => ({
-      type:
-        firstPosition.type === PositionType.LENDING_BORROW
-          ? "borrowed"
-          : "supplied",
+      type: firstPosition.type === PositionType.LENDING_BORROW ? "borrowed" : "supplied",
       tokenAddress: asset.address,
       symbol: asset.symbol,
       amount: asset.amount,
@@ -95,7 +85,7 @@ export function convertToDefiPosition(
  */
 export async function scanWalletPositions(
   walletAddress: string,
-  resources: any[],
+  resources: any[]
 ): Promise<DeFiPosition[]> {
   // Ensure protocols are loaded
   await ProtocolLoader.loadCore();
@@ -184,9 +174,7 @@ export async function analyzeTransaction(tx: any) {
 
     for (const pattern of patterns) {
       const regex =
-        typeof pattern.pattern === "string"
-          ? new RegExp(pattern.pattern)
-          : pattern.pattern;
+        typeof pattern.pattern === "string" ? new RegExp(pattern.pattern) : pattern.pattern;
 
       if (regex.test(functionName)) {
         activity = pattern.activity;
@@ -242,8 +230,5 @@ export function getProtocolLogo(protocolId: string): string | null {
  */
 export function isHighRiskProtocol(protocolId: string): boolean {
   const protocol = protocolRegistry.get(protocolId);
-  return (
-    protocol?.metadata.riskLevel === "high" ||
-    protocol?.metadata.auditStatus === "unaudited"
-  );
+  return protocol?.metadata.riskLevel === "high" || protocol?.metadata.auditStatus === "unaudited";
 }

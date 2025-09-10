@@ -13,19 +13,14 @@ export const AptosValidationSchemas = {
   /**
    * Aptos address validation - handles both full and short formats
    */
-  aptosAddress: z
-    .string()
-    .regex(/^0x[a-fA-F0-9]{1,64}$/, "Invalid Aptos address format"),
+  aptosAddress: z.string().regex(/^0x[a-fA-F0-9]{1,64}$/, "Invalid Aptos address format"),
 
   /**
    * Full asset type validation (includes module and resource)
    */
   assetType: z
     .string()
-    .regex(
-      /^0x[a-fA-F0-9]{1,64}(::[a-zA-Z_][a-zA-Z0-9_]*)*$/,
-      "Invalid Aptos asset type format",
-    ),
+    .regex(/^0x[a-fA-F0-9]{1,64}(::[a-zA-Z_][a-zA-Z0-9_]*)*$/, "Invalid Aptos asset type format"),
 
   /**
    * Protocol validation
@@ -58,9 +53,7 @@ export const AptosValidators = {
   /**
    * Validate asset type format
    */
-  validateAssetType: (
-    assetType: string,
-  ): { isValid: boolean; error?: string } => {
+  validateAssetType: (assetType: string): { isValid: boolean; error?: string } => {
     try {
       AptosValidationSchemas.assetType.parse(assetType);
       return { isValid: true };

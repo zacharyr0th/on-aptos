@@ -1,44 +1,38 @@
 // Responsive hooks
-export {
-  useResponsive,
-  useIsMobile,
-  useDeviceType,
-  BREAKPOINTS,
-} from "./useResponsive";
 
-// Translation hooks
-export { useTranslation, usePageTranslation } from "./useTranslation";
-
-// Data hooks
-export { useMarketPrice, useBitcoinPrice } from "./useMarketPrice";
-// usePortfolioQuery removed - functionality consolidated into portfolio services
-export { useDefiMetrics } from "./useDefiMetrics";
-export { useProtocolMetrics } from "./useProtocolMetrics";
+// Wallet hooks
+export { useAnsName } from "./useAnsName";
 export {
+  useBalanceHistory,
   useGasUsage,
   useTokenPriceHistory,
-  useBalanceHistory,
   useTopPriceChanges,
   useTransactionHistory,
 } from "./useAptosAnalytics";
-
 // UI interaction hooks
 export { useClickOutside } from "./useClickOutside";
+// Performance hooks
+export { useDataPrefetch } from "./useDataPrefetching";
 export { useDebounce, useDebouncedCallback } from "./useDebounce";
+// usePortfolioQuery removed - functionality consolidated into portfolio services
+export { useDefiMetrics } from "./useDefiMetrics";
+// Error handling hooks
+export { useAsyncError, useErrorBoundary } from "./useErrorBoundary";
 export {
   useIntersectionObserver,
   useOnScreen,
 } from "./useIntersectionObserver";
-
 // State management hooks
 export { useLocalStorage } from "./useLocalStorage";
-
-// Error handling hooks
-export { useErrorBoundary, useAsyncError } from "./useErrorBoundary";
+// Data hooks
+export { useBitcoinPrice, useMarketPrice } from "./useMarketPrice";
+export { useProtocolMetrics } from "./useProtocolMetrics";
+export {
+  BREAKPOINTS,
+  useDeviceType,
+  useIsMobile,
+  useResponsive,
+} from "./useResponsive";
 export { useRetry, useRetryFn } from "./useRetry";
-
-// Wallet hooks
-export { useAnsName } from "./useAnsName";
-
-// Performance hooks
-export { useDataPrefetch } from "./useDataPrefetching";
+// Translation hooks
+export { usePageTranslation, useTranslation } from "./useTranslation";

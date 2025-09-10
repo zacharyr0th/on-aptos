@@ -68,9 +68,7 @@ export const PWA_SHORTCUTS = [
   {
     name: "Stablecoins",
     url: APP_ROUTES.MARKETS.STABLES,
-    icons: [
-      { src: "/icons/stablecoins.png", sizes: "192x192", type: "image/png" },
-    ],
+    icons: [{ src: "/icons/stablecoins.png", sizes: "192x192", type: "image/png" }],
   },
   {
     name: "RWAs",

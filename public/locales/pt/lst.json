@@ -16,7 +16,6 @@
   "providers": {
     "all": "All",
     "amnis": "Amnis Finance",
-    "ditto": "Ditto Finance",
     "thala": "Thala Labs",
     "other": "Other"
   },

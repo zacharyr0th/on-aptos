@@ -4,39 +4,18 @@
  */
 
 import {
-  scanWalletPositions,
   getAllProtocolsForFilter,
+  scanWalletPositions,
 } from "@/lib/protocols/adapters/portfolio-adapter";
 import { ProtocolLoader } from "@/lib/protocols/loader";
 import type { DeFiPosition } from "@/lib/types/defi";
 import { logger } from "@/lib/utils/core/logger";
-
-import { DefaultPriceService } from "../external/price-service";
 import { UnifiedPanoraService } from "../portfolio/unified-panora-service";
-
+import { UnifiedPriceService } from "../shared/utils/unified-price-service";
 import { FungibleAssetService } from "./fungible-asset-service";
 
 // Re-export DeFiPosition for external use
 export type { DeFiPosition } from "@/lib/types/defi";
-
-// Legacy interface for backward compatibility
-interface LegacyDeFiPosition {
-  id: string;
-  protocol: string;
-  type: "lp" | "lending" | "staking" | "farming" | "token" | "derivatives";
-  address: string;
-  assets: Array<{
-    type: string;
-    tokenAddress: string;
-    symbol: string;
-    amount: string;
-    valueUSD: number;
-    metadata?: Record<string, any>;
-  }>;
-  totalValueUSD: number;
-  lastUpdated: string;
-  metadata?: Record<string, any>;
-}
 
 export interface ScanResult {
   positions: DeFiPosition[];
@@ -55,9 +34,9 @@ export interface ScanResult {
  * Unified resource fetcher with caching
  */
 class ResourceFetcher {
-  private cache = new Map<string, any[]>();
+  private cache = new Map<string, unknown[]>();
 
-  async fetchAccountResources(walletAddress: string): Promise<any[]> {
+  async fetchAccountResources(walletAddress: string): Promise<unknown[]> {
     const cached = this.cache.get(walletAddress);
     if (cached) {
       logger.debug("Using cached resources", { walletAddress });
@@ -70,7 +49,7 @@ class ResourceFetcher {
         headers: {
           "Content-Type": "application/json",
         },
-      },
+      }
     );
 
     if (!response.ok) {
@@ -92,7 +71,7 @@ class ResourceFetcher {
  */
 export class UnifiedDeFiScanner {
   private fetcher = new ResourceFetcher();
-  private priceService = new DefaultPriceService();
+  // Use static UnifiedPriceService instead of instance
 
   /**
    * Scan wallet for all DeFi positions
@@ -103,7 +82,7 @@ export class UnifiedDeFiScanner {
       minValueUSD?: number;
       includeTokens?: boolean;
       protocols?: string[];
-    } = {},
+    } = {}
   ): Promise<ScanResult> {
     const startTime = Date.now();
     const errors: Array<{ protocol: string; error: string }> = [];
@@ -127,14 +106,10 @@ export class UnifiedDeFiScanner {
       let positions = await scanWalletPositions(walletAddress, resources);
 
       // Enrich positions with fungible asset balances
-      positions = await this.enrichPositionsWithFungibleAssets(
-        positions,
-        walletAddress,
-      );
+      positions = await this.enrichPositionsWithFungibleAssets(positions, walletAddress);
 
       // Add direct fungible asset positions (like MKLP)
-      const faPositions =
-        await this.createFungibleAssetPositions(walletAddress);
+      const faPositions = await this.createFungibleAssetPositions(walletAddress);
       positions = [...positions, ...faPositions];
 
       // Add regular tokens if requested
@@ -153,36 +128,30 @@ export class UnifiedDeFiScanner {
       if (options.protocols && options.protocols.length > 0) {
         positions = positions.filter((p) =>
           options.protocols!.some((protocol) =>
-            p.protocol.toLowerCase().includes(protocol.toLowerCase()),
-          ),
+            p.protocol.toLowerCase().includes(protocol.toLowerCase())
+          )
         );
       }
 
       // Filter by minimum value
       const filteredPositions = options.minValueUSD
         ? positions.filter(
-            (pos) =>
-              (pos.totalValueUSD ?? pos.totalValue ?? 0) >=
-              options.minValueUSD!,
+            (pos) => (pos.totalValueUSD ?? pos.totalValue ?? 0) >= options.minValueUSD!
           )
         : positions;
 
       // Sort by value
       const sortedPositions = filteredPositions.sort(
-        (a, b) =>
-          (b.totalValueUSD ?? b.totalValue ?? 0) -
-          (a.totalValueUSD ?? a.totalValue ?? 0),
+        (a, b) => (b.totalValueUSD ?? b.totalValue ?? 0) - (a.totalValueUSD ?? a.totalValue ?? 0)
       );
 
       // Calculate totals
       const totalValueUSD = sortedPositions.reduce(
         (sum, pos) => sum + (pos.totalValueUSD ?? pos.totalValue ?? 0),
-        0,
+        0
       );
 
-      const protocols = Array.from(
-        new Set(sortedPositions.map((pos) => pos.protocol)),
-      );
+      const protocols = Array.from(new Set(sortedPositions.map((pos) => pos.protocol)));
 
       const scanDuration = Date.now() - startTime;
 
@@ -217,33 +186,32 @@ export class UnifiedDeFiScanner {
   /**
    * Scan regular tokens (non-DeFi positions)
    */
-  private async scanTokens(
-    resources: any[],
-    walletAddress: string,
-  ): Promise<DeFiPosition[]> {
+  private async scanTokens(resources: unknown[], walletAddress: string): Promise<DeFiPosition[]> {
     const positions: DeFiPosition[] = [];
 
     const coinResources = resources.filter(
       (r) =>
-        r.type.startsWith("0x1::coin::CoinStore<") &&
-        !r.type.includes("AptosCoin"), // Handled separately
+        (r as any).type.startsWith("0x1::coin::CoinStore<") &&
+        !(r as any).type.includes("AptosCoin") // Handled separately
     );
 
     for (const resource of coinResources) {
-      const balance = resource.data?.coin?.value || "0";
+      const resourceData = resource as { data?: { coin?: { value?: string } }; type: string };
+      const balance = resourceData.data?.coin?.value || "0";
       if (balance === "0") continue;
 
-      const tokenMatch = resource.type.match(/CoinStore<(.+)>/);
+      const tokenMatch = resourceData.type.match(/CoinStore<(.+)>/);
       if (!tokenMatch) continue;
 
       const tokenAddress = tokenMatch[1];
-      const amount = parseFloat(balance) / Math.pow(10, 8);
+      const amount = parseFloat(balance) / 10 ** 8;
 
       let valueUSD = 0;
       try {
-        const price = await this.priceService.getTokenPrice(tokenAddress);
+        const priceData = await UnifiedPriceService.getAssetPrice(tokenAddress);
+        const price = priceData?.price || 0;
         valueUSD = amount * (price || 0);
-      } catch (error) {
+      } catch {
         logger.debug("Could not fetch token price", { tokenAddress });
       }
 
@@ -284,10 +252,9 @@ export class UnifiedDeFiScanner {
    */
   private async enrichPositionsWithFungibleAssets(
     positions: DeFiPosition[],
-    walletAddress: string,
+    walletAddress: string
   ): Promise<DeFiPosition[]> {
-    const fungibleBalances =
-      await FungibleAssetService.getBalances(walletAddress);
+    const fungibleBalances = await FungibleAssetService.getBalances(walletAddress);
 
     return positions.map((position) => {
       // Check if position requires fungible asset query
@@ -301,7 +268,7 @@ export class UnifiedDeFiScanner {
         if (faBalance) {
           // Update position with real balance
           const decimals = faBalance.metadata?.decimals || 6;
-          const amount = faBalance.amount / Math.pow(10, decimals);
+          const amount = faBalance.amount / 10 ** decimals;
 
           position.assets = [
             {
@@ -326,9 +293,7 @@ export class UnifiedDeFiScanner {
   /**
    * Enrich positions with real prices from Panora
    */
-  private async enrichPositionsWithPrices(
-    positions: DeFiPosition[],
-  ): Promise<DeFiPosition[]> {
+  private async enrichPositionsWithPrices(positions: DeFiPosition[]): Promise<DeFiPosition[]> {
     if (positions.length === 0) return positions;
 
     try {
@@ -352,9 +317,7 @@ export class UnifiedDeFiScanner {
       });
 
       // Fetch prices from Panora
-      const prices = await UnifiedPanoraService.getTokenPrices(
-        Array.from(tokenAddresses),
-      );
+      const prices = await UnifiedPanoraService.getTokenPrices(Array.from(tokenAddresses));
 
       logger.info(`Retrieved ${prices.size} prices`);
 
@@ -391,10 +354,7 @@ export class UnifiedDeFiScanner {
 
       logger.info("Price enrichment completed", {
         totalPositions: enrichedPositions.length,
-        totalValue: enrichedPositions.reduce(
-          (sum, p) => sum + p.totalValueUSD,
-          0,
-        ),
+        totalValue: enrichedPositions.reduce((sum, p) => sum + p.totalValueUSD, 0),
       });
 
       return enrichedPositions;
@@ -433,21 +393,18 @@ export class UnifiedDeFiScanner {
   /**
    * Create positions directly from fungible assets (for tokens like MKLP)
    */
-  private async createFungibleAssetPositions(
-    walletAddress: string,
-  ): Promise<DeFiPosition[]> {
+  private async createFungibleAssetPositions(walletAddress: string): Promise<DeFiPosition[]> {
     const positions: DeFiPosition[] = [];
 
     try {
       // Get MKLP balances specifically
-      const mklpBalances =
-        await FungibleAssetService.getMKLPBalances(walletAddress);
+      const mklpBalances = await FungibleAssetService.getMKLPBalances(walletAddress);
 
       for (const balance of mklpBalances) {
         if (balance.amount === 0) continue;
 
         const decimals = balance.metadata?.decimals || 6;
-        const amount = balance.amount / Math.pow(10, decimals);
+        const amount = balance.amount / 10 ** decimals;
 
         positions.push({
           positionId: `mklp-${balance.asset_type}`,
@@ -491,10 +448,7 @@ export class UnifiedDeFiScanner {
   /**
    * Scan specific protocols only
    */
-  async scanProtocols(
-    walletAddress: string,
-    protocolNames: string[],
-  ): Promise<ScanResult> {
+  async scanProtocols(walletAddress: string, protocolNames: string[]): Promise<ScanResult> {
     return this.scan(walletAddress, { protocols: protocolNames });
   }
 
@@ -535,7 +489,7 @@ export const unifiedScanner = new UnifiedDeFiScanner();
  */
 export async function scanDeFiPositions(
   walletAddress: string,
-  options: { minValueUSD?: number } = {},
+  options: { minValueUSD?: number } = {}
 ): Promise<ScanResult> {
   return unifiedScanner.scan(walletAddress, options);
 }

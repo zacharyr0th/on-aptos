@@ -2,7 +2,7 @@
  * Shared types for page components
  */
 
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 
 // Page layout types
 export interface PageContainerProps {

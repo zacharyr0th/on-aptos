@@ -1,14 +1,8 @@
 "use client";
 
-import type { PageSectionProps } from "./types";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import type { PageSectionProps } from "./types";
 
 export function PageSection({
   title,
@@ -30,9 +24,7 @@ export function PageSection({
           </div>
         </CardHeader>
       )}
-      <CardContent className={cn(!title && !description && "pt-6")}>
-        {children}
-      </CardContent>
+      <CardContent className={cn(!title && !description && "pt-6")}>{children}</CardContent>
     </Card>
   );
 }

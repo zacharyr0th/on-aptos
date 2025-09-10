@@ -4,8 +4,8 @@ import { NextResponse } from "next/server";
 import { CACHE_CONFIG } from "@/lib/config/cache";
 
 import { RateLimitError } from "../core/errors";
-import { logger, errorLogger } from "../core/logger";
-import { RateLimitInfo, ApiResponse } from "../core/types";
+import { errorLogger, logger } from "../core/logger";
+import type { ApiResponse, RateLimitInfo } from "../core/types";
 
 // Configuration using centralized config
 const RATE_LIMIT_WINDOW = CACHE_CONFIG.RATE_LIMIT.WINDOW;
@@ -61,7 +61,7 @@ export function checkRateLimit(ip: string): RateLimitInfo {
 
   // Clean up old timestamps outside of burst window
   record.requestTimestamps = record.requestTimestamps.filter(
-    (timestamp) => now - timestamp < BURST_WINDOW,
+    (timestamp) => now - timestamp < BURST_WINDOW
   );
 
   // Add current timestamp
@@ -88,10 +88,7 @@ export function checkRateLimit(ip: string): RateLimitInfo {
       allowed: false,
       resetInSeconds,
       remaining: 0,
-      burstRemaining: Math.max(
-        0,
-        BURST_LIMIT - record.requestTimestamps.length,
-      ),
+      burstRemaining: Math.max(0, BURST_LIMIT - record.requestTimestamps.length),
     };
   }
 
@@ -105,15 +102,11 @@ export function checkRateLimit(ip: string): RateLimitInfo {
 /**
  * Get security headers including rate limit info
  */
-export function getSecurityHeaders(
-  rateLimitInfo: RateLimitInfo,
-): Record<string, string> {
+export function getSecurityHeaders(rateLimitInfo: RateLimitInfo): Record<string, string> {
   return {
     "X-RateLimit-Limit": RATE_LIMIT_MAX_REQUESTS.toString(),
     "X-RateLimit-Remaining": rateLimitInfo.remaining.toString(),
-    "X-RateLimit-Reset": (
-      rateLimitInfo.resetInSeconds || RATE_LIMIT_WINDOW / 1000
-    ).toString(),
+    "X-RateLimit-Reset": (rateLimitInfo.resetInSeconds || RATE_LIMIT_WINDOW / 1000).toString(),
     "X-RateLimit-Burst-Limit": BURST_LIMIT.toString(),
     "X-RateLimit-Burst-Remaining": rateLimitInfo.burstRemaining.toString(),
     "X-Content-Type-Options": "nosniff",
@@ -138,12 +131,12 @@ function scheduleRateLimitCleanup(): void {
         }
 
         data.requestTimestamps = data.requestTimestamps.filter(
-          (timestamp) => now - timestamp < BURST_WINDOW,
+          (timestamp) => now - timestamp < BURST_WINDOW
         );
       }
     } catch (error) {
       errorLogger.error(
-        `Rate limit cleanup error occurred: ${error instanceof Error ? error.message : String(error)}`,
+        `Rate limit cleanup error occurred: ${error instanceof Error ? error.message : String(error)}`
       );
     } finally {
       scheduleRateLimitCleanup();
@@ -162,7 +155,7 @@ export async function withApiEnhancements<T>(
   options: {
     customHeaders?: Record<string, string>;
     cacheMaxAge?: number; // Allow custom cache max age in seconds
-  } = {},
+  } = {}
 ): Promise<NextResponse> {
   const startTime = Date.now();
   const clientIp = await getClientIp();
@@ -173,7 +166,7 @@ export async function withApiEnhancements<T>(
       {
         clientIp,
       },
-      "API request started",
+      "API request started"
     );
 
     // Rate limiting
@@ -185,12 +178,12 @@ export async function withApiEnhancements<T>(
           clientIp,
           resetInSeconds: rateLimitResult.resetInSeconds,
         },
-        "Rate limit exceeded",
+        "Rate limit exceeded"
       );
 
       throw new RateLimitError(
         `Rate limit exceeded. Please try again in ${rateLimitResult.resetInSeconds} seconds.`,
-        rateLimitResult.resetInSeconds || 60,
+        rateLimitResult.resetInSeconds || 60
       );
     }
 
@@ -211,7 +204,7 @@ export async function withApiEnhancements<T>(
         clientIp,
         duration,
       },
-      "API request completed successfully",
+      "API request completed successfully"
     );
 
     const cacheMaxAge = options.cacheMaxAge || 60;
@@ -229,7 +222,7 @@ export async function withApiEnhancements<T>(
     });
   } catch (error) {
     errorLogger.error(
-      `API request failed: ${error instanceof Error ? error.message : String(error)}`,
+      `API request failed: ${error instanceof Error ? error.message : String(error)}`
     );
 
     // Handle rate limit errors specially
@@ -244,7 +237,7 @@ export async function withApiEnhancements<T>(
           headers: {
             "Retry-After": error.resetInSeconds.toString(),
           },
-        },
+        }
       );
     }
 
@@ -255,16 +248,15 @@ export async function withApiEnhancements<T>(
         clientIp,
         duration: Date.now() - startTime,
       },
-      "API request failed",
+      "API request failed"
     );
 
     return NextResponse.json(
       {
         error: "Internal server error",
-        message:
-          error instanceof Error ? error.message : "Failed to process request",
+        message: error instanceof Error ? error.message : "Failed to process request",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -274,7 +266,7 @@ export async function withApiEnhancements<T>(
  */
 export async function withTrpcApiEnhancements<T>(
   trpcCaller: () => Promise<T>,
-  customHeaders?: Record<string, string>,
+  customHeaders?: Record<string, string>
 ): Promise<NextResponse> {
   return withApiEnhancements(trpcCaller, {
     customHeaders,

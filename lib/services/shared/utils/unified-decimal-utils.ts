@@ -1,5 +1,4 @@
 import { DECIMALS, PORTFOLIO_THRESHOLDS } from "@/lib/constants";
-
 import { TokenRegistry } from "./token-registry";
 
 /**
@@ -38,10 +37,7 @@ export class UnifiedDecimalUtils {
   /**
    * Convert raw amount to decimal format - OPTIMIZED
    */
-  static convertToDecimal(
-    amount: string | number,
-    options: ConversionOptions = {},
-  ): number {
+  static convertToDecimal(amount: string | number, options: ConversionOptions = {}): number {
     // Early return for zero/invalid
     if (!amount || amount === "0" || amount === 0) return 0;
 
@@ -57,8 +53,7 @@ export class UnifiedDecimalUtils {
     if (isNaN(value)) return 0;
 
     // Use bit shifting for power of 2 decimals when possible
-    const result =
-      decimals === 8 ? value / 100000000 : value / Math.pow(10, decimals);
+    const result = decimals === 8 ? value / 100000000 : value / 10 ** decimals;
 
     // Cache result
     if (conversionCache.size > CONVERSION_CACHE_SIZE) {
@@ -75,12 +70,9 @@ export class UnifiedDecimalUtils {
   /**
    * Convert decimal amount back to raw format
    */
-  static convertFromDecimal(
-    amount: number,
-    options: ConversionOptions = {},
-  ): string {
+  static convertFromDecimal(amount: number, options: ConversionOptions = {}): string {
     const decimals = options.decimals || DECIMALS.DEFAULT;
-    const rawValue = amount * Math.pow(10, decimals);
+    const rawValue = amount * 10 ** decimals;
     return Math.floor(rawValue).toString();
   }
 
@@ -91,24 +83,21 @@ export class UnifiedDecimalUtils {
     amount: string | number,
     tokenAddress?: string,
     symbol?: string,
-    options: ConversionOptions = {},
+    options: ConversionOptions = {}
   ): FormattedBalance {
     // Determine decimals from token registry or use provided/default
     const decimals =
       options.decimals ||
-      (tokenAddress
-        ? TokenRegistry.getTokenDecimals(tokenAddress, symbol)
-        : DECIMALS.DEFAULT);
+      (tokenAddress ? TokenRegistry.getTokenDecimals(tokenAddress, symbol) : DECIMALS.DEFAULT);
 
     const minDisplayThreshold =
       options.minDisplayThreshold || PORTFOLIO_THRESHOLDS.MIN_BALANCE_DISPLAY;
 
     const rawAmount = typeof amount === "string" ? amount : amount.toString();
-    const formattedBalance = this.convertToDecimal(rawAmount, { decimals });
+    const formattedBalance = UnifiedDecimalUtils.convertToDecimal(rawAmount, { decimals });
 
     const isAboveThreshold = formattedBalance >= minDisplayThreshold;
-    const isDust =
-      formattedBalance > 0 && formattedBalance < minDisplayThreshold;
+    const isDust = formattedBalance > 0 && formattedBalance < minDisplayThreshold;
 
     // Apply threshold - show 0 if below minimum
     const displayBalance = isAboveThreshold ? formattedBalance : 0;
@@ -116,7 +105,7 @@ export class UnifiedDecimalUtils {
     return {
       raw: rawAmount,
       formatted: displayBalance,
-      display: this.formatNumber(displayBalance, options.roundingPrecision),
+      display: UnifiedDecimalUtils.formatNumber(displayBalance, options.roundingPrecision),
       isAboveThreshold,
       isDust,
     };
@@ -128,10 +117,9 @@ export class UnifiedDecimalUtils {
   static calculateTokenValue(
     balance: number,
     price: number,
-    options: ConversionOptions = {},
+    options: ConversionOptions = {}
   ): TokenValue {
-    const minValueThreshold =
-      options.minValueThreshold || PORTFOLIO_THRESHOLDS.MIN_VALUE_USD;
+    const minValueThreshold = options.minValueThreshold || PORTFOLIO_THRESHOLDS.MIN_VALUE_USD;
     const rawValue = balance * price;
 
     // Apply value threshold
@@ -142,7 +130,7 @@ export class UnifiedDecimalUtils {
       balance,
       price,
       value,
-      formattedValue: this.formatUSD(value),
+      formattedValue: UnifiedDecimalUtils.formatUSD(value),
       isSignificant,
     };
   }
@@ -157,7 +145,7 @@ export class UnifiedDecimalUtils {
       useGrouping?: boolean;
       minimumFractionDigits?: number;
       maximumFractionDigits?: number;
-    } = {},
+    } = {}
   ): string {
     const {
       useGrouping = true,
@@ -166,13 +154,13 @@ export class UnifiedDecimalUtils {
     } = options;
 
     // Handle very small numbers
-    if (Math.abs(value) < Math.pow(10, -precision) && value !== 0) {
-      return `< ${Math.pow(10, -precision)}`;
+    if (Math.abs(value) < 10 ** -precision && value !== 0) {
+      return `< ${10 ** -precision}`;
     }
 
     // Handle very large numbers
     if (Math.abs(value) >= 1e9) {
-      return this.formatLargeNumber(value);
+      return UnifiedDecimalUtils.formatLargeNumber(value);
     }
 
     return new Intl.NumberFormat("en-US", {
@@ -191,7 +179,7 @@ export class UnifiedDecimalUtils {
       showCents?: boolean;
       compact?: boolean;
       minimumValue?: number;
-    } = {},
+    } = {}
   ): string {
     const { showCents = true, compact = false, minimumValue = 0.01 } = options;
 
@@ -203,7 +191,7 @@ export class UnifiedDecimalUtils {
 
     // Use compact notation for large values
     if (compact && Math.abs(value) >= 1e6) {
-      return this.formatCompactUSD(value);
+      return UnifiedDecimalUtils.formatCompactUSD(value);
     }
 
     const formatter = new Intl.NumberFormat("en-US", {
@@ -225,12 +213,12 @@ export class UnifiedDecimalUtils {
       precision?: number;
       showSign?: boolean;
       showPlusSign?: boolean;
-    } = {},
+    } = {}
   ): string {
     const { precision = 2, showSign = true, showPlusSign = true } = options;
 
     const sign = showSign ? (value >= 0 && showPlusSign ? "+" : "") : "";
-    const formattedValue = this.formatNumber(value, precision);
+    const formattedValue = UnifiedDecimalUtils.formatNumber(value, precision);
 
     return `${sign}${formattedValue}%`;
   }
@@ -239,7 +227,7 @@ export class UnifiedDecimalUtils {
    * Round to specified number of decimal places
    */
   static roundToDecimals(value: number, decimals: number = 6): number {
-    const factor = Math.pow(10, decimals);
+    const factor = 10 ** decimals;
     return Math.round(value * factor) / factor;
   }
 
@@ -252,17 +240,14 @@ export class UnifiedDecimalUtils {
     thresholds: {
       minBalance?: number;
       minValue?: number;
-    } = {},
+    } = {}
   ): boolean {
-    const minBalance =
-      thresholds.minBalance || PORTFOLIO_THRESHOLDS.MIN_BALANCE_DISPLAY;
+    const minBalance = thresholds.minBalance || PORTFOLIO_THRESHOLDS.MIN_BALANCE_DISPLAY;
     const minValue = thresholds.minValue || PORTFOLIO_THRESHOLDS.MIN_VALUE_USD;
 
     const value = balance * price;
 
-    return (
-      (balance > 0 && balance < minBalance) || (value > 0 && value < minValue)
-    );
+    return (balance > 0 && balance < minBalance) || (value > 0 && value < minValue);
   }
 
   /**
@@ -275,14 +260,14 @@ export class UnifiedDecimalUtils {
       symbol?: string;
       price?: number;
     }>,
-    options: ConversionOptions = {},
+    options: ConversionOptions = {}
   ): Array<FormattedBalance & { value?: TokenValue }> {
     return balances.map(({ amount, tokenAddress, symbol, price }) => {
-      const formattedBalance = this.formatBalance(
+      const formattedBalance = UnifiedDecimalUtils.formatBalance(
         amount,
         tokenAddress,
         symbol,
-        options,
+        options
       );
 
       const result = { ...formattedBalance } as FormattedBalance & {
@@ -290,10 +275,10 @@ export class UnifiedDecimalUtils {
       };
 
       if (price !== undefined && price > 0) {
-        result.value = this.calculateTokenValue(
+        result.value = UnifiedDecimalUtils.calculateTokenValue(
           formattedBalance.formatted,
           price,
-          options,
+          options
         );
       }
 
@@ -304,11 +289,7 @@ export class UnifiedDecimalUtils {
   /**
    * Get appropriate decimal places for a token
    */
-  static getOptimalPrecision(
-    value: number,
-    _tokenAddress?: string,
-    _symbol?: string,
-  ): number {
+  static getOptimalPrecision(value: number, _tokenAddress?: string, _symbol?: string): number {
     // Very small values need more precision
     if (Math.abs(value) < 0.001) return 8;
     if (Math.abs(value) < 0.01) return 6;
@@ -325,7 +306,7 @@ export class UnifiedDecimalUtils {
   static parseUserInput(
     input: string,
     tokenAddress?: string,
-    symbol?: string,
+    symbol?: string
   ): {
     isValid: boolean;
     value: number;
@@ -359,7 +340,7 @@ export class UnifiedDecimalUtils {
       const decimals = tokenAddress
         ? TokenRegistry.getTokenDecimals(tokenAddress, symbol)
         : DECIMALS.DEFAULT;
-      const rawAmount = this.convertFromDecimal(value, { decimals });
+      const rawAmount = UnifiedDecimalUtils.convertFromDecimal(value, { decimals });
 
       return {
         isValid: true,
@@ -393,7 +374,7 @@ export class UnifiedDecimalUtils {
       return `${sign}${(abs / 1e3).toFixed(1)}K`;
     }
 
-    return this.formatNumber(value, 2);
+    return UnifiedDecimalUtils.formatNumber(value, 2);
   }
 
   /**
@@ -411,7 +392,7 @@ export class UnifiedDecimalUtils {
       return `${sign}$${(abs / 1e6).toFixed(1)}M`;
     }
 
-    return this.formatUSD(value);
+    return UnifiedDecimalUtils.formatUSD(value);
   }
 
   /**
@@ -427,7 +408,7 @@ export class UnifiedDecimalUtils {
   static clamp(
     value: number,
     min: number = Number.MIN_SAFE_INTEGER,
-    max: number = Number.MAX_SAFE_INTEGER,
+    max: number = Number.MAX_SAFE_INTEGER
   ): number {
     return Math.max(min, Math.min(max, value));
   }
@@ -436,12 +417,12 @@ export class UnifiedDecimalUtils {
    * Get formatted range string (e.g., "1.234 - 5.678")
    */
   static formatRange(min: number, max: number, precision: number = 3): string {
-    if (this.isEqual(min, max)) {
-      return this.formatNumber(min, precision);
+    if (UnifiedDecimalUtils.isEqual(min, max)) {
+      return UnifiedDecimalUtils.formatNumber(min, precision);
     }
 
-    const formattedMin = this.formatNumber(min, precision);
-    const formattedMax = this.formatNumber(max, precision);
+    const formattedMin = UnifiedDecimalUtils.formatNumber(min, precision);
+    const formattedMax = UnifiedDecimalUtils.formatNumber(max, precision);
 
     return `${formattedMin} - ${formattedMax}`;
   }

@@ -1,13 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import React from "react";
+import type React from "react";
 
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface StatCardProps {
   title: string;
@@ -45,9 +41,7 @@ export function StatCard({
           className={`relative flex flex-col bg-card border rounded-xl p-4 md:p-5 shadow-sm hover:shadow-md transition-all duration-200 cursor-help min-h-[100px] md:min-h-[120px] group ${className}`}
         >
           <div className="mb-3">
-            <h2 className="text-sm md:text-base font-semibold text-card-foreground">
-              {title}
-            </h2>
+            <h2 className="text-sm md:text-base font-semibold text-card-foreground">{title}</h2>
           </div>
           <div className="flex-1 flex flex-col justify-center">
             <div className="text-lg md:text-2xl font-bold text-card-foreground font-mono mb-1">

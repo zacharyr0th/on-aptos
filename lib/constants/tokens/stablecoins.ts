@@ -25,10 +25,8 @@ export const LAYERZERO_STABLECOINS = {
 
 // Wormhole bridged coins
 export const WORMHOLE_STABLECOINS = {
-  WH_USDT:
-    "0xa2eda21a58856fda86451436513b867c97eecb4ba099da5775520e0f7492e852::coin::T",
-  WH_USDC:
-    "0x5e156f1207d0ebfa19a9eeff00d62a282278fb8719f4fab3a586a0a2c0fffbea::coin::T",
+  WH_USDT: "0xa2eda21a58856fda86451436513b867c97eecb4ba099da5775520e0f7492e852::coin::T",
+  WH_USDC: "0x5e156f1207d0ebfa19a9eeff00d62a282278fb8719f4fab3a586a0a2c0fffbea::coin::T",
 } as const;
 
 // Celer bridged coins
@@ -55,3 +53,33 @@ export const LEGITIMATE_STABLECOINS = new Set([
   ...Object.values(CELER_STABLECOINS),
   ...Object.values(ALGO_STABLECOINS),
 ]) as Set<string>;
+
+/**
+ * All stablecoins combined for backwards compatibility
+ */
+export const ALL_STABLECOINS = {
+  ...STABLECOINS,
+  ...LAYERZERO_STABLECOINS,
+  ...WORMHOLE_STABLECOINS,
+  ...CELER_STABLECOINS,
+  ...ALGO_STABLECOINS,
+} as const;
+
+/**
+ * Stablecoin symbols for display
+ */
+export const STABLECOIN_SYMBOLS = [
+  "USDC",
+  "USDT",
+  "USDE",
+  "sUSDe",
+  "mUSD",
+  "USDA",
+  "lzUSDC",
+  "lzUSDT",
+  "whUSDC",
+  "whUSDT",
+  "ceUSDC",
+  "ceUSDT",
+  "MOD",
+] as const;

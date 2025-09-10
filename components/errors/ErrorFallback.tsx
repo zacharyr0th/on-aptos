@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import type React from "react";
 
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/lib/hooks/useTranslation";
@@ -30,7 +30,7 @@ export const ErrorFallback: React.FC<ErrorFallbackProps> = ({
       titleText: t("messages.details_unavailable", "Details Unavailable"),
       messageText: t(
         "messages.dialog_error_message",
-        "An error occurred while trying to display the information. You can try closing and reopening this dialog.",
+        "An error occurred while trying to display the information. You can try closing and reopening this dialog."
       ),
       buttonVariant: "outline" as const,
       buttonText: t("actions.close_dialog", "Close Dialog"),
@@ -52,8 +52,7 @@ export const ErrorFallback: React.FC<ErrorFallbackProps> = ({
       title: "text-2xl font-bold mb-4",
       message: "text-muted-foreground mb-4",
       titleText: "Something went wrong",
-      messageText:
-        "We apologize for the inconvenience. Please try refreshing the page.",
+      messageText: "We apologize for the inconvenience. Please try refreshing the page.",
       buttonVariant: "default" as const,
       buttonText: "Refresh Page",
       showRetry: true,
@@ -61,8 +60,7 @@ export const ErrorFallback: React.FC<ErrorFallbackProps> = ({
   };
 
   const currentConfig = config[level];
-  const handleAction =
-    level === "page" ? () => window.location.reload() : onRetry || onClose;
+  const handleAction = level === "page" ? () => window.location.reload() : onRetry || onClose;
 
   return (
     <div className={`${currentConfig.container} ${className}`}>
@@ -86,10 +84,7 @@ export const ErrorFallback: React.FC<ErrorFallbackProps> = ({
           <h3 className={currentConfig.title}>{currentConfig.titleText}</h3>
           <p className={currentConfig.message}>{currentConfig.messageText}</p>
           {handleAction && (
-            <Button
-              onClick={handleAction}
-              variant={currentConfig.buttonVariant}
-            >
+            <Button onClick={handleAction} variant={currentConfig.buttonVariant}>
               {currentConfig.buttonText}
             </Button>
           )}

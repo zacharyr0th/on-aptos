@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
 
 import { useTranslation } from "@/lib/hooks/useTranslation";
 
@@ -9,9 +9,7 @@ export function useAddressValidation() {
   const validateAddress = useCallback(
     (address: string): boolean => {
       if (!address) {
-        setAddressError(
-          t("wallet.error_empty_address", "Please enter an address"),
-        );
+        setAddressError(t("wallet.error_empty_address", "Please enter an address"));
         return false;
       }
 
@@ -19,25 +17,20 @@ export function useAddressValidation() {
       const isValid = /^0x[a-fA-F0-9]{64}$/.test(cleanAddress);
 
       if (!isValid) {
-        setAddressError(
-          t("wallet.error_invalid_format", "Invalid address format"),
-        );
+        setAddressError(t("wallet.error_invalid_format", "Invalid address format"));
         return false;
       }
 
       setAddressError("");
       return true;
     },
-    [t],
+    [t]
   );
 
-  const normalizeAddress = useCallback(
-    (address: string | undefined): string | undefined => {
-      if (!address) return undefined;
-      return !address.startsWith("0x") ? `0x${address}` : address;
-    },
-    [],
-  );
+  const normalizeAddress = useCallback((address: string | undefined): string | undefined => {
+    if (!address) return undefined;
+    return !address.startsWith("0x") ? `0x${address}` : address;
+  }, []);
 
   const clearError = useCallback(() => {
     setAddressError("");

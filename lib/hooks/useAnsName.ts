@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
+import { useEffect, useState } from "react";
 import { logger } from "@/lib/utils/core/logger";
 
 interface AnsData {
@@ -28,16 +28,11 @@ export function useAnsName() {
 
       setIsLoading(true);
       try {
-        const response = await fetch(
-          `/api/portfolio/ans?address=${account.address}`,
-        );
+        const response = await fetch(`/api/portfolio/ans?address=${account.address}`);
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
-          throw new Error(
-            errorData.details ||
-              `HTTP ${response.status}: ${response.statusText}`,
-          );
+          throw new Error(errorData.details || `HTTP ${response.status}: ${response.statusText}`);
         }
 
         const result = await response.json();
@@ -50,7 +45,7 @@ export function useAnsName() {
         }
       } catch (error) {
         logger.error(
-          `Failed to fetch ANS name: ${error instanceof Error ? error.message : String(error)}`,
+          `Failed to fetch ANS name: ${error instanceof Error ? error.message : String(error)}`
         );
         setAnsName(null);
         setAnsData(null);

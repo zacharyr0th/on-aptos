@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-
-import { apiLogger } from "@/lib/utils/core/logger";
 import { UnifiedCache } from "@/lib/utils/cache/unified-cache";
+import { apiLogger } from "@/lib/utils/core/logger";
 
 const cache = new UnifiedCache({ ttl: 5 * 60 * 1000 }); // 5 minutes
 
@@ -26,30 +25,21 @@ export async function GET() {
 
     // Filter for Aptos pools
     const aptosPools =
-      poolsData.data?.filter(
-        (pool: any) => pool.chain?.toLowerCase() === "aptos",
-      ) || [];
+      poolsData.data?.filter((pool: any) => pool.chain?.toLowerCase() === "aptos") || [];
 
     // Calculate yield metrics
     const yieldMetrics = {
       totalPools: aptosPools.length,
-      totalTvl: aptosPools.reduce(
-        (sum: number, pool: any) => sum + (pool.tvlUsd || 0),
-        0,
-      ),
+      totalTvl: aptosPools.reduce((sum: number, pool: any) => sum + (pool.tvlUsd || 0), 0),
       averageApy:
-        aptosPools.reduce(
-          (sum: number, pool: any) => sum + (pool.apy || 0),
-          0,
-        ) / (aptosPools.length || 1),
+        aptosPools.reduce((sum: number, pool: any) => sum + (pool.apy || 0), 0) /
+        (aptosPools.length || 1),
       medianApy: (() => {
         const apys = aptosPools
           .map((pool: any) => pool.apy || 0)
           .sort((a: number, b: number) => a - b);
         const mid = Math.floor(apys.length / 2);
-        return apys.length % 2 === 0
-          ? (apys[mid - 1] + apys[mid]) / 2
-          : apys[mid];
+        return apys.length % 2 === 0 ? (apys[mid - 1] + apys[mid]) / 2 : apys[mid];
       })(),
       highestApy: Math.max(...aptosPools.map((pool: any) => pool.apy || 0)),
       topPools: aptosPools
@@ -70,17 +60,17 @@ export async function GET() {
         dex: aptosPools.filter(
           (pool: any) =>
             pool.project?.toLowerCase().includes("swap") ||
-            pool.project?.toLowerCase().includes("dex"),
+            pool.project?.toLowerCase().includes("dex")
         ),
         lending: aptosPools.filter(
           (pool: any) =>
             pool.project?.toLowerCase().includes("lend") ||
-            pool.project?.toLowerCase().includes("borrow"),
+            pool.project?.toLowerCase().includes("borrow")
         ),
         staking: aptosPools.filter(
           (pool: any) =>
             pool.project?.toLowerCase().includes("stake") ||
-            pool.project?.toLowerCase().includes("staking"),
+            pool.project?.toLowerCase().includes("staking")
         ),
         yield: aptosPools.filter(
           (pool: any) =>
@@ -88,7 +78,7 @@ export async function GET() {
             !pool.project?.toLowerCase().includes("dex") &&
             !pool.project?.toLowerCase().includes("lend") &&
             !pool.project?.toLowerCase().includes("borrow") &&
-            !pool.project?.toLowerCase().includes("stake"),
+            !pool.project?.toLowerCase().includes("stake")
         ),
       },
       riskMetrics: {
@@ -96,13 +86,10 @@ export async function GET() {
           (pool: any) =>
             pool.symbol?.toLowerCase().includes("usdc") ||
             pool.symbol?.toLowerCase().includes("usdt") ||
-            pool.symbol?.toLowerCase().includes("dai"),
+            pool.symbol?.toLowerCase().includes("dai")
         ).length,
-        highRiskPools: aptosPools.filter((pool: any) => (pool.apy || 0) > 100)
-          .length,
-        impermanentLossRisk: aptosPools.filter(
-          (pool: any) => Math.abs(pool.il7d || 0) > 5,
-        ).length,
+        highRiskPools: aptosPools.filter((pool: any) => (pool.apy || 0) > 100).length,
+        impermanentLossRisk: aptosPools.filter((pool: any) => Math.abs(pool.il7d || 0) > 5).length,
       },
     };
 
@@ -117,9 +104,6 @@ export async function GET() {
     return NextResponse.json(yieldMetrics);
   } catch (error) {
     apiLogger.error("Error fetching Aptos yield data:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch yield data" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Failed to fetch yield data" }, { status: 500 });
   }
 }

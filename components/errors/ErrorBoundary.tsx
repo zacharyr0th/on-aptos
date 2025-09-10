@@ -1,10 +1,15 @@
 "use client";
 
 import React from "react";
+import { logger } from "@/lib/utils/core/logger";
+import { ErrorFallback } from "./ErrorFallback";
 
 interface Props {
   children: React.ReactNode;
   fallback?: React.ReactNode;
+  level?: "dialog" | "component" | "page";
+  onRetry?: () => void;
+  onError?: (error: Error, errorInfo: React.ErrorInfo) => void;
 }
 
 interface State {
@@ -23,20 +28,25 @@ export class ErrorBoundary extends React.Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    // Log to error reporting service here
-    import("@/lib/utils/core/logger").then(({ logger }) => {
-      logger.error("Component Error:", { error: error.message, errorInfo });
+    logger.error("Component Error Boundary:", {
+      error: error.message,
+      stack: error.stack,
+      componentStack: errorInfo.componentStack,
     });
+
+    this.props.onError?.(error, errorInfo);
   }
+
+  handleRetry = () => {
+    this.setState({ hasError: false, error: undefined });
+    this.props.onRetry?.();
+  };
 
   render() {
     if (this.state.hasError) {
       return (
         this.props.fallback || (
-          <div className="p-4 rounded-md bg-destructive/10 text-destructive">
-            <h2 className="text-lg font-semibold mb-2">Something went wrong</h2>
-            <p className="text-sm">Please try refreshing the page</p>
-          </div>
+          <ErrorFallback level={this.props.level || "component"} onRetry={this.handleRetry} />
         )
       );
     }

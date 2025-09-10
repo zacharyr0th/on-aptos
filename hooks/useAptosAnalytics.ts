@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { logger } from "@/lib/utils/core/logger";
 
 interface GasUsageData {
@@ -41,7 +41,7 @@ export function useGasUsage(
   address: string | null,
   startDate: Date,
   endDate: Date,
-  granularity?: string,
+  granularity?: string
 ) {
   const [data, setData] = useState<GasUsageData[]>([]);
   const [loading, setLoading] = useState(false);
@@ -92,7 +92,7 @@ export function useGasUsage(
 
 export function useTokenPriceHistory(
   tokenAddress: string | null,
-  lookback: "hour" | "day" | "week" | "month" | "year" | "all",
+  lookback: "hour" | "day" | "week" | "month" | "year" | "all"
 ) {
   const [data, setData] = useState<TokenPriceData[]>([]);
   const [loading, setLoading] = useState(false);
@@ -111,9 +111,7 @@ export function useTokenPriceHistory(
           lookback,
         });
 
-        const response = await fetch(
-          `/api/analytics/token-price-history?${params}`,
-        );
+        const response = await fetch(`/api/analytics/token-price-history?${params}`);
         const result = await response.json();
 
         if (!response.ok) throw new Error(result.error);
@@ -133,10 +131,7 @@ export function useTokenPriceHistory(
   return { data, loading, error };
 }
 
-export function useBalanceHistory(
-  address: string | null,
-  lookback: "year" | "all" = "year",
-) {
+export function useBalanceHistory(address: string | null, lookback: "year" | "all" = "year") {
   const [data, setData] = useState<BalanceHistoryData[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -173,14 +168,14 @@ export function useBalanceHistory(
 
   return useMemo(
     () => ({ data, loading, error, refetch: fetchBalanceHistory }),
-    [data, loading, error, fetchBalanceHistory],
+    [data, loading, error, fetchBalanceHistory]
   );
 }
 
 export function useTopPriceChanges(
   lookback: "hour" | "day" | "week" | "month",
   limit: number = 10,
-  gainers: boolean = true,
+  gainers: boolean = true
 ) {
   const [data, setData] = useState<TopPriceChangeData[]>([]);
   const [loading, setLoading] = useState(false);
@@ -198,9 +193,7 @@ export function useTopPriceChanges(
           gainers: gainers.toString(),
         });
 
-        const response = await fetch(
-          `/api/analytics/top-price-changes?${params}`,
-        );
+        const response = await fetch(`/api/analytics/top-price-changes?${params}`);
         const result = await response.json();
 
         if (!response.ok) throw new Error(result.error);
@@ -228,7 +221,7 @@ export function useTransactionHistory(
     assetSymbol?: string;
     limit?: number;
     offset?: number;
-  },
+  }
 ) {
   const [data, setData] = useState<TransactionHistoryData[]>([]);
   const [loading, setLoading] = useState(false);
@@ -237,13 +230,7 @@ export function useTransactionHistory(
   // Memoize options to prevent unnecessary refetches
   const optionsKey = useMemo(
     () => JSON.stringify(options || {}),
-    [
-      options?.dateStart,
-      options?.dateEnd,
-      options?.assetSymbol,
-      options?.limit,
-      options?.offset,
-    ],
+    [options?.dateStart, options?.dateEnd, options?.assetSymbol, options?.limit, options?.offset]
   );
 
   useEffect(() => {
@@ -261,21 +248,15 @@ export function useTransactionHistory(
         });
 
         const parsedOptions = JSON.parse(optionsKey);
-        if (parsedOptions.dateStart)
-          params.append("date_start", parsedOptions.dateStart);
-        if (parsedOptions.dateEnd)
-          params.append("date_end", parsedOptions.dateEnd);
-        if (parsedOptions.assetSymbol)
-          params.append("asset_symbol", parsedOptions.assetSymbol);
-        if (parsedOptions.limit)
-          params.append("limit", parsedOptions.limit.toString());
-        if (parsedOptions.offset)
-          params.append("offset", parsedOptions.offset.toString());
+        if (parsedOptions.dateStart) params.append("date_start", parsedOptions.dateStart);
+        if (parsedOptions.dateEnd) params.append("date_end", parsedOptions.dateEnd);
+        if (parsedOptions.assetSymbol) params.append("asset_symbol", parsedOptions.assetSymbol);
+        if (parsedOptions.limit) params.append("limit", parsedOptions.limit.toString());
+        if (parsedOptions.offset) params.append("offset", parsedOptions.offset.toString());
 
-        const response = await fetch(
-          `/api/analytics/transaction-history?${params}`,
-          { signal: abortController.signal },
-        );
+        const response = await fetch(`/api/analytics/transaction-history?${params}`, {
+          signal: abortController.signal,
+        });
         const result = await response.json();
 
         if (!response.ok) throw new Error(result.error);

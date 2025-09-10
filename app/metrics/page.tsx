@@ -1,15 +1,23 @@
-import MetricsPage from "@/components/pages/metrics/Page";
-import { createPage } from "@/lib/utils/page-factory";
+import type { Metadata } from "next";
 
-const pageConfig = createPage({
-  title: "Ecosystem Metrics",
+export const metadata: Metadata = {
+  title: "Analytics & Metrics - On Aptos",
   description:
-    "Real-time metrics and analytics for the Aptos blockchain ecosystem. Track network performance, transaction volume, token statistics, and ecosystem growth.",
-  Component: MetricsPage,
-  dynamic: "force-static",
-});
+    "Comprehensive analytics and metrics for the Aptos ecosystem, including DeFi TVL, transaction volumes, and network statistics.",
+};
 
-export const metadata = pageConfig.metadata;
-export const revalidate = 3600;
-export const dynamic = "force-static";
-export default pageConfig.default;
+export default function MetricsPage() {
+  return (
+    <div className="container mx-auto px-4 py-8 max-w-7xl">
+      <div className="space-y-8">
+        {/* Header */}
+        <div className="text-center space-y-4">
+          <h1 className="text-4xl font-bold tracking-tight text-foreground">Analytics & Metrics</h1>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            This page is under construction.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -1,10 +1,5 @@
 // Import and re-export consolidated types
-import type {
-  TokenMetadata,
-  NFT,
-  FungibleAsset,
-  Transaction,
-} from "@/lib/types/consolidated";
+import type { FungibleAsset, NFT, TokenMetadata, Transaction } from "@/lib/types/consolidated";
 import type { DeFiPosition } from "@/lib/types/defi";
 
 // Re-export for external consumption

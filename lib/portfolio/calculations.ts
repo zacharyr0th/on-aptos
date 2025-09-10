@@ -28,7 +28,7 @@ export interface ChartDataPoint {
 export function filterVisibleAssets(
   assets: Asset[],
   hideFiltered: boolean = true,
-  minValue: number = 0.01,
+  minValue: number = 0.01
 ): Asset[] {
   if (!assets) return [];
   if (!hideFiltered) return assets;
@@ -40,8 +40,7 @@ export function filterVisibleAssets(
     // Filter out CELL tokens
     if (
       asset.metadata?.symbol === "CELL" ||
-      asset.asset_type ===
-        "0x2ebb2ccac5e027a87fa0e2e5f656a3a4238d6a48d93ec9b610d570fc0aa0df12"
+      asset.asset_type === "0x2ebb2ccac5e027a87fa0e2e5f656a3a4238d6a48d93ec9b610d570fc0aa0df12"
     ) {
       return false;
     }
@@ -72,7 +71,7 @@ export function groupDeFiByProtocol(positions: any[]): DeFiGroup[] {
         position.totalValueUSD || position.totalValue || position.tvl_usd || 0;
       return acc;
     },
-    {} as Record<string, DeFiGroup>,
+    {} as Record<string, DeFiGroup>
   );
 
   const groups = Object.values(grouped) as DeFiGroup[];
@@ -82,18 +81,9 @@ export function groupDeFiByProtocol(positions: any[]): DeFiGroup[] {
 /**
  * Calculate total portfolio value
  */
-export function calculateTotalValue(
-  assets: Asset[],
-  defiGroups: DeFiGroup[],
-): number {
-  const assetsValue = assets.reduce(
-    (sum, asset) => sum + (asset.value || 0),
-    0,
-  );
-  const defiValue = defiGroups.reduce(
-    (sum, group) => sum + group.totalValue,
-    0,
-  );
+export function calculateTotalValue(assets: Asset[], defiGroups: DeFiGroup[]): number {
+  const assetsValue = assets.reduce((sum, asset) => sum + (asset.value || 0), 0);
+  const defiValue = defiGroups.reduce((sum, group) => sum + group.totalValue, 0);
   return assetsValue + defiValue;
 }
 
@@ -103,7 +93,7 @@ export function calculateTotalValue(
 export function generatePieChartData(
   assets: Asset[],
   defiGroups: DeFiGroup[],
-  minPercentage: number = 0.5,
+  minPercentage: number = 0.5
 ): ChartDataPoint[] {
   const totalValue = calculateTotalValue(assets, defiGroups);
   if (totalValue === 0) return [];
@@ -164,7 +154,7 @@ export function generatePieChartData(
  */
 export function calculate24hChange(
   currentValue: number,
-  history: Array<{ timestamp: number; value: number }>,
+  history: Array<{ timestamp: number; value: number }>
 ): { change: number; percentage: number } {
   if (!history || history.length === 0) {
     return { change: 0, percentage: 0 };
@@ -193,7 +183,7 @@ export function calculate24hChange(
 export function sortDeFiPositions(
   groups: DeFiGroup[],
   sortBy: "protocol" | "value" | "type",
-  order: "asc" | "desc",
+  order: "asc" | "desc"
 ): DeFiGroup[] {
   const sorted = [...groups].sort((a, b) => {
     let comparison = 0;
@@ -205,12 +195,13 @@ export function sortDeFiPositions(
       case "value":
         comparison = a.totalValue - b.totalValue;
         break;
-      case "type":
+      case "type": {
         // Sort by protocol type if available
         const typeA = a.positions[0]?.protocol_type || "";
         const typeB = b.positions[0]?.protocol_type || "";
         comparison = typeA.localeCompare(typeB);
         break;
+      }
     }
 
     return order === "asc" ? comparison : -comparison;
@@ -258,9 +249,7 @@ export function isValidAptosAddress(address: string): boolean {
 /**
  * Normalize address to standard format
  */
-export function normalizeAddress(
-  address: string | undefined,
-): string | undefined {
+export function normalizeAddress(address: string | undefined): string | undefined {
   if (!address) return undefined;
   return !address.startsWith("0x") ? `0x${address}` : address;
 }

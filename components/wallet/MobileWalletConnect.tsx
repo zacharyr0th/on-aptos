@@ -1,16 +1,10 @@
 "use client";
 
-import { Smartphone, ExternalLink } from "lucide-react";
-import { useState, useCallback, useEffect } from "react";
+import { ExternalLink, Smartphone } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { safeWindowOpen } from "@/lib/utils/core/security";
 
@@ -25,10 +19,9 @@ export function MobileWalletConnect({ className }: MobileWalletConnectProps) {
   useEffect(() => {
     // Detect if user is on mobile device
     const checkMobile = () => {
-      const isMobileDevice =
-        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-          navigator.userAgent,
-        );
+      const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        navigator.userAgent
+      );
       setIsMobile(isMobileDevice);
     };
 
@@ -82,9 +75,7 @@ export function MobileWalletConnect({ className }: MobileWalletConnectProps) {
           <Smartphone className="h-8 w-8 text-primary" />
         </div>
         <CardTitle className="text-xl">Connect Your Wallet</CardTitle>
-        <CardDescription>
-          Choose your preferred wallet to connect to On Aptos
-        </CardDescription>
+        <CardDescription>Choose your preferred wallet to connect to On Aptos</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <Button
@@ -107,9 +98,7 @@ export function MobileWalletConnect({ className }: MobileWalletConnectProps) {
               <div className="font-medium">
                 {isConnecting === "petra" ? "Opening Petra..." : "Petra Wallet"}
               </div>
-              <div className="text-sm text-muted-foreground">
-                Mobile & Extension
-              </div>
+              <div className="text-sm text-muted-foreground">Mobile & Extension</div>
             </div>
           </div>
           <ExternalLink className="h-4 w-4" />
@@ -126,9 +115,7 @@ export function MobileWalletConnect({ className }: MobileWalletConnectProps) {
             </div>
             <div className="text-left">
               <div className="font-medium">Aptos Connect</div>
-              <div className="text-sm text-muted-foreground">
-                Google / Apple ID
-              </div>
+              <div className="text-sm text-muted-foreground">Google / Apple ID</div>
             </div>
           </div>
           <ExternalLink className="h-4 w-4" />

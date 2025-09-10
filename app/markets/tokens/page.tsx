@@ -1,5 +1,5 @@
-import { createPage } from "@/lib/utils/page-factory";
 import dynamic from "next/dynamic";
+import { createPage } from "@/lib/utils/page-factory";
 
 // Lazy load the TokensPage component to reduce initial bundle size
 const TokensPage = dynamic(() => import("@/components/pages/markets/tokens/Page"), {

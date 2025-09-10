@@ -2,6 +2,6 @@
  * Wallet-related components
  */
 
-export { WalletConnectButton } from "./WalletConnectButton";
 export { MobileWalletConnect } from "./MobileWalletConnect";
+export { WalletConnectButton } from "./WalletConnectButton";
 export { WalletProvider } from "./WalletProvider";

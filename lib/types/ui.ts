@@ -2,9 +2,9 @@
  * Centralized UI component type definitions
  */
 
-import { StaticImageData } from "next/image";
+import type { StaticImageData } from "next/image";
 
-import { TokenMetadata } from "./tokens";
+import type { TokenMetadata } from "./tokens";
 
 // Base Dialog/Modal Props
 export interface BaseDialogProps {
@@ -72,9 +72,7 @@ export interface BaseErrorProps {
   className?: string;
 }
 
-export interface BaseLoadingErrorProps
-  extends BaseLoadingProps,
-    BaseErrorProps {}
+export interface BaseLoadingErrorProps extends BaseLoadingProps, BaseErrorProps {}
 
 // Loading states
 export type LoadingSkeletonVariant =
@@ -98,10 +96,6 @@ export interface LoadingSkeletonProps extends BaseLoadingProps {
 
 // Error Fallback Props
 export interface ErrorFallbackProps extends BaseErrorProps {
-  onCloseDialog?: () => void;
-}
-
-export interface DialogErrorFallbackProps {
   onCloseDialog?: () => void;
 }
 
@@ -361,7 +355,5 @@ export interface TooltipProps {
 
 // Type guards
 export function isValidImageSrc(src: any): src is string | StaticImageData {
-  return (
-    typeof src === "string" || (src && typeof src === "object" && "src" in src)
-  );
+  return typeof src === "string" || (src && typeof src === "object" && "src" in src);
 }

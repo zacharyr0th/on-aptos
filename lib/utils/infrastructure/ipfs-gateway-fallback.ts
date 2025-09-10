@@ -30,8 +30,8 @@ export function extractIPFSHash(url: string): string | null {
 
   // HTTP gateway URLs - improved regex to capture full hash
   const gatewayPatterns = [
-    /https?:\/\/[^\/]+\/ipfs\/([a-zA-Z0-9]+[a-zA-Z0-9\/\-_]*)/,
-    /https?:\/\/[^\/]+\.ipfs\.[^\/]+\/([a-zA-Z0-9]+[a-zA-Z0-9\/\-_]*)/,
+    /https?:\/\/[^/]+\/ipfs\/([a-zA-Z0-9]+[a-zA-Z0-9/\-_]*)/,
+    /https?:\/\/[^/]+\.ipfs\.[^/]+\/([a-zA-Z0-9]+[a-zA-Z0-9/\-_]*)/,
   ];
 
   for (const pattern of gatewayPatterns) {
@@ -78,11 +78,9 @@ function recordGatewayFailure(gateway: string, statusCode?: number) {
 
   // Exponential backoff for rate limiting (429) errors
   if (statusCode === 429) {
-    const backoffSeconds = Math.min(60, Math.pow(2, existing.failedAttempts));
+    const backoffSeconds = Math.min(60, 2 ** existing.failedAttempts);
     existing.backoffUntil = now + backoffSeconds * 1000;
-    logger.debug(
-      `Gateway ${gateway} rate limited, backing off for ${backoffSeconds}s`,
-    );
+    logger.debug(`Gateway ${gateway} rate limited, backing off for ${backoffSeconds}s`);
   } else {
     // Shorter backoff for other errors
     existing.backoffUntil = now + 5000;

@@ -49,10 +49,7 @@ export const formatMarketShare = (value: number, total: number): string => {
 /**
  * Safe parse number with fallback
  */
-export const safeParseFloat = (
-  value: string | number,
-  fallback = 0,
-): number => {
+export const safeParseFloat = (value: string | number, fallback = 0): number => {
   if (typeof value === "number") return value;
   const parsed = parseFloat(value);
   return isNaN(parsed) ? fallback : parsed;
@@ -64,7 +61,7 @@ export const safeParseFloat = (
 export async function retryWithBackoff<T>(
   fn: () => Promise<T>,
   maxRetries = 3,
-  initialDelay = 1000,
+  initialDelay = 1000
 ): Promise<T> {
   let lastError: Error | undefined;
 
@@ -74,7 +71,7 @@ export async function retryWithBackoff<T>(
     } catch (error) {
       lastError = error as Error;
       if (i < maxRetries - 1) {
-        const delay = initialDelay * Math.pow(2, i);
+        const delay = initialDelay * 2 ** i;
         logger.debug(`Retry attempt ${i + 1} after ${delay}ms`);
         await new Promise((resolve) => setTimeout(resolve, delay));
       }
@@ -89,7 +86,7 @@ export async function retryWithBackoff<T>(
  */
 export function debounce<T extends (...args: any[]) => any>(
   fn: T,
-  delay: number,
+  delay: number
 ): (...args: Parameters<T>) => void {
   let timeoutId: NodeJS.Timeout;
 
@@ -105,12 +102,12 @@ export function debounce<T extends (...args: any[]) => any>(
 export const formatTokenValue = (
   value: string | number,
   decimals: number,
-  displayDecimals = 2,
+  displayDecimals = 2
 ): string => {
   const numValue = typeof value === "string" ? parseFloat(value) : value;
   if (isNaN(numValue)) return "0";
 
-  const adjustedValue = numValue / Math.pow(10, decimals);
+  const adjustedValue = numValue / 10 ** decimals;
 
   if (adjustedValue < 0.01 && adjustedValue > 0) {
     return "<0.01";
@@ -122,17 +119,13 @@ export const formatTokenValue = (
 /**
  * Sort tokens by market share
  */
-export const sortByMarketShare = <T extends { value: number }>(
-  items: T[],
-): T[] => {
+export const sortByMarketShare = <T extends { value: number }>(items: T[]): T[] => {
   return [...items].sort((a, b) => b.value - a.value);
 };
 
 /**
  * Calculate total value from array of items
  */
-export const calculateTotal = <T extends { value: number }>(
-  items: T[],
-): number => {
+export const calculateTotal = <T extends { value: number }>(items: T[]): number => {
   return items.reduce((sum, item) => sum + item.value, 0);
 };

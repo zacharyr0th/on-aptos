@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
 import { logger } from "@/lib/utils/core/logger";
 
@@ -18,9 +18,7 @@ export const CACHE_DURATIONS = {
 /**
  * Generate standard cache headers
  */
-export function getCacheHeaders(
-  duration: number = CACHE_DURATIONS.MEDIUM,
-): Record<string, string> {
+export function getCacheHeaders(duration: number = CACHE_DURATIONS.MEDIUM): Record<string, string> {
   return {
     "Cache-Control": `public, s-maxage=${duration}, stale-while-revalidate=${duration * 2}`,
   };
@@ -41,31 +39,17 @@ export function extractParams(request: NextRequest): CommonParams {
   const { searchParams } = new URL(request.url);
 
   return {
-    address:
-      searchParams.get("address") ||
-      searchParams.get("walletAddress") ||
-      undefined,
-    walletAddress:
-      searchParams.get("walletAddress") ||
-      searchParams.get("address") ||
-      undefined,
-    limit: searchParams.get("limit")
-      ? parseInt(searchParams.get("limit")!, 10)
-      : undefined,
-    offset: searchParams.get("offset")
-      ? parseInt(searchParams.get("offset")!, 10)
-      : undefined,
+    address: searchParams.get("address") || searchParams.get("walletAddress") || undefined,
+    walletAddress: searchParams.get("walletAddress") || searchParams.get("address") || undefined,
+    limit: searchParams.get("limit") ? parseInt(searchParams.get("limit")!, 10) : undefined,
+    offset: searchParams.get("offset") ? parseInt(searchParams.get("offset")!, 10) : undefined,
   };
 }
 
 /**
  * Standard error response
  */
-export function errorResponse(
-  message: string,
-  status: number = 500,
-  details?: any,
-): NextResponse {
+export function errorResponse(message: string, status: number = 500, details?: any): NextResponse {
   const response = {
     error: message,
     status,
@@ -87,7 +71,7 @@ export function errorResponse(
 export function successResponse<T>(
   data: T,
   cacheDuration?: number,
-  headers?: Record<string, string>,
+  headers?: Record<string, string>
 ): NextResponse {
   const responseHeaders = {
     ...headers,
@@ -150,23 +134,17 @@ export async function apiHandler<T>(
   options?: {
     maxBodySize?: number; // Max body size in bytes
     allowedMethods?: string[]; // Allowed HTTP methods
-  },
+  }
 ): Promise<(request: NextRequest) => Promise<NextResponse>> {
   return async (request: NextRequest) => {
     try {
       // Check allowed methods
-      if (
-        options?.allowedMethods &&
-        !options.allowedMethods.includes(request.method)
-      ) {
+      if (options?.allowedMethods && !options.allowedMethods.includes(request.method)) {
         return errorResponse(`Method ${request.method} not allowed`, 405);
       }
 
       // Check body size for POST/PUT/PATCH requests
-      if (
-        options?.maxBodySize &&
-        ["POST", "PUT", "PATCH"].includes(request.method)
-      ) {
+      if (options?.maxBodySize && ["POST", "PUT", "PATCH"].includes(request.method)) {
         const contentLength = request.headers.get("content-length");
         if (contentLength && parseInt(contentLength) > options.maxBodySize) {
           return errorResponse("Request body too large", 413);
@@ -185,7 +163,7 @@ export async function apiHandler<T>(
       return errorResponse(
         "Internal server error",
         500,
-        process.env.NODE_ENV === "development" ? error : undefined,
+        process.env.NODE_ENV === "development" ? error : undefined
       );
     }
   };
@@ -194,10 +172,7 @@ export async function apiHandler<T>(
 /**
  * Validate required parameters
  */
-export function validateRequiredParams(
-  params: CommonParams,
-  required: string[],
-): string | null {
+export function validateRequiredParams(params: CommonParams, required: string[]): string | null {
   for (const param of required) {
     if (!params[param]) {
       return `Missing required parameter: ${param}`;
@@ -213,7 +188,7 @@ export function parseNumericParam(
   value: string | null,
   defaultValue: number,
   min?: number,
-  max?: number,
+  max?: number
 ): number {
   if (!value) return defaultValue;
 

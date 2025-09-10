@@ -21,9 +21,7 @@ export class FungibleAssetService {
   /**
    * Fetch fungible asset balances for a wallet
    */
-  static async getBalances(
-    walletAddress: string,
-  ): Promise<FungibleAssetBalance[]> {
+  static async getBalances(walletAddress: string): Promise<FungibleAssetBalance[]> {
     const query = `
       query GetFungibleAssetBalances($owner_address: String!) {
         current_fungible_asset_balances(
@@ -84,23 +82,19 @@ export class FungibleAssetService {
    */
   static async getBalance(
     walletAddress: string,
-    assetType: string,
+    assetType: string
   ): Promise<FungibleAssetBalance | null> {
-    const balances = await this.getBalances(walletAddress);
+    const balances = await FungibleAssetService.getBalances(walletAddress);
     return balances.find((b) => b.asset_type === assetType) || null;
   }
 
   /**
    * Get MKLP balances specifically
    */
-  static async getMKLPBalances(
-    walletAddress: string,
-  ): Promise<FungibleAssetBalance[]> {
-    const balances = await this.getBalances(walletAddress);
+  static async getMKLPBalances(walletAddress: string): Promise<FungibleAssetBalance[]> {
+    const balances = await FungibleAssetService.getBalances(walletAddress);
     return balances.filter(
-      (b) =>
-        b.asset_type.includes("house_lp::MKLP") ||
-        b.asset_type.includes("mklp::MKLP"),
+      (b) => b.asset_type.includes("house_lp::MKLP") || b.asset_type.includes("mklp::MKLP")
     );
   }
 

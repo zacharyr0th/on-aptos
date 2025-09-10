@@ -1,17 +1,13 @@
-import { NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 
 import {
-  StablecoinService,
   BitcoinService,
-  RWAService,
   LiquidStakingService,
+  RWAService,
+  StablecoinService,
 } from "@/lib/services/asset-types";
-import {
-  successResponse,
-  errorResponse,
-  CACHE_DURATIONS,
-} from "@/lib/utils/api/common";
-import { withRateLimit, RATE_LIMIT_TIERS } from "@/lib/utils/api/rate-limiter";
+import { CACHE_DURATIONS, errorResponse, successResponse } from "@/lib/utils/api/common";
+import { RATE_LIMIT_TIERS, withRateLimit } from "@/lib/utils/api/rate-limiter";
 import { logger } from "@/lib/utils/core/logger";
 import { OPTIONS } from "../shared";
 
@@ -47,9 +43,7 @@ async function unifiedAssetsHandler(request: NextRequest) {
 
     // Handle individual asset types or all
     const types: AssetType[] =
-      assetType === "all"
-        ? ["stables", "btc", "rwa", "lst"]
-        : [assetType as AssetType];
+      assetType === "all" ? ["stables", "btc", "rwa", "lst"] : [assetType as AssetType];
 
     const results = await Promise.allSettled(
       types.map(async (type: AssetType): Promise<AssetResult> => {
@@ -81,7 +75,7 @@ async function unifiedAssetsHandler(request: NextRequest) {
           default:
             throw new Error(`Invalid asset type: ${type}`);
         }
-      }),
+      })
     );
 
     // Process results
@@ -103,10 +97,7 @@ async function unifiedAssetsHandler(request: NextRequest) {
 
       // Helper function to calculate metrics for a supply array
       const calculateSupplyMetrics = (supplies: any[]) => ({
-        totalSupply: supplies.reduce(
-          (sum: number, s: any) => sum + (s.supply || 0),
-          0,
-        ),
+        totalSupply: supplies.reduce((sum: number, s: any) => sum + (s.supply || 0), 0),
         count: supplies.length,
       });
 
@@ -135,7 +126,7 @@ async function unifiedAssetsHandler(request: NextRequest) {
         "X-Data-Source": "aptos-indexer",
         "X-Asset-Type": assetType,
         "X-Include-Metrics": includeMetrics ? "true" : "false",
-      },
+      }
     );
   } catch (error) {
     logger.error("Unified assets API error", {
@@ -145,7 +136,7 @@ async function unifiedAssetsHandler(request: NextRequest) {
 
     return errorResponse(
       error instanceof Error ? error.message : "Failed to fetch asset data",
-      500,
+      500
     );
   }
 }

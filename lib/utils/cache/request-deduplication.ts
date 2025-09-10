@@ -29,7 +29,21 @@ export class RequestDeduplicator {
 
     // Check if there's already a pending request for this key
     if (this.pendingRequests.has(key)) {
-      return this.pendingRequests.get(key) as Promise<Response>;
+      // Wait for the cached response data and create a new Response for this consumer
+      const cachedPromise = this.pendingRequests.get(key) as Promise<any>;
+      const responseData = await cachedPromise;
+      
+      // If it's a response data object, create a new Response
+      if (responseData && typeof responseData === 'object' && 'body' in responseData) {
+        return new Response(responseData.body, {
+          status: responseData.status,
+          statusText: responseData.statusText,
+          headers: new Headers(responseData.headers),
+        });
+      }
+      
+      // Fallback for backward compatibility
+      return responseData;
     }
 
     // Clean up cache if it gets too large
@@ -37,32 +51,43 @@ export class RequestDeduplicator {
       this.cleanup();
     }
 
-    // Create the request promise
+    // Create the request promise that stores response data
     const requestPromise = fetch(url, options)
       .then(async (response) => {
-        // For successful responses, cache the body content
-        if (response.ok) {
-          const responseText = await response.text();
-          // Create a new Response with the cached body for each consumer
-          return new Response(responseText, {
-            status: response.status,
-            statusText: response.statusText,
-            headers: response.headers,
-          });
-        }
-        // For error responses, just clone as before
-        return response.clone();
+        // Store the response data to allow multiple consumers
+        const responseData = {
+          body: await response.text(),
+          status: response.status,
+          statusText: response.statusText,
+          headers: Object.fromEntries(response.headers.entries()),
+        };
+        
+        // Store the data, not a Response object
+        return responseData;
       })
-      .finally(() => {
-        // Remove from pending requests when done
+      .catch((error) => {
+        // Remove from cache on error
         this.pendingRequests.delete(key);
+        throw error;
       });
 
     // Store the promise
     this.pendingRequests.set(key, requestPromise);
     this.requestCount++;
 
-    return requestPromise;
+    // For the first requester, wait for the data and create a Response
+    const responseData = await requestPromise;
+    
+    // Clean up after completion
+    setTimeout(() => {
+      this.pendingRequests.delete(key);
+    }, 100); // Small delay to allow other consumers to get the cached data
+    
+    return new Response(responseData.body, {
+      status: responseData.status,
+      statusText: responseData.statusText,
+      headers: new Headers(responseData.headers),
+    });
   }
 
   /**
@@ -71,7 +96,7 @@ export class RequestDeduplicator {
   async dedupeFunction<T>(
     key: string,
     fn: () => Promise<T>,
-    ttl: number = 30000, // 30 seconds default TTL
+    ttl: number = 30000 // 30 seconds default TTL
   ): Promise<T> {
     // Check if there's already a pending request for this key
     if (this.pendingRequests.has(key)) {
@@ -86,9 +111,7 @@ export class RequestDeduplicator {
     // Create the request promise with TTL
     const requestPromise = Promise.race([
       fn(),
-      new Promise<T>((_, reject) =>
-        setTimeout(() => reject(new Error("Request timeout")), ttl),
-      ),
+      new Promise<T>((_, reject) => setTimeout(() => reject(new Error("Request timeout")), ttl)),
     ]).finally(() => {
       // Remove from pending requests when done
       this.pendingRequests.delete(key);
@@ -134,10 +157,7 @@ export class RequestDeduplicator {
   /**
    * Static method for compatibility with services that expect the old interface
    */
-  static async deduplicate<T>(
-    key: string,
-    requestFn: () => Promise<T>,
-  ): Promise<T> {
+  static async deduplicate<T>(key: string, requestFn: () => Promise<T>): Promise<T> {
     return dedupeAsyncCall(key, requestFn);
   }
 }
@@ -148,21 +168,14 @@ export const requestDeduplicator = new RequestDeduplicator();
 /**
  * Enhanced fetch with request deduplication
  */
-export const dedupeFetch = (
-  url: string,
-  options?: RequestInit,
-): Promise<Response> => {
+export const dedupeFetch = (url: string, options?: RequestInit): Promise<Response> => {
   return requestDeduplicator.dedupeFetch(url, options);
 };
 
 /**
  * Utility to deduplicate any async function call
  */
-export const dedupeAsyncCall = <T>(
-  key: string,
-  fn: () => Promise<T>,
-  ttl?: number,
-): Promise<T> => {
+export const dedupeAsyncCall = <T>(key: string, fn: () => Promise<T>, ttl?: number): Promise<T> => {
   return requestDeduplicator.dedupeFunction(key, fn, ttl);
 };
 
@@ -172,7 +185,7 @@ export const dedupeAsyncCall = <T>(
 export function withDeduplication<TArgs extends unknown[], TReturn>(
   fn: (...args: TArgs) => Promise<TReturn>,
   keyGenerator: (...args: TArgs) => string,
-  ttl?: number,
+  ttl?: number
 ): (...args: TArgs) => Promise<TReturn> {
   return (...args: TArgs) => {
     const key = keyGenerator(...args);
@@ -186,7 +199,7 @@ export function withDeduplication<TArgs extends unknown[], TReturn>(
 export function createDedupedEndpoint<TArgs extends unknown[], TReturn>(
   endpoint: (...args: TArgs) => Promise<TReturn>,
   keyGenerator: (...args: TArgs) => string,
-  ttl: number = 30000,
+  ttl: number = 30000
 ) {
   return withDeduplication(endpoint, keyGenerator, ttl);
 }

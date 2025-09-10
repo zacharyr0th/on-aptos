@@ -8,10 +8,10 @@ import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
 
 import {
-  StandardAPIResponse,
-  APIError,
+  type APIError,
   APIErrorCode,
-  ResponseMeta,
+  type ResponseMeta,
+  type StandardAPIResponse,
 } from "@/lib/types/api";
 import { logger } from "@/lib/utils/core/logger";
 
@@ -25,7 +25,7 @@ export function buildSuccessResponse<T>(
     cacheHit?: boolean;
     apiCalls?: number;
     pagination?: ResponseMeta["pagination"];
-  } = {},
+  } = {}
 ): StandardAPIResponse<T> {
   const { startTime, cacheHit = false, apiCalls, pagination } = options;
 
@@ -52,7 +52,7 @@ export function buildErrorResponse(
   code: APIErrorCode,
   message: string,
   details?: Record<string, any>,
-  httpStatus: number = 500,
+  httpStatus: number = 500
 ): NextResponse<StandardAPIResponse<never>> {
   const isDev = process.env.NODE_ENV === "development";
 
@@ -96,7 +96,7 @@ export const APIResponses = {
       APIErrorCode.MISSING_PARAMETER,
       `Missing required parameter: ${parameter}`,
       { parameter },
-      400,
+      400
     ),
 
   invalidAddress: (address: string) =>
@@ -104,31 +104,21 @@ export const APIResponses = {
       APIErrorCode.INVALID_ADDRESS,
       "Invalid Aptos address format",
       { address },
-      400,
+      400
     ),
 
   rateLimited: (limit: number, windowMs: number) =>
-    buildErrorResponse(
-      APIErrorCode.RATE_LIMITED,
-      "Rate limit exceeded",
-      { limit, windowMs },
-      429,
-    ),
+    buildErrorResponse(APIErrorCode.RATE_LIMITED, "Rate limit exceeded", { limit, windowMs }, 429),
 
   notFound: (resource: string) =>
-    buildErrorResponse(
-      APIErrorCode.NOT_FOUND,
-      `${resource} not found`,
-      { resource },
-      404,
-    ),
+    buildErrorResponse(APIErrorCode.NOT_FOUND, `${resource} not found`, { resource }, 404),
 
   internalError: (message: string = "Internal server error", error?: Error) =>
     buildErrorResponse(
       APIErrorCode.INTERNAL_ERROR,
       message,
       error ? { stack: error.stack, name: error.name } : undefined,
-      500,
+      500
     ),
 
   serviceUnavailable: (service: string) =>
@@ -136,7 +126,7 @@ export const APIResponses = {
       APIErrorCode.SERVICE_UNAVAILABLE,
       `${service} is currently unavailable`,
       { service },
-      503,
+      503
     ),
 
   timeout: (operation: string) =>
@@ -144,7 +134,7 @@ export const APIResponses = {
       APIErrorCode.TIMEOUT,
       `Operation timed out: ${operation}`,
       { operation },
-      504,
+      504
     ),
 
   externalAPIError: (service: string, originalError?: string) =>
@@ -152,7 +142,7 @@ export const APIResponses = {
       APIErrorCode.EXTERNAL_API_ERROR,
       `External API error from ${service}`,
       { service, originalError },
-      502,
+      502
     ),
 };
 
@@ -166,15 +156,10 @@ export function withAPIHandler<T>(
     operation?: string;
     cacheHit?: boolean;
     apiCalls?: number;
-  } = {},
+  } = {}
 ) {
   return async (): Promise<NextResponse<StandardAPIResponse<T>>> => {
-    const {
-      startTime = Date.now(),
-      operation = "API operation",
-      cacheHit,
-      apiCalls,
-    } = options;
+    const { startTime = Date.now(), operation = "API operation", cacheHit, apiCalls } = options;
 
     try {
       const data = await handler();
@@ -194,10 +179,7 @@ export function withAPIHandler<T>(
 
       if (error instanceof Error) {
         // Handle specific error types
-        if (
-          error.message.includes("rate limit") ||
-          error.message.includes("429")
-        ) {
+        if (error.message.includes("rate limit") || error.message.includes("429")) {
           return APIResponses.rateLimited(100, 60000);
         }
 
@@ -205,10 +187,7 @@ export function withAPIHandler<T>(
           return APIResponses.timeout(operation);
         }
 
-        if (
-          error.message.includes("not found") ||
-          error.message.includes("404")
-        ) {
+        if (error.message.includes("not found") || error.message.includes("404")) {
           return APIResponses.notFound(operation);
         }
 
@@ -226,13 +205,11 @@ export function withAPIHandler<T>(
 export function createCacheHeaders(
   maxAge: number,
   staleWhileRevalidate?: number,
-  additionalHeaders: Record<string, string> = {},
+  additionalHeaders: Record<string, string> = {}
 ): Record<string, string> {
   return {
     "Cache-Control": `public, max-age=${maxAge}${
-      staleWhileRevalidate
-        ? `, stale-while-revalidate=${staleWhileRevalidate}`
-        : ""
+      staleWhileRevalidate ? `, stale-while-revalidate=${staleWhileRevalidate}` : ""
     }`,
     "X-Content-Type": "application/json",
     Vary: "Accept-Encoding",

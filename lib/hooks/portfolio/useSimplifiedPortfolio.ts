@@ -1,4 +1,4 @@
-import { useMemo, useCallback } from "react";
+import { useCallback, useMemo } from "react";
 
 import { usePortfolio } from "./usePortfolio";
 import { usePortfolioData } from "./usePortfolioData";
@@ -26,8 +26,10 @@ export function useSimplifiedPortfolio({
     defiLoading,
     transactionsLoading,
     hasMoreNFTs,
+    hasMoreTransactions,
     isLoadingMore,
     loadMoreNFTs,
+    loadMoreTransactions,
     error: dataError,
     totalNFTCount,
     allNFTs,
@@ -56,8 +58,7 @@ export function useSimplifiedPortfolio({
 
       // Filter out CELL tokens
       const isCellToken =
-        asset.asset_type ===
-          "0x2ebb2ccac5e027a87fa0e2e5f656a3a4238d6a48d93ec9b610d570fc0aa0df12" ||
+        asset.asset_type === "0x2ebb2ccac5e027a87fa0e2e5f656a3a4238d6a48d93ec9b610d570fc0aa0df12" ||
         asset.metadata?.symbol === "CELL";
       if (isCellToken) return false;
 
@@ -83,10 +84,7 @@ export function useSimplifiedPortfolio({
         }
         acc[protocol].positions.push(position);
         acc[protocol].totalValue +=
-          position.totalValueUSD ||
-          position.totalValue ||
-          position.tvl_usd ||
-          0;
+          position.totalValueUSD || position.totalValue || position.tvl_usd || 0;
         const protocolType = position.protocolType || position.protocol_type;
         if (protocolType) {
           acc[protocol].protocolTypes.add(protocolType);
@@ -101,33 +99,26 @@ export function useSimplifiedPortfolio({
           totalValue: number;
           protocolTypes: Set<string>;
         }
-      >,
+      >
     );
 
     return Object.values(grouped);
   }, [defiPositions]);
 
   // Use simplified portfolio hook for derived state
-  const { portfolioMetrics, pieChartData, pieChartColors } = usePortfolio(
-    nfts || undefined,
-    {
-      portfolioAssets: visibleAssets || undefined,
-      defiPositions: defiPositions || undefined,
-      groupedDeFiPositions: groupedDeFiPositions || undefined,
-      history: history || undefined,
-      averageHistory: averageHistory || undefined,
-      currentPrice: currentPrice || undefined,
-      previousPrice: previousPrice || undefined,
-    },
-  );
+  const { portfolioMetrics, pieChartData, pieChartColors } = usePortfolio(nfts || undefined, {
+    portfolioAssets: visibleAssets || undefined,
+    defiPositions: defiPositions || undefined,
+    groupedDeFiPositions: groupedDeFiPositions || undefined,
+    history: history || undefined,
+    averageHistory: averageHistory || undefined,
+    currentPrice: currentPrice || undefined,
+    previousPrice: previousPrice || undefined,
+  });
 
   // Show skeleton until ALL data is loaded
   const isLoading =
-    dataLoading ||
-    historyLoading ||
-    nftsLoading ||
-    defiLoading ||
-    transactionsLoading;
+    dataLoading || historyLoading || nftsLoading || defiLoading || transactionsLoading;
 
   return {
     // Data
@@ -163,8 +154,10 @@ export function useSimplifiedPortfolio({
 
     // NFT pagination
     hasMoreNFTs,
+    hasMoreTransactions,
     isLoadingMore,
     loadMoreNFTs,
+    loadMoreTransactions,
 
     // Error
     error: dataError,

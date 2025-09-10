@@ -36,11 +36,7 @@ export type TranslatableStringArray = Translatable<string[]>;
 export type LargeNumberString = string; // Runtime validation with zod or similar
 
 // === Data Source Types ===
-export type DataProvider =
-  | "DefiLlama"
-  | "CoinGecko"
-  | "Aptos Indexer"
-  | "Custom API";
+export type DataProvider = "DefiLlama" | "CoinGecko" | "Aptos Indexer" | "Custom API";
 
 export interface DataSource {
   provider: DataProvider;
@@ -353,27 +349,17 @@ export type MultipleProtocol = BaseDefiProtocol & {
 };
 
 // === Main Union Type ===
-export type DefiProtocol =
-  | CreditProtocol
-  | YieldProtocol
-  | TradingProtocol
-  | MultipleProtocol;
+export type DefiProtocol = CreditProtocol | YieldProtocol | TradingProtocol | MultipleProtocol;
 
 // === Localization Helpers ===
 export type LocalizationHelpers = {
   // Get translated text with fallback to English
-  getText: (
-    translatable: TranslatableString,
-    locale: SupportedLanguage,
-  ) => string;
+  getText: (translatable: TranslatableString, locale: SupportedLanguage) => string;
   // Get translated array with fallback to English
-  getArray: (
-    translatable: TranslatableStringArray,
-    locale: SupportedLanguage,
-  ) => string[];
+  getArray: (translatable: TranslatableStringArray, locale: SupportedLanguage) => string[];
   // Check if translation exists for a specific locale
   hasTranslation: (
     translatable: TranslatableString | TranslatableStringArray,
-    locale: SupportedLanguage,
+    locale: SupportedLanguage
   ) => boolean;
 };

@@ -82,7 +82,7 @@ export class UnifiedResponseBuilder {
       pagination?: PaginationMeta;
       cacheHeaders?: keyof typeof CACHE_HEADERS | string;
       cors?: boolean;
-    } = {},
+    } = {}
   ): NextResponse<StandardResponse<T>> {
     const {
       startTime = Date.now(),
@@ -119,8 +119,7 @@ export class UnifiedResponseBuilder {
     // Add cache headers
     if (typeof cacheHeaders === "string") {
       if (cacheHeaders in CACHE_HEADERS) {
-        headers["Cache-Control"] =
-          CACHE_HEADERS[cacheHeaders as keyof typeof CACHE_HEADERS];
+        headers["Cache-Control"] = CACHE_HEADERS[cacheHeaders as keyof typeof CACHE_HEADERS];
       } else {
         headers["Cache-Control"] = cacheHeaders;
       }
@@ -152,7 +151,7 @@ export class UnifiedResponseBuilder {
       code?: string;
       details?: Record<string, any>;
       cors?: boolean;
-    } = {},
+    } = {}
   ): NextResponse<ErrorResponse> {
     const { startTime = Date.now(), code, details, cors = true } = options;
 
@@ -196,9 +195,9 @@ export class UnifiedResponseBuilder {
   static cached<T>(
     data: T,
     startTime: number,
-    source: string = "cache",
+    source: string = "cache"
   ): NextResponse<StandardResponse<T>> {
-    return this.success(data, {
+    return UnifiedResponseBuilder.success(data, {
       startTime,
       cached: true,
       cacheHit: true,
@@ -215,9 +214,9 @@ export class UnifiedResponseBuilder {
     data: T,
     startTime: number,
     apiCalls: number = 1,
-    source?: string,
+    source?: string
   ): NextResponse<StandardResponse<T>> {
-    return this.success(data, {
+    return UnifiedResponseBuilder.success(data, {
       startTime,
       cached: false,
       cacheHit: false,
@@ -230,12 +229,8 @@ export class UnifiedResponseBuilder {
   /**
    * Build a fallback response when using default data
    */
-  static fallback<T>(
-    data: T,
-    startTime: number,
-    error?: Error,
-  ): NextResponse<StandardResponse<T>> {
-    const response = this.success(data, {
+  static fallback<T>(data: T, startTime: number, error?: Error): NextResponse<StandardResponse<T>> {
+    const response = UnifiedResponseBuilder.success(data, {
       startTime,
       cached: false,
       source: "fallback",
@@ -264,9 +259,9 @@ export class UnifiedResponseBuilder {
       source?: string;
       apiCalls?: number;
       cacheHeaders?: keyof typeof CACHE_HEADERS | string;
-    } = {},
+    } = {}
   ): NextResponse<StandardResponse<T[]>> {
-    return this.success(data, {
+    return UnifiedResponseBuilder.success(data, {
       ...options,
       pagination,
     });
@@ -278,9 +273,9 @@ export class UnifiedResponseBuilder {
   static validationError(
     field: string,
     message: string,
-    startTime?: number,
+    startTime?: number
   ): NextResponse<ErrorResponse> {
-    return this.error(`Validation error: ${field} - ${message}`, 400, {
+    return UnifiedResponseBuilder.error(`Validation error: ${field} - ${message}`, 400, {
       startTime,
       code: "VALIDATION_ERROR",
       details: { field, message },
@@ -293,9 +288,9 @@ export class UnifiedResponseBuilder {
   static rateLimited(
     limit: number,
     resetTime: Date,
-    startTime?: number,
+    startTime?: number
   ): NextResponse<ErrorResponse> {
-    const response = this.error("Rate limit exceeded", 429, {
+    const response = UnifiedResponseBuilder.error("Rate limit exceeded", 429, {
       startTime,
       code: "RATE_LIMITED",
       details: { limit, resetTime },
@@ -303,10 +298,7 @@ export class UnifiedResponseBuilder {
 
     // Add rate limiting headers
     const headers = new Headers(response.headers);
-    headers.set(
-      "Retry-After",
-      Math.ceil((resetTime.getTime() - Date.now()) / 1000).toString(),
-    );
+    headers.set("Retry-After", Math.ceil((resetTime.getTime() - Date.now()) / 1000).toString());
     headers.set("X-RateLimit-Limit", limit.toString());
     headers.set("X-RateLimit-Reset", resetTime.toISOString());
 
@@ -319,11 +311,8 @@ export class UnifiedResponseBuilder {
   /**
    * Handle service unavailable with 503 status
    */
-  static serviceUnavailable(
-    service: string,
-    startTime?: number,
-  ): NextResponse<ErrorResponse> {
-    return this.error(`Service unavailable: ${service}`, 503, {
+  static serviceUnavailable(service: string, startTime?: number): NextResponse<ErrorResponse> {
+    return UnifiedResponseBuilder.error(`Service unavailable: ${service}`, 503, {
       startTime,
       code: "SERVICE_UNAVAILABLE",
       details: { service },
@@ -333,11 +322,8 @@ export class UnifiedResponseBuilder {
   /**
    * Handle not found with 404 status
    */
-  static notFound(
-    resource: string,
-    startTime?: number,
-  ): NextResponse<ErrorResponse> {
-    return this.error(`Resource not found: ${resource}`, 404, {
+  static notFound(resource: string, startTime?: number): NextResponse<ErrorResponse> {
+    return UnifiedResponseBuilder.error(`Resource not found: ${resource}`, 404, {
       startTime,
       code: "NOT_FOUND",
       details: { resource },
@@ -359,7 +345,7 @@ export class UnifiedResponseBuilder {
    */
   static async withErrorBoundary<T>(
     handler: () => Promise<NextResponse<StandardResponse<T>>>,
-    fallbackData?: T,
+    fallbackData?: T
   ): Promise<NextResponse<StandardResponse<T> | ErrorResponse>> {
     const startTime = Date.now();
 
@@ -373,10 +359,10 @@ export class UnifiedResponseBuilder {
       });
 
       if (fallbackData) {
-        return this.fallback(fallbackData, startTime, error as Error);
+        return UnifiedResponseBuilder.fallback(fallbackData, startTime, error as Error);
       }
 
-      return this.error(error as Error, 500, { startTime });
+      return UnifiedResponseBuilder.error(error as Error, 500, { startTime });
     }
   }
 }
@@ -393,7 +379,7 @@ export function buildResponse<T>(
   data: T,
   startTime: number,
   cached: boolean = false,
-  apiCalls: number = 1,
+  apiCalls: number = 1
 ): NextResponse<StandardResponse<T>> {
   if (cached) {
     return UnifiedResponseBuilder.cached(data, startTime);

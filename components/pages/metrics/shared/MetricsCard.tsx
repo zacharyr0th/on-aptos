@@ -1,13 +1,7 @@
 "use client";
 
-import { ReactNode } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import type { ReactNode } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface MetricsCardProps {
   title: string;
@@ -58,9 +52,7 @@ export const QuickStatsCard: React.FC<QuickStatsCardProps> = ({
       </CardHeader>
       <CardContent>
         <div className={`text-xl font-bold ${valueClassName}`}>{value}</div>
-        {subtitle && (
-          <p className="text-xs text-muted-foreground">{subtitle}</p>
-        )}
+        {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
       </CardContent>
     </Card>
   );

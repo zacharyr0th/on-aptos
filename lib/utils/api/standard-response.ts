@@ -40,7 +40,7 @@ export function successResponse<T>(
     headers?: ApiHeaders;
     cache?: keyof typeof CACHE_HEADERS;
     status?: number;
-  },
+  }
 ) {
   const cacheControl = options?.cache
     ? CACHE_HEADERS[options.cache]
@@ -68,7 +68,7 @@ export function errorResponse(
     status?: number;
     details?: any;
     service?: string;
-  },
+  }
 ) {
   const errorMessage = error instanceof Error ? error.message : error;
   const status = options?.status || 500;
@@ -94,7 +94,7 @@ export function errorResponse(
         "X-Content-Type": "application/json",
         ...(options?.service && { "X-Service": options.service }),
       },
-    },
+    }
   );
 }
 
@@ -103,7 +103,7 @@ export function errorResponse(
  */
 export function validateParams(
   params: Record<string, any>,
-  required: string[],
+  required: string[]
 ): { valid: boolean; missing?: string[] } {
   const missing = required.filter((key) => !params[key]);
 

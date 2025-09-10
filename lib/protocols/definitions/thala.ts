@@ -2,7 +2,8 @@
  * Thala Protocol Definition
  */
 
-import { ProtocolDefinition, ProtocolType, PositionType } from "../types";
+import { ProtocolType } from "@/lib/types/defi";
+import { PositionType, type ProtocolDefinition } from "../types";
 
 export const ThalaProtocol: ProtocolDefinition = {
   metadata: {
@@ -41,13 +42,13 @@ export const ThalaProtocol: ProtocolDefinition = {
         extractAssets: (data) => {
           // Farming positions require additional queries to get actual balances
           // Return empty array if no direct balance available
-          if (!data?.pool_info) return [];
+          if (!(data as any)?.pool_info) return [];
           return [];
         },
         extractMetadata: (data) => ({
           farmingPosition: true,
-          poolHandle: data?.pool_info?.handle,
-          poolId: data?.pool_info?.id,
+          poolHandle: (data as any)?.pool_info?.handle,
+          poolId: (data as any)?.pool_info?.id,
           requiresAdditionalQuery: true,
           protocolName: "Thala Labs",
           positionType: "Farm",
@@ -59,7 +60,7 @@ export const ThalaProtocol: ProtocolDefinition = {
         positionType: PositionType.FARMING,
         priority: 105,
         extractAssets: (data) => {
-          const escrowValue = data?.escrow?.value || "0";
+          const escrowValue = (data as any)?.escrow?.value || "0";
           if (escrowValue === "0" || !escrowValue) return [];
           return [
             {
@@ -73,10 +74,10 @@ export const ThalaProtocol: ProtocolDefinition = {
         },
         extractMetadata: (data) => ({
           vestingPosition: true,
-          claimIds: data?.claim_ids || [],
-          escrowValue: data?.escrow?.value || "0",
-          claimableAmount: data?.claimable_amount || "0",
-          nextClaimTime: data?.next_claim_time,
+          claimIds: (data as any)?.claim_ids || [],
+          escrowValue: (data as any)?.escrow?.value || "0",
+          claimableAmount: (data as any)?.claimable_amount || "0",
+          nextClaimTime: (data as any)?.next_claim_time,
           protocolName: "Thala Labs",
           positionType: "Vesting",
         }),
@@ -88,10 +89,10 @@ export const ThalaProtocol: ProtocolDefinition = {
         priority: 100,
         extractAssets: (data) => [
           {
-            address: data.type,
+            address: (data as any).type,
             symbol: "THALA-STABLE-LP",
             decimals: 8,
-            amount: data?.coin?.value || "0",
+            amount: (data as any)?.coin?.value || "0",
           },
         ],
       },
@@ -102,10 +103,10 @@ export const ThalaProtocol: ProtocolDefinition = {
         priority: 100,
         extractAssets: (data) => [
           {
-            address: data.type,
+            address: (data as any).type,
             symbol: "THALA-WEIGHTED-LP",
             decimals: 8,
-            amount: data?.coin?.value || "0",
+            amount: (data as any)?.coin?.value || "0",
           },
         ],
       },
@@ -120,7 +121,7 @@ export const ThalaProtocol: ProtocolDefinition = {
               "0x6f986d146e4a90b828d8c12c14b6f4e003fdff11a8eecceceb63744363eaac01::mod_coin::MOD",
             symbol: "MOD",
             decimals: 8,
-            amount: data?.coin?.value || "0",
+            amount: (data as any)?.coin?.value || "0",
           },
         ],
         extractMetadata: (data) => ({
@@ -135,10 +136,10 @@ export const ThalaProtocol: ProtocolDefinition = {
         priority: 80,
         extractAssets: (data) => [
           {
-            address: data.type,
+            address: (data as any).type,
             symbol: "THL",
             decimals: 8,
-            amount: data?.coin?.value || "0",
+            amount: (data as any)?.coin?.value || "0",
           },
         ],
       },

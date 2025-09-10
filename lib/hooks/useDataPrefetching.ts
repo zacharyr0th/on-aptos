@@ -15,9 +15,7 @@ interface PrefetchConfig {
  */
 export function useDataPrefetch(pageOrConfig?: PageType | PrefetchConfig) {
   const config: PrefetchConfig =
-    typeof pageOrConfig === "string"
-      ? getPageConfig(pageOrConfig)
-      : pageOrConfig || {};
+    typeof pageOrConfig === "string" ? getPageConfig(pageOrConfig) : pageOrConfig || {};
   const { enabled = true, symbols = ["btc", "susde"], onError } = config;
 
   // TODO: Implement trpc client setup and use trpc.useUtils() here

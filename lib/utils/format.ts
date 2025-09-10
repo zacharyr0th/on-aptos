@@ -4,7 +4,7 @@
  */
 
 import type { Currency, FiatCurrency } from "@/lib/types/consolidated";
-import { logger, errorLogger } from "@/lib/utils/core/logger";
+import { errorLogger, logger } from "@/lib/utils/core/logger";
 
 // Re-export currency types from consolidated
 export type { Currency, FiatCurrency } from "@/lib/types/consolidated";
@@ -43,11 +43,7 @@ const SUPPORTED_FIATS: readonly FiatCurrency[] = [
 const formatCache = new Map<string, string>();
 const CACHE_SIZE_LIMIT = 1000;
 
-function getCacheKey(
-  type: string,
-  value: number | string,
-  ...args: unknown[]
-): string {
+function getCacheKey(type: string, value: number | string, ...args: unknown[]): string {
   return `${type}:${value}:${JSON.stringify(args)}`;
 }
 
@@ -65,9 +61,7 @@ function cleanupCache() {
  * Check if a currency is a fiat currency
  */
 export function isFiatCurrency(currency: string): currency is FiatCurrency {
-  return (SUPPORTED_FIATS as readonly string[]).includes(
-    currency.toUpperCase(),
-  );
+  return (SUPPORTED_FIATS as readonly string[]).includes(currency.toUpperCase());
 }
 
 /**
@@ -115,7 +109,7 @@ export function formatCurrency(
     decimals?: number;
     minimumFractionDigits?: number;
     maximumFractionDigits?: number;
-  } = {},
+  } = {}
 ): string {
   if (amount === null || amount === undefined || isNaN(amount)) {
     return "—";
@@ -148,24 +142,15 @@ export function formatCurrency(
     if (absAmount >= 1_000_000_000) {
       const billions = amount / 1_000_000_000;
       const formatted = billions.toFixed(1).replace(/\.0$/, "");
-      result =
-        showSymbol && isFiatCurrency(code)
-          ? `$${formatted}b`
-          : `${formatted}b ${code}`;
+      result = showSymbol && isFiatCurrency(code) ? `$${formatted}b` : `${formatted}b ${code}`;
     } else if (absAmount >= 1_000_000) {
       const millions = amount / 1_000_000;
       const formatted = millions.toFixed(1).replace(/\.0$/, "");
-      result =
-        showSymbol && isFiatCurrency(code)
-          ? `$${formatted}m`
-          : `${formatted}m ${code}`;
+      result = showSymbol && isFiatCurrency(code) ? `$${formatted}m` : `${formatted}m ${code}`;
     } else if (absAmount >= 1_000) {
       const thousands = amount / 1_000;
       const formatted = thousands.toFixed(1).replace(/\.0$/, "");
-      result =
-        showSymbol && isFiatCurrency(code)
-          ? `$${formatted}k`
-          : `${formatted}k ${code}`;
+      result = showSymbol && isFiatCurrency(code) ? `$${formatted}k` : `${formatted}k ${code}`;
     } else {
       // This shouldn't happen, but just in case
       result = formatFullNumber();
@@ -182,12 +167,8 @@ export function formatCurrency(
     const defaultMinFrac = absAmount < 1000 ? 2 : 0;
     const defaultMaxFrac = absAmount < 1000 ? 2 : 2;
 
-    const minFrac =
-      minimumFractionDigits ??
-      (decimals !== undefined ? decimals : defaultMinFrac);
-    const maxFrac =
-      maximumFractionDigits ??
-      (decimals !== undefined ? decimals : defaultMaxFrac);
+    const minFrac = minimumFractionDigits ?? (decimals !== undefined ? decimals : defaultMinFrac);
+    const maxFrac = maximumFractionDigits ?? (decimals !== undefined ? decimals : defaultMaxFrac);
 
     if (isFiatCurrency(code) && showSymbol) {
       return new Intl.NumberFormat("en-US", {
@@ -224,7 +205,7 @@ export function formatPercentage(
     maximumFractionDigits?: number;
     showSign?: boolean;
     decimals?: number; // Shorthand for min/max fraction digits
-  },
+  }
 ): string {
   const cacheKey = getCacheKey("percentage", value, options);
   if (formatCache.has(cacheKey)) {
@@ -255,7 +236,7 @@ export function formatPercentage(
  */
 export function formatCurrencyMobile(
   amount: number,
-  currencyCode: Currency | string = "USD",
+  currencyCode: Currency | string = "USD"
 ): string {
   if (amount === null || amount === undefined || isNaN(amount)) {
     return "—";
@@ -267,16 +248,12 @@ export function formatCurrencyMobile(
   if (absAmount >= 1_000_000_000) {
     const billions = amount / 1_000_000_000;
     const formatted =
-      billions >= 100
-        ? Math.round(billions).toString()
-        : billions.toFixed(1).replace(/\.0$/, "");
+      billions >= 100 ? Math.round(billions).toString() : billions.toFixed(1).replace(/\.0$/, "");
     return isFiatCurrency(code) ? `$${formatted}B` : `${formatted}B ${code}`;
   } else if (absAmount >= 1_000_000) {
     const millions = amount / 1_000_000;
     const formatted =
-      millions >= 100
-        ? Math.round(millions).toString()
-        : millions.toFixed(1).replace(/\.0$/, "");
+      millions >= 100 ? Math.round(millions).toString() : millions.toFixed(1).replace(/\.0$/, "");
     return isFiatCurrency(code) ? `$${formatted}M` : `${formatted}M ${code}`;
   } else if (absAmount >= 1_000) {
     const thousands = amount / 1_000;
@@ -314,7 +291,7 @@ export function formatAmount(
     compact?: boolean;
     showSymbol?: boolean;
     decimals?: number;
-  },
+  }
 ): string {
   // Default to compact=true to enforce the rules
   return formatCurrency(amount, currencyCode, {
@@ -334,7 +311,7 @@ export function formatAmountFull(
   options?: {
     showSymbol?: boolean;
     decimals?: number;
-  },
+  }
 ): string {
   // Force compact=false to show full numbers
   return formatCurrency(amount, currencyCode, {
@@ -378,7 +355,7 @@ export function formatNumber(
     compactDisplay?: "short" | "long";
     useGrouping?: boolean;
     decimals?: number; // Shorthand for min/max fraction digits
-  },
+  }
 ): string {
   const cacheKey = getCacheKey("number", value, options);
   if (formatCache.has(cacheKey)) {
@@ -417,7 +394,7 @@ export function formatTokenAmount(
     maximumFractionDigits?: number;
     showSymbol?: boolean;
     useCompact?: boolean;
-  },
+  }
 ): string {
   const {
     minimumFractionDigits = 0,
@@ -444,7 +421,7 @@ export function formatTokenAmount(
 export function formatBigIntWithDecimals(
   value: bigint,
   decimals: number,
-  displayDecimals?: number,
+  displayDecimals?: number
 ): string {
   const divisor = BigInt(10 ** decimals);
   const integerPart = value / divisor;
@@ -459,19 +436,14 @@ export function formatBigIntWithDecimals(
     ? fractionalStr.slice(0, displayDecimals)
     : fractionalStr.replace(/0+$/, "");
 
-  return trimmedFractional
-    ? `${integerPart}.${trimmedFractional}`
-    : integerPart.toString();
+  return trimmedFractional ? `${integerPart}.${trimmedFractional}` : integerPart.toString();
 }
 
 /**
  * Get the correct decimals for a token based on its type
  * Some tokens have incorrect or missing decimal metadata
  */
-function getTokenDecimals(
-  assetType?: string,
-  metadataDecimals?: number,
-): number {
+function getTokenDecimals(assetType?: string, metadataDecimals?: number): number {
   // If we have valid metadata decimals, use them
   if (metadataDecimals !== undefined && metadataDecimals >= 0) {
     return metadataDecimals;
@@ -498,7 +470,7 @@ function getTokenDecimals(
 export function convertRawTokenAmount(
   rawAmount: string | bigint | number,
   decimals: number,
-  assetType?: string,
+  assetType?: string
 ): number {
   try {
     // Use the correct decimals for this token
@@ -538,7 +510,7 @@ export function convertRawTokenAmount(
           type: typeof rawAmount,
           rawAmount,
         },
-        "Invalid rawAmount type",
+        "Invalid rawAmount type"
       );
       return 0;
     }
@@ -562,7 +534,7 @@ export function convertRawTokenAmount(
         decimals,
         assetType,
       },
-      "Error in convertRawTokenAmount",
+      "Error in convertRawTokenAmount"
     );
     return 0;
   }
@@ -623,7 +595,7 @@ export function formatDate(
   options?: {
     format?: "short" | "medium" | "long" | "full";
     includeTime?: boolean;
-  },
+  }
 ): string {
   const dateObj = new Date(date);
 
@@ -735,11 +707,10 @@ export { formatPercentage as formatPercent };
 export function formatTokenAmountFromRaw(
   rawAmount: string | number,
   decimals: number = 8,
-  _symbol?: string,
+  _symbol?: string
 ): number {
-  const amount =
-    typeof rawAmount === "string" ? parseFloat(rawAmount) : rawAmount;
-  const formatted = amount / Math.pow(10, decimals);
+  const amount = typeof rawAmount === "string" ? parseFloat(rawAmount) : rawAmount;
+  const formatted = amount / 10 ** decimals;
   return formatted;
 }
 

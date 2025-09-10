@@ -2,10 +2,10 @@
  * Core types for the protocol system
  */
 
-import { ProtocolType } from "@/lib/types/defi";
+// Import and re-export ProtocolType for protocol definitions
+import type { ProtocolType } from "@/lib/types/defi";
 
-// Re-export ProtocolType from defi types (most comprehensive)
-export { ProtocolType };
+export { ProtocolType } from "@/lib/types/defi";
 
 // Local protocol-specific types
 export enum ProtocolSubType {
@@ -38,7 +38,7 @@ export interface AssetInfo {
   decimals: number;
   amount: string;
   valueUSD?: number;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface ProtocolPattern {
@@ -48,8 +48,8 @@ export interface ProtocolPattern {
 
   // Position extraction
   positionType: PositionType;
-  extractAssets: (data: any) => AssetInfo[];
-  extractMetadata?: (data: any) => Record<string, any>;
+  extractAssets: (data: Record<string, unknown>) => AssetInfo[];
+  extractMetadata?: (data: Record<string, unknown>) => Record<string, unknown>;
 
   // Optional filters
   minAmount?: string; // Minimum amount to consider
@@ -106,13 +106,13 @@ export interface ProtocolDefinition {
   // Custom handlers
   handlers?: {
     // Custom position extraction
-    extractPosition?: (resource: any) => Promise<any>;
+    extractPosition?: (resource: Record<string, unknown>) => Promise<Record<string, unknown>>;
 
     // Custom transaction categorization
-    categorizeTransaction?: (tx: any) => Promise<any>;
+    categorizeTransaction?: (tx: Record<string, unknown>) => Promise<Record<string, unknown>>;
 
     // Custom value calculation
-    calculateValue?: (position: any) => Promise<number>;
+    calculateValue?: (position: Record<string, unknown>) => Promise<number>;
   };
 
   // Version info

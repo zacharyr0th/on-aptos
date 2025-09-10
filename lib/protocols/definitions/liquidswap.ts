@@ -2,7 +2,7 @@
  * LiquidSwap Protocol Definition
  */
 
-import { ProtocolDefinition, ProtocolType, PositionType } from "../types";
+import { PositionType, type ProtocolDefinition, ProtocolType } from "../types";
 
 export const LiquidSwapProtocol: ProtocolDefinition = {
   metadata: {
@@ -29,16 +29,14 @@ export const LiquidSwapProtocol: ProtocolDefinition = {
         positionType: PositionType.LP,
         priority: 100,
         extractAssets: (data) => {
-          const typeMatch = data.type.match(/<(.+), (.+)>/);
-          const [token0, token1] = typeMatch
-            ? [typeMatch[1], typeMatch[2]]
-            : ["", ""];
+          const typeMatch = (data as any).type.match(/<(.+), (.+)>/);
+          const [token0, token1] = typeMatch ? [typeMatch[1], typeMatch[2]] : ["", ""];
           return [
             {
-              address: data.type,
+              address: (data as any).type,
               symbol: `LP-${token0.split("::").pop()}-${token1.split("::").pop()}`,
               decimals: 8,
-              amount: data?.data?.coin_x_reserve || "0",
+              amount: (data as any)?.data?.coin_x_reserve || "0",
             },
           ];
         },

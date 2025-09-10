@@ -13,14 +13,7 @@ const Toaster = () => {
     setMounted(true);
   }, []);
 
-  const toaster = (
-    <Sonner
-      theme={theme as any}
-      position="bottom-right"
-      richColors
-      expand={false}
-    />
-  );
+  const toaster = <Sonner theme={theme as any} position="bottom-right" richColors expand={false} />;
 
   // Use portal to render at document.body level
   if (mounted && typeof document !== "undefined") {

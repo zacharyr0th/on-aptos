@@ -223,16 +223,7 @@
       "Protocol Suite": "프로토콜 스위트"
     }
   },
-  "protocols": {
-    "mirage": {
-      "description": "Composable liquidity layer bringing next-gen DeFi. Deposit collateral and borrow self-repaying stablecoin loans powered by perpetuals with up to 100x leverage.",
-      "categoryBreakdown": "Trading • Perps",
-      "feeStructure": "Dynamic fee structure based on trading volume and position size. Competitive fees for perpetual futures trading.",
-      "integration": {
-        "description": "Fully on-chain perpetuals with CEX-like experience. All positions, vaults, and orders are represented as NFTs for secondary market trading."
-      }
-    }
-  },
+  "protocols": {},
   "protocol_descriptions": {
     "Panora": "온체인 주문서와 10개 이상의 AMM에 연결되는 \"메타-DEX\"로, 풀 간에 주문을 분할하면서 UI에서 자동 업데이트되는 정규 토큰 목록을 관리합니다.",
     "Kana": "9개 체인에 걸쳐 스왈을 라우팅; 페이마스터 계약을 통해 사용자가 가스용 APT를 보유하지 않고도 Aptos에서 거래 가능; 주문서 기반 perp 엔진.",
@@ -257,8 +248,7 @@
     "Kofi": "MEV 부스트 리퀴 스테이킹과 레버리지 LSD 볼트.",
     "Ichi": "자동화된 유동성 관리자 볼트로 프로젝트가 단측 유동성을 제공할 수 있음; 스마트 범위가 비영구 손실을 줄이기 위해 리뱸런싱하며 재무부는 네이티브 토큰으로 스왈 수수료를 획득.",
     "Moar": "사용자가 한 곳에서 대출하고 다른 곳에서 배포할 수 있는 크로스 프로토콜 신용 계정으로 레버리지 파밍 레이어를 구축.",
-    "Thala": "멀티 풀 AMM, 초과 담보 MOD 스테이블코인, sthAPT와 thAPT를 통한 리퀴 스테이킹을 특징으로 하는 DeFi 애플리케이션 스위트.",
-    "Mirage": "A composable liquidity layer powering DeFi's next frontier. Deposit collateral and borrow a self-repaying stablecoin loan powered by perpetuals. Features fully on-chain perps with CEX-like experience, instant execution, low fees, and up to 100x leverage."
+    "Thala": "멀티 풀 AMM, 초과 담보 MOD 스테이블코인, sthAPT와 thAPT를 통한 리퀴 스테이킹을 특징으로 하는 DeFi 애플리케이션 스위트."
   },
   "protocol_category_breakdown": {
     "Thala": "트레이딩 • 수익 • 신용"

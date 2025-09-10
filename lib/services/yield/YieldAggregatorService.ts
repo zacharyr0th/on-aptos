@@ -1,33 +1,15 @@
-import { YIELD_PROTOCOL_ADDRESSES as PROTOCOL_ADDRESSES } from "@/lib/constants";
-import { DeFiPosition } from "@/lib/services/defi";
+import { PROTOCOLS } from "@/lib/constants/protocols/protocol-registry";
+import type { DeFiPosition } from "@/lib/services/defi";
 import { logger } from "@/lib/utils/core/logger";
-
-import {
-  AptosResourceFetcher,
+import { AptosResourceFetcher } from "./AptosResourceFetcher";
+import { DefiLlamaIntegration } from "./DefiLlamaIntegration";
+import type {
   ProtocolOpportunity,
-} from "./AptosResourceFetcher";
-import { DefiLlamaIntegration, YieldOpportunity } from "./DefiLlamaIntegration";
-
-export interface YieldStrategy {
-  id: string;
-  name: string;
-  description: string;
-  targetAPY: number;
-  risk: "conservative" | "moderate" | "aggressive";
-  protocols: string[];
-  allocation: Record<string, number>; // protocol -> percentage
-  estimatedGas: number;
-  steps: YieldStrategyStep[];
-}
-
-export interface YieldStrategyStep {
-  protocol: string;
-  action: "deposit" | "withdraw" | "swap" | "stake" | "harvest";
-  asset: string;
-  amount: string;
-  targetAsset?: string;
-  estimatedAPY: number;
-}
+  YieldOpportunity,
+  YieldStrategy,
+  YieldStrategyStep,
+} from "./types";
+import { sanitizeFilters, sanitizeWalletAddress, sanitizeYieldOpportunities } from "./validation";
 
 export class YieldAggregatorService {
   private static instance: YieldAggregatorService;
@@ -40,10 +22,10 @@ export class YieldAggregatorService {
   }
 
   static getInstance(): YieldAggregatorService {
-    if (!this.instance) {
-      this.instance = new YieldAggregatorService();
+    if (!YieldAggregatorService.instance) {
+      YieldAggregatorService.instance = new YieldAggregatorService();
     }
-    return this.instance;
+    return YieldAggregatorService.instance;
   }
 
   /**
@@ -57,28 +39,26 @@ export class YieldAggregatorService {
       protocols?: string[];
       assets?: string[];
       includeInactive?: boolean;
-    },
+    }
   ): Promise<YieldOpportunity[]> {
     try {
       const opportunities: YieldOpportunity[] = [];
 
       // Fetch opportunities from various sources
-      const [lending, liquidity, staking, farming, defiLlama] =
-        await Promise.all([
-          this.fetchLendingOpportunities(),
-          this.fetchLiquidityOpportunities(),
-          this.fetchStakingOpportunities(),
-          this.fetchFarmingOpportunities(),
-          this.fetchDefiLlamaOpportunities(),
-        ]);
+      const [lending, liquidity, staking, farming, defiLlama] = await Promise.allSettled([
+        this.fetchLendingOpportunities(),
+        this.fetchLiquidityOpportunities(),
+        this.fetchStakingOpportunities(),
+        this.fetchFarmingOpportunities(),
+        this.fetchDefiLlamaOpportunities(),
+      ]);
 
-      opportunities.push(
-        ...lending,
-        ...liquidity,
-        ...staking,
-        ...farming,
-        ...defiLlama,
-      );
+      // Extract successful results
+      const successfulResults = [lending, liquidity, staking, farming, defiLlama]
+        .filter((result) => result.status === "fulfilled")
+        .flatMap((result) => (result as PromiseFulfilledResult<YieldOpportunity[]>).value);
+
+      opportunities.push(...successfulResults);
 
       // Filter based on criteria
       let filtered = opportunities;
@@ -89,22 +69,18 @@ export class YieldAggregatorService {
 
       if (filters?.maxRisk) {
         const riskLevels = { low: 1, medium: 2, high: 3 };
-        filtered = filtered.filter(
-          (o) => riskLevels[o.risk] <= riskLevels[filters.maxRisk!],
-        );
+        filtered = filtered.filter((o) => riskLevels[o.risk] <= riskLevels[filters.maxRisk!]);
       }
 
       if (filters?.protocols?.length) {
-        filtered = filtered.filter((o) =>
-          filters.protocols!.includes(o.protocol),
-        );
+        filtered = filtered.filter((o) => filters.protocols!.includes(o.protocol));
       }
 
       if (filters?.assets?.length) {
         filtered = filtered.filter(
           (o) =>
             filters.assets!.includes(o.asset) ||
-            (o.pairedAsset && filters.assets!.includes(o.pairedAsset)),
+            (o.pairedAsset && filters.assets!.includes(o.pairedAsset))
         );
       }
 
@@ -139,7 +115,7 @@ export class YieldAggregatorService {
       preferredProtocols?: string[];
       excludeProtocols?: string[];
       timeHorizon?: number; // days
-    },
+    }
   ): Promise<YieldStrategy[]> {
     const strategies: YieldStrategy[] = [];
 
@@ -148,51 +124,38 @@ export class YieldAggregatorService {
 
     // Conservative strategy: Focus on lending and stable LPs
     if (preferences.riskTolerance === "conservative") {
-      const conservativeOps = opportunities.filter(
-        (o) => o.risk === "low" && o.apy > 0,
-      );
+      const conservativeOps = opportunities.filter((o) => o.risk === "low" && o.apy > 0);
 
       strategies.push({
         id: "conservative-diversified",
         name: "Conservative Diversified Lending",
-        description:
-          "Spread funds across top lending protocols for stable yields",
+        description: "Spread funds across top lending protocols for stable yields",
         targetAPY: this.calculateWeightedAPY(conservativeOps.slice(0, 3)),
         risk: "conservative",
-        protocols: [
-          ...new Set(conservativeOps.slice(0, 3).map((o) => o.protocol)),
-        ],
-        allocation: this.calculateOptimalAllocation(
-          conservativeOps.slice(0, 3),
-        ),
+        protocols: Array.from(new Set(conservativeOps.slice(0, 3).map((o) => o.protocol))),
+        allocation: this.calculateOptimalAllocation(conservativeOps.slice(0, 3)),
         estimatedGas: 0.5,
         steps: this.generateStrategySteps(
           conservativeOps.slice(0, 3),
-          preferences.availableCapital,
+          preferences.availableCapital
         ),
       });
     }
 
     // Moderate strategy: Mix of lending and LP
     if (preferences.riskTolerance === "moderate") {
-      const moderateOps = opportunities.filter(
-        (o) => o.risk !== "high" && o.apy > 5,
-      );
+      const moderateOps = opportunities.filter((o) => o.risk !== "high" && o.apy > 5);
 
       strategies.push({
         id: "balanced-yield",
         name: "Balanced Yield Portfolio",
-        description:
-          "Combination of lending and liquidity provision for enhanced yields",
+        description: "Combination of lending and liquidity provision for enhanced yields",
         targetAPY: this.calculateWeightedAPY(moderateOps.slice(0, 5)),
         risk: "moderate",
-        protocols: [...new Set(moderateOps.slice(0, 5).map((o) => o.protocol))],
+        protocols: Array.from(new Set(moderateOps.slice(0, 5).map((o) => o.protocol))),
         allocation: this.calculateOptimalAllocation(moderateOps.slice(0, 5)),
         estimatedGas: 1.0,
-        steps: this.generateStrategySteps(
-          moderateOps.slice(0, 5),
-          preferences.availableCapital,
-        ),
+        steps: this.generateStrategySteps(moderateOps.slice(0, 5), preferences.availableCapital),
       });
     }
 
@@ -203,17 +166,13 @@ export class YieldAggregatorService {
       strategies.push({
         id: "high-yield-farming",
         name: "High Yield Farming Strategy",
-        description:
-          "Maximize returns through high-APY farming and staking opportunities",
+        description: "Maximize returns through high-APY farming and staking opportunities",
         targetAPY: this.calculateWeightedAPY(aggressiveOps),
         risk: "aggressive",
-        protocols: [...new Set(aggressiveOps.map((o) => o.protocol))],
+        protocols: Array.from(new Set(aggressiveOps.map((o) => o.protocol))),
         allocation: this.calculateOptimalAllocation(aggressiveOps),
         estimatedGas: 2.0,
-        steps: this.generateStrategySteps(
-          aggressiveOps,
-          preferences.availableCapital,
-        ),
+        steps: this.generateStrategySteps(aggressiveOps, preferences.availableCapital),
       });
     }
 
@@ -225,7 +184,7 @@ export class YieldAggregatorService {
    */
   async calculateRebalancingPath(
     _currentPositions: DeFiPosition[],
-    _targetStrategy: YieldStrategy,
+    _targetStrategy: YieldStrategy
   ): Promise<{
     withdrawals: Array<{ protocol: string; asset: string; amount: number }>;
     swaps: Array<{ from: string; to: string; amount: number }>;
@@ -249,31 +208,31 @@ export class YieldAggregatorService {
     try {
       // Use generalized protocol fetcher
       const [aries, echelon, echo, meso] = await Promise.allSettled([
-        this.fetchProtocolOpportunities("Aries", PROTOCOL_ADDRESSES.ARIES, {
+        this.fetchProtocolOpportunities("Aries", PROTOCOLS.ARIES_MARKETS.addresses[0], {
           resourceFilters: [
-            `${PROTOCOL_ADDRESSES.ARIES}::reserve::ReserveCoinContainer`,
+            `${PROTOCOLS.ARIES_MARKETS.addresses[0]}::reserve::ReserveCoinContainer`,
           ],
           opportunityType: "lending",
           protocolType: "lending",
           risk: "low",
           features: ["Auto-compound", "No lock period"],
         }),
-        this.fetchProtocolOpportunities("Echelon", PROTOCOL_ADDRESSES.ECHELON, {
-          resourceFilters: [`${PROTOCOL_ADDRESSES.ECHELON}::lending::Lending`],
+        this.fetchProtocolOpportunities("Echelon", PROTOCOLS.ECHELON.addresses[0], {
+          resourceFilters: [`${PROTOCOLS.ECHELON.addresses[0]}::lending::Lending`],
           opportunityType: "lending",
           protocolType: "lending",
           risk: "low",
           features: ["Flexible withdrawal", "Isolated markets"],
         }),
-        this.fetchProtocolOpportunities("Echo", PROTOCOL_ADDRESSES.ECHO, {
-          resourceFilters: [`${PROTOCOL_ADDRESSES.ECHO}::lending`],
+        this.fetchProtocolOpportunities("Echo", PROTOCOLS.ECHO_LENDING.addresses[0], {
+          resourceFilters: [`${PROTOCOLS.ECHO_LENDING.addresses[0]}::lending`],
           opportunityType: "lending",
           protocolType: "lending",
           risk: "low",
           features: ["Bitcoin lending"],
         }),
-        this.fetchProtocolOpportunities("Meso", PROTOCOL_ADDRESSES.MESO, {
-          resourceFilters: [`${PROTOCOL_ADDRESSES.MESO}::lending`],
+        this.fetchProtocolOpportunities("Meso", PROTOCOLS.MESO_FINANCE.addresses[0], {
+          resourceFilters: [`${PROTOCOLS.MESO_FINANCE.addresses[0]}::lending`],
           opportunityType: "lending",
           protocolType: "lending",
           risk: "medium",
@@ -283,13 +242,11 @@ export class YieldAggregatorService {
 
       // Process results and convert to YieldOpportunity format
       const allResults = [aries, echelon, echo, meso].filter(
-        (result) => result.status === "fulfilled",
+        (result) => result.status === "fulfilled"
       );
       for (const result of allResults) {
         if (result.status === "fulfilled") {
-          opportunities.push(
-            ...result.value.map(this.convertProtocolToYieldOpportunity),
-          );
+          opportunities.push(...result.value.map(this.convertProtocolToYieldOpportunity));
         }
       }
     } catch (error) {
@@ -302,24 +259,11 @@ export class YieldAggregatorService {
   /**
    * Convert ProtocolOpportunity to YieldOpportunity format
    */
-  private convertProtocolToYieldOpportunity(
-    protocolOpp: ProtocolOpportunity,
-  ): YieldOpportunity {
+  private convertProtocolToYieldOpportunity(protocolOpp: ProtocolOpportunity): YieldOpportunity {
     return {
-      id: protocolOpp.id,
-      protocol: protocolOpp.protocol,
-      protocolType: protocolOpp.protocolType,
-      opportunityType: protocolOpp.opportunityType,
-      asset: protocolOpp.asset,
-      assetSymbol: protocolOpp.assetSymbol,
-      pairedAsset: protocolOpp.pairedAsset,
-      pairedAssetSymbol: protocolOpp.pairedAssetSymbol,
-      apy: protocolOpp.apy,
-      tvl: protocolOpp.tvl,
-      risk: protocolOpp.risk,
-      features: protocolOpp.features,
-      rewards: protocolOpp.rewards,
-      isActive: protocolOpp.isActive,
+      ...protocolOpp,
+      apr: protocolOpp.apy,
+      autoCompound: false,
     };
   }
 
@@ -331,22 +275,13 @@ export class YieldAggregatorService {
     protocolAddress: string,
     config: {
       resourceFilters: string[];
-      opportunityType:
-        | "lending"
-        | "liquidity"
-        | "staking"
-        | "farming"
-        | "vault";
+      opportunityType: "lending" | "liquidity" | "staking" | "farming" | "vault";
       protocolType: string;
       risk: "low" | "medium" | "high";
       features: string[];
-    },
+    }
   ): Promise<ProtocolOpportunity[]> {
-    return this.resourceFetcher.fetchProtocolOpportunities(
-      protocolName,
-      protocolAddress,
-      config,
-    );
+    return this.resourceFetcher.fetchProtocolOpportunities(protocolName, protocolAddress, config);
   }
 
   private async fetchLiquidityOpportunities(): Promise<YieldOpportunity[]> {
@@ -354,38 +289,30 @@ export class YieldAggregatorService {
 
     try {
       const [thala, liquidswap] = await Promise.allSettled([
-        this.fetchProtocolOpportunities("Thala", PROTOCOL_ADDRESSES.THALA, {
+        this.fetchProtocolOpportunities("Thala", PROTOCOLS.THALA_INFRA.addresses[0], {
           resourceFilters: [
-            `${PROTOCOL_ADDRESSES.THALA}::stable_pool::StablePool`,
-            `${PROTOCOL_ADDRESSES.THALA}::weighted_pool::WeightedPool`,
+            `${PROTOCOLS.THALA_INFRA.addresses[0]}::stable_pool::StablePool`,
+            `${PROTOCOLS.THALA_INFRA.addresses[0]}::weighted_pool::WeightedPool`,
           ],
           opportunityType: "liquidity",
           protocolType: "dex",
           risk: "medium",
           features: ["Trading fees", "THL rewards"],
         }),
-        this.fetchProtocolOpportunities(
-          "LiquidSwap",
-          PROTOCOL_ADDRESSES.LIQUIDSWAP,
-          {
-            resourceFilters: [`liquidity_pool::LiquidityPool`],
-            opportunityType: "liquidity",
-            protocolType: "dex",
-            risk: "medium",
-            features: ["Low fees", "Stable pools"],
-          },
-        ),
+        this.fetchProtocolOpportunities("LiquidSwap", PROTOCOLS.LIQUIDSWAP.addresses[6], {
+          resourceFilters: [`liquidity_pool::LiquidityPool`],
+          opportunityType: "liquidity",
+          protocolType: "dex",
+          risk: "medium",
+          features: ["Low fees", "Stable pools"],
+        }),
       ]);
 
       // Process results
-      const allResults = [thala, liquidswap].filter(
-        (result) => result.status === "fulfilled",
-      );
+      const allResults = [thala, liquidswap].filter((result) => result.status === "fulfilled");
       for (const result of allResults) {
         if (result.status === "fulfilled") {
-          opportunities.push(
-            ...result.value.map(this.convertProtocolToYieldOpportunity),
-          );
+          opportunities.push(...result.value.map(this.convertProtocolToYieldOpportunity));
         }
       }
     } catch (error) {
@@ -400,8 +327,8 @@ export class YieldAggregatorService {
 
     try {
       const [amnis] = await Promise.allSettled([
-        this.fetchProtocolOpportunities("Amnis", PROTOCOL_ADDRESSES.AMNIS, {
-          resourceFilters: [`${PROTOCOL_ADDRESSES.AMNIS}::amapt_token`],
+        this.fetchProtocolOpportunities("Amnis", PROTOCOLS.AMNIS_FINANCE.addresses[0], {
+          resourceFilters: [`${PROTOCOLS.AMNIS_FINANCE.addresses[0]}::amapt_token`],
           opportunityType: "staking",
           protocolType: "liquid_staking",
           risk: "low",
@@ -410,14 +337,10 @@ export class YieldAggregatorService {
       ]);
 
       // Process results
-      const allResults = [amnis].filter(
-        (result) => result.status === "fulfilled",
-      );
+      const allResults = [amnis].filter((result) => result.status === "fulfilled");
       for (const result of allResults) {
         if (result.status === "fulfilled") {
-          opportunities.push(
-            ...result.value.map(this.convertProtocolToYieldOpportunity),
-          );
+          opportunities.push(...result.value.map(this.convertProtocolToYieldOpportunity));
         }
       }
     } catch (error) {
@@ -432,24 +355,18 @@ export class YieldAggregatorService {
 
     try {
       const [thalaFarm] = await Promise.allSettled([
-        this.fetchProtocolOpportunities(
-          "Thala Farm",
-          PROTOCOL_ADDRESSES.THALA_FARM,
-          {
-            resourceFilters: [`${PROTOCOL_ADDRESSES.THALA_FARM}::farming`],
-            opportunityType: "farming",
-            protocolType: "farming",
-            risk: "medium",
-            features: ["Auto-compound", "THL rewards"],
-          },
-        ),
+        this.fetchProtocolOpportunities("Thala Farm", PROTOCOLS.THALA_FARM.addresses[0], {
+          resourceFilters: [`${PROTOCOLS.THALA_FARM.addresses[0]}::farming`],
+          opportunityType: "farming",
+          protocolType: "farming",
+          risk: "medium",
+          features: ["Auto-compound", "THL rewards"],
+        }),
       ]);
 
       // Process results
       if (thalaFarm.status === "fulfilled") {
-        opportunities.push(
-          ...thalaFarm.value.map(this.convertProtocolToYieldOpportunity),
-        );
+        opportunities.push(...thalaFarm.value.map(this.convertProtocolToYieldOpportunity));
       }
     } catch (error) {
       logger.error("Error fetching farming opportunities:", error);
@@ -460,13 +377,11 @@ export class YieldAggregatorService {
 
   private async enrichWithUserData(
     opportunities: YieldOpportunity[],
-    walletAddress: string,
+    walletAddress: string
   ): Promise<void> {
     // Add user's current deposits to opportunities
     // This would fetch from DeFi positions
-    logger.debug(
-      `Enriching ${opportunities.length} opportunities for wallet ${walletAddress}`,
-    );
+    logger.debug(`Enriching ${opportunities.length} opportunities for wallet ${walletAddress}`);
     // TODO: Implement user position enrichment
   }
 
@@ -475,15 +390,10 @@ export class YieldAggregatorService {
     const totalValue = opportunities.reduce((sum, o) => sum + (o.tvl || 0), 0);
     if (totalValue === 0) return 0;
 
-    return opportunities.reduce(
-      (sum, o) => sum + (o.apy * (o.tvl || 0)) / totalValue,
-      0,
-    );
+    return opportunities.reduce((sum, o) => sum + (o.apy * (o.tvl || 0)) / totalValue, 0);
   }
 
-  private calculateOptimalAllocation(
-    opportunities: YieldOpportunity[],
-  ): Record<string, number> {
+  private calculateOptimalAllocation(opportunities: YieldOpportunity[]): Record<string, number> {
     const allocation: Record<string, number> = {};
     const total = opportunities.length;
 
@@ -499,7 +409,7 @@ export class YieldAggregatorService {
 
   private generateStrategySteps(
     opportunities: YieldOpportunity[],
-    capital: number,
+    capital: number
   ): YieldStrategyStep[] {
     const steps: YieldStrategyStep[] = [];
     const allocation = 1 / opportunities.length;

@@ -11,7 +11,7 @@ export class AppError extends Error {
     message: string,
     public code: string,
     public statusCode: number = 500,
-    public isOperational: boolean = true,
+    public isOperational: boolean = true
   ) {
     // In production, use generic message for security
     super(isProduction ? "An error occurred" : message);
@@ -21,11 +21,7 @@ export class AppError extends Error {
 }
 
 export class ApiError extends AppError {
-  constructor(
-    message: string,
-    statusCode: number = 500,
-    code: string = "API_ERROR",
-  ) {
+  constructor(message: string, statusCode: number = 500, code: string = "API_ERROR") {
     super(message, code, statusCode, true);
   }
 }
@@ -33,7 +29,7 @@ export class ApiError extends AppError {
 export class RateLimitError extends AppError {
   constructor(
     message: string,
-    public resetInSeconds: number,
+    public resetInSeconds: number
   ) {
     super(message, "RATE_LIMITED", 429, true);
   }
@@ -42,7 +38,7 @@ export class RateLimitError extends AppError {
 export class TimeoutError extends AppError {
   constructor(
     message: string,
-    public timeout: number,
+    public timeout: number
   ) {
     super(message, "TIMEOUT", 408, true);
   }
@@ -108,6 +104,6 @@ export function logError(error: unknown, context?: Record<string, any>): void {
       context,
       timestamp: new Date().toISOString(),
     },
-    "Error occurred",
+    "Error occurred"
   );
 }

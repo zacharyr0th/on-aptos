@@ -4,5 +4,5 @@
 // Cache utilities removed - TanStack Query handles client-side caching
 // For rate-limited API caching, use simple-cache.ts
 
-export { enhancedFetch, apiRequest, graphQLRequest } from "./fetch-utils";
 export * from "../core/types";
+export { apiRequest, enhancedFetch, graphQLRequest } from "./fetch-utils";

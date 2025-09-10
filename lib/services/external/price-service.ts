@@ -5,6 +5,7 @@ interface PriceService {
   getTokenPrice(tokenAddress: string): Promise<number | null>;
   getTokenPrices(tokenAddresses: string[]): Promise<Map<string, number>>;
 }
+
 import { AssetService } from "../portfolio/services/asset-service";
 
 export class DefaultPriceService implements PriceService {
@@ -13,10 +14,7 @@ export class DefaultPriceService implements PriceService {
 
   async getTokenPrice(tokenAddress: string): Promise<number | null> {
     // Hardcoded price for MKLP tokens
-    if (
-      tokenAddress.includes("::house_lp::MKLP") ||
-      tokenAddress.includes("::mklp::MKLP")
-    ) {
+    if (tokenAddress.includes("::house_lp::MKLP") || tokenAddress.includes("::mklp::MKLP")) {
       const hardcodedPrice = 1.05;
       this.priceCache.set(tokenAddress, {
         price: hardcodedPrice,
@@ -26,10 +24,7 @@ export class DefaultPriceService implements PriceService {
     }
 
     // Hardcoded price for THALA-LP tokens (Thala Farm LP tokens)
-    if (
-      tokenAddress ===
-      "0xb4a8b8462b4423780d6ee256f3a9a3b9ece5d9440d614f7ab2bfa4556aa4f69d"
-    ) {
+    if (tokenAddress === "0xb4a8b8462b4423780d6ee256f3a9a3b9ece5d9440d614f7ab2bfa4556aa4f69d") {
       const hardcodedPrice = 1.5; // Estimated LP token price
       this.priceCache.set(tokenAddress, {
         price: hardcodedPrice,
@@ -68,10 +63,7 @@ export class DefaultPriceService implements PriceService {
     const remainingAddresses: string[] = [];
 
     for (const address of tokenAddresses) {
-      if (
-        address.includes("::house_lp::MKLP") ||
-        address.includes("::mklp::MKLP")
-      ) {
+      if (address.includes("::house_lp::MKLP") || address.includes("::mklp::MKLP")) {
         const hardcodedPrice = 1.05;
         priceMap.set(address, hardcodedPrice);
         hardcodedPrices.set(address, hardcodedPrice);
@@ -80,10 +72,7 @@ export class DefaultPriceService implements PriceService {
           price: hardcodedPrice,
           timestamp: Date.now(),
         });
-      } else if (
-        address ===
-        "0xb4a8b8462b4423780d6ee256f3a9a3b9ece5d9440d614f7ab2bfa4556aa4f69d"
-      ) {
+      } else if (address === "0xb4a8b8462b4423780d6ee256f3a9a3b9ece5d9440d614f7ab2bfa4556aa4f69d") {
         const hardcodedPrice = 1.5;
         priceMap.set(address, hardcodedPrice);
         hardcodedPrices.set(address, hardcodedPrice);

@@ -1,9 +1,6 @@
 import { PANORA_TOKENS } from "@/lib/config/data";
 import { LST_TOKEN_ADDRESSES } from "@/lib/constants/tokens/lst";
-import {
-  ALL_STABLECOINS,
-  LEGITIMATE_STABLECOINS,
-} from "@/lib/constants/tokens/stablecoins";
+import { ALL_STABLECOINS, LEGITIMATE_STABLECOINS } from "@/lib/constants/tokens/stablecoins";
 
 export type TokenCategory = "Stablecoins" | "LSTs" | "DeFi" | "Other";
 
@@ -40,10 +37,7 @@ function isLST(assetType: string): boolean {
   // Check if it's in the LST addresses object
   for (const provider of Object.values(LST_TOKEN_ADDRESSES)) {
     for (const token of Object.values(provider)) {
-      if (
-        ("coin" in token && token.coin === assetType) ||
-        token.fa === assetType
-      ) {
+      if (("coin" in token && token.coin === assetType) || token.fa === assetType) {
         return true;
       }
     }
@@ -58,10 +52,7 @@ function isLST(assetType: string): boolean {
 }
 
 // Categorize a single token
-export function categorizeToken(
-  assetType: string,
-  symbol?: string,
-): TokenCategory {
+export function categorizeToken(assetType: string, symbol?: string): TokenCategory {
   // Check if it's explicitly marked as DeFi
   if (assetType === "DeFi Positions" || symbol === "DEFI") {
     return "DeFi";
@@ -88,7 +79,7 @@ export function processAllocationData(
     symbol: string;
     value: number;
     percentage: number;
-  }>,
+  }>
 ): {
   categories: CategoryAllocation[];
   topTokens: CategorizedToken[];
@@ -112,10 +103,7 @@ export function processAllocationData(
   });
 
   // Calculate total value
-  const totalValue = Array.from(categoryMap.values()).reduce(
-    (sum, val) => sum + val,
-    0,
-  );
+  const totalValue = Array.from(categoryMap.values()).reduce((sum, val) => sum + val, 0);
 
   // Convert to category allocations
   const categories: CategoryAllocation[] = Array.from(categoryMap.entries())
@@ -128,9 +116,7 @@ export function processAllocationData(
     .sort((a, b) => b.value - a.value);
 
   // Get top 3 tokens by value
-  const topTokens = categorizedTokens
-    .sort((a, b) => b.value - a.value)
-    .slice(0, 3);
+  const topTokens = categorizedTokens.sort((a, b) => b.value - a.value).slice(0, 3);
 
   return { categories, topTokens };
 }

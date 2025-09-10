@@ -63,10 +63,7 @@ const BASE_COLORS = {
 /**
  * Helper function to create color maps from token arrays
  */
-const createColorMap = (
-  entries: [string[], string][],
-  defaultColor: string,
-): TokenColorMap => {
+const createColorMap = (entries: [string[], string][], defaultColor: string): TokenColorMap => {
   const map: TokenColorMap = { default: defaultColor };
   for (const [tokens, color] of entries) {
     tokens.forEach((token) => {
@@ -107,7 +104,7 @@ export const STABLECOIN_COLORS = createColorMap(
     // MOD - darker pastel purple
     [["MOD"], BASE_COLORS.purple300], // purple-300
   ],
-  BASE_COLORS.gray300,
+  BASE_COLORS.gray300
 );
 
 /**
@@ -122,7 +119,7 @@ export const BTC_COLORS = createColorMap(
     [["wBTC"], BASE_COLORS.orange200], // Pastel muted orange (orange-200)
     [["tBTC"], BASE_COLORS.indigo300], // Pastel indigo (indigo-300)
   ],
-  BASE_COLORS.gray200, // Pastel gray (gray-200)
+  BASE_COLORS.gray200 // Pastel gray (gray-200)
 );
 
 /**
@@ -131,10 +128,7 @@ export const BTC_COLORS = createColorMap(
 export const LST_COLORS = createColorMap(
   [
     // Amnis tokens - Soft pastel blue tones
-    [
-      ["stAPT", "amAPT", "amAPT / stAPT", "amAPT/stAPT", "Amnis"],
-      BASE_COLORS.blue300,
-    ], // blue-300
+    [["stAPT", "amAPT", "amAPT / stAPT", "amAPT/stAPT", "Amnis"], BASE_COLORS.blue300], // blue-300
 
     // Thala tokens - Darker purple tones
     [
@@ -151,15 +145,12 @@ export const LST_COLORS = createColorMap(
     ], // purple-500
 
     // Kofi tokens - Soft pastel green tones
-    [
-      ["kAPT", "stkAPT", "kAPT / stkAPT", "kAPT/stkAPT", "Kofi"],
-      BASE_COLORS.green300,
-    ], // green-300
+    [["kAPT", "stkAPT", "kAPT / stkAPT", "kAPT/stkAPT", "Kofi"], BASE_COLORS.green300], // green-300
 
     // Trustake/Turfin tokens - Soft pastel gray tones
     [["truAPT", "Trustake", "turAPT", "Turfin"], BASE_COLORS.gray300], // gray-300
   ],
-  BASE_COLORS.gray300, // gray-300
+  BASE_COLORS.gray300 // gray-300
 );
 
 /**
@@ -190,7 +181,7 @@ export const RWA_COLORS = createColorMap(
     [["BSFG-KES-1"], BASE_COLORS.purple200], // purple-200
     [["BSFG-AD-1"], BASE_COLORS.violet200], // violet-200
   ],
-  BASE_COLORS.indigo200, // indigo-200
+  BASE_COLORS.indigo200 // indigo-200
 );
 
 /**
@@ -263,6 +254,34 @@ export const CATEGORY_COLORS = {
   // Default fallback
   default: "bg-muted text-muted-foreground border-border",
 };
+
+/**
+ * DeFi Protocol colors by category - Using HSL for consistency
+ */
+export const DEFI_PROTOCOL_COLORS = {
+  trading: BASE_COLORS.blue500, // blue-500
+  lending: BASE_COLORS.green600, // green-600
+  yield: BASE_COLORS.purple500, // purple-500
+  multiple: BASE_COLORS.orange600, // orange-600
+  staking: BASE_COLORS.teal500, // teal-500
+  default: BASE_COLORS.gray400, // gray-400
+};
+
+/**
+ * Treemap colors for visualization
+ */
+export const TREEMAP_COLORS = [
+  BASE_COLORS.blue500,
+  BASE_COLORS.green600,
+  BASE_COLORS.purple500,
+  BASE_COLORS.orange600,
+  BASE_COLORS.teal500,
+  BASE_COLORS.violet500,
+  BASE_COLORS.amber500,
+  BASE_COLORS.pink500,
+  BASE_COLORS.sky500,
+  BASE_COLORS.indigo300,
+];
 
 /**
  * UI component colors - References CSS variables for consistency

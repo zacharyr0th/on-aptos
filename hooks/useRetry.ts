@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import { logger } from "@/lib/utils/core/logger";
 
 interface RetryOptions {
@@ -21,16 +21,8 @@ interface RetryState<T> {
  * Hook for managing async operations with automatic retry logic
  * Supports exponential backoff and customizable retry strategies
  */
-export function useRetry<T>(
-  asyncFn: () => Promise<T>,
-  options: RetryOptions = {},
-): RetryState<T> {
-  const {
-    maxAttempts = 3,
-    delay = 1000,
-    backoff = "exponential",
-    onRetry,
-  } = options;
+export function useRetry<T>(asyncFn: () => Promise<T>, options: RetryOptions = {}): RetryState<T> {
+  const { maxAttempts = 3, delay = 1000, backoff = "exponential", onRetry } = options;
 
   const [data, setData] = useState<T | null>(null);
   const [error, setError] = useState<Error | null>(null);
@@ -86,9 +78,7 @@ export function useRetry<T>(
         if (attemptNumber < maxAttempts) {
           // Calculate delay based on backoff strategy
           const retryDelay =
-            backoff === "exponential"
-              ? delay * Math.pow(2, attemptNumber - 1)
-              : delay * attemptNumber;
+            backoff === "exponential" ? delay * 2 ** (attemptNumber - 1) : delay * attemptNumber;
 
           // Call onRetry callback if provided
           onRetry?.(attemptNumber, error);
@@ -107,7 +97,7 @@ export function useRetry<T>(
         }
       }
     },
-    [asyncFn, maxAttempts, delay, backoff, onRetry],
+    [asyncFn, maxAttempts, delay, backoff, onRetry]
   );
 
   const retry = useCallback(() => execute(1), [execute]);
@@ -128,7 +118,7 @@ export function useRetry<T>(
  */
 export function useRetryFn<T extends (...args: any[]) => Promise<any>>(
   fn: T,
-  options: RetryOptions = {},
+  options: RetryOptions = {}
 ): (...args: Parameters<T>) => Promise<ReturnType<T>> {
   const { maxAttempts = 3, delay = 1000, backoff = "exponential" } = options;
 
@@ -144,9 +134,7 @@ export function useRetryFn<T extends (...args: any[]) => Promise<any>>(
 
           if (attempt < maxAttempts) {
             const retryDelay =
-              backoff === "exponential"
-                ? delay * Math.pow(2, attempt - 1)
-                : delay * attempt;
+              backoff === "exponential" ? delay * 2 ** (attempt - 1) : delay * attempt;
 
             await new Promise((resolve) => setTimeout(resolve, retryDelay));
           }
@@ -155,6 +143,6 @@ export function useRetryFn<T extends (...args: any[]) => Promise<any>>(
 
       throw lastError;
     },
-    [fn, maxAttempts, delay, backoff],
+    [fn, maxAttempts, delay, backoff]
   );
 }

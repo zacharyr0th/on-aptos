@@ -68,34 +68,30 @@ export class UnifiedAssetValidator {
     address: string,
     symbol?: string,
     balance?: number,
-    options: AssetValidationOptions = {},
+    options: AssetValidationOptions = {}
   ): ValidationResult {
-    const {
-      checkBalance = true,
-      balanceThreshold = 1000000,
-      strictMode = false,
-    } = options;
+    const { checkBalance = true, balanceThreshold = 1000000, strictMode = false } = options;
 
     const warnings: string[] = [];
     let isScam = false;
     let riskLevel: "low" | "medium" | "high" = "low";
 
     // Check if blacklisted
-    if (this.BLACKLISTED_ADDRESSES.has(address)) {
+    if (UnifiedAssetValidator.BLACKLISTED_ADDRESSES.has(address)) {
       isScam = true;
       riskLevel = "high";
       warnings.push("Address is blacklisted as malicious");
     }
 
     // Check for scam patterns
-    if (this.hasScamPatterns(address, symbol)) {
+    if (UnifiedAssetValidator.hasScamPatterns(address, symbol)) {
       isScam = true;
       riskLevel = "high";
       warnings.push("Contains suspicious patterns");
     }
 
     // Check for fake tokens
-    if (this.isFakeToken(address, symbol)) {
+    if (UnifiedAssetValidator.isFakeToken(address, symbol)) {
       isScam = true;
       riskLevel = "high";
       warnings.push("Potentially fake token");
@@ -105,15 +101,15 @@ export class UnifiedAssetValidator {
     if (
       checkBalance &&
       balance &&
-      this.hasSuspiciousBalance(balance, balanceThreshold)
+      UnifiedAssetValidator.hasSuspiciousBalance(balance, balanceThreshold)
     ) {
       riskLevel = riskLevel === "high" ? "high" : "medium";
       warnings.push("Suspiciously high balance");
     }
 
     // Determine if legitimate
-    const isLegitimate = this.isLegitimateToken(address, symbol);
-    const isVerified = this.isVerifiedToken(address, symbol);
+    const isLegitimate = UnifiedAssetValidator.isLegitimateToken(address, symbol);
+    const isVerified = UnifiedAssetValidator.isVerifiedToken(address, symbol);
 
     // In strict mode, only verified tokens are considered safe
     if (strictMode && !isVerified) {
@@ -126,7 +122,7 @@ export class UnifiedAssetValidator {
       isStablecoin: TokenRegistry.isStablecoin(address, symbol),
       isLiquidStaking: TokenRegistry.isLiquidStakingToken(address),
       isNativeToken: TokenRegistry.isNativeAPT(address),
-      protocolVerified: this.isProtocolToken(address),
+      protocolVerified: UnifiedAssetValidator.isProtocolToken(address),
     };
 
     return {
@@ -145,9 +141,9 @@ export class UnifiedAssetValidator {
    */
   static isScamToken(address: string, symbol?: string): boolean {
     return (
-      this.BLACKLISTED_ADDRESSES.has(address) ||
-      this.hasScamPatterns(address, symbol) ||
-      this.isFakeToken(address, symbol)
+      UnifiedAssetValidator.BLACKLISTED_ADDRESSES.has(address) ||
+      UnifiedAssetValidator.hasScamPatterns(address, symbol) ||
+      UnifiedAssetValidator.isFakeToken(address, symbol)
     );
   }
 
@@ -161,12 +157,12 @@ export class UnifiedAssetValidator {
     // Verified stablecoins are legitimate
     if (
       TokenRegistry.isStablecoin(address, symbol) &&
-      this.isLegitimateStablecoin(address)
+      UnifiedAssetValidator.isLegitimateStablecoin(address)
     )
       return true;
 
     // Known protocol tokens are legitimate
-    if (this.isProtocolToken(address)) return true;
+    if (UnifiedAssetValidator.isProtocolToken(address)) return true;
 
     // Liquid staking tokens from known protocols
     if (TokenRegistry.isLiquidStakingToken(address)) return true;
@@ -182,7 +178,7 @@ export class UnifiedAssetValidator {
    * Check if stablecoin is legitimate (not fake)
    */
   static isLegitimateStablecoin(address: string): boolean {
-    return this.LEGITIMATE_STABLECOINS.has(address);
+    return UnifiedAssetValidator.LEGITIMATE_STABLECOINS.has(address);
   }
 
   /**
@@ -193,10 +189,10 @@ export class UnifiedAssetValidator {
     if (TokenRegistry.isNativeAPT(address)) return true;
 
     // Legitimate stablecoins are verified
-    if (this.isLegitimateStablecoin(address)) return true;
+    if (UnifiedAssetValidator.isLegitimateStablecoin(address)) return true;
 
     // Known protocol tokens are verified
-    if (this.isProtocolToken(address)) return true;
+    if (UnifiedAssetValidator.isProtocolToken(address)) return true;
 
     // Check token registry for verified status
     const registeredSymbol = TokenRegistry.getSymbolFromAddress(address);
@@ -212,12 +208,12 @@ export class UnifiedAssetValidator {
       symbol?: string;
       balance?: number;
     }>,
-    options: AssetValidationOptions = {},
+    options: AssetValidationOptions = {}
   ): Map<string, ValidationResult> {
     const results = new Map<string, ValidationResult>();
 
     assets.forEach(({ address, symbol, balance }) => {
-      const validation = this.validateAsset(address, symbol, balance, options);
+      const validation = UnifiedAssetValidator.validateAsset(address, symbol, balance, options);
       results.set(address, validation);
     });
 
@@ -240,7 +236,7 @@ export class UnifiedAssetValidator {
       requireVerified?: boolean;
       requireLegitimate?: boolean;
       maxRiskLevel?: "low" | "medium" | "high";
-    } = {},
+    } = {}
   ): T[] {
     const {
       excludeScam = true,
@@ -253,10 +249,10 @@ export class UnifiedAssetValidator {
     const maxRisk = riskLevels[maxRiskLevel];
 
     return assets.filter((asset) => {
-      const validation = this.validateAsset(
+      const validation = UnifiedAssetValidator.validateAsset(
         asset.asset_type,
         asset.metadata?.symbol,
-        asset.balance,
+        asset.balance
       );
 
       if (excludeScam && validation.isScam) return false;
@@ -276,7 +272,7 @@ export class UnifiedAssetValidator {
       address: string;
       symbol?: string;
       balance?: number;
-    }>,
+    }>
   ): {
     total: number;
     valid: number;
@@ -286,7 +282,7 @@ export class UnifiedAssetValidator {
     riskBreakdown: Record<"low" | "medium" | "high", number>;
     topWarnings: Array<{ warning: string; count: number }>;
   } {
-    const validations = this.validateBatch(assets);
+    const validations = UnifiedAssetValidator.validateBatch(assets);
     const results = Array.from(validations.values());
 
     const summary = {
@@ -295,10 +291,7 @@ export class UnifiedAssetValidator {
       scam: results.filter((r) => r.isScam).length,
       verified: results.filter((r) => r.isVerified).length,
       legitimate: results.filter((r) => r.isLegitimate).length,
-      riskBreakdown: { low: 0, medium: 0, high: 0 } as Record<
-        "low" | "medium" | "high",
-        number
-      >,
+      riskBreakdown: { low: 0, medium: 0, high: 0 } as Record<"low" | "medium" | "high", number>,
       topWarnings: [] as Array<{ warning: string; count: number }>,
     };
 
@@ -328,7 +321,7 @@ export class UnifiedAssetValidator {
    * Check for scam patterns in address or symbol
    */
   private static hasScamPatterns(address: string, symbol?: string): boolean {
-    return this.SCAM_PATTERNS.some((pattern) => {
+    return UnifiedAssetValidator.SCAM_PATTERNS.some((pattern) => {
       return pattern.test(address) || (symbol && pattern.test(symbol));
     });
   }
@@ -338,10 +331,7 @@ export class UnifiedAssetValidator {
    */
   private static isFakeToken(address: string, symbol?: string): boolean {
     // Check for fake APT tokens
-    if (
-      symbol?.toUpperCase() === "APT" &&
-      !TokenRegistry.isNativeAPT(address)
-    ) {
+    if (symbol?.toUpperCase() === "APT" && !TokenRegistry.isNativeAPT(address)) {
       return true;
     }
 
@@ -349,7 +339,7 @@ export class UnifiedAssetValidator {
     if (
       symbol &&
       TokenRegistry.isStablecoin(address, symbol) &&
-      !this.isLegitimateStablecoin(address)
+      !UnifiedAssetValidator.isLegitimateStablecoin(address)
     ) {
       return true;
     }
@@ -373,10 +363,7 @@ export class UnifiedAssetValidator {
   /**
    * Check if balance is suspiciously high (possible airdrop scam)
    */
-  private static hasSuspiciousBalance(
-    balance: number,
-    threshold: number,
-  ): boolean {
+  private static hasSuspiciousBalance(balance: number, threshold: number): boolean {
     return balance > threshold;
   }
 
@@ -398,27 +385,27 @@ export class UnifiedAssetValidator {
    * Add address to blacklist (runtime)
    */
   static addToBlacklist(address: string): void {
-    this.BLACKLISTED_ADDRESSES.add(address);
+    UnifiedAssetValidator.BLACKLISTED_ADDRESSES.add(address);
   }
 
   /**
    * Remove address from blacklist (runtime)
    */
   static removeFromBlacklist(address: string): void {
-    this.BLACKLISTED_ADDRESSES.delete(address);
+    UnifiedAssetValidator.BLACKLISTED_ADDRESSES.delete(address);
   }
 
   /**
    * Check if address is blacklisted
    */
   static isBlacklisted(address: string): boolean {
-    return this.BLACKLISTED_ADDRESSES.has(address);
+    return UnifiedAssetValidator.BLACKLISTED_ADDRESSES.has(address);
   }
 
   /**
    * Get all blacklisted addresses
    */
   static getBlacklist(): string[] {
-    return Array.from(this.BLACKLISTED_ADDRESSES);
+    return Array.from(UnifiedAssetValidator.BLACKLISTED_ADDRESSES);
   }
 }

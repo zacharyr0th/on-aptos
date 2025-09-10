@@ -1,8 +1,8 @@
 "use client";
 
 import { Inbox } from "lucide-react";
-import type { EmptyStateProps } from "./types";
 import { cn } from "@/lib/utils";
+import type { EmptyStateProps } from "./types";
 
 export function EmptyState({
   title = "No data available",
@@ -12,12 +12,7 @@ export function EmptyState({
   className,
 }: EmptyStateProps) {
   return (
-    <div
-      className={cn(
-        "flex flex-col items-center justify-center p-8 space-y-4",
-        className,
-      )}
-    >
+    <div className={cn("flex flex-col items-center justify-center p-8 space-y-4", className)}>
       {icon || <Inbox className="h-12 w-12 text-muted-foreground" />}
       <div className="text-center space-y-2">
         <h3 className="text-lg font-semibold">{title}</h3>

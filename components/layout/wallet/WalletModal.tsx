@@ -27,7 +27,7 @@ export function WalletModal({ open, onOpenChange }: WalletModalProps) {
       router.push("/tools/portfolio");
     } catch (error: any) {
       logger.warn(
-        `Failed to connect to ${walletName}: ${error instanceof Error ? error.message : String(error)}`,
+        `Failed to connect to ${walletName}: ${error instanceof Error ? error.message : String(error)}`
       );
     }
   };
@@ -70,8 +70,7 @@ export function WalletModal({ open, onOpenChange }: WalletModalProps) {
           {extensionWallets.length === 0 && (
             <div className="text-center py-4">
               <p className="text-sm text-muted-foreground mb-4">
-                No wallet extensions detected. Please install a wallet
-                extension.
+                No wallet extensions detected. Please install a wallet extension.
               </p>
               <div className="flex flex-col gap-2">
                 <Button
@@ -84,9 +83,7 @@ export function WalletModal({ open, onOpenChange }: WalletModalProps) {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() =>
-                    window.open("https://www.okx.com/web3", "_blank")
-                  }
+                  onClick={() => window.open("https://www.okx.com/web3", "_blank")}
                 >
                   Install OKX Wallet
                 </Button>

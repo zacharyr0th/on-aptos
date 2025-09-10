@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { errorLogger } from "@/lib/utils/core/logger";
 
 interface ErrorBoundaryState {
@@ -42,6 +42,6 @@ export function useAsyncError() {
     (error: Error) => {
       throwError(error);
     },
-    [throwError],
+    [throwError]
   );
 }

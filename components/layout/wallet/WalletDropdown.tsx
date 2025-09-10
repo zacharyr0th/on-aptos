@@ -4,7 +4,7 @@ import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { Copy, LogOut, User, Wallet } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import React from "react";
+import React, { useState } from "react";
 
 import {
   DropdownMenu,
@@ -18,6 +18,7 @@ import { useAnsName } from "@/lib/hooks/useAnsName";
 import { useTranslation } from "@/lib/hooks/useTranslation";
 import { copyToClipboard } from "@/lib/utils/clipboard";
 import { logger } from "@/lib/utils/core/logger";
+import { WalletModal } from "./WalletModal";
 
 interface WalletDropdownProps {
   className?: string;
@@ -29,12 +30,11 @@ export function WalletDropdown({ className }: WalletDropdownProps) {
   const { account, disconnect } = useWallet();
   const { ansName, ansData } = useAnsName();
   const { t } = useTranslation("common");
+  const [showWalletModal, setShowWalletModal] = useState(false);
 
   const walletAddress = account?.address?.toString();
   const normalizedAddress =
-    walletAddress && !walletAddress.startsWith("0x")
-      ? `0x${walletAddress}`
-      : walletAddress;
+    walletAddress && !walletAddress.startsWith("0x") ? `0x${walletAddress}` : walletAddress;
 
   const handleCopyAddress = async () => {
     if (!normalizedAddress) {
@@ -52,23 +52,26 @@ export function WalletDropdown({ className }: WalletDropdownProps) {
 
   const handlePortfolioClick = () => {
     if (!normalizedAddress) {
-      router.push("/tools/portfolio");
+      // Open wallet modal instead of navigating to portfolio
+      setShowWalletModal(true);
     }
   };
 
   if (!normalizedAddress) {
     return (
-      <button onClick={handlePortfolioClick} className={className}>
-        {pathname === "/" ? "Launch App" : "Portfolio Analytics"}
-      </button>
+      <>
+        <button onClick={handlePortfolioClick} className={className}>
+          {pathname === "/" ? "Launch App" : "Portfolio"}
+        </button>
+        <WalletModal open={showWalletModal} onOpenChange={setShowWalletModal} />
+      </>
     );
   }
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className={className}>
-        {ansName ||
-          `${normalizedAddress.slice(0, 6)}...${normalizedAddress.slice(-4)}`}
+        {ansName || `${normalizedAddress.slice(0, 6)}...${normalizedAddress.slice(-4)}`}
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-80">
         <DropdownMenuLabel className="font-normal">
@@ -81,11 +84,9 @@ export function WalletDropdown({ className }: WalletDropdownProps) {
                     <p className="text-sm font-semibold">{ansData.name}</p>
                     {ansData.subdomain ? (
                       <p className="text-xs text-muted-foreground">
-                        {t(
-                          "wallet.subdomain_of",
-                          "Subdomain of {{domain}}.apt",
-                          { domain: ansData.domain },
-                        )}
+                        {t("wallet.subdomain_of", "Subdomain of {{domain}}.apt", {
+                          domain: ansData.domain,
+                        })}
                       </p>
                     ) : (
                       <p className="text-xs text-muted-foreground">
@@ -124,7 +125,7 @@ export function WalletDropdown({ className }: WalletDropdownProps) {
           <>
             <DropdownMenuItem asChild>
               <Link href="/tools/portfolio" className="cursor-pointer">
-                View Portfolio Analytics
+                View Portfolio
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />

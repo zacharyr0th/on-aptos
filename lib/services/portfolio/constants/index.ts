@@ -22,8 +22,7 @@ export const THRESHOLDS = {
 } as const;
 
 export const APTOS_INDEXER_URL =
-  process.env.NEXT_PUBLIC_APTOS_INDEXER_URL ||
-  "https://api.mainnet.aptoslabs.com/v1/graphql";
+  process.env.NEXT_PUBLIC_APTOS_INDEXER_URL || "https://api.mainnet.aptoslabs.com/v1/graphql";
 
 export const ERROR_MESSAGES = {
   GRAPHQL_ERROR: "GraphQL query failed",

@@ -1,9 +1,10 @@
 import { Analytics } from "@vercel/analytics/react";
-import { Metadata, Viewport } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { headers } from "next/headers";
 import Script from "next/script";
-import React, { ReactNode } from "react";
+import type React from "react";
+import type { ReactNode } from "react";
 
 import { ErrorBoundary } from "@/components/errors/ErrorBoundary";
 import { LayoutContent } from "@/components/layout/LayoutContent";
@@ -14,6 +15,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { WalletProvider } from "@/components/wallet/WalletProvider";
 import { APP_CONFIG, DEVELOPER_CONFIG } from "@/lib/config/app";
+import { APP_ROUTES } from "@/lib/config/routes";
 
 import "./globals.css";
 
@@ -34,30 +36,31 @@ export const runtime = "nodejs";
 // Enhanced page metadata for better SEO and PWA
 export const metadata: Metadata = {
   title: {
-    default: "On Aptos - Real-time Blockchain Analytics | What's on Aptos?",
-    template: "%s | On Aptos - Blockchain Analytics",
+    default:
+      "On Aptos - Professional Blockchain Analytics | Institutional-Grade Portfolio Tracking",
+    template: "%s | On Aptos - Professional Analytics",
   },
   description:
-    "Real-time analytics for Bitcoin, DeFi, and Stablecoins on Aptos blockchain. Track token supplies, prices, and market data with our comprehensive API and dashboards.",
+    "Professional-grade blockchain analytics for institutional investors and advanced traders. Real-time portfolio tracking, DeFi intelligence, and comprehensive market analysis across 25+ Aptos protocols.",
   keywords: [
     "Aptos",
-    "blockchain",
-    "DeFi",
-    "Bitcoin",
-    "Stablecoins",
-    "cryptocurrency",
     "blockchain analytics",
-    "token tracking",
-    "real-time data",
-    "API",
-    "xBTC",
-    "SBTC",
-    "aBTC",
-    "USDT",
-    "USDC",
-    "USDe",
-    "amAPT",
-    "stAPT",
+    "institutional portfolio tracking",
+    "professional DeFi analytics",
+    "enterprise blockchain data",
+    "cryptocurrency portfolio management",
+    "real-time market intelligence",
+    "institutional-grade analytics",
+    "professional trading tools",
+    "advanced portfolio metrics",
+    "DeFi intelligence platform",
+    "blockchain portfolio analytics",
+    "crypto asset management",
+    "professional traders",
+    "institutional investors",
+    "portfolio performance tracking",
+    "yield optimization",
+    "risk assessment tools",
   ],
   authors: [
     {
@@ -67,41 +70,39 @@ export const metadata: Metadata = {
   ],
   creator: DEVELOPER_CONFIG.name,
   publisher: "On Aptos",
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL || "https://onaptos.com",
-  ),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://onaptos.com"),
   alternates: {
     canonical: "/",
     types: {
-      "application/ld+json": "/api/seo/llm-metadata",
-      "text/plain": "/api/seo/llm-readme",
+      "application/ld+json": APP_ROUTES.API.SEO.LLM_METADATA,
+      "text/plain": APP_ROUTES.API.SEO.LLM_README,
     },
   },
   openGraph: {
     type: "website",
     locale: "en_US",
     url: "/",
-    title: "On Aptos - Real-time Blockchain Analytics",
+    title: "On Aptos - Professional Blockchain Analytics Platform",
     description:
-      "Real-time analytics for Bitcoin, DeFi, and Stablecoins on Aptos blockchain. Track token supplies, prices, and market data.",
+      "Institutional-grade portfolio tracking and DeFi intelligence. Professional analytics for advanced traders and institutional investors on Aptos blockchain.",
     siteName: "On Aptos",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "On Aptos - Blockchain Analytics Dashboard",
+        alt: "On Aptos - Professional Blockchain Analytics Platform",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "On Aptos - Real-time Blockchain Analytics",
+    title: "On Aptos - Professional Blockchain Analytics",
     description:
-      "Real-time analytics for Bitcoin, DeFi, and Stablecoins on Aptos blockchain.",
+      "Institutional-grade portfolio tracking and professional DeFi analytics for advanced traders and institutional investors.",
     creator: DEVELOPER_CONFIG.twitter,
     site: "@onaptos",
-    images: ["/twitter-image.png"],
+    images: ["/og-image.png"],
   },
   robots: {
     index: true,
@@ -182,7 +183,8 @@ export default async function RootLayout({
         "@id": "https://onaptos.com/#website",
         url: "https://onaptos.com",
         name: "On Aptos",
-        description: "Real-time blockchain analytics for Aptos",
+        description:
+          "Professional blockchain analytics and institutional-grade portfolio tracking for Aptos",
         publisher: {
           "@id": "https://onaptos.com/#organization",
         },
@@ -217,12 +219,8 @@ export default async function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="apple-touch-icon" href="/icons/app/icon-192x192.png" />
-        <link rel="alternate" type="text/plain" href="/api/seo/llm-readme" />
-        <link
-          rel="alternate"
-          type="application/ld+json"
-          href="/api/seo/llm-metadata"
-        />
+        <link rel="alternate" type="text/plain" href={APP_ROUTES.API.SEO.LLM_README} />
+        <link rel="alternate" type="application/ld+json" href={APP_ROUTES.API.SEO.LLM_METADATA} />
         <meta name="author" content={DEVELOPER_CONFIG.name} />
         <Script
           id="structured-data"
@@ -233,9 +231,7 @@ export default async function RootLayout({
           }}
         />
       </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}>
         <I18nProvider>
           <ThemeProvider
             attribute="class"

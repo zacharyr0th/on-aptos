@@ -3,7 +3,7 @@
  * Single source of truth for all token-related types
  */
 
-import { StaticImageData } from "next/image";
+import type { StaticImageData } from "next/image";
 
 // Base token structure
 export interface TokenBase {
@@ -171,19 +171,13 @@ export function hasValidThumbnail(metadata: TokenMetadata): boolean {
 }
 
 export function hasValidIssuer(
-  metadata: TokenMetadata,
+  metadata: TokenMetadata
 ): metadata is TokenMetadata & { issuer: TokenIssuer } {
-  return !!(
-    metadata.issuer &&
-    typeof metadata.issuer === "object" &&
-    "name" in metadata.issuer
-  );
+  return !!(metadata.issuer && typeof metadata.issuer === "object" && "name" in metadata.issuer);
 }
 
 // Helper to normalize issuer field
-export function normalizeIssuer(
-  issuer: string | TokenIssuer | undefined,
-): TokenIssuer | undefined {
+export function normalizeIssuer(issuer: string | TokenIssuer | undefined): TokenIssuer | undefined {
   if (!issuer) return undefined;
   if (typeof issuer === "string") {
     return { name: issuer };
@@ -191,11 +185,72 @@ export function normalizeIssuer(
   return issuer;
 }
 
+// Token data for treemap visualization
+export interface TokenData {
+  panoraId?: string;
+  symbol: string;
+  name: string;
+  price: number;
+  supply?: number;
+  fdv?: number;
+  logoUrl?: string | null;
+  panoraTags?: string[];
+  panoraUI?: boolean;
+  marketCap?: number;
+  volume24h?: number;
+  priceChange24h?: number;
+  faAddress?: string | null;
+  tokenAddress?: string | null;
+}
+
+// Token data for token list displays
+export interface TokenListItem {
+  tokenAddress: string | null;
+  faAddress: string | null;
+  name: string;
+  symbol: string;
+  decimals: number;
+  price?: string;
+  priceChange24H?: number;
+  supply?: number;
+  marketCap?: number;
+  fullyDilutedValuation?: number;
+  category?: string;
+  isVerified?: boolean;
+  logoUrl?: string;
+  panoraTags?: string[];
+  rank?: number;
+}
+
+// API response for paginated token lists
+export interface TokensResponse {
+  tokens: TokenListItem[];
+  totalTokens: number;
+  hasMore: boolean;
+  nextCursor?: number;
+}
+
+// Treemap visualization item
+export interface TreemapItem {
+  name: string;
+  size: number;
+  symbol: string;
+  fdv: number;
+  logoUrl?: string | null;
+  fill: string;
+  percentage: number;
+  price: number;
+  supply?: number;
+  panoraTags?: string[];
+  marketCap?: number;
+  volume24h?: number;
+  priceChange24h?: number;
+  fullName: string;
+  uniqueId: string;
+}
+
 // Helper to get safe thumbnail URL
-export function getThumbnailUrl(
-  metadata: TokenMetadata,
-  fallback = "/placeholder.jpg",
-): string {
+export function getThumbnailUrl(metadata: TokenMetadata, fallback = "/placeholder.jpg"): string {
   if (metadata.thumbnail && typeof metadata.thumbnail === "string") {
     return metadata.thumbnail;
   }

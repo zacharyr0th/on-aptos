@@ -58,3 +58,42 @@ This project uses standard language codes:
 
 - Two-letter ISO 639-1 codes for most languages (e.g., `en`, `es`, `fr`)
 - Extended codes for regional variants (e.g., `zh-CN` for Simplified Chinese)
+
+## Image Optimization
+
+For images in the `public/readme/` directory, an automated optimization script is available:
+
+### Running Image Optimization
+
+```bash
+# Using bun script
+bun run optimize:images
+
+# Or directly
+node scripts/optimize-readme-images.js
+```
+
+### What it does
+
+- Converts PNG/JPG images to optimized WebP format
+- Removes original files after successful conversion
+- Uses Sharp or ImageMagick for optimization
+- Maintains image quality at 85% with efficient compression
+- Provides detailed optimization statistics
+
+### Prerequisites
+
+Install either Sharp or ImageMagick:
+
+```bash
+# Sharp (recommended)
+bun add sharp
+
+# Or ImageMagick (macOS)
+brew install imagemagick
+
+# Or ImageMagick (Ubuntu)
+sudo apt install imagemagick
+```
+
+The script automatically detects and uses the available optimization tool.

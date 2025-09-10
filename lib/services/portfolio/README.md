@@ -15,9 +15,9 @@ portfolio/
 │   ├── defi-service.ts    # DeFi position tracking
 │   ├── metrics-service.ts # Portfolio metrics calculation
 │   ├── portfolio-history-service.ts # Historical data
-│   └── price-service.ts   # Price data aggregation
-├── utils/                 # Shared utilities
-│   ├── graphql-helpers.ts # GraphQL query execution
+│   └── (price service moved to shared/utils)
+├── utils/                 # Shared utilities (deprecated - moved to ../shared/utils)
+│   ├── (graphql helpers consolidated into unified client)
 │   ├── decimal-converter.ts # Number formatting
 │   ├── asset-validators.ts # Asset validation
 │   └── price-aggregator.ts # Price caching and aggregation
@@ -76,7 +76,7 @@ const assets = await getWalletAssets(address);
 - **DeFiService**: DeFi position tracking and metrics
 - **MetricsService**: Portfolio value calculations and analytics
 - **PortfolioHistoryService**: Historical portfolio reconstruction
-- **PriceService**: Price data aggregation from multiple sources
+- **UnifiedPriceService**: Price data aggregation from multiple sources (moved to ../shared/utils)
 
 ## Performance Optimizations
 

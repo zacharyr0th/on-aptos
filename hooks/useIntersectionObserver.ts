@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, RefObject } from "react";
+import { type RefObject, useEffect, useRef, useState } from "react";
 
 interface UseIntersectionObserverOptions extends IntersectionObserverInit {
   freezeOnceVisible?: boolean;
@@ -9,14 +9,9 @@ interface UseIntersectionObserverOptions extends IntersectionObserverInit {
  * Useful for lazy loading, infinite scroll, and viewport-based animations
  */
 export function useIntersectionObserver<T extends HTMLElement = HTMLDivElement>(
-  options: UseIntersectionObserverOptions = {},
+  options: UseIntersectionObserverOptions = {}
 ): [RefObject<T | null>, IntersectionObserverEntry | undefined] {
-  const {
-    threshold = 0,
-    root = null,
-    rootMargin = "0%",
-    freezeOnceVisible = false,
-  } = options;
+  const { threshold = 0, root = null, rootMargin = "0%", freezeOnceVisible = false } = options;
 
   const elementRef = useRef<T>(null);
   const [entry, setEntry] = useState<IntersectionObserverEntry>();
@@ -58,7 +53,7 @@ export function useIntersectionObserver<T extends HTMLElement = HTMLDivElement>(
  * Simplified hook that returns boolean for element visibility
  */
 export function useOnScreen<T extends HTMLElement = HTMLDivElement>(
-  options?: UseIntersectionObserverOptions,
+  options?: UseIntersectionObserverOptions
 ): [RefObject<T | null>, boolean] {
   const [ref, entry] = useIntersectionObserver<T>(options);
   return [ref, !!entry?.isIntersecting];

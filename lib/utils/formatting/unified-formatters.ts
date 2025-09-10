@@ -5,11 +5,11 @@
 
 import { UnifiedCache } from "../cache/unified-cache";
 import {
+  type Currency,
+  convertRawTokenAmount,
   formatAmount,
   formatCurrency,
   formatNumber,
-  convertRawTokenAmount,
-  type Currency,
 } from "../format";
 
 // Shared format cache for memoization
@@ -44,7 +44,7 @@ class UnifiedFormatters {
     value: number,
     symbol: string,
     decimals: number = 0,
-    useCache: boolean = true,
+    useCache: boolean = true
   ): string {
     if (!Number.isFinite(value)) return "0";
 
@@ -67,7 +67,7 @@ class UnifiedFormatters {
   static formatTokenAmountWithCommas(
     value: number,
     decimals: number = 0,
-    useCache: boolean = true,
+    useCache: boolean = true
   ): string {
     if (!Number.isFinite(value)) return "0";
 
@@ -97,8 +97,7 @@ class UnifiedFormatters {
   static formatPercentageFast(value: number, decimals: number = 1): string {
     if (!Number.isFinite(value)) return "0.0%";
 
-    const rounded =
-      Math.round(value * Math.pow(10, decimals)) / Math.pow(10, decimals);
+    const rounded = Math.round(value * 10 ** decimals) / 10 ** decimals;
 
     // Check pre-computed common values
     if (decimals === 1 && commonPercentages.has(rounded)) {
@@ -120,10 +119,9 @@ class UnifiedFormatters {
   static formatMarketCap(
     value: number,
     compact: boolean = true,
-    currency: Currency = "USD",
+    currency: Currency = "USD"
   ): string {
-    if (!Number.isFinite(value) || value <= 0)
-      return formatCurrency(0, currency);
+    if (!Number.isFinite(value) || value <= 0) return formatCurrency(0, currency);
 
     const cacheKey = `mcap:${Math.round(value / 1000)}:${compact}:${currency}`;
     const cached = formatCache.get(cacheKey);
@@ -137,16 +135,12 @@ class UnifiedFormatters {
   /**
    * Format token supply with appropriate scaling
    */
-  static formatTokenSupply(
-    supply: string | number,
-    decimals: number = 8,
-  ): string {
-    const numericSupply =
-      typeof supply === "string" ? parseFloat(supply) : supply;
+  static formatTokenSupply(supply: string | number, decimals: number = 8): string {
+    const numericSupply = typeof supply === "string" ? parseFloat(supply) : supply;
 
     if (!Number.isFinite(numericSupply)) return "0";
 
-    const adjustedSupply = numericSupply / Math.pow(10, decimals);
+    const adjustedSupply = numericSupply / 10 ** decimals;
     const cacheKey = `supply:${Math.round(adjustedSupply)}:${decimals}`;
     const cached = formatCache.get(cacheKey);
     if (cached) return cached;
@@ -166,7 +160,7 @@ class UnifiedFormatters {
     amount: string | number,
     decimals: number,
     displayDecimals: number = 4,
-    symbol?: string,
+    symbol?: string
   ): string {
     const balance = convertRawTokenAmount(amount, decimals);
 
@@ -197,7 +191,7 @@ class UnifiedFormatters {
   static formatDollarAmount(
     value: number,
     compact: boolean = false,
-    minDisplayValue: number = 0.01,
+    minDisplayValue: number = 0.01
   ): string {
     if (!Number.isFinite(value)) return "$0.00";
 
@@ -217,11 +211,7 @@ class UnifiedFormatters {
   /**
    * Format APY/percentage with proper bounds
    */
-  static formatAPY(
-    value: number,
-    decimals: number = 2,
-    suffix: string = "%",
-  ): string {
+  static formatAPY(value: number, decimals: number = 2, suffix: string = "%"): string {
     if (!Number.isFinite(value)) return `0.00${suffix}`;
 
     // Cap extreme values for display
@@ -240,8 +230,7 @@ class UnifiedFormatters {
    * Smart price formatting based on value magnitude
    */
   static formatSmartPrice(value: number, currency: Currency = "USD"): string {
-    if (!Number.isFinite(value) || value <= 0)
-      return formatCurrency(0, currency);
+    if (!Number.isFinite(value) || value <= 0) return formatCurrency(0, currency);
 
     const cacheKey = `smart:${value}:${currency}`;
     const cached = formatCache.get(cacheKey);
@@ -284,25 +273,20 @@ class UnifiedFormatters {
 // Asset-specific formatters using the unified system
 class AssetFormatters {
   // BTC formatters
-  static formatBTCAmount = (value: number) =>
-    UnifiedFormatters.formatTokenAmount(value, "BTC", 0);
+  static formatBTCAmount = (value: number) => UnifiedFormatters.formatTokenAmount(value, "BTC", 0);
 
   static formatBTCAmountWithCommas = (value: number) =>
     UnifiedFormatters.formatTokenAmountWithCommas(value, 0);
 
   // APT formatters
-  static formatAPTAmount = (value: number) =>
-    UnifiedFormatters.formatTokenAmount(value, "APT", 0);
+  static formatAPTAmount = (value: number) => UnifiedFormatters.formatTokenAmount(value, "APT", 0);
 
   static formatAPTAmountWithCommas = (value: number) =>
     UnifiedFormatters.formatTokenAmountWithCommas(value, 0);
 
   // Generic token formatters
-  static formatTokenAmount = (
-    value: number,
-    symbol: string,
-    decimals: number = 0,
-  ) => UnifiedFormatters.formatTokenAmount(value, symbol, decimals);
+  static formatTokenAmount = (value: number, symbol: string, decimals: number = 0) =>
+    UnifiedFormatters.formatTokenAmount(value, symbol, decimals);
 
   static formatTokenAmountWithCommas = (value: number, decimals: number = 0) =>
     UnifiedFormatters.formatTokenAmountWithCommas(value, decimals);
@@ -310,11 +294,9 @@ class AssetFormatters {
 
 // Convenience exports for backward compatibility
 export const formatBTCAmount = AssetFormatters.formatBTCAmount;
-export const formatBTCAmountWithCommas =
-  AssetFormatters.formatBTCAmountWithCommas;
+export const formatBTCAmountWithCommas = AssetFormatters.formatBTCAmountWithCommas;
 export const formatAPTAmount = AssetFormatters.formatAPTAmount;
-export const formatAPTAmountWithCommas =
-  AssetFormatters.formatAPTAmountWithCommas;
+export const formatAPTAmountWithCommas = AssetFormatters.formatAPTAmountWithCommas;
 
 // New unified exports
 export const {
@@ -336,9 +318,9 @@ export { UnifiedFormatters, AssetFormatters };
 
 // Re-export base formatting utilities for compatibility
 export {
+  type Currency,
+  convertRawTokenAmount,
   formatAmount,
   formatCurrency,
   formatNumber,
-  convertRawTokenAmount,
-  type Currency,
 } from "../format";

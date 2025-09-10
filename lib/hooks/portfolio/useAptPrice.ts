@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { logger } from "@/lib/utils/core/logger";
 
@@ -13,9 +13,7 @@ export function useAptPrice(refreshInterval = 60000) {
       setError(null);
 
       try {
-        const response = await fetch(
-          "/api/unified/prices?tokens=0x1::aptos_coin::AptosCoin",
-        );
+        const response = await fetch("/api/unified/prices?tokens=0x1::aptos_coin::AptosCoin");
 
         if (!response.ok) {
           throw new Error("Failed to fetch APT price");

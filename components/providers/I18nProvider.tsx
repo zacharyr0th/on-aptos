@@ -1,6 +1,6 @@
 "use client";
 
-import React, { ReactNode, useEffect } from "react";
+import React, { type ReactNode, useEffect } from "react";
 import { I18nextProvider } from "react-i18next";
 
 import i18n from "@/lib/i18n";
@@ -16,12 +16,9 @@ export function I18nProvider({ children }: I18nProviderProps) {
     logger.info(
       {
         initialLanguage: i18n.language,
-        localStorage:
-          typeof window !== "undefined"
-            ? localStorage.getItem("i18n-language")
-            : "N/A",
+        localStorage: typeof window !== "undefined" ? localStorage.getItem("i18n-language") : "N/A",
       },
-      "I18nProvider mounted",
+      "I18nProvider mounted"
     );
   }, []);
 

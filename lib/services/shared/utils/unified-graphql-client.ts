@@ -33,6 +33,62 @@ export interface PaginationVariables {
   offset: number;
 }
 
+// Additional GraphQL queries from legacy graphql-helpers
+export const LEGACY_QUERIES = {
+  COIN_SUPPLY: `
+    query GetCoinSupply($coinType: String!) {
+      coin_supply(where: { coin_type: { _eq: $coinType } }) {
+        coin_type
+        supply
+        last_transaction_timestamp
+        last_transaction_version
+      }
+    }
+  `,
+
+  FUNGIBLE_ASSET_METADATA: `
+    query GetFungibleAssetMetadata($assetType: String!) {
+      fungible_asset_metadata(where: { asset_type: { _eq: $assetType } }) {
+        asset_type
+        name
+        symbol
+        decimals
+        icon_uri
+        last_transaction_timestamp
+        last_transaction_version
+      }
+    }
+  `,
+
+  FUNGIBLE_ASSET_SUPPLY: `
+    query GetFungibleAssetSupply($assetType: String!) {
+      current_fungible_asset_balances_aggregate(
+        where: { 
+          asset_type: { _eq: $assetType },
+          amount: { _gt: "0" }
+        }
+      ) {
+        aggregate {
+          sum {
+            amount
+          }
+        }
+      }
+    }
+  `,
+
+  BATCH_COIN_INFO: `
+    query GetBatchCoinInfo($coinTypes: [String!]!) {
+      coin_infos(where: { coin_type: { _in: $coinTypes } }) {
+        coin_type
+        name
+        symbol
+        decimals
+      }
+    }
+  `,
+};
+
 /**
  * Unified GraphQL queries - centralized location for all queries
  */
@@ -237,18 +293,18 @@ export class UnifiedGraphQLClient {
   static async query<T>(
     queryString: string,
     variables: Record<string, any> = {},
-    config: QueryConfig = {},
+    config: QueryConfig = {}
   ): Promise<T> {
     const {
       includeAuth = true,
       retries = 1,
-      cacheTTL = this.DEFAULT_CACHE_TTL,
+      cacheTTL = UnifiedGraphQLClient.DEFAULT_CACHE_TTL,
     } = config;
 
     // Check cache if TTL is set
     if (cacheTTL > 0) {
       const cacheKey = `${queryString}:${JSON.stringify(variables)}`;
-      const cached = this.cache.get(cacheKey);
+      const cached = UnifiedGraphQLClient.cache.get(cacheKey);
       if (cached && Date.now() - cached.timestamp < cacheTTL) {
         logger.debug("Returning cached GraphQL result");
         return cached.data;
@@ -265,9 +321,7 @@ export class UnifiedGraphQLClient {
         headers["Authorization"] = `Bearer ${apiKey}`;
         logger.info(`[GraphQL] Using API key: ${apiKey.substring(0, 10)}...`);
       } else {
-        logger.warn(
-          "[GraphQL] No API key found - making unauthenticated request",
-        );
+        logger.warn("[GraphQL] No API key found - making unauthenticated request");
       }
     }
 
@@ -281,7 +335,7 @@ export class UnifiedGraphQLClient {
             query: queryString,
             variables,
           },
-          { headers },
+          { headers }
         );
 
         if (response.errors && response.errors.length > 0) {
@@ -307,9 +361,9 @@ export class UnifiedGraphQLClient {
 
           if (attempt < retries) {
             logger.warn(
-              `GraphQL query returned no data, retrying... (${attempt + 1}/${retries + 1})`,
+              `GraphQL query returned no data, retrying... (${attempt + 1}/${retries + 1})`
             );
-            await this.delay(1000 * (attempt + 1)); // Exponential backoff
+            await UnifiedGraphQLClient.delay(1000 * (attempt + 1)); // Exponential backoff
             continue;
           }
           break;
@@ -318,7 +372,7 @@ export class UnifiedGraphQLClient {
         // Cache successful result
         if (cacheTTL > 0) {
           const cacheKey = `${queryString}:${JSON.stringify(variables)}`;
-          this.cache.set(cacheKey, {
+          UnifiedGraphQLClient.cache.set(cacheKey, {
             data: response.data,
             timestamp: Date.now(),
           });
@@ -341,17 +395,13 @@ export class UnifiedGraphQLClient {
         });
 
         if (attempt < retries) {
-          logger.info(
-            `Retrying GraphQL query... (${attempt + 1}/${retries + 1})`,
-          );
-          await this.delay(1000 * (attempt + 1));
+          logger.info(`Retrying GraphQL query... (${attempt + 1}/${retries + 1})`);
+          await UnifiedGraphQLClient.delay(1000 * (attempt + 1));
         }
       }
     }
 
-    throw new Error(
-      `${ERROR_MESSAGES.INDEXER_ERROR}: ${lastError?.message || "Unknown error"}`,
-    );
+    throw new Error(`${ERROR_MESSAGES.INDEXER_ERROR}: ${lastError?.message || "Unknown error"}`);
   }
 
   /**
@@ -361,18 +411,14 @@ export class UnifiedGraphQLClient {
     queryString: string,
     variables: Record<string, any> = {},
     pagination: PaginationParams = {},
-    config: QueryConfig = {},
+    config: QueryConfig = {}
   ): Promise<T> {
-    const paginationVars = this.buildPaginationVariables(
+    const paginationVars = UnifiedGraphQLClient.buildPaginationVariables(
       pagination.page,
-      pagination.limit,
+      pagination.limit
     );
 
-    return this.query<T>(
-      queryString,
-      { ...variables, ...paginationVars },
-      config,
-    );
+    return UnifiedGraphQLClient.query<T>(queryString, { ...variables, ...paginationVars }, config);
   }
 
   /**
@@ -384,17 +430,17 @@ export class UnifiedGraphQLClient {
       query: string;
       variables?: Record<string, any>;
       config?: QueryConfig;
-    }>,
+    }>
   ): Promise<T> {
     const results = await Promise.allSettled(
       queries.map(async ({ name, query, variables, config }) => {
         try {
-          const result = await this.query(query, variables, config);
+          const result = await UnifiedGraphQLClient.query(query, variables, config);
           return { name, result, status: "fulfilled" as const };
         } catch (error) {
           return { name, error, status: "rejected" as const };
         }
-      }),
+      })
     );
 
     const batchResult = {} as T;
@@ -417,10 +463,7 @@ export class UnifiedGraphQLClient {
   /**
    * Build pagination variables from page/limit
    */
-  static buildPaginationVariables(
-    page: number = 1,
-    limit: number = 25,
-  ): PaginationVariables {
+  static buildPaginationVariables(page: number = 1, limit: number = 25): PaginationVariables {
     return {
       limit,
       offset: (page - 1) * limit,
@@ -431,7 +474,7 @@ export class UnifiedGraphQLClient {
    * Clear the query cache
    */
   static clearCache(): void {
-    this.cache.clear();
+    UnifiedGraphQLClient.cache.clear();
     logger.info("GraphQL cache cleared");
   }
 
@@ -443,13 +486,13 @@ export class UnifiedGraphQLClient {
     entries: Array<{ key: string; age: number }>;
   } {
     const now = Date.now();
-    const entries = Array.from(this.cache.entries()).map(([key, value]) => ({
+    const entries = Array.from(UnifiedGraphQLClient.cache.entries()).map(([key, value]) => ({
       key: key.slice(0, 100), // Truncate for readability
       age: now - value.timestamp,
     }));
 
     return {
-      size: this.cache.size,
+      size: UnifiedGraphQLClient.cache.size,
       entries,
     };
   }
@@ -462,19 +505,99 @@ export class UnifiedGraphQLClient {
   }
 
   /**
+   * Legacy helper functions consolidated from graphql-helpers
+   */
+  static async getCoinSupply(coinType: string): Promise<number> {
+    try {
+      const data = await UnifiedGraphQLClient.query<{
+        coin_supply: Array<{ supply: string }>;
+      }>(LEGACY_QUERIES.COIN_SUPPLY, { coinType });
+
+      if (data.coin_supply && data.coin_supply.length > 0) {
+        return parseFloat(data.coin_supply[0].supply);
+      }
+      return 0;
+    } catch (error) {
+      logger.error("Failed to get coin supply:", { coinType, error });
+      return 0;
+    }
+  }
+
+  static async getFungibleAssetSupply(assetType: string): Promise<{
+    supply: number;
+    metadata?: {
+      name: string;
+      symbol: string;
+      decimals: number;
+      icon_uri?: string;
+    };
+  }> {
+    try {
+      logger.info("Getting fungible asset supply for:", assetType);
+
+      // Get metadata first
+      const metadataData = await UnifiedGraphQLClient.query<{
+        fungible_asset_metadata: Array<{
+          name: string;
+          symbol: string;
+          decimals: number;
+          icon_uri?: string;
+        }>;
+      }>(LEGACY_QUERIES.FUNGIBLE_ASSET_METADATA, { assetType }, { includeAuth: true });
+
+      // Get aggregated supply
+      const supplyData = await UnifiedGraphQLClient.query<{
+        current_fungible_asset_balances_aggregate: {
+          aggregate: {
+            sum: {
+              amount: string | null;
+            };
+          };
+        };
+      }>(LEGACY_QUERIES.FUNGIBLE_ASSET_SUPPLY, { assetType }, { includeAuth: true });
+
+      const totalSupply = parseFloat(
+        supplyData.current_fungible_asset_balances_aggregate?.aggregate?.sum?.amount || "0"
+      );
+
+      logger.info(`Total supply for ${assetType}: ${totalSupply}`);
+
+      if (metadataData.fungible_asset_metadata && metadataData.fungible_asset_metadata.length > 0) {
+        const asset = metadataData.fungible_asset_metadata[0];
+        return {
+          supply: totalSupply,
+          metadata: {
+            name: asset.name,
+            symbol: asset.symbol,
+            decimals: asset.decimals,
+            icon_uri: asset.icon_uri,
+          },
+        };
+      }
+      return { supply: totalSupply };
+    } catch (error) {
+      logger.error("Failed to get fungible asset supply:", {
+        assetType,
+        error,
+      });
+      return { supply: 0 };
+    }
+  }
+
+  /**
    * Health check for the GraphQL endpoint
    */
   static async healthCheck(): Promise<boolean> {
     try {
       // Simple query to test connectivity
-      await this.query(
+      await UnifiedGraphQLClient.query(
         `query HealthCheck { 
           processor_status(limit: 1) { 
             processor 
           } 
         }`,
         {},
-        { includeAuth: false, cacheTTL: 0 },
+        { includeAuth: false, cacheTTL: 0 }
       );
       return true;
     } catch (error) {

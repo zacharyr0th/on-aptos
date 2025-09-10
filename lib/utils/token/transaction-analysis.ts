@@ -3,21 +3,14 @@
  * Fully compatible with existing portfolio components
  */
 
-import { RWA_TOKENS } from "@/lib/constants";
-import {
-  STABLECOINS,
-  LIQUID_STAKING_TOKEN_SET,
-  CEX_ADDRESSES,
-} from "@/lib/constants";
+import { CEX_ADDRESSES, LIQUID_STAKING_TOKEN_SET, RWA_TOKENS, STABLECOINS } from "@/lib/constants";
 import { analyzeTransaction as analyzeWithNewSystem } from "@/lib/protocols/adapters/portfolio-adapter";
-import { TransactionCategory, ActivityType } from "@/lib/types/consolidated";
+import { ActivityType, TransactionCategory } from "@/lib/types/consolidated";
 
 // Removed unused logger import
 
 // Create lookup for backward compatibility
-const RWA_TOKEN_BY_ADDRESS = Object.fromEntries(
-  RWA_TOKENS.map((token) => [token.address, token]),
-);
+const RWA_TOKEN_BY_ADDRESS = Object.fromEntries(RWA_TOKENS.map((token) => [token.address, token]));
 
 export interface Transaction {
   transaction_version: string;
@@ -80,20 +73,20 @@ export class OptimizedTransactionAnalyzer {
   /**
    * Analyze a transaction with new protocol system
    */
-  static async analyzeTransaction(
-    tx: Transaction,
-  ): Promise<OptimizedTransactionInfo> {
-    const direction = this.determineDirection(tx);
-    const assetInfo = this.analyzeAsset(tx.asset_type);
+  static async analyzeTransaction(tx: Transaction): Promise<OptimizedTransactionInfo> {
+    const direction = OptimizedTransactionAnalyzer.determineDirection(tx);
+    const assetInfo = OptimizedTransactionAnalyzer.analyzeAsset(tx.asset_type);
 
     // Try new protocol system first
     const protocolAnalysis = await analyzeWithNewSystem(tx);
 
     if (protocolAnalysis.protocol) {
-      const activityType = this.mapActivityToType(protocolAnalysis.activity);
+      const activityType = OptimizedTransactionAnalyzer.mapActivityToType(
+        protocolAnalysis.activity
+      );
 
       return {
-        category: this.mapToCategory(protocolAnalysis.category),
+        category: OptimizedTransactionAnalyzer.mapToCategory(protocolAnalysis.category),
         subcategory: protocolAnalysis.protocol.id,
         displayName: protocolAnalysis.displayName,
         protocol: protocolAnalysis.protocol,
@@ -101,28 +94,28 @@ export class OptimizedTransactionAnalyzer {
         assetInfo,
         direction,
         activityType,
-        description: this.generateDescription(
+        description: OptimizedTransactionAnalyzer.generateDescription(
           tx,
           protocolAnalysis.displayName,
-          assetInfo,
+          assetInfo
         ),
         confidence: protocolAnalysis.confidence,
       };
     }
 
     // Fallback to basic analysis
-    return this.analyzeBasic(tx, direction, assetInfo);
+    return OptimizedTransactionAnalyzer.analyzeBasic(tx, direction, assetInfo);
   }
 
   /**
    * Synchronous version for backward compatibility
    */
   static analyzeTransactionSync(tx: Transaction): OptimizedTransactionInfo {
-    const direction = this.determineDirection(tx);
-    const assetInfo = this.analyzeAsset(tx.asset_type);
+    const direction = OptimizedTransactionAnalyzer.determineDirection(tx);
+    const assetInfo = OptimizedTransactionAnalyzer.analyzeAsset(tx.asset_type);
 
     // Basic analysis without protocol detection
-    return this.analyzeBasic(tx, direction, assetInfo);
+    return OptimizedTransactionAnalyzer.analyzeBasic(tx, direction, assetInfo);
   }
 
   /**
@@ -131,26 +124,26 @@ export class OptimizedTransactionAnalyzer {
   private static analyzeBasic(
     tx: Transaction,
     direction: "incoming" | "outgoing" | "neutral",
-    assetInfo: any,
+    assetInfo: any
   ): OptimizedTransactionInfo {
     // Check for RWA
     if (tx.asset_type && RWA_TOKEN_BY_ADDRESS[tx.asset_type]) {
-      return this.analyzeRWAActivity(tx, direction, assetInfo);
+      return OptimizedTransactionAnalyzer.analyzeRWAActivity(tx, direction, assetInfo);
     }
 
     // Check for CEX
-    if (tx.sender && this.identifyCEX(tx.sender)) {
-      return this.analyzeCEXInteraction(tx, direction, assetInfo);
+    if (tx.sender && OptimizedTransactionAnalyzer.identifyCEX(tx.sender)) {
+      return OptimizedTransactionAnalyzer.analyzeCEXInteraction(tx, direction, assetInfo);
     }
 
     // Check for system activities
-    const systemAnalysis = this.analyzeSystemActivity(tx);
+    const systemAnalysis = OptimizedTransactionAnalyzer.analyzeSystemActivity(tx);
     if (systemAnalysis) {
       return { ...systemAnalysis, direction, assetInfo };
     }
 
     // Default to transfer
-    return this.analyzeBasicTransfer(tx, direction, assetInfo);
+    return OptimizedTransactionAnalyzer.analyzeBasicTransfer(tx, direction, assetInfo);
   }
 
   /**
@@ -208,7 +201,7 @@ export class OptimizedTransactionAnalyzer {
   private static analyzeRWAActivity(
     tx: Transaction,
     direction: "incoming" | "outgoing" | "neutral",
-    assetInfo: any,
+    assetInfo: any
   ): OptimizedTransactionInfo {
     const rwaToken = RWA_TOKEN_BY_ADDRESS[tx.asset_type];
     const lowerType = tx.type.toLowerCase();
@@ -231,7 +224,7 @@ export class OptimizedTransactionAnalyzer {
       direction,
       activityType,
       description: `${displayName} - ${rwaToken.assetName}`,
-      confidence: this.CONFIDENCE_THRESHOLDS.HIGH,
+      confidence: OptimizedTransactionAnalyzer.CONFIDENCE_THRESHOLDS.HIGH,
       assetInfo,
     };
   }
@@ -242,22 +235,19 @@ export class OptimizedTransactionAnalyzer {
   private static analyzeCEXInteraction(
     tx: Transaction,
     direction: "incoming" | "outgoing" | "neutral",
-    assetInfo: any,
+    assetInfo: any
   ): OptimizedTransactionInfo {
-    const cexName = this.identifyCEX(tx.sender!);
+    const cexName = OptimizedTransactionAnalyzer.identifyCEX(tx.sender!);
 
     return {
       category: TransactionCategory.CEX,
       subcategory: cexName?.toLowerCase() || "cex",
-      displayName:
-        direction === "incoming" ? `From ${cexName}` : `To ${cexName}`,
+      displayName: direction === "incoming" ? `From ${cexName}` : `To ${cexName}`,
       direction,
       activityType:
-        direction === "incoming"
-          ? MAPPED_ACTIVITY_TYPES.CEX_WITHDRAW
-          : ActivityType.CEX_DEPOSIT,
+        direction === "incoming" ? MAPPED_ACTIVITY_TYPES.CEX_WITHDRAW : ActivityType.CEX_DEPOSIT,
       description: `${direction === "incoming" ? "Withdrew from" : "Deposited to"} ${cexName}`,
-      confidence: this.CONFIDENCE_THRESHOLDS.HIGH,
+      confidence: OptimizedTransactionAnalyzer.CONFIDENCE_THRESHOLDS.HIGH,
       assetInfo,
     };
   }
@@ -265,9 +255,7 @@ export class OptimizedTransactionAnalyzer {
   /**
    * Analyze system activities
    */
-  private static analyzeSystemActivity(
-    tx: Transaction,
-  ): OptimizedTransactionInfo | null {
+  private static analyzeSystemActivity(tx: Transaction): OptimizedTransactionInfo | null {
     if (!tx.type) return null;
 
     const lowerType = tx.type.toLowerCase();
@@ -279,7 +267,7 @@ export class OptimizedTransactionAnalyzer {
         activityType: ActivityType.ACCOUNT_CREATION,
         displayName: "Create Account",
         description: "Created new account",
-        confidence: this.CONFIDENCE_THRESHOLDS.HIGH,
+        confidence: OptimizedTransactionAnalyzer.CONFIDENCE_THRESHOLDS.HIGH,
         direction: "neutral",
         assetInfo: undefined,
       };
@@ -292,7 +280,7 @@ export class OptimizedTransactionAnalyzer {
         activityType: MAPPED_ACTIVITY_TYPES.COIN_REGISTER,
         displayName: "Register Coin",
         description: "Registered new coin type",
-        confidence: this.CONFIDENCE_THRESHOLDS.HIGH,
+        confidence: OptimizedTransactionAnalyzer.CONFIDENCE_THRESHOLDS.HIGH,
         direction: "neutral",
         assetInfo: undefined,
       };
@@ -307,7 +295,7 @@ export class OptimizedTransactionAnalyzer {
   private static analyzeBasicTransfer(
     tx: Transaction,
     direction: "incoming" | "outgoing" | "neutral",
-    assetInfo: any,
+    assetInfo: any
   ): OptimizedTransactionInfo {
     return {
       category: TransactionCategory.TRANSFER,
@@ -315,11 +303,9 @@ export class OptimizedTransactionAnalyzer {
       displayName: direction === "incoming" ? "Receive" : "Send",
       direction,
       activityType:
-        direction === "incoming"
-          ? MAPPED_ACTIVITY_TYPES.RECEIVE
-          : MAPPED_ACTIVITY_TYPES.SEND,
+        direction === "incoming" ? MAPPED_ACTIVITY_TYPES.RECEIVE : MAPPED_ACTIVITY_TYPES.SEND,
       description: `${direction === "incoming" ? "Received" : "Sent"} ${assetInfo?.displaySymbol || "tokens"}`,
-      confidence: this.CONFIDENCE_THRESHOLDS.LOW,
+      confidence: OptimizedTransactionAnalyzer.CONFIDENCE_THRESHOLDS.LOW,
       assetInfo,
     };
   }
@@ -327,18 +313,14 @@ export class OptimizedTransactionAnalyzer {
   /**
    * Helper methods
    */
-  private static determineDirection(
-    tx: Transaction,
-  ): "incoming" | "outgoing" | "neutral" {
+  private static determineDirection(tx: Transaction): "incoming" | "outgoing" | "neutral" {
     const amount = parseFloat(tx.amount || "0");
     if (amount > 0) return "incoming";
     if (amount < 0) return "outgoing";
     return "neutral";
   }
 
-  private static analyzeAsset(
-    assetType: string,
-  ): OptimizedTransactionInfo["assetInfo"] {
+  private static analyzeAsset(assetType: string): OptimizedTransactionInfo["assetInfo"] {
     const isStablecoin = Object.values(STABLECOINS).includes(assetType as any);
     const isLST = LIQUID_STAKING_TOKEN_SET.has(assetType);
     const isRWA = !!RWA_TOKEN_BY_ADDRESS[assetType];
@@ -347,9 +329,7 @@ export class OptimizedTransactionAnalyzer {
 
     if (isStablecoin) {
       displaySymbol =
-        Object.entries(STABLECOINS).find(
-          ([_, addr]) => addr === assetType,
-        )?.[0] || "Stablecoin";
+        Object.entries(STABLECOINS).find(([_, addr]) => addr === assetType)?.[0] || "Stablecoin";
     } else if (isLST) {
       displaySymbol = "LST"; // Generic LST label since we don't have reverse lookup anymore
     } else if (isRWA) {
@@ -376,7 +356,7 @@ export class OptimizedTransactionAnalyzer {
   private static generateDescription(
     tx: Transaction,
     baseDescription: string,
-    assetInfo: any,
+    assetInfo: any
   ): string {
     if (tx.amount && parseFloat(tx.amount) !== 0) {
       const amount = parseFloat(tx.amount);
@@ -427,4 +407,4 @@ export { OptimizedTransactionAnalyzer as EnhancedTransactionAnalyzer };
 export type { OptimizedTransactionInfo as EnhancedTransactionInfo };
 
 // Export types for components
-export { TransactionCategory, ActivityType } from "@/lib/types/consolidated";
+export { ActivityType, TransactionCategory } from "@/lib/types/consolidated";

@@ -1,5 +1,5 @@
-import { PANORA_TOKENS } from "@/lib/config/data";
-import { TOKEN_REGISTRY, NATIVE_TOKENS, STABLECOINS } from "@/lib/constants";
+import { PANORA_TOKENS } from "@/lib/config/tokens/lst";
+import { NATIVE_TOKENS, STABLECOINS, TOKEN_REGISTRY } from "@/lib/constants";
 import { logger } from "@/lib/utils/core/logger";
 
 /**
@@ -26,8 +26,7 @@ export const PROTOCOL_TOKEN_ADDRESSES = {
 
 // Liquid staking token addresses
 export const LIQUID_STAKING_ADDRESSES = {
-  thAPT:
-    "0xfaf4e633ae9eb31366c9ca24214231760926576c7b625313b3688b5e900731f6::staking::ThalaAPT",
+  thAPT: "0xfaf4e633ae9eb31366c9ca24214231760926576c7b625313b3688b5e900731f6::staking::ThalaAPT",
   stAPT:
     "0x111ae3e5bc816a5e63c2da97d0aa3886519e0cd5e4b046659fa35796bd11542a::stapt_token::StakedApt",
   amAPT:
@@ -87,9 +86,7 @@ function initializeMappings() {
     }
   });
 
-  logger.info(
-    `Initialized token registry with ${ADDRESS_TO_SYMBOL_MAP.size} mappings`,
-  );
+  logger.info(`Initialized token registry with ${ADDRESS_TO_SYMBOL_MAP.size} mappings`);
 }
 
 // Initialize on module load
@@ -140,16 +137,8 @@ export class TokenRegistry {
     if (address && address.includes("::asset::DAI")) return "DAI";
 
     // Handle protocol tokens
-    if (
-      address &&
-      (address.includes("::thl_coin::") || address.includes("::THL"))
-    )
-      return "THL";
-    if (
-      address &&
-      (address.includes("::mod_coin::") || address.includes("::MOD"))
-    )
-      return "MOD";
+    if (address && (address.includes("::thl_coin::") || address.includes("::THL"))) return "THL";
+    if (address && (address.includes("::mod_coin::") || address.includes("::MOD"))) return "MOD";
 
     // Extract from address structure as last resort
     if (!address) return "UNKNOWN";
@@ -228,7 +217,7 @@ export class TokenRegistry {
    */
   static getTokenDecimals(address: string, symbol?: string): number {
     // Native APT tokens
-    if (this.isNativeAPT(address)) return 8;
+    if (TokenRegistry.isNativeAPT(address)) return 8;
 
     // Check symbol for known tokens
     const upperSymbol = symbol?.toUpperCase();
@@ -237,17 +226,14 @@ export class TokenRegistry {
     if (upperSymbol === "UPT" || upperSymbol === "UPTOS") return 8; // Uptos token uses 8 decimals
 
     // Stablecoins typically use 6 decimals
-    if (this.isStablecoin(address, symbol)) {
-      if (
-        symbol?.toUpperCase().includes("USDC") ||
-        symbol?.toUpperCase().includes("USDT")
-      ) {
+    if (TokenRegistry.isStablecoin(address, symbol)) {
+      if (symbol?.toUpperCase().includes("USDC") || symbol?.toUpperCase().includes("USDT")) {
         return 6;
       }
     }
 
     // Liquid staking tokens follow APT (8 decimals)
-    if (this.isLiquidStakingToken(address)) return 8;
+    if (TokenRegistry.isLiquidStakingToken(address)) return 8;
 
     // Default for most Aptos tokens
     return 8;
@@ -258,10 +244,7 @@ export class TokenRegistry {
    */
   static mapToUnderlyingAsset(address: string, symbol?: string): string | null {
     // APT variants map to native APT
-    if (
-      symbol?.toLowerCase().includes("apt") ||
-      this.isLiquidStakingToken(address)
-    ) {
+    if (symbol?.toLowerCase().includes("apt") || TokenRegistry.isLiquidStakingToken(address)) {
       return NATIVE_TOKENS.APT;
     }
 
@@ -286,7 +269,7 @@ export class TokenRegistry {
    */
   static isSuspiciousToken(address: string, symbol?: string): boolean {
     // Check for fake APT tokens
-    if (symbol?.toUpperCase() === "APT" && !this.isNativeAPT(address)) {
+    if (symbol?.toUpperCase() === "APT" && !TokenRegistry.isNativeAPT(address)) {
       return true;
     }
 
@@ -303,7 +286,7 @@ export class TokenRegistry {
     ];
 
     return scamPatterns.some(
-      (pattern) => pattern.test(address) || (symbol && pattern.test(symbol)),
+      (pattern) => pattern.test(address) || (symbol && pattern.test(symbol))
     );
   }
 
@@ -311,12 +294,10 @@ export class TokenRegistry {
    * Get all registered tokens
    */
   static getAllTokens(): Array<{ symbol: string; address: string }> {
-    return Array.from(ADDRESS_TO_SYMBOL_MAP.entries()).map(
-      ([address, symbol]) => ({
-        symbol,
-        address,
-      }),
-    );
+    return Array.from(ADDRESS_TO_SYMBOL_MAP.entries()).map(([address, symbol]) => ({
+      symbol,
+      address,
+    }));
   }
 
   /**

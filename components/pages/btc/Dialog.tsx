@@ -2,40 +2,26 @@
 
 import { Bitcoin, Copy } from "lucide-react";
 import Image from "next/image";
-import React, { useMemo, memo, useCallback } from "react";
-
-import {
-  BTCFormattingError,
-  BTC_DECIMAL_PLACES,
-  measurePerformance,
-} from "./types";
-import { logger } from "@/lib/utils/core/logger";
-
-import { ErrorFallback as DialogErrorFallback } from "@/components/errors/ErrorFallback";
+import type React from "react";
+import { memo, useCallback, useMemo } from "react";
 import { ErrorBoundary } from "@/components/errors/ErrorBoundary";
+import { ErrorFallback as DialogErrorFallback } from "@/components/errors/ErrorFallback";
+import { measurePerformance } from "@/components/pages/shared/utils";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { TokenDialogContent } from "@/components/ui/token-dialog-content";
-import { BaseTokenDialogProps } from "@/components/ui/token-dialog-types";
+import type { BaseTokenDialogProps } from "@/components/ui/token-dialog-types";
 import { usePageTranslation } from "@/lib/hooks/useTranslation";
 import { convertRawTokenAmount } from "@/lib/utils";
-
+import { logger } from "@/lib/utils/core/logger";
+import { BTC_DECIMAL_PLACES, BTCFormattingError } from "./types";
 
 interface BtcTokenDialogProps extends BaseTokenDialogProps {
   bitcoinPrice?: number;
 }
 
 // Optimized supply calculation with ultra-fast formatting
-const calculateSupplyData = (
-  supply: string,
-  decimals: number,
-  bitcoinPrice: number,
-) => {
+const calculateSupplyData = (supply: string, decimals: number, bitcoinPrice: number) => {
   // Input validation with early returns
   if (!supply || typeof supply !== "string") {
     throw new BTCFormattingError("Invalid supply data", { supply });
@@ -43,9 +29,7 @@ const calculateSupplyData = (
 
   // Fix: Handle null/undefined decimals and provide default
   const validDecimals =
-    decimals !== null && decimals !== undefined && Number.isFinite(decimals)
-      ? decimals
-      : 8;
+    decimals !== null && decimals !== undefined && Number.isFinite(decimals) ? decimals : 8;
 
   if (validDecimals < 0 || validDecimals > BTC_DECIMAL_PLACES) {
     throw new BTCFormattingError("Invalid decimals", {
@@ -112,10 +96,7 @@ const SupplyCalculator = memo<{
       } catch (error) {
         logger.error("Error calculating BTC values:", error);
         return {
-          btcAmount: t(
-            "btc:error.error_calculating_supply",
-            "Error calculating supply",
-          ),
+          btcAmount: t("btc:error.error_calculating_supply", "Error calculating supply"),
           usdAmount: null,
           success: false,
           error:
@@ -144,9 +125,7 @@ const SupplyCalculator = memo<{
       <span>
         {formattedData.btcAmount} BTC
         {formattedData.usdAmount && (
-          <span className="text-muted-foreground ml-1">
-            ≈ {formattedData.usdAmount}
-          </span>
+          <span className="text-muted-foreground ml-1">≈ {formattedData.usdAmount}</span>
         )}
       </span>
     </div>
@@ -168,9 +147,7 @@ const AddressDisplay = memo<{
   return (
     <div className="flex items-center gap-2">
       <div className="flex-grow">
-        <code className="bg-muted px-1 py-0.5 rounded text-xs font-mono break-all">
-          {address}
-        </code>
+        <code className="bg-muted px-1 py-0.5 rounded text-xs font-mono break-all">{address}</code>
       </div>
       <Button
         variant="ghost"
@@ -198,7 +175,7 @@ const TokenIcon = memo<{
       logger.error("Failed to load token image:", src);
       e.currentTarget.src = fallbackSrc;
     },
-    [src, fallbackSrc],
+    [src, fallbackSrc]
   );
 
   return (
@@ -253,9 +230,7 @@ const TokenDialog = memo<BtcTokenDialogProps>(
         return (
           <div className="flex items-center gap-2">
             <Bitcoin className="h-5 w-5 text-amber-500" />
-            <span className="text-destructive">
-              {t("btc:error.invalid_data", "Invalid data")}
-            </span>
+            <span className="text-destructive">{t("btc:error.invalid_data", "Invalid data")}</span>
           </div>
         );
       }
@@ -280,13 +255,7 @@ const TokenDialog = memo<BtcTokenDialogProps>(
         );
       }
 
-      return (
-        <AddressDisplay
-          address={metadata.assetAddress}
-          onCopy={handleCopy}
-          t={t}
-        />
-      );
+      return <AddressDisplay address={metadata.assetAddress} onCopy={handleCopy} t={t} />;
     }, [isValidData, metadata, handleCopy, t]);
 
     // Memoized dialog header content
@@ -295,7 +264,12 @@ const TokenDialog = memo<BtcTokenDialogProps>(
 
       return (
         <div className="flex items-center gap-3">
-          <TokenIcon src={typeof metadata.thumbnail === 'string' ? metadata.thumbnail : metadata.thumbnail.src} alt={`${metadata.name} icon`} />
+          <TokenIcon
+            src={
+              typeof metadata.thumbnail === "string" ? metadata.thumbnail : metadata.thumbnail.src
+            }
+            alt={`${metadata.name} icon`}
+          />
           <div>
             <DialogTitle className="text-xl">{metadata.name}</DialogTitle>
             <p className="text-sm text-muted-foreground">{metadata.symbol}</p>
@@ -320,15 +294,11 @@ const TokenDialog = memo<BtcTokenDialogProps>(
           {/* Additional metadata display */}
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div className="space-y-1">
-              <p className="text-muted-foreground">
-                {t("btc:stats.decimals", "Decimals")}
-              </p>
+              <p className="text-muted-foreground">{t("btc:stats.decimals", "Decimals")}</p>
               <p className="font-mono">{metadata.decimals ?? 8}</p>
             </div>
             <div className="space-y-1">
-              <p className="text-muted-foreground">
-                {t("btc:stats.network", "Network")}
-              </p>
+              <p className="text-muted-foreground">{t("btc:stats.network", "Network")}</p>
               <p>{t("btc:stats.aptos_mainnet", "Aptos Mainnet")}</p>
             </div>
           </div>
@@ -346,9 +316,7 @@ const TokenDialog = memo<BtcTokenDialogProps>(
         <DialogContent className="max-w-2xl bg-card fixed top-[50vh] left-[50%] translate-x-[-50%] translate-y-[-50%]">
           <DialogHeader>{headerContent}</DialogHeader>
 
-          <ErrorBoundary
-            fallback={<DialogErrorFallback level="dialog" onClose={handleClose} />}
-          >
+          <ErrorBoundary fallback={<DialogErrorFallback level="dialog" onClose={handleClose} />}>
             <TokenDialogContent
               metadata={metadata}
               formattedSupply={formattedSupply}
@@ -361,7 +329,7 @@ const TokenDialog = memo<BtcTokenDialogProps>(
         </DialogContent>
       </Dialog>
     );
-  },
+  }
 );
 
 TokenDialog.displayName = "TokenDialog";

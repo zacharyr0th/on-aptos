@@ -3,8 +3,8 @@
  * Standardizes all Panora API interactions across the application
  */
 
-import { getPanoraAuthHeaders } from "./common";
 import { apiLogger } from "../core/logger";
+import { getPanoraAuthHeaders } from "./common";
 
 const PANORA_BASE_URL = "https://api.panora.exchange";
 
@@ -35,7 +35,7 @@ export class PanoraClient {
    */
   async fetch<T = any>(
     endpoint: string,
-    params?: Record<string, string | number | boolean>,
+    params?: Record<string, string | number | boolean>
   ): Promise<T> {
     const url = new URL(`${this.baseUrl}${endpoint}`);
 
@@ -91,9 +91,7 @@ export class PanoraClient {
 
         // Don't retry on client errors (4xx) except 429 (rate limit)
         if (error instanceof Error && error.message.includes("HTTP 4")) {
-          const status = parseInt(
-            error.message.match(/HTTP (\d{3})/)?.[1] || "0",
-          );
+          const status = parseInt(error.message.match(/HTTP (\d{3})/)?.[1] || "0");
           if (status !== 429) {
             throw error;
           }
@@ -101,7 +99,7 @@ export class PanoraClient {
 
         // Add delay between retries (exponential backoff)
         if (attempt < this.retries) {
-          const delay = Math.min(1000 * Math.pow(2, attempt - 1), 5000);
+          const delay = Math.min(1000 * 2 ** (attempt - 1), 5000);
           await new Promise((resolve) => setTimeout(resolve, delay));
         }
       }
@@ -182,7 +180,7 @@ export const panoraClient = new PanoraClient();
 // Convenience functions using the default client
 export const fetchFromPanora = <T = any>(
   endpoint: string,
-  params?: Record<string, string | number | boolean>,
+  params?: Record<string, string | number | boolean>
 ): Promise<T> => panoraClient.fetch<T>(endpoint, params);
 
 export const getPanoraTokenList = (params?: {

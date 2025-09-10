@@ -5,47 +5,42 @@
  * General-purpose utilities have been moved to lib/services/shared/utils.
  */
 
-// Re-export commonly used utilities from shared services
-export { UnifiedPriceService } from "../../shared/utils/unified-price-service";
-export type {
-  UnifiedPriceData,
-  AssetPrice,
-} from "../../shared/utils/unified-price-service";
-
-export { TokenRegistry } from "../../shared/utils/token-registry";
-export {
-  CORE_TOKEN_ADDRESSES,
-  PROTOCOL_TOKEN_ADDRESSES,
-  LIQUID_STAKING_ADDRESSES,
-  ALL_TOKEN_ADDRESSES,
-} from "../../shared/utils/token-registry";
-
-export {
-  UnifiedGraphQLClient,
-  UNIFIED_QUERIES,
-} from "../../shared/utils/unified-graphql-client";
-export type {
-  GraphQLResponse,
-  QueryConfig,
-  PaginationParams,
-  PaginationVariables,
-} from "../../shared/utils/unified-graphql-client";
-
-export { DeFiPositionConverter } from "../../defi/shared/defi-position-converter";
 export type { UnifiedDeFiPosition } from "../../defi/shared/defi-position-converter";
-
-export { UnifiedDecimalUtils } from "../../shared/utils/unified-decimal-utils";
+export { DeFiPositionConverter } from "../../defi/shared/defi-position-converter";
+export {
+  ALL_TOKEN_ADDRESSES,
+  CORE_TOKEN_ADDRESSES,
+  LIQUID_STAKING_ADDRESSES,
+  PROTOCOL_TOKEN_ADDRESSES,
+  TokenRegistry,
+} from "../../shared/utils/token-registry";
+export type {
+  AssetValidationOptions,
+  ValidationResult,
+} from "../../shared/utils/unified-asset-validator";
+export { UnifiedAssetValidator } from "../../shared/utils/unified-asset-validator";
 export type {
   ConversionOptions,
   FormattedBalance,
   TokenValue,
 } from "../../shared/utils/unified-decimal-utils";
-
-export { UnifiedAssetValidator } from "../../shared/utils/unified-asset-validator";
+export { UnifiedDecimalUtils } from "../../shared/utils/unified-decimal-utils";
 export type {
-  ValidationResult,
-  AssetValidationOptions,
-} from "../../shared/utils/unified-asset-validator";
+  GraphQLResponse,
+  PaginationParams,
+  PaginationVariables,
+  QueryConfig,
+} from "../../shared/utils/unified-graphql-client";
+export {
+  UNIFIED_QUERIES,
+  UnifiedGraphQLClient,
+} from "../../shared/utils/unified-graphql-client";
+export type {
+  AssetPrice,
+  UnifiedPriceData,
+} from "../../shared/utils/unified-price-service";
+// Re-export commonly used utilities from shared services
+export { UnifiedPriceService } from "../../shared/utils/unified-price-service";
 
 /**
  * Migration guide for existing code:

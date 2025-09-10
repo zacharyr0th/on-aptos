@@ -27,27 +27,21 @@ export const PROTOCOLS: Record<string, ProtocolInfo> = {
     label: "0x1",
     type: ProtocolType.UNKNOWN,
     description: "Core Aptos framework",
-    addresses: [
-      "0x0000000000000000000000000000000000000000000000000000000000000001",
-    ],
+    addresses: ["0x0000000000000000000000000000000000000000000000000000000000000001"],
   },
   APTOS_TOKEN_V2: {
     name: "Digital Assets",
     label: "0x4",
     type: ProtocolType.UNKNOWN,
     description: "Aptos token v2 standard",
-    addresses: [
-      "0x0000000000000000000000000000000000000000000000000000000000000004",
-    ],
+    addresses: ["0x0000000000000000000000000000000000000000000000000000000000000004"],
   },
   MERKLE_TRADE: {
     name: "Merkle",
     label: "MKLP",
     type: ProtocolType.DERIVATIVES,
     description: "Derivatives trading protocol",
-    addresses: [
-      "0x5ae6789dd2fec1a9ec9cccfb3acaf12e93d432f0a3a42c92fe1a9d490b7bbc06",
-    ],
+    addresses: ["0x5ae6789dd2fec1a9ec9cccfb3acaf12e93d432f0a3a42c92fe1a9d490b7bbc06"],
   },
   AMNIS_FINANCE: {
     name: "Amnis",
@@ -66,9 +60,7 @@ export const PROTOCOLS: Record<string, ProtocolInfo> = {
     label: "thAPT",
     type: ProtocolType.LIQUID_STAKING,
     description: "Thala liquid staking derivatives",
-    addresses: [
-      "0xfaf4e633ae9eb31366c9ca24214231760926576c7b625313b3688b5e900731f6",
-    ],
+    addresses: ["0xfaf4e633ae9eb31366c9ca24214231760926576c7b625313b3688b5e900731f6"],
   },
   // LAYERZERO: {
   //   name: 'LayerZero',
@@ -90,9 +82,7 @@ export const PROTOCOLS: Record<string, ProtocolInfo> = {
     label: "Aries",
     type: ProtocolType.LENDING,
     description: "Lending and borrowing protocol",
-    addresses: [
-      "0x9770fa9c725cbd97eb50b2be5f7416efdfd1f1554beb0750d4dae4c64e860da3",
-    ],
+    addresses: ["0x9770fa9c725cbd97eb50b2be5f7416efdfd1f1554beb0750d4dae4c64e860da3"],
   },
   THALA_FARM: {
     name: "Thala Farm",
@@ -122,9 +112,7 @@ export const PROTOCOLS: Record<string, ProtocolInfo> = {
     label: "VibrantX",
     type: ProtocolType.DEX,
     description: "DeFi protocol",
-    addresses: [
-      "0x17f1e926a81639e9557f4e4934df93452945ec30bc962e11351db59eb0d78c33",
-    ],
+    addresses: ["0x17f1e926a81639e9557f4e4934df93452945ec30bc962e11351db59eb0d78c33"],
   },
   THALA_INFRA: {
     name: "Thala Infrastructure",
@@ -151,9 +139,7 @@ export const PROTOCOLS: Record<string, ProtocolInfo> = {
     label: "MOD",
     type: ProtocolType.LENDING,
     description: "Thala collateralized debt positions",
-    addresses: [
-      "0x6f986d146e4a90b828d8c12c14b6f4e003fdff11a8eecceceb63744363eaac01",
-    ],
+    addresses: ["0x6f986d146e4a90b828d8c12c14b6f4e003fdff11a8eecceceb63744363eaac01"],
   },
   // Additional lending protocols
   ECHELON: {
@@ -181,9 +167,7 @@ export const PROTOCOLS: Record<string, ProtocolInfo> = {
     label: "Meso",
     type: ProtocolType.LENDING,
     description: "Meso lending protocol",
-    addresses: [
-      "0x68476f9d437e3f32fd262ba898b5e3ee0a23a1d586a6cf29a28add35f253f6f7",
-    ],
+    addresses: ["0x68476f9d437e3f32fd262ba898b5e3ee0a23a1d586a6cf29a28add35f253f6f7"],
   },
   JOULE_FINANCE: {
     name: "Joule",
@@ -200,9 +184,7 @@ export const PROTOCOLS: Record<string, ProtocolInfo> = {
     label: "Superposition",
     type: ProtocolType.LENDING,
     description: "Superposition lending protocol",
-    addresses: [
-      "0xccd1a84ccea93531d7f165b90134aa0415feb30e8757ab1632dac68c0055f5c2",
-    ],
+    addresses: ["0xccd1a84ccea93531d7f165b90134aa0415feb30e8757ab1632dac68c0055f5c2"],
   },
   AAVE: {
     name: "Aave",
@@ -250,9 +232,7 @@ export const PROTOCOLS: Record<string, ProtocolInfo> = {
     label: "Panora",
     type: ProtocolType.DEX,
     description: "Panora decentralized exchange",
-    addresses: [
-      "0x1c3206329806286fd2223647c9f9b130e66baeb6d7224a18c1f642ffe48f3b4c",
-    ],
+    addresses: ["0x1c3206329806286fd2223647c9f9b130e66baeb6d7224a18c1f642ffe48f3b4c"],
   },
   KANA_LABS: {
     name: "KanaLabs",
@@ -269,9 +249,7 @@ export const PROTOCOLS: Record<string, ProtocolInfo> = {
     label: "Hyperion",
     type: ProtocolType.DEX,
     description: "Hyperion DEX",
-    addresses: [
-      "0x8b4a2c4bb53857c718a04c020b98f8c2e1f99a68b0f57389a8bf5434cd22e05c",
-    ],
+    addresses: ["0x8b4a2c4bb53857c718a04c020b98f8c2e1f99a68b0f57389a8bf5434cd22e05c"],
   },
   // Bridges
   WORMHOLE: {
@@ -289,9 +267,7 @@ export const PROTOCOLS: Record<string, ProtocolInfo> = {
     label: "Celer",
     type: ProtocolType.BRIDGE,
     description: "Celer cross-chain bridge",
-    addresses: [
-      "0x8d87a65ba30e09357fa2edea2c80dbac296e5dec2b18287113500b902942929d",
-    ],
+    addresses: ["0x8d87a65ba30e09357fa2edea2c80dbac296e5dec2b18287113500b902942929d"],
   },
   // Other DeFi protocols
   TRUFIN: {
@@ -299,54 +275,42 @@ export const PROTOCOLS: Record<string, ProtocolInfo> = {
     label: "TruFin",
     type: ProtocolType.LIQUID_STAKING,
     description: "TruFin liquid staking",
-    addresses: [
-      "0x6f8ca77dd0a4c65362f475adb1c26ae921b1d75aa6b70e53d0e340efd7d8bc80",
-    ],
+    addresses: ["0x6f8ca77dd0a4c65362f475adb1c26ae921b1d75aa6b70e53d0e340efd7d8bc80"],
   },
   UPTOS_PUMP: {
     name: "Uptos Pump",
     label: "UPTOS",
     type: ProtocolType.DEX,
     description: "Uptos meme coin launcher",
-    addresses: [
-      "0x4e5e85fd647c7e19560590831616a3c021080265576af3182535a1d19e8bc2b3",
-    ],
+    addresses: ["0x4e5e85fd647c7e19560590831616a3c021080265576af3182535a1d19e8bc2b3"],
   },
   DEFY: {
     name: "Defy",
     label: "DEFY",
     type: ProtocolType.DEX,
     description: "Defy protocol",
-    addresses: [
-      "0xcd7b88c2181881bf8e7ef741cae867aee038e75df94224496a4a81627edf7f65",
-    ],
+    addresses: ["0xcd7b88c2181881bf8e7ef741cae867aee038e75df94224496a4a81627edf7f65"],
   },
   LUCID_FINANCE: {
     name: "Lucid",
     label: "Lucid",
     type: ProtocolType.DEX,
     description: "Lucid protocol",
-    addresses: [
-      "0xa3111961a31597ca770c60be02fc9f72bdee663f563e45223e79793557eef0d9",
-    ],
+    addresses: ["0xa3111961a31597ca770c60be02fc9f72bdee663f563e45223e79793557eef0d9"],
   },
   PACT_LABS: {
     name: "Pact Labs",
     label: "PACT",
     type: ProtocolType.DEX,
     description: "Pact Labs protocol",
-    addresses: [
-      "0xddb92cba8f18ae94c40c49ca27a2ba31eca85ce37a436e25d36c8e1f516d9c62",
-    ],
+    addresses: ["0xddb92cba8f18ae94c40c49ca27a2ba31eca85ce37a436e25d36c8e1f516d9c62"],
   },
   THETIS_MARKET: {
     name: "Thetis",
     label: "Thetis",
     type: ProtocolType.DEX,
     description: "Thetis Market protocol",
-    addresses: [
-      "0x0c727553dd5019c4887581f0a89dca9c8ea400116d70e9da7164897812c6646e",
-    ],
+    addresses: ["0x0c727553dd5019c4887581f0a89dca9c8ea400116d70e9da7164897812c6646e"],
   },
   MIRAGE_PROTOCOL: {
     name: "Mirage Protocol",
@@ -363,27 +327,21 @@ export const PROTOCOLS: Record<string, ProtocolInfo> = {
     label: "SUSHI",
     type: ProtocolType.DEX,
     description: "SushiSwap decentralized exchange",
-    addresses: [
-      "0x31a6675cbe84365bf2b0cbce617ece6c47023ef70826533bde5203d32171dc3c",
-    ],
+    addresses: ["0x31a6675cbe84365bf2b0cbce617ece6c47023ef70826533bde5203d32171dc3c"],
   },
   WAPAL: {
     name: "Wapal",
     label: "Wapal",
     type: ProtocolType.NFT,
     description: "Wapal NFT marketplace",
-    addresses: [
-      "0x584b50b999c78ade62f8359c91b5165ff390338d45f8e55969a04e65d76258c9",
-    ],
+    addresses: ["0x584b50b999c78ade62f8359c91b5165ff390338d45f8e55969a04e65d76258c9"],
   },
   MERCATO: {
     name: "Mercato",
     label: "Mercato",
     type: ProtocolType.NFT,
     description: "Mercato NFT marketplace",
-    addresses: [
-      "0xe11c12ec495f3989c35e1c6a0af414451223305b579291fc8f3d9d0575a23c26",
-    ],
+    addresses: ["0xe11c12ec495f3989c35e1c6a0af414451223305b579291fc8f3d9d0575a23c26"],
   },
   BLUEMOVE_MARKETPLACE: {
     name: "BlueMove",
@@ -455,7 +413,7 @@ function initializeProtocolCache() {
 
     // Sort by address length (longest first) for most specific matches
     PROTOCOL_ADDRESSES_CACHE = addressProtocolPairs.sort(
-      (a, b) => b.address.length - a.address.length,
+      (a, b) => b.address.length - a.address.length
     );
   }
 }
@@ -533,19 +491,10 @@ export function isPhantomAsset(assetType: string, metadata?: any): boolean {
     // Bridge tokens (USDC, USDT, WETH, WBTC) are NOT phantom assets - they're tradeable
     if (protocol.type === ProtocolType.BRIDGE) {
       // Check if it's a standard bridged token (these are tradeable)
-      const tradableBridgedTokens = [
-        "USDC",
-        "USDT",
-        "WETH",
-        "WBTC",
-        "ETH",
-        "BTC",
-      ];
+      const tradableBridgedTokens = ["USDC", "USDT", "WETH", "WBTC", "ETH", "BTC"];
       if (
         metadata?.symbol &&
-        tradableBridgedTokens.some((token) =>
-          metadata.symbol.toUpperCase().includes(token),
-        )
+        tradableBridgedTokens.some((token) => metadata.symbol.toUpperCase().includes(token))
       ) {
         return false; // These are tradeable bridged tokens, not phantom assets
       }
@@ -554,11 +503,7 @@ export function isPhantomAsset(assetType: string, metadata?: any): boolean {
     }
 
     // Liquid staking and farming assets are typically locked
-    if (
-      [ProtocolType.LIQUID_STAKING, ProtocolType.FARMING].includes(
-        protocol.type,
-      )
-    ) {
+    if ([ProtocolType.LIQUID_STAKING, ProtocolType.FARMING].includes(protocol.type)) {
       return true;
     }
   }
@@ -567,7 +512,7 @@ export function isPhantomAsset(assetType: string, metadata?: any): boolean {
   if (
     metadata?.symbol &&
     STAKED_ASSET_SYMBOLS.some((stakedSymbol) =>
-      metadata.symbol.toLowerCase().includes(stakedSymbol.toLowerCase()),
+      metadata.symbol.toLowerCase().includes(stakedSymbol.toLowerCase())
     )
   ) {
     return true;

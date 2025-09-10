@@ -3,19 +3,16 @@
  * Centralizes all environment-dependent settings
  */
 
-import { env, isProduction, isDevelopment } from "./validate-env";
+import { env, isDevelopment, isProduction } from "./validate-env";
 
 export const APP_CONFIG = {
   // Site configuration
   siteUrl: env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
   appName: process.env.NEXT_PUBLIC_APP_NAME || "On Aptos",
-  siteDescription:
-    process.env.NEXT_PUBLIC_SITE_DESCRIPTION || "Aptos DeFi ecosystem tracker",
+  siteDescription: process.env.NEXT_PUBLIC_SITE_DESCRIPTION || "Aptos DeFi ecosystem tracker",
 
   // CORS configuration
-  corsOrigins: process.env.NEXT_PUBLIC_CORS_ORIGINS?.split(",") || [
-    "http://localhost:3000",
-  ],
+  corsOrigins: process.env.NEXT_PUBLIC_CORS_ORIGINS?.split(",") || ["http://localhost:3000"],
 
   // Port configuration
   port: process.env.PORT || process.env.DEV_PORT || "3000",
@@ -44,8 +41,7 @@ export const API_CONFIG = {
 
   // CoinMarketCap API
   cmc: {
-    baseUrl:
-      process.env.CMC_API_BASE_URL || "https://pro-api.coinmarketcap.com/v1",
+    baseUrl: process.env.CMC_API_BASE_URL || "https://pro-api.coinmarketcap.com/v1",
     apiKey: env.CMC_API_KEY || "",
   },
 

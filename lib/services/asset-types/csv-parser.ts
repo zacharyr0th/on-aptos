@@ -76,11 +76,7 @@ export function parseCSVData(csvContent: string): CSVRWAAsset[] {
       const value = values[index];
 
       // Convert numeric fields
-      if (
-        header.includes("_dollar") ||
-        header.includes("_token") ||
-        header.includes("price_")
-      ) {
+      if (header.includes("_dollar") || header.includes("_token") || header.includes("price_")) {
         asset[header] = value === "" ? 0 : parseFloat(value) || 0;
       } else {
         asset[header] = value;
@@ -99,10 +95,7 @@ export function transformCSVToRWAAsset(csvAsset: CSVRWAAsset): ParsedRWAAsset {
     const classLower = assetClass.toLowerCase();
     if (classLower.includes("treasury") || classLower.includes("us-treasury")) {
       return "treasury";
-    } else if (
-      classLower.includes("credit") ||
-      classLower.includes("private-credit")
-    ) {
+    } else if (classLower.includes("credit") || classLower.includes("private-credit")) {
       return "credit";
     } else if (classLower.includes("alternative")) {
       return "alternative";
@@ -122,8 +115,7 @@ export function transformCSVToRWAAsset(csvAsset: CSVRWAAsset): ParsedRWAAsset {
   };
 
   // Use the most appropriate value for TVL
-  const tvlValue =
-    csvAsset.total_asset_value_dollar || csvAsset.market_value_dollar || 0;
+  const tvlValue = csvAsset.total_asset_value_dollar || csvAsset.market_value_dollar || 0;
 
   return {
     id: csvAsset.token_id,
@@ -147,13 +139,8 @@ export function transformCSVToRWAAsset(csvAsset: CSVRWAAsset): ParsedRWAAsset {
   };
 }
 
-export function filterByProtocols(
-  assets: ParsedRWAAsset[],
-  protocols: string[],
-): ParsedRWAAsset[] {
+export function filterByProtocols(assets: ParsedRWAAsset[], protocols: string[]): ParsedRWAAsset[] {
   return assets.filter((asset) =>
-    protocols.some((protocol) =>
-      asset.protocol.toLowerCase().includes(protocol.toLowerCase()),
-    ),
+    protocols.some((protocol) => asset.protocol.toLowerCase().includes(protocol.toLowerCase()))
   );
 }

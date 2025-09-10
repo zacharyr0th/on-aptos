@@ -1,29 +1,18 @@
 import { logger } from "@/lib/utils/core/logger";
 
-import type {
-  FungibleAsset,
-  PortfolioMetrics,
-  AssetPrice,
-  DeFiPosition,
-} from "../types";
+import type { AssetPrice, DeFiPosition, FungibleAsset, PortfolioMetrics } from "../types";
 
 import { AssetService } from "./asset-service";
 
 export class MetricsService {
   static async calculatePortfolioMetrics(
     assets: FungibleAsset[],
-    defiPositions: DeFiPosition[] = [],
+    defiPositions: DeFiPosition[] = []
   ): Promise<PortfolioMetrics> {
     try {
       // Calculate total portfolio value
-      const assetValue = assets.reduce(
-        (sum, asset) => sum + (asset.value || 0),
-        0,
-      );
-      const defiValue = defiPositions.reduce(
-        (sum, position) => sum + position.totalValueUSD,
-        0,
-      );
+      const assetValue = assets.reduce((sum, asset) => sum + (asset.value || 0), 0);
+      const defiValue = defiPositions.reduce((sum, position) => sum + position.totalValueUSD, 0);
       const totalValue = assetValue + defiValue;
 
       // Get unique asset types for price changes
@@ -46,21 +35,17 @@ export class MetricsService {
         }
       });
 
-      const totalChangePercent24h =
-        totalValue > 0 ? (totalChange24h / totalValue) * 100 : 0;
+      const totalChangePercent24h = totalValue > 0 ? (totalChange24h / totalValue) * 100 : 0;
 
       // Calculate asset allocation
-      const assetAllocation = this.calculateAssetAllocation(
+      const assetAllocation = MetricsService.calculateAssetAllocation(
         assets,
         defiPositions,
-        totalValue,
+        totalValue
       );
 
       // Find top gainers and losers
-      const { topGainers, topLosers } = this.findTopMovers(
-        assets,
-        assetPriceMap,
-      );
+      const { topGainers, topLosers } = MetricsService.findTopMovers(assets, assetPriceMap);
 
       return {
         totalValue,
@@ -86,7 +71,7 @@ export class MetricsService {
   private static calculateAssetAllocation(
     assets: FungibleAsset[],
     defiPositions: DeFiPosition[],
-    totalValue: number,
+    totalValue: number
   ): Array<{
     assetType: string;
     symbol: string;
@@ -114,10 +99,7 @@ export class MetricsService {
 
     // Add DeFi positions as aggregated
     if (defiPositions.length > 0) {
-      const defiTotal = defiPositions.reduce(
-        (sum, pos) => sum + pos.totalValueUSD,
-        0,
-      );
+      const defiTotal = defiPositions.reduce((sum, pos) => sum + pos.totalValueUSD, 0);
       if (defiTotal > 0) {
         allocation.push({
           assetType: "DeFi Positions",
@@ -134,7 +116,7 @@ export class MetricsService {
 
   private static findTopMovers(
     assets: FungibleAsset[],
-    priceMap: Map<string, AssetPrice>,
+    priceMap: Map<string, AssetPrice>
   ): { topGainers: AssetPrice[]; topLosers: AssetPrice[] } {
     const movers: AssetPrice[] = [];
 

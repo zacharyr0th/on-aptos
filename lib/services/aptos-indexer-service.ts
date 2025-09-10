@@ -12,10 +12,7 @@ interface GraphQLResponse<T> {
 /**
  * Base GraphQL query function with authentication
  */
-async function queryIndexer<T>(
-  query: string,
-  variables?: any,
-): Promise<T | null> {
+async function queryIndexer<T>(query: string, variables?: any): Promise<T | null> {
   try {
     logger.info("Making GraphQL query to Aptos indexer", {
       hasSecret: !!APTOS_BUILD_SECRET,
@@ -41,9 +38,7 @@ async function queryIndexer<T>(
         statusText: response.statusText,
         body: errorText,
       });
-      throw new Error(
-        `HTTP ${response.status}: ${response.statusText} - ${errorText}`,
-      );
+      throw new Error(`HTTP ${response.status}: ${response.statusText} - ${errorText}`);
     }
 
     const result: GraphQLResponse<T> = await response.json();
@@ -376,9 +371,7 @@ export async function getDomainMetrics() {
  */
 export async function getGasMetrics() {
   // Gas data not available in current indexer schema
-  logger.warn(
-    "Gas metrics not available - gas fields not accessible in current schema",
-  );
+  logger.warn("Gas metrics not available - gas fields not accessible in current schema");
   return null;
 }
 
@@ -389,27 +382,19 @@ export async function getComprehensiveEcosystemMetrics() {
   try {
     logger.info("Fetching comprehensive ecosystem metrics from Aptos indexer");
 
-    const [
-      networkActivity,
-      stakingData,
-      walletData,
-      tokenData,
-      nftData,
-      domainData,
-      gasData,
-    ] = await Promise.allSettled([
-      getNetworkActivityMetrics(),
-      getStakingMetrics(),
-      getWalletMetrics(),
-      getTokenMetrics(),
-      getNFTMetrics(),
-      getDomainMetrics(),
-      getGasMetrics(),
-    ]);
+    const [networkActivity, stakingData, walletData, tokenData, nftData, domainData, gasData] =
+      await Promise.allSettled([
+        getNetworkActivityMetrics(),
+        getStakingMetrics(),
+        getWalletMetrics(),
+        getTokenMetrics(),
+        getNFTMetrics(),
+        getDomainMetrics(),
+        getGasMetrics(),
+      ]);
 
     return {
-      networkActivity:
-        networkActivity.status === "fulfilled" ? networkActivity.value : null,
+      networkActivity: networkActivity.status === "fulfilled" ? networkActivity.value : null,
       staking: stakingData.status === "fulfilled" ? stakingData.value : null,
       wallets: walletData.status === "fulfilled" ? walletData.value : null,
       tokens: tokenData.status === "fulfilled" ? tokenData.value : null,
@@ -432,9 +417,7 @@ export function calculateNetworkPerformance(networkData: any) {
 
   if (!blocks || blocks.length < 2) return null;
 
-  const sortedBlocks = blocks.sort(
-    (a: any, b: any) => b.block_height - a.block_height,
-  );
+  const sortedBlocks = blocks.sort((a: any, b: any) => b.block_height - a.block_height);
   const blockTimes: number[] = [];
   const epochs = new Set();
   const proposers = new Set();
@@ -458,8 +441,7 @@ export function calculateNetworkPerformance(networkData: any) {
 
   // Calculate precise statistics
   const sortedTimes = [...blockTimes].sort((a, b) => a - b);
-  const avgBlockTime =
-    blockTimes.reduce((sum, time) => sum + time, 0) / blockTimes.length;
+  const avgBlockTime = blockTimes.reduce((sum, time) => sum + time, 0) / blockTimes.length;
   const medianBlockTime = sortedTimes[Math.floor(sortedTimes.length / 2)];
   const p95BlockTime = sortedTimes[Math.floor(sortedTimes.length * 0.95)];
   const minBlockTime = Math.min(...blockTimes);
@@ -467,10 +449,7 @@ export function calculateNetworkPerformance(networkData: any) {
 
   // Calculate variance and standard deviation
   const variance =
-    blockTimes.reduce(
-      (sum, time) => sum + Math.pow(time - avgBlockTime, 2),
-      0,
-    ) / blockTimes.length;
+    blockTimes.reduce((sum, time) => sum + (time - avgBlockTime) ** 2, 0) / blockTimes.length;
   const stdDev = Math.sqrt(variance);
 
   // Calculate finality time (approximate - usually 2-3 block confirmations on Aptos)
@@ -507,16 +486,12 @@ export function calculateGasStatistics(gasData: any) {
   // Calculate gas fees from individual transactions
   const gasFees = transactions
     .filter((tx: any) => tx.gas_used && tx.gas_unit_price)
-    .map(
-      (tx: any) =>
-        (parseInt(tx.gas_used) * parseInt(tx.gas_unit_price)) / 100000000,
-    ); // Convert to APT
+    .map((tx: any) => (parseInt(tx.gas_used) * parseInt(tx.gas_unit_price)) / 100000000); // Convert to APT
 
   if (gasFees.length === 0) return null;
 
   const sortedFees = gasFees.sort((a: number, b: number) => a - b);
-  const avgGasFee =
-    gasFees.reduce((sum: number, fee: number) => sum + fee, 0) / gasFees.length;
+  const avgGasFee = gasFees.reduce((sum: number, fee: number) => sum + fee, 0) / gasFees.length;
   const medianGasFee = sortedFees[Math.floor(sortedFees.length / 2)];
   const p95GasFee = sortedFees[Math.floor(sortedFees.length * 0.95)];
   const minGasFee = Math.min(...gasFees);

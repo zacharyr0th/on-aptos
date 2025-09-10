@@ -1,6 +1,6 @@
 export { MetricsCard, QuickStatsCard } from "./MetricsCard";
-export { MetricsTable } from "./MetricsTable";
-export { MetricsLoadingSkeleton } from "./MetricsLoadingSkeleton";
 export { MetricsHeader } from "./MetricsHeader";
-export { useMetricsQuery, useMultipleMetricsQueries, useMetricsRefresh } from "./useMetricsQuery";
+export { MetricsLoadingSkeleton } from "./MetricsLoadingSkeleton";
+export { MetricsTable } from "./MetricsTable";
 export * from "./metricsUtils";
+export { useMetricsQuery, useMetricsRefresh, useMultipleMetricsQueries } from "./useMetricsQuery";

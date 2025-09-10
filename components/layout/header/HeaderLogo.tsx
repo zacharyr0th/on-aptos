@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
-import React, { useMemo } from "react";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
+import React, { useMemo } from "react";
 
 import { GitHubStarCount } from "@/components/ui/github-star-count";
 import { useTranslation } from "@/lib/hooks/useTranslation";
@@ -49,7 +49,6 @@ export function HeaderLogo() {
         key: "page_titles.portfolio",
         fallback: "Portfolio Analytics",
       },
-      "/tools/metrics": { key: "page_titles.metrics", fallback: "Metrics" },
     };
 
     const config = pageConfig[pathname] || {
@@ -92,13 +91,8 @@ export function HeaderLogo() {
         </Link>
       </h1>
       <GitHubStarCount
-        owner={
-          process.env.DEVELOPER_GITHUB?.split("/").slice(-2, -1)[0] ||
-          "yourusername"
-        }
-        repo={
-          process.env.DEVELOPER_GITHUB?.split("/").slice(-1)[0] || "on-aptos"
-        }
+        owner={process.env.DEVELOPER_GITHUB?.split("/").slice(-2, -1)[0] || "yourusername"}
+        repo={process.env.DEVELOPER_GITHUB?.split("/").slice(-1)[0] || "on-aptos"}
         className="hidden sm:flex"
         showGithubLogo={true}
       />

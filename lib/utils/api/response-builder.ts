@@ -9,9 +9,9 @@ import { z } from "zod";
 
 // Re-export the main response builders for backward compatibility
 export {
-  buildSuccessResponse,
-  buildErrorResponse,
   APIResponses,
+  buildErrorResponse,
+  buildSuccessResponse,
 } from "./api-response";
 
 // Response schemas (kept for existing tRPC validation)
@@ -47,7 +47,7 @@ export function buildTRPCResponse<T>(
     cacheHits?: number;
     cacheMisses?: number;
     apiCalls?: number;
-  },
+  }
 ): {
   timestamp: string;
   performance: {
@@ -81,7 +81,7 @@ export function buildTRPCResponse<T>(
  */
 export function buildCachedResponse<T>(
   data: T,
-  startTime: number,
+  startTime: number
 ): ReturnType<typeof buildTRPCResponse<T>> {
   return buildTRPCResponse(data, {
     startTime,
@@ -95,7 +95,7 @@ export function buildCachedResponse<T>(
 export function buildFreshResponse<T>(
   data: T,
   startTime: number,
-  apiCalls = 1,
+  apiCalls = 1
 ): ReturnType<typeof buildTRPCResponse<T>> {
   return buildTRPCResponse(data, {
     startTime,
@@ -108,7 +108,7 @@ export function buildFreshResponse<T>(
 
 export function buildFallbackResponse<T>(
   data: T,
-  startTime: number,
+  startTime: number
 ): ReturnType<typeof buildTRPCResponse<T>> {
   return buildTRPCResponse(data, {
     startTime,
@@ -162,10 +162,7 @@ export function formatApiError(error: unknown): {
 /**
  * Handle API errors with proper logging
  */
-export function handleApiError(
-  error: unknown,
-  context?: ErrorContext,
-): NextResponse {
+export function handleApiError(error: unknown, context?: ErrorContext): NextResponse {
   logError(error, context);
   const formattedError = formatApiError(error);
 
@@ -174,17 +171,14 @@ export function handleApiError(
       error: formattedError.message,
       code: formattedError.code,
     },
-    { status: formattedError.statusCode },
+    { status: formattedError.statusCode }
   );
 }
 
 /**
  * Error handling wrapper for async functions
  */
-export function withErrorHandling<T>(
-  fn: () => Promise<T>,
-  _context?: ErrorContext,
-): Promise<T> {
+export function withErrorHandling<T>(fn: () => Promise<T>, _context?: ErrorContext): Promise<T> {
   return fn().catch((error) => {
     throw error; // Let the caller handle the error
   });
@@ -196,7 +190,7 @@ export function withErrorHandling<T>(
 export function withErrorHandlingAndFallback<T>(
   fn: () => Promise<NextResponse<T>>,
   context?: ErrorContext,
-  fallbackData?: T,
+  fallbackData?: T
 ): Promise<NextResponse<T>> {
   return fn().catch((error) => {
     logError(error, context);
@@ -212,10 +206,7 @@ export function withErrorHandlingAndFallback<T>(
 /**
  * Create a success response with standard structure
  */
-export function createSuccessResponse<T>(
-  data: T,
-  headers?: HeadersInit,
-): NextResponse {
+export function createSuccessResponse<T>(data: T, headers?: HeadersInit): NextResponse {
   return NextResponse.json(
     {
       success: true,
@@ -225,7 +216,7 @@ export function createSuccessResponse<T>(
     {
       status: 200,
       headers,
-    },
+    }
   );
 }
 
@@ -235,7 +226,7 @@ export function createSuccessResponse<T>(
 export function createErrorResponse(
   message: string,
   details?: string,
-  status: number = 500,
+  status: number = 500
 ): NextResponse {
   return NextResponse.json(
     {
@@ -246,6 +237,6 @@ export function createErrorResponse(
     },
     {
       status,
-    },
+    }
   );
 }

@@ -1,8 +1,7 @@
-import type { DeFiPosition as NewDeFiPosition } from "@/lib/services/defi";
+import type { DeFiPosition as LegacyDeFiPosition } from "@/lib/types/defi";
 import { ProtocolType } from "@/lib/types/defi";
-
-import type { DeFiPosition as LegacyDeFiPosition } from "../../portfolio/types";
 import { TokenRegistry } from "../../shared/utils/token-registry";
+import type { DeFiPosition as NewDeFiPosition } from "../unified-scanner";
 
 /**
  * Unified DeFi position converter that handles all position format transformations
@@ -93,7 +92,9 @@ const PROTOCOL_TYPE_MAPPING: Record<ProtocolType, string> = {
   [ProtocolType.BRIDGE]: "Bridge",
   [ProtocolType.LAUNCHPAD]: "Launchpad",
   [ProtocolType.AGGREGATOR]: "Aggregator",
+  [ProtocolType.INFRASTRUCTURE]: "Infrastructure",
   [ProtocolType.NFT]: "NFT",
+  [ProtocolType.NFT_MARKETPLACE]: "NFT Marketplace",
   [ProtocolType.UNKNOWN]: "Unknown",
 };
 
@@ -111,8 +112,7 @@ export class DeFiPositionConverter {
     for (const asset of position.assets) {
       // Handle both tokenAddress and address fields (from different sources)
       const address = asset.tokenAddress || asset.address || "";
-      const symbol =
-        asset.symbol || TokenRegistry.getSymbolFromAddress(address);
+      const symbol = asset.symbol || TokenRegistry.getSymbolFromAddress(address);
       const assetData = {
         asset: address,
         symbol,
@@ -188,9 +188,7 @@ export class DeFiPositionConverter {
   /**
    * Convert legacy DeFi position to unified format
    */
-  static fromLegacyDeFiPosition(
-    position: LegacyDeFiPosition,
-  ): UnifiedDeFiPosition {
+  static fromLegacyDeFiPosition(position: LegacyDeFiPosition): UnifiedDeFiPosition {
     const suppliedAssets: UnifiedDeFiPosition["suppliedAssets"] = [];
     const borrowedAssets: UnifiedDeFiPosition["borrowedAssets"] = [];
     const liquidityAssets: UnifiedDeFiPosition["liquidityAssets"] = [];
@@ -248,7 +246,7 @@ export class DeFiPositionConverter {
    */
   static fromComprehensivePosition(
     position: any,
-    priceMap: Map<string, number>,
+    priceMap: Map<string, number>
   ): UnifiedDeFiPosition {
     const suppliedAssets: UnifiedDeFiPosition["suppliedAssets"] = [];
     const borrowedAssets: UnifiedDeFiPosition["borrowedAssets"] = [];
@@ -284,11 +282,8 @@ export class DeFiPositionConverter {
     if (position.tokens?.length > 0) {
       position.tokens.forEach((token: any) => {
         const rawBalance = parseFloat(token.balance || "0");
-        const decimals = TokenRegistry.getTokenDecimals(
-          token.address,
-          token.symbol,
-        );
-        const balance = rawBalance / Math.pow(10, decimals);
+        const decimals = TokenRegistry.getTokenDecimals(token.address, token.symbol);
+        const balance = rawBalance / 10 ** decimals;
 
         const price = priceMap.get(token.address) || 0;
         const value = balance * price;
@@ -329,7 +324,7 @@ export class DeFiPositionConverter {
     return {
       id: `${position.protocol}-${position.protocolAddress}`,
       protocol: position.protocol,
-      protocolType: this.mapPositionTypeToProtocolType(position.type),
+      protocolType: DeFiPositionConverter.mapPositionTypeToProtocolType(position.type),
       poolName: position.description,
       positionType: POSITION_TYPE_MAPPING[position.type] || position.type,
       suppliedAssets,
@@ -348,9 +343,7 @@ export class DeFiPositionConverter {
   /**
    * Convert unified position to legacy format for backward compatibility
    */
-  static toLegacyDeFiPosition(
-    position: UnifiedDeFiPosition,
-  ): LegacyDeFiPosition {
+  static toLegacyDeFiPosition(position: UnifiedDeFiPosition): LegacyDeFiPosition {
     // Convert to the expected DeFi position format from /lib/types/defi.ts
     const supplied = position.suppliedAssets.map((asset) => ({
       asset: asset.asset,
@@ -411,10 +404,7 @@ export class DeFiPositionConverter {
     }>;
   } {
     const totalPositions = positions.length;
-    const totalValueUSD = positions.reduce(
-      (sum, pos) => sum + pos.totalValueUSD,
-      0,
-    );
+    const totalValueUSD = positions.reduce((sum, pos) => sum + pos.totalValueUSD, 0);
 
     // Group by protocol
     const protocolBreakdown: Record<string, number> = {};
@@ -424,8 +414,7 @@ export class DeFiPositionConverter {
       const protocol = position.protocol || "Unknown";
       const type = position.positionType || "Other";
 
-      protocolBreakdown[protocol] =
-        (protocolBreakdown[protocol] || 0) + position.totalValueUSD;
+      protocolBreakdown[protocol] = (protocolBreakdown[protocol] || 0) + position.totalValueUSD;
       typeBreakdown[type] = (typeBreakdown[type] || 0) + position.totalValueUSD;
     });
 
@@ -475,21 +464,19 @@ export class DeFiPositionConverter {
     }
 
     // Validate asset data
-    [
-      ...position.suppliedAssets,
-      ...position.borrowedAssets,
-      ...position.stakedAssets,
-    ].forEach((asset, index) => {
-      if (!asset.asset) {
-        errors.push(`Asset ${index} missing address`);
+    [...position.suppliedAssets, ...position.borrowedAssets, ...position.stakedAssets].forEach(
+      (asset, index) => {
+        if (!asset.asset) {
+          errors.push(`Asset ${index} missing address`);
+        }
+        if (asset.amount < 0) {
+          errors.push(`Asset ${index} amount cannot be negative`);
+        }
+        if (asset.value < 0) {
+          errors.push(`Asset ${index} value cannot be negative`);
+        }
       }
-      if (asset.amount < 0) {
-        errors.push(`Asset ${index} amount cannot be negative`);
-      }
-      if (asset.value < 0) {
-        errors.push(`Asset ${index} value cannot be negative`);
-      }
-    });
+    );
 
     return {
       isValid: errors.length === 0,
@@ -522,9 +509,7 @@ export class DeFiPositionConverter {
   /**
    * Merge duplicate positions from the same protocol
    */
-  static mergeDuplicates(
-    positions: UnifiedDeFiPosition[],
-  ): UnifiedDeFiPosition[] {
+  static mergeDuplicates(positions: UnifiedDeFiPosition[]): UnifiedDeFiPosition[] {
     const merged = new Map<string, UnifiedDeFiPosition>();
 
     positions.forEach((position) => {
@@ -551,7 +536,7 @@ export class DeFiPositionConverter {
    */
   static filterByMinValue(
     positions: UnifiedDeFiPosition[],
-    minValueUSD: number = 0.1,
+    minValueUSD: number = 0.1
   ): UnifiedDeFiPosition[] {
     return positions.filter((position) => {
       // Always include LP positions regardless of value

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { logger } from "@/lib/utils/core/logger";
 
 /**
@@ -7,7 +7,7 @@ import { logger } from "@/lib/utils/core/logger";
  */
 export function useLocalStorage<T>(
   key: string,
-  initialValue: T,
+  initialValue: T
 ): [T, (value: T | ((val: T) => T)) => void, () => void] {
   // Get from local storage then parse stored json or return initialValue
   const readValue = useCallback((): T => {
@@ -32,16 +32,13 @@ export function useLocalStorage<T>(
     (value: T | ((val: T) => T)) => {
       // Prevent build error "window is undefined" but keeps working
       if (typeof window === "undefined") {
-        logger.warn(
-          `Tried setting localStorage key "${key}" during SSR - ignoring`,
-        );
+        logger.warn(`Tried setting localStorage key "${key}" during SSR - ignoring`);
         return;
       }
 
       try {
         // Allow value to be a function so we have the same API as useState
-        const valueToStore =
-          value instanceof Function ? value(storedValue) : value;
+        const valueToStore = value instanceof Function ? value(storedValue) : value;
 
         // Save to local storage
         window.localStorage.setItem(key, JSON.stringify(valueToStore));
@@ -53,13 +50,13 @@ export function useLocalStorage<T>(
         window.dispatchEvent(
           new CustomEvent("local-storage", {
             detail: { key, value: valueToStore },
-          }),
+          })
         );
       } catch (error) {
         logger.error(`Error setting localStorage key "${key}":`, error);
       }
     },
-    [key, storedValue],
+    [key, storedValue]
   );
 
   // Remove value from localStorage
@@ -76,7 +73,7 @@ export function useLocalStorage<T>(
       window.dispatchEvent(
         new CustomEvent("local-storage", {
           detail: { key, value: null },
-        }),
+        })
       );
     } catch (error) {
       logger.error(`Error removing localStorage key "${key}":`, error);
@@ -107,17 +104,11 @@ export function useLocalStorage<T>(
     };
 
     window.addEventListener("storage", handleStorageChange);
-    window.addEventListener(
-      "local-storage",
-      handleCustomEvent as EventListener,
-    );
+    window.addEventListener("local-storage", handleCustomEvent as EventListener);
 
     return () => {
       window.removeEventListener("storage", handleStorageChange);
-      window.removeEventListener(
-        "local-storage",
-        handleCustomEvent as EventListener,
-      );
+      window.removeEventListener("local-storage", handleCustomEvent as EventListener);
     };
   }, [key]);
 

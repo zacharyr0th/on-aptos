@@ -52,9 +52,7 @@ export const lendingProtocols: DefiProtocol[] = [
       },
     },
     integration: {
-      smartContractLinks: [
-        "https://github.com/zxk0029/superposition-finance-aptos-sdk",
-      ],
+      smartContractLinks: ["https://github.com/zxk0029/superposition-finance-aptos-sdk"],
     },
   },
   {

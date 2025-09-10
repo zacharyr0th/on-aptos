@@ -76,10 +76,7 @@ export interface RetryOptions {
   onRetry?: (attempt: number, error: Record<string, unknown>) => void;
 }
 
-export async function withRetry<T>(
-  operation: () => Promise<T>,
-  options: RetryOptions,
-): Promise<T> {
+export async function withRetry<T>(operation: () => Promise<T>, options: RetryOptions): Promise<T> {
   const { maxAttempts, backoffStrategy, baseDelay, onRetry } = options;
   let lastError: Record<string, unknown>;
 
@@ -87,9 +84,7 @@ export async function withRetry<T>(
     try {
       if (attempt > 0) {
         const delay =
-          backoffStrategy === "exponential"
-            ? Math.pow(2, attempt) * baseDelay
-            : (attempt + 1) * baseDelay;
+          backoffStrategy === "exponential" ? 2 ** attempt * baseDelay : (attempt + 1) * baseDelay;
 
         await new Promise((resolve) => setTimeout(resolve, delay));
         onRetry?.(attempt + 1, lastError);

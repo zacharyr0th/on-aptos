@@ -22,7 +22,7 @@ A comprehensive blockchain analytics platform for the Aptos ecosystem, providing
 
 ### Prerequisites
 
-- Node.js 18+ and pnpm 8+
+- Node.js 18+ and Bun
 - API keys (see below)
 
 ### Installation
@@ -32,7 +32,7 @@ A comprehensive blockchain analytics platform for the Aptos ecosystem, providing
 ```bash
 git clone https://github.com/yourusername/on-aptos.git
 cd on-aptos
-pnpm install
+bun install
 ```
 
 2. Configure environment:
@@ -54,17 +54,17 @@ RWA_API_KEY=your_key           # Contact for access
 4. Start development:
 
 ```bash
-pnpm dev
+bun dev
 ```
 
 ## Development
 
 ```bash
-pnpm dev          # Start development server
-pnpm build        # Create production build
-pnpm lint         # Run linting
-pnpm typecheck    # TypeScript checking
-pnpm test         # Run tests
+bun dev           # Start development server
+bun run build     # Create production build
+bun run lint      # Run linting with Biome
+bun run typecheck # TypeScript checking
+bun run test      # Run tests
 ```
 
 ## Security

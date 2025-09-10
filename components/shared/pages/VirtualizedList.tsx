@@ -1,9 +1,9 @@
 "use client";
 
-import { useRef, useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { cn } from "@/lib/utils";
 import { LoadingState } from "./LoadingState";
 import type { VirtualizedListProps } from "./types";
-import { cn } from "@/lib/utils";
 
 export function VirtualizedList<T>({
   items,
@@ -45,7 +45,7 @@ export function VirtualizedList<T>({
       }
       return itemHeight;
     },
-    [itemHeight],
+    [itemHeight]
   );
 
   const calculateVisibleRange = useCallback(() => {
@@ -84,10 +84,7 @@ export function VirtualizedList<T>({
 
   const { startIndex, endIndex, offsetY } = calculateVisibleRange();
 
-  const totalHeight = items.reduce(
-    (acc, _, index) => acc + getItemHeight(index),
-    0,
-  );
+  const totalHeight = items.reduce((acc, _, index) => acc + getItemHeight(index), 0);
 
   if (isLoading) {
     return loadingComponent || <LoadingState className={className} />;

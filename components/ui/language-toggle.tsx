@@ -4,7 +4,7 @@ import { Globe } from "lucide-react";
 import * as React from "react";
 
 import { Badge } from "@/components/ui/badge";
-import { supportedLanguages, type SupportedLanguage } from "@/lib/i18n";
+import { type SupportedLanguage, supportedLanguages } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 // Language labels for all supported languages
@@ -75,7 +75,7 @@ export function LanguageToggle() {
           "text-primary-foreground",
           "hover:bg-primary/80",
           "transition-colors duration-200",
-          "shadow-lg",
+          "shadow-lg"
         )}
         type="button"
         aria-label="Change language"
@@ -95,7 +95,7 @@ export function LanguageToggle() {
                   "transition-colors duration-200",
                   lang === currentLang
                     ? "bg-primary/10 text-primary font-semibold"
-                    : "hover:bg-accent hover:text-accent-foreground",
+                    : "hover:bg-accent hover:text-accent-foreground"
                 )}
                 disabled={lang === currentLang}
               >

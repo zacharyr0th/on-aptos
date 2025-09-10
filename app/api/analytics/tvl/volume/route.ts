@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-
-import { apiLogger } from "@/lib/utils/core/logger";
 import { UnifiedCache } from "@/lib/utils/cache/unified-cache";
+import { apiLogger } from "@/lib/utils/core/logger";
 
 const cache = new UnifiedCache({ ttl: 5 * 60 * 1000 }); // 5 minutes
 
@@ -14,12 +13,9 @@ export async function GET() {
     }
 
     // Fetch DEX volume data
-    const dexResponse = await fetch(
-      "https://api.llama.fi/overview/dexs/aptos",
-      {
-        next: { revalidate: 300 },
-      },
-    );
+    const dexResponse = await fetch("https://api.llama.fi/overview/dexs/aptos", {
+      next: { revalidate: 300 },
+    });
 
     let dexData = null;
     if (dexResponse.ok) {
@@ -27,12 +23,9 @@ export async function GET() {
     }
 
     // Fetch options volume if available
-    const optionsResponse = await fetch(
-      "https://api.llama.fi/overview/options/aptos",
-      {
-        next: { revalidate: 300 },
-      },
-    );
+    const optionsResponse = await fetch("https://api.llama.fi/overview/options/aptos", {
+      next: { revalidate: 300 },
+    });
 
     let optionsData = null;
     if (optionsResponse.ok) {
@@ -45,12 +38,9 @@ export async function GET() {
     }
 
     // Fetch bridge volume data
-    const bridgeResponse = await fetch(
-      "https://api.llama.fi/bridgevolume/aptos",
-      {
-        next: { revalidate: 300 },
-      },
-    );
+    const bridgeResponse = await fetch("https://api.llama.fi/bridgevolume/aptos", {
+      next: { revalidate: 300 },
+    });
 
     let bridgeData = null;
     if (bridgeResponse.ok) {
@@ -103,22 +93,20 @@ export async function GET() {
       bridge: bridgeData
         ? {
             totalVolume: bridgeData.reduce(
-              (sum: number, entry: any) =>
-                sum + (entry.depositUSD || 0) + (entry.withdrawUSD || 0),
-              0,
+              (sum: number, entry: any) => sum + (entry.depositUSD || 0) + (entry.withdrawUSD || 0),
+              0
             ),
             inflows: bridgeData.reduce(
               (sum: number, entry: any) => sum + (entry.depositUSD || 0),
-              0,
+              0
             ),
             outflows: bridgeData.reduce(
               (sum: number, entry: any) => sum + (entry.withdrawUSD || 0),
-              0,
+              0
             ),
             netFlow: bridgeData.reduce(
-              (sum: number, entry: any) =>
-                sum + (entry.depositUSD || 0) - (entry.withdrawUSD || 0),
-              0,
+              (sum: number, entry: any) => sum + (entry.depositUSD || 0) - (entry.withdrawUSD || 0),
+              0
             ),
           }
         : {
@@ -133,18 +121,15 @@ export async function GET() {
         totalVolume7d: (dexData?.total7d || 0) + (optionsData?.total7d || 0),
         dexDominance:
           dexData?.total24h && optionsData?.total24h
-            ? (dexData.total24h / (dexData.total24h + optionsData.total24h)) *
-              100
+            ? (dexData.total24h / (dexData.total24h + optionsData.total24h)) * 100
             : 100,
-        avgDailyVolume:
-          ((dexData?.total7d || 0) + (optionsData?.total7d || 0)) / 7,
+        avgDailyVolume: ((dexData?.total7d || 0) + (optionsData?.total7d || 0)) / 7,
       },
 
       growth: {
         volume24hChange: dexData?.change_24h || 0,
         volume7dChange: dexData?.change_7d || 0,
-        isGrowing:
-          (dexData?.change_24h || 0) > 0 && (dexData?.change_7d || 0) > 0,
+        isGrowing: (dexData?.change_24h || 0) > 0 && (dexData?.change_7d || 0) > 0,
       },
     };
 
@@ -159,9 +144,6 @@ export async function GET() {
     return NextResponse.json(volumeMetrics);
   } catch (error) {
     apiLogger.error("Error fetching Aptos volume data:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch volume data" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Failed to fetch volume data" }, { status: 500 });
   }
 }

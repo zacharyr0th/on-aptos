@@ -8,10 +8,10 @@ export { defiProtocols };
 
 // Re-export category-specific protocols for direct access
 export {
-  tradingProtocols,
-  lendingProtocols,
-  yieldProtocols,
   derivativesProtocols,
-  launchpadProtocols,
   getProtocolsByCategory,
+  launchpadProtocols,
+  lendingProtocols,
+  tradingProtocols,
+  yieldProtocols,
 } from "./protocols/index";

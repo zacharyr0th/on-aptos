@@ -27,9 +27,7 @@ export function LayoutContent({ children }: LayoutContentProps) {
   return (
     <div className={containerClass}>
       {showHeader && <Header />}
-      <main className={isPortfolioPage ? "flex-1 overflow-hidden" : "flex-1"}>
-        {children}
-      </main>
+      <main className={isPortfolioPage ? "flex-1 overflow-hidden" : "flex-1"}>{children}</main>
       {showFooter && <Footer />}
     </div>
   );

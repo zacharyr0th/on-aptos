@@ -223,62 +223,7 @@
       "Protocol Suite": "Protocol Suite"
     }
   },
-  "protocols": {
-    "names": {
-      "Panora": "Panora",
-      "Kana": "Kana",
-      "Thetis": "Thetis",
-      "Anqa": "Anqa",
-      "LiquidSwap": "LiquidSwap",
-      "Cellana": "Cellana",
-      "PancakeSwap": "PancakeSwap",
-      "SushiSwap": "SushiSwap",
-      "Hyperion": "Hyperion",
-      "Tapp": "Tapp",
-      "Merkle": "Merkle",
-      "AGDEX": "AGDEX",
-      "Pump": "Pump",
-      "Aries": "Aries",
-      "Superposition": "Superposition",
-      "Joule": "Joule",
-      "Echelon": "Echelon",
-      "Meso": "Meso",
-      "TruFin": "TruFin",
-      "Amnis": "Amnis",
-      "Kofi": "Kofi",
-      "Ichi": "Ichi",
-      "Moar": "Moar",
-      "Thala": "Thala",
-      "Mirage": "Mirage"
-    },
-    "short_descriptions": {
-      "Panora": "Meta-DEX aggregator",
-      "Kana": "Cross-chain swap router",
-      "Thetis": "Multi-product trading platform",
-      "Anqa": "Advanced DEX aggregator",
-      "LiquidSwap": "First Aptos DEX",
-      "Cellana": "ve(3,3) AMM",
-      "PancakeSwap": "Popular multichain DEX",
-      "SushiSwap": "Cross-chain DeFi platform",
-      "Hyperion": "Hybrid trading platform",
-      "Tapp": "Hook-enabled modular DEX",
-      "Merkle": "Gamified perpetuals",
-      "AGDEX": "Cross-margin perps",
-      "Pump": "Meme token launchpad",
-      "Aries": "Compound-style lending",
-      "Superposition": "Advanced risk management",
-      "Joule": "Isolated lending pools",
-      "Echelon": "Multi-mode lending hub",
-      "Meso": "Capital-efficient lending",
-      "TruFin": "Enterprise liquid staking",
-      "Amnis": "Dual-token liquid staking",
-      "Kofi": "MEV-boosted staking",
-      "Ichi": "Automated liquidity manager",
-      "Moar": "Leveraged farming layer",
-      "Thala": "DeFi protocol suite",
-      "Mirage": "Composable liquidity layer"
-    }
-  },
+  "protocols": {},
   "protocol_descriptions": {
     "Panora": "\"Meta-DEX\" wey dey plug into on-chain order-book and 10+ AMMs, dey split orders across pools while e dey curate canonical token list wey dey auto-update for im UI.",
     "Kana": "Routes swaps across nine chains; Paymaster contract dey let users trade for Aptos without holding APT for gas; orderbook-based perp engine.",
@@ -303,21 +248,10 @@
     "Kofi": "MEV-boosted liquid staking with leveraged-LSD vaults.",
     "Ichi": "Automated Liquidity Manager vaults let projects seed single-sided liquidity; smart ranges rebalance to cut impermanent loss while treasuries earn swap fees for their native token.",
     "Moar": "Building leveraged-farm layer with cross-protocol credit accounts enabling users to borrow for one place and deploy for another.",
-    "Thala": "Suite of DeFi apps featuring multi-pool AMM, di over-collateralized MOD stablecoin, and liquid-staking via sthAPT and thAPT.",
-    "Mirage": "Composable liquidity layer powering DeFi next frontier. Deposit collateral and borrow self-repaying stablecoin loan powered by perpetuals. Features fully on-chain perps with CEX-like experience, instant execution, low fees, and up to 100x leverage."
+    "Thala": "Suite of DeFi apps featuring multi-pool AMM, di over-collateralized MOD stablecoin, and liquid-staking via sthAPT and thAPT."
   },
   "protocol_category_breakdown": {
     "Thala": "Trading • Yield • Credit"
-  },
-  "protocols": {
-    "mirage": {
-      "description": "Composable liquidity layer powering DeFi next frontier. Deposit collateral and borrow self-repaying stablecoin loan powered by perpetuals with up to 100x leverage.",
-      "categoryBreakdown": "Trading • Perps",
-      "feeStructure": "Dynamic fee structure based on trading volume and position size. Competitive rates for perpetual futures trading.",
-      "integration": {
-        "description": "Fully on-chain perpetuals with CEX-like experience. All positions, vaults, and orders dey tokenized as NFTs for secondary market trading."
-      }
-    }
   },
   "table": {
     "protocol": "Protocol",

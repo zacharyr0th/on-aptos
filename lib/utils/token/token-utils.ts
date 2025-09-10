@@ -5,11 +5,11 @@
 
 import { PANORA_TOKENS } from "@/lib/config/data";
 import {
+  CELER_STABLECOINS,
+  LAYERZERO_STABLECOINS,
   LST_TOKEN_ADDRESSES,
   STABLECOINS,
-  LAYERZERO_STABLECOINS,
   WORMHOLE_STABLECOINS,
-  CELER_STABLECOINS,
 } from "@/lib/constants";
 import { TOKEN_CATEGORY_COLORS } from "@/lib/constants/ui/colors";
 import { PanoraTokenListService } from "@/lib/services/portfolio/panora-token-list";
@@ -67,7 +67,7 @@ export function getTokenSymbol(
   metadata?: {
     symbol?: string;
     [key: string]: unknown;
-  },
+  }
 ): string | null {
   // Ensure assetType is a string
   if (!assetType || typeof assetType !== "string") {
@@ -153,10 +153,7 @@ export function isLST(assetType: string): boolean {
 /**
  * Categorize a single token
  */
-export function categorizeToken(
-  assetType: string,
-  symbol?: string,
-): TokenCategory {
+export function categorizeToken(assetType: string, symbol?: string): TokenCategory {
   // Check if it's explicitly marked as DeFi
   if (assetType === "DeFi Positions" || symbol === "DEFI") {
     return "DeFi";
@@ -185,7 +182,7 @@ export function processAllocationData(
     symbol: string;
     value: number;
     percentage: number;
-  }>,
+  }>
 ): {
   categories: CategoryAllocation[];
   topTokens: CategorizedToken[];
@@ -209,10 +206,7 @@ export function processAllocationData(
   });
 
   // Calculate total value
-  const totalValue = Array.from(categoryMap.values()).reduce(
-    (sum, val) => sum + val,
-    0,
-  );
+  const totalValue = Array.from(categoryMap.values()).reduce((sum, val) => sum + val, 0);
 
   // Convert to category allocations
   const categories: CategoryAllocation[] = Array.from(categoryMap.entries())
@@ -225,9 +219,7 @@ export function processAllocationData(
     .sort((a, b) => b.value - a.value);
 
   // Get top 3 tokens by value
-  const topTokens = categorizedTokens
-    .sort((a, b) => b.value - a.value)
-    .slice(0, 3);
+  const topTokens = categorizedTokens.sort((a, b) => b.value - a.value).slice(0, 3);
 
   return { categories, topTokens };
 }
@@ -250,8 +242,7 @@ export function isAptAsset(assetType: string): boolean {
   return (
     assetType === "0x1::aptos_coin::AptosCoin" ||
     assetType === "0xa" ||
-    assetType ===
-      "0x000000000000000000000000000000000000000000000000000000000000000a" ||
+    assetType === "0x000000000000000000000000000000000000000000000000000000000000000a" ||
     assetType.toLowerCase().includes("aptos") ||
     assetType.toLowerCase().includes("apt")
   );
@@ -288,7 +279,7 @@ export async function getTokenLogoUrl(
   metadata?: {
     symbol?: string;
     [key: string]: unknown;
-  },
+  }
 ): Promise<string | null> {
   try {
     // First try to get from Panora by address
@@ -307,9 +298,7 @@ export async function getTokenLogoUrl(
       if (isAllowedImageDomain(tokenInfo.logoUrl)) {
         return tokenInfo.logoUrl;
       } else {
-        logger.debug(
-          `Logo URL domain not allowed: ${tokenInfo.logoUrl}, using placeholder`,
-        );
+        logger.debug(`Logo URL domain not allowed: ${tokenInfo.logoUrl}, using placeholder`);
         return "/placeholder.jpg";
       }
     }
@@ -347,7 +336,7 @@ export function getTokenLogoUrlSync(
   metadata?: {
     symbol?: string;
     [key: string]: unknown;
-  },
+  }
 ): string | null {
   const symbol = getTokenSymbol(assetType, metadata);
 
@@ -385,7 +374,7 @@ export async function getTokenLogoUrlWithFallback(
     icon_uri?: string;
     symbol?: string;
     [key: string]: unknown;
-  },
+  }
 ): Promise<string> {
   // First try metadata icon_uri if it's a valid URL
   if (
@@ -404,9 +393,7 @@ export async function getTokenLogoUrlWithFallback(
           if (isAllowedImageDomain(iconUri)) {
             return iconUri;
           } else {
-            logger.debug(
-              `Metadata icon_uri domain not allowed: ${iconUri}, using placeholder`,
-            );
+            logger.debug(`Metadata icon_uri domain not allowed: ${iconUri}, using placeholder`);
             return "/placeholder.jpg";
           }
         }
@@ -449,7 +436,7 @@ export function getTokenLogoUrlWithFallbackSync(
     icon_uri?: string;
     symbol?: string;
     [key: string]: unknown;
-  },
+  }
 ): string {
   // First try metadata icon_uri if it's a valid URL
   if (
@@ -506,10 +493,7 @@ export function getTokenLogoUrlWithFallbackSync(
 /**
  * Copy to clipboard with error handling and toast notifications
  */
-export const copyToClipboard = async (
-  text: string,
-  _label: string = "Address",
-): Promise<void> => {
+export const copyToClipboard = async (text: string, _label: string = "Address"): Promise<void> => {
   if (!text) {
     logger.warn("Attempted to copy empty text to clipboard");
     return;
@@ -521,7 +505,7 @@ export const copyToClipboard = async (
     // toast.success(`${label} copied to clipboard`);
   } catch (error) {
     logger.error(
-      `Failed to copy to clipboard: ${error instanceof Error ? error.message : String(error)}`,
+      `Failed to copy to clipboard: ${error instanceof Error ? error.message : String(error)}`
     );
     // toast.error("Failed to copy to clipboard");
   }
@@ -530,11 +514,7 @@ export const copyToClipboard = async (
 /**
  * Truncate address for display
  */
-export const truncateAddress = (
-  address: string,
-  startChars = 8,
-  endChars = 8,
-): string => {
+export const truncateAddress = (address: string, startChars = 8, endChars = 8): string => {
   if (!address) return "";
   if (address.length <= startChars + endChars) return address;
   return `${address.slice(0, startChars)}...${address.slice(-endChars)}`;
@@ -550,7 +530,7 @@ export const formatTokenAmount = (
     showDecimals?: boolean;
     maxDecimals?: number;
     useGrouping?: boolean;
-  } = {},
+  } = {}
 ): string => {
   const { showDecimals = true, maxDecimals = 2, useGrouping = true } = options;
 
@@ -558,10 +538,10 @@ export const formatTokenAmount = (
     let numericAmount: number;
 
     if (typeof amount === "bigint") {
-      numericAmount = Number(amount) / Math.pow(10, decimals);
+      numericAmount = Number(amount) / 10 ** decimals;
     } else if (typeof amount === "string") {
       const cleanAmount = amount.replace(/[,\s]/g, "");
-      numericAmount = Number(cleanAmount) / Math.pow(10, decimals);
+      numericAmount = Number(cleanAmount) / 10 ** decimals;
     } else {
       numericAmount = Number(amount);
     }
@@ -592,7 +572,7 @@ export const formatTokenSupply = (
   options: {
     showSymbol?: boolean;
     maxDecimals?: number;
-  } = {},
+  } = {}
 ): string => {
   const { showSymbol = true, maxDecimals = 0 } = options;
 
@@ -618,7 +598,7 @@ export const formatUSDValue = (
   options: {
     decimals?: number;
     compact?: boolean;
-  } = {},
+  } = {}
 ): string => {
   const { decimals = 0, compact = true } = options;
 
@@ -685,10 +665,8 @@ export const validateTokenData = (token: {
 /**
  * Sort tokens by supply (descending)
  */
-export const sortTokensBySupply = <
-  T extends { symbol: string; supply: string },
->(
-  tokens: T[],
+export const sortTokensBySupply = <T extends { symbol: string; supply: string }>(
+  tokens: T[]
 ): T[] => {
   return tokens.filter(validateTokenData).sort((a, b) => {
     try {
@@ -705,7 +683,7 @@ export const sortTokensBySupply = <
 export class TokenFormattingError extends Error {
   constructor(
     message: string,
-    public readonly context?: Record<string, unknown>,
+    public readonly context?: Record<string, unknown>
   ) {
     super(message);
     this.name = "TokenFormattingError";
@@ -715,7 +693,7 @@ export class TokenFormattingError extends Error {
 export class TokenValidationError extends Error {
   constructor(
     message: string,
-    public readonly token?: unknown,
+    public readonly token?: unknown
   ) {
     super(message);
     this.name = "TokenValidationError";

@@ -5,10 +5,7 @@
 
 import { PANORA_TOKENS } from "@/lib/config/data";
 import { LST_TOKEN_ADDRESSES } from "@/lib/constants";
-import {
-  ALL_STABLECOINS,
-  LEGITIMATE_STABLECOINS,
-} from "@/lib/constants/tokens/stablecoins";
+import { ALL_STABLECOINS, LEGITIMATE_STABLECOINS } from "@/lib/constants/tokens/stablecoins";
 import { PanoraTokenListService } from "@/lib/utils/api/panora-token-list";
 import { logger } from "@/lib/utils/core/logger";
 
@@ -68,7 +65,7 @@ const ALLOWED_IMAGE_DOMAINS = [
  */
 export function getTokenSymbol(
   assetType: string,
-  metadata?: { symbol?: string; icon_uri?: string; logo_url?: string },
+  metadata?: { symbol?: string; icon_uri?: string; logo_url?: string }
 ): string | null {
   // Try to get symbol from metadata first
   if (metadata?.symbol) {
@@ -119,10 +116,7 @@ export function isLST(assetType: string): boolean {
   // Check if it's in the LST addresses object
   for (const provider of Object.values(LST_TOKEN_ADDRESSES)) {
     for (const token of Object.values(provider)) {
-      if (
-        ("coin" in token && token.coin === assetType) ||
-        token.fa === assetType
-      ) {
+      if (("coin" in token && token.coin === assetType) || token.fa === assetType) {
         return true;
       }
     }
@@ -139,10 +133,7 @@ export function isLST(assetType: string): boolean {
 /**
  * Categorize a single token
  */
-export function categorizeToken(
-  assetType: string,
-  symbol?: string,
-): TokenCategory {
+export function categorizeToken(assetType: string, symbol?: string): TokenCategory {
   // Check if it's explicitly marked as DeFi
   if (assetType === "DeFi Positions" || symbol === "DEFI") {
     return "DeFi";
@@ -171,7 +162,7 @@ export function processAllocationData(
     symbol: string;
     value: number;
     percentage: number;
-  }>,
+  }>
 ): {
   categories: CategoryAllocation[];
   topTokens: CategorizedToken[];
@@ -195,10 +186,7 @@ export function processAllocationData(
   });
 
   // Calculate total value
-  const totalValue = Array.from(categoryMap.values()).reduce(
-    (sum, val) => sum + val,
-    0,
-  );
+  const totalValue = Array.from(categoryMap.values()).reduce((sum, val) => sum + val, 0);
 
   // Convert to category allocations
   const categories: CategoryAllocation[] = Array.from(categoryMap.entries())
@@ -211,9 +199,7 @@ export function processAllocationData(
     .sort((a, b) => b.value - a.value);
 
   // Get top 3 tokens by value
-  const topTokens = categorizedTokens
-    .sort((a, b) => b.value - a.value)
-    .slice(0, 3);
+  const topTokens = categorizedTokens.sort((a, b) => b.value - a.value).slice(0, 3);
 
   return { categories, topTokens };
 }
@@ -236,8 +222,7 @@ export function isAptAsset(assetType: string): boolean {
   return (
     assetType === "0x1::aptos_coin::AptosCoin" ||
     assetType === "0xa" ||
-    assetType ===
-      "0x000000000000000000000000000000000000000000000000000000000000000a" ||
+    assetType === "0x000000000000000000000000000000000000000000000000000000000000000a" ||
     assetType.toLowerCase().includes("aptos") ||
     assetType.toLowerCase().includes("apt")
   );
@@ -271,7 +256,7 @@ function isAllowedImageDomain(url: string): boolean {
  */
 export async function getTokenLogoUrl(
   assetType: string,
-  metadata?: { symbol?: string; icon_uri?: string; logo_url?: string },
+  metadata?: { symbol?: string; icon_uri?: string; logo_url?: string }
 ): Promise<string | null> {
   try {
     // First try to get from Panora by address
@@ -290,9 +275,7 @@ export async function getTokenLogoUrl(
       if (isAllowedImageDomain(tokenInfo.logoUrl)) {
         return tokenInfo.logoUrl;
       } else {
-        logger.debug(
-          `Logo URL domain not allowed: ${tokenInfo.logoUrl}, using placeholder`,
-        );
+        logger.debug(`Logo URL domain not allowed: ${tokenInfo.logoUrl}, using placeholder`);
         return "/placeholder.jpg";
       }
     }
@@ -327,7 +310,7 @@ export async function getTokenLogoUrl(
  */
 export function getTokenLogoUrlSync(
   assetType: string,
-  metadata?: { symbol?: string; icon_uri?: string; logo_url?: string },
+  metadata?: { symbol?: string; icon_uri?: string; logo_url?: string }
 ): string | null {
   const symbol = getTokenSymbol(assetType, metadata);
 
@@ -361,7 +344,7 @@ export function getTokenLogoUrlSync(
  */
 export async function getTokenLogoUrlWithFallback(
   assetType: string,
-  metadata?: { symbol?: string; icon_uri?: string; logo_url?: string },
+  metadata?: { symbol?: string; icon_uri?: string; logo_url?: string }
 ): Promise<string> {
   // First try metadata icon_uri if it's a valid URL
   if (
@@ -380,9 +363,7 @@ export async function getTokenLogoUrlWithFallback(
           if (isAllowedImageDomain(iconUri)) {
             return iconUri;
           } else {
-            logger.debug(
-              `Metadata icon_uri domain not allowed: ${iconUri}, using placeholder`,
-            );
+            logger.debug(`Metadata icon_uri domain not allowed: ${iconUri}, using placeholder`);
             return "/placeholder.jpg";
           }
         }
@@ -421,7 +402,7 @@ export async function getTokenLogoUrlWithFallback(
  */
 export function getTokenLogoUrlWithFallbackSync(
   assetType: string,
-  metadata?: { symbol?: string; icon_uri?: string; logo_url?: string },
+  metadata?: { symbol?: string; icon_uri?: string; logo_url?: string }
 ): string {
   // First try metadata icon_uri if it's a valid URL
   if (

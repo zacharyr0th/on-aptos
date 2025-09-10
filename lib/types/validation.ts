@@ -107,7 +107,7 @@ export const DeFiPositionSchema = z.object({
           amount: z.string(),
           value: z.number(),
           apy: z.number().optional(),
-        }),
+        })
       )
       .optional(),
     borrowed: z
@@ -117,7 +117,7 @@ export const DeFiPositionSchema = z.object({
           amount: z.string(),
           value: z.number(),
           apy: z.number().optional(),
-        }),
+        })
       )
       .optional(),
     staked: z
@@ -127,7 +127,7 @@ export const DeFiPositionSchema = z.object({
           amount: z.string(),
           value: z.number(),
           apy: z.number().optional(),
-        }),
+        })
       )
       .optional(),
     liquidity: z
@@ -151,7 +151,7 @@ export const DeFiPositionSchema = z.object({
             })
             .optional(),
           apy: z.number().optional(),
-        }),
+        })
       )
       .optional(),
     rewards: z
@@ -160,7 +160,7 @@ export const DeFiPositionSchema = z.object({
           asset: z.string(),
           amount: z.string(),
           value: z.number(),
-        }),
+        })
       )
       .optional(),
   }),
@@ -234,7 +234,7 @@ export const NFTCollectionStatsSchema = z.object({
     z.object({
       name: z.string(),
       count: z.number(),
-    }),
+    })
   ),
   totalCollections: z.number(),
   concentrationTop3: z.number(),
@@ -402,8 +402,6 @@ export type ValidatedFungibleAsset = z.infer<typeof FungibleAssetSchema>;
 export type ValidatedDeFiPosition = z.infer<typeof DeFiPositionSchema>;
 export type ValidatedTransaction = z.infer<typeof TransactionSchema>;
 export type ValidatedPortfolioData = z.infer<typeof PortfolioDataSchema>;
-export type ValidatedPortfolioResponse = z.infer<
-  typeof PortfolioResponseSchema
->;
+export type ValidatedPortfolioResponse = z.infer<typeof PortfolioResponseSchema>;
 
 // Schemas are already exported above - no need to re-export

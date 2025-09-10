@@ -224,16 +224,7 @@
       "Protocol Suite": "Suite de Protocolos"
     }
   },
-  "protocols": {
-    "mirage": {
-      "description": "Composable liquidity layer bringing next-gen DeFi. Deposit collateral and borrow self-repaying stablecoin loans powered by perpetuals with up to 100x leverage.",
-      "categoryBreakdown": "Trading • Perps",
-      "feeStructure": "Dynamic fee structure based on trading volume and position size. Competitive fees for perpetual futures trading.",
-      "integration": {
-        "description": "Fully on-chain perpetuals with CEX-like experience. All positions, vaults, and orders are represented as NFTs for secondary market trading."
-      }
-    }
-  },
+  "protocols": {},
   "protocol_descriptions": {
     "Panora": "Un \"meta-DEX\" que se conecta a un libro de órdenes en cadena y más de 10 AMMs, dividiendo órdenes entre pools mientras mantiene una lista canónica de tokens que se actualiza automáticamente en su interfaz.",
     "Kana": "Enruta intercambios a través de nueve cadenas; un contrato Paymaster permite a los usuarios operar en Aptos sin poseer APT para gas; un motor de perpetuos basado en libro de órdenes.",
@@ -258,8 +249,7 @@
     "Kofi": "Staking líquido potenciado por MEV con bóvedas LSD apalancadas.",
     "Ichi": "Las bóvedas del Gestor de Liquidez Automatizado permiten a los proyectos sembrar liquidez unilateral; los rangos inteligentes se rebalancean para reducir la pérdida impermanente mientras las tesorerías ganan comisiones de intercambio en su token nativo.",
     "Moar": "Construyendo una capa de farming apalancado con cuentas de crédito entre protocolos que permiten a los usuarios pedir prestado en un lugar y desplegar en otro.",
-    "Thala": "Una suite de aplicaciones DeFi que incluye un AMM multi-pool, la stablecoin sobre-colateralizada MOD, y staking líquido vía sthAPT y thAPT.",
-    "Mirage": "A composable liquidity layer powering DeFi's next frontier. Deposit collateral and borrow a self-repaying stablecoin loan powered by perpetuals. Features fully on-chain perps with CEX-like experience, instant execution, low fees, and up to 100x leverage."
+    "Thala": "Una suite de aplicaciones DeFi que incluye un AMM multi-pool, la stablecoin sobre-colateralizada MOD, y staking líquido vía sthAPT y thAPT."
   },
   "protocol_category_breakdown": {
     "Thala": "Trading • Rendimiento • Crédito"

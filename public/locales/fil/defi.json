@@ -223,62 +223,7 @@
       "Protocol Suite": "Protocol Suite"
     }
   },
-  "protocols": {
-    "names": {
-      "Panora": "Panora",
-      "Kana": "Kana",
-      "Thetis": "Thetis",
-      "Anqa": "Anqa",
-      "LiquidSwap": "LiquidSwap",
-      "Cellana": "Cellana",
-      "PancakeSwap": "PancakeSwap",
-      "SushiSwap": "SushiSwap",
-      "Hyperion": "Hyperion",
-      "Tapp": "Tapp",
-      "Merkle": "Merkle",
-      "AGDEX": "AGDEX",
-      "Pump": "Pump",
-      "Aries": "Aries",
-      "Superposition": "Superposition",
-      "Joule": "Joule",
-      "Echelon": "Echelon",
-      "Meso": "Meso",
-      "TruFin": "TruFin",
-      "Amnis": "Amnis",
-      "Kofi": "Kofi",
-      "Ichi": "Ichi",
-      "Moar": "Moar",
-      "Thala": "Thala",
-      "Mirage": "Mirage"
-    },
-    "short_descriptions": {
-      "Panora": "Meta-DEX aggregator",
-      "Kana": "Cross-chain swap router",
-      "Thetis": "Multi-product trading platform",
-      "Anqa": "Advanced DEX aggregator",
-      "LiquidSwap": "Unang DEX sa Aptos",
-      "Cellana": "ve(3,3) AMM",
-      "PancakeSwap": "Popular multichain DEX",
-      "SushiSwap": "Cross-chain DeFi platform",
-      "Hyperion": "Hybrid trading platform",
-      "Tapp": "Hook-enabled modular DEX",
-      "Merkle": "Gamified perpetuals",
-      "AGDEX": "Cross-margin perps",
-      "Pump": "Meme token launchpad",
-      "Aries": "Compound-style lending",
-      "Superposition": "Advanced risk management",
-      "Joule": "Isolated lending pools",
-      "Echelon": "Multi-mode lending hub",
-      "Meso": "Capital-efficient lending",
-      "TruFin": "Enterprise liquid staking",
-      "Amnis": "Dual-token liquid staking",
-      "Kofi": "MEV-boosted staking",
-      "Ichi": "Automated liquidity manager",
-      "Moar": "Leveraged farming layer",
-      "Thala": "DeFi protocol suite",
-      "Mirage": "Composable liquidity layer"
-    }
-  },
+  "protocols": {},
   "protocol_descriptions": {
     "Panora": "Isang \"meta-DEX\" na kumokonekta sa on-chain order-book at 10+ AMMs, hinahati ang orders sa mga pool habang nag-aalaga ng canonical token list na awtomatikong nag-a-update sa UI.",
     "Kana": "Nag-r-route ng swaps sa siyam na chains; ang Paymaster contract ay nagbibigay-daan sa users na mag-trade sa Aptos nang walang APT para sa gas; may orderbook-based perp engine.",
@@ -303,21 +248,10 @@
     "Kofi": "MEV-boosted liquid staking na may leveraged-LSD vaults.",
     "Ichi": "Ang Automated Liquidity Manager vaults ay nagbibigay-daan sa projects na mag-seed ng single-sided liquidity; ang smart ranges ay nag-r-rebalance para mabawasan ang impermanent loss habang kumikita ang treasuries ng swap fees sa kanilang native token.",
     "Moar": "Gumagawa ng leveraged-farm layer na may cross-protocol credit accounts na nagbibigay-daan sa users na humiram sa isang lugar at mag-deploy sa iba.",
-    "Thala": "Isang suite ng DeFi apps na may multi-pool AMM, over-collateralized MOD stablecoin, at liquid-staking sa pamamagitan ng sthAPT at thAPT.",
-    "Mirage": "Isang composable liquidity layer na nagpapalakas ng susunod na frontier ng DeFi. Mag-deposit ng collateral at humiram ng self-repaying stablecoin loan na powered ng perpetuals. May fully on-chain perps na may CEX-like experience, instant execution, mababang fees, at hanggang 100x leverage."
+    "Thala": "Isang suite ng DeFi apps na may multi-pool AMM, over-collateralized MOD stablecoin, at liquid-staking sa pamamagitan ng sthAPT at thAPT."
   },
   "protocol_category_breakdown": {
     "Thala": "Trading • Yield • Credit"
-  },
-  "protocols": {
-    "mirage": {
-      "description": "Isang composable liquidity layer na nagpapalakas ng susunod na frontier ng DeFi. Mag-deposit ng collateral at humiram ng self-repaying stablecoin loan na powered ng perpetuals na may hanggang 100x leverage.",
-      "categoryBreakdown": "Trading • Perps",
-      "feeStructure": "Dynamic fee structure batay sa trading volume at position size. Competitive rates para sa perpetual futures trading.",
-      "integration": {
-        "description": "Fully on-chain perpetuals na may CEX-like experience. Lahat ng positions, vaults, at orders ay tokenized bilang NFTs para sa secondary market trading."
-      }
-    }
   },
   "table": {
     "protocol": "Protocol",

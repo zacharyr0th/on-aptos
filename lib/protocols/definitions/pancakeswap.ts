@@ -2,7 +2,7 @@
  * PancakeSwap Protocol Definition
  */
 
-import { ProtocolDefinition, ProtocolType, PositionType } from "../types";
+import { PositionType, type ProtocolDefinition, ProtocolType } from "../types";
 
 export const PancakeSwapProtocol: ProtocolDefinition = {
   metadata: {
@@ -30,10 +30,10 @@ export const PancakeSwapProtocol: ProtocolDefinition = {
         priority: 100,
         extractAssets: (data) => [
           {
-            address: data.type,
+            address: (data as any).type,
             symbol: "CAKE-LP",
             decimals: 8,
-            amount: data?.data?.balance || "0",
+            amount: (data as any)?.data?.balance || "0",
           },
         ],
       },
@@ -43,10 +43,10 @@ export const PancakeSwapProtocol: ProtocolDefinition = {
         priority: 90,
         extractAssets: (data) => [
           {
-            address: data.type,
+            address: (data as any).type,
             symbol: "CAKE-FARM",
             decimals: 8,
-            amount: data?.data?.amount || "0",
+            amount: (data as any)?.data?.amount || "0",
           },
         ],
       },

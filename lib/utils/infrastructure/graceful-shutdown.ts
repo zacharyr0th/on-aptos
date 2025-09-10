@@ -20,12 +20,9 @@ class GracefulShutdown {
    */
   register(handler: ShutdownHandler): void {
     if (this.isShuttingDown) {
-      logger.warn(
-        "[GracefulShutdown] Cannot register handler during shutdown",
-        {
-          handler: handler.name,
-        },
-      );
+      logger.warn("[GracefulShutdown] Cannot register handler during shutdown", {
+        handler: handler.name,
+      });
       return;
     }
 
@@ -48,10 +45,7 @@ class GracefulShutdown {
     const results = await Promise.allSettled(
       this.handlers.map(async ({ name, handler, timeout = 5000 }) => {
         const timeoutPromise = new Promise<never>((_, reject) =>
-          setTimeout(
-            () => reject(new Error(`Handler timeout: ${name}`)),
-            timeout,
-          ),
+          setTimeout(() => reject(new Error(`Handler timeout: ${name}`)), timeout)
         );
 
         try {
@@ -66,7 +60,7 @@ class GracefulShutdown {
           });
           throw error;
         }
-      }),
+      })
     );
 
     // Log results
@@ -93,10 +87,7 @@ class GracefulShutdown {
 
     const shutdownPromise = this.executeHandlers();
     const timeoutPromise = new Promise<never>((_, reject) =>
-      setTimeout(
-        () => reject(new Error("Graceful shutdown timeout")),
-        this.shutdownTimeout,
-      ),
+      setTimeout(() => reject(new Error("Graceful shutdown timeout")), this.shutdownTimeout)
     );
 
     try {
@@ -121,9 +112,7 @@ class GracefulShutdown {
   setupSignalHandlers(): void {
     // Only setup signal handlers in Node.js runtime
     if (!isNodeRuntime) {
-      logger.warn(
-        "[GracefulShutdown] Skipping signal handlers - not in Node.js runtime",
-      );
+      logger.warn("[GracefulShutdown] Skipping signal handlers - not in Node.js runtime");
       return;
     }
 

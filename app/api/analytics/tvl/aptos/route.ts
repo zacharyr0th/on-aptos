@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-
-import { apiLogger } from "@/lib/utils/core/logger";
 import { UnifiedCache } from "@/lib/utils/cache/unified-cache";
+import { apiLogger } from "@/lib/utils/core/logger";
 
 const cache = new UnifiedCache({ ttl: 5 * 60 * 1000 }); // 5 minutes
 
@@ -36,20 +35,14 @@ export async function GET() {
 
       if (tvlResponse.ok) {
         currentTvl = await tvlResponse.json();
-        apiLogger.info(
-          "Aptos TVL from direct endpoint (fallback):",
-          currentTvl,
-        );
+        apiLogger.info("Aptos TVL from direct endpoint (fallback):", currentTvl);
       }
     }
 
     // Fetch historical TVL data
-    const historicalResponse = await fetch(
-      "https://api.llama.fi/v2/historicalChainTvl/aptos",
-      {
-        next: { revalidate: 300 },
-      },
-    );
+    const historicalResponse = await fetch("https://api.llama.fi/v2/historicalChainTvl/aptos", {
+      next: { revalidate: 300 },
+    });
 
     let historicalData = null;
     if (historicalResponse.ok) {
@@ -62,10 +55,7 @@ export async function GET() {
 
     if (chainsData) {
       const aptos = chainsData.find((chain: any) => chain.name === "Aptos");
-      const totalTvl = chainsData.reduce(
-        (sum: number, chain: any) => sum + (chain.tvl || 0),
-        0,
-      );
+      const totalTvl = chainsData.reduce((sum: number, chain: any) => sum + (chain.tvl || 0), 0);
 
       chainComparison = {
         aptos: aptos?.tvl || 0,
@@ -105,9 +95,6 @@ export async function GET() {
     return NextResponse.json(result);
   } catch (error) {
     apiLogger.error("Error fetching Aptos TVL data:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch TVL data" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Failed to fetch TVL data" }, { status: 500 });
   }
 }

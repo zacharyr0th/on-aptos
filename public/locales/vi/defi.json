@@ -223,62 +223,7 @@
       "Protocol Suite": "Bộ giao thức"
     }
   },
-  "protocols": {
-    "names": {
-      "Panora": "Panora",
-      "Kana": "Kana",
-      "Thetis": "Thetis",
-      "Anqa": "Anqa",
-      "LiquidSwap": "LiquidSwap",
-      "Cellana": "Cellana",
-      "PancakeSwap": "PancakeSwap",
-      "SushiSwap": "SushiSwap",
-      "Hyperion": "Hyperion",
-      "Tapp": "Tapp",
-      "Merkle": "Merkle",
-      "AGDEX": "AGDEX",
-      "Pump": "Pump",
-      "Aries": "Aries",
-      "Superposition": "Superposition",
-      "Joule": "Joule",
-      "Echelon": "Echelon",
-      "Meso": "Meso",
-      "TruFin": "TruFin",
-      "Amnis": "Amnis",
-      "Kofi": "Kofi",
-      "Ichi": "Ichi",
-      "Moar": "Moar",
-      "Thala": "Thala",
-      "Mirage": "Mirage"
-    },
-    "short_descriptions": {
-      "Panora": "Tổng hợp meta-DEX",
-      "Kana": "Bộ định tuyến hoán đổi chuỗi chéo",
-      "Thetis": "Nền tảng giao dịch đa sản phẩm",
-      "Anqa": "Tổng hợp DEX nâng cao",
-      "LiquidSwap": "DEX đầu tiên trên Aptos",
-      "Cellana": "ve(3,3) AMM",
-      "PancakeSwap": "DEX đa chuỗi phổ biến",
-      "SushiSwap": "Nền tảng DeFi chuỗi chéo",
-      "Hyperion": "Nền tảng giao dịch kết hợp",
-      "Tapp": "DEX mô-đun có hook",
-      "Merkle": "Hợp đồng vĩnh viễn game hóa",
-      "AGDEX": "Hợp đồng vĩnh viễn margin chéo",
-      "Pump": "Launchpad token meme",
-      "Aries": "Cho vay kiểu Compound",
-      "Superposition": "Quản lý rủi ro nâng cao",
-      "Joule": "Pool cho vay cách ly",
-      "Echelon": "Trung tâm cho vay đa chế độ",
-      "Meso": "Cho vay hiệu quả vốn",
-      "TruFin": "Staking thanh khoản doanh nghiệp",
-      "Amnis": "Staking thanh khoản hai token",
-      "Kofi": "Staking tăng cường MEV",
-      "Ichi": "Quản lý thanh khoản tự động",
-      "Moar": "Lớp farming đòn bẩy",
-      "Thala": "Bộ giao thức DeFi",
-      "Mirage": "Lớp thanh khoản kết hợp"
-    }
-  },
+  "protocols": {},
   "protocol_descriptions": {
     "Panora": "Một \"meta-DEX\" kết nối với sổ lệnh on-chain và hơn 10 AMM, chia lệnh qua các pool trong khi quản lý danh sách token chính thức tự động cập nhật trong giao diện.",
     "Kana": "Định tuyến hoán đổi qua chín chuỗi; hợp đồng Paymaster cho phép người dùng giao dịch trên Aptos mà không cần giữ APT cho gas; công cụ perp dựa trên sổ lệnh.",
@@ -303,21 +248,10 @@
     "Kofi": "Staking thanh khoản tăng cường MEV với vault LSD đòn bẩy.",
     "Ichi": "Vault Quản lý Thanh khoản Tự động cho phép dự án gieo thanh khoản một chiều; khoảng thông minh cân bằng lại để cắt giảm tổn thất tạm thời trong khi ngân quỹ kiếm phí hoán đổi bằng token gốc của họ.",
     "Moar": "Xây dựng lớp farm đòn bẩy với tài khoản tín dụng xuyên giao thức cho phép người dùng vay ở một nơi và triển khai ở nơi khác.",
-    "Thala": "Bộ ứng dụng DeFi có AMM đa pool, stablecoin MOD thế chấp quá mức và liquid-staking qua sthAPT và thAPT.",
-    "Mirage": "Lớp thanh khoản kết hợp thúc đẩy biên giới tiếp theo của DeFi. Gửi tài sản thế chấp và vay khoản vay stablecoin tự trả được cung cấp bởi hợp đồng vĩnh viễn. Có perp hoàn toàn on-chain với trải nghiệm như CEX, thực thi tức thì, phí thấp và đòn bẩy lên đến 100x."
+    "Thala": "Bộ ứng dụng DeFi có AMM đa pool, stablecoin MOD thế chấp quá mức và liquid-staking qua sthAPT và thAPT."
   },
   "protocol_category_breakdown": {
     "Thala": "Giao dịch • Lợi suất • Tín dụng"
-  },
-  "protocols": {
-    "mirage": {
-      "description": "Lớp thanh khoản kết hợp thúc đẩy biên giới tiếp theo của DeFi. Gửi tài sản thế chấp và vay khoản vay stablecoin tự trả được cung cấp bởi hợp đồng vĩnh viễn với đòn bẩy lên đến 100x.",
-      "categoryBreakdown": "Giao dịch • Hợp đồng vĩnh viễn",
-      "feeStructure": "Cấu trúc phí động dựa trên khối lượng giao dịch và kích thước vị thế. Mức phí cạnh tranh cho giao dịch hợp đồng tương lai vĩnh viễn.",
-      "integration": {
-        "description": "Hợp đồng vĩnh viễn hoàn toàn on-chain với trải nghiệm như CEX. Tất cả vị thế, vault và lệnh được token hóa thành NFT để giao dịch thị trường thứ cấp."
-      }
-    }
   },
   "table": {
     "protocol": "Giao thức",

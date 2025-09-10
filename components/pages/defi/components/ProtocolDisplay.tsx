@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useResponsive } from "@/hooks/useResponsive";
 import { usePageTranslation } from "@/hooks/useTranslation";
 
-import { defiProtocols } from "../data";
+import type { defiProtocols } from "../data";
 
 import { VirtualizedProtocolTable } from "./VirtualizedProtocolTable";
 
@@ -24,10 +24,7 @@ export const ProtocolDisplay = React.memo(function ProtocolDisplay({
     return (
       <div className="text-center py-8 md:py-12 px-4">
         <p className="text-muted-foreground mb-4 text-sm md:text-base">
-          {t(
-            "defi:search.no_results",
-            "No protocols found matching your criteria.",
-          )}
+          {t("defi:search.no_results", "No protocols found matching your criteria.")}
         </p>
         <Button
           variant="outline"

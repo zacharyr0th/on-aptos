@@ -1,51 +1,18 @@
 import { logger } from "@/lib/utils/core/logger";
-import {
-  resolveIPFSUrl,
-  IPFS_GATEWAYS,
-  extractIPFSHash,
-} from "@/lib/utils/infrastructure/ipfs-gateway-fallback";
 
-// Function to convert IPFS URL to HTTP URL
-export async function convertIPFSToHTTP(url: string): Promise<string> {
-  if (!url) return "";
-
-  // Use the new fallback mechanism for IPFS URLs
-  const resolvedUrl = await resolveIPFSUrl(url);
-
-  // Handle Arweave protocol
-  if (url.startsWith("ar://")) {
-    const hash = url.replace("ar://", "");
-    return `${ARWEAVE_GATEWAYS[0]}${hash}`;
-  }
-
-  return resolvedUrl;
-}
-
-// Synchronous version for immediate rendering (uses default gateway)
-export function convertIPFSToHTTPSync(url: string): string {
-  if (!url) return "";
-
-  // Handle IPFS protocol
-  if (url.startsWith("ipfs://")) {
-    const hash = url.slice(7);
-    return `${IPFS_GATEWAYS[0]}${hash}`;
-  }
-
-  // Handle Arweave protocol
-  if (url.startsWith("ar://")) {
-    const hash = url.replace("ar://", "");
-    return `${ARWEAVE_GATEWAYS[0]}${hash}`;
-  }
-
-  // Extract IPFS hash from HTTP URLs and convert to preferred gateway
-  const ipfsHash = extractIPFSHash(url);
-  if (ipfsHash) {
-    return `${IPFS_GATEWAYS[0]}${ipfsHash}`;
-  }
-
-  // Return as-is for other URLs
-  return url;
-}
+// Common IPFS gateways
+const IPFS_GATEWAYS = [
+  "https://ipfs.io/ipfs/",
+  "https://gateway.ipfs.io/ipfs/",
+  "https://cloudflare-ipfs.com/ipfs/",
+  "https://gateway.pinata.cloud/ipfs/",
+  "https://ipfs.infura.io/ipfs/",
+  "https://ipfs.4everland.io/ipfs/",
+  "https://ipfs.filebase.io/ipfs/",
+  "https://ipfs.w3s.link/ipfs/",
+  "https://ipfs.dweb.link/ipfs/",
+  "https://nftstorage.link/ipfs/",
+];
 
 // Common Arweave gateways
 const ARWEAVE_GATEWAYS = [
@@ -71,11 +38,11 @@ interface NFTMetadata {
  */
 export async function extractNFTImageUrl(
   tokenUri: string | undefined,
-  cdnImageUri: string | undefined,
+  cdnImageUri: string | undefined
 ): Promise<string | undefined> {
   // Prefer CDN image if available
   if (cdnImageUri) {
-    return await convertIPFSToHTTP(cdnImageUri);
+    return cdnImageUri;
   }
 
   if (!tokenUri) {
@@ -83,25 +50,40 @@ export async function extractNFTImageUrl(
   }
 
   try {
-    // Convert IPFS/Arweave URLs to HTTP
-    const httpUrl = await convertIPFSToHTTP(tokenUri);
-
-    // Handle IPFS URIs - don't try to validate, just return converted URL
+    // Handle IPFS URIs
     if (tokenUri.startsWith("ipfs://")) {
-      return httpUrl;
+      const ipfsHash = tokenUri.replace("ipfs://", "");
+      // Try multiple gateways
+      for (const gateway of IPFS_GATEWAYS) {
+        try {
+          const url = `${gateway}${ipfsHash}`;
+          const response = await fetch(url, {
+            method: "HEAD",
+            signal: AbortSignal.timeout(5000),
+          });
+          if (response.ok) {
+            return url;
+          }
+        } catch {
+          // Try next gateway
+        }
+      }
+      // Default to first gateway if none work
+      return `${IPFS_GATEWAYS[0]}${ipfsHash}`;
     }
 
     // Handle Arweave URIs
     if (tokenUri.startsWith("ar://")) {
-      return httpUrl;
+      const arweaveId = tokenUri.replace("ar://", "");
+      return `${ARWEAVE_GATEWAYS[0]}${arweaveId}`;
     }
 
     // Handle direct HTTP/HTTPS URLs
-    if (httpUrl.startsWith("http://") || httpUrl.startsWith("https://")) {
+    if (tokenUri.startsWith("http://") || tokenUri.startsWith("https://")) {
       // If it's a JSON metadata URL, fetch and extract image
-      if (httpUrl.endsWith(".json") || httpUrl.includes("/metadata/")) {
+      if (tokenUri.endsWith(".json") || tokenUri.includes("/metadata/")) {
         try {
-          const response = await fetch(httpUrl, {
+          const response = await fetch(tokenUri, {
             signal: AbortSignal.timeout(5000),
           });
           if (response.ok) {
@@ -112,30 +94,22 @@ export async function extractNFTImageUrl(
             }
           }
         } catch (error) {
-          logger.debug(`Failed to fetch NFT metadata from ${httpUrl}:`, error);
+          logger.warn(`Failed to fetch NFT metadata from ${tokenUri}:`, error);
         }
       }
 
       // Return as-is if it looks like an image URL
-      const imageExtensions = [
-        ".jpg",
-        ".jpeg",
-        ".png",
-        ".gif",
-        ".webp",
-        ".svg",
-        ".bmp",
-      ];
-      if (imageExtensions.some((ext) => httpUrl.toLowerCase().includes(ext))) {
-        return httpUrl;
+      const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg", ".bmp"];
+      if (imageExtensions.some((ext) => tokenUri.toLowerCase().includes(ext))) {
+        return tokenUri;
       }
 
       // Otherwise return the URL and let the frontend handle it
-      return httpUrl;
+      return tokenUri;
     }
 
-    // Return converted URL if we can't process it
-    return httpUrl;
+    // Return original if we can't process it
+    return tokenUri;
   } catch (error) {
     logger.error("Error extracting NFT image URL:", error);
     return undefined;
@@ -192,8 +166,7 @@ export function isSafeImageUrl(url: string): boolean {
 
     // Check if hostname ends with any safe domain
     return safeDomains.some(
-      (domain) =>
-        urlObj.hostname === domain || urlObj.hostname.endsWith(`.${domain}`),
+      (domain) => urlObj.hostname === domain || urlObj.hostname.endsWith(`.${domain}`)
     );
   } catch {
     return false;
@@ -205,7 +178,7 @@ export function isSafeImageUrl(url: string): boolean {
  */
 export async function processNFTTokenUri(
   tokenUri: string | undefined,
-  cdnImageUri: string | undefined,
+  cdnImageUri: string | undefined
 ): Promise<string> {
   const imageUrl = await extractNFTImageUrl(tokenUri, cdnImageUri);
 
@@ -213,16 +186,41 @@ export async function processNFTTokenUri(
     return "/placeholder.jpg";
   }
 
-  // For IPFS and Arweave URLs, we trust the gateway conversion
-  if (tokenUri?.startsWith("ipfs://") || tokenUri?.startsWith("ar://")) {
-    return imageUrl;
-  }
-
-  // Validate other URLs are safe
+  // Validate the URL is safe
   if (!isSafeImageUrl(imageUrl)) {
-    logger.debug(`Unsafe image URL blocked: ${imageUrl}`);
+    logger.warn(`Unsafe image URL blocked: ${imageUrl}`);
     return "/placeholder.jpg";
   }
 
   return imageUrl;
+}
+
+/**
+ * Synchronously converts IPFS URLs to HTTP URLs
+ * This is a simplified version for immediate UI rendering
+ */
+export function convertIPFSToHTTPSync(url: string | undefined): string {
+  if (!url) {
+    return "/placeholder.jpg";
+  }
+
+  // Convert IPFS URLs to HTTP URLs
+  if (url.startsWith("ipfs://")) {
+    const hash = url.replace("ipfs://", "");
+    return `${IPFS_GATEWAYS[0]}${hash}`;
+  }
+
+  // Convert Arweave URLs
+  if (url.startsWith("ar://")) {
+    const hash = url.replace("ar://", "");
+    return `${ARWEAVE_GATEWAYS[0]}${hash}`;
+  }
+
+  // Return as-is if already HTTP(S)
+  if (url.startsWith("http://") || url.startsWith("https://")) {
+    return url;
+  }
+
+  // For relative paths or other protocols, return placeholder
+  return "/placeholder.jpg";
 }

@@ -1,4 +1,4 @@
-import { TokenMetadata } from "@/lib/types/tokens";
+import type { TokenMetadata } from "@/lib/types/tokens";
 
 // Utility functions
 const generateExplorerLink = (address: string) =>
@@ -30,12 +30,10 @@ const STABLECOIN_CONFIGS: Record<string, BaseTokenConfig> = {
     thumbnail: "/icons/stables/usdt.webp",
     type: "Native Aptos issuance",
     issuer: "Tether Operations Ltd.",
-    assetAddress:
-      "0x357b0b74bc833e95a115ad22604854d6b0fca151cecd94111770e5d6ffc9dc2b",
+    assetAddress: "0x357b0b74bc833e95a115ad22604854d6b0fca151cecd94111770e5d6ffc9dc2b",
     decimals: 6,
     website: "https://tether.to",
-    auditLink:
-      "https://tether.to/en/supported-protocols/?utm_source=chatgpt.com",
+    auditLink: "https://tether.to/en/supported-protocols/?utm_source=chatgpt.com",
     tags: ["collateralized", "fiat-backed"],
   },
   USDC: {
@@ -44,8 +42,7 @@ const STABLECOIN_CONFIGS: Record<string, BaseTokenConfig> = {
     thumbnail: "/icons/stables/usdc.webp",
     type: "Native Aptos issuance (Circle CCTP)",
     issuer: "Circle Internet Financial LLC",
-    assetAddress:
-      "0xbae207659db88bea0cbead6da0ed00aac12edcdda169e591cd41c94180b46f3b",
+    assetAddress: "0xbae207659db88bea0cbead6da0ed00aac12edcdda169e591cd41c94180b46f3b",
     decimals: 6,
     website: "https://www.circle.com/usdc",
     auditLink: "https://www.circle.com/en/transparency",
@@ -57,8 +54,7 @@ const STABLECOIN_CONFIGS: Record<string, BaseTokenConfig> = {
     thumbnail: "/icons/stables/USDA.webp",
     type: "Native Aptos issuance",
     issuer: "USDA Issuer",
-    assetAddress:
-      "0x534e4c3dc0f038dab1a8259e89301c4da58779a5d482fb354a41c08147e6b9ec",
+    assetAddress: "0x534e4c3dc0f038dab1a8259e89301c4da58779a5d482fb354a41c08147e6b9ec",
     decimals: 8,
     website: "#",
     auditLink: "#",
@@ -70,8 +66,7 @@ const STABLECOIN_CONFIGS: Record<string, BaseTokenConfig> = {
     thumbnail: "/icons/stables/mod.webp",
     type: "Algorithmic Stablecoin",
     issuer: "Thala",
-    assetAddress:
-      "0x94ed76d3d66cb0b6e7a3ab81acf830e3a50b8ae3cfb9edc0abea635a11185ff4",
+    assetAddress: "0x94ed76d3d66cb0b6e7a3ab81acf830e3a50b8ae3cfb9edc0abea635a11185ff4",
     decimals: 8,
     website: "#",
     auditLink: "#",
@@ -83,8 +78,7 @@ const STABLECOIN_CONFIGS: Record<string, BaseTokenConfig> = {
     thumbnail: "/icons/stables/susde.webp",
     type: "Algorithmic Stablecoin (LayerZero OFT)",
     issuer: "Ethena Labs",
-    assetAddress:
-      "0xb30a694a344edee467d9f82330bbe7c3b89f440a1ecd2da1f3bca266560fce69",
+    assetAddress: "0xb30a694a344edee467d9f82330bbe7c3b89f440a1ecd2da1f3bca266560fce69",
     decimals: 6,
     website: "https://ethena.fi",
     auditLink: "https://www.ethena.fi/transparency",
@@ -96,8 +90,7 @@ const STABLECOIN_CONFIGS: Record<string, BaseTokenConfig> = {
     thumbnail: "/icons/stables/usde.webp",
     type: "Algorithmic Stablecoin (LayerZero OFT)",
     issuer: "Ethena Labs",
-    assetAddress:
-      "0xf37a8864fe737eb8ec2c2931047047cbaed1beed3fb0e5b7c5526dafd3b9c2e9",
+    assetAddress: "0xf37a8864fe737eb8ec2c2931047047cbaed1beed3fb0e5b7c5526dafd3b9c2e9",
     decimals: 6,
     website: "https://ethena.fi",
     auditLink: "https://www.ethena.fi/transparency",
@@ -110,8 +103,7 @@ const STABLECOIN_CONFIGS: Record<string, BaseTokenConfig> = {
     thumbnail: "/icons/stables/usdc.webp",
     type: "Bridged via LayerZero",
     issuer: "Circle (via LayerZero)",
-    assetAddress:
-      "0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDC",
+    assetAddress: "0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDC",
     decimals: 6,
     website: "https://layerzero.network",
     auditLink: "https://www.circle.com/en/transparency",
@@ -123,8 +115,7 @@ const STABLECOIN_CONFIGS: Record<string, BaseTokenConfig> = {
     thumbnail: "/icons/stables/usdt.webp",
     type: "Bridged via LayerZero",
     issuer: "Tether (via LayerZero)",
-    assetAddress:
-      "0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDT",
+    assetAddress: "0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDT",
     decimals: 6,
     website: "https://layerzero.network",
     auditLink: "https://tether.to/en/transparency",
@@ -137,8 +128,7 @@ const STABLECOIN_CONFIGS: Record<string, BaseTokenConfig> = {
     thumbnail: "/icons/stables/usdc.webp",
     type: "Bridged via Wormhole",
     issuer: "Circle (via Wormhole)",
-    assetAddress:
-      "0x5e156f1207d0ebfa19a9eeff00d62a282278fb8719f4fab3a586a0a2c0fffbea::coin::T",
+    assetAddress: "0x5e156f1207d0ebfa19a9eeff00d62a282278fb8719f4fab3a586a0a2c0fffbea::coin::T",
     decimals: 6,
     website: "https://wormhole.com",
     auditLink: "https://www.circle.com/en/transparency",
@@ -150,8 +140,7 @@ const STABLECOIN_CONFIGS: Record<string, BaseTokenConfig> = {
     thumbnail: "/icons/stables/usdt.webp",
     type: "Bridged via Wormhole",
     issuer: "Tether (via Wormhole)",
-    assetAddress:
-      "0xa2eda21a58856fda86451436513b867c97eecb4ba099da5775520e0f7492e852::coin::T",
+    assetAddress: "0xa2eda21a58856fda86451436513b867c97eecb4ba099da5775520e0f7492e852::coin::T",
     decimals: 6,
     website: "https://wormhole.com",
     auditLink: "https://tether.to/en/transparency",
@@ -192,13 +181,9 @@ const generateMetadata = (config: BaseTokenConfig): TokenMetadata => ({
   explorerLink: generateExplorerLink(config.assetAddress),
 });
 
-export const STABLECOIN_METADATA: Record<string, TokenMetadata> =
-  Object.fromEntries(
-    Object.entries(STABLECOIN_CONFIGS).map(([key, config]) => [
-      key,
-      generateMetadata(config),
-    ]),
-  );
+export const STABLECOIN_METADATA: Record<string, TokenMetadata> = Object.fromEntries(
+  Object.entries(STABLECOIN_CONFIGS).map(([key, config]) => [key, generateMetadata(config)])
+);
 
 // Add combined tokens
 STABLECOIN_METADATA["sUSDe / USDe"] = {
@@ -216,8 +201,5 @@ STABLECOIN_METADATA["sUSDe / USDe"] = {
 };
 
 export const STABLE_TOKENS: Record<string, string> = Object.fromEntries(
-  Object.entries(STABLECOIN_CONFIGS).map(([symbol, config]) => [
-    symbol,
-    config.assetAddress,
-  ]),
+  Object.entries(STABLECOIN_CONFIGS).map(([symbol, config]) => [symbol, config.assetAddress])
 );

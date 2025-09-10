@@ -1,28 +1,25 @@
 // Token utilities
 export {
-  getTokenSymbol,
-  getSymbolFromAssetType,
-  isStablecoin,
-  isLST,
+  type CategorizedToken,
+  type CategoryAllocation,
   categorizeToken,
-  processAllocationData,
   getAssetDecimals,
-  isAptAsset,
+  getSymbolFromAssetType,
   getTokenLogoUrl,
   getTokenLogoUrlSync,
   getTokenLogoUrlWithFallback,
   getTokenLogoUrlWithFallbackSync,
+  getTokenSymbol,
+  isAptAsset,
+  isLST,
+  isStablecoin,
   preloadTokenList,
+  processAllocationData,
   type TokenCategory,
-  type CategorizedToken,
-  type CategoryAllocation,
 } from "./token-utils";
 
-// Token logos
-export * from "./token-logos";
-
-// Portfolio utilities
-export * from "./portfolio-utils";
+// Token logos - removed (file deleted)
+// Portfolio utilities - removed (file deleted)
 
 // Transaction analysis - uses new protocol system
 export * from "./transaction-analysis";

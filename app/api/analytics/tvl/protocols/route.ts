@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-
-import { apiLogger } from "@/lib/utils/core/logger";
 import { UnifiedCache } from "@/lib/utils/cache/unified-cache";
+import { apiLogger } from "@/lib/utils/core/logger";
 
 const cache = new UnifiedCache({ ttl: 5 * 60 * 1000 }); // 5 minutes
 
@@ -26,7 +25,7 @@ export async function GET() {
 
     // Filter for Aptos protocols
     const aptosProtocols = allProtocols.filter((protocol: any) =>
-      protocol.chains?.includes("Aptos"),
+      protocol.chains?.includes("Aptos")
     );
 
     // Sort by TVL and calculate metrics
@@ -50,30 +49,20 @@ export async function GET() {
       totalProtocols: aptosProtocols.length,
       totalTvl: sortedProtocols.reduce((sum: number, p: any) => sum + p.tvl, 0),
       topProtocols: sortedProtocols.slice(0, 20),
-      categories: [
-        ...new Set(aptosProtocols.map((p: any) => p.category).filter(Boolean)),
-      ],
+      categories: [...new Set(aptosProtocols.map((p: any) => p.category).filter(Boolean))],
       newProtocols: aptosProtocols.filter((p: any) => {
         // Consider protocols newer than 30 days as "new" (rough estimation)
         return p.tvl < 1000000 && p.tvl > 0; // Small but growing TVL
       }).length,
       growthMetrics: {
         avgChange1d:
-          sortedProtocols.reduce(
-            (sum: number, p: any) => sum + (p.change1d || 0),
-            0,
-          ) / sortedProtocols.length,
+          sortedProtocols.reduce((sum: number, p: any) => sum + (p.change1d || 0), 0) /
+          sortedProtocols.length,
         avgChange7d:
-          sortedProtocols.reduce(
-            (sum: number, p: any) => sum + (p.change7d || 0),
-            0,
-          ) / sortedProtocols.length,
-        positiveGrowth1d: sortedProtocols.filter(
-          (p: any) => (p.change1d || 0) > 0,
-        ).length,
-        positiveGrowth7d: sortedProtocols.filter(
-          (p: any) => (p.change7d || 0) > 0,
-        ).length,
+          sortedProtocols.reduce((sum: number, p: any) => sum + (p.change7d || 0), 0) /
+          sortedProtocols.length,
+        positiveGrowth1d: sortedProtocols.filter((p: any) => (p.change1d || 0) > 0).length,
+        positiveGrowth7d: sortedProtocols.filter((p: any) => (p.change7d || 0) > 0).length,
       },
     };
 
@@ -88,9 +77,6 @@ export async function GET() {
     return NextResponse.json(protocolMetrics);
   } catch (error) {
     apiLogger.error("Error fetching Aptos protocol data:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch protocol data" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Failed to fetch protocol data" }, { status: 500 });
   }
 }

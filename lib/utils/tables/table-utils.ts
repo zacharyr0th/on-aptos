@@ -1,5 +1,5 @@
-import { cn } from "@/lib/utils";
 import type { TableColumn } from "@/lib/types/ui";
+import { cn } from "@/lib/utils";
 
 export interface SortConfig {
   key: string;
@@ -8,7 +8,7 @@ export interface SortConfig {
 
 export function sortData<T extends Record<string, any>>(
   data: T[],
-  sortConfig: SortConfig | null,
+  sortConfig: SortConfig | null
 ): T[] {
   if (!sortConfig) return data;
 
@@ -34,7 +34,7 @@ export function sortData<T extends Record<string, any>>(
 
 export function filterData<T extends Record<string, any>>(
   data: T[],
-  filters: Record<string, any>,
+  filters: Record<string, any>
 ): T[] {
   return data.filter((item) => {
     return Object.entries(filters).every(([key, value]) => {
@@ -51,31 +51,24 @@ export function filterData<T extends Record<string, any>>(
   });
 }
 
-export function paginateData<T>(
-  data: T[],
-  page: number,
-  pageSize: number,
-): T[] {
+export function paginateData<T>(data: T[], page: number, pageSize: number): T[] {
   const startIndex = (page - 1) * pageSize;
   return data.slice(startIndex, startIndex + pageSize);
 }
 
-export function getTableCellClass(
-  align?: "left" | "center" | "right",
-  className?: string,
-): string {
+export function getTableCellClass(align?: "left" | "center" | "right", className?: string): string {
   return cn(
     "py-2",
     align === "center" && "text-center",
     align === "right" && "text-right",
-    className,
+    className
   );
 }
 
 export function createColumn<T>(
   key: keyof T | string,
   label: string,
-  options?: Partial<TableColumn<T>>,
+  options?: Partial<TableColumn<T>>
 ): TableColumn<T> {
   return {
     key: String(key),
@@ -89,7 +82,7 @@ export function createColumn<T>(
 export function createSortableColumn<T>(
   key: keyof T | string,
   label: string,
-  options?: Partial<TableColumn<T>>,
+  options?: Partial<TableColumn<T>>
 ): TableColumn<T> {
   return createColumn(key, label, { ...options, sortable: true });
 }
@@ -100,7 +93,7 @@ export function getNestedValue<T>(obj: T, path: string): any {
 
 export function formatTableValue(
   value: any,
-  type?: "currency" | "number" | "percent" | "date",
+  type?: "currency" | "number" | "percent" | "date"
 ): string {
   if (value === null || value === undefined) return "—";
 
@@ -130,10 +123,10 @@ export interface TableSortState {
 
 export function useTableSort<T>(
   data: T[],
-  initialSort?: TableSortState,
+  initialSort?: TableSortState
 ): [T[], (key: string) => void, TableSortState] {
   const [sortState, setSortState] = useState<TableSortState>(
-    initialSort || { sortBy: null, sortOrder: "asc" },
+    initialSort || { sortBy: null, sortOrder: "asc" }
   );
 
   const handleSort = useCallback((key: string) => {
@@ -159,4 +152,4 @@ export function useTableSort<T>(
   return [sortedData, handleSort, sortState];
 }
 
-import { useState, useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";

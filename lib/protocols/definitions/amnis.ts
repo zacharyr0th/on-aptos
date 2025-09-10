@@ -2,7 +2,8 @@
  * Amnis Finance Protocol Definition
  */
 
-import { ProtocolDefinition, ProtocolType, PositionType } from "../types";
+import { ProtocolType } from "@/lib/types/defi";
+import { PositionType, type ProtocolDefinition } from "../types";
 
 export const AmnisProtocol: ProtocolDefinition = {
   metadata: {
@@ -36,7 +37,7 @@ export const AmnisProtocol: ProtocolDefinition = {
               "0x111ae3e5bc816a5e63c2da97d0aa3886519e0cd5e4b046659fa35796bd11542a::amapt_token::AmnisApt",
             symbol: "amAPT",
             decimals: 8,
-            amount: data?.data?.balance || "0",
+            amount: (data as any)?.(data as any)?.balance || "0",
           },
         ],
       },

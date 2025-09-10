@@ -1,37 +1,5 @@
 import { logger } from "@/lib/utils/core/logger";
-
-export interface YieldOpportunity {
-  id: string;
-  protocol: string;
-  protocolType: string;
-  opportunityType: "lending" | "liquidity" | "staking" | "farming" | "vault";
-  asset: string;
-  assetSymbol: string;
-  pairedAsset?: string;
-  pairedAssetSymbol?: string;
-  apy: number;
-  apr?: number;
-  tvl: number;
-  userDeposit?: number;
-  minDeposit?: number;
-  maxDeposit?: number;
-  risk: "low" | "medium" | "high";
-  features: string[];
-  rewards?: {
-    token: string;
-    symbol: string;
-    apr: number;
-  }[];
-  fees?: {
-    deposit?: number;
-    withdrawal?: number;
-    performance?: number;
-  };
-  lockPeriod?: number;
-  autoCompound?: boolean;
-  isActive: boolean;
-  metadata?: Record<string, any>;
-}
+import type { YieldOpportunity } from "./types";
 
 /**
  * Integration with DefiLlama Yields API
@@ -46,10 +14,10 @@ export class DefiLlamaIntegration {
   private constructor() {}
 
   static getInstance(): DefiLlamaIntegration {
-    if (!this.instance) {
-      this.instance = new DefiLlamaIntegration();
+    if (!DefiLlamaIntegration.instance) {
+      DefiLlamaIntegration.instance = new DefiLlamaIntegration();
     }
-    return this.instance;
+    return DefiLlamaIntegration.instance;
   }
 
   /**
@@ -86,10 +54,7 @@ export class DefiLlamaIntegration {
       const allPools = await this.getAllPools();
       // Filter for Aptos chain
       return allPools.filter(
-        (pool) =>
-          pool.chain?.toLowerCase() === "aptos" &&
-          pool.apy != null &&
-          pool.apy > 0,
+        (pool) => pool.chain?.toLowerCase() === "aptos" && pool.apy != null && pool.apy > 0
       );
     } catch (error) {
       logger.error("Error fetching Aptos pools:", error);
@@ -102,12 +67,7 @@ export class DefiLlamaIntegration {
    */
   transformPool(pool: any): YieldOpportunity {
     // Determine opportunity type
-    let opportunityType:
-      | "lending"
-      | "liquidity"
-      | "staking"
-      | "farming"
-      | "vault" = "liquidity";
+    let opportunityType: "lending" | "liquidity" | "staking" | "farming" | "vault" = "liquidity";
 
     // Check protocol-specific mappings first
     const protocol = (pool.project || "").toLowerCase();
@@ -115,10 +75,7 @@ export class DefiLlamaIntegration {
       opportunityType = "staking";
     } else if (pool.category === "Lending" || pool.poolMeta?.includes("lend")) {
       opportunityType = "lending";
-    } else if (
-      pool.category === "Liquid Staking" ||
-      pool.poolMeta?.includes("stak")
-    ) {
+    } else if (pool.category === "Liquid Staking" || pool.poolMeta?.includes("stak")) {
       opportunityType = "staking";
     } else if (pool.category === "Farm" || pool.poolMeta?.includes("farm")) {
       opportunityType = "farming";
@@ -137,7 +94,7 @@ export class DefiLlamaIntegration {
 
     // Parse symbol/asset info
     let assetSymbol = pool.symbol || "UNKNOWN";
-    let pairedAssetSymbol = undefined;
+    let pairedAssetSymbol;
 
     if (assetSymbol.includes("-")) {
       const parts = assetSymbol.split("-");
@@ -195,8 +152,7 @@ export class DefiLlamaIntegration {
     if (pool.category === "Liquid Staking") features.push("Liquid Staking");
     if (pool.rewardTokens?.length > 0) features.push("Reward Tokens");
     if (pool.boosted) features.push("Boosted");
-    if (!pool.lockPeriod || pool.lockPeriod === 0)
-      features.push("No lock period");
+    if (!pool.lockPeriod || pool.lockPeriod === 0) features.push("No lock period");
 
     return features;
   }
@@ -208,9 +164,7 @@ export class DefiLlamaIntegration {
     try {
       const response = await fetch(`${this.apiUrl}/protocol/${protocol}`);
       if (!response.ok) {
-        throw new Error(
-          `Failed to fetch protocol stats: ${response.statusText}`,
-        );
+        throw new Error(`Failed to fetch protocol stats: ${response.statusText}`);
       }
 
       return await response.json();

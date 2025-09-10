@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { APP_ROUTES } from "@/lib/config/routes";
 
 export default function NotFound() {
   return (
@@ -6,18 +7,18 @@ export default function NotFound() {
       <h1 className="text-4xl font-bold">404</h1>
       <h2 className="text-xl text-muted-foreground">Page Not Found</h2>
       <p className="text-muted-foreground text-center max-w-md">
-        The page you're looking for doesn't exist. You might want to check out
-        our dashboards instead.
+        The page you're looking for doesn't exist. You might want to check out our dashboards
+        instead.
       </p>
       <div className="flex gap-4 mt-4">
         <Link
-          href="/"
+          href={APP_ROUTES.HOME}
           className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
         >
           Home
         </Link>
         <Link
-          href="/portfolio"
+          href={APP_ROUTES.TOOLS.PORTFOLIO}
           className="px-4 py-2 border border-border rounded-md hover:bg-muted transition-colors"
         >
           Portfolio

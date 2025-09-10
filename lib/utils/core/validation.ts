@@ -1,64 +1,38 @@
 /**
- * Unified validation utilities
- * Consolidates validation functions from api-response.ts, portfolio-utils.ts, and other files
+ * Core validation utilities for the application
  */
 
+import { z } from "zod";
+
 /**
- * Validate Aptos address format
- * Consolidated from api-response.ts and portfolio-utils.ts
+ * Validates an Aptos wallet address
  */
 export function validateAptosAddress(address: string): boolean {
+  if (!address) return false;
   return /^0x[a-fA-F0-9]{1,64}$/.test(address);
 }
 
 /**
- * Comprehensive wallet address validation with detailed error messages
+ * Alias for validateAptosAddress
  */
-export async function validateWalletAddress(address: string | null): Promise<{
-  isValid: boolean;
-  error?: string;
-}> {
-  if (!address) {
-    return { isValid: false, error: "Wallet address is required" };
-  }
-
-  // Basic validation - check if it's a valid Aptos address format
-  // Aptos addresses are 64 character hex strings (with or without 0x prefix)
-  const addressRegex = /^(0x)?[a-fA-F0-9]{64}$/;
-
-  const cleanAddress = address.startsWith("0x") ? address.slice(2) : address;
-
-  if (!addressRegex.test(address) && !addressRegex.test(cleanAddress)) {
-    return { isValid: false, error: "Invalid wallet address format" };
-  }
-
-  return { isValid: true };
+export function validateWalletAddress(address: string): boolean {
+  return validateAptosAddress(address);
 }
 
 /**
- * Validate pagination parameters
+ * Validates pagination parameters
  */
-export function validatePagination(
-  page?: string | null,
-  limit?: string | null,
-  maxLimit: number = 100,
-): { page: number; limit: number; offset: number } {
-  const parsedPage = Math.max(1, parseInt(page || "1", 10));
-  const parsedLimit = Math.min(
-    maxLimit,
-    Math.max(1, parseInt(limit || "30", 10)),
-  );
-  const offset = (parsedPage - 1) * parsedLimit;
-
-  return {
-    page: parsedPage,
-    limit: parsedLimit,
-    offset,
-  };
+export function validatePagination(params: { page?: number; limit?: number }): {
+  page: number;
+  limit: number;
+} {
+  const page = Math.max(1, params.page || 1);
+  const limit = Math.min(100, Math.max(1, params.limit || 20));
+  return { page, limit };
 }
 
 /**
- * Validate URL format
+ * Checks if a string is a valid URL
  */
 export function isValidUrl(url: string): boolean {
   try {
@@ -70,7 +44,7 @@ export function isValidUrl(url: string): boolean {
 }
 
 /**
- * Validate HTTP/HTTPS URL format
+ * Checks if a string is a valid HTTP/HTTPS URL
  */
 export function isValidHttpUrl(url: string): boolean {
   try {
@@ -82,7 +56,7 @@ export function isValidHttpUrl(url: string): boolean {
 }
 
 /**
- * Validate email format (basic)
+ * Validates email format
  */
 export function isValidEmail(email: string): boolean {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -90,76 +64,77 @@ export function isValidEmail(email: string): boolean {
 }
 
 /**
- * Validate positive number
+ * Checks if a value is a positive number
  */
-export function isPositiveNumber(value: string | number): boolean {
-  const num = typeof value === "string" ? parseFloat(value) : value;
+export function isPositiveNumber(value: unknown): boolean {
+  const num = Number(value);
   return !isNaN(num) && num > 0;
 }
 
 /**
- * Validate non-negative number
+ * Checks if a value is a non-negative number
  */
-export function isNonNegativeNumber(value: string | number): boolean {
-  const num = typeof value === "string" ? parseFloat(value) : value;
+export function isNonNegativeNumber(value: unknown): boolean {
+  const num = Number(value);
   return !isNaN(num) && num >= 0;
 }
 
 /**
- * Validate integer
+ * Checks if a value is an integer
  */
-export function isInteger(value: string | number): boolean {
-  const num = typeof value === "string" ? parseInt(value, 10) : value;
-  return Number.isInteger(num);
+export function isInteger(value: unknown): boolean {
+  const num = Number(value);
+  return !isNaN(num) && Number.isInteger(num);
 }
 
 /**
- * Validate string length
+ * Validates string length
  */
-export function isValidLength(
-  value: string,
-  minLength: number = 0,
-  maxLength: number = Infinity,
-): boolean {
-  return value.length >= minLength && value.length <= maxLength;
+export function isValidLength(str: string, min: number, max: number): boolean {
+  return str.length >= min && str.length <= max;
 }
 
 /**
- * Validate required field
+ * Checks if a value is required (not null, undefined, or empty string)
  */
 export function isRequired(value: unknown): boolean {
-  if (value === null || value === undefined) return false;
-  if (typeof value === "string" && value.trim() === "") return false;
-  return true;
+  return value !== null && value !== undefined && value !== "";
 }
 
 /**
- * Sanitize string input by removing dangerous characters
+ * Sanitizes a string by removing dangerous characters
  */
-export function sanitizeString(input: string): string {
-  return input
-    .replace(/[<>\"'&]/g, "") // Remove potentially dangerous HTML/XSS characters
+export function sanitizeString(str: string): string {
+  if (typeof str !== "string") return "";
+  // Remove HTML tags and script content
+  return str
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
+    .replace(/<[^>]+>/g, "")
     .trim();
 }
 
 /**
- * Validate and sanitize query parameter
+ * Validates and sanitizes query parameters
  */
 export function validateQueryParam(
-  param: string | string[] | undefined,
-  required: boolean = false,
-  maxLength: number = 1000,
-): string | null {
-  if (!param) {
-    return required ? null : "";
+  param: unknown,
+  type: "string" | "number" | "boolean" = "string"
+): unknown {
+  if (param === null || param === undefined) return undefined;
+
+  switch (type) {
+    case "number": {
+      const num = Number(param);
+      return isNaN(num) ? undefined : num;
+    }
+    case "boolean": {
+      if (typeof param === "boolean") return param;
+      if (param === "true") return true;
+      if (param === "false") return false;
+      return undefined;
+    }
+    case "string":
+    default:
+      return sanitizeString(String(param));
   }
-
-  // Handle array case - take first element
-  const value = Array.isArray(param) ? param[0] : param;
-
-  if (!value || value.length > maxLength) {
-    return null;
-  }
-
-  return sanitizeString(value);
 }

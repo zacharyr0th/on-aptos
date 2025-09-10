@@ -2,7 +2,7 @@
  * SushiSwap Protocol Definition
  */
 
-import { ProtocolDefinition, ProtocolType, PositionType } from "../types";
+import { PositionType, type ProtocolDefinition, ProtocolType } from "../types";
 
 export const SushiSwapProtocol: ProtocolDefinition = {
   metadata: {
@@ -17,9 +17,7 @@ export const SushiSwapProtocol: ProtocolDefinition = {
     auditStatus: "audited",
   },
 
-  addresses: [
-    "0x31a6675cbe84365bf2b0cbce617ece6c47023ef70826533bde5203d32171dc3c",
-  ],
+  addresses: ["0x31a6675cbe84365bf2b0cbce617ece6c47023ef70826533bde5203d32171dc3c"],
 
   patterns: {
     resources: [
@@ -29,10 +27,10 @@ export const SushiSwapProtocol: ProtocolDefinition = {
         priority: 100,
         extractAssets: (data) => [
           {
-            address: data.type,
+            address: (data as any).type,
             symbol: "SUSHI-LP",
             decimals: 8,
-            amount: data?.data?.value || "0",
+            amount: (data as any)?.data?.value || "0",
           },
         ],
       },

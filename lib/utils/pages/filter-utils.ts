@@ -20,7 +20,7 @@ export interface FilterGroup {
 export function applyFilters<T>(
   data: T[],
   filters: Record<string, any>,
-  filterFunctions: Record<string, (item: T, value: any) => boolean>,
+  filterFunctions: Record<string, (item: T, value: any) => boolean>
 ): T[] {
   return data.filter((item) => {
     return Object.entries(filters).every(([key, value]) => {
@@ -32,11 +32,7 @@ export function applyFilters<T>(
 }
 
 // Search filter
-export function searchFilter<T>(
-  data: T[],
-  query: string,
-  searchFields: (keyof T)[],
-): T[] {
+export function searchFilter<T>(data: T[], query: string, searchFields: (keyof T)[]): T[] {
   if (!query) return data;
 
   const lowerQuery = query.toLowerCase();
@@ -55,12 +51,7 @@ export function searchFilter<T>(
 }
 
 // Range filter
-export function rangeFilter<T>(
-  data: T[],
-  field: keyof T,
-  min?: number,
-  max?: number,
-): T[] {
+export function rangeFilter<T>(data: T[], field: keyof T, min?: number, max?: number): T[] {
   return data.filter((item) => {
     const value = Number(item[field]);
     if (isNaN(value)) return false;
@@ -75,7 +66,7 @@ export function dateRangeFilter<T>(
   data: T[],
   field: keyof T,
   startDate?: Date,
-  endDate?: Date,
+  endDate?: Date
 ): T[] {
   return data.filter((item) => {
     const value = item[field];
@@ -91,11 +82,7 @@ export function dateRangeFilter<T>(
 }
 
 // Category filter
-export function categoryFilter<T>(
-  data: T[],
-  field: keyof T,
-  categories: string[],
-): T[] {
+export function categoryFilter<T>(data: T[], field: keyof T, categories: string[]): T[] {
   if (!categories || categories.length === 0) return data;
   return data.filter((item) => categories.includes(String(item[field])));
 }
@@ -104,7 +91,7 @@ export function categoryFilter<T>(
 export function buildFilterOptions<T>(
   data: T[],
   field: keyof T,
-  labelFormatter?: (value: any) => string,
+  labelFormatter?: (value: any) => string
 ): FilterOption[] {
   const counts = new Map<string, number>();
 
@@ -155,11 +142,7 @@ export function parseSearchQuery(query: string): {
 }
 
 // Advanced search filter with query parsing
-export function advancedSearchFilter<T>(
-  data: T[],
-  query: string,
-  searchFields: (keyof T)[],
-): T[] {
+export function advancedSearchFilter<T>(data: T[], query: string, searchFields: (keyof T)[]): T[] {
   if (!query) return data;
 
   const { terms, exact, exclude } = parseSearchQuery(query);
@@ -243,7 +226,7 @@ export class FilterState<T extends Record<string, any>> {
 
   hasActiveFilters(): boolean {
     return Object.values(this.filters).some(
-      (value) => value !== undefined && value !== null && value !== "",
+      (value) => value !== undefined && value !== null && value !== ""
     );
   }
 }

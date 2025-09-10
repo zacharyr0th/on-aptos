@@ -1,9 +1,9 @@
 "use client";
 
 import { Loader2 } from "lucide-react";
-import type { LoadingStateProps } from "./types";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import type { LoadingStateProps } from "./types";
 
 export function LoadingState({
   message = "Loading...",
@@ -42,15 +42,8 @@ export function LoadingState({
   }
 
   return (
-    <div
-      className={cn(
-        "flex flex-col items-center justify-center p-8 space-y-4",
-        className,
-      )}
-    >
-      {showSpinner && (
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      )}
+    <div className={cn("flex flex-col items-center justify-center p-8 space-y-4", className)}>
+      {showSpinner && <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />}
       <p className="text-sm text-muted-foreground">{message}</p>
     </div>
   );

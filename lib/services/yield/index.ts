@@ -4,27 +4,21 @@
  */
 
 export { AptosResourceFetcher } from "./AptosResourceFetcher";
-export type { ProtocolOpportunity } from "./AptosResourceFetcher";
-
-export { DefiLlamaIntegration } from "./DefiLlamaIntegration";
-export type { YieldOpportunity } from "./DefiLlamaIntegration";
-
 export { AutoCompoundService } from "./AutoCompoundService";
+export { DefiLlamaIntegration } from "./DefiLlamaIntegration";
+// Export all types from the centralized types file
 export type {
   CompoundablePosition,
   HarvestablePosition,
-} from "./AutoCompoundService";
-
-export { YieldAggregatorService } from "./YieldAggregatorService";
-export type {
+  ProtocolOpportunity,
+  YieldOpportunity,
   YieldStrategy,
   YieldStrategyStep,
-} from "./YieldAggregatorService";
+} from "./types";
 
-// Re-export commonly used constants
-export {
-  YIELD_PROTOCOL_ADDRESSES,
-  YIELD_TOKEN_ADDRESSES,
-  getSymbolFromAddress,
-  getAddressFromSymbol,
-} from "@/lib/constants";
+// Export validation utilities
+export * from "./validation";
+export { YieldAggregatorService } from "./YieldAggregatorService";
+
+// Note: Constants and utilities can be imported directly from their respective modules
+// to avoid unnecessary re-exports and dependencies in this module

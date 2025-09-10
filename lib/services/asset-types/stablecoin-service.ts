@@ -1,21 +1,20 @@
 import { SERVICE_CONFIG } from "@/lib/config/cache";
 import {
-  STABLECOINS,
-  LAYERZERO_STABLECOINS,
-  WORMHOLE_STABLECOINS,
-  CELER_STABLECOINS,
   ALGO_STABLECOINS,
+  CELER_STABLECOINS,
+  LAYERZERO_STABLECOINS,
+  STABLECOINS,
+  WORMHOLE_STABLECOINS,
 } from "@/lib/constants";
 import { TETHER_RESERVES } from "@/lib/constants/tokens/addresses";
 import { logger } from "@/lib/utils/core/logger";
 import { formatBigIntWithDecimals } from "@/lib/utils/format";
-
 import type {
-  StablecoinSupply,
-  StablecoinData,
   BridgedCoinConfig,
-  StablecoinGraphQLResponse,
   CoinBalanceResponse,
+  StablecoinData,
+  StablecoinGraphQLResponse,
+  StablecoinSupply,
 } from "../shared/types";
 import { BaseAssetService } from "../shared/utils/base-service";
 
@@ -27,15 +26,11 @@ const REST_API_URL = "https://api.mainnet.aptoslabs.com/v1";
 const config = SERVICE_CONFIG.stables;
 
 // Stablecoin metadata
-const STABLECOIN_METADATA: Record<
-  string,
-  { symbol: string; decimals: number }
-> = {
+const STABLECOIN_METADATA: Record<string, { symbol: string; decimals: number }> = {
   [STABLECOINS.USDC]: { symbol: "USDC", decimals: 6 },
   [STABLECOINS.USDT]: { symbol: "USDT", decimals: 6 },
   [STABLECOINS.USDE]: { symbol: "USDe", decimals: 6 },
   [STABLECOINS.SUSDE]: { symbol: "sUSDe", decimals: 6 },
-  [STABLECOINS.MUSD]: { symbol: "mUSD", decimals: 8 },
   [STABLECOINS.USDA]: { symbol: "USDA", decimals: 8 },
   [ALGO_STABLECOINS.MOD]: { symbol: "MOD", decimals: 8 },
 };
@@ -45,48 +40,42 @@ const BRIDGED_COINS: BridgedCoinConfig[] = [
     symbol: "lzUSDC",
     name: "LayerZero USDC",
     asset_type: LAYERZERO_STABLECOINS.LZ_USDC,
-    account:
-      "0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa",
+    account: "0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa",
     decimals: 6,
   },
   {
     symbol: "lzUSDT",
     name: "LayerZero USDT",
     asset_type: LAYERZERO_STABLECOINS.LZ_USDT,
-    account:
-      "0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa",
+    account: "0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa",
     decimals: 6,
   },
   {
     symbol: "whUSDC",
     name: "Wormhole USDC",
     asset_type: WORMHOLE_STABLECOINS.WH_USDC,
-    account:
-      "0x5e156f1207d0ebfa19a9eeff00d62a282278fb8719f4fab3a586a0a2c0fffbea",
+    account: "0x5e156f1207d0ebfa19a9eeff00d62a282278fb8719f4fab3a586a0a2c0fffbea",
     decimals: 6,
   },
   {
     symbol: "whUSDT",
     name: "Wormhole USDT",
     asset_type: WORMHOLE_STABLECOINS.WH_USDT,
-    account:
-      "0xa2eda21a58856fda86451436513b867c97eecb4ba099da5775520e0f7492e852",
+    account: "0xa2eda21a58856fda86451436513b867c97eecb4ba099da5775520e0f7492e852",
     decimals: 6,
   },
   {
     symbol: "ceUSDC",
     name: "Celer USDC",
     asset_type: CELER_STABLECOINS.CELER_USDC,
-    account:
-      "0x8d87a65ba30e09357fa2edea2c80dbac296e5dec2b18287113500b902942929d",
+    account: "0x8d87a65ba30e09357fa2edea2c80dbac296e5dec2b18287113500b902942929d",
     decimals: 6,
   },
   {
     symbol: "ceUSDT",
     name: "Celer USDT",
     asset_type: CELER_STABLECOINS.CELER_USDT,
-    account:
-      "0x8d87a65ba30e09357fa2edea2c80dbac296e5dec2b18287113500b902942929d",
+    account: "0x8d87a65ba30e09357fa2edea2c80dbac296e5dec2b18287113500b902942929d",
     decimals: 6,
   },
 ];
@@ -98,10 +87,10 @@ export class StablecoinService extends BaseAssetService {
   static async getStablecoinSupplies(): Promise<StablecoinData> {
     const cacheKey = "stablecoin-supplies";
 
-    return this.getCachedOrFetch(
+    return StablecoinService.getCachedOrFetch(
       cacheKey,
-      () => this.fetchStablecoinSupplies(),
-      config.ttl * 1000,
+      () => StablecoinService.fetchStablecoinSupplies(),
+      config.ttl * 1000
     );
   }
 
@@ -113,16 +102,16 @@ export class StablecoinService extends BaseAssetService {
 
     try {
       // Fetch native fungible assets and USDT reserve
-      const nativeData = await this.fetchNativeFungibleAssets();
+      const nativeData = await StablecoinService.fetchNativeFungibleAssets();
 
       // Fetch bridged coin supplies
-      const bridgedSupplies = await this.fetchBridgedCoinSupplies();
+      const bridgedSupplies = await StablecoinService.fetchBridgedCoinSupplies();
 
       // Combine and process all supplies
       const allSupplies = [...nativeData.supplies, ...bridgedSupplies];
 
       // Calculate total supply and percentages
-      const processedData = this.processSupplies(allSupplies);
+      const processedData = StablecoinService.processSupplies(allSupplies);
 
       // Add USDT reserve data
       const result: StablecoinData = {
@@ -130,14 +119,14 @@ export class StablecoinService extends BaseAssetService {
         usdt_reserve: nativeData.usdtReserve,
       };
 
-      this.logMetrics("fetchStablecoinSupplies", startTime, true, {
+      StablecoinService.logMetrics("fetchStablecoinSupplies", startTime, true, {
         supplyCount: result.supplies.length,
         totalSupply: result.total,
       });
 
       return result;
     } catch (error) {
-      this.logMetrics("fetchStablecoinSupplies", startTime, false);
+      StablecoinService.logMetrics("fetchStablecoinSupplies", startTime, false);
       logger.error("Failed to fetch stablecoin supplies:", error);
       throw error;
     }
@@ -150,10 +139,7 @@ export class StablecoinService extends BaseAssetService {
     supplies: StablecoinSupply[];
     usdtReserve: StablecoinData["usdt_reserve"];
   }> {
-    const fungibleAssets = [
-      ...Object.values(STABLECOINS),
-      ALGO_STABLECOINS.MOD,
-    ];
+    const fungibleAssets = [...Object.values(STABLECOINS), ALGO_STABLECOINS.MOD];
 
     // Use the metadata table which has supply information
     const query = `
@@ -178,7 +164,7 @@ export class StablecoinService extends BaseAssetService {
       }
     `;
 
-    const result = await this.executeGraphQLQuery<any>(query);
+    const result = await StablecoinService.executeGraphQLQuery<any>(query);
 
     const supplies: StablecoinSupply[] = [];
 
@@ -203,10 +189,7 @@ export class StablecoinService extends BaseAssetService {
         // Extract supply from supply_v2 - it's a direct number
         let supply = BigInt(0);
         if (item.supply_v2) {
-          if (
-            typeof item.supply_v2 === "string" ||
-            typeof item.supply_v2 === "number"
-          ) {
+          if (typeof item.supply_v2 === "string" || typeof item.supply_v2 === "number") {
             supply = BigInt(item.supply_v2);
           }
         }
@@ -218,7 +201,7 @@ export class StablecoinService extends BaseAssetService {
           const reserveAmount = BigInt(usdtReserveBalance);
           supply = supply - reserveAmount;
           logger.info(
-            `USDT: Total supply ${supply + reserveAmount}, Reserve ${usdtReserveBalance}, Circulating ${supply.toString()}`,
+            `USDT: Total supply ${supply + reserveAmount}, Reserve ${usdtReserveBalance}, Circulating ${supply.toString()}`
           );
         }
 
@@ -247,10 +230,7 @@ export class StablecoinService extends BaseAssetService {
       supplies,
       usdtReserve: {
         amount: usdtReserveBalance,
-        amount_formatted: formatBigIntWithDecimals(
-          BigInt(usdtReserveBalance),
-          6,
-        ),
+        amount_formatted: formatBigIntWithDecimals(BigInt(usdtReserveBalance), 6),
         address: TETHER_RESERVES.PRIMARY,
       },
     };
@@ -268,25 +248,23 @@ export class StablecoinService extends BaseAssetService {
         const resourceType = `0x1::coin::CoinInfo<${coin.asset_type}>`;
         const url = `${REST_API_URL}/accounts/${coin.account}/resource/${encodeURIComponent(resourceType)}`;
 
-        const response = await this.withTimeout(
+        const response = await StablecoinService.withTimeout(
           fetch(url, {
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${process.env.APTOS_BUILD_SECRET}`,
             },
           }),
-          10000,
+          10000
         );
 
         if (!response.ok) {
-          logger.warn(
-            `Failed to fetch ${coin.symbol}: HTTP ${response.status}`,
-          );
+          logger.warn(`Failed to fetch ${coin.symbol}: HTTP ${response.status}`);
           continue;
         }
 
         const data = await response.json();
-        const supply = this.extractCoinSupply(data, coin);
+        const supply = StablecoinService.extractCoinSupply(data, coin);
 
         const divisor = BigInt(10 ** coin.decimals);
         supplies.push({
@@ -317,10 +295,7 @@ export class StablecoinService extends BaseAssetService {
   /**
    * Extract coin supply from CoinInfo resource response
    */
-  private static extractCoinSupply(
-    data: any,
-    _coin: BridgedCoinConfig,
-  ): bigint {
+  private static extractCoinSupply(data: any, _coin: BridgedCoinConfig): bigint {
     // Try different paths for the supply data from CoinInfo resource
     if (data.data?.supply?.vec?.[0]?.integer?.vec?.[0]?.value) {
       return BigInt(data.data.supply.vec[0].integer.vec[0].value);
@@ -341,7 +316,7 @@ export class StablecoinService extends BaseAssetService {
    * Process supplies to calculate totals and percentages
    */
   private static processSupplies(
-    supplies: StablecoinSupply[],
+    supplies: StablecoinSupply[]
   ): Omit<StablecoinData, "usdt_reserve"> {
     // Sort by supply descending
     supplies.sort((a, b) => {
@@ -360,9 +335,7 @@ export class StablecoinService extends BaseAssetService {
     for (const item of supplies) {
       const dollarSupply = BigInt(item.supply);
       item.percentage =
-        totalDollarValue > 0
-          ? Number((dollarSupply * BigInt(10000)) / totalDollarValue) / 100
-          : 0;
+        totalDollarValue > 0 ? Number((dollarSupply * BigInt(10000)) / totalDollarValue) / 100 : 0;
     }
 
     // Calculate total supply in raw units (normalized to 6 decimals)
@@ -376,8 +349,7 @@ export class StablecoinService extends BaseAssetService {
       const supplyBigInt = BigInt(supply.supply_raw);
 
       // Normalize to 6 decimals
-      const normalizedSupply =
-        decimals === 8 ? supplyBigInt / BigInt(100) : supplyBigInt;
+      const normalizedSupply = decimals === 8 ? supplyBigInt / BigInt(100) : supplyBigInt;
 
       totalSupplyRaw += normalizedSupply;
     }
@@ -402,13 +374,13 @@ export class StablecoinService extends BaseAssetService {
       headers["Authorization"] = `Bearer ${process.env.APTOS_BUILD_SECRET}`;
     }
 
-    const response = await this.withTimeout(
+    const response = await StablecoinService.withTimeout(
       fetch(INDEXER_URL, {
         method: "POST",
         headers,
         body: JSON.stringify({ query }),
       }),
-      30000,
+      30000
     );
 
     if (!response.ok) {

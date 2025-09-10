@@ -1,8 +1,7 @@
 "use client";
 
 import { AlertTriangle } from "lucide-react";
-
-import { MetricsLoadingSkeleton } from "./MetricsLoadingSkeleton";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -11,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
+import { MetricsLoadingSkeleton } from "./MetricsLoadingSkeleton";
 
 interface MetricsTableColumn {
   key: string;
@@ -78,10 +77,7 @@ export const MetricsTable: React.FC<MetricsTableProps> = ({
             <TableRow key={index} className="hover:bg-muted/50">
               {columns.map((column) => (
                 <TableCell key={column.key}>
-                  {renderCell ? 
-                    renderCell(column.key, row[column.key], row) : 
-                    row[column.key]
-                  }
+                  {renderCell ? renderCell(column.key, row[column.key], row) : row[column.key]}
                 </TableCell>
               ))}
             </TableRow>

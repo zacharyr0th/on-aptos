@@ -1,35 +1,33 @@
-import { createSortableColumn } from "./table-utils";
 import type { TableColumn } from "@/lib/types/ui";
 import { formatCurrency, formatTokenAmount } from "@/lib/utils/format";
+import { createSortableColumn } from "./table-utils";
 
 export const ASSET_TABLE_COLUMNS: TableColumn[] = [
-  createSortableColumn("symbol", "Ticker", { width: "30%" }),
+  createSortableColumn("symbol", "Ticker", { width: "40%" }),
   createSortableColumn("balance", "Quantity", {
-    width: "15%",
+    width: "20%",
     align: "right",
     render: (value, row) => formatTokenAmount(value, row.decimals),
   }),
   createSortableColumn("price", "Price", {
-    width: "15%",
+    width: "20%",
     align: "right",
     render: (value) => (value ? formatCurrency(value) : "—"),
   }),
   createSortableColumn("value", "Value", {
-    width: "15%",
+    width: "20%",
     align: "right",
     render: (value) => (value ? formatCurrency(value) : "—"),
   }),
   createSortableColumn("change24h", "24h", {
     width: "12.5%",
     align: "right",
-    render: (value) =>
-      value ? `${value > 0 ? "+" : ""}${value.toFixed(2)}%` : "—",
+    render: (value) => (value ? `${value > 0 ? "+" : ""}${value.toFixed(2)}%` : "—"),
   }),
   createSortableColumn("change7d", "7d", {
     width: "12.5%",
     align: "right",
-    render: (value) =>
-      value ? `${value > 0 ? "+" : ""}${value.toFixed(2)}%` : "—",
+    render: (value) => (value ? `${value > 0 ? "+" : ""}${value.toFixed(2)}%` : "—"),
   }),
 ];
 
@@ -51,14 +49,12 @@ export const DEFI_TABLE_COLUMNS: TableColumn[] = [
   createSortableColumn("change24h", "24h", {
     width: "15%",
     align: "right",
-    render: (value) =>
-      value ? `${value > 0 ? "+" : ""}${value.toFixed(2)}%` : "—",
+    render: (value) => (value ? `${value > 0 ? "+" : ""}${value.toFixed(2)}%` : "—"),
   }),
   createSortableColumn("change7d", "7d", {
     width: "15%",
     align: "right",
-    render: (value) =>
-      value ? `${value > 0 ? "+" : ""}${value.toFixed(2)}%` : "—",
+    render: (value) => (value ? `${value > 0 ? "+" : ""}${value.toFixed(2)}%` : "—"),
   }),
 ];
 

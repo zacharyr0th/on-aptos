@@ -1,11 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
-import {
-  errorResponse,
-  successResponse,
-  CACHE_DURATIONS,
-} from "@/lib/utils/api/common";
-import { withRateLimit, RATE_LIMIT_TIERS } from "@/lib/utils/api/rate-limiter";
+import { CACHE_DURATIONS, errorResponse, successResponse } from "@/lib/utils/api/common";
+import { RATE_LIMIT_TIERS, withRateLimit } from "@/lib/utils/api/rate-limiter";
 
 // Revalidate this route every 5 minutes
 export const revalidate = 300;
@@ -26,15 +22,12 @@ async function cmcBTCHandler(request: NextRequest) {
         Accept: "application/json",
         "User-Agent": "OnAptos-BTC-Tracker/1.0",
       },
-    },
+    }
   );
 
   if (!response.ok) {
     const errorBody = await response.text().catch(() => "Unknown error");
-    return errorResponse(
-      `CMC API error: ${response.status} - ${errorBody}`,
-      response.status,
-    );
+    return errorResponse(`CMC API error: ${response.status} - ${errorBody}`, response.status);
   }
 
   const data = await response.json();

@@ -1,18 +1,19 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
 import {
-  extractParams,
-  errorResponse,
-  successResponse,
   CACHE_DURATIONS,
+  errorResponse,
+  extractParams,
   getAptosAuthHeaders,
+  successResponse,
   validateRequiredParams,
 } from "@/lib/utils/api/common";
-import { withRateLimit, RATE_LIMIT_TIERS } from "@/lib/utils/api/rate-limiter";
+import { RATE_LIMIT_TIERS, withRateLimit } from "@/lib/utils/api/rate-limiter";
 import { apiLogger } from "@/lib/utils/core/logger";
 
-// Cache ANS data for 10 minutes
-export const revalidate = 600;
+import { PORTFOLIO_CACHE, PORTFOLIO_RATE_LIMIT_NAMES } from "../constants";
+
+export const revalidate = 300;
 
 async function portfolioANSHandler(request: NextRequest) {
   const params = extractParams(request);
@@ -53,13 +54,13 @@ async function portfolioANSHandler(request: NextRequest) {
               source: "ans-api",
             },
           },
-          CACHE_DURATIONS.LONG,
+          PORTFOLIO_CACHE.ANS
         );
       }
     }
   } catch (error) {
     apiLogger.warn(
-      `[ANS] ANS API failed, falling back to GraphQL: ${error instanceof Error ? error.message : String(error)}`,
+      `[ANS] ANS API failed, falling back to GraphQL: ${error instanceof Error ? error.message : String(error)}`
     );
   }
 
@@ -130,7 +131,7 @@ async function portfolioANSHandler(request: NextRequest) {
           source: "graphql",
         },
       },
-      CACHE_DURATIONS.LONG,
+      PORTFOLIO_CACHE.ANS
     );
   }
 
@@ -140,11 +141,11 @@ async function portfolioANSHandler(request: NextRequest) {
       success: true,
       data: null,
     },
-    CACHE_DURATIONS.LONG,
+    CACHE_DURATIONS.LONG
   );
 }
 
 export const GET = withRateLimit(portfolioANSHandler, {
-  name: "portfolio-ans",
+  name: PORTFOLIO_RATE_LIMIT_NAMES.ANS,
   ...RATE_LIMIT_TIERS.RELAXED, // ANS lookups are lightweight
 });

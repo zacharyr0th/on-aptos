@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { dedupeFetch } from "@/lib/utils/cache/request-deduplication";
 import { logger } from "@/lib/utils/core/logger";
@@ -33,7 +33,7 @@ interface TokenPriceResult {
  */
 export function useTokenPrice(
   tokenAddress?: string,
-  options: TokenPriceOptions = {},
+  options: TokenPriceOptions = {}
 ): TokenPriceResult {
   const {
     refreshInterval = 60000,
@@ -43,9 +43,7 @@ export function useTokenPrice(
   } = options;
 
   const [price, setPrice] = useState<number | null>(null);
-  const [priceHistory, setPriceHistory] = useState<
-    Array<{ timestamp: string; price: number }>
-  >([]);
+  const [priceHistory, setPriceHistory] = useState<Array<{ timestamp: string; price: number }>>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
@@ -62,9 +60,7 @@ export function useTokenPrice(
 
     try {
       const requests: Promise<Response>[] = [
-        dedupeFetch(
-          `/api/unified/prices?tokens=${encodeURIComponent(tokenAddress)}`,
-        ),
+        dedupeFetch(`/api/unified/prices?tokens=${encodeURIComponent(tokenAddress)}`),
       ];
 
       if (includeHistory) {
@@ -74,8 +70,8 @@ export function useTokenPrice(
               address: tokenAddress,
               lookback: historyTimeframe,
               downsample_to: downsampleTo.toString(),
-            })}`,
-          ),
+            })}`
+          )
         );
       }
 
@@ -84,9 +80,7 @@ export function useTokenPrice(
 
       // Process latest price
       if (!latestResponse.ok) {
-        throw new Error(
-          `Failed to fetch token price: ${latestResponse.status}`,
-        );
+        throw new Error(`Failed to fetch token price: ${latestResponse.status}`);
       }
 
       const latestData = await latestResponse.json();
@@ -97,9 +91,7 @@ export function useTokenPrice(
       // Process price history if requested
       if (includeHistory && historyResponse) {
         if (!historyResponse.ok) {
-          logger.warn(
-            `Failed to fetch price history: ${historyResponse.status}`,
-          );
+          logger.warn(`Failed to fetch price history: ${historyResponse.status}`);
         } else {
           const historyData = await historyResponse.json();
           const history = (historyData.data || []).map((item: any) => ({
@@ -173,7 +165,7 @@ export function useAptPrice(refreshInterval = 60000) {
  */
 export function useTokenChart(
   tokenAddress?: string,
-  timeframe: "hour" | "day" | "week" | "month" | "year" | "all" = "month",
+  timeframe: "hour" | "day" | "week" | "month" | "year" | "all" = "month"
 ) {
   const result = useTokenPrice(tokenAddress, {
     includeHistory: true,

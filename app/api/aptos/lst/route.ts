@@ -1,46 +1,28 @@
-import { NextRequest } from "next/server";
+import { SERVICE_CONFIG } from "@/lib/config/cache";
+import { fetchLSTSuppliesData } from "@/lib/services/asset-types/liquid-staking-service";
+import { ApiError } from "@/lib/utils/errors";
+import { withApiEnhancements } from "@/lib/utils/server";
 
-import { LiquidStakingService } from "@/lib/services/assets/services/liquid-staking-service";
-import {
-  successResponse,
-  errorResponse,
-  CACHE_DURATIONS,
-} from "@/lib/utils/api/common";
-import { withRateLimit, RATE_LIMIT_TIERS } from "@/lib/utils/api/rate-limiter";
-import { logger } from "@/lib/utils/core/logger";
+export async function GET() {
+  return withApiEnhancements(
+    async () => {
+      try {
+        const data = await fetchLSTSuppliesData();
 
-async function handler(request: NextRequest) {
-  try {
-    const forceRefresh = request.nextUrl.searchParams.get("refresh") === "true";
-    const data = await LiquidStakingService.getLSTSupplyDetailed(forceRefresh);
-
-    const headers = {
-      "X-Content-Type": "application/json",
-      "X-Service": "lst-supplies",
-      "X-API-Version": "2.0",
-      "X-Data-Source": "Aptos Indexer",
-      Vary: "Accept-Encoding",
-    };
-
-    if (!data.success) {
-      return errorResponse("Failed to fetch LST data", 503, data);
+        return data;
+      } catch (error) {
+        if (error instanceof Error) {
+          throw new ApiError(`LST supplies fetch failed: ${error.message}`, undefined, "LST-Route");
+        }
+        throw new ApiError("LST supplies fetch failed: Unknown error", undefined, "LST-Route");
+      }
+    },
+    {
+      customHeaders: {
+        "Cache-Control": `public, max-age=${Math.floor(SERVICE_CONFIG.lst.ttl / 1000)}, stale-while-revalidate=${Math.floor(SERVICE_CONFIG.lst.ttl / 2000)}`,
+        "X-Content-Type": "application/json",
+        "X-Service": "lst-supplies",
+      },
     }
-
-    return successResponse(data, CACHE_DURATIONS.MEDIUM, headers);
-  } catch (error) {
-    logger.error("LST Supply API error", {
-      error: error instanceof Error ? error.message : String(error),
-      endpoint: "/api/aptos/lst",
-    });
-    return errorResponse(
-      "Failed to fetch LST supply data",
-      500,
-      error instanceof Error ? error.message : undefined,
-    );
-  }
+  );
 }
-
-export const GET = withRateLimit(handler, {
-  name: "lst-supply",
-  ...RATE_LIMIT_TIERS.PUBLIC,
-});

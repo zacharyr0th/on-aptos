@@ -1,9 +1,9 @@
 import type { DefiProtocol } from "../types";
 import {
-  YieldAggregatorImplementation,
-  LiquidStakingImplementation,
   LeveragedFarmingImplementation,
   LiquidityManagerImplementation,
+  LiquidStakingImplementation,
+  YieldAggregatorImplementation,
 } from "../types";
 
 // Yield farming and staking protocols

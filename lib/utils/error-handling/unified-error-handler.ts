@@ -3,7 +3,7 @@
  * Consolidates all error handling patterns across the application
  */
 
-import { serviceLogger, apiLogger, errorLogger } from "../core/logger";
+import { apiLogger, errorLogger, serviceLogger } from "../core/logger";
 
 // Error types and interfaces
 export interface RetryOptions {
@@ -43,7 +43,7 @@ export class UnifiedError extends Error {
     status?: number,
     context?: ErrorContext,
     isRetryable: boolean = false,
-    originalError?: Error,
+    originalError?: Error
   ) {
     super(message);
     this.name = "UnifiedError";
@@ -155,9 +155,9 @@ export class UnifiedErrorHandler {
     attempt: number,
     baseDelay: number,
     backoffFactor: number,
-    maxDelay: number,
+    maxDelay: number
   ): number {
-    const delay = baseDelay * Math.pow(backoffFactor, attempt - 1);
+    const delay = baseDelay * backoffFactor ** (attempt - 1);
     return Math.min(delay, maxDelay);
   }
 
@@ -167,7 +167,7 @@ export class UnifiedErrorHandler {
   static wrapError(
     error: any,
     context: ErrorContext = {},
-    defaultMessage: string = "An error occurred",
+    defaultMessage: string = "An error occurred"
   ): UnifiedError {
     if (error instanceof UnifiedError) {
       // Already wrapped, just add context
@@ -177,7 +177,7 @@ export class UnifiedErrorHandler {
         error.status,
         { ...error.context, ...context },
         error.isRetryable,
-        error.originalError || error,
+        error.originalError || error
       );
     }
 
@@ -234,7 +234,7 @@ export class UnifiedErrorHandler {
   static async withRetry<T>(
     fn: () => Promise<T>,
     options: RetryOptions = {},
-    context: ErrorContext = {},
+    context: ErrorContext = {}
   ): Promise<T> {
     const config = { ...DEFAULT_RETRY_OPTIONS, ...options };
     let lastError: any;
@@ -243,29 +243,26 @@ export class UnifiedErrorHandler {
       try {
         return await fn();
       } catch (error) {
-        lastError = this.wrapError(error, context);
+        lastError = UnifiedErrorHandler.wrapError(error, context);
 
         // Check if we should retry
-        if (
-          attempt === config.maxAttempts ||
-          !config.retryCondition(lastError, attempt)
-        ) {
+        if (attempt === config.maxAttempts || !config.retryCondition(lastError, attempt)) {
           throw lastError;
         }
 
         // Calculate delay
-        const delay = this.calculateDelay(
+        const delay = UnifiedErrorHandler.calculateDelay(
           attempt,
           config.baseDelay,
           config.backoffFactor,
-          config.maxDelay,
+          config.maxDelay
         );
 
         // Call retry callback
         config.onRetry(lastError, attempt, delay);
 
         // Wait before retry
-        await this.sleep(delay);
+        await UnifiedErrorHandler.sleep(delay);
       }
     }
 
@@ -278,7 +275,7 @@ export class UnifiedErrorHandler {
   static async withTimeout<T>(
     fn: () => Promise<T>,
     options: TimeoutOptions = {},
-    context: ErrorContext = {},
+    context: ErrorContext = {}
   ): Promise<T> {
     const { timeout = 30000, timeoutMessage = "Operation timed out" } = options;
 
@@ -286,18 +283,9 @@ export class UnifiedErrorHandler {
       fn(),
       new Promise<T>((_, reject) =>
         setTimeout(
-          () =>
-            reject(
-              new UnifiedError(
-                timeoutMessage,
-                ERROR_CODES.TIMEOUT,
-                408,
-                context,
-                true,
-              ),
-            ),
-          timeout,
-        ),
+          () => reject(new UnifiedError(timeoutMessage, ERROR_CODES.TIMEOUT, 408, context, true)),
+          timeout
+        )
       ),
     ]);
   }
@@ -309,12 +297,12 @@ export class UnifiedErrorHandler {
     fn: () => Promise<T>,
     retryOptions: RetryOptions = {},
     timeoutOptions: TimeoutOptions = {},
-    context: ErrorContext = {},
+    context: ErrorContext = {}
   ): Promise<T> {
-    return this.withRetry(
-      () => this.withTimeout(fn, timeoutOptions, context),
+    return UnifiedErrorHandler.withRetry(
+      () => UnifiedErrorHandler.withTimeout(fn, timeoutOptions, context),
       retryOptions,
-      context,
+      context
     );
   }
 
@@ -324,12 +312,12 @@ export class UnifiedErrorHandler {
   static async withFallback<T>(
     fn: () => Promise<T>,
     fallback: T | (() => Promise<T>),
-    context: ErrorContext = {},
+    context: ErrorContext = {}
   ): Promise<T> {
     try {
       return await fn();
     } catch (error) {
-      const wrappedError = this.wrapError(error, context);
+      const wrappedError = UnifiedErrorHandler.wrapError(error, context);
 
       serviceLogger.warn("Function failed, using fallback", {
         error: wrappedError.message,
@@ -351,7 +339,7 @@ export class UnifiedErrorHandler {
   static validateRequired(
     params: Record<string, any>,
     required: string[],
-    context: ErrorContext = {},
+    context: ErrorContext = {}
   ): void {
     const missing = required.filter((key) => {
       const value = params[key];
@@ -363,7 +351,7 @@ export class UnifiedErrorHandler {
         `Missing required parameters: ${missing.join(", ")}`,
         ERROR_CODES.VALIDATION_ERROR,
         400,
-        { ...context, missingParams: missing },
+        { ...context, missingParams: missing }
       );
     }
   }
@@ -371,12 +359,9 @@ export class UnifiedErrorHandler {
   /**
    * Log error with appropriate level
    */
-  static logError(
-    error: UnifiedError | Error,
-    context: ErrorContext = {},
-  ): void {
+  static logError(error: UnifiedError | Error, context: ErrorContext = {}): void {
     const errorObj =
-      error instanceof UnifiedError ? error : this.wrapError(error, context);
+      error instanceof UnifiedError ? error : UnifiedErrorHandler.wrapError(error, context);
 
     const logData = {
       code: errorObj.code,
@@ -401,16 +386,19 @@ export class UnifiedErrorHandler {
   static handleFetchError(
     response: Response | null,
     error: any,
-    context: ErrorContext = {},
+    context: ErrorContext = {}
   ): UnifiedError {
     if (response) {
-      return this.wrapError(
+      return UnifiedErrorHandler.wrapError(
         new Error(`HTTP ${response.status}: ${response.statusText}`),
-        { ...context, status: response.status },
+        {
+          ...context,
+          status: response.status,
+        }
       );
     }
 
-    return this.wrapError(error, context);
+    return UnifiedErrorHandler.wrapError(error, context);
   }
 }
 

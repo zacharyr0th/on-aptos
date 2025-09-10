@@ -6,8 +6,7 @@ export const ECHO_PROTOCOL_CONFIG = {
   markets: [
     {
       symbol: "aBTC",
-      marketAddress:
-        "0x68476f9d437e3f32fd262ba898b5e3ee0a23a1d586a6cf29a28add35f253f6f7",
+      marketAddress: "0x68476f9d437e3f32fd262ba898b5e3ee0a23a1d586a6cf29a28add35f253f6f7",
       assetType: BTC_METADATA.aBTC.assetAddress,
       description: BTC_METADATA.aBTC.name,
       decimals: BTC_METADATA.aBTC.decimals,

@@ -1,19 +1,13 @@
-import React, { useMemo, memo, useCallback } from "react";
-import {
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-  TooltipProps,
-} from "recharts";
+import type React from "react";
+import { memo, useCallback, useMemo } from "react";
+import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip, type TooltipProps } from "recharts";
 
-import { useResponsive } from "@/hooks/useResponsive";
-import { logger, errorLogger } from "@/lib/utils/core/logger";
+import { useResponsive } from "@/lib/hooks/useResponsive";
+import { errorLogger, logger } from "@/lib/utils/core/logger";
 import {
-  formatAssetValue,
   CHART_DIMENSIONS,
-  ChartDataItem,
+  type ChartDataItem,
+  formatAssetValue,
 } from "@/lib/utils/format/chart-utils";
 
 export interface MarketShareChartProps {
@@ -84,15 +78,10 @@ const CustomLegend = memo<{
   if (!chartData.length) return null;
 
   const shouldShowAll = chartData.length <= maxItems;
-  const itemsToShow = shouldShowAll
-    ? chartData
-    : chartData.slice(0, maxItems - 1);
+  const itemsToShow = shouldShowAll ? chartData : chartData.slice(0, maxItems - 1);
   const remainingItems = shouldShowAll ? [] : chartData.slice(maxItems - 1);
   const remainingCount = remainingItems.length;
-  const remainingPercentage = remainingItems.reduce(
-    (sum, item) => sum + item.value,
-    0,
-  );
+  const remainingPercentage = remainingItems.reduce((sum, item) => sum + item.value, 0);
 
   return (
     <div className="flex flex-col gap-4">
@@ -101,27 +90,16 @@ const CustomLegend = memo<{
           return customRenderer(item, i);
         }
 
-        const displayValue = Number.isFinite(item.value)
-          ? item.value.toFixed(2)
-          : "0.00";
-        const color =
-          item.color || colors[item.name] || colors.default || "#888";
+        const displayValue = Number.isFinite(item.value) ? item.value.toFixed(2) : "0.00";
+        const color = item.color || colors[item.name] || colors.default || "#888";
 
         return (
-          <div
-            key={`legend-${item.name}-${i}`}
-            className="flex items-center gap-3"
-          >
-            <div
-              className="w-3 h-3 rounded-sm flex-shrink-0"
-              style={{ backgroundColor: color }}
-            />
+          <div key={`legend-${item.name}-${i}`} className="flex items-center gap-3">
+            <div className="w-3 h-3 rounded-sm flex-shrink-0" style={{ backgroundColor: color }} />
             <div className="min-w-[64px] flex flex-wrap text-card-foreground gap-x-1">
               <span>{item.name}</span>
             </div>
-            <span className="text-sm text-muted-foreground ml-auto pl-2">
-              {displayValue}%
-            </span>
+            <span className="text-sm text-muted-foreground ml-auto pl-2">{displayValue}%</span>
           </div>
         );
       })}
@@ -175,10 +153,7 @@ export const MarketShareChart = memo<MarketShareChartProps>(
       const result = [...mainItems];
 
       if (otherItems.length > 0) {
-        const othersValue = otherItems.reduce(
-          (sum, item) => sum + item.value,
-          0,
-        );
+        const othersValue = otherItems.reduce((sum, item) => sum + item.value, 0);
 
         // Calculate total supply more robustly - try multiple field formats
         const othersSupply = otherItems.reduce((sum, item) => {
@@ -227,7 +202,7 @@ export const MarketShareChart = memo<MarketShareChartProps>(
           : CHART_DIMENSIONS.desktop.outerRadius,
         size: isMobile ? "w-56 h-56" : "w-80 h-80",
       }),
-      [isMobile],
+      [isMobile]
     );
 
     // Memoized color getter for cells
@@ -238,7 +213,7 @@ export const MarketShareChart = memo<MarketShareChartProps>(
         }
         return entry.color || colors[entry.name] || colors.default || "#888";
       },
-      [colors],
+      [colors]
     );
 
     // Error boundary fallback
@@ -256,9 +231,7 @@ export const MarketShareChart = memo<MarketShareChartProps>(
       <div className="relative w-full h-full">
         {/* Top right content */}
         {topRightContent && showTotalInfo && (
-          <div className="absolute top-4 right-4 z-10 hidden md:block">
-            {topRightContent}
-          </div>
+          <div className="absolute top-4 right-4 z-10 hidden md:block">{topRightContent}</div>
         )}
 
         <div
@@ -321,7 +294,7 @@ export const MarketShareChart = memo<MarketShareChartProps>(
         </div>
       </div>
     );
-  },
+  }
 );
 
 MarketShareChart.displayName = "MarketShareChart";
