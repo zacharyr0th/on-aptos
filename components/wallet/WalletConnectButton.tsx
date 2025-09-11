@@ -3,6 +3,7 @@
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { Check, Copy, LogOut, Wallet } from "lucide-react";
 import Image from "next/image";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -27,6 +28,8 @@ interface WalletConnectButtonProps {
 export function WalletConnectButton({ size = "sm", className }: WalletConnectButtonProps = {}) {
   const { t } = useTranslation("common");
   const { connect, account, connected, disconnect, wallets, isLoading } = useWallet();
+  const router = useRouter();
+  const pathname = usePathname();
   const [showWalletModal, setShowWalletModal] = useState(false);
   const [copiedAddress, setCopiedAddress] = useState(false);
   const [isClient, setIsClient] = useState(false);
@@ -148,6 +151,11 @@ export function WalletConnectButton({ size = "sm", className }: WalletConnectBut
     try {
       await connect(walletName as any);
       setShowWalletModal(false);
+
+      // Navigate to portfolio after successful connection if on home page
+      if (pathname === "/") {
+        router.push("/tools/portfolio");
+      }
     } catch (error: any) {
       const errorMessage = error?.message || error?.toString() || "Unknown connection error";
 

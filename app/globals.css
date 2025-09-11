@@ -420,11 +420,30 @@
     min-height: 100svh;
   }
 
-  /* Portfolio page specific - enforce single viewport */
-  body:has(.portfolio-single-viewport) {
+  /* Portfolio and landing pages - enforce single viewport */
+  body:has(.portfolio-single-viewport),
+  body:has(.landing-single-viewport) {
     overflow: hidden !important;
     height: 100vh !important;
     height: 100dvh !important;
+  }
+  
+  /* Optimize spacing for single viewport pages */
+  .portfolio-single-viewport,
+  .landing-single-viewport {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  
+  /* Compact spacing for better single screen fit */
+  .compact-spacing {
+    @apply py-1 sm:py-2;
+  }
+  
+  .compact-padding {
+    @apply p-2 sm:p-3;
   }
 
   /* Mobile-specific grid improvements */

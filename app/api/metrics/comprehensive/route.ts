@@ -34,6 +34,7 @@ async function fetchDuneData(queryId: number) {
   }
 }
 
+
 // Comprehensive Analytics using ONLY working core queries
 const DUNE_QUERY_IDS = {
   // ===== CORE NETWORK ANALYTICS (Working Queries Only) =====
@@ -50,6 +51,9 @@ const DUNE_QUERY_IDS = {
   DEX_TRADING_VOLUME: 5699630, // DEX swap events and trading volume (7.5M+ events)
   ACTIVITY_PATTERNS: 5699668, // Hourly activity patterns (transactions, users, gas, failed txns)
   NETWORK_OVERVIEW: 5699670, // Comprehensive network overview metrics
+  // ===== ADDITIONAL REQUESTED METRICS =====
+  ALL_TIME_TRANSACTIONS: 5699671, // All-time total transaction count
+  BLOCK_TIMES: 5699672, // Block times and finality metrics
 };
 
 // Helper to get Dune query URL
@@ -77,6 +81,9 @@ export async function GET() {
       dexTradingVolume,
       activityPatterns,
       networkOverview,
+      // Additional requested metrics
+      allTimeTransactions,
+      blockTimes,
     ] = await Promise.allSettled([
       // Core Network Analytics (Working Queries Only)
       fetchDuneData(DUNE_QUERY_IDS.PROTOCOL_ACTIVITY),
@@ -92,6 +99,9 @@ export async function GET() {
       fetchDuneData(DUNE_QUERY_IDS.DEX_TRADING_VOLUME),
       fetchDuneData(DUNE_QUERY_IDS.ACTIVITY_PATTERNS),
       fetchDuneData(DUNE_QUERY_IDS.NETWORK_OVERVIEW),
+      // Additional requested metrics
+      fetchDuneData(DUNE_QUERY_IDS.ALL_TIME_TRANSACTIONS),
+      fetchDuneData(DUNE_QUERY_IDS.BLOCK_TIMES),
     ]);
 
     // Extract successful results and apply COMPREHENSIVE analytics processing
@@ -112,6 +122,9 @@ export async function GET() {
     const dexTradingData = extractResult(dexTradingVolume);
     const activityPatternsData = extractResult(activityPatterns);
     const networkOverviewData = extractResult(networkOverview);
+    // Additional requested metrics
+    const allTimeTransactionsData = extractResult(allTimeTransactions);
+    const blockTimesData = extractResult(blockTimes);
 
     // Extract MASSIVE COMPREHENSIVE metrics using ALL available data sources
 
@@ -121,6 +134,21 @@ export async function GET() {
     const uniqueUsers = parseInt(mainMetrics.unique_senders || 0);
     const avgSuccessRate = parseFloat(mainMetrics.success_rate || 0);
     const avgGasPrice = parseFloat(mainMetrics.avg_gas_cost || 0);
+    
+    // NEW: All-time transactions and block time metrics - NO FALLBACKS, REAL DATA ONLY
+    const allTimeMetrics = allTimeTransactionsData[0] || {};
+    const allTimeTransactionCount = allTimeMetrics.total_all_time_transactions ? 
+      parseInt(allTimeMetrics.total_all_time_transactions) : null;
+    const networkLifetimeDays = allTimeMetrics.network_age_days ? 
+      parseInt(allTimeMetrics.network_age_days) : null;
+    
+    const blockMetrics = blockTimesData[0] || {};
+    const avgBlockTime = blockMetrics.avg_block_time_seconds ? 
+      parseFloat(blockMetrics.avg_block_time_seconds) : null;
+    const avgFinalityTime = blockMetrics.avg_finality_time_seconds ? 
+      parseFloat(blockMetrics.avg_finality_time_seconds) : null;
+    const networkReliabilityScore = blockMetrics.network_reliability_pct ? 
+      parseFloat(blockMetrics.network_reliability_pct) : null;
 
     // From DEX_COMPARISON (3431742): daily_active_addresses, daily_transactions
     const dailyMetrics = dexData[0] || {};
@@ -458,17 +486,21 @@ export async function GET() {
 
     // Build clean table data with unique metrics only
     const tableData = [
-      // Core Network Metrics - Keep only most comprehensive
+      // Core Network Metrics - Removed inaccurate Dune transaction count
+      ...(allTimeTransactionCount !== null
+        ? [
+            {
+              name: "All-Time Total Transactions",
+              value: formatMetricValue(allTimeTransactionCount),
+              change: "—",
+              category: "Network Activity",
+              queryUrl: getDuneQueryUrl(DUNE_QUERY_IDS.ALL_TIME_TRANSACTIONS),
+              queryId: DUNE_QUERY_IDS.ALL_TIME_TRANSACTIONS,
+            },
+          ]
+        : []),
       {
-        name: "Total Network Transactions",
-        value: formatMetricValue(totalTransactions),
-        change: "—",
-        category: "Network Activity",
-        queryUrl: getDuneQueryUrl(DUNE_QUERY_IDS.PROTOCOL_ACTIVITY),
-        queryId: DUNE_QUERY_IDS.PROTOCOL_ACTIVITY,
-      },
-      {
-        name: "Daily Active Addresses",
+        name: "Daily Active Addresses (24h)",
         value: formatMetricValue(dailyActiveAddresses),
         change: "—",
         category: "User Activity",
@@ -511,17 +543,57 @@ export async function GET() {
         queryUrl: getDuneQueryUrl(DUNE_QUERY_IDS.PROTOCOL_ACTIVITY),
         queryId: DUNE_QUERY_IDS.PROTOCOL_ACTIVITY,
       },
-      {
-        name: "Average Gas Cost (APT)",
-        value: avgGasPrice.toFixed(6),
-        change: "—",
-        category: "Network Performance",
-        queryUrl: getDuneQueryUrl(DUNE_QUERY_IDS.PROTOCOL_ACTIVITY),
-        queryId: DUNE_QUERY_IDS.PROTOCOL_ACTIVITY,
-      },
+      ...(avgGasPrice > 0
+        ? [
+            {
+              name: "Average Gas Cost (APT)",
+              value: avgGasPrice.toFixed(6),
+              change: "—",
+              category: "Network Performance",
+              queryUrl: getDuneQueryUrl(DUNE_QUERY_IDS.PROTOCOL_ACTIVITY),
+              queryId: DUNE_QUERY_IDS.PROTOCOL_ACTIVITY,
+            },
+          ]
+        : []),
+      ...(avgBlockTime && avgBlockTime > 0
+        ? [
+            {
+              name: "Average Block Time",
+              value: `${avgBlockTime.toFixed(2)}s`,
+              change: "—",
+              category: "Network Performance",
+              queryUrl: getDuneQueryUrl(DUNE_QUERY_IDS.BLOCK_TIMES),
+              queryId: DUNE_QUERY_IDS.BLOCK_TIMES,
+            },
+          ]
+        : []),
+      ...(avgFinalityTime && avgFinalityTime > 0 && avgFinalityTime !== avgBlockTime
+        ? [
+            {
+              name: "Transaction Finality Time",
+              value: `${avgFinalityTime.toFixed(2)}s`,
+              change: "—",
+              category: "Network Performance",
+              queryUrl: getDuneQueryUrl(DUNE_QUERY_IDS.BLOCK_TIMES),
+              queryId: DUNE_QUERY_IDS.BLOCK_TIMES,
+            },
+          ]
+        : []),
+      ...(networkReliabilityScore && networkReliabilityScore !== avgSuccessRate
+        ? [
+            {
+              name: "Enhanced Network Reliability",
+              value: `${networkReliabilityScore.toFixed(1)}%`,
+              change: "—",
+              category: "Network Performance",
+              queryUrl: getDuneQueryUrl(DUNE_QUERY_IDS.BLOCK_TIMES),
+              queryId: DUNE_QUERY_IDS.BLOCK_TIMES,
+            },
+          ]
+        : []),
       // Keep only USD gas fees (most useful)
       {
-        name: "Daily Gas Fees (USD)",
+        name: "Daily Gas Fees (24h USD)",
         value: `$${formatMetricValue(dailyGasFeesUSD)}`,
         change: "—",
         category: "Gas Economics",
@@ -595,7 +667,55 @@ export async function GET() {
           ]
         : []),
 
-      // Removed extended protocol metrics as they use different time ranges
+      // Additional useful metrics from available data
+      ...(hourlyFailedTxns > 0
+        ? [
+            {
+              name: "Hourly Failed Transactions",
+              value: formatMetricValue(hourlyFailedTxns),
+              change: "—",
+              category: "Network Performance",
+              queryUrl: getDuneQueryUrl(DUNE_QUERY_IDS.ACTIVITY_PATTERNS),
+              queryId: DUNE_QUERY_IDS.ACTIVITY_PATTERNS,
+            },
+          ]
+        : []),
+      ...(netGasAPT > 0
+        ? [
+            {
+              name: "Net Daily Gas (24h APT)",
+              value: `${formatMetricValue(netGasAPT)} APT`,
+              change: "—",
+              category: "Gas Economics",
+              queryUrl: getDuneQueryUrl(DUNE_QUERY_IDS.USER_ANALYTICS),
+              queryId: DUNE_QUERY_IDS.USER_ANALYTICS,
+            },
+          ]
+        : []),
+      ...(averageHourlyTransactions > 0
+        ? [
+            {
+              name: "Average Hourly Transactions",
+              value: formatMetricValue(averageHourlyTransactions),
+              change: "—",
+              category: "Network Activity",
+              queryUrl: getDuneQueryUrl(DUNE_QUERY_IDS.ACTIVITY_PATTERNS),
+              queryId: DUNE_QUERY_IDS.ACTIVITY_PATTERNS,
+            },
+          ]
+        : []),
+      ...(networkLifetimeDays && networkLifetimeDays > 0
+        ? [
+            {
+              name: "Network Age (Days)",
+              value: `${networkLifetimeDays} days`,
+              change: "—",
+              category: "Network Performance",
+              queryUrl: getDuneQueryUrl(DUNE_QUERY_IDS.ALL_TIME_TRANSACTIONS),
+              queryId: DUNE_QUERY_IDS.ALL_TIME_TRANSACTIONS,
+            },
+          ]
+        : []),
     ]
       .filter(
         (item) =>
@@ -618,15 +738,20 @@ export async function GET() {
       // CORE NETWORK METRICS
       // ============================================================================
       totalTransactions,
+      allTimeTransactionCount: allTimeTransactionCount || "-", // Show "-" if no real data
       totalAccounts: uniqueUsers,
-      totalValidators: 0, // Need real validator query
-      networkUptime: avgSuccessRate.toFixed(1),
-      totalTransactionsChange: 0, // Need historical data
-      totalAccountsChange: 0, // Need historical data
-      totalValidatorsChange: 0,
+      totalValidators: "-", // No real validator data available
+      networkUptime: avgSuccessRate > 0 ? avgSuccessRate.toFixed(1) : "-",
+      networkReliabilityScore: networkReliabilityScore || "-", // Show "-" if no real data
+      totalTransactionsChange: "-", // No historical data available
+      totalAccountsChange: "-", // No historical data available
+      totalValidatorsChange: "-",
       totalProtocols,
       totalTVL: totalTVL,
-      averageGasPrice: avgGasPrice,
+      averageGasPrice: avgGasPrice > 0 ? avgGasPrice : "-", // Show "-" if no real data
+      avgBlockTime: avgBlockTime || "-", // Show "-" if no real data
+      avgFinalityTime: avgFinalityTime || "-", // Show "-" if no real data
+      networkLifetimeDays: networkLifetimeDays || "-", // Show "-" if no real data
 
       // Core metrics from working queries
       dailyActiveAddresses,

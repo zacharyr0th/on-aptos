@@ -1,11 +1,6 @@
 import React from "react";
 import { cn } from "@/lib/utils";
 import { PortfolioMainContent } from "../PortfolioMainContent";
-import { SimplifiedAssetsTable, SimplifiedDeFiTable } from "../SimplifiedPortfolioTables";
-import { NFTSummaryView } from "../SummaryViews";
-import { getProtocolLogo } from "../shared/PortfolioMetrics";
-import { TransactionHistoryTable } from "../TransactionHistoryTable";
-import { WalletSummary } from "../WalletSummary";
 import { NewSidebar } from "./NewSidebar";
 
 import { PriceList } from "./PriceList";
@@ -151,89 +146,121 @@ export function PortfolioLayout({
         </div>
       </div>
 
-      {/* Mobile Layout - Following BTC/Stables Pattern */}
+      {/* Mobile Layout - Simplified */}
       <div className="lg:hidden h-full flex flex-col overflow-hidden">
-        {/* Mobile: Show portfolio value at top like BTC/Stables */}
-        <div className="flex-none px-4 py-4">
-          <div className="md:hidden mb-6">
-            <div className="flex items-center justify-between mb-1">
-              <h2 className="text-sm text-muted-foreground">Portfolio Value</h2>
-            </div>
-            <p className="text-xl font-bold font-mono">
-              {portfolioMetrics?.totalPortfolioValue
-                ? `$${portfolioMetrics.totalPortfolioValue.toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}`
-                : "$0.00"}
-            </p>
-          </div>
-        </div>
-
-        {/* Mobile Content - Scrollable */}
-        <div className="flex-1 overflow-y-auto px-4 pb-4">
-          <div className="space-y-6">
-            {/* Wallet Summary Section */}
-            <div className="space-y-4">
-              <WalletSummary
-                walletAddress={normalizedAddress}
-                assets={visibleAssets}
-                totalValue={portfolioMetrics?.totalPortfolioValue || 0}
-                isLoading={dataLoading}
-                selectedAsset={selectedAsset}
-                onAssetSelect={(asset) => onItemSelect(asset ? "asset" : null, asset)}
-                nfts={nfts}
-                totalNFTCount={totalNFTCount}
-                nftCollectionStats={nftCollectionStats}
-              />
+        {/* Mobile Content */}
+        <div className="flex-1 overflow-y-auto px-4 py-4">
+          <div className="space-y-4">
+            {/* Portfolio Value */}
+            <div>
+              <p className="text-2xl font-bold">
+                {portfolioMetrics?.totalPortfolioValue
+                  ? `$${portfolioMetrics.totalPortfolioValue.toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}`
+                  : "$0.00"}
+              </p>
             </div>
 
-            {/* NFTs Section - Only show if user has NFTs */}
-            {((nfts && nfts.length > 0) || (totalNFTCount && totalNFTCount > 0)) && (
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">
-                  NFTs ({totalNFTCount || nfts?.length || 0})
+            {/* Assets List */}
+            {visibleAssets && visibleAssets.length > 0 && (
+              <div>
+                <h3 className="text-sm font-semibold mb-2">Tokens</h3>
+                <div className="space-y-1">
+                  {visibleAssets.map((asset, i) => (
+                    <div
+                      key={i}
+                      className={cn(
+                        "flex items-center justify-between p-2 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors",
+                        selectedAsset === asset && "bg-muted"
+                      )}
+                      onClick={() => onItemSelect("asset", asset)}
+                    >
+                      <div className="flex items-center gap-2">
+                        <div className="h-6 w-6 rounded-full bg-muted flex items-center justify-center text-xs">
+                          {asset.metadata?.symbol?.[0] || "?"}
+                        </div>
+                        <span className="text-sm font-medium">
+                          {asset.metadata?.symbol || "Unknown"}
+                        </span>
+                      </div>
+                      <span className="text-sm text-muted-foreground">
+                        $
+                        {(asset.value || 0).toLocaleString(undefined, {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* NFTs Grid */}
+            {nfts && nfts.length > 0 && (
+              <div>
+                <h3 className="text-sm font-semibold mb-2">
+                  NFTs ({totalNFTCount || nfts.length})
                 </h3>
-                <NFTSummaryView
-                  nfts={nfts}
-                  totalNFTCount={totalNFTCount}
-                  nftCollectionStats={nftCollectionStats}
-                  accountNames={accountNames}
-                  isLoading={nftsLoading}
-                  onNFTSelect={(nft) => onItemSelect(nft ? "nft" : null, nft)}
-                  selectedNFT={selectedNFT}
-                  hasMoreNFTs={hasMoreNFTs}
-                  isLoadingMore={isLoadingMore}
-                  loadMoreNFTs={loadMoreNFTs}
-                />
+                <div className="grid grid-cols-3 gap-2">
+                  {nfts.slice(0, 6).map((nft, i) => (
+                    <div
+                      key={i}
+                      className="aspect-square rounded-lg overflow-hidden bg-muted cursor-pointer"
+                      onClick={() => onItemSelect("nft", nft)}
+                    >
+                      {nft.cdn_image_uri && (
+                        <img
+                          src={nft.cdn_image_uri}
+                          alt={nft.token_name}
+                          className="w-full h-full object-cover"
+                        />
+                      )}
+                    </div>
+                  ))}
+                </div>
+                {totalNFTCount && totalNFTCount > 6 && (
+                  <p className="text-xs text-muted-foreground mt-2">+{totalNFTCount - 6} more</p>
+                )}
               </div>
             )}
 
-            {/* DeFi Section - Only show if user has DeFi positions */}
+            {/* DeFi Positions */}
             {groupedDeFiPositions && groupedDeFiPositions.length > 0 && (
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">DeFi ({groupedDeFiPositions.length})</h3>
-                <SimplifiedDeFiTable
-                  groupedDeFiPositions={groupedDeFiPositions}
-                  selectedPosition={selectedDeFiPosition}
-                  onPositionSelect={(pos: any) => onItemSelect(pos ? "defi" : null, pos)}
-                  isLoading={defiLoading}
-                  getProtocolLogo={getProtocolLogo}
-                />
+              <div>
+                <h3 className="text-sm font-semibold mb-2">DeFi</h3>
+                <div className="space-y-1">
+                  {groupedDeFiPositions.map((position, i) => (
+                    <div
+                      key={i}
+                      className={cn(
+                        "flex items-center justify-between p-2 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors",
+                        selectedDeFiPosition === position && "bg-muted"
+                      )}
+                      onClick={() => onItemSelect("defi", position)}
+                    >
+                      <div className="flex items-center gap-2">
+                        <div className="h-6 w-6 rounded-full bg-muted flex items-center justify-center text-xs">
+                          {position.protocol?.[0]?.toUpperCase() || "?"}
+                        </div>
+                        <span className="text-sm font-medium">
+                          {position.protocol || "Unknown"}
+                        </span>
+                      </div>
+                      <span className="text-sm text-muted-foreground">
+                        $
+                        {(position.totalValue || 0).toLocaleString(undefined, {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
-
-            {/* Transactions Section */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Recent Transactions</h3>
-              <TransactionHistoryTable
-                transactions={transactions}
-                isLoading={transactionsLoading}
-                walletAddress={normalizedAddress}
-                hasMoreTransactions={hasMoreTransactions}
-                loadMoreTransactions={loadMoreTransactions}
-              />
-            </div>
           </div>
         </div>
       </div>

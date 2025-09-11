@@ -48,6 +48,13 @@ interface FocusedDashboardsProps {
   metrics: MetricsData;
 }
 
+// Helper function to safely format numbers - return "-" for unavailable data
+const safeToFixed = (value: any, decimals: number = 0): string => {
+  if (value === "-" || value === null || value === undefined) return "-";
+  const num = typeof value === 'string' ? parseFloat(value) : Number(value);
+  return !isNaN(num) && isFinite(num) ? num.toFixed(decimals) : "-";
+};
+
 const FocusedDashboards: React.FC<FocusedDashboardsProps> = ({ metrics }) => {
   if (!metrics) {
     return <div className="text-center py-8 text-muted-foreground">Loading dashboard data...</div>;
@@ -109,7 +116,7 @@ const FocusedDashboards: React.FC<FocusedDashboardsProps> = ({ metrics }) => {
         <CardContent>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="space-y-2">
-              <div className="text-2xl font-mono">{successRate.toFixed(1)}%</div>
+              <div className="text-2xl font-mono">{safeToFixed(successRate, 1)}%</div>
               <div className="text-sm text-muted-foreground">Success Rate</div>
               <Badge
                 variant={
@@ -120,22 +127,22 @@ const FocusedDashboards: React.FC<FocusedDashboardsProps> = ({ metrics }) => {
               </Badge>
             </div>
             <div className="space-y-2">
-              <div className="text-2xl font-mono">{(peakHourTxs / 1000).toFixed(0)}K</div>
+              <div className="text-2xl font-mono">{safeToFixed(peakHourTxs / 1000, 0)}K</div>
               <div className="text-sm text-muted-foreground">Peak Transactions/hr</div>
               <div className="text-xs text-muted-foreground">
-                vs {(avgHourlyTxs / 1000).toFixed(0)}K avg
+                vs {safeToFixed(avgHourlyTxs / 1000, 0)}K avg
               </div>
             </div>
             <div className="space-y-2">
-              <div className="text-2xl font-mono">{networkUtilization.toFixed(1)}%</div>
+              <div className="text-2xl font-mono">{safeToFixed(networkUtilization, 1)}%</div>
               <div className="text-sm text-muted-foreground">Network Utilization</div>
               <div className="text-xs text-muted-foreground">of {metrics.maxTPS} TPS capacity</div>
             </div>
             <div className="space-y-2">
-              <div className="text-2xl font-mono">{(failedTxsPerHour / 1000).toFixed(0)}K</div>
+              <div className="text-2xl font-mono">{safeToFixed(failedTxsPerHour / 1000, 0)}K</div>
               <div className="text-sm text-muted-foreground">Failed Transactions/hr</div>
               <div className="text-xs text-muted-foreground">
-                {((failedTxsPerHour / peakHourTxs) * 100).toFixed(1)}% failure rate
+                {safeToFixed((failedTxsPerHour / peakHourTxs) * 100, 1)}% failure rate
               </div>
             </div>
           </div>
@@ -165,13 +172,13 @@ const FocusedDashboards: React.FC<FocusedDashboardsProps> = ({ metrics }) => {
                       <div className="flex justify-between items-center">
                         <span className="font-medium">{protocol.protocolName}</span>
                         <div className="flex items-center gap-2">
-                          <span className="font-mono text-sm">{share.toFixed(1)}%</span>
+                          <span className="font-mono text-sm">{safeToFixed(share, 1)}%</span>
                           {index === 0 && <Badge variant="default">Leader</Badge>}
                         </div>
                       </div>
                       <div className="text-xs text-muted-foreground flex justify-between">
                         <span>
-                          {(protocol.transactionCount / 1000000).toFixed(1)}M transactions
+                          {safeToFixed(protocol.transactionCount / 1000000, 1)}M transactions
                         </span>
                         <span>{protocol.senderCount.toLocaleString()} users</span>
                       </div>
@@ -188,7 +195,7 @@ const FocusedDashboards: React.FC<FocusedDashboardsProps> = ({ metrics }) => {
                     </span>
                   </div>
                   <p className="text-xs text-orange-700 dark:text-orange-300 mt-1">
-                    Top protocol controls {protocolMarketShare.toFixed(1)}% of transactions
+                    Top protocol controls {safeToFixed(protocolMarketShare, 1)}% of transactions
                   </p>
                 </div>
               )}
@@ -209,11 +216,11 @@ const FocusedDashboards: React.FC<FocusedDashboardsProps> = ({ metrics }) => {
                       <div className="grid grid-cols-2 gap-4 text-sm">
                         <div>
                           <span className="text-muted-foreground">Gas per Transaction:</span>
-                          <div className="font-mono">{gasPerTx.toFixed(6)} APT</div>
+                          <div className="font-mono">{safeToFixed(gasPerTx, 6)} APT</div>
                         </div>
                         <div>
                           <span className="text-muted-foreground">Transactions per User:</span>
-                          <div className="font-mono">{txsPerUser.toFixed(1)}</div>
+                          <div className="font-mono">{safeToFixed(txsPerUser, 1)}</div>
                         </div>
                       </div>
                       <Badge
@@ -252,32 +259,32 @@ const FocusedDashboards: React.FC<FocusedDashboardsProps> = ({ metrics }) => {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="space-y-2">
               <div className="text-2xl font-mono">
-                {(metrics.dailyActiveAddresses / 1000).toFixed(0)}K
+                {safeToFixed(metrics.dailyActiveAddresses / 1000, 0)}K
               </div>
               <div className="text-sm text-muted-foreground">Daily Active Users</div>
               <div className="text-xs text-muted-foreground">
-                vs {(metrics.behaviorDailyActiveUsers / 1000).toFixed(0)}K behavior-tracked
+                vs {safeToFixed(metrics.behaviorDailyActiveUsers / 1000, 0)}K behavior-tracked
               </div>
             </div>
             <div className="space-y-2">
-              <div className="text-2xl font-mono">{userDiscrepancy.toFixed(1)}%</div>
+              <div className="text-2xl font-mono">{safeToFixed(userDiscrepancy, 1)}%</div>
               <div className="text-sm text-muted-foreground">Measurement Discrepancy</div>
               <Badge variant={userDiscrepancy > 30 ? "destructive" : "secondary"}>
                 {userDiscrepancy > 30 ? "Investigation Needed" : "Acceptable Range"}
               </Badge>
             </div>
             <div className="space-y-2">
-              <div className="text-2xl font-mono">{signaturesPerTx.toFixed(1)}</div>
+              <div className="text-2xl font-mono">{safeToFixed(signaturesPerTx, 1)}</div>
               <div className="text-sm text-muted-foreground">Signatures per Transaction</div>
               <Badge variant={signaturesPerTx > 1.5 ? "default" : "secondary"}>
                 {signaturesPerTx > 1.5 ? "Complex Operations" : "Simple Transactions"}
               </Badge>
             </div>
             <div className="space-y-2">
-              <div className="text-2xl font-mono">{(peakUsers / 1000).toFixed(0)}K</div>
+              <div className="text-2xl font-mono">{safeToFixed(peakUsers / 1000, 0)}K</div>
               <div className="text-sm text-muted-foreground">Peak Hourly Users</div>
               <div className="text-xs text-muted-foreground">
-                {((peakUsers / metrics.dailyActiveAddresses) * 100).toFixed(0)}% of daily users
+                {safeToFixed((peakUsers / metrics.dailyActiveAddresses) * 100, 0)}% of daily users
               </div>
             </div>
           </div>
@@ -296,15 +303,15 @@ const FocusedDashboards: React.FC<FocusedDashboardsProps> = ({ metrics }) => {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="space-y-2">
               <div className="text-2xl font-mono">
-                ${(metrics.dailyGasFeesUSD / 1000).toFixed(1)}K
+                ${safeToFixed(metrics.dailyGasFeesUSD / 1000, 1)}K
               </div>
               <div className="text-sm text-muted-foreground">Daily Revenue</div>
               <div className="text-xs text-muted-foreground">
-                {metrics.dailyGasFeesAPT.toFixed(0)} APT collected
+                {safeToFixed(metrics.dailyGasFeesAPT, 0)} APT collected
               </div>
             </div>
             <div className="space-y-2">
-              <div className="text-2xl font-mono">${gasPerUser.toFixed(2)}</div>
+              <div className="text-2xl font-mono">${safeToFixed(gasPerUser, 2)}</div>
               <div className="text-sm text-muted-foreground">Average Cost per User</div>
               <Badge
                 variant={
@@ -320,14 +327,14 @@ const FocusedDashboards: React.FC<FocusedDashboardsProps> = ({ metrics }) => {
             </div>
             <div className="space-y-2">
               <div className="text-2xl font-mono">
-                {metrics.activityPatterns?.[0]?.avg_gas_price?.toFixed(0) ?? "101"}
+                {safeToFixed(metrics.activityPatterns?.[0]?.avg_gas_price, 0) || "101"}
               </div>
               <div className="text-sm text-muted-foreground">Current Gas Price</div>
               <div className="text-xs text-muted-foreground">Units per gas</div>
             </div>
             <div className="space-y-2">
               <div className="text-2xl font-mono">
-                {(metrics.dailyTransactions / 1000000).toFixed(1)}M
+                {safeToFixed(metrics.dailyTransactions / 1000000, 1)}M
               </div>
               <div className="text-sm text-muted-foreground">Daily Transactions</div>
               <Badge variant="default">Major DeFi Activity</Badge>
@@ -367,18 +374,18 @@ const FocusedDashboards: React.FC<FocusedDashboardsProps> = ({ metrics }) => {
                         <div>
                           <span className="text-muted-foreground">Transactions:</span>
                           <div className="font-mono">
-                            {(pattern.transactions / 1000).toFixed(0)}K
+                            {safeToFixed(pattern.transactions / 1000, 0)}K
                           </div>
                         </div>
                         <div>
                           <span className="text-muted-foreground">Users:</span>
                           <div className="font-mono">
-                            {(pattern.unique_users / 1000).toFixed(0)}K
+                            {safeToFixed(pattern.unique_users / 1000, 0)}K
                           </div>
                         </div>
                         <div>
                           <span className="text-muted-foreground">Failure Rate:</span>
-                          <div className="font-mono text-red-600">{failureRate.toFixed(1)}%</div>
+                          <div className="font-mono text-red-600">{safeToFixed(failureRate, 1)}%</div>
                         </div>
                       </div>
                     </div>
@@ -392,18 +399,18 @@ const FocusedDashboards: React.FC<FocusedDashboardsProps> = ({ metrics }) => {
                 <div className="p-4 border rounded space-y-2">
                   <div className="text-2xl font-mono">
                     {avgHourlyTxs > 0
-                      ? (((peakHourTxs - avgHourlyTxs) / avgHourlyTxs) * 100).toFixed(0)
+                      ? safeToFixed(((peakHourTxs - avgHourlyTxs) / avgHourlyTxs) * 100, 0)
                       : 0}
                     %
                   </div>
                   <div className="text-sm text-muted-foreground">Peak vs Average</div>
                   <div className="text-xs text-muted-foreground">
-                    {(peakHourTxs / 1000).toFixed(0)}K peak vs {(avgHourlyTxs / 1000).toFixed(0)}K
+                    {safeToFixed(peakHourTxs / 1000, 0)}K peak vs {safeToFixed(avgHourlyTxs / 1000, 0)}K
                     avg
                   </div>
                 </div>
                 <div className="p-4 border rounded space-y-2">
-                  <div className="text-2xl font-mono">{(peakHourTxs / 3600).toFixed(0)}</div>
+                  <div className="text-2xl font-mono">{safeToFixed(peakHourTxs / 3600, 0)}</div>
                   <div className="text-sm text-muted-foreground">Peak TPS</div>
                   <div className="text-xs text-muted-foreground">
                     Transactions per second at peak
@@ -411,7 +418,7 @@ const FocusedDashboards: React.FC<FocusedDashboardsProps> = ({ metrics }) => {
                 </div>
                 <div className="p-4 border rounded space-y-2">
                   <div className="text-2xl font-mono">
-                    {peakHourTxs > 0 ? ((failedTxsPerHour / peakHourTxs) * 100).toFixed(1) : 0}%
+                    {safeToFixed(peakHourTxs > 0 ? ((failedTxsPerHour / peakHourTxs) * 100) : 0, 1)}%
                   </div>
                   <div className="text-sm text-muted-foreground">Network Stress Indicator</div>
                   <Badge

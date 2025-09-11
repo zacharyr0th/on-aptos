@@ -87,20 +87,26 @@ export function usePortfolioHistory(
     }
 
     try {
+      // Use the correct API endpoint path
       const response = await fetch(
-        `/api/wallet/ans/names?address=${encodeURIComponent(walletAddress)}`
+        `/api/portfolio/ans/names?address=${encodeURIComponent(walletAddress)}`
       );
-      if (response.ok) {
-        const result = await response.json();
-        if (result.success && result.data) {
-          setAccountNames(result.data);
-        }
+
+      if (!response.ok) {
+        // Silently fail - ANS names are optional
+        setAccountNames(null);
+        return;
+      }
+
+      const result = await response.json();
+      if (result.success && result.data) {
+        setAccountNames(result.data);
+      } else {
+        setAccountNames(null);
       }
     } catch (error) {
-      logger.error(
-        `Failed to fetch ANS names: ${error instanceof Error ? error.message : String(error)}`
-      );
-      // Don't set error state as this is not critical
+      // Silently handle errors - ANS is optional, don't log errors
+      setAccountNames(null);
     }
   }, [walletAddress]);
 

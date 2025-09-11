@@ -52,6 +52,13 @@ interface AdvancedBlockchainAnalyticsProps {
   metrics: AdvancedMetrics;
 }
 
+// Helper function to safely format numbers - return "-" for unavailable data
+const safeToFixed = (value: any, decimals: number = 0): string => {
+  if (value === "-" || value === null || value === undefined) return "-";
+  const num = typeof value === 'string' ? parseFloat(value) : Number(value);
+  return !isNaN(num) && isFinite(num) ? num.toFixed(decimals) : "-";
+};
+
 const AdvancedBlockchainAnalytics: React.FC<AdvancedBlockchainAnalyticsProps> = ({ metrics }) => {
   if (!metrics) {
     return (
@@ -120,7 +127,7 @@ const AdvancedBlockchainAnalytics: React.FC<AdvancedBlockchainAnalyticsProps> = 
                 overallHealth > 75 ? "default" : overallHealth > 50 ? "secondary" : "destructive"
               }
             >
-              {overallHealth.toFixed(0)}/100
+              {safeToFixed(overallHealth, 0)}/100
             </Badge>
           </CardTitle>
         </CardHeader>
@@ -132,7 +139,7 @@ const AdvancedBlockchainAnalytics: React.FC<AdvancedBlockchainAnalyticsProps> = 
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">Decentralization</span>
                     <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
-                      {healthMetrics.decentralization.toFixed(0)}
+                      {safeToFixed(healthMetrics.decentralization, 0)}
                     </span>
                   </div>
                   <Progress value={healthMetrics.decentralization} className="h-2" />
@@ -147,7 +154,7 @@ const AdvancedBlockchainAnalytics: React.FC<AdvancedBlockchainAnalyticsProps> = 
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">Throughput</span>
                     <span className="text-lg font-bold text-green-600 dark:text-green-400">
-                      {healthMetrics.throughput.toFixed(0)}
+                      {safeToFixed(healthMetrics.throughput, 0)}
                     </span>
                   </div>
                   <Progress value={healthMetrics.throughput} className="h-2" />
@@ -162,7 +169,7 @@ const AdvancedBlockchainAnalytics: React.FC<AdvancedBlockchainAnalyticsProps> = 
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">Gas Stability</span>
                     <span className="text-lg font-bold text-purple-600 dark:text-purple-400">
-                      {healthMetrics.gasStability.toFixed(0)}
+                      {safeToFixed(healthMetrics.gasStability, 0)}
                     </span>
                   </div>
                   <Progress value={healthMetrics.gasStability} className="h-2" />
@@ -179,7 +186,7 @@ const AdvancedBlockchainAnalytics: React.FC<AdvancedBlockchainAnalyticsProps> = 
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">User Engagement</span>
                     <span className="text-lg font-bold text-orange-600 dark:text-orange-400">
-                      {healthMetrics.userEngagement.toFixed(0)}
+                      {safeToFixed(healthMetrics.userEngagement, 0)}
                     </span>
                   </div>
                   <Progress value={healthMetrics.userEngagement} className="h-2" />

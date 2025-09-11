@@ -53,7 +53,7 @@ const HeaderComponent = (): React.ReactElement | null => {
 
   return (
     <ErrorBoundary>
-      <header className="relative py-2 sm:py-3 md:py-4 z-[9999] isolate textured-bg">
+      <header className="relative py-1 sm:py-2 z-[9999] isolate textured-bg">
         <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20">
           <div className="flex items-center justify-between w-full">
             <HeaderLogo />

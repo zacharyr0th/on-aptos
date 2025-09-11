@@ -277,12 +277,12 @@ export const TransactionHistoryTable: React.FC<TransactionHistoryTableProps> = R
     ]);
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
     const [searchQuery, setSearchQuery] = React.useState("");
-    const [selectedCategory, setSelectedCategory] = React.useState<string>("all");
-    const [selectedProtocol, setSelectedProtocol] = React.useState<string>("all");
+    // Removed category and protocol state for simplicity
 
     const tableRef = React.useRef<HTMLDivElement>(null);
 
-    // All available category options with counts
+    // Removed category and protocol filtering
+    /*
     const allCategoryOptions = [
       { value: "all", label: "All", count: 0 },
       { value: "received", label: "Received", count: 0 },
@@ -382,6 +382,7 @@ export const TransactionHistoryTable: React.FC<TransactionHistoryTableProps> = R
 
       return { topCategories, dropdownCategories };
     }, [categoryCounts]);
+    */
 
     // Use the optimized loadMoreTransactions function from the hook (25 at a time)
 
@@ -389,22 +390,7 @@ export const TransactionHistoryTable: React.FC<TransactionHistoryTableProps> = R
     const { filteredTransactions, displayTransactions } = React.useMemo(() => {
       let filtered = allTransactions;
 
-      // Filter by protocol
-      if (selectedProtocol !== "all") {
-        filtered = filtered.filter((tx) => {
-          const analysis = getTransactionAnalysis(tx);
-          const protocolKey = analysis.protocol?.name || "none";
-          return protocolKey === selectedProtocol;
-        });
-      }
-
-      // Filter by category
-      if (selectedCategory !== "all") {
-        filtered = filtered.filter((tx) => {
-          const category = getTransactionCategory(tx);
-          return category === selectedCategory;
-        });
-      }
+      // Removed protocol and category filtering for simplicity
 
       // Filter by search query using enhanced analysis
       if (searchQuery) {
@@ -439,7 +425,7 @@ export const TransactionHistoryTable: React.FC<TransactionHistoryTableProps> = R
       const displayTransactions = filtered.slice(0, displayedCount);
 
       return { filteredTransactions: filtered, displayTransactions };
-    }, [allTransactions, searchQuery, selectedCategory, selectedProtocol, displayedCount]);
+    }, [allTransactions, searchQuery, displayedCount]);
 
     // Handle scroll-based loading similar to PriceList
     React.useEffect(() => {
@@ -482,7 +468,7 @@ export const TransactionHistoryTable: React.FC<TransactionHistoryTableProps> = R
     React.useEffect(() => {
       // Reset to initial amount when filters change
       setDisplayedCount(100);
-    }, [searchQuery, selectedCategory, selectedProtocol]);
+    }, [searchQuery]);
 
     // Initialize with preloaded transactions if available
     React.useEffect(() => {
@@ -513,13 +499,11 @@ export const TransactionHistoryTable: React.FC<TransactionHistoryTableProps> = R
     // Clear filters function
     const clearFilters = () => {
       setSearchQuery("");
-      setSelectedCategory("all");
-      setSelectedProtocol("all");
+      // Filters removed
     };
 
     // Check if any filters are active
-    const hasActiveFilters =
-      searchQuery !== "" || selectedCategory !== "all" || selectedProtocol !== "all";
+    const hasActiveFilters = searchQuery !== "";
 
     // Memoize columns
     const columns = React.useMemo<ColumnDef<Transaction>[]>(
@@ -983,156 +967,7 @@ export const TransactionHistoryTable: React.FC<TransactionHistoryTableProps> = R
           </h2>
         </div>
 
-        <div className="space-y-3 mb-4 flex-shrink-0">
-          {/* Mobile Layout */}
-          <div className="block lg:hidden space-y-3">
-            {/* Protocol Dropdown */}
-            <Select value={selectedProtocol} onValueChange={setSelectedProtocol}>
-              <SelectTrigger className="w-full bg-transparent border-border hover:bg-accent hover:text-accent-foreground">
-                <SelectValue placeholder="Select protocol" />
-              </SelectTrigger>
-              <SelectContent>
-                {protocolOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    <div className="flex items-center justify-between w-full">
-                      <span>{option.label}</span>
-                      {option.count > 0 && (
-                        <Badge variant="secondary" className="ml-2 h-4 px-2 text-xs">
-                          {option.count}
-                        </Badge>
-                      )}
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            {/* Category Dropdown - Mobile */}
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="w-full bg-transparent border-border hover:bg-accent hover:text-accent-foreground">
-                <SelectValue placeholder="All Categories" />
-              </SelectTrigger>
-              <SelectContent>
-                {/* Show all categories on mobile, but only non-zero ones */}
-                {[...topCategories, ...dropdownCategories].map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    <div className="flex items-center justify-between w-full">
-                      <span>{option.label}</span>
-                      <Badge variant="secondary" className="ml-2 h-4 px-2 text-xs">
-                        {option.count}
-                      </Badge>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            {/* Clear Filters */}
-            {hasActiveFilters && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={clearFilters}
-                className="text-muted-foreground hover:text-foreground w-full"
-              >
-                <X className="h-4 w-4 mr-2" />
-                Clear filters
-              </Button>
-            )}
-          </div>
-
-          {/* Desktop Layout - Clear filters only */}
-          <div className="hidden lg:flex lg:items-center lg:justify-start gap-4">
-            {hasActiveFilters && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={clearFilters}
-                className="text-muted-foreground hover:text-foreground"
-              >
-                <X className="h-4 w-4 mr-2" />
-                Clear filters
-              </Button>
-            )}
-          </div>
-        </div>
-
-        {/* Category Filter - Top categories as buttons + dropdowns */}
-        <div className="w-full">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            {/* Left side - Category filters */}
-            <div className="flex flex-wrap items-center gap-2 flex-1 min-w-0">
-              {/* Top category buttons */}
-              {topCategories.map((option) => (
-                <Button
-                  key={option.value}
-                  variant={selectedCategory === option.value ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setSelectedCategory(option.value)}
-                  className={cn(
-                    "text-xs h-10 border transition-colors",
-                    selectedCategory === option.value
-                      ? "bg-primary text-primary-foreground border-primary hover:bg-primary/90"
-                      : "bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground"
-                  )}
-                >
-                  {option.label} ({option.count})
-                </Button>
-              ))}
-
-              {/* Dropdown for additional categories */}
-              {dropdownCategories.length > 0 && (
-                <Select
-                  value={
-                    dropdownCategories.find((cat) => cat.value === selectedCategory)
-                      ? selectedCategory
-                      : ""
-                  }
-                  onValueChange={setSelectedCategory}
-                >
-                  <SelectTrigger className="w-[140px] h-10 text-xs">
-                    <SelectValue placeholder="More..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {dropdownCategories.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        <div className="flex items-center justify-between w-full">
-                          <span>{option.label}</span>
-                          <Badge variant="secondary" className="ml-2 h-4 px-2 text-xs">
-                            {option.count}
-                          </Badge>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            </div>
-
-            {/* Right side - Protocol dropdown */}
-            <div className="flex items-center gap-2 flex-shrink-0">
-              <Select value={selectedProtocol} onValueChange={setSelectedProtocol}>
-                <SelectTrigger className="w-[160px] lg:w-[180px] h-10 text-xs bg-transparent border-border hover:bg-accent hover:text-accent-foreground">
-                  <SelectValue placeholder="All Protocols" />
-                </SelectTrigger>
-                <SelectContent>
-                  {protocolOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      <div className="flex items-center justify-between w-full">
-                        <span>{option.label}</span>
-                        {option.count > 0 && (
-                          <Badge variant="secondary" className="ml-2 h-4 px-2 text-xs">
-                            {option.count}
-                          </Badge>
-                        )}
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </div>
+        {/* Simplified - removed all filter dropdowns and category buttons */}
 
         {/* Loading indicator for batch loading */}
         {preloadedTransactionsLoading && allTransactions.length > 0 && (

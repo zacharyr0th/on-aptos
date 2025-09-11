@@ -131,9 +131,9 @@ export const LandingSection = ({ onManualAddressSubmit }: LandingSectionProps) =
     const selectedLogos = [
       btcLogos[0], // WBTC
       btcLogos[1], // Bitcoin
-      stableLogos[4], // USDC
-      stableLogos[6], // USDT
-      stableLogos[5], // USDe
+      stableLogos[3], // USDC (index 3, not 4)
+      stableLogos[5], // USDT (index 5, not 6)
+      stableLogos[4], // USDe (index 4, not 5)
       protocolLogos[17], // Panora (correct index)
       protocolLogos[11], // Liquidswap (correct index)
       protocolLogos[20], // Thala (correct index)
@@ -142,13 +142,8 @@ export const LandingSection = ({ onManualAddressSubmit }: LandingSectionProps) =
   }, []);
 
   return (
-    <div
-      className={cn(
-        "h-[calc(100vh-16rem)] flex flex-col relative overflow-hidden",
-        GeistMono.className
-      )}
-    >
-      <main className="flex-grow relative z-10 flex flex-col justify-center items-center py-1">
+    <div className={cn("h-full flex flex-col relative overflow-hidden", GeistMono.className)}>
+      <main className="flex-grow relative z-10 flex flex-col justify-center items-center py-0">
         <div className="container-layout w-full">
           {/* Mobile background logo */}
           <div className="absolute top-8 right-8 w-32 h-32 opacity-5 dark:opacity-10 md:hidden">
@@ -163,22 +158,22 @@ export const LandingSection = ({ onManualAddressSubmit }: LandingSectionProps) =
           </div>
 
           {/* Main content container */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6 items-center justify-center h-full pt-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6 items-center justify-center h-full">
             {/* Left Side - Big Text */}
-            <div className="space-y-3 text-left">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
+            <div className="space-y-2 text-left">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight">
                 Track your
                 <br />
                 <span className="text-primary">Aptos</span> portfolio
               </h1>
-              <p className="text-base sm:text-lg md:text-xl text-muted-foreground leading-relaxed max-w-full md:max-w-lg">
+              <p className="text-sm sm:text-base md:text-lg text-muted-foreground leading-relaxed max-w-full md:max-w-lg">
                 Track tokens, DeFi positions, and NFTs
               </p>
 
               {/* CTA Section with Wallet Connect and Address Input */}
-              <div className="space-y-2 pt-1">
+              <div className="space-y-2 pt-0">
                 <div className="space-y-2 max-w-xs">
-                  <WalletConnectButton size="lg" className="h-10 px-6 text-sm w-full" />
+                  <WalletConnectButton size="lg" className="h-9 px-5 text-sm w-full" />
 
                   <div className="flex items-center gap-3">
                     <div className="h-[1px] bg-border flex-1" />
@@ -203,7 +198,7 @@ export const LandingSection = ({ onManualAddressSubmit }: LandingSectionProps) =
                       }}
                       disabled={isResolving}
                       className={cn(
-                        "pl-11 h-10 text-sm transition-all w-full",
+                        "pl-11 h-9 text-sm transition-all w-full",
                         addressError && "border-destructive focus-visible:ring-destructive/50",
                         isResolving && "opacity-50 cursor-wait"
                       )}

@@ -17,11 +17,15 @@ export default function robots(): MetadataRoute.Robots {
     "/api/seo/*",
     "/.well-known/ai-plugin.json",
     "/llms.txt",
-    APP_ROUTES.BITCOIN,
-    APP_ROUTES.DEFI,
-    APP_ROUTES.STABLES,
-    APP_ROUTES.RWAS,
-    APP_ROUTES.BTC,
+    APP_ROUTES.MARKETS.BITCOIN,
+    APP_ROUTES.MARKETS.STABLES,
+    APP_ROUTES.MARKETS.RWAS,
+    APP_ROUTES.MARKETS.TOKENS,
+    APP_ROUTES.PROTOCOLS.DEFI,
+    APP_ROUTES.PROTOCOLS.LST,
+    APP_ROUTES.PROTOCOLS.YIELDS,
+    APP_ROUTES.TOOLS.PORTFOLIO,
+    APP_ROUTES.TOOLS.METRICS,
   ];
 
   return {

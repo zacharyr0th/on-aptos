@@ -49,6 +49,10 @@ export function HeaderLogo() {
         key: "page_titles.portfolio",
         fallback: "Portfolio Analytics",
       },
+      "/tools/metrics": {
+        key: "page_titles.metrics",
+        fallback: "Metrics",
+      },
     };
 
     const config = pageConfig[pathname] || {

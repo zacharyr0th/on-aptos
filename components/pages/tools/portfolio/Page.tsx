@@ -181,8 +181,8 @@ function PortfolioPageContent() {
 
   return (
     <div className="portfolio-single-viewport flex flex-col relative h-full overflow-hidden">
-      <main className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20 py-1 sm:py-2 md:py-4 flex-1 relative z-10 flex flex-col overflow-hidden min-h-0">
-        <div className="flex-none mb-3 sm:mb-4">
+      <main className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20 py-1 sm:py-2 flex-1 relative z-10 flex flex-col overflow-hidden min-h-0">
+        <div className="flex-none mb-2">
           <AddressBar
             manualAddress={state.manualAddress}
             setManualAddress={(address) => {

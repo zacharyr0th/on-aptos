@@ -1,10 +1,9 @@
 "use client";
 
-import { ChevronRight, Image as ImageIcon, Layers, Search, Wallet } from "lucide-react";
+import { ChevronRight, Image as ImageIcon, Layers, Wallet } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
@@ -63,47 +62,29 @@ export function NewSidebar({
   className,
 }: NewSidebarProps) {
   const [activeTab, setActiveTab] = useState<"tokens" | "nfts" | "defi">("tokens");
-  const [searchTerm, setSearchTerm] = useState("");
 
   const tabs: SidebarTab[] = [
     {
       id: "tokens",
       label: "Tokens",
       icon: <Wallet className="h-4 w-4" />,
-      count: assets.length,
     },
     {
       id: "nfts",
       label: "NFTs",
       icon: <ImageIcon className="h-4 w-4" />,
-      count: totalNFTCount ?? nfts.length,
     },
     {
       id: "defi",
       label: "DeFi",
       icon: <Layers className="h-4 w-4" />,
-      count: defiPositions.length,
     },
   ];
 
-  // Filter data based on search
-  const filteredAssets = assets.filter(
-    (asset) =>
-      asset.metadata?.symbol?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      asset.metadata?.name?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const filteredNFTs = nfts.filter(
-    (nft) =>
-      nft.token_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      nft.collection_name?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const filteredDeFi = defiPositions.filter(
-    (defi) =>
-      defi.protocol?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      defi.type?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Use data directly without filtering
+  const filteredAssets = assets;
+  const filteredNFTs = nfts;
+  const filteredDeFi = defiPositions;
 
   const renderTokenItem = (asset: any) => {
     const isSelected = selectedAsset?.asset_type === asset.asset_type;
@@ -248,13 +229,11 @@ export function NewSidebar({
 
       if (filteredAssets.length === 0) {
         return (
-          <div className="text-center py-8 text-sm text-muted-foreground">
-            {searchTerm ? "No tokens found" : "No tokens in wallet"}
-          </div>
+          <div className="text-center py-8 text-sm text-muted-foreground">No tokens in wallet</div>
         );
       }
 
-      return <div className="space-y-1 px-2">{filteredAssets.map(renderTokenItem)}</div>;
+      return <div className="space-y-1 px-3">{filteredAssets.map(renderTokenItem)}</div>;
     }
 
     if (activeTab === "nfts") {
@@ -270,13 +249,11 @@ export function NewSidebar({
 
       if (filteredNFTs.length === 0) {
         return (
-          <div className="text-center py-8 text-sm text-muted-foreground">
-            {searchTerm ? "No NFTs found" : "No NFTs in wallet"}
-          </div>
+          <div className="text-center py-8 text-sm text-muted-foreground">No NFTs in wallet</div>
         );
       }
 
-      return <div className="grid grid-cols-2 gap-2 px-2">{filteredNFTs.map(renderNFTItem)}</div>;
+      return <div className="grid grid-cols-2 gap-2 px-3">{filteredNFTs.map(renderNFTItem)}</div>;
     }
 
     if (activeTab === "defi") {
@@ -292,67 +269,48 @@ export function NewSidebar({
 
       if (filteredDeFi.length === 0) {
         return (
-          <div className="text-center py-8 text-sm text-muted-foreground">
-            {searchTerm ? "No DeFi positions found" : "No DeFi positions"}
-          </div>
+          <div className="text-center py-8 text-sm text-muted-foreground">No DeFi positions</div>
         );
       }
 
-      return <div className="space-y-1 px-2">{filteredDeFi.map(renderDeFiItem)}</div>;
+      return <div className="space-y-1 px-3">{filteredDeFi.map(renderDeFiItem)}</div>;
     }
 
     return null;
   };
 
   return (
-    <div className={cn("flex flex-col h-full bg-inherit border-r", className)}>
-      {/* Header with total value */}
-      <div className="px-4 py-3 border-b">
-        <div className="mb-3">
-          <p className="text-xs text-muted-foreground uppercase tracking-wider">Portfolio Value</p>
-          <p className="text-2xl font-bold">{formatCurrency(totalValue)}</p>
-        </div>
-
-        {/* Search bar */}
-        <div className="relative">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-8 h-8 text-sm"
-          />
-        </div>
-      </div>
-
+    <div className={cn("flex flex-col h-full bg-inherit", className)}>
       {/* Tab navigation */}
-      <div className="flex border-b">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={cn(
-              "flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-sm font-medium transition-colors relative",
-              activeTab === tab.id
-                ? "text-foreground"
-                : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            {tab.icon}
-            <span>{tab.label}</span>
-            {tab.count !== undefined && tab.count > 0 && (
-              <span className="ml-1 text-xs">({tab.count})</span>
-            )}
-            {activeTab === tab.id && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
-            )}
-          </button>
-        ))}
+      <div className="border-b">
+        <div className="flex">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={cn(
+                "flex-1 flex items-center justify-center gap-1.5 px-2 py-2 text-sm font-medium transition-colors relative",
+                activeTab === tab.id
+                  ? "text-foreground"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              {tab.icon}
+              <span>{tab.label}</span>
+              {tab.count !== undefined && tab.count > 0 && (
+                <span className="ml-1 text-xs">({tab.count})</span>
+              )}
+              {activeTab === tab.id && (
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
+              )}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Content area */}
       <ScrollArea className="flex-1">
-        <div className="py-2">{renderContent()}</div>
+        <div className="py-1">{renderContent()}</div>
       </ScrollArea>
     </div>
   );

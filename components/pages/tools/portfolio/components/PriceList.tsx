@@ -37,11 +37,11 @@ export function PriceList({ className }: PriceListProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Fetch token prices for portfolio page - get more tokens for better scrolling experience
+  // Fetch token prices for portfolio page - limited to 25 for performance
   const { data: tokens, isLoading } = useQuery({
     queryKey: ["token-prices"],
     queryFn: async () => {
-      const response = await fetch("/api/markets/tokens?limit=5000"); // Fetch all tokens to show verified ones first
+      const response = await fetch("/api/markets/tokens?limit=25");
       if (!response.ok) throw new Error("Failed to fetch token prices");
       const result = await response.json();
       return result.data?.tokens || [];

@@ -53,7 +53,7 @@ export default function MetricsPage(): React.ReactElement {
           {/* Header with refresh button */}
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h1 className="text-2xl font-bold">Aptos Ecosystem Metrics</h1>
+              <h1 className="text-2xl font-bold">Metrics on Aptos</h1>
               <p className="text-sm text-muted-foreground mt-1">
                 Real blockchain data from {error ? "Dune Analytics" : "13 live Dune queries"} • No
                 mock data

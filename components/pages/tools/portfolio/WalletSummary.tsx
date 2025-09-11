@@ -202,15 +202,6 @@ export const WalletSummary: React.FC<WalletSummaryProps> = ({
 
   return (
     <div className="space-y-4 pt-4">
-      <StatsGrid
-        tokens={portfolioMetrics.totalAssets}
-        nfts={portfolioMetrics.nftCount}
-        defi={portfolioMetrics.defiCount}
-        nftCount={totalNFTCount}
-      />
-
-      <div className="hidden sm:block border-b border-neutral-200 dark:border-neutral-800" />
-
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-2 lg:px-8">
         {/* Chart Section */}
         <div className="space-y-3 overflow-visible lg:pr-4">

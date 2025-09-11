@@ -189,6 +189,20 @@ export function DesktopNavigationMenu({ navigationItems, onMenuClose }: Navigati
               </NavigationMenuContent>
             </NavigationMenuItem>
 
+            {/* Performance Link */}
+            <NavigationMenuItem>
+              <Link
+                href="/performance"
+                className={cn(
+                  navigationMenuTriggerStyle(),
+                  "text-sm font-medium",
+                  pathname === "/performance" && "bg-accent"
+                )}
+              >
+                Performance
+              </Link>
+            </NavigationMenuItem>
+
             {/* Portfolio/Wallet Button */}
             <NavigationMenuItem>
               <WalletDropdown className={navigationMenuTriggerStyle()} />

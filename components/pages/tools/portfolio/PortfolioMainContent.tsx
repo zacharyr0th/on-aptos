@@ -151,48 +151,46 @@ export function PortfolioMainContent({
     }
   }, [selectedNFT, setSelectedNFT, selectedAsset, handleAssetSelect, setSidebarView]);
 
+  const [mainTab, setMainTab] = useState<"charts" | "transactions">("charts");
+
   return (
     <div className="h-full flex flex-col">
-      <div className="flex justify-between pb-2">
-        <div className="flex gap-8">
+      {/* Tab navigation */}
+      <div className="border-b">
+        <div className="flex">
           <button
-            onClick={() => setActiveTab("portfolio")}
+            onClick={() => setMainTab("charts")}
             className={cn(
-              "pb-2 border-b-2",
-              activeTab === "portfolio"
-                ? "border-foreground text-foreground"
-                : "border-transparent text-muted-foreground"
+              "flex-1 flex items-center justify-center gap-1.5 px-2 py-2 text-sm font-medium transition-colors relative",
+              mainTab === "charts"
+                ? "text-foreground"
+                : "text-muted-foreground hover:text-foreground"
             )}
           >
-            Summary
+            Charts
+            {mainTab === "charts" && (
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
+            )}
           </button>
           <button
-            onClick={() => setActiveTab("transactions")}
+            onClick={() => setMainTab("transactions")}
             className={cn(
-              "pb-2 border-b-2",
-              activeTab === "transactions"
-                ? "border-foreground text-foreground"
-                : "border-transparent text-muted-foreground"
+              "flex-1 flex items-center justify-center gap-1.5 px-2 py-2 text-sm font-medium transition-colors relative",
+              mainTab === "transactions"
+                ? "text-foreground"
+                : "text-muted-foreground hover:text-foreground"
             )}
           >
             Transactions
-          </button>
-          <button
-            onClick={() => setActiveTab("yield")}
-            className={cn(
-              "pb-2 border-b-2",
-              activeTab === "yield"
-                ? "border-foreground text-foreground"
-                : "border-transparent text-muted-foreground"
+            {mainTab === "transactions" && (
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
             )}
-          >
-            Yields
           </button>
         </div>
       </div>
 
       <div className="flex-1 min-h-0 overflow-hidden">
-        {activeTab === "portfolio" && (
+        {mainTab === "charts" && activeTab === "portfolio" && (
           <div className="h-full overflow-auto">
             {/* Show NFT Details if NFT is selected */}
             {selectedNFT ? (
@@ -468,7 +466,7 @@ export function PortfolioMainContent({
           </div>
         )}
 
-        {activeTab === "transactions" && (
+        {mainTab === "transactions" && (
           <div className="h-full">
             <TransactionHistoryTable
               preloadedTransactions={transactions}
@@ -481,7 +479,7 @@ export function PortfolioMainContent({
           </div>
         )}
 
-        {activeTab === "yield" && (
+        {mainTab === "charts" && activeTab === "yield" && (
           <div className="h-full">
             <YieldTable walletAddress={normalizedAddress} />
           </div>

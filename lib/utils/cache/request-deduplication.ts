@@ -32,16 +32,16 @@ export class RequestDeduplicator {
       // Wait for the cached response data and create a new Response for this consumer
       const cachedPromise = this.pendingRequests.get(key) as Promise<any>;
       const responseData = await cachedPromise;
-      
+
       // If it's a response data object, create a new Response
-      if (responseData && typeof responseData === 'object' && 'body' in responseData) {
+      if (responseData && typeof responseData === "object" && "body" in responseData) {
         return new Response(responseData.body, {
           status: responseData.status,
           statusText: responseData.statusText,
           headers: new Headers(responseData.headers),
         });
       }
-      
+
       // Fallback for backward compatibility
       return responseData;
     }
@@ -61,7 +61,7 @@ export class RequestDeduplicator {
           statusText: response.statusText,
           headers: Object.fromEntries(response.headers.entries()),
         };
-        
+
         // Store the data, not a Response object
         return responseData;
       })
@@ -77,12 +77,12 @@ export class RequestDeduplicator {
 
     // For the first requester, wait for the data and create a Response
     const responseData = await requestPromise;
-    
+
     // Clean up after completion
     setTimeout(() => {
       this.pendingRequests.delete(key);
     }, 100); // Small delay to allow other consumers to get the cached data
-    
+
     return new Response(responseData.body, {
       status: responseData.status,
       statusText: responseData.statusText,

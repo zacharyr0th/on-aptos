@@ -151,6 +151,21 @@ export function MobileMenu({ isOpen, onToggle, onClose, navigationItems }: Mobil
                 <div className="py-2 border-t border-border">
                   <div className="px-4 py-2">
                     <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                      Performance
+                    </h3>
+                  </div>
+                  <MobileNavLink
+                    href="/performance"
+                    active={pathname === "/performance"}
+                    onClick={onClose}
+                  >
+                    USDT Performance
+                  </MobileNavLink>
+                </div>
+
+                <div className="py-2 border-t border-border">
+                  <div className="px-4 py-2">
+                    <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                       DeFi
                     </h3>
                   </div>
