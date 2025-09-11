@@ -1,7 +1,6 @@
 import withBundleAnalyzer from "@next/bundle-analyzer";
 import { dirname, resolve } from "path";
 import { fileURLToPath } from "url";
-import webpack from "webpack";
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -109,39 +108,39 @@ const nextConfig = {
   },
 
   // Enhanced webpack config for optimization with Bun compatibility
-  webpack: (config, { isServer, dev, nextRuntime }) => {
+  webpack: (config, { isServer, dev, nextRuntime, webpack }) => {
     // Fix global reference issues for both server and edge runtimes
     config.output = config.output || {};
-    
+
     if (isServer) {
       // Node.js runtime
-      config.output.globalObject = 'global';
+      config.output.globalObject = "global";
     } else {
       // Client-side builds
-      config.output.globalObject = 'self';
+      config.output.globalObject = "self";
     }
-    
+
     // Handle edge runtime global references
-    if (nextRuntime === 'edge') {
+    if (nextRuntime === "edge") {
       config.resolve = config.resolve || {};
       config.resolve.alias = {
         ...config.resolve.alias,
-        'global': 'globalThis',
+        global: "globalThis",
       };
-      
+
       config.plugins = config.plugins || [];
       config.plugins.push(
         new webpack.DefinePlugin({
-          global: 'globalThis',
+          global: "globalThis",
         })
       );
     }
-    
+
     // Exclude service worker from webpack processing to avoid SSR issues
     config.externals = config.externals || [];
     if (isServer) {
       config.externals.push({
-        'sw-transaction-prefetch.js': 'commonjs sw-transaction-prefetch.js'
+        "sw-transaction-prefetch.js": "commonjs sw-transaction-prefetch.js",
       });
     }
 
