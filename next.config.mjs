@@ -1,6 +1,7 @@
 import withBundleAnalyzer from "@next/bundle-analyzer";
 import { dirname, resolve } from "path";
 import { fileURLToPath } from "url";
+import webpack from "webpack";
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -130,7 +131,7 @@ const nextConfig = {
       
       config.plugins = config.plugins || [];
       config.plugins.push(
-        new config.webpack.DefinePlugin({
+        new webpack.DefinePlugin({
           global: 'globalThis',
         })
       );
