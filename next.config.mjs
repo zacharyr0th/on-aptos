@@ -108,7 +108,42 @@ const nextConfig = {
   },
 
   // Enhanced webpack config for optimization with Bun compatibility
-  webpack: (config, { isServer, dev }) => {
+  webpack: (config, { isServer, dev, nextRuntime }) => {
+    // Fix global reference issues for both server and edge runtimes
+    config.output = config.output || {};
+    
+    if (isServer) {
+      // Node.js runtime
+      config.output.globalObject = 'global';
+    } else {
+      // Client-side builds
+      config.output.globalObject = 'self';
+    }
+    
+    // Handle edge runtime global references
+    if (nextRuntime === 'edge') {
+      config.resolve = config.resolve || {};
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        'global': 'globalThis',
+      };
+      
+      config.plugins = config.plugins || [];
+      config.plugins.push(
+        new config.webpack.DefinePlugin({
+          global: 'globalThis',
+        })
+      );
+    }
+    
+    // Exclude service worker from webpack processing to avoid SSR issues
+    config.externals = config.externals || [];
+    if (isServer) {
+      config.externals.push({
+        'sw-transaction-prefetch.js': 'commonjs sw-transaction-prefetch.js'
+      });
+    }
+
     // Handle Node.js modules in browser for wallet adapters
     if (!isServer) {
       config.resolve.fallback = {

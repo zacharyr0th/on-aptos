@@ -1,0 +1,55 @@
+# Exclude everything except essential app files
+node_modules
+.next
+.git
+.vercel
+docs
+public/Screenshot*.png
+
+# Development and testing
+*.test.ts
+*.test.js  
+*.spec.ts
+*.spec.js
+__tests__
+tests
+coverage
+
+# Build artifacts
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+.turbo
+.swc
+.cache
+
+# Environment and config
+.env
+.env.*
+!.env.example
+.eslintrc*
+.prettierrc*
+biome.json
+vitest.config.*
+
+# IDE and OS
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+
+# Logs and temporary
+*.log
+logs
+tmp
+temp
+.tmp
+
+# Large files
+*.mp4
+*.mov
+*.avi
+
+# Documentation (keep only essential)
+*.md
+!README.md
+!CLAUDE.md
