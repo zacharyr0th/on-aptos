@@ -30,7 +30,7 @@ export default function MetricsPage(): React.ReactElement {
         <main className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20 py-8 flex-1 relative">
           {/* Key Metrics Cards */}
           <KeyMetricCards />
-          
+
           {/* Single Clean Metrics Table */}
           <div className="bg-card rounded-lg p-6">
             <h2 className="text-xl font-semibold mb-4">Network Metrics</h2>
@@ -66,8 +66,8 @@ export default function MetricsPage(): React.ReactElement {
                     </TableRow>
                   ) : tableData && tableData.length > 0 ? (
                     tableData.map((item, index) => (
-                      <TableRow 
-                        key={index} 
+                      <TableRow
+                        key={index}
                         className="cursor-pointer hover:bg-muted/50 transition-colors"
                         onClick={() => {
                           if (item.queryUrl) {

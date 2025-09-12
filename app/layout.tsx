@@ -30,8 +30,8 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// Force Node.js runtime for layout
-export const runtime = "nodejs";
+// Remove runtime forcing to test if it fixes webpack issue
+// export const runtime = "nodejs";
 
 // Enhanced page metadata for better SEO and PWA
 export const metadata: Metadata = {
@@ -168,11 +168,11 @@ interface RootLayoutProps {
   children: ReactNode;
 }
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
-}: RootLayoutProps): Promise<React.ReactElement> {
-  // Get nonce from headers
-  const nonce = (await headers()).get("x-nonce");
+}: RootLayoutProps): React.ReactElement {
+  // Get nonce from headers - remove async for now
+  const nonce = undefined;
 
   // Structured data for the entire site
   const structuredData = {

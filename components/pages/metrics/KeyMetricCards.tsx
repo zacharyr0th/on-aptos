@@ -8,8 +8,8 @@ import { useKeyMetrics } from "@/hooks/useKeyMetrics";
 
 // Helper function to safely format numbers
 const safeToFixed = (value: any, decimals: number = 0): string => {
-  const num = typeof value === 'string' ? parseFloat(value) : Number(value);
-  return !isNaN(num) && isFinite(num) ? num.toFixed(decimals) : '0';
+  const num = typeof value === "string" ? parseFloat(value) : Number(value);
+  return !isNaN(num) && isFinite(num) ? num.toFixed(decimals) : "0";
 };
 
 const formatLargeNumber = (value: number): string => {
@@ -22,7 +22,7 @@ const formatLargeNumber = (value: number): string => {
 export default function KeyMetricCards() {
   const { metrics: duneMetrics, loading: duneLoading, error: duneError } = useMetricsData();
   const { metrics: indexerMetrics, loading: indexerLoading, error: indexerError } = useKeyMetrics();
-  
+
   const loading = duneLoading || indexerLoading;
   const error = duneError || indexerError;
 
@@ -61,9 +61,9 @@ export default function KeyMetricCards() {
             )}
           </div>
           <p className="text-xs text-muted-foreground">
-            {indexerMetrics?.allTimeTransactions ? 
-              "Total transactions from Aptos Indexer" : 
-              "Transaction data loading..."}
+            {indexerMetrics?.allTimeTransactions
+              ? "Total transactions from Aptos Indexer"
+              : "Transaction data loading..."}
           </p>
           {!loading && indexerMetrics?.allTimeTransactions && (
             <Badge variant="secondary" className="mt-1">
@@ -83,20 +83,20 @@ export default function KeyMetricCards() {
           <div className="text-2xl font-bold">
             {loading ? (
               <div className="h-8 bg-muted animate-pulse rounded w-16"></div>
+            ) : // Use Dune data for gas price since it's working (0.002 APT)
+            duneMetrics?.averageGasPrice ? (
+              `${safeToFixed(duneMetrics.averageGasPrice, 6)} APT`
             ) : (
-              // Use Dune data for gas price since it's working (0.002 APT)
-              duneMetrics?.averageGasPrice ? 
-                `${safeToFixed(duneMetrics.averageGasPrice, 6)} APT` : 
-                "-"
+              "-"
             )}
           </div>
           <p className="text-xs text-muted-foreground">
-            {duneMetrics?.averageGasPrice ? 
-              "Average gas cost from Dune query" : 
-              "Gas fee data not available"}
+            {duneMetrics?.averageGasPrice
+              ? "Average gas cost from Dune query"
+              : "Gas fee data not available"}
           </p>
           {!loading && duneMetrics?.averageGasPrice && (
-            <Badge 
+            <Badge
               variant={(duneMetrics.averageGasPrice as number) < 0.001 ? "default" : "secondary"}
               className="mt-1"
             >
@@ -121,24 +121,21 @@ export default function KeyMetricCards() {
           <div className="text-2xl font-bold">
             {loading ? (
               <div className="h-8 bg-muted animate-pulse rounded w-12"></div>
+            ) : // Use Key Metrics data for block time if available
+            indexerMetrics?.avgBlockTimeSeconds ? (
+              `${safeToFixed(indexerMetrics.avgBlockTimeSeconds, 1)}s`
             ) : (
-              // Use Key Metrics data for block time if available
-              indexerMetrics?.avgBlockTimeSeconds ? 
-                `${safeToFixed(indexerMetrics.avgBlockTimeSeconds, 1)}s` : 
-                "-"
+              "-"
             )}
           </div>
           <p className="text-xs text-muted-foreground">
-            {indexerMetrics?.avgBlockTimeSeconds ? 
-              "Average time between blocks" : 
-              "Block time data not available"}
+            {indexerMetrics?.avgBlockTimeSeconds
+              ? "Average time between blocks"
+              : "Block time data not available"}
           </p>
           {!loading && indexerMetrics?.avgBlockTimeSeconds && (
-            <Badge 
-              variant={
-                (indexerMetrics?.avgBlockTimeSeconds || 0) <= 5 ? 
-                "default" : "secondary"
-              }
+            <Badge
+              variant={(indexerMetrics?.avgBlockTimeSeconds || 0) <= 5 ? "default" : "secondary"}
               className="mt-1"
             >
               {(indexerMetrics?.avgBlockTimeSeconds || 0) <= 5 ? "Fast" : "Normal"}
@@ -162,27 +159,33 @@ export default function KeyMetricCards() {
           <div className="text-2xl font-bold">
             {loading ? (
               <div className="h-8 bg-muted animate-pulse rounded w-16"></div>
+            ) : duneMetrics?.networkUptime === "-" ? (
+              "-"
             ) : (
-              duneMetrics?.networkUptime === "-" ? 
-                "-" : 
-                `${safeToFixed(duneMetrics?.networkUptime || 0, 1)}%`
+              `${safeToFixed(duneMetrics?.networkUptime || 0, 1)}%`
             )}
           </div>
           <p className="text-xs text-muted-foreground">
-            {duneMetrics?.networkUptime === "-" ? 
-              "Reliability data not available" : 
-              "Transaction success rate"}
+            {duneMetrics?.networkUptime === "-"
+              ? "Reliability data not available"
+              : "Transaction success rate"}
           </p>
           {!loading && duneMetrics?.networkUptime && duneMetrics.networkUptime !== "-" && (
-            <Badge 
+            <Badge
               variant={
-                (parseFloat(duneMetrics.networkUptime as string)) >= 99 ? "default" : 
-                (parseFloat(duneMetrics.networkUptime as string)) >= 95 ? "secondary" : "destructive"
+                parseFloat(duneMetrics.networkUptime as string) >= 99
+                  ? "default"
+                  : parseFloat(duneMetrics.networkUptime as string) >= 95
+                    ? "secondary"
+                    : "destructive"
               }
               className="mt-1"
             >
-              {(parseFloat(duneMetrics.networkUptime as string)) >= 99 ? "Excellent" : 
-               (parseFloat(duneMetrics.networkUptime as string)) >= 95 ? "Good" : "Issues"}
+              {parseFloat(duneMetrics.networkUptime as string) >= 99
+                ? "Excellent"
+                : parseFloat(duneMetrics.networkUptime as string) >= 95
+                  ? "Good"
+                  : "Issues"}
             </Badge>
           )}
           {!loading && duneMetrics?.networkUptime === "-" && (

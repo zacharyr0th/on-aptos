@@ -34,7 +34,6 @@ async function fetchDuneData(queryId: number) {
   }
 }
 
-
 // Comprehensive Analytics using ONLY working core queries
 const DUNE_QUERY_IDS = {
   // ===== CORE NETWORK ANALYTICS (Working Queries Only) =====
@@ -134,21 +133,26 @@ export async function GET() {
     const uniqueUsers = parseInt(mainMetrics.unique_senders || 0);
     const avgSuccessRate = parseFloat(mainMetrics.success_rate || 0);
     const avgGasPrice = parseFloat(mainMetrics.avg_gas_cost || 0);
-    
+
     // NEW: All-time transactions and block time metrics - NO FALLBACKS, REAL DATA ONLY
     const allTimeMetrics = allTimeTransactionsData[0] || {};
-    const allTimeTransactionCount = allTimeMetrics.total_all_time_transactions ? 
-      parseInt(allTimeMetrics.total_all_time_transactions) : null;
-    const networkLifetimeDays = allTimeMetrics.network_age_days ? 
-      parseInt(allTimeMetrics.network_age_days) : null;
-    
+    const allTimeTransactionCount = allTimeMetrics.total_all_time_transactions
+      ? parseInt(allTimeMetrics.total_all_time_transactions)
+      : null;
+    const networkLifetimeDays = allTimeMetrics.network_age_days
+      ? parseInt(allTimeMetrics.network_age_days)
+      : null;
+
     const blockMetrics = blockTimesData[0] || {};
-    const avgBlockTime = blockMetrics.avg_block_time_seconds ? 
-      parseFloat(blockMetrics.avg_block_time_seconds) : null;
-    const avgFinalityTime = blockMetrics.avg_finality_time_seconds ? 
-      parseFloat(blockMetrics.avg_finality_time_seconds) : null;
-    const networkReliabilityScore = blockMetrics.network_reliability_pct ? 
-      parseFloat(blockMetrics.network_reliability_pct) : null;
+    const avgBlockTime = blockMetrics.avg_block_time_seconds
+      ? parseFloat(blockMetrics.avg_block_time_seconds)
+      : null;
+    const avgFinalityTime = blockMetrics.avg_finality_time_seconds
+      ? parseFloat(blockMetrics.avg_finality_time_seconds)
+      : null;
+    const networkReliabilityScore = blockMetrics.network_reliability_pct
+      ? parseFloat(blockMetrics.network_reliability_pct)
+      : null;
 
     // From DEX_COMPARISON (3431742): daily_active_addresses, daily_transactions
     const dailyMetrics = dexData[0] || {};

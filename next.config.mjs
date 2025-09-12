@@ -107,43 +107,8 @@ const nextConfig = {
     unoptimized: true,
   },
 
-  // Enhanced webpack config for optimization with Bun compatibility
-  webpack: (config, { isServer, dev, nextRuntime, webpack }) => {
-    // Fix global reference issues for both server and edge runtimes
-    config.output = config.output || {};
-
-    if (isServer) {
-      // Node.js runtime
-      config.output.globalObject = "global";
-    } else {
-      // Client-side builds
-      config.output.globalObject = "self";
-    }
-
-    // Handle edge runtime global references
-    if (nextRuntime === "edge") {
-      config.resolve = config.resolve || {};
-      config.resolve.alias = {
-        ...config.resolve.alias,
-        global: "globalThis",
-      };
-
-      config.plugins = config.plugins || [];
-      config.plugins.push(
-        new webpack.DefinePlugin({
-          global: "globalThis",
-        })
-      );
-    }
-
-    // Exclude service worker from webpack processing to avoid SSR issues
-    config.externals = config.externals || [];
-    if (isServer) {
-      config.externals.push({
-        "sw-transaction-prefetch.js": "commonjs sw-transaction-prefetch.js",
-      });
-    }
-
+  // Simplified webpack config to resolve build issues
+  webpack: (config, { isServer, dev }) => {
     // Handle Node.js modules in browser for wallet adapters
     if (!isServer) {
       config.resolve.fallback = {
@@ -157,103 +122,6 @@ const nextConfig = {
         os: false,
         util: false,
       };
-    }
-
-    // Bun compatibility optimizations
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      // Ensure proper resolution for Bun runtime
-      "@": resolve(process.cwd()),
-    };
-
-    // Optimize for Bun's faster module resolution
-    config.resolve.symlinks = false;
-    config.resolve.cacheWithContext = false;
-
-    // Optimize bundle size in production
-    if (!dev) {
-      // Enhanced chunk splitting strategy
-      config.optimization.splitChunks = {
-        chunks: "all",
-        minSize: 20000,
-        minRemainingSize: 0,
-        minChunks: 1,
-        maxAsyncRequests: 30,
-        maxInitialRequests: 30,
-        enforceSizeThreshold: 50000,
-        cacheGroups: {
-          // Core React and Next.js
-          framework: {
-            chunks: "all",
-            name: "framework",
-            test: /(?:react|react-dom|next)[\\/]/,
-            priority: 40,
-            enforce: true,
-          },
-          // Radix UI components (large in your bundle)
-          radixUI: {
-            test: /[\\/]node_modules[\\/]@radix-ui[\\/]/,
-            name: "radix-ui",
-            chunks: "all",
-            priority: 30,
-          },
-          // TanStack Query
-          tanstackQuery: {
-            test: /[\\/]node_modules[\\/]@tanstack[\\/]/,
-            name: "tanstack-query",
-            chunks: "all",
-            priority: 25,
-          },
-          // Charts and visualization libraries
-          charts: {
-            test: /[\\/]node_modules[\\/](recharts|d3|@nivo)[\\/]/,
-            name: "charts",
-            chunks: "all",
-            priority: 20,
-          },
-          // Wallet adapters and crypto libraries
-          walletLibs: {
-            test: /[\\/]node_modules[\\/](@aptos-labs|@wallet-adapter|@solana)[\\/]/,
-            name: "wallet-libs",
-            chunks: "all",
-            priority: 20,
-          },
-          // Large individual libraries
-          largeDeps: {
-            test: /[\\/]node_modules[\\/](framer-motion|ua-parser-js|moment|lodash)[\\/]/,
-            name: "large-deps",
-            chunks: "all",
-            priority: 15,
-          },
-          // Icons and UI utilities
-          icons: {
-            test: /[\\/]node_modules[\\/](lucide-react|react-icons|@heroicons)[\\/]/,
-            name: "icons",
-            chunks: "all",
-            priority: 10,
-          },
-          // Other vendor libraries
-          vendor: {
-            test: /[\\/]node_modules[\\/]/,
-            name: "vendors",
-            chunks: "all",
-            priority: 5,
-            minChunks: 2,
-          },
-          // Common modules shared between pages
-          common: {
-            name: "common",
-            minChunks: 2,
-            priority: 0,
-            chunks: "all",
-            reuseExistingChunk: true,
-          },
-        },
-      };
-
-      // Tree shake unused code
-      config.optimization.usedExports = true;
-      config.optimization.sideEffects = false;
     }
 
     return config;

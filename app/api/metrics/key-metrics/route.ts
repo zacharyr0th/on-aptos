@@ -5,12 +5,13 @@ import { apiLogger } from "@/lib/utils/core/logger";
 export async function GET() {
   try {
     const aptosSecret = process.env.APTOS_BUILD_SECRET;
-    const indexerUrl = process.env.NEXT_PUBLIC_APTOS_INDEXER_URL || "https://api.mainnet.aptoslabs.com/v1/graphql";
-    
+    const indexerUrl =
+      process.env.NEXT_PUBLIC_APTOS_INDEXER_URL || "https://api.mainnet.aptoslabs.com/v1/graphql";
+
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
     };
-    
+
     if (aptosSecret) {
       headers["Authorization"] = `Bearer ${aptosSecret}`;
     }
@@ -93,13 +94,13 @@ export async function GET() {
     if (recentResponse.status === "fulfilled" && recentResponse.value.ok) {
       const data = await recentResponse.value.json();
       const transactions = data.data?.user_transactions || [];
-      
+
       if (transactions.length > 0) {
         // Calculate average gas fee in APT
         const totalGasFees = transactions.reduce((sum: number, tx: any) => {
           const gasUsed = parseInt(tx.gas_used) || 0;
           const gasPrice = parseInt(tx.gas_unit_price) || 0;
-          return sum + (gasUsed * gasPrice);
+          return sum + gasUsed * gasPrice;
         }, 0);
         avgGasFeeAPT = totalGasFees / transactions.length / 1e8; // Convert octa to APT
       }
@@ -110,23 +111,26 @@ export async function GET() {
       const data = await blockResponse.value.json();
       apiLogger.info("Block response data:", data);
       const blocks = data.data?.block_metadata_transactions || [];
-      
+
       if (blocks.length > 1) {
         const blockTimes: number[] = [];
         // Calculate time differences between consecutive blocks
         for (let i = 1; i < Math.min(blocks.length, 20); i++) {
-          const currentTime = new Date(blocks[i-1].timestamp).getTime();
+          const currentTime = new Date(blocks[i - 1].timestamp).getTime();
           const prevTime = new Date(blocks[i].timestamp).getTime();
           const timeDiff = (currentTime - prevTime) / 1000; // Convert to seconds
-          
-          if (timeDiff > 0 && timeDiff < 60) { // Filter reasonable block times (0-60 seconds)
+
+          if (timeDiff > 0 && timeDiff < 60) {
+            // Filter reasonable block times (0-60 seconds)
             blockTimes.push(timeDiff);
           }
         }
-        
+
         if (blockTimes.length > 0) {
           avgBlockTimeSeconds = blockTimes.reduce((sum, time) => sum + time, 0) / blockTimes.length;
-          apiLogger.info(`Calculated average block time: ${avgBlockTimeSeconds}s from ${blockTimes.length} blocks`);
+          apiLogger.info(
+            `Calculated average block time: ${avgBlockTimeSeconds}s from ${blockTimes.length} blocks`
+          );
         }
       }
     }
@@ -146,21 +150,23 @@ export async function GET() {
         "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
       },
     });
-
   } catch (error) {
     apiLogger.error("Error fetching key metrics from Aptos Indexer:", error);
-    
+
     // Return fallback values - show "-" for unavailable data
-    return NextResponse.json({
-      allTimeTransactions: 0,
-      avgGasFeeAPT: 0,
-      avgBlockTimeSeconds: 4.0,
-      networkReliability: "-", // Not available from API
-      avgFinalityTime: 4.0,
-    }, {
-      headers: {
-        "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+    return NextResponse.json(
+      {
+        allTimeTransactions: 0,
+        avgGasFeeAPT: 0,
+        avgBlockTimeSeconds: 4.0,
+        networkReliability: "-", // Not available from API
+        avgFinalityTime: 4.0,
       },
-    });
+      {
+        headers: {
+          "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+        },
+      }
+    );
   }
 }

@@ -55,7 +55,7 @@ interface AdvancedBlockchainAnalyticsProps {
 // Helper function to safely format numbers - return "-" for unavailable data
 const safeToFixed = (value: any, decimals: number = 0): string => {
   if (value === "-" || value === null || value === undefined) return "-";
-  const num = typeof value === 'string' ? parseFloat(value) : Number(value);
+  const num = typeof value === "string" ? parseFloat(value) : Number(value);
   return !isNaN(num) && isFinite(num) ? num.toFixed(decimals) : "-";
 };
 

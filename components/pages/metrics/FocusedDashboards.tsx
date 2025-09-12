@@ -51,7 +51,7 @@ interface FocusedDashboardsProps {
 // Helper function to safely format numbers - return "-" for unavailable data
 const safeToFixed = (value: any, decimals: number = 0): string => {
   if (value === "-" || value === null || value === undefined) return "-";
-  const num = typeof value === 'string' ? parseFloat(value) : Number(value);
+  const num = typeof value === "string" ? parseFloat(value) : Number(value);
   return !isNaN(num) && isFinite(num) ? num.toFixed(decimals) : "-";
 };
 
@@ -385,7 +385,9 @@ const FocusedDashboards: React.FC<FocusedDashboardsProps> = ({ metrics }) => {
                         </div>
                         <div>
                           <span className="text-muted-foreground">Failure Rate:</span>
-                          <div className="font-mono text-red-600">{safeToFixed(failureRate, 1)}%</div>
+                          <div className="font-mono text-red-600">
+                            {safeToFixed(failureRate, 1)}%
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -405,8 +407,8 @@ const FocusedDashboards: React.FC<FocusedDashboardsProps> = ({ metrics }) => {
                   </div>
                   <div className="text-sm text-muted-foreground">Peak vs Average</div>
                   <div className="text-xs text-muted-foreground">
-                    {safeToFixed(peakHourTxs / 1000, 0)}K peak vs {safeToFixed(avgHourlyTxs / 1000, 0)}K
-                    avg
+                    {safeToFixed(peakHourTxs / 1000, 0)}K peak vs{" "}
+                    {safeToFixed(avgHourlyTxs / 1000, 0)}K avg
                   </div>
                 </div>
                 <div className="p-4 border rounded space-y-2">
@@ -418,7 +420,7 @@ const FocusedDashboards: React.FC<FocusedDashboardsProps> = ({ metrics }) => {
                 </div>
                 <div className="p-4 border rounded space-y-2">
                   <div className="text-2xl font-mono">
-                    {safeToFixed(peakHourTxs > 0 ? ((failedTxsPerHour / peakHourTxs) * 100) : 0, 1)}%
+                    {safeToFixed(peakHourTxs > 0 ? (failedTxsPerHour / peakHourTxs) * 100 : 0, 1)}%
                   </div>
                   <div className="text-sm text-muted-foreground">Network Stress Indicator</div>
                   <Badge

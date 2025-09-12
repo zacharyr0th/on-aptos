@@ -33,7 +33,7 @@ export function useKeyMetrics() {
 
         const data: KeyMetrics = await response.json();
         setMetrics(data);
-        
+
         logger.info("Successfully fetched key metrics", data);
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : "Unknown error";
