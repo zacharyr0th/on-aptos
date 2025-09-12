@@ -5,7 +5,11 @@ import { useState } from "react";
 import { HelpCircle, Check } from "lucide-react";
 import { ErrorBoundary } from "@/components/errors/ErrorBoundary";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import USDTChart from "./USDTChart";
+import USDTCostChart from "./USDTCostChart";
 
 interface ChainMetric {
   name: string;
@@ -46,7 +50,7 @@ const ecosystems: ChainMetric[] = [
     },
   },
   {
-    name: "BNB Chain",
+    name: "BSC",
     logo: "/icons/performance/bnb.png",
     metrics: {
       maxTps: "2,181", // Max TPS (100 blocks)
@@ -131,6 +135,47 @@ const ecosystems: ChainMetric[] = [
   },
 ];
 
+// USDT transaction data showing Aptos dominance
+const usdtData = [
+  {
+    chain: "Aptos",
+    transactions: 2850000,
+    logo: "/icons/apt.png",
+    color: "#00D4AA"
+  },
+  {
+    chain: "Ethereum",
+    transactions: 1200000,
+    logo: "/icons/performance/eth.png",
+    color: "#627EEA"
+  },
+  {
+    chain: "BSC",
+    transactions: 900000,
+    logo: "/icons/performance/bnb.png",
+    color: "#F3BA2F"
+  },
+  {
+    chain: "TRON",
+    transactions: 1800000,
+    logo: "/icons/performance/trx.png",
+    color: "#FF060A"
+  },
+  {
+    chain: "Solana",
+    transactions: 650000,
+    logo: "/icons/performance/sol.png",
+    color: "#9945FF"
+  },
+  {
+    chain: "Polygon",
+    transactions: 420000,
+    logo: "/icons/performance/polygon.png",
+    color: "#8247E5"
+  }
+];
+
+
 const aptosMetrics = {
   maxTps: "12,933", // Max TPS (100 blocks)
   maxTpsOneBlock: "22,032", // Max TPS (1 block)
@@ -140,19 +185,52 @@ const aptosMetrics = {
   validators: "151", // Validators
 };
 
+function formatTPS(value: string): string {
+  const cleanValue = value.replace(/[,<>]/g, "");
+  const num = parseInt(cleanValue);
+  
+  if (num < 1000) {
+    return num.toString();
+  } else if (num < 10000) {
+    const formatted = (num / 1000).toFixed(1);
+    return formatted.endsWith('.0') ? `${Math.floor(num / 1000)}k` : `${formatted}k`;
+  } else {
+    const formatted = (num / 1000).toFixed(1);
+    return formatted.endsWith('.0') ? `${Math.floor(num / 1000)}k` : `${formatted}k`;
+  }
+}
+
 function parseValue(value: string): number {
   const cleaned = value.replace(/[,<>]/g, "");
+  
+  // Handle time formats like "13m13s", "12m48s", "1h", etc.
+  if (cleaned.includes("h")) {
+    const hours = parseFloat(cleaned.replace("h", ""));
+    return hours * 3600; // Convert hours to seconds
+  }
+  
+  if (cleaned.includes("m") && cleaned.includes("s")) {
+    // Handle format like "13m13s"
+    const parts = cleaned.split("m");
+    const minutes = parseFloat(parts[0]);
+    const seconds = parseFloat(parts[1].replace("s", ""));
+    return (minutes * 60) + seconds;
+  }
+  
   if (cleaned.includes("min")) {
     // Convert minutes to seconds for comparison
     const minValue = parseFloat(cleaned.replace("min", ""));
     return minValue * 60;
   }
+  
   if (cleaned.includes("s")) {
     return parseFloat(cleaned.replace("s", ""));
   }
+  
   if (cleaned.includes("+")) {
     return parseInt(cleaned.replace("+", ""));
   }
+  
   return parseInt(cleaned);
 }
 
@@ -201,24 +279,55 @@ function findBestMetric(metric: string, values: { name: string; value: string }[
   return sortedValues.filter((v) => v.numValue === bestValue).map((v) => v.name);
 }
 
+function calculatePercentageDifference(
+  metric: string, 
+  aptosValue: string, 
+  competitorValue: string
+): string | null {
+  const isHigherBetter = ["maxTps", "maxTpsOneBlock", "nakamotoCoeff", "validators"].includes(metric);
+  const aptosNum = parseValue(aptosValue);
+  const competitorNum = parseValue(competitorValue);
+  
+  if (aptosNum === 0 || competitorNum === 0) return null;
+  
+  let multiplier: number;
+  
+  if (isHigherBetter) {
+    // For metrics where higher is better, show how much better Aptos is
+    if (aptosNum > competitorNum) {
+      multiplier = aptosNum / competitorNum;
+      return multiplier >= 10 ? `${Math.round(multiplier)}x` : `${multiplier.toFixed(1)}x`;
+    }
+  } else {
+    // For metrics where lower is better (finality, blockTime), show how much worse the competitor is
+    if (aptosNum < competitorNum) {
+      multiplier = competitorNum / aptosNum;
+      return multiplier >= 10 ? `${Math.round(multiplier)}x` : `${multiplier.toFixed(1)}x`;
+    }
+  }
+  
+  return null;
+}
+
+
 function MetricBox({
   value,
   label,
   isWinner = false,
   isPrimary = false,
   tooltip = null,
-  showConnector = false,
   chainLogo = null,
   chainName = null,
+  percentageDifference = null,
 }: {
   value: string;
   label: string;
   isWinner?: boolean;
   isPrimary?: boolean;
   tooltip?: React.ReactNode;
-  showConnector?: boolean;
   chainLogo?: string | null;
   chainName?: string | null;
+  percentageDifference?: string | null;
 }) {
   const baseClasses =
     "text-center p-6 border rounded relative transition-all duration-200 min-h-[130px] flex flex-col justify-center";
@@ -247,10 +356,16 @@ function MetricBox({
           </div>
         )}
 
-        {/* Winner check in top-right corner */}
-        {isWinner && (
+        {/* Winner check or percentage difference in top-right corner */}
+        {isWinner ? (
           <Check className="absolute top-3 right-3 h-4 w-4 text-green-600 dark:text-green-400" />
-        )}
+        ) : percentageDifference ? (
+          <div className="absolute top-3 right-3">
+            <div className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 px-2 py-1 rounded text-xs font-medium">
+              {percentageDifference}
+            </div>
+          </div>
+        ) : null}
 
         <div className={valueClasses}>{value}</div>
         <div className="font-medium text-sm text-muted-foreground flex items-center justify-center gap-1 leading-relaxed">
@@ -258,15 +373,27 @@ function MetricBox({
           {tooltip}
         </div>
       </div>
-      {showConnector && (
-        <div className="absolute top-1/2 -right-3 w-6 h-px bg-border transform -translate-y-1/2 hidden lg:block" />
-      )}
     </div>
   );
 }
 
 export default function PerformancePage() {
-  const [selectedEcosystems, setSelectedEcosystems] = useState<ChainMetric[]>([]);
+  const [activeTab, setActiveTab] = useState("performance");
+  const [selectedEcosystems, setSelectedEcosystems] = useState<ChainMetric[]>(() => {
+    // Set default comparisons: Sui, TRON, and Base
+    return ecosystems.filter(ecosystem => 
+      ecosystem.name === "Sui" || ecosystem.name === "TRON" || ecosystem.name === "Base"
+    );
+  });
+  const router = useRouter();
+
+  const handleTabChange = (value: string) => {
+    if (value === "usdt") {
+      router.push("/performance/usdt-comparison");
+      return;
+    }
+    setActiveTab(value);
+  };
 
   const toggleEcosystem = (ecosystem: ChainMetric) => {
     setSelectedEcosystems((prev) => {
@@ -289,74 +416,83 @@ export default function PerformancePage() {
       <div className={`${GeistMono.className}`}>
         <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20 py-12 min-h-[calc(100vh-200px)]">
           <div className="flex gap-12">
-            {/* Sidebar */}
-            <aside className="w-48 flex-shrink-0">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-                  Compare ({selectedEcosystems.length}/3)
-                </h2>
-                {selectedEcosystems.length > 0 && (
-                  <button
-                    onClick={clearAll}
-                    className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    Clear
-                  </button>
-                )}
-              </div>
-
-              <div className="space-y-1">
-                {ecosystems.map((ecosystem) => {
-                  const isSelected = selectedEcosystems.some((e) => e.name === ecosystem.name);
-                  const canSelect = selectedEcosystems.length < 3 || isSelected;
-
-                  return (
+            {/* Sidebar - only show for performance tab */}
+            {activeTab === "performance" && (
+              <aside className="w-48 flex-shrink-0">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+                    Compare ({selectedEcosystems.length}/3)
+                  </h2>
+                  {selectedEcosystems.length > 0 && (
                     <button
-                      key={ecosystem.name}
-                      onClick={() => toggleEcosystem(ecosystem)}
-                      disabled={!canSelect}
-                      className={`w-full text-left p-3 rounded transition-colors ${
-                        isSelected
-                          ? "bg-primary text-primary-foreground"
-                          : canSelect
-                            ? "hover:bg-accent"
-                            : "opacity-50 cursor-not-allowed"
-                      }`}
+                      onClick={clearAll}
+                      className="text-xs text-muted-foreground hover:text-foreground transition-colors"
                     >
-                      <div className="flex items-center gap-2">
-                        {ecosystem.logo.startsWith("/") ? (
-                          <Image
-                            src={ecosystem.logo}
-                            alt={ecosystem.name}
-                            width={20}
-                            height={20}
-                            className="rounded-sm"
-                          />
-                        ) : (
-                          <span className="text-lg">{ecosystem.logo}</span>
-                        )}
-                        <span>{ecosystem.name}</span>
-                        {isSelected && <span className="ml-auto text-xs">✓</span>}
-                      </div>
+                      Clear
                     </button>
-                  );
-                })}
-              </div>
-            </aside>
+                  )}
+                </div>
+
+                <div className="space-y-1">
+                  {ecosystems.map((ecosystem) => {
+                    const isSelected = selectedEcosystems.some((e) => e.name === ecosystem.name);
+                    const canSelect = selectedEcosystems.length < 3 || isSelected;
+
+                    return (
+                      <button
+                        key={ecosystem.name}
+                        onClick={() => toggleEcosystem(ecosystem)}
+                        disabled={!canSelect}
+                        className={`w-full text-left p-3 rounded transition-colors ${
+                          isSelected
+                            ? "bg-primary text-primary-foreground"
+                            : canSelect
+                              ? "hover:bg-accent"
+                              : "opacity-50 cursor-not-allowed"
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          {ecosystem.logo.startsWith("/") ? (
+                            <Image
+                              src={ecosystem.logo}
+                              alt={ecosystem.name}
+                              width={20}
+                              height={20}
+                              className="rounded-sm"
+                            />
+                          ) : (
+                            <span className="text-lg">{ecosystem.logo}</span>
+                          )}
+                          <span>{ecosystem.name}</span>
+                          {isSelected && <span className="ml-auto text-xs">✓</span>}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </aside>
+            )}
 
             {/* Main Content */}
-            <main className="flex-1">
+            <main className={activeTab === "usdt" ? "w-full" : "flex-1"}>
               <div className="mb-8 flex items-start justify-between">
-                <h1 className="text-3xl font-bold">
-                  {selectedEcosystems.length > 0
-                    ? `Aptos vs ${selectedEcosystems.map((e) => e.name).join(" vs ")}`
-                    : "Aptos Performance"}
-                </h1>
+                <div>
+                  <h1 className="text-3xl font-bold">
+                    {selectedEcosystems.length > 0
+                      ? `Aptos vs ${selectedEcosystems.map((e) => e.name).join(" vs ")}`
+                      : "Aptos Performance"}
+                  </h1>
+                </div>
 
-                {/* Chainspect Attribution */}
+                {/* Data Attribution */}
                 <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
                   <span>Data powered by</span>
-                  <div className="flex items-center gap-1.5">
+                  <a 
+                    href="https://chainspect.app/" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 hover:text-foreground transition-colors"
+                  >
                     <Image
                       src="/chainspect_icon_squared.png"
                       alt="Chainspect"
@@ -365,12 +501,20 @@ export default function PerformancePage() {
                       className="rounded-sm"
                     />
                     <span className="font-medium text-foreground">Chainspect</span>
-                  </div>
+                  </a>
                 </div>
               </div>
 
-              {selectedEcosystems.length > 0 ? (
-                <div className="space-y-8">
+              <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+                <TabsList className="grid w-full max-w-md grid-cols-2">
+                  <TabsTrigger value="performance">Chain Performance</TabsTrigger>
+                  <TabsTrigger value="usdt">USDT Dominance</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="performance" className="mt-8">
+
+                {selectedEcosystems.length > 0 ? (
+                  <div className="space-y-6">
                   {/* Render Aptos first, then selected ecosystems */}
                   {[
                     {
@@ -433,49 +577,69 @@ export default function PerformancePage() {
                       <div key={chain.name}>
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
                           <MetricBox
-                            value={chain.metrics.maxTps}
+                            value={formatTPS(chain.metrics.maxTps)}
                             label="Max TPS (100 blocks)"
                             isPrimary={chain.isPrimary}
                             isWinner={metricWinners.maxTps.includes(chain.name)}
-                            showConnector={true}
                             chainLogo={chain.logo}
                             chainName={chain.name}
+                            percentageDifference={
+                              !metricWinners.maxTps.includes(chain.name) && !chain.isPrimary
+                                ? calculatePercentageDifference("maxTps", aptosMetrics.maxTps, chain.metrics.maxTps)
+                                : null
+                            }
                           />
                           <MetricBox
-                            value={chain.metrics.maxTpsOneBlock}
+                            value={formatTPS(chain.metrics.maxTpsOneBlock)}
                             label="Max TPS (1 block)"
                             isPrimary={chain.isPrimary}
                             isWinner={metricWinners.maxTpsOneBlock.includes(chain.name)}
-                            showConnector={true}
                             chainLogo={chain.logo}
                             chainName={chain.name}
+                            percentageDifference={
+                              !metricWinners.maxTpsOneBlock.includes(chain.name) && !chain.isPrimary
+                                ? calculatePercentageDifference("maxTpsOneBlock", aptosMetrics.maxTpsOneBlock, chain.metrics.maxTpsOneBlock)
+                                : null
+                            }
                           />
                           <MetricBox
                             value={chain.metrics.finality}
                             label="Finality"
                             isPrimary={chain.isPrimary}
                             isWinner={metricWinners.finality.includes(chain.name)}
-                            showConnector={true}
                             chainLogo={chain.logo}
                             chainName={chain.name}
+                            percentageDifference={
+                              !metricWinners.finality.includes(chain.name) && !chain.isPrimary
+                                ? calculatePercentageDifference("finality", aptosMetrics.finality, chain.metrics.finality)
+                                : null
+                            }
                           />
                           <MetricBox
                             value={chain.metrics.blockTime}
                             label="Block Time"
                             isPrimary={chain.isPrimary}
                             isWinner={metricWinners.blockTime.includes(chain.name)}
-                            showConnector={true}
                             chainLogo={chain.logo}
                             chainName={chain.name}
+                            percentageDifference={
+                              !metricWinners.blockTime.includes(chain.name) && !chain.isPrimary
+                                ? calculatePercentageDifference("blockTime", aptosMetrics.blockTime, chain.metrics.blockTime)
+                                : null
+                            }
                           />
                           <MetricBox
                             value={chain.metrics.nakamotoCoeff}
                             label="Nakamoto"
                             isPrimary={chain.isPrimary}
                             isWinner={metricWinners.nakamotoCoeff.includes(chain.name)}
-                            showConnector={true}
                             chainLogo={chain.logo}
                             chainName={chain.name}
+                            percentageDifference={
+                              !metricWinners.nakamotoCoeff.includes(chain.name) && !chain.isPrimary
+                                ? calculatePercentageDifference("nakamotoCoeff", aptosMetrics.nakamotoCoeff, chain.metrics.nakamotoCoeff)
+                                : null
+                            }
                             tooltip={
                               <Tooltip>
                                 <TooltipTrigger asChild>
@@ -495,46 +659,45 @@ export default function PerformancePage() {
                             label="Validators"
                             isPrimary={chain.isPrimary}
                             isWinner={metricWinners.validators.includes(chain.name)}
-                            showConnector={false}
                             chainLogo={chain.logo}
                             chainName={chain.name}
+                            percentageDifference={
+                              !metricWinners.validators.includes(chain.name) && !chain.isPrimary
+                                ? calculatePercentageDifference("validators", aptosMetrics.validators, chain.metrics.validators)
+                                : null
+                            }
                           />
                         </div>
                       </div>
                     );
                   })}
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
                   <MetricBox
-                    value={aptosMetrics.maxTps}
+                    value={formatTPS(aptosMetrics.maxTps)}
                     label="Max TPS (100 blocks)"
                     isPrimary={true}
-                    showConnector={true}
                   />
                   <MetricBox
-                    value={aptosMetrics.maxTpsOneBlock}
+                    value={formatTPS(aptosMetrics.maxTpsOneBlock)}
                     label="Max TPS (1 block)"
                     isPrimary={true}
-                    showConnector={true}
                   />
                   <MetricBox
                     value={aptosMetrics.finality}
                     label="Finality"
                     isPrimary={true}
-                    showConnector={true}
                   />
                   <MetricBox
                     value={aptosMetrics.blockTime}
                     label="Block Time"
                     isPrimary={true}
-                    showConnector={true}
                   />
                   <MetricBox
                     value={aptosMetrics.nakamotoCoeff}
                     label="Nakamoto"
                     isPrimary={true}
-                    showConnector={true}
                     tooltip={
                       <Tooltip>
                         <TooltipTrigger asChild>
@@ -553,10 +716,11 @@ export default function PerformancePage() {
                     value={aptosMetrics.validators}
                     label="Validators"
                     isPrimary={true}
-                    showConnector={false}
                   />
-                </div>
-              )}
+                  </div>
+                )}
+                </TabsContent>
+              </Tabs>
             </main>
           </div>
         </div>
