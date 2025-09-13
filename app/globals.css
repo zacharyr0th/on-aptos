@@ -617,4 +617,40 @@
   .animate-spin-slow {
     animation: spin-slow 30s linear infinite;
   }
+
+  /* USDT Transaction Banner Scrolling Animation */
+  @keyframes scroll {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  .animate-scroll {
+    animation: scroll 25s linear infinite;
+    will-change: transform;
+    /* Ensure smooth animation even during React re-renders */
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+
+  .animate-scroll:hover {
+    animation-play-state: paused;
+  }
+  
+  /* Prevent layout shift and enable hardware acceleration */
+  .animate-scroll > * {
+    backface-visibility: hidden;
+    transform: translateZ(0);
+    /* Force compositing layer for smooth animation */
+    will-change: transform;
+  }
+  
+  /* Ensure container stability */
+  .animate-scroll-container {
+    overflow: hidden;
+    contain: layout style paint;
+  }
 }

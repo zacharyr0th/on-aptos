@@ -1,7 +1,15 @@
 "use client";
 
-import { useEffect, useRef, useState } from 'react';
-import * as d3 from 'd3';
+import { useEffect, useRef, useState, useMemo, useCallback } from 'react';
+import { memo } from 'react';
+// Import only specific D3 functions to reduce bundle size
+import { select } from 'd3-selection';
+import { scaleBand, scaleLog } from 'd3-scale';
+import { axisBottom, axisLeft } from 'd3-axis';
+import { max } from 'd3-array';
+import { easeBackOut } from 'd3-ease';
+// Import transition to enable .transition() on selections
+import 'd3-transition';
 
 interface ChainCost {
   chain: string;
@@ -14,19 +22,32 @@ interface USDTCostChartProps {
   data: ChainCost[];
 }
 
-export default function USDTCostChart({ data }: USDTCostChartProps) {
+const USDTCostChart = memo(function USDTCostChart({ data }: USDTCostChartProps) {
   const svgRef = useRef<SVGSVGElement>(null);
-  const tooltipRef = useRef<HTMLDivElement>(null);
-  const [hoveredChain, setHoveredChain] = useState<string | null>(null);
+  const [isDark, setIsDark] = useState(false);
+  const chartInitialized = useRef(false);
 
+  // Check theme on mount and listen for changes
   useEffect(() => {
-    if (!svgRef.current) return;
+    const checkTheme = () => {
+      setIsDark(document.documentElement.classList.contains('dark'));
+    };
+    
+    checkTheme();
+    
+    // Listen for theme changes
+    const observer = new MutationObserver(checkTheme);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+    
+    return () => observer.disconnect();
+  }, []);
 
-    // Clear previous chart
-    d3.select(svgRef.current).selectAll("*").remove();
-
-    // Parse cost data and convert to numeric values (using upper bound for ranges)
-    const parsedData = data.map(item => {
+  // Memoize parsed data to avoid recalculation
+  const parsedData = useMemo(() => {
+    return data.map(item => {
       let cost = item.cost.replace('$', '');
       let numericCost: number;
       
@@ -48,15 +69,32 @@ export default function USDTCostChart({ data }: USDTCostChartProps) {
         multiplier: multiplier === 1 ? null : multiplier
       };
     }).sort((a, b) => a.numericCost - b.numericCost); // Sort by cost
+  }, [data]);
+
+  // Debounced resize handler
+  const handleResize = useCallback(() => {
+    if (chartInitialized.current) {
+      // Re-render chart on resize
+      chartInitialized.current = false;
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!svgRef.current) return;
+
+    // Only clear if not initialized or data changed
+    if (!chartInitialized.current) {
+      select(svgRef.current).selectAll("*").remove();
+    }
 
     // Responsive sizing
-    const containerWidth = svgRef.current.clientWidth || 400;
-    const containerHeight = svgRef.current.clientHeight || 350;
-    const margin = { top: 30, right: 40, bottom: 80, left: 70 };
+    const containerWidth = svgRef.current.clientWidth || 500;
+    const containerHeight = svgRef.current.clientHeight || 450;
+    const margin = { top: 30, right: 40, bottom: 70, left: 70 };
     const width = containerWidth - margin.left - margin.right;
     const height = containerHeight - margin.top - margin.bottom;
 
-    const svg = d3.select(svgRef.current)
+    const svg = select(svgRef.current)
       .attr("width", containerWidth)
       .attr("height", containerHeight);
 
@@ -64,13 +102,13 @@ export default function USDTCostChart({ data }: USDTCostChartProps) {
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
     // Scales
-    const xScale = d3.scaleBand()
+    const xScale = scaleBand()
       .domain(parsedData.map(d => d.chain))
       .range([0, width])
       .padding(0.15);
 
-    const yScale = d3.scaleLog()
-      .domain([0.0001, d3.max(parsedData, d => d.numericCost) || 1])
+    const yScale = scaleLog()
+      .domain([0.0001, max(parsedData, d => d.numericCost) || 1])
       .range([height, 0])
       .nice();
 
@@ -79,7 +117,7 @@ export default function USDTCostChart({ data }: USDTCostChartProps) {
       'Aptos': { base: '#000000', light: '#374151' },
       'Ethereum': { base: '#627EEA', light: '#8B9AFF' },
       'Polygon': { base: '#8247E5', light: '#A855F7' },
-      'BSC': { base: '#F3BA2F', light: '#FCD34D' },
+      'BNB Chain': { base: '#F0B90B', light: '#FCD34D' },
       'TRON': { base: '#FF6B6B', light: '#FCA5A5' },
       'Bitcoin': { base: '#F7931A', light: '#FBBF24' },
       'Solana': { base: '#9945FF', light: '#C084FC' },
@@ -93,7 +131,7 @@ export default function USDTCostChart({ data }: USDTCostChartProps) {
     
     Object.entries(chainColors).forEach(([chain, colors]) => {
       const gradient = defs.append("linearGradient")
-        .attr("id", `${chain.toLowerCase()}Gradient`)
+        .attr("id", `${chain.toLowerCase().replace(/\s+/g, '')}Gradient`)
         .attr("gradientUnits", "userSpaceOnUse")
         .attr("x1", 0).attr("y1", height)
         .attr("x2", 0).attr("y2", 0);
@@ -111,7 +149,7 @@ export default function USDTCostChart({ data }: USDTCostChartProps) {
     g.append("g")
       .attr("class", "grid")
       .attr("transform", `translate(0,${height})`)
-      .call(d3.axisBottom(xScale)
+      .call(axisBottom(xScale)
         .tickSize(-height)
         .tickFormat(() => ""))
       .style("stroke-dasharray", "2,2")
@@ -119,7 +157,7 @@ export default function USDTCostChart({ data }: USDTCostChartProps) {
 
     g.append("g")
       .attr("class", "grid")
-      .call(d3.axisLeft(yScale)
+      .call(axisLeft(yScale)
         .tickSize(-width)
         .tickFormat(() => ""))
       .style("stroke-dasharray", "2,2")
@@ -135,66 +173,18 @@ export default function USDTCostChart({ data }: USDTCostChartProps) {
       .attr('y', height) // Start from bottom for animation
       .attr('width', xScale.bandwidth())
       .attr('height', 0) // Start with 0 height for animation
-      .attr('fill', d => `url(#${d.chain.toLowerCase()}Gradient)`)
+      .attr('fill', d => `url(#${d.chain.toLowerCase().replace(/\s+/g, '')}Gradient)`)
       .attr('stroke', d => chainColors[d.chain as keyof typeof chainColors]?.base || '#4b5563')
       .attr('stroke-width', 1)
       .attr('rx', 4)
       .attr('ry', 4)
-      .style('cursor', 'pointer')
-      .style('filter', 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))')
-      .on('mouseover', function(event, d) {
-        // Highlight bar
-        d3.select(this)
-          .transition()
-          .duration(150)
-          .attr('stroke-width', 2)
-          .style('filter', 'drop-shadow(0 4px 8px rgba(0,0,0,0.2))');
-        
-        setHoveredChain(d.chain);
-        
-        // Show tooltip
-        if (tooltipRef.current) {
-          const multiplierText = d.multiplier 
-            ? `${d.multiplier >= 1000 ? `${(d.multiplier / 1000).toFixed(1)}k` : Math.round(d.multiplier)}x more than Aptos`
-            : 'Lowest cost';
-            
-          tooltipRef.current.innerHTML = `
-            <div class="font-semibold text-sm mb-1">${d.chain}</div>
-            <div class="text-xs text-gray-600">Cost: ${d.displayCost}</div>
-            <div class="text-xs ${d.isLowest ? 'text-green-600' : 'text-red-600'}">${multiplierText}</div>
-          `;
-          tooltipRef.current.style.display = 'block';
-          tooltipRef.current.style.left = (event.pageX + 10) + 'px';
-          tooltipRef.current.style.top = (event.pageY - 10) + 'px';
-        }
-      })
-      .on('mousemove', function(event) {
-        if (tooltipRef.current) {
-          tooltipRef.current.style.left = (event.pageX + 10) + 'px';
-          tooltipRef.current.style.top = (event.pageY - 10) + 'px';
-        }
-      })
-      .on('mouseout', function() {
-        // Remove highlight
-        d3.select(this)
-          .transition()
-          .duration(150)
-          .attr('stroke-width', 1)
-          .style('filter', 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))');
-        
-        setHoveredChain(null);
-        
-        // Hide tooltip
-        if (tooltipRef.current) {
-          tooltipRef.current.style.display = 'none';
-        }
-      });
+      .style('filter', 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))');
 
     // Animate bars
     bars.transition()
       .duration(800)
       .delay((d, i) => i * 100)
-      .ease(d3.easeBackOut)
+      .ease(easeBackOut)
       .attr('y', d => yScale(d.numericCost))
       .attr('height', d => height - yScale(d.numericCost));
 
@@ -253,7 +243,7 @@ export default function USDTCostChart({ data }: USDTCostChartProps) {
       .style('font-size', '9px')
       .style('font-weight', '400')
       .style('fill', d => d.chain === 'TRON' ? '#ffffff' : '#dc2626')
-      .text('up to')
+      .text('Up to')
       .style('opacity', 0);
 
     // Animate multiplier text
@@ -271,7 +261,7 @@ export default function USDTCostChart({ data }: USDTCostChartProps) {
     // X-axis with logos
     const xAxis = g.append('g')
       .attr('transform', `translate(0,${height})`)
-      .call(d3.axisBottom(xScale).tickSize(0))
+      .call(axisBottom(xScale).tickSize(0))
       .selectAll('text')
       .remove(); // Remove default text labels
 
@@ -295,7 +285,7 @@ export default function USDTCostChart({ data }: USDTCostChartProps) {
           'Aptos': '/icons/apt.png',
           'Ethereum': '/icons/performance/eth.png',
           'Polygon': '/icons/performance/polygon.png',
-          'BSC': '/icons/performance/bnb.png',
+          'BNB Chain': '/icons/performance/bnb.png',
           'TRON': '/icons/performance/trx.png',
           'Bitcoin': '/icons/performance/btc.png',
           'Solana': '/icons/performance/sol.png',
@@ -304,11 +294,18 @@ export default function USDTCostChart({ data }: USDTCostChartProps) {
           'Polkadot': '/icons/performance/polkadot.png'
         };
         return logoMap[d.chain] || '/icons/apt.png';
+      })
+      .style('filter', d => {
+        // Only invert APT logo in dark mode
+        if (d.chain === 'Aptos' && isDark) {
+          return 'invert(1)';
+        }
+        return 'none';
       });
 
     // Y-axis with cleaner log scale formatting
     const yAxis = g.append('g')
-      .call(d3.axisLeft(yScale)
+      .call(axisLeft(yScale)
         .tickValues([0.0001, 0.001, 0.01, 0.1, 1, 10])
         .tickFormat(d => {
           const num = Number(d);
@@ -319,11 +316,12 @@ export default function USDTCostChart({ data }: USDTCostChartProps) {
         })
         .tickSize(-5))
       .style('font-size', '11px')
-      .style('fill', '#6b7280');
+      .style('fill', 'currentColor')
+      .style('opacity', '0.7');
 
-    // Style axis lines
-    g.select('.domain').style('stroke', '#e5e7eb');
-    yAxis.select('.domain').style('stroke', '#e5e7eb');
+    // Style axis lines with current color and opacity
+    g.select('.domain').style('stroke', 'currentColor').style('opacity', '0.2');
+    yAxis.select('.domain').style('stroke', 'currentColor').style('opacity', '0.2');
 
     // Y-axis label
     g.append('text')
@@ -333,7 +331,7 @@ export default function USDTCostChart({ data }: USDTCostChartProps) {
       .attr('dy', '1em')
       .style('text-anchor', 'middle')
       .style('font-size', '13px')
-      .style('fill', '#374151')
+      .style('fill', 'currentColor')
       .style('font-weight', '500')
       .text('Transfer Cost (USD)');
 
@@ -344,8 +342,9 @@ export default function USDTCostChart({ data }: USDTCostChartProps) {
       .attr('text-anchor', 'middle')
       .style('font-size', '16px')
       .style('font-weight', '600')
-      .style('fill', '#1f2937')
-      .text('USDT Transfer Costs by Chain (Log)');
+      .style('fill', 'currentColor')
+      .style('opacity', '0.8')
+      .text('USDt Transfer Costs by Chain (Log)');
 
     // Add Aptos callout
     const aptosData = parsedData.find(d => d.isLowest);
@@ -355,21 +354,21 @@ export default function USDTCostChart({ data }: USDTCostChartProps) {
         .attr('y', yScale(aptosData.numericCost) - 15)
         .attr('text-anchor', 'middle')
         .style('font-size', '11px')
-        .style('fill', '#000000')
+        .style('fill', isDark ? 'white' : 'black')
         .style('font-weight', '600')
         .text('LOWEST');
     }
 
-  }, [data]);
+    // Mark as initialized
+    chartInitialized.current = true;
+
+  }, [parsedData, isDark]);
 
   return (
     <div className="w-full h-full relative">
       <svg ref={svgRef} className="w-full h-full" />
-      <div
-        ref={tooltipRef}
-        className="absolute z-10 bg-white border border-gray-200 rounded-lg shadow-lg p-3 pointer-events-none"
-        style={{ display: 'none' }}
-      />
     </div>
   );
-}
+});
+
+export default USDTCostChart;

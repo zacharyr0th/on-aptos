@@ -2,7 +2,7 @@
 
 import { GeistMono } from "geist/font/mono";
 import { useState } from "react";
-import { HelpCircle, Check } from "lucide-react";
+import { HelpCircle, Check, AlertTriangle } from "lucide-react";
 import { ErrorBoundary } from "@/components/errors/ErrorBoundary";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -203,6 +203,7 @@ function formatTPS(value: string): string {
 function parseValue(value: string): number {
   const cleaned = value.replace(/[,<>]/g, "");
   
+  
   // Handle time formats like "13m13s", "12m48s", "1h", etc.
   if (cleaned.includes("h")) {
     const hours = parseFloat(cleaned.replace("h", ""));
@@ -282,31 +283,74 @@ function findBestMetric(metric: string, values: { name: string; value: string }[
 function calculatePercentageDifference(
   metric: string, 
   aptosValue: string, 
-  competitorValue: string
-): string | null {
+  competitorValue: string,
+  forAptos: boolean = false,
+  competitorName: string = "Competitor"
+): { multiplier: string; fraction: string; advantageText: string; severity: 'moderate' | 'severe' | 'critical' | 'extreme' } | null {
   const isHigherBetter = ["maxTps", "maxTpsOneBlock", "nakamotoCoeff", "validators"].includes(metric);
   const aptosNum = parseValue(aptosValue);
   const competitorNum = parseValue(competitorValue);
   
   if (aptosNum === 0 || competitorNum === 0) return null;
   
-  let multiplier: number;
-  
+  // Determine who is actually winning
+  let aptosIsWinning: boolean;
   if (isHigherBetter) {
-    // For metrics where higher is better, show how much better Aptos is
-    if (aptosNum > competitorNum) {
-      multiplier = aptosNum / competitorNum;
-      return multiplier >= 10 ? `${Math.round(multiplier)}x` : `${multiplier.toFixed(1)}x`;
+    aptosIsWinning = aptosNum > competitorNum;
+  } else {
+    aptosIsWinning = aptosNum < competitorNum;
+  }
+  
+  // Always show comparison text now to maintain consistent card sizes
+  
+  // Calculate how much better the winner is
+  let multiplier: number;
+  let winnerName: string;
+  let loserName: string;
+  
+  if (aptosIsWinning) {
+    // Aptos is winning, show on competitor card
+    winnerName = "Aptos";
+    loserName = competitorName;
+    if (isHigherBetter) {
+      multiplier = aptosNum / competitorNum; // e.g., 12933 / 926 = 14x
+    } else {
+      multiplier = competitorNum / aptosNum; // e.g., 57s / 1s = 57x
     }
   } else {
-    // For metrics where lower is better (finality, blockTime), show how much worse the competitor is
-    if (aptosNum < competitorNum) {
-      multiplier = competitorNum / aptosNum;
-      return multiplier >= 10 ? `${Math.round(multiplier)}x` : `${multiplier.toFixed(1)}x`;
+    // Competitor is winning, show on Aptos card  
+    winnerName = competitorName;
+    loserName = "Aptos";
+    if (isHigherBetter) {
+      multiplier = competitorNum / aptosNum; // e.g., 965 / 151 = 6.4x
+    } else {
+      multiplier = aptosNum / competitorNum; // e.g., 12.8s / 1s = 12.8x
     }
   }
   
-  return null;
+  const multiplierText = multiplier >= 10 ? `${Math.round(multiplier)}x` : `${multiplier.toFixed(1)}x`;
+  
+  // Create fraction text 
+  const fractionText = multiplier >= 10 
+    ? `1/${Math.round(multiplier)}` 
+    : `1/${multiplier.toFixed(1).replace('.0', '')}`;
+  
+  // Create advantage text
+  const advantageText = `${winnerName} is ${multiplierText} better`;
+  
+  // Determine severity based on multiplier
+  let severity: 'moderate' | 'severe' | 'critical' | 'extreme';
+  if (multiplier < 10) {
+    severity = 'moderate';
+  } else if (multiplier < 100) {
+    severity = 'severe';
+  } else if (multiplier < 1000) {
+    severity = 'critical';
+  } else {
+    severity = 'extreme';
+  }
+  
+  return { multiplier: multiplierText, fraction: fractionText, advantageText, severity };
 }
 
 
@@ -327,18 +371,49 @@ function MetricBox({
   tooltip?: React.ReactNode;
   chainLogo?: string | null;
   chainName?: string | null;
-  percentageDifference?: string | null;
+  percentageDifference?: { multiplier: string; fraction: string; advantageText: string; severity: 'moderate' | 'severe' | 'critical' | 'extreme' } | null;
 }) {
   const baseClasses =
-    "text-center p-6 border rounded relative transition-all duration-200 min-h-[130px] flex flex-col justify-center";
-  const winnerClasses = isWinner ? "border-green-500 bg-green-50 dark:bg-green-950/20" : "";
-  const valueClasses = isPrimary
-    ? `text-2xl xl:text-3xl font-bold font-mono mb-3 leading-tight ${isWinner ? "text-green-600 dark:text-green-400" : "text-primary"}`
-    : `text-2xl xl:text-3xl font-bold font-mono mb-3 leading-tight ${isWinner ? "text-green-600 dark:text-green-400" : "text-muted-foreground"}`;
+    "text-center p-5 border rounded relative transition-all duration-200 min-h-[140px] flex flex-col justify-center";
+  
+  // Determine card styling based on performance
+  let cardClasses = "";
+  let valueTextClasses = "";
+  let badgeElement = null;
+  
+  if (isWinner) {
+    cardClasses = "border-green-500 bg-green-50 dark:bg-green-950/20";
+    valueTextClasses = "text-green-600 dark:text-green-400";
+  } else if (percentageDifference) {
+    const { severity } = percentageDifference;
+    
+    switch (severity) {
+      case 'moderate':
+        cardClasses = "border-orange-400 bg-orange-50 dark:bg-orange-950/20";
+        valueTextClasses = "text-orange-700 dark:text-orange-300";
+        break;
+      case 'severe':
+        cardClasses = "border-red-400 bg-red-50 dark:bg-red-950/20";
+        valueTextClasses = "text-red-700 dark:text-red-300";
+        break;
+      case 'critical':
+        cardClasses = "border-red-600 bg-red-100 dark:bg-red-900/30";
+        valueTextClasses = "text-red-800 dark:text-red-200";
+        break;
+      case 'extreme':
+        cardClasses = "border-red-800 bg-red-200 dark:bg-red-900/50";
+        valueTextClasses = "text-red-900 dark:text-red-100";
+        break;
+    }
+  }
+  
+  const finalValueClasses = isPrimary
+    ? `text-xl xl:text-2xl font-bold font-mono mb-2 leading-tight ${isWinner ? valueTextClasses : "text-primary"}`
+    : `text-xl xl:text-2xl font-bold font-mono mb-2 leading-tight ${percentageDifference ? valueTextClasses : (isWinner ? valueTextClasses : "text-muted-foreground")}`;
 
   return (
     <div className="relative">
-      <div className={`${baseClasses} ${winnerClasses}`}>
+      <div className={`${baseClasses} ${cardClasses}`}>
         {/* Chain Logo in top-left corner */}
         {chainLogo && (
           <div className="absolute top-3 left-3">
@@ -346,32 +421,35 @@ function MetricBox({
               <Image
                 src={chainLogo}
                 alt={chainName || ""}
-                width={16}
-                height={16}
-                className="rounded-sm opacity-60"
+                width={24}
+                height={24}
+                className={`rounded-sm opacity-60 ${chainLogo.includes('/apt.png') ? 'dark:invert' : ''}`}
               />
             ) : (
-              <span className="text-sm opacity-60">{chainLogo}</span>
+              <span className="text-xl opacity-60">{chainLogo}</span>
             )}
           </div>
         )}
 
-        {/* Winner check or percentage difference in top-right corner */}
-        {isWinner ? (
+        {/* Winner check in top-right corner */}
+        {isWinner && (
           <Check className="absolute top-3 right-3 h-4 w-4 text-green-600 dark:text-green-400" />
-        ) : percentageDifference ? (
-          <div className="absolute top-3 right-3">
-            <div className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 px-2 py-1 rounded text-xs font-medium">
-              {percentageDifference}
-            </div>
-          </div>
-        ) : null}
+        )}
 
-        <div className={valueClasses}>{value}</div>
+        <div className={finalValueClasses}>{value}</div>
         <div className="font-medium text-sm text-muted-foreground flex items-center justify-center gap-1 leading-relaxed">
           <span className="whitespace-nowrap">{label}</span>
           {tooltip}
         </div>
+        {percentageDifference && (
+          <div className="text-xs text-muted-foreground mt-1 font-medium">
+            {percentageDifference.advantageText.includes('Aptos is') ? (
+              <>Aptos is <span className="font-bold text-primary">{percentageDifference.multiplier}</span> better</>
+            ) : (
+              <>{percentageDifference.advantageText.split(' is ')[0]} is <span className="font-bold text-primary">{percentageDifference.multiplier}</span> better</>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -414,12 +492,12 @@ export default function PerformancePage() {
   return (
     <ErrorBoundary>
       <div className={`${GeistMono.className}`}>
-        <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20 py-12 min-h-[calc(100vh-200px)]">
+        <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20 py-4">
           <div className="flex gap-12">
             {/* Sidebar - only show for performance tab */}
             {activeTab === "performance" && (
               <aside className="w-48 flex-shrink-0">
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-6">
                   <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
                     Compare ({selectedEcosystems.length}/3)
                   </h2>
@@ -433,7 +511,7 @@ export default function PerformancePage() {
                   )}
                 </div>
 
-                <div className="space-y-1">
+                <div className="space-y-2">
                   {ecosystems.map((ecosystem) => {
                     const isSelected = selectedEcosystems.some((e) => e.name === ecosystem.name);
                     const canSelect = selectedEcosystems.length < 3 || isSelected;
@@ -443,9 +521,9 @@ export default function PerformancePage() {
                         key={ecosystem.name}
                         onClick={() => toggleEcosystem(ecosystem)}
                         disabled={!canSelect}
-                        className={`w-full text-left p-3 rounded transition-colors ${
+                        className={`w-full text-left p-4 rounded transition-colors ${
                           isSelected
-                            ? "bg-primary text-primary-foreground"
+                            ? "bg-accent text-accent-foreground"
                             : canSelect
                               ? "hover:bg-accent"
                               : "opacity-50 cursor-not-allowed"
@@ -458,7 +536,7 @@ export default function PerformancePage() {
                               alt={ecosystem.name}
                               width={20}
                               height={20}
-                              className="rounded-sm"
+                              className={`rounded-sm ${ecosystem.logo.includes('/apt.png') ? 'dark:invert' : ''}`}
                             />
                           ) : (
                             <span className="text-lg">{ecosystem.logo}</span>
@@ -502,17 +580,26 @@ export default function PerformancePage() {
                     />
                     <span className="font-medium text-foreground">Chainspect</span>
                   </a>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="text-sm max-w-xs">
+                        Chainspect does not have an API so these values were hardcoded on September 11th, 2025.
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
                 </div>
               </div>
 
               <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
                 <TabsList className="grid w-full max-w-md grid-cols-2">
                   <TabsTrigger value="performance">Chain Performance</TabsTrigger>
-                  <TabsTrigger value="usdt">USDT Dominance</TabsTrigger>
+                  <TabsTrigger value="usdt">USDt Comparison</TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="performance" className="mt-8">
-
+                <TabsContent value="performance" className="mt-6">
                 {selectedEcosystems.length > 0 ? (
                   <div className="space-y-6">
                   {/* Render Aptos first, then selected ecosystems */}
@@ -575,7 +662,7 @@ export default function PerformancePage() {
 
                     return (
                       <div key={chain.name}>
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                           <MetricBox
                             value={formatTPS(chain.metrics.maxTps)}
                             label="Max TPS (100 blocks)"
@@ -583,11 +670,26 @@ export default function PerformancePage() {
                             isWinner={metricWinners.maxTps.includes(chain.name)}
                             chainLogo={chain.logo}
                             chainName={chain.name}
-                            percentageDifference={
-                              !metricWinners.maxTps.includes(chain.name) && !chain.isPrimary
-                                ? calculatePercentageDifference("maxTps", aptosMetrics.maxTps, chain.metrics.maxTps)
-                                : null
-                            }
+                            percentageDifference={(() => {
+                              if (chain.isPrimary) {
+                                // For Aptos cards, find the best competitor and compare against them
+                                const winner = selectedEcosystems.find(e => metricWinners.maxTps.includes(e.name));
+                                if (winner) {
+                                  return calculatePercentageDifference("maxTps", aptosMetrics.maxTps, winner.metrics.maxTps, true, winner.name);
+                                } else {
+                                  // If Aptos is winning, compare against the best competitor
+                                  const bestCompetitor = selectedEcosystems.reduce((best, current) => {
+                                    const bestVal = parseValue(best.metrics.maxTps);
+                                    const currentVal = parseValue(current.metrics.maxTps);
+                                    return currentVal > bestVal ? current : best;
+                                  });
+                                  return calculatePercentageDifference("maxTps", aptosMetrics.maxTps, bestCompetitor.metrics.maxTps, false, bestCompetitor.name);
+                                }
+                              } else {
+                                // For competitor cards, always compare against Aptos
+                                return calculatePercentageDifference("maxTps", aptosMetrics.maxTps, chain.metrics.maxTps, false, chain.name);
+                              }
+                            })()}
                           />
                           <MetricBox
                             value={formatTPS(chain.metrics.maxTpsOneBlock)}
@@ -596,11 +698,23 @@ export default function PerformancePage() {
                             isWinner={metricWinners.maxTpsOneBlock.includes(chain.name)}
                             chainLogo={chain.logo}
                             chainName={chain.name}
-                            percentageDifference={
-                              !metricWinners.maxTpsOneBlock.includes(chain.name) && !chain.isPrimary
-                                ? calculatePercentageDifference("maxTpsOneBlock", aptosMetrics.maxTpsOneBlock, chain.metrics.maxTpsOneBlock)
-                                : null
-                            }
+                            percentageDifference={(() => {
+                              if (chain.isPrimary) {
+                                const winner = selectedEcosystems.find(e => metricWinners.maxTpsOneBlock.includes(e.name));
+                                if (winner) {
+                                  return calculatePercentageDifference("maxTpsOneBlock", aptosMetrics.maxTpsOneBlock, winner.metrics.maxTpsOneBlock, true, winner.name);
+                                } else {
+                                  const bestCompetitor = selectedEcosystems.reduce((best, current) => {
+                                    const bestVal = parseValue(best.metrics.maxTpsOneBlock);
+                                    const currentVal = parseValue(current.metrics.maxTpsOneBlock);
+                                    return currentVal > bestVal ? current : best;
+                                  });
+                                  return calculatePercentageDifference("maxTpsOneBlock", aptosMetrics.maxTpsOneBlock, bestCompetitor.metrics.maxTpsOneBlock, false, bestCompetitor.name);
+                                }
+                              } else {
+                                return calculatePercentageDifference("maxTpsOneBlock", aptosMetrics.maxTpsOneBlock, chain.metrics.maxTpsOneBlock, false, chain.name);
+                              }
+                            })()}
                           />
                           <MetricBox
                             value={chain.metrics.finality}
@@ -609,11 +723,23 @@ export default function PerformancePage() {
                             isWinner={metricWinners.finality.includes(chain.name)}
                             chainLogo={chain.logo}
                             chainName={chain.name}
-                            percentageDifference={
-                              !metricWinners.finality.includes(chain.name) && !chain.isPrimary
-                                ? calculatePercentageDifference("finality", aptosMetrics.finality, chain.metrics.finality)
-                                : null
-                            }
+                            percentageDifference={(() => {
+                              if (chain.isPrimary) {
+                                const winner = selectedEcosystems.find(e => metricWinners.finality.includes(e.name));
+                                if (winner) {
+                                  return calculatePercentageDifference("finality", aptosMetrics.finality, winner.metrics.finality, true, winner.name);
+                                } else {
+                                  const bestCompetitor = selectedEcosystems.reduce((best, current) => {
+                                    const bestVal = parseValue(best.metrics.finality);
+                                    const currentVal = parseValue(current.metrics.finality);
+                                    return currentVal < bestVal ? current : best;
+                                  });
+                                  return calculatePercentageDifference("finality", aptosMetrics.finality, bestCompetitor.metrics.finality, false, bestCompetitor.name);
+                                }
+                              } else {
+                                return calculatePercentageDifference("finality", aptosMetrics.finality, chain.metrics.finality, false, chain.name);
+                              }
+                            })()}
                           />
                           <MetricBox
                             value={chain.metrics.blockTime}
@@ -622,11 +748,23 @@ export default function PerformancePage() {
                             isWinner={metricWinners.blockTime.includes(chain.name)}
                             chainLogo={chain.logo}
                             chainName={chain.name}
-                            percentageDifference={
-                              !metricWinners.blockTime.includes(chain.name) && !chain.isPrimary
-                                ? calculatePercentageDifference("blockTime", aptosMetrics.blockTime, chain.metrics.blockTime)
-                                : null
-                            }
+                            percentageDifference={(() => {
+                              if (chain.isPrimary) {
+                                const winner = selectedEcosystems.find(e => metricWinners.blockTime.includes(e.name));
+                                if (winner) {
+                                  return calculatePercentageDifference("blockTime", aptosMetrics.blockTime, winner.metrics.blockTime, true, winner.name);
+                                } else {
+                                  const bestCompetitor = selectedEcosystems.reduce((best, current) => {
+                                    const bestVal = parseValue(best.metrics.blockTime);
+                                    const currentVal = parseValue(current.metrics.blockTime);
+                                    return currentVal < bestVal ? current : best;
+                                  });
+                                  return calculatePercentageDifference("blockTime", aptosMetrics.blockTime, bestCompetitor.metrics.blockTime, false, bestCompetitor.name);
+                                }
+                              } else {
+                                return calculatePercentageDifference("blockTime", aptosMetrics.blockTime, chain.metrics.blockTime, false, chain.name);
+                              }
+                            })()}
                           />
                           <MetricBox
                             value={chain.metrics.nakamotoCoeff}
@@ -635,11 +773,23 @@ export default function PerformancePage() {
                             isWinner={metricWinners.nakamotoCoeff.includes(chain.name)}
                             chainLogo={chain.logo}
                             chainName={chain.name}
-                            percentageDifference={
-                              !metricWinners.nakamotoCoeff.includes(chain.name) && !chain.isPrimary
-                                ? calculatePercentageDifference("nakamotoCoeff", aptosMetrics.nakamotoCoeff, chain.metrics.nakamotoCoeff)
-                                : null
-                            }
+                            percentageDifference={(() => {
+                              if (chain.isPrimary) {
+                                const winner = selectedEcosystems.find(e => metricWinners.nakamotoCoeff.includes(e.name));
+                                if (winner) {
+                                  return calculatePercentageDifference("nakamotoCoeff", aptosMetrics.nakamotoCoeff, winner.metrics.nakamotoCoeff, true, winner.name);
+                                } else {
+                                  const bestCompetitor = selectedEcosystems.reduce((best, current) => {
+                                    const bestVal = parseValue(best.metrics.nakamotoCoeff);
+                                    const currentVal = parseValue(current.metrics.nakamotoCoeff);
+                                    return currentVal > bestVal ? current : best;
+                                  });
+                                  return calculatePercentageDifference("nakamotoCoeff", aptosMetrics.nakamotoCoeff, bestCompetitor.metrics.nakamotoCoeff, false, bestCompetitor.name);
+                                }
+                              } else {
+                                return calculatePercentageDifference("nakamotoCoeff", aptosMetrics.nakamotoCoeff, chain.metrics.nakamotoCoeff, false, chain.name);
+                              }
+                            })()}
                             tooltip={
                               <Tooltip>
                                 <TooltipTrigger asChild>
@@ -661,11 +811,23 @@ export default function PerformancePage() {
                             isWinner={metricWinners.validators.includes(chain.name)}
                             chainLogo={chain.logo}
                             chainName={chain.name}
-                            percentageDifference={
-                              !metricWinners.validators.includes(chain.name) && !chain.isPrimary
-                                ? calculatePercentageDifference("validators", aptosMetrics.validators, chain.metrics.validators)
-                                : null
-                            }
+                            percentageDifference={(() => {
+                              if (chain.isPrimary) {
+                                const winner = selectedEcosystems.find(e => metricWinners.validators.includes(e.name));
+                                if (winner) {
+                                  return calculatePercentageDifference("validators", aptosMetrics.validators, winner.metrics.validators, true, winner.name);
+                                } else {
+                                  const bestCompetitor = selectedEcosystems.reduce((best, current) => {
+                                    const bestVal = parseValue(best.metrics.validators);
+                                    const currentVal = parseValue(current.metrics.validators);
+                                    return currentVal > bestVal ? current : best;
+                                  });
+                                  return calculatePercentageDifference("validators", aptosMetrics.validators, bestCompetitor.metrics.validators, false, bestCompetitor.name);
+                                }
+                              } else {
+                                return calculatePercentageDifference("validators", aptosMetrics.validators, chain.metrics.validators, false, chain.name);
+                              }
+                            })()}
                           />
                         </div>
                       </div>
@@ -673,7 +835,7 @@ export default function PerformancePage() {
                   })}
                   </div>
                 ) : (
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                   <MetricBox
                     value={formatTPS(aptosMetrics.maxTps)}
                     label="Max TPS (100 blocks)"
