@@ -404,10 +404,11 @@ const USDTCostChart = memo(function USDTCostChart({ data }: USDTCostChartProps) 
           if (num >= 0.001) return `$${num.toFixed(3)}`;
           return `$${num.toFixed(4)}`;
         })
-        .tickSize(-5))
-      .style('font-size', '11px')
+        .tickSize(-8))
+      .style('font-size', '14px')
+      .style('font-weight', '500')
       .style('fill', 'currentColor')
-      .style('opacity', '0.7');
+      .style('opacity', '0.8');
 
     // Style axis lines with current color and opacity
     g.select('.domain').style('stroke', 'currentColor').style('opacity', '0.2');
@@ -420,21 +421,22 @@ const USDTCostChart = memo(function USDTCostChart({ data }: USDTCostChartProps) 
       .attr('x', 0 - (height / 2))
       .attr('dy', '1em')
       .style('text-anchor', 'middle')
-      .style('font-size', '13px')
+      .style('font-size', '14px')
       .style('fill', 'currentColor')
-      .style('font-weight', '500')
+      .style('font-weight', '600')
+      .style('opacity', '0.9')
       .text('Transfer Cost (USD)');
 
     // Title
     g.append('text')
       .attr('x', width / 2)
-      .attr('y', -10)
+      .attr('y', -12)
       .attr('text-anchor', 'middle')
-      .style('font-size', '16px')
-      .style('font-weight', '600')
+      .style('font-size', '18px')
+      .style('font-weight', '700')
       .style('fill', 'currentColor')
-      .style('opacity', '0.8')
-      .text('USDt Transfer Costs by Chain (Log)');
+      .style('opacity', '0.9')
+      .text('USDt Transfer Costs by Chain (Logarithmic Scale)');
 
     // Add Aptos callout
     const aptosData = parsedData.find(d => d.isLowest);
