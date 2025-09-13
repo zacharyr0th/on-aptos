@@ -252,7 +252,7 @@ const USDTComparisonPage = memo(function USDTComparisonPage() {
                             </div>
                           ) : null}
 
-                          <div className={`${item.chain === 'Solana' ? 'text-xl xl:text-2xl' : 'text-2xl xl:text-3xl'} font-bold font-mono mb-3 leading-tight ${valueTextClasses || "text-foreground"}`}>
+                          <div className={`${item.chain === 'Solana' ? 'text-xl xl:text-2xl whitespace-nowrap text-center' : 'text-2xl xl:text-3xl'} font-bold font-mono mb-3 leading-tight ${valueTextClasses || "text-foreground"}`}>
                             {item.cost}
                           </div>
                           <div className="font-medium text-base text-muted-foreground flex items-center justify-center gap-1 leading-relaxed">

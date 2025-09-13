@@ -118,10 +118,10 @@ const USDTCostChart = memo(function USDTCostChart({ data }: USDTCostChartProps) 
       'Ethereum': { base: '#627EEA', light: '#8B9AFF' },
       'Polygon': { base: '#8247E5', light: '#A855F7' },
       'BNB Chain': { base: '#F0B90B', light: '#FCD34D' },
-      'TRON': { base: '#FF6B6B', light: '#FCA5A5' },
+      'TRON': { base: '#E84142', light: '#F87171' },
       'Bitcoin': { base: '#F7931A', light: '#FBBF24' },
       'Solana': { base: '#9945FF', light: '#C084FC' },
-      'Avalanche': { base: '#E84142', light: '#F87171' },
+      'Avalanche': { base: '#FF6B6B', light: '#FCA5A5' },
       'TON': { base: '#0088CC', light: '#38BDF8' },
       'Polkadot': { base: '#E6007A', light: '#F472B6' }
     };
@@ -188,25 +188,19 @@ const USDTCostChart = memo(function USDTCostChart({ data }: USDTCostChartProps) 
       .attr('y', d => yScale(d.numericCost))
       .attr('height', d => height - yScale(d.numericCost));
 
-    // Add multiplier text above/inside bars
+    // Add multiplier text inside bars
     const multiplierText = g.selectAll('.multiplier-text')
       .data(parsedData.filter(d => d.multiplier))
       .enter()
       .append('text')
       .attr('class', 'multiplier-text')
       .attr('x', d => xScale(d.chain)! + xScale.bandwidth() / 2)
-      .attr('y', d => {
-        // For TRON (highest bar), put multiplier inside the bar
-        if (d.chain === 'TRON') {
-          return yScale(d.numericCost) + 30;
-        }
-        // For other chains, put multiplier above the bar
-        return yScale(d.numericCost) - 5;
-      })
+      .attr('y', d => yScale(d.numericCost) + 30)
       .attr('text-anchor', 'middle')
+      .attr('dominant-baseline', 'central')
       .style('font-size', '11px')
       .style('font-weight', '600')
-      .style('fill', d => d.chain === 'TRON' ? '#ffffff' : '#dc2626')
+      .style('fill', '#ffffff')
       .text(d => {
         // Use specific values for SOL and TRON - show only the number
         if (d.chain === 'Solana') {
@@ -224,26 +218,110 @@ const USDTCostChart = memo(function USDTCostChart({ data }: USDTCostChartProps) 
       })
       .style('opacity', 0);
 
-    // Add "up to" text above the numbers for Solana and TRON
+    // Add "up to" text inside bars for Solana and TRON
     const upToText = g.selectAll('.up-to-text')
       .data(parsedData.filter(d => d.chain === 'Solana' || d.chain === 'TRON'))
       .enter()
       .append('text')
       .attr('class', 'up-to-text')
       .attr('x', d => xScale(d.chain)! + xScale.bandwidth() / 2)
-      .attr('y', d => {
-        // For TRON (highest bar), put "up to" inside the bar above the number
-        if (d.chain === 'TRON') {
-          return yScale(d.numericCost) + 15;
-        }
-        // For Solana, put "up to" above the bar above the number
-        return yScale(d.numericCost) - 20;
-      })
+      .attr('y', d => yScale(d.numericCost) + 15)
       .attr('text-anchor', 'middle')
+      .attr('dominant-baseline', 'central')
       .style('font-size', '9px')
       .style('font-weight', '400')
-      .style('fill', d => d.chain === 'TRON' ? '#ffffff' : '#dc2626')
+      .style('fill', '#ffffff')
       .text('Up to')
+      .style('opacity', 0);
+
+    // Add "sometimes" label text for lower bounds of Solana and TRON
+    const sometimesLabelText = g.selectAll('.sometimes-label-text')
+      .data(parsedData.filter(d => d.chain === 'Solana' || d.chain === 'TRON'))
+      .enter()
+      .append('text')
+      .attr('class', 'sometimes-label-text')
+      .attr('x', d => xScale(d.chain)! + xScale.bandwidth() / 2)
+      .attr('y', d => {
+        let lowerBound: number;
+        
+        if (d.chain === 'Solana') {
+          lowerBound = 0.002; // $0.002 from $0.002-0.12
+        } else if (d.chain === 'TRON') {
+          lowerBound = 2; // $2 from $2-4
+        } else {
+          return yScale(d.numericCost) + 45;
+        }
+        
+        // Position at the height that corresponds to the lower bound cost
+        // For TRON, add extra spacing to avoid overlap with "Up to" text
+        const baseY = yScale(lowerBound);
+        if (d.chain === 'TRON') {
+          return baseY + 15; // Position "Sometimes" above the multiplier for TRON
+        }
+        return baseY;
+      })
+      .attr('text-anchor', 'middle')
+      .attr('dominant-baseline', 'central')
+      .style('font-size', '9px')
+      .style('font-weight', '400')
+      .style('fill', '#ffffff')
+      .text('Sometimes')
+      .style('opacity', 0);
+
+    // Add "sometimes" multiplier text for lower bounds of Solana and TRON
+    const sometimesMultiplierText = g.selectAll('.sometimes-multiplier-text')
+      .data(parsedData.filter(d => d.chain === 'Solana' || d.chain === 'TRON'))
+      .enter()
+      .append('text')
+      .attr('class', 'sometimes-multiplier-text')
+      .attr('x', d => xScale(d.chain)! + xScale.bandwidth() / 2)
+      .attr('y', d => {
+        let lowerBound: number;
+        
+        if (d.chain === 'Solana') {
+          lowerBound = 0.002; // $0.002 from $0.002-0.12
+        } else if (d.chain === 'TRON') {
+          lowerBound = 2; // $2 from $2-4
+        } else {
+          return yScale(d.numericCost) + 45;
+        }
+        
+        // Position at the height that corresponds to the lower bound cost
+        // For TRON, add extra spacing to avoid overlap with "Up to" text
+        const baseY = yScale(lowerBound);
+        if (d.chain === 'TRON') {
+          return baseY + 30; // Position multiplier below "Sometimes" for TRON
+        }
+        return baseY + 15;
+      })
+      .attr('text-anchor', 'middle')
+      .attr('dominant-baseline', 'central')
+      .style('font-size', '11px')
+      .style('font-weight', '600')
+      .style('fill', '#ffffff')
+      .text(d => {
+        const aptosBase = 0.0001;
+        let lowerBound: number;
+        
+        if (d.chain === 'Solana') {
+          lowerBound = 0.002; // $0.002 from $0.002-0.12
+        } else if (d.chain === 'TRON') {
+          lowerBound = 2; // $2 from $2-4
+        } else {
+          return '';
+        }
+        
+        const multiplier = lowerBound / aptosBase;
+        let multiplierText: string;
+        
+        if (d.chain === 'TRON') {
+          multiplierText = '20,000'; // Show full number for TRON
+        } else {
+          multiplierText = multiplier >= 1000 ? `${(multiplier / 1000).toFixed(0)}k` : Math.round(multiplier).toString();
+        }
+        
+        return `${multiplierText}x`;
+      })
       .style('opacity', 0);
 
     // Animate multiplier text
@@ -254,6 +332,18 @@ const USDTCostChart = memo(function USDTCostChart({ data }: USDTCostChartProps) 
 
     // Animate "up to" text
     upToText.transition()
+      .duration(800)
+      .delay(1000)
+      .style('opacity', 1);
+
+    // Animate "sometimes" label text
+    sometimesLabelText.transition()
+      .duration(800)
+      .delay(1000)
+      .style('opacity', 1);
+
+    // Animate "sometimes" multiplier text
+    sometimesMultiplierText.transition()
       .duration(800)
       .delay(1000)
       .style('opacity', 1);
