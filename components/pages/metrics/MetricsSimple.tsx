@@ -18,8 +18,8 @@ import AdvancedBlockchainAnalytics from "./AdvancedBlockchainAnalytics";
 import ComprehensiveAnalytics from "./ComprehensiveAnalytics";
 import FocusedDashboards from "./FocusedDashboards";
 import IntelligentAnalysis from "./IntelligentAnalysis";
-import SimpleDataDisplay from "./SimpleDataDisplay";
 import KeyMetricCards from "./KeyMetricCards";
+import SimpleDataDisplay from "./SimpleDataDisplay";
 
 export default function MetricsPage(): React.ReactElement {
   const { tableData, metrics, loading: metricsLoading, error } = useMetricsData();

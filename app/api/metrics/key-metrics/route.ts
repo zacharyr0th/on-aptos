@@ -75,7 +75,7 @@ export async function GET() {
     let allTimeTransactions = 0;
     let avgGasFeeAPT = 0;
     let avgBlockTimeSeconds = 4.0; // Default for Aptos
-    let networkReliability: number | string = "-"; // Not available in user_transactions table
+    const networkReliability: number | string = "-"; // Not available in user_transactions table
 
     // Process all-time transactions
     if (allTimeResponse.status === "fulfilled" && allTimeResponse.value.ok) {

@@ -168,9 +168,7 @@ interface RootLayoutProps {
   children: ReactNode;
 }
 
-export default function RootLayout({
-  children,
-}: RootLayoutProps): React.ReactElement {
+export default function RootLayout({ children }: RootLayoutProps): React.ReactElement {
   // Get nonce from headers - remove async for now
   const nonce = undefined;
 

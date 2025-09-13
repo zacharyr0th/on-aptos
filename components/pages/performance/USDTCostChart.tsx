@@ -1,15 +1,14 @@
 "use client";
 
-import { useEffect, useRef, useState, useMemo, useCallback } from 'react';
-import { memo } from 'react';
+import { max } from "d3-array";
+import { axisBottom, axisLeft } from "d3-axis";
+import { easeBackOut } from "d3-ease";
+import { scaleBand, scaleLog } from "d3-scale";
 // Import only specific D3 functions to reduce bundle size
-import { select } from 'd3-selection';
-import { scaleBand, scaleLog } from 'd3-scale';
-import { axisBottom, axisLeft } from 'd3-axis';
-import { max } from 'd3-array';
-import { easeBackOut } from 'd3-ease';
+import { select } from "d3-selection";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 // Import transition to enable .transition() on selections
-import 'd3-transition';
+import "d3-transition";
 
 interface ChainCost {
   chain: string;
@@ -30,54 +29,94 @@ const USDTCostChart = memo(function USDTCostChart({ data }: USDTCostChartProps) 
   // Check theme on mount and listen for changes
   useEffect(() => {
     const checkTheme = () => {
-      setIsDark(document.documentElement.classList.contains('dark'));
+      setIsDark(document.documentElement.classList.contains("dark"));
     };
-    
+
     checkTheme();
-    
+
     // Listen for theme changes
     const observer = new MutationObserver(checkTheme);
     observer.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ['class']
+      attributeFilter: ["class"],
     });
-    
+
     return () => observer.disconnect();
   }, []);
 
   // Memoize parsed data to avoid recalculation
   const parsedData = useMemo(() => {
-    return data.map(item => {
-      let cost = item.cost.replace('$', '');
-      let numericCost: number;
-      
-      if (cost.includes('-')) {
-        // Take the upper bound for ranges
-        numericCost = parseFloat(cost.split('-')[1]);
-      } else {
-        numericCost = parseFloat(cost);
-      }
-      
-      // Calculate multiplier vs Aptos
-      const aptosBase = 0.0001;
-      const multiplier = numericCost / aptosBase;
-      
-      return {
-        ...item,
-        numericCost,
-        displayCost: item.cost,
-        multiplier: multiplier === 1 ? null : multiplier
-      };
-    }).sort((a, b) => a.numericCost - b.numericCost); // Sort by cost
+    return data
+      .map((item) => {
+        const cost = item.cost.replace("$", "");
+        let numericCost: number;
+
+        if (cost.includes("-")) {
+          // Take the upper bound for ranges
+          numericCost = parseFloat(cost.split("-")[1]);
+        } else {
+          numericCost = parseFloat(cost);
+        }
+
+        // Calculate multiplier vs Aptos
+        const aptosBase = 0.0001;
+        const multiplier = numericCost / aptosBase;
+
+        return {
+          ...item,
+          numericCost,
+          displayCost: item.cost,
+          multiplier: multiplier === 1 ? null : multiplier,
+        };
+      })
+      .sort((a, b) => a.numericCost - b.numericCost); // Sort by cost
   }, [data]);
 
-  // Debounced resize handler
+  // Responsive margin function - ensure chart content fits in viewport with proper spacing for icons and labels
+  const getResponsiveMargins = useCallback((width: number) => {
+    if (width >= 1024) return { top: 30, right: 40, bottom: 70, left: 70 }; // Keep desktop unchanged
+    if (width >= 640) return { top: 25, right: 30, bottom: 60, left: 60 };
+    if (width >= 480) return { top: 22, right: 25, bottom: 55, left: 60 }; // Extra space for mobile icons
+    if (width >= 360) return { top: 20, right: 20, bottom: 50, left: 55 }; // More space to prevent cutoff
+    return { top: 18, right: 15, bottom: 45, left: 50 }; // Ultra-mobile: generous space for icons
+  }, []);
+
+  // Ultra-responsive font sizes
+  const getResponsiveFontSizes = useCallback((width: number) => {
+    if (width >= 1024)
+      return { axis: "14px", title: "18px", multiplier: "11px", upTo: "9px", label: "11px" };
+    if (width >= 640)
+      return { axis: "12px", title: "16px", multiplier: "10px", upTo: "8px", label: "10px" };
+    if (width >= 480)
+      return { axis: "12px", title: "16px", multiplier: "9px", upTo: "7px", label: "9px" }; // Larger title on mobile
+    if (width >= 360)
+      return { axis: "11px", title: "15px", multiplier: "8px", upTo: "6px", label: "8px" }; // Larger title on mobile
+    return { axis: "10px", title: "14px", multiplier: "7px", upTo: "5px", label: "7px" }; // Larger title on ultra-mobile
+  }, []);
+
+  // Debounced resize handler to ensure chart redraws on viewport changes
   const handleResize = useCallback(() => {
     if (chartInitialized.current) {
-      // Re-render chart on resize
+      // Force re-render chart on resize to fix scaling issues
       chartInitialized.current = false;
     }
   }, []);
+
+  // Listen for window resize events
+  useEffect(() => {
+    let resizeTimeout: NodeJS.Timeout;
+
+    const debouncedResize = () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(handleResize, 150);
+    };
+
+    window.addEventListener("resize", debouncedResize);
+    return () => {
+      window.removeEventListener("resize", debouncedResize);
+      clearTimeout(resizeTimeout);
+    };
+  }, [handleResize]);
 
   useEffect(() => {
     if (!svgRef.current) return;
@@ -87,378 +126,451 @@ const USDTCostChart = memo(function USDTCostChart({ data }: USDTCostChartProps) 
       select(svgRef.current).selectAll("*").remove();
     }
 
-    // Responsive sizing
-    const containerWidth = svgRef.current.clientWidth || 500;
-    const containerHeight = svgRef.current.clientHeight || 450;
-    const margin = { top: 30, right: 40, bottom: 70, left: 70 };
-    const width = containerWidth - margin.left - margin.right;
-    const height = containerHeight - margin.top - margin.bottom;
+    // Get actual container dimensions without forcing minimums
+    const containerWidth = svgRef.current.clientWidth || 320;
+    const containerHeight = svgRef.current.clientHeight || 300;
+    const margin = getResponsiveMargins(containerWidth);
+    const fontSizes = getResponsiveFontSizes(containerWidth);
+
+    // Ensure chart dimensions never go negative but allow small sizes
+    const width = Math.max(containerWidth - margin.left - margin.right, 150);
+    const height = Math.max(containerHeight - margin.top - margin.bottom, 120);
+
+    // Screen size detection
+    const isMobile = containerWidth < 480;
+    const isTablet = containerWidth < 768;
+    const isTinyScreen = containerWidth < 360;
 
     const svg = select(svgRef.current)
       .attr("width", containerWidth)
-      .attr("height", containerHeight);
+      .attr("height", containerHeight)
+      .attr("viewBox", `0 0 ${containerWidth} ${containerHeight}`)
+      .style("width", "100%")
+      .style("height", "100%");
 
-    const g = svg.append("g")
-      .attr("transform", `translate(${margin.left},${margin.top})`);
+    const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
     // Scales
     const xScale = scaleBand()
-      .domain(parsedData.map(d => d.chain))
+      .domain(parsedData.map((d) => d.chain))
       .range([0, width])
-      .padding(0.15);
+      .padding(isTinyScreen ? 0.05 : isMobile ? 0.08 : isTablet ? 0.12 : 0.15); // Ultra-tight padding for tiny screens
 
     const yScale = scaleLog()
-      .domain([0.0001, max(parsedData, d => d.numericCost) || 1])
+      .domain([0.0001, max(parsedData, (d) => d.numericCost) || 1])
       .range([height, 0])
       .nice();
 
     // Chain color mapping
     const chainColors = {
-      'Aptos': { base: '#000000', light: '#374151' },
-      'Ethereum': { base: '#627EEA', light: '#8B9AFF' },
-      'Polygon': { base: '#8247E5', light: '#A855F7' },
-      'BNB Chain': { base: '#F0B90B', light: '#FCD34D' },
-      'TRON': { base: '#E84142', light: '#F87171' },
-      'Bitcoin': { base: '#F7931A', light: '#FBBF24' },
-      'Solana': { base: '#9945FF', light: '#C084FC' },
-      'Avalanche': { base: '#FF6B6B', light: '#FCA5A5' },
-      'TON': { base: '#0088CC', light: '#38BDF8' },
-      'Polkadot': { base: '#E6007A', light: '#F472B6' }
+      Aptos: { base: "#000000", light: "#374151" },
+      Ethereum: { base: "#627EEA", light: "#8B9AFF" },
+      Polygon: { base: "#8247E5", light: "#A855F7" },
+      "BNB Chain": { base: "#F0B90B", light: "#FCD34D" },
+      TRON: { base: "#E84142", light: "#F87171" },
+      Bitcoin: { base: "#F7931A", light: "#FBBF24" },
+      Solana: { base: "#9945FF", light: "#C084FC" },
+      Avalanche: { base: "#FF6B6B", light: "#FCA5A5" },
+      TON: { base: "#0088CC", light: "#38BDF8" },
+      Polkadot: { base: "#E6007A", light: "#F472B6" },
     };
 
     // Create gradient definitions for each chain
     const defs = svg.append("defs");
-    
+
     Object.entries(chainColors).forEach(([chain, colors]) => {
-      const gradient = defs.append("linearGradient")
-        .attr("id", `${chain.toLowerCase().replace(/\s+/g, '')}Gradient`)
+      const gradient = defs
+        .append("linearGradient")
+        .attr("id", `${chain.toLowerCase().replace(/\s+/g, "")}Gradient`)
         .attr("gradientUnits", "userSpaceOnUse")
-        .attr("x1", 0).attr("y1", height)
-        .attr("x2", 0).attr("y2", 0);
-      
-      gradient.append("stop")
-        .attr("offset", "0%")
-        .attr("stop-color", colors.base);
-      
-      gradient.append("stop")
-        .attr("offset", "100%")
-        .attr("stop-color", colors.light);
+        .attr("x1", 0)
+        .attr("y1", height)
+        .attr("x2", 0)
+        .attr("y2", 0);
+
+      gradient.append("stop").attr("offset", "0%").attr("stop-color", colors.base);
+
+      gradient.append("stop").attr("offset", "100%").attr("stop-color", colors.light);
     });
 
-    // Add background grid lines
+    // Add background grid lines (hide Y-axis grid on mobile)
     g.append("g")
       .attr("class", "grid")
       .attr("transform", `translate(0,${height})`)
-      .call(axisBottom(xScale)
-        .tickSize(-height)
-        .tickFormat(() => ""))
+      .call(
+        axisBottom(xScale)
+          .tickSize(-height)
+          .tickFormat(() => "")
+      )
       .style("stroke-dasharray", "2,2")
       .style("opacity", 0.1);
 
-    g.append("g")
-      .attr("class", "grid")
-      .call(axisLeft(yScale)
-        .tickSize(-width)
-        .tickFormat(() => ""))
-      .style("stroke-dasharray", "2,2")
-      .style("opacity", 0.1);
+    // Only add Y-axis grid lines on larger screens
+    if (!isMobile && !isTinyScreen) {
+      g.append("g")
+        .attr("class", "grid")
+        .call(
+          axisLeft(yScale)
+            .tickSize(-width)
+            .tickFormat(() => "")
+        )
+        .style("stroke-dasharray", "2,2")
+        .style("opacity", 0.1);
+    }
 
     // Bars with animation and interactivity
-    const bars = g.selectAll('.bar')
+    const bars = g
+      .selectAll(".bar")
       .data(parsedData)
       .enter()
-      .append('rect')
-      .attr('class', 'bar')
-      .attr('x', d => xScale(d.chain)!)
-      .attr('y', height) // Start from bottom for animation
-      .attr('width', xScale.bandwidth())
-      .attr('height', 0) // Start with 0 height for animation
-      .attr('fill', d => `url(#${d.chain.toLowerCase().replace(/\s+/g, '')}Gradient)`)
-      .attr('stroke', d => chainColors[d.chain as keyof typeof chainColors]?.base || '#4b5563')
-      .attr('stroke-width', 1)
-      .attr('rx', 4)
-      .attr('ry', 4)
-      .style('filter', 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))');
+      .append("rect")
+      .attr("class", "bar")
+      .attr("x", (d) => xScale(d.chain)!)
+      .attr("y", height) // Start from bottom for animation
+      .attr("width", xScale.bandwidth())
+      .attr("height", 0) // Start with 0 height for animation
+      .attr("fill", (d) => `url(#${d.chain.toLowerCase().replace(/\s+/g, "")}Gradient)`)
+      .attr("stroke", (d) => chainColors[d.chain as keyof typeof chainColors]?.base || "#4b5563")
+      .attr("stroke-width", 1)
+      .attr("rx", 4)
+      .attr("ry", 4)
+      .style("filter", "drop-shadow(0 2px 4px rgba(0,0,0,0.1))");
 
     // Animate bars
-    bars.transition()
+    bars
+      .transition()
       .duration(800)
       .delay((d, i) => i * 100)
       .ease(easeBackOut)
-      .attr('y', d => yScale(d.numericCost))
-      .attr('height', d => height - yScale(d.numericCost));
+      .attr("y", (d) => yScale(d.numericCost))
+      .attr("height", (d) => height - yScale(d.numericCost));
 
-    // Add multiplier text inside bars
-    const multiplierText = g.selectAll('.multiplier-text')
-      .data(parsedData.filter(d => d.multiplier))
+    // Add multiplier text inside bars (hide on mobile completely)
+    const multiplierText = g
+      .selectAll(".multiplier-text")
+      .data(!isMobile && !isTinyScreen && !isTablet ? parsedData.filter((d) => d.multiplier && xScale.bandwidth() >= 40) : []) // Hide on mobile/tablet/tiny screens
       .enter()
-      .append('text')
-      .attr('class', 'multiplier-text')
-      .attr('x', d => xScale(d.chain)! + xScale.bandwidth() / 2)
-      .attr('y', d => yScale(d.numericCost) + 30)
-      .attr('text-anchor', 'middle')
-      .attr('dominant-baseline', 'central')
-      .style('font-size', '11px')
-      .style('font-weight', '600')
-      .style('fill', '#ffffff')
-      .text(d => {
-        // Use specific values for SOL and TRON - show only the number
-        if (d.chain === 'Solana') {
-          return '1,200x';
+      .append("text")
+      .attr("class", "multiplier-text")
+      .attr("x", (d) => xScale(d.chain)! + xScale.bandwidth() / 2)
+      .attr("y", (d) => {
+        const baseY = yScale(d.numericCost);
+        const barHeight = height - baseY;
+        // Position text in center of bar if bar is tall enough, otherwise slightly above center
+        return barHeight > 40 ? baseY + Math.min(barHeight / 2, 25) : baseY + 15;
+      })
+      .attr("text-anchor", "middle")
+      .attr("dominant-baseline", "central")
+      .style("font-size", fontSizes.multiplier)
+      .style("font-weight", "600")
+      .style("fill", "#ffffff")
+      .text((d) => {
+        // Full text for desktop only
+        if (d.chain === "Solana") {
+          return "1,200x";
         }
-        if (d.chain === 'TRON') {
-          return '40,000x';
+        if (d.chain === "TRON") {
+          return "40,000x";
         }
-        
+
         const multiplier = d.multiplier;
         if (multiplier >= 1000) {
           return `${(multiplier / 1000).toFixed(1)}kx`;
         }
         return `${Math.round(multiplier)}x`;
       })
-      .style('opacity', 0);
+      .style("opacity", 0);
 
-    // Add "up to" text inside bars for Solana and TRON
-    const upToText = g.selectAll('.up-to-text')
-      .data(parsedData.filter(d => d.chain === 'Solana' || d.chain === 'TRON'))
+    // Add "up to" text inside bars for Solana and TRON (hide on mobile and small screens)
+    const upToText = g
+      .selectAll(".up-to-text")
+      .data(
+        !isMobile && !isTinyScreen && xScale.bandwidth() >= 50
+          ? parsedData.filter((d) => d.chain === "Solana" || d.chain === "TRON")
+          : []
+      )
       .enter()
-      .append('text')
-      .attr('class', 'up-to-text')
-      .attr('x', d => xScale(d.chain)! + xScale.bandwidth() / 2)
-      .attr('y', d => yScale(d.numericCost) + 15)
-      .attr('text-anchor', 'middle')
-      .attr('dominant-baseline', 'central')
-      .style('font-size', '9px')
-      .style('font-weight', '400')
-      .style('fill', '#ffffff')
-      .text('Up to')
-      .style('opacity', 0);
+      .append("text")
+      .attr("class", "up-to-text")
+      .attr("x", (d) => xScale(d.chain)! + xScale.bandwidth() / 2)
+      .attr("y", (d) => {
+        const baseY = yScale(d.numericCost);
+        const barHeight = height - baseY;
+        return barHeight > 50 ? baseY + 12 : baseY + 8;
+      })
+      .attr("text-anchor", "middle")
+      .attr("dominant-baseline", "central")
+      .style("font-size", fontSizes.upTo)
+      .style("font-weight", "400")
+      .style("fill", "#ffffff")
+      .text("Up to")
+      .style("opacity", 0);
 
-    // Add "sometimes" label text for lower bounds of Solana and TRON
-    const sometimesLabelText = g.selectAll('.sometimes-label-text')
-      .data(parsedData.filter(d => d.chain === 'Solana' || d.chain === 'TRON'))
+    // Add "sometimes" label text for lower bounds of Solana and TRON (hide on mobile)
+    const sometimesLabelText = g
+      .selectAll(".sometimes-label-text")
+      .data(!isMobile && !isTinyScreen ? parsedData.filter((d) => d.chain === "Solana" || d.chain === "TRON") : [])
       .enter()
-      .append('text')
-      .attr('class', 'sometimes-label-text')
-      .attr('x', d => xScale(d.chain)! + xScale.bandwidth() / 2)
-      .attr('y', d => {
+      .append("text")
+      .attr("class", "sometimes-label-text")
+      .attr("x", (d) => xScale(d.chain)! + xScale.bandwidth() / 2)
+      .attr("y", (d) => {
         let lowerBound: number;
-        
-        if (d.chain === 'Solana') {
+
+        if (d.chain === "Solana") {
           lowerBound = 0.002; // $0.002 from $0.002-0.12
-        } else if (d.chain === 'TRON') {
+        } else if (d.chain === "TRON") {
           lowerBound = 2; // $2 from $2-4
         } else {
           return yScale(d.numericCost) + 45;
         }
-        
+
         // Position at the height that corresponds to the lower bound cost
         // For TRON, add extra spacing to avoid overlap with "Up to" text
         const baseY = yScale(lowerBound);
-        if (d.chain === 'TRON') {
+        if (d.chain === "TRON") {
           return baseY + 15; // Position "Sometimes" above the multiplier for TRON
         }
         return baseY;
       })
-      .attr('text-anchor', 'middle')
-      .attr('dominant-baseline', 'central')
-      .style('font-size', '9px')
-      .style('font-weight', '400')
-      .style('fill', '#ffffff')
-      .text('Sometimes')
-      .style('opacity', 0);
+      .attr("text-anchor", "middle")
+      .attr("dominant-baseline", "central")
+      .style("font-size", "9px")
+      .style("font-weight", "400")
+      .style("fill", "#ffffff")
+      .text("Sometimes")
+      .style("opacity", 0);
 
-    // Add "sometimes" multiplier text for lower bounds of Solana and TRON
-    const sometimesMultiplierText = g.selectAll('.sometimes-multiplier-text')
-      .data(parsedData.filter(d => d.chain === 'Solana' || d.chain === 'TRON'))
+    // Add "sometimes" multiplier text for lower bounds of Solana and TRON (hide on mobile)
+    const sometimesMultiplierText = g
+      .selectAll(".sometimes-multiplier-text")
+      .data(!isMobile && !isTinyScreen ? parsedData.filter((d) => d.chain === "Solana" || d.chain === "TRON") : [])
       .enter()
-      .append('text')
-      .attr('class', 'sometimes-multiplier-text')
-      .attr('x', d => xScale(d.chain)! + xScale.bandwidth() / 2)
-      .attr('y', d => {
+      .append("text")
+      .attr("class", "sometimes-multiplier-text")
+      .attr("x", (d) => xScale(d.chain)! + xScale.bandwidth() / 2)
+      .attr("y", (d) => {
         let lowerBound: number;
-        
-        if (d.chain === 'Solana') {
+
+        if (d.chain === "Solana") {
           lowerBound = 0.002; // $0.002 from $0.002-0.12
-        } else if (d.chain === 'TRON') {
+        } else if (d.chain === "TRON") {
           lowerBound = 2; // $2 from $2-4
         } else {
           return yScale(d.numericCost) + 45;
         }
-        
+
         // Position at the height that corresponds to the lower bound cost
         // For TRON, add extra spacing to avoid overlap with "Up to" text
         const baseY = yScale(lowerBound);
-        if (d.chain === 'TRON') {
+        if (d.chain === "TRON") {
           return baseY + 30; // Position multiplier below "Sometimes" for TRON
         }
         return baseY + 15;
       })
-      .attr('text-anchor', 'middle')
-      .attr('dominant-baseline', 'central')
-      .style('font-size', '11px')
-      .style('font-weight', '600')
-      .style('fill', '#ffffff')
-      .text(d => {
+      .attr("text-anchor", "middle")
+      .attr("dominant-baseline", "central")
+      .style("font-size", "11px")
+      .style("font-weight", "600")
+      .style("fill", "#ffffff")
+      .text((d) => {
         const aptosBase = 0.0001;
         let lowerBound: number;
-        
-        if (d.chain === 'Solana') {
+
+        if (d.chain === "Solana") {
           lowerBound = 0.002; // $0.002 from $0.002-0.12
-        } else if (d.chain === 'TRON') {
+        } else if (d.chain === "TRON") {
           lowerBound = 2; // $2 from $2-4
         } else {
-          return '';
+          return "";
         }
-        
+
         const multiplier = lowerBound / aptosBase;
         let multiplierText: string;
-        
-        if (d.chain === 'TRON') {
-          multiplierText = '20,000'; // Show full number for TRON
+
+        if (d.chain === "TRON") {
+          multiplierText = "20,000"; // Show full number for TRON
         } else {
-          multiplierText = multiplier >= 1000 ? `${(multiplier / 1000).toFixed(0)}k` : Math.round(multiplier).toString();
+          multiplierText =
+            multiplier >= 1000
+              ? `${(multiplier / 1000).toFixed(0)}k`
+              : Math.round(multiplier).toString();
         }
-        
+
         return `${multiplierText}x`;
       })
-      .style('opacity', 0);
+      .style("opacity", 0);
 
     // Animate multiplier text
-    multiplierText.transition()
-      .duration(800)
-      .delay(1000)
-      .style('opacity', 1);
+    multiplierText.transition().duration(800).delay(1000).style("opacity", 1);
 
     // Animate "up to" text
-    upToText.transition()
-      .duration(800)
-      .delay(1000)
-      .style('opacity', 1);
+    upToText.transition().duration(800).delay(1000).style("opacity", 1);
 
     // Animate "sometimes" label text
-    sometimesLabelText.transition()
-      .duration(800)
-      .delay(1000)
-      .style('opacity', 1);
+    sometimesLabelText.transition().duration(800).delay(1000).style("opacity", 1);
 
     // Animate "sometimes" multiplier text
-    sometimesMultiplierText.transition()
-      .duration(800)
-      .delay(1000)
-      .style('opacity', 1);
+    sometimesMultiplierText.transition().duration(800).delay(1000).style("opacity", 1);
 
     // X-axis with logos
-    const xAxis = g.append('g')
-      .attr('transform', `translate(0,${height})`)
+    const xAxis = g
+      .append("g")
+      .attr("transform", `translate(0,${height})`)
       .call(axisBottom(xScale).tickSize(0))
-      .selectAll('text')
+      .selectAll("text")
       .remove(); // Remove default text labels
 
-
-    // Add logos to X-axis for all chains
-    const xLabels = g.selectAll('.x-label')
+    // Add logos to X-axis for all chains with responsive positioning
+    const logoYOffset = isTinyScreen ? 8 : isMobile ? 10 : isTablet ? 12 : 15;
+    const xLabels = g
+      .selectAll(".x-label")
       .data(parsedData)
       .enter()
-      .append('g')
-      .attr('class', 'x-label')
-      .attr('transform', d => `translate(${xScale(d.chain)! + xScale.bandwidth() / 2}, ${height + 15})`);
+      .append("g")
+      .attr("class", "x-label")
+      .attr(
+        "transform",
+        (d) => `translate(${xScale(d.chain)! + xScale.bandwidth() / 2}, ${height + logoYOffset})`
+      );
 
-    // Add logos for all chains in X-axis
-    xLabels.append('image')
-      .attr('x', -12)
-      .attr('y', 0)
-      .attr('width', 24)
-      .attr('height', 24)
-      .attr('href', d => {
-        const logoMap: { [key: string]: string } = {
-          'Aptos': '/icons/apt.png',
-          'Ethereum': '/icons/performance/eth.png',
-          'Polygon': '/icons/performance/polygon.png',
-          'BNB Chain': '/icons/performance/bnb.png',
-          'TRON': '/icons/performance/trx.png',
-          'Bitcoin': '/icons/performance/btc.png',
-          'Solana': '/icons/performance/sol.png',
-          'Avalanche': '/icons/performance/avax.png',
-          'TON': '/icons/performance/ton.png',
-          'Polkadot': '/icons/performance/polkadot.png'
-        };
-        return logoMap[d.chain] || '/icons/apt.png';
-      })
-      .style('filter', d => {
-        // Only invert APT logo in dark mode
-        if (d.chain === 'Aptos' && isDark) {
-          return 'invert(1)';
-        }
-        return 'none';
-      });
+    // Add logos for all chains in X-axis with ultra-responsive sizing
+    const logoSize = isTinyScreen ? 12 : isMobile ? 14 : isTablet ? 18 : 24;
+    const logoOffset = -logoSize / 2;
 
-    // Y-axis with cleaner log scale formatting
-    const yAxis = g.append('g')
-      .call(axisLeft(yScale)
-        .tickValues([0.0001, 0.001, 0.01, 0.1, 1, 10])
-        .tickFormat(d => {
-          const num = Number(d);
-          if (num >= 1) return `$${num}`;
-          if (num >= 0.01) return `$${num.toFixed(2)}`;
-          if (num >= 0.001) return `$${num.toFixed(3)}`;
-          return `$${num.toFixed(4)}`;
+    // Only show logos if there's enough space
+    if (xScale.bandwidth() >= logoSize) {
+      xLabels
+        .append("image")
+        .attr("x", logoOffset)
+        .attr("y", 0)
+        .attr("width", logoSize)
+        .attr("height", logoSize)
+        .attr("href", (d) => {
+          const logoMap: { [key: string]: string } = {
+            Aptos: "/icons/apt.png",
+            Ethereum: "/icons/performance/eth.png",
+            Polygon: "/icons/performance/polygon.png",
+            "BNB Chain": "/icons/performance/bnb.png",
+            TRON: "/icons/performance/trx.png",
+            Bitcoin: "/icons/performance/btc.png",
+            Solana: "/icons/performance/sol.png",
+            Avalanche: "/icons/performance/avax.png",
+            TON: "/icons/performance/ton.png",
+            Polkadot: "/icons/performance/polkadot.png",
+          };
+          return logoMap[d.chain] || "/icons/apt.png";
         })
-        .tickSize(-8))
-      .style('font-size', '14px')
-      .style('font-weight', '500')
-      .style('fill', 'currentColor')
-      .style('opacity', '0.8');
+        .style("filter", (d) => {
+          // Only invert APT logo in dark mode
+          if (d.chain === "Aptos" && isDark) {
+            return "invert(1)";
+          }
+          return "none";
+        });
+    }
+
+    // Y-axis with ultra-responsive formatting
+    const tickValues = isTinyScreen
+      ? [0.0001, 1] // Minimal ticks for tiny screens
+      : isMobile
+        ? [0.0001, 0.01, 1] // Fewer ticks on mobile
+        : isTablet
+          ? [0.0001, 0.001, 0.01, 0.1, 1]
+          : [0.0001, 0.001, 0.01, 0.1, 1, 10];
+
+    const yAxis = g
+      .append("g")
+      .call(
+        axisLeft(yScale)
+          .tickValues(tickValues)
+          .tickFormat((d) => {
+            const num = Number(d);
+            if (isMobile) {
+              // Shorter format for mobile
+              if (num >= 1) return `$${num}`;
+              if (num >= 0.01) return `$${num.toFixed(2)}`;
+              return `$${num.toFixed(4)}`;
+            }
+            if (num >= 1) return `$${num}`;
+            if (num >= 0.01) return `$${num.toFixed(2)}`;
+            if (num >= 0.001) return `$${num.toFixed(3)}`;
+            return `$${num.toFixed(4)}`;
+          })
+          .tickSize(isMobile ? -4 : -8)
+      )
+      .style("font-size", fontSizes.axis)
+      .style("font-weight", "500")
+      .style("fill", "currentColor")
+      .style("opacity", "0.8");
 
     // Style axis lines with current color and opacity
-    g.select('.domain').style('stroke', 'currentColor').style('opacity', '0.2');
-    yAxis.select('.domain').style('stroke', 'currentColor').style('opacity', '0.2');
+    g.select(".domain").style("stroke", "currentColor").style("opacity", "0.2");
+    yAxis.select(".domain").style("stroke", "currentColor").style("opacity", "0.2");
 
-    // Y-axis label
-    g.append('text')
-      .attr('transform', 'rotate(-90)')
-      .attr('y', 0 - margin.left)
-      .attr('x', 0 - (height / 2))
-      .attr('dy', '1em')
-      .style('text-anchor', 'middle')
-      .style('font-size', '14px')
-      .style('fill', 'currentColor')
-      .style('font-weight', '600')
-      .style('opacity', '0.9')
-      .text('Transfer Cost (USD)');
+    // Y-axis label (hide on tiny screens)
+    if (!isTinyScreen && margin.left > 25) {
+      g.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 0 - margin.left + (isMobile ? 8 : isTablet ? 5 : 0)) // More spacing for mobile
+        .attr("x", 0 - height / 2)
+        .attr("dy", isMobile ? "0.9em" : "1em")
+        .style("text-anchor", "middle")
+        .style("font-size", fontSizes.axis)
+        .style("fill", "currentColor")
+        .style("font-weight", "600")
+        .style("opacity", "0.9")
+        .text(isMobile ? "Cost" : "Transfer Cost (USD)");
+    }
 
-    // Title
-    g.append('text')
-      .attr('x', width / 2)
-      .attr('y', -12)
-      .attr('text-anchor', 'middle')
-      .style('font-size', '18px')
-      .style('font-weight', '700')
-      .style('fill', 'currentColor')
-      .style('opacity', '0.9')
-      .text('USDt Transfer Costs by Chain (Logarithmic Scale)');
+    // Title with ultra-responsive text and proper positioning
+    const titleYOffset = isTinyScreen ? -8 : isMobile ? -10 : -12;
+    g.append("text")
+      .attr("x", width / 2)
+      .attr("y", Math.max(titleYOffset, -margin.top + 5)) // Ensure title doesn't go above margin
+      .attr("text-anchor", "middle")
+      .style("font-size", fontSizes.title)
+      .style("font-weight", "700")
+      .style("fill", "currentColor")
+      .style("opacity", "0.9")
+      .text(
+        isTinyScreen
+          ? "USDt Costs"
+          : isMobile
+            ? "USDt Transfer Costs"
+            : isTablet
+              ? "USDt Transfer Costs by Chain"
+              : "USDt Transfer Costs by Chain (Logarithmic Scale)"
+      );
 
-    // Add Aptos callout
-    const aptosData = parsedData.find(d => d.isLowest);
+    // Add Aptos callout with responsive positioning
+    const aptosData = parsedData.find((d) => d.isLowest);
     if (aptosData) {
-      g.append('text')
-        .attr('x', xScale(aptosData.chain)! + xScale.bandwidth() / 2)
-        .attr('y', yScale(aptosData.numericCost) - 15)
-        .attr('text-anchor', 'middle')
-        .style('font-size', '11px')
-        .style('fill', isDark ? 'white' : 'black')
-        .style('font-weight', '600')
-        .text('LOWEST');
+      g.append("text")
+        .attr("x", xScale(aptosData.chain)! + xScale.bandwidth() / 2)
+        .attr("y", yScale(aptosData.numericCost) - (isMobile ? 10 : 15))
+        .attr("text-anchor", "middle")
+        .style("font-size", fontSizes.label)
+        .style("fill", isDark ? "white" : "black")
+        .style("font-weight", "600")
+        .text("LOWEST");
     }
 
     // Mark as initialized
     chartInitialized.current = true;
-
-  }, [parsedData, isDark]);
+  }, [parsedData, isDark, getResponsiveMargins, getResponsiveFontSizes]);
 
   return (
     <div className="w-full h-full relative">
-      <svg ref={svgRef} className="w-full h-full" />
+      <svg
+        ref={svgRef}
+        className="w-full h-full"
+        style={{
+          maxWidth: "100%",
+          maxHeight: "100%",
+          display: "block",
+        }}
+      />
     </div>
   );
 });

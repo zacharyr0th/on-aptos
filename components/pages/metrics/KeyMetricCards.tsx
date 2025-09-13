@@ -1,10 +1,10 @@
 "use client";
 
 import { Activity, Clock, DollarSign, Zap } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useMetricsData } from "@/hooks/useMetricsData";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useKeyMetrics } from "@/hooks/useKeyMetrics";
+import { useMetricsData } from "@/hooks/useMetricsData";
 
 // Helper function to safely format numbers
 const safeToFixed = (value: any, decimals: number = 0): string => {

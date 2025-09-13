@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
+import { useEffect, useRef, useState } from "react";
 
 interface ChainData {
   chain: string;
@@ -41,12 +41,12 @@ export default function USDTChart({ data }: USDTChartProps) {
     const width = dimensions.width - margin.left - margin.right;
     const height = dimensions.height - margin.top - margin.bottom;
 
-    const maxTransactions = Math.max(...data.map(d => d.transactions));
-    
+    const maxTransactions = Math.max(...data.map((d) => d.transactions));
+
     // Create scales
     const xScale = d3
       .scaleBand()
-      .domain(data.map(d => d.chain))
+      .domain(data.map((d) => d.chain))
       .range([0, width])
       .padding(0.2);
 
@@ -55,9 +55,7 @@ export default function USDTChart({ data }: USDTChartProps) {
       .domain([0, maxTransactions * 1.1])
       .range([height, 0]);
 
-    const container = svg
-      .append("g")
-      .attr("transform", `translate(${margin.left},${margin.top})`);
+    const container = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
     // Add gradient definitions
     const defs = svg.append("defs");
@@ -66,8 +64,10 @@ export default function USDTChart({ data }: USDTChartProps) {
         .append("linearGradient")
         .attr("id", `gradient-${i}`)
         .attr("gradientUnits", "userSpaceOnUse")
-        .attr("x1", 0).attr("y1", height)
-        .attr("x2", 0).attr("y2", 0);
+        .attr("x1", 0)
+        .attr("y1", height)
+        .attr("x2", 0)
+        .attr("y2", 0);
 
       gradient
         .append("stop")
@@ -89,19 +89,19 @@ export default function USDTChart({ data }: USDTChartProps) {
       .enter()
       .append("rect")
       .attr("class", "bar")
-      .attr("x", d => xScale(d.chain)!)
+      .attr("x", (d) => xScale(d.chain)!)
       .attr("width", xScale.bandwidth())
       .attr("y", height)
       .attr("height", 0)
       .attr("fill", (d, i) => `url(#gradient-${i})`)
-      .attr("stroke", d => d.color)
+      .attr("stroke", (d) => d.color)
       .attr("stroke-width", 2)
       .attr("rx", 4)
       .transition()
       .duration(1000)
       .delay((d, i) => i * 100)
-      .attr("y", d => yScale(d.transactions))
-      .attr("height", d => height - yScale(d.transactions));
+      .attr("y", (d) => yScale(d.transactions))
+      .attr("height", (d) => height - yScale(d.transactions));
 
     // Add value labels on bars
     container
@@ -110,14 +110,14 @@ export default function USDTChart({ data }: USDTChartProps) {
       .enter()
       .append("text")
       .attr("class", "value-label")
-      .attr("x", d => xScale(d.chain)! + xScale.bandwidth() / 2)
-      .attr("y", d => yScale(d.transactions) - 10)
+      .attr("x", (d) => xScale(d.chain)! + xScale.bandwidth() / 2)
+      .attr("y", (d) => yScale(d.transactions) - 10)
       .attr("text-anchor", "middle")
       .style("font-size", "14px")
       .style("font-weight", "bold")
       .style("fill", "#374151")
       .style("opacity", 0)
-      .text(d => d.transactions.toLocaleString())
+      .text((d) => d.transactions.toLocaleString())
       .transition()
       .duration(1000)
       .delay((d, i) => i * 100 + 500)
@@ -130,11 +130,14 @@ export default function USDTChart({ data }: USDTChartProps) {
       .enter()
       .append("g")
       .attr("class", "chain-label")
-      .attr("transform", d => `translate(${xScale(d.chain)! + xScale.bandwidth() / 2}, ${height + 20})`);
+      .attr(
+        "transform",
+        (d) => `translate(${xScale(d.chain)! + xScale.bandwidth() / 2}, ${height + 20})`
+      );
 
     chainLabels
       .append("image")
-      .attr("href", d => d.logo)
+      .attr("href", (d) => d.logo)
       .attr("x", -12)
       .attr("y", -12)
       .attr("width", 24)
@@ -153,15 +156,14 @@ export default function USDTChart({ data }: USDTChartProps) {
       .style("font-weight", "600")
       .style("fill", "#6B7280")
       .style("opacity", 0)
-      .text(d => d.chain)
+      .text((d) => d.chain)
       .transition()
       .duration(500)
       .delay((d, i) => i * 100 + 1000)
       .style("opacity", 1);
 
     // Add y-axis
-    const yAxis = d3.axisLeft(yScale)
-      .tickFormat(d => d3.format(".2s")(d));
+    const yAxis = d3.axisLeft(yScale).tickFormat((d) => d3.format(".2s")(d));
 
     container
       .append("g")
@@ -187,21 +189,20 @@ export default function USDTChart({ data }: USDTChartProps) {
     // Add hover effects
     container
       .selectAll(".bar")
-      .on("mouseenter", function(event, d) {
+      .on("mouseenter", function (event, d) {
         d3.select(this)
           .transition()
           .duration(200)
           .attr("stroke-width", 3)
           .style("filter", "brightness(1.1)");
       })
-      .on("mouseleave", function() {
+      .on("mouseleave", function () {
         d3.select(this)
           .transition()
           .duration(200)
           .attr("stroke-width", 2)
           .style("filter", "brightness(1)");
       });
-
   }, [data, dimensions]);
 
   return (
