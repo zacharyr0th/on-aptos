@@ -71,6 +71,7 @@ export const ALL_STABLECOINS = {
 export const STABLECOIN_SYMBOLS = [
   "USDC",
   "USDT",
+  "USDt", // Tether with lowercase 't' (common variant)
   "USDE",
   "sUSDe",
   "mUSD",

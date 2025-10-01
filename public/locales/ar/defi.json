@@ -22,6 +22,7 @@
     "placeholder": "ابحث عن البروتوكولات...",
     "results": "تم العثور على {{count}} بروتوكول",
     "results_of": "من أصل {{total}} بروتوكول",
+    "showing_protocols": "عرض {{count}} من {{total}} بروتوكول",
     "no_results": "لم يتم العثور على بروتوكولات تطابق معاييرك.",
     "clear_search": "مسح البحث",
     "search_hint": "ابحث بالاسم أو الفئة أو الوصف"

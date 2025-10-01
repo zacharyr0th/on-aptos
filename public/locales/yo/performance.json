@@ -1,0 +1,62 @@
+{
+  "page": {
+    "title": "Ișẹ Aptos",
+    "title_vs": "Aptos pẹlu {{chains}}",
+    "description": "Fiwe àwọn àlàyé ìṣe blockchain Aptos pẹ̀lú àwọn pàtàkì mìíràn"
+  },
+  "tabs": {
+    "performance": "Ìṣe Pàtàkì",
+    "performance_short": "Ìṣe",
+    "usdt": "Ìfiweran USDt",
+    "usdt_short": "USDt"
+  },
+  "sidebar": {
+    "compare": "Fiweran",
+    "compare_count": "Fiweran ({{count}}/3)",
+    "clear": "Paarẹ"
+  },
+  "metrics": {
+    "max_tps": "TPS To Ga Julọ",
+    "max_tps_100_blocks": "TPS To Ga Julọ (100 blocks)",
+    "max_tps_1_block": "TPS To Ga Julọ (1 block)",
+    "finality": "Ipari",
+    "block_time": "Àkókò Block",
+    "nakamoto": "Nakamoto",
+    "validators": "Àwọn Aṣayẹwo"
+  },
+  "comparison": {
+    "is_better": "jẹ́",
+    "better": "dara si",
+    "same_as": "Bakanna bi",
+    "aptos_is": "Aptos jẹ́",
+    "multiplier_better": "{{multiplier}} dara si"
+  },
+  "chains": {
+    "aptos": "Aptos",
+    "ethereum": "Ethereum",
+    "solana": "Solana",
+    "bsc": "BSC",
+    "avalanche": "Avalanche",
+    "cardano": "Cardano",
+    "sui": "Sui",
+    "tron": "TRON",
+    "base": "Base",
+    "bitcoin": "Bitcoin"
+  },
+  "tooltips": {
+    "nakamoto_coefficient": "Àwọn àgbájọ kékeré tó nílò láti ṣàkóso >50% àwọn ohun ẹlọ nẹtiwọọki. Giga = pipin sísí.",
+    "chainspect_data": "Chainspect kò ní API nítorí náà àwọn iye wọ̀nyí ni a fi sínú kóòdù ní September 11th, 2025."
+  },
+  "attribution": {
+    "data_powered_by": "Data tí a fi ní agbára nípa",
+    "chainspect": "Chainspect"
+  },
+  "usdt": {
+    "title": "Ìfiweran Iṣowo USDT",
+    "transactions": "Àwọn Iṣowo",
+    "daily_transactions": "Àwọn Iṣowo Ojoojúmọ́",
+    "market_share": "Ìpín Ọjà",
+    "cost_comparison": "Ìfiweran Iye Owo Iṣowo",
+    "aptos_dominance": "Aptos ní agbára lórí àwọn iṣowo USDT káàkiri àwọn blockchain pàtàkì"
+  }
+}

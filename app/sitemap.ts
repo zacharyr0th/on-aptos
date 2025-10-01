@@ -1,5 +1,4 @@
 import type { MetadataRoute } from "next";
-import { APP_ROUTES, SITEMAP_ROUTES } from "@/lib/config/routes";
 
 // Force Node.js runtime instead of edge runtime
 export const runtime = "nodejs";
@@ -8,8 +7,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
   const isoDate = new Date().toISOString();
 
-  // Generate static pages from config
-  const staticPages = SITEMAP_ROUTES.map((route) => ({
+  // Generate static pages
+  const staticPages = [
+    { path: "/", priority: 1.0, changeFreq: "daily" as const },
+    { path: "/performance", priority: 0.9, changeFreq: "weekly" as const },
+    { path: "/protocols/defi", priority: 0.9, changeFreq: "weekly" as const },
+    { path: "/markets/bitcoin", priority: 0.9, changeFreq: "weekly" as const },
+    { path: "/markets/stables", priority: 0.9, changeFreq: "weekly" as const },
+    { path: "/markets/rwas", priority: 0.9, changeFreq: "weekly" as const },
+    { path: "/markets/tokens", priority: 0.9, changeFreq: "weekly" as const },
+    { path: "/protocols/yields", priority: 0.8, changeFreq: "weekly" as const },
+    { path: "/protocols/lst", priority: 0.8, changeFreq: "weekly" as const },
+    { path: "/tools/portfolio", priority: 0.8, changeFreq: "daily" as const },
+    { path: "/metrics", priority: 0.7, changeFreq: "weekly" as const },
+    { path: "/network", priority: 0.7, changeFreq: "weekly" as const },
+  ].map((route) => ({
     url: `${baseUrl}${route.path}`,
     lastModified: isoDate,
     changeFrequency: route.changeFreq,
@@ -19,49 +31,49 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // API endpoints for data access
   const apiPages = [
     {
-      url: `${baseUrl}${APP_ROUTES.API.BTC}`,
+      url: `${baseUrl}/api/markets/bitcoin`,
       lastModified: isoDate,
       changeFrequency: "hourly" as const,
       priority: 0.8,
     },
     {
-      url: `${baseUrl}${APP_ROUTES.API.STABLES}`,
+      url: `${baseUrl}/api/markets/stables`,
       lastModified: isoDate,
       changeFrequency: "hourly" as const,
       priority: 0.8,
     },
     {
-      url: `${baseUrl}${APP_ROUTES.API.RWAS}`,
+      url: `${baseUrl}/api/markets/rwas`,
       lastModified: isoDate,
       changeFrequency: "hourly" as const,
       priority: 0.8,
     },
     {
-      url: `${baseUrl}${APP_ROUTES.API.TOKENS}`,
+      url: `${baseUrl}/api/markets/tokens`,
       lastModified: isoDate,
       changeFrequency: "hourly" as const,
       priority: 0.8,
     },
     {
-      url: `${baseUrl}${APP_ROUTES.API.PRICES}`,
+      url: `${baseUrl}/api/prices`,
       lastModified: isoDate,
       changeFrequency: "hourly" as const,
       priority: 0.7,
     },
     {
-      url: `${baseUrl}${APP_ROUTES.API.SEO.LLM_METADATA}`,
+      url: `${baseUrl}/api/seo/llm-metadata`,
       lastModified: isoDate,
       changeFrequency: "weekly" as const,
       priority: 0.85,
     },
     {
-      url: `${baseUrl}${APP_ROUTES.API.SEO.LLM_README}`,
+      url: `${baseUrl}/api/seo/llm-readme`,
       lastModified: isoDate,
       changeFrequency: "weekly" as const,
       priority: 0.85,
     },
     {
-      url: `${baseUrl}${APP_ROUTES.API.SEO.LLMS_TXT}`,
+      url: `${baseUrl}/api/seo/llms.txt`,
       lastModified: isoDate,
       changeFrequency: "weekly" as const,
       priority: 0.85,

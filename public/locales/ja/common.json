@@ -219,7 +219,10 @@
       "powered_by": "Powered by",
       "built_by": "Built by",
       "complete": "完全な",
-      "subtitle_desc": "Aptosエコシステム全体で、すべての資産、DeFiポジション、NFTをリアルタイムで追跡します"
+      "subtitle_desc": "Aptosエコシステム全体で、すべての資産、DeFiポジション、NFTをリアルタイムで追跡します",
+      "track_your": "あなたの",
+      "aptos_portfolio": "Aptosポートフォリオを追跡",
+      "track_tokens_defi_nfts": "トークン、DeFiポジション、NFTを追跡"
     },
     "features": {
       "title": "ポートフォリオ追跡",

@@ -25,23 +25,12 @@ export function TokenTreemap({ tokens }: TokenTreemapProps) {
   const [selectedToken, setSelectedToken] = useState<TreemapItem | null>(null);
 
   const treemapData = useMemo(() => {
-    logger.debug(`Treemap received ${tokens.length} tokens from parent`);
+    if (!tokens || tokens.length === 0) return [];
 
-    // Use whatever tokens are passed from the parent (respects page filters)
-    // Only show tokens with meaningful FDV (supply data available)
     const validTokens = tokens
-      .filter((token) => (token.fdv || 0) > 1000) // Minimum $1k FDV
+      .filter((token) => (token.fdv || 0) > 1000)
       .sort((a, b) => (b.fdv || 0) - (a.fdv || 0))
-      .slice(0, 200); // Show top 200 tokens by FDV
-
-    const stablecoins = validTokens.filter(
-      (token) => token.symbol && STABLECOIN_SYMBOLS.includes(token.symbol as any)
-    );
-    logger.debug(`Treemap has ${stablecoins.length} stablecoins:`, {
-      stablecoins: stablecoins.map((t) => t.symbol),
-    });
-
-    logger.debug(`Treemap filtered to ${validTokens.length} valid tokens`);
+      .slice(0, 50);
 
     if (validTokens.length === 0) return [];
 
@@ -77,7 +66,7 @@ export function TokenTreemap({ tokens }: TokenTreemapProps) {
       fullName: token.name,
       uniqueId: token.faAddress || token.tokenAddress || `${token.symbol}-${index}`, // Unique ID for keys
     }));
-  }, [tokens]);
+  }, [tokens.length]);
 
   if (treemapData.length === 0) {
     return (
@@ -89,7 +78,6 @@ export function TokenTreemap({ tokens }: TokenTreemapProps) {
 
   return (
     <div className="w-full">
-      <h3 className="text-lg font-semibold mb-4">Token Market Cap Treemap</h3>
 
       {/* Selected Token Details Row */}
       {selectedToken && (
@@ -198,6 +186,8 @@ export function TokenTreemap({ tokens }: TokenTreemapProps) {
             nameKey="name"
             aspectRatio={4 / 3}
             stroke="none"
+            animationDuration={0}
+            isAnimationActive={false}
             content={<TreemapContent onCellClick={setSelectedToken} />}
           >
             <RechartsTooltip content={<TreemapTooltip />} />

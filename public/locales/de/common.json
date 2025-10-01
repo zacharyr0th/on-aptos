@@ -219,7 +219,10 @@
       "powered_by": "Unterstützt von",
       "built_by": "Erstellt von",
       "complete": "Ein Vollständiger",
-      "subtitle_desc": "Verfolgen Sie alle Ihre Vermögenswerte, DeFi-Positionen und NFTs in Echtzeit im gesamten Aptos-Ökosystem"
+      "subtitle_desc": "Verfolgen Sie alle Ihre Vermögenswerte, DeFi-Positionen und NFTs in Echtzeit im gesamten Aptos-Ökosystem",
+      "track_your": "Verfolgen Sie Ihr",
+      "aptos_portfolio": "Aptos-Portfolio",
+      "track_tokens_defi_nfts": "Verfolgen Sie Token, DeFi-Positionen und NFTs"
     },
     "features": {
       "title": "Portfolio-Verfolgung",

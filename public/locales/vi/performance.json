@@ -1,0 +1,62 @@
+{
+  "page": {
+    "title": "Hiệu suất Aptos",
+    "title_vs": "Aptos so với {{chains}}",
+    "description": "So sánh các chỉ số hiệu suất blockchain Aptos với các chuỗi hàng đầu khác"
+  },
+  "tabs": {
+    "performance": "Hiệu suất Chuỗi",
+    "performance_short": "Hiệu suất",
+    "usdt": "So sánh USDt",
+    "usdt_short": "USDt"
+  },
+  "sidebar": {
+    "compare": "So sánh",
+    "compare_count": "So sánh ({{count}}/3)",
+    "clear": "Xóa"
+  },
+  "metrics": {
+    "max_tps": "TPS tối đa",
+    "max_tps_100_blocks": "TPS tối đa (100 khối)",
+    "max_tps_1_block": "TPS tối đa (1 khối)",
+    "finality": "Tính cuối cùng",
+    "block_time": "Thời gian khối",
+    "nakamoto": "Nakamoto",
+    "validators": "Validators"
+  },
+  "comparison": {
+    "is_better": "là",
+    "better": "tốt hơn",
+    "same_as": "Bằng với",
+    "aptos_is": "Aptos là",
+    "multiplier_better": "tốt hơn {{multiplier}} lần"
+  },
+  "chains": {
+    "aptos": "Aptos",
+    "ethereum": "Ethereum",
+    "solana": "Solana",
+    "bsc": "BSC",
+    "avalanche": "Avalanche",
+    "cardano": "Cardano",
+    "sui": "Sui",
+    "tron": "TRON",
+    "base": "Base",
+    "bitcoin": "Bitcoin"
+  },
+  "tooltips": {
+    "nakamoto_coefficient": "Số lượng thực thể tối thiểu cần thiết để kiểm soát >50% tài nguyên mạng. Cao hơn = phi tập trung hơn.",
+    "chainspect_data": "Chainspect không có API nên các giá trị này đã được mã hóa cứng vào ngày 11 tháng 9 năm 2025."
+  },
+  "attribution": {
+    "data_powered_by": "Dữ liệu được cung cấp bởi",
+    "chainspect": "Chainspect"
+  },
+  "usdt": {
+    "title": "So sánh giao dịch USDT",
+    "transactions": "Giao dịch",
+    "daily_transactions": "Giao dịch hàng ngày",
+    "market_share": "Thị phần",
+    "cost_comparison": "So sánh chi phí giao dịch",
+    "aptos_dominance": "Aptos thống trị các giao dịch USDT trên các blockchain chính"
+  }
+}

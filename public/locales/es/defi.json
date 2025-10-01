@@ -12,16 +12,17 @@
     "estimated_tvl": "TVL Estimado",
     "volume_data": "Volumen de trading 24h",
     "defi_protocols": "Protocolos DeFi",
-    "fees_24h": "Fees 24h",
-    "protocol_fees": "Protocol fees",
-    "stablecoin_volume": "Stablecoin Volume",
-    "stablecoin_trading": "Stablecoin trading volume",
-    "coming_soon": "Coming Soon"
+    "fees_24h": "Comisiones 24h",
+    "protocol_fees": "Comisiones del protocolo",
+    "stablecoin_volume": "Volumen de Stablecoins",
+    "stablecoin_trading": "Volumen de trading de stablecoins",
+    "coming_soon": "Próximamente"
   },
   "search": {
     "placeholder": "Buscar protocolos...",
     "results": "{{count}} protocolos encontrados",
     "results_of": "de {{total}} protocolos",
+    "showing_protocols": "Mostrando {{count}} de {{total}} protocolos",
     "no_results": "No se encontraron protocolos que coincidan con sus criterios.",
     "clear_search": "Limpiar búsqueda",
     "search_hint": "Buscar por nombre, categoría o descripción"

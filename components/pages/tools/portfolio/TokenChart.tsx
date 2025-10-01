@@ -41,7 +41,7 @@ const CustomTooltip = ({ active, payload, _label }: any) => {
   const date = new Date(data.bucketed_timestamp_minutes_utc);
 
   return (
-    <div className="bg-card/95 backdrop-blur-sm border border-border/50 rounded-lg shadow-lg p-3 z-10">
+    <div className="bg-popover border rounded-lg shadow-md p-3 z-10">
       <p className={`font-semibold text-card-foreground ${GeistMono.className}`}>
         {formatCurrency(data.price_usd)}
       </p>
@@ -184,7 +184,7 @@ export function TokenChart({
                 axisLine={false}
                 tickLine={false}
               />
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted-foreground))" opacity={0.1} />
               <RechartsTooltip content={<CustomTooltip />} />
               <Area
                 type="monotone"
@@ -216,7 +216,7 @@ export function TokenChart({
 
       {/* Summary stats */}
       {data.length > 0 && (
-        <div className="grid grid-cols-2 gap-4 pt-2 border-t">
+        <div className="grid grid-cols-2 gap-4 pt-4 border-t mt-4">
           <div>
             <p className="text-xs text-muted-foreground">High</p>
             <p className={`font-semibold text-sm ${GeistMono.className}`}>

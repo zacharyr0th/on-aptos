@@ -25,6 +25,8 @@ interface FilterControlsProps extends Omit<BaseFilterProps<FilterState>, "filter
   selectedSubcategory?: string;
   onCategoryChange: (category: string) => void;
   onSubcategoryChange?: (subcategory: string | undefined) => void;
+  protocolCounts?: Record<string, number>; // Add protocol counts per category
+  subcategoryCounts?: Record<string, Record<string, number>>; // Add subcategory counts per category
 }
 
 export function FilterControls({
@@ -33,6 +35,8 @@ export function FilterControls({
   selectedSubcategory,
   onCategoryChange,
   onSubcategoryChange,
+  protocolCounts = {},
+  subcategoryCounts = {},
 }: FilterControlsProps) {
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const { t, getText, isReady } = usePageTranslation("defi");
@@ -121,6 +125,7 @@ export function FilterControls({
         {/* Categories with their subcategories as indented items */}
         {categories
           .filter((cat) => cat !== "All")
+          .filter((cat) => !protocolCounts || Object.keys(protocolCounts).length === 0 || protocolCounts[cat] > 0) // Filter out empty categories only if counts exist
           .map((category) => {
             const categoryDef = getCategoryDefinition(category);
             const hasSubcategories =
@@ -167,6 +172,11 @@ export function FilterControls({
                     .filter(
                       (item): item is { subcategory: string; description: any } => item !== null
                     )
+                    .filter(({ subcategory }) => {
+                      // Only show subcategories that have actual protocols
+                      if (!subcategoryCounts[category]) return false;
+                      return (subcategoryCounts[category][subcategory] || 0) > 0;
+                    })
                     .map(({ subcategory, description }) => (
                       <DropdownMenuItem
                         key={`${category}-${subcategory}`}
@@ -198,7 +208,9 @@ export function FilterControls({
   const DesktopCategoryButtons = () => (
     <>
       <div className="flex flex-wrap items-center gap-1.5 md:gap-2">
-        {categories.map((category) => {
+        {categories
+          .filter((category) => category === "All" || !protocolCounts || Object.keys(protocolCounts).length === 0 || protocolCounts[category] > 0) // Show all if no counts provided
+          .map((category) => {
           const isSelected = selectedCategory === category;
           const isExpanded = expandedCategory === category;
           const categoryDef = getCategoryDefinition(category);
@@ -294,6 +306,11 @@ export function FilterControls({
                             description: any;
                           } => item !== null
                         )
+                        .filter(({ subcategory }) => {
+                          // Only show subcategories that have actual protocols
+                          if (!subcategoryCounts[expandedCategory]) return false;
+                          return (subcategoryCounts[expandedCategory][subcategory] || 0) > 0;
+                        })
                         .map(({ subcategory, description }) => (
                           <Tooltip key={subcategory}>
                             <TooltipTrigger asChild>

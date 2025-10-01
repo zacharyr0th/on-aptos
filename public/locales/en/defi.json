@@ -23,6 +23,7 @@
     "aria_label": "Search protocols",
     "results": "{{count}} protocols found",
     "results_of": "of {{total}} protocols",
+    "showing_protocols": "Showing {{count}} of {{total}} protocols",
     "no_results": "No protocols found matching your criteria.",
     "clear_search": "Clear search",
     "search_hint": "Search by name, category, or description"

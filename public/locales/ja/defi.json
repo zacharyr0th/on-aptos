@@ -22,6 +22,7 @@
     "placeholder": "プロトコルを検索...",
     "results": "{{count}}件のプロトコルが見つかりました",
     "results_of": "{{total}}件のプロトコル中",
+    "showing_protocols": "{{total}}件中{{count}}件のプロトコルを表示",
     "no_results": "条件に一致するプロトコルが見つかりません。",
     "clear_search": "検索をクリア",
     "search_hint": "名前、カテゴリ、または説明で検索"

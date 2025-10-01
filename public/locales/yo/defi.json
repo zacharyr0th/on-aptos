@@ -22,6 +22,7 @@
     "placeholder": "Wá àwọn ìlànà...",
     "results": "{{count}} àwọn ìlànà tí a rí",
     "results_of": "nínú {{total}} àwọn ìlànà",
+    "showing_protocols": "Ń fi {{count}} hàn nínú {{total}} àwọn ìlànà",
     "no_results": "A kò rí àwọn ìlànà tó bá àwárí rẹ mu.",
     "clear_search": "Fọ ìwádìí",
     "search_hint": "Wá pẹ̀lú orúkọ, ẹ̀ka, tàbí àpèjúwe"

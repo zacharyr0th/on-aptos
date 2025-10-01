@@ -1,5 +1,4 @@
 import type { MetadataRoute } from "next";
-import { APP_ROUTES } from "@/lib/config/routes";
 
 // Force Node.js runtime instead of edge runtime
 export const runtime = "nodejs";
@@ -8,24 +7,24 @@ export default function robots(): MetadataRoute.Robots {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
   const allowedPaths = [
-    APP_ROUTES.HOME,
-    APP_ROUTES.API.BTC,
-    APP_ROUTES.API.STABLES,
-    APP_ROUTES.API.RWAS,
-    APP_ROUTES.API.PRICES,
+    "/",
+    "/api/markets/bitcoin",
+    "/api/markets/stables",
+    "/api/markets/rwas",
+    "/api/prices",
     "/api/seo/",
     "/api/seo/*",
     "/.well-known/ai-plugin.json",
     "/llms.txt",
-    APP_ROUTES.MARKETS.BITCOIN,
-    APP_ROUTES.MARKETS.STABLES,
-    APP_ROUTES.MARKETS.RWAS,
-    APP_ROUTES.MARKETS.TOKENS,
-    APP_ROUTES.PROTOCOLS.DEFI,
-    APP_ROUTES.PROTOCOLS.LST,
-    APP_ROUTES.PROTOCOLS.YIELDS,
-    APP_ROUTES.TOOLS.PORTFOLIO,
-    APP_ROUTES.TOOLS.METRICS,
+    "/markets/bitcoin",
+    "/markets/stables",
+    "/markets/rwas",
+    "/markets/tokens",
+    "/protocols/defi",
+    "/protocols/lst",
+    "/protocols/yields",
+    "/tools/portfolio",
+    "/metrics",
   ];
 
   return {

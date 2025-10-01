@@ -22,6 +22,7 @@
     "placeholder": "Protokolle suchen …",
     "results": "{{count}} Protokolle gefunden",
     "results_of": "von {{total}} Protokollen",
+    "showing_protocols": "Zeige {{count}} von {{total}} Protokollen",
     "no_results": "Keine Protokolle entsprechen deinen Kriterien.",
     "clear_search": "Suche löschen",
     "search_hint": "Nach Name, Kategorie oder Beschreibung suchen"

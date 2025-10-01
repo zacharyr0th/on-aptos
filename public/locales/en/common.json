@@ -219,7 +219,10 @@
       "powered_by": "Powered by",
       "built_by": "Built by",
       "complete": "A Complete",
-      "subtitle_desc": "Track all your assets, DeFi positions, and NFTs in real-time across the Aptos ecosystem"
+      "subtitle_desc": "Track all your assets, DeFi positions, and NFTs in real-time across the Aptos ecosystem",
+      "track_your": "Track your",
+      "aptos_portfolio": "Aptos portfolio",
+      "track_tokens_defi_nfts": "Track tokens, DeFi positions, and NFTs"
     },
     "features": {
       "title": "Portfolio Tracking",

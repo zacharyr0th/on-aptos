@@ -1,0 +1,111 @@
+{
+  "page": {
+    "title": "Portfolio",
+    "description": "Bi diddigin portfolio din Aptos tare da bayanan lokaci-lokaci",
+    "meta_description": "Bi diddigin kuma bincika portfolio din wallet Aptos tare da ma'aunin tokens na lokaci-lokaci, matsayin DeFi, NFTs da tarihin ma'amala"
+  },
+  "navigation": {
+    "overview": "Bayyani",
+    "tokens": "Tokens",
+    "defi": "DeFi",
+    "nfts": "NFTs",
+    "transactions": "Ma'amala",
+    "history": "Tarihi"
+  },
+  "landing": {
+    "track_your": "Bi diddigin",
+    "aptos_portfolio": "portfolio din Aptos",
+    "track_tokens_defi_nfts": "Bi diddigin tokens, matsayin DeFi da NFTs",
+    "enter_address": "Shigar da adireshin wallet",
+    "placeholder": "0x1234...abcd",
+    "analyze": "Bincika Portfolio",
+    "features": {
+      "real_time": "Ma'aunin lokaci-lokaci",
+      "defi_positions": "Matsayin DeFi",
+      "nft_collections": "Tarin NFT",
+      "transaction_history": "Tarihin ma'amala"
+    }
+  },
+  "overview": {
+    "total_value": "Jimlar Darajar Portfolio",
+    "tokens": "Tokens",
+    "defi": "DeFi",
+    "nfts": "NFTs",
+    "24h_change": "Canjin 24h",
+    "allocation": "Rabo",
+    "assets": "Kadarori",
+    "collections": "Tarin",
+    "positions": "Matsayi"
+  },
+  "tokens": {
+    "title": "Riƙon Tokens",
+    "balance": "Ma'auni",
+    "value": "Daraja",
+    "price": "Farashi",
+    "change_24h": "Canjin 24h",
+    "no_tokens": "Ba a sami tokens ba",
+    "loading": "Ana ɗaukar tokens..."
+  },
+  "defi": {
+    "title": "Matsayin DeFi",
+    "protocol": "Protocol",
+    "position": "Matsayi",
+    "value": "Daraja",
+    "apy": "APY",
+    "no_positions": "Ba a sami matsayin DeFi ba",
+    "loading": "Ana ɗaukar matsayi..."
+  },
+  "nfts": {
+    "title": "Tarin NFT",
+    "collection": "Tarin",
+    "items": "Abubuwa",
+    "floor_price": "Farashin Floor",
+    "no_nfts": "Ba a sami NFTs ba",
+    "loading": "Ana ɗaukar NFTs...",
+    "view_collection": "Duba Tarin"
+  },
+  "transactions": {
+    "title": "Tarihin Ma'amala",
+    "type": "Nau'i",
+    "amount": "Adadi",
+    "timestamp": "Lokaci",
+    "status": "Matsayi",
+    "hash": "Hash",
+    "no_transactions": "Ba a sami ma'amala ba",
+    "loading": "Ana ɗaukar ma'amala...",
+    "view_explorer": "Duba a Explorer"
+  },
+  "filters": {
+    "all": "Duka",
+    "tokens": "Tokens",
+    "defi": "DeFi",
+    "nfts": "NFTs",
+    "sort_by": "Jera ta",
+    "value": "Daraja",
+    "name": "Suna",
+    "recent": "Na baya-bayan nan"
+  },
+  "actions": {
+    "refresh": "Sabunta",
+    "export": "Fitar",
+    "share": "Raba",
+    "copy_address": "Kwafi Adireshi",
+    "view_details": "Duba Cikakkun Bayanai"
+  },
+  "status": {
+    "loading": "Ana ɗaukar portfolio...",
+    "error": "Kuskure wajen ɗaukar portfolio",
+    "retry": "Sake gwadawa",
+    "no_data": "Babu bayanan da ake samu",
+    "invalid_address": "Adireshin wallet mara inganci"
+  },
+  "tooltips": {
+    "total_value": "Jimlar darajar dukkan kadarori a cikin portfolio dinku",
+    "24h_change": "Canjin farashi a cikin sa'o'i 24 da suka wuce",
+    "allocation": "Rabon kadarori bisa daraja",
+    "refresh": "Sabunta bayanan portfolio",
+    "export": "Fitar da bayanan portfolio",
+    "share": "Raba portfolio",
+    "copy_address": "Kwafi adireshin wallet zuwa clipboard"
+  }
+}

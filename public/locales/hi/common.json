@@ -219,7 +219,10 @@
       "powered_by": "द्वारा संचालित",
       "built_by": "द्वारा निर्मित",
       "complete": "एक पूर्ण",
-      "subtitle_desc": "Aptos पारिस्थितिकी तंत्र में अपनी सभी संपत्तियों, DeFi पोजीशन और NFTs को रियल-टाइम में ट्रैक करें"
+      "subtitle_desc": "Aptos पारिस्थितिकी तंत्र में अपनी सभी संपत्तियों, DeFi पोजीशन और NFTs को रियल-टाइम में ट्रैक करें",
+      "track_your": "अपने",
+      "aptos_portfolio": "Aptos पोर्टफोलियो को ट्रैक करें",
+      "track_tokens_defi_nfts": "टोकन, DeFi पोजीशन और NFTs को ट्रैक करें"
     },
     "features": {
       "title": "पोर्टफोलियो ट्रैकिंग",

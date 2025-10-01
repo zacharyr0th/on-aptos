@@ -1,0 +1,62 @@
+{
+  "page": {
+    "title": "Aikin Aptos",
+    "title_vs": "Aptos da {{chains}}",
+    "description": "Kwatanta ma'aunin aikin blockchain na Aptos da sauran manyan sarƙoƙi"
+  },
+  "tabs": {
+    "performance": "Aikin Sarƙa",
+    "performance_short": "Aiki",
+    "usdt": "Kwatancen USDt",
+    "usdt_short": "USDt"
+  },
+  "sidebar": {
+    "compare": "Kwatanta",
+    "compare_count": "Kwatanta ({{count}}/3)",
+    "clear": "Share"
+  },
+  "metrics": {
+    "max_tps": "Mafi girman TPS",
+    "max_tps_100_blocks": "Mafi girman TPS (buloki 100)",
+    "max_tps_1_block": "Mafi girman TPS (buloki 1)",
+    "finality": "Ƙarshe",
+    "block_time": "Lokacin Buloki",
+    "nakamoto": "Nakamoto",
+    "validators": "Masu Tabbatarwa"
+  },
+  "comparison": {
+    "is_better": "shi ne",
+    "better": "mafi kyau",
+    "same_as": "Daidai da",
+    "aptos_is": "Aptos shi ne",
+    "multiplier_better": "{{multiplier}} mafi kyau"
+  },
+  "chains": {
+    "aptos": "Aptos",
+    "ethereum": "Ethereum",
+    "solana": "Solana",
+    "bsc": "BSC",
+    "avalanche": "Avalanche",
+    "cardano": "Cardano",
+    "sui": "Sui",
+    "tron": "TRON",
+    "base": "Base",
+    "bitcoin": "Bitcoin"
+  },
+  "tooltips": {
+    "nakamoto_coefficient": "Mafi ƙanƙantar ƙungiyoyi da ake buƙata don sarrafa >50% na albarkatun cibiyar sadarwa. Mafi girma = mafi rarrabawa.",
+    "chainspect_data": "Chainspect ba shi da API don haka an ƙaddamar da waɗannan ƙima a ranar 11 ga Satumba, 2025."
+  },
+  "attribution": {
+    "data_powered_by": "Bayanan da aka yi amfani da su ta",
+    "chainspect": "Chainspect"
+  },
+  "usdt": {
+    "title": "Kwatancen Ma'amalar USDT",
+    "transactions": "Ma'amaloli",
+    "daily_transactions": "Ma'amalolin Yau da kullun",
+    "market_share": "Rabo na Kasuwa",
+    "cost_comparison": "Kwatancen Farashin Ma'amala",
+    "aptos_dominance": "Aptos ya mamaye ma'amalolin USDT a cikin manyan blockchain"
+  }
+}

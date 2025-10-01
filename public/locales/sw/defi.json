@@ -21,8 +21,9 @@
   "search": {
     "placeholder": "Search protocols...",
     "results": "{{count}} protocols found",
-    "results_of": "of {{total}} protocols",
-    "no_results": "No protocols found matching your criteria.",
+    "results_of": "kati ya itifaki {{total}}",
+    "showing_protocols": "Inaonyesha {{count}} kati ya itifaki {{total}}",
+    "no_results": "Hakuna itifaki zilizopatikana zinazokabili vigezo vyako.",
     "clear_search": "Clear search",
     "search_hint": "Search by name, category, or description"
   },

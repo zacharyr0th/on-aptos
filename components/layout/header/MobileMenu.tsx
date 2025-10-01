@@ -94,7 +94,7 @@ export function MobileMenu({ isOpen, onToggle, onClose, navigationItems }: Mobil
         <>
           {/* Backdrop */}
           <div
-            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 md:hidden"
+            className="fixed inset-0 bg-black/20 dark:bg-black/40 backdrop-blur-sm z-40 md:hidden"
             onClick={onClose}
             aria-hidden="true"
           />

@@ -219,7 +219,10 @@
       "powered_by": "Inaendeshwa na",
       "built_by": "Imejengwa na",
       "complete": "Mkamilifu",
-      "subtitle_desc": "Fuatilia mali zako zote, nafasi za DeFi, na NFTs kwa wakati halisi katika mfumo mzima wa Aptos"
+      "subtitle_desc": "Fuatilia mali zako zote, nafasi za DeFi, na NFTs kwa wakati halisi katika mfumo mzima wa Aptos",
+      "track_your": "Fuatilia",
+      "aptos_portfolio": "kasha lako la Aptos",
+      "track_tokens_defi_nfts": "Fuatilia tokeni, nafasi za DeFi, na NFTs"
     },
     "features": {
       "title": "Ufuatiliaji wa Kasha",

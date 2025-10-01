@@ -1,0 +1,62 @@
+{
+  "page": {
+    "title": "एप्टोस प्रदर्शन",
+    "title_vs": "एप्टोस बनाम {{chains}}",
+    "description": "एप्टोस ब्लॉकचेन प्रदर्शन मेट्रिक्स की तुलना अन्य अग्रणी चेन्स के साथ करें"
+  },
+  "tabs": {
+    "performance": "चेन प्रदर्शन",
+    "performance_short": "प्रदर्शन",
+    "usdt": "USDt तुलना",
+    "usdt_short": "USDt"
+  },
+  "sidebar": {
+    "compare": "तुलना करें",
+    "compare_count": "तुलना करें ({{count}}/3)",
+    "clear": "साफ करें"
+  },
+  "metrics": {
+    "max_tps": "अधिकतम TPS",
+    "max_tps_100_blocks": "अधिकतम TPS (100 ब्लॉक्स)",
+    "max_tps_1_block": "अधिकतम TPS (1 ब्लॉक)",
+    "finality": "अंतिमता",
+    "block_time": "ब्लॉक समय",
+    "nakamoto": "नाकामोतो",
+    "validators": "वैलिडेटर्स"
+  },
+  "comparison": {
+    "is_better": "है",
+    "better": "बेहतर",
+    "same_as": "बराबर",
+    "aptos_is": "एप्टोस है",
+    "multiplier_better": "{{multiplier}} बेहतर"
+  },
+  "chains": {
+    "aptos": "एप्टोस",
+    "ethereum": "इथेरियम",
+    "solana": "सोलाना",
+    "bsc": "BSC",
+    "avalanche": "एवलांच",
+    "cardano": "कार्डानो",
+    "sui": "सुई",
+    "tron": "TRON",
+    "base": "बेस",
+    "bitcoin": "बिटकॉइन"
+  },
+  "tooltips": {
+    "nakamoto_coefficient": "नेटवर्क संसाधनों के >50% को नियंत्रित करने के लिए आवश्यक न्यूनतम इकाइयां। उच्चतर = अधिक विकेंद्रीकृत।",
+    "chainspect_data": "चेनस्पेक्ट के पास API नहीं है इसलिए ये मान 11 सितंबर 2025 को हार्डकोड किए गए थे।"
+  },
+  "attribution": {
+    "data_powered_by": "डेटा प्रदान किया गया",
+    "chainspect": "चेनस्पेक्ट"
+  },
+  "usdt": {
+    "title": "USDT लेनदेन तुलना",
+    "transactions": "लेनदेन",
+    "daily_transactions": "दैनिक लेनदेन",
+    "market_share": "बाजार हिस्सेदारी",
+    "cost_comparison": "लेनदेन लागत तुलना",
+    "aptos_dominance": "एप्टोस प्रमुख ब्लॉकचेन्स में USDT लेनदेन पर हावी है"
+  }
+}

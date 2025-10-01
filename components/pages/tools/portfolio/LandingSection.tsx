@@ -62,12 +62,13 @@ export const LandingSection = ({ onManualAddressSubmit }: LandingSectionProps) =
   const [inputAddress, setInputAddress] = useState("");
   const [addressError, setAddressError] = useState("");
   const [isResolving, setIsResolving] = useState(false);
-  const { t } = useTranslation("common");
+  const { t } = useTranslation("portfolio");
+  const { t: tCommon } = useTranslation("common");
 
   // Validate Aptos address format or ANS domain
   const validateInput = (input: string) => {
     if (!input) {
-      setAddressError(t("wallet.error_empty_input", "Please enter an address or ANS name"));
+      setAddressError(t("status.invalid_address", "Please enter an address or ANS name"));
       return false;
     }
 
@@ -84,7 +85,7 @@ export const LandingSection = ({ onManualAddressSubmit }: LandingSectionProps) =
     const isValidFormat = /^0x[a-fA-F0-9]{64}$/.test(cleanAddress);
 
     if (!isValidFormat) {
-      setAddressError(t("wallet.error_invalid_format", "Invalid address format or ANS name"));
+      setAddressError(t("status.invalid_address", "Invalid address format or ANS name"));
       return false;
     }
 
@@ -162,12 +163,12 @@ export const LandingSection = ({ onManualAddressSubmit }: LandingSectionProps) =
             {/* Left Side - Big Text */}
             <div className="space-y-2 text-left">
               <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight">
-                Track your
+                {t("landing.track_your", "Track your")}
                 <br />
-                <span className="text-primary">Aptos</span> portfolio
+                <span className="text-primary">Aptos</span> {t("landing.portfolio", "portfolio")}
               </h1>
               <p className="text-sm sm:text-base md:text-lg text-muted-foreground leading-relaxed max-w-full md:max-w-lg">
-                Track tokens, DeFi positions, and NFTs
+                {t("landing.track_tokens_defi_nfts", "Track tokens, DeFi positions, and NFTs")}
               </p>
 
               {/* CTA Section with Wallet Connect and Address Input */}
@@ -177,7 +178,7 @@ export const LandingSection = ({ onManualAddressSubmit }: LandingSectionProps) =
 
                   <div className="flex items-center gap-3">
                     <div className="h-[1px] bg-border flex-1" />
-                    <span className="text-sm text-muted-foreground">{t("common.or", "or")}</span>
+                    <span className="text-sm text-muted-foreground">{tCommon("or", "or")}</span>
                     <div className="h-[1px] bg-border flex-1" />
                   </div>
 
@@ -185,7 +186,7 @@ export const LandingSection = ({ onManualAddressSubmit }: LandingSectionProps) =
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
                     <Input
                       type="text"
-                      placeholder={t("wallet.search_ans_placeholder", "Search any wallet or ANS")}
+                      placeholder={t("landing.placeholder", "Search any wallet or ANS")}
                       value={inputAddress}
                       onChange={(e) => {
                         setInputAddress(e.target.value);

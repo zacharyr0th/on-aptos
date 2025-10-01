@@ -1,0 +1,111 @@
+{
+  "page": {
+    "title": "投资组合",
+    "description": "使用实时数据跟踪您的Aptos投资组合",
+    "meta_description": "使用实时代币余额、DeFi仓位、NFT和交易历史跟踪和分析您的Aptos钱包投资组合"
+  },
+  "navigation": {
+    "overview": "概览",
+    "tokens": "代币",
+    "defi": "DeFi",
+    "nfts": "NFT",
+    "transactions": "交易",
+    "history": "历史"
+  },
+  "landing": {
+    "track_your": "跟踪您的",
+    "aptos_portfolio": "Aptos投资组合",
+    "track_tokens_defi_nfts": "跟踪代币、DeFi仓位和NFT",
+    "enter_address": "输入钱包地址",
+    "placeholder": "0x1234...abcd",
+    "analyze": "分析投资组合",
+    "features": {
+      "real_time": "实时余额",
+      "defi_positions": "DeFi仓位",
+      "nft_collections": "NFT收藏",
+      "transaction_history": "交易历史"
+    }
+  },
+  "overview": {
+    "total_value": "投资组合总价值",
+    "tokens": "代币",
+    "defi": "DeFi",
+    "nfts": "NFT",
+    "24h_change": "24小时变化",
+    "allocation": "配置",
+    "assets": "资产",
+    "collections": "收藏",
+    "positions": "仓位"
+  },
+  "tokens": {
+    "title": "代币持有",
+    "balance": "余额",
+    "value": "价值",
+    "price": "价格",
+    "change_24h": "24小时变化",
+    "no_tokens": "未找到代币",
+    "loading": "正在加载代币..."
+  },
+  "defi": {
+    "title": "DeFi仓位",
+    "protocol": "协议",
+    "position": "仓位",
+    "value": "价值",
+    "apy": "年化收益率",
+    "no_positions": "未找到DeFi仓位",
+    "loading": "正在加载仓位..."
+  },
+  "nfts": {
+    "title": "NFT收藏",
+    "collection": "收藏",
+    "items": "项目",
+    "floor_price": "地板价",
+    "no_nfts": "未找到NFT",
+    "loading": "正在加载NFT...",
+    "view_collection": "查看收藏"
+  },
+  "transactions": {
+    "title": "交易历史",
+    "type": "类型",
+    "amount": "数量",
+    "timestamp": "时间",
+    "status": "状态",
+    "hash": "哈希",
+    "no_transactions": "未找到交易",
+    "loading": "正在加载交易...",
+    "view_explorer": "在浏览器中查看"
+  },
+  "filters": {
+    "all": "全部",
+    "tokens": "代币",
+    "defi": "DeFi",
+    "nfts": "NFT",
+    "sort_by": "排序",
+    "value": "价值",
+    "name": "名称",
+    "recent": "最近"
+  },
+  "actions": {
+    "refresh": "刷新",
+    "export": "导出",
+    "share": "分享",
+    "copy_address": "复制地址",
+    "view_details": "查看详情"
+  },
+  "status": {
+    "loading": "正在加载投资组合...",
+    "error": "加载投资组合时出错",
+    "retry": "重试",
+    "no_data": "没有可用数据",
+    "invalid_address": "无效的钱包地址"
+  },
+  "tooltips": {
+    "total_value": "您投资组合中所有资产的总价值",
+    "24h_change": "过去24小时的价格变化",
+    "allocation": "按价值分配的资产分布",
+    "refresh": "刷新投资组合数据",
+    "export": "导出投资组合数据",
+    "share": "分享投资组合",
+    "copy_address": "将钱包地址复制到剪贴板"
+  }
+}

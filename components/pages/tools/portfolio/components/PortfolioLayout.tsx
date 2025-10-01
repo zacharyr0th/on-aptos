@@ -87,29 +87,32 @@ export function PortfolioLayout({
   return (
     <div className="h-full flex flex-col">
       {/* Desktop Layout - Optimized Grid */}
-      <div className="hidden lg:grid grid-cols-12 gap-2 h-full">
+      <div className="hidden lg:grid grid-cols-12 gap-6 h-full p-6">
         {/* Sidebar - 3 columns (25%) */}
         <div className="col-span-3 h-full overflow-hidden">
-          <NewSidebar
-            assets={visibleAssets}
-            nfts={nfts}
-            defiPositions={groupedDeFiPositions}
-            assetsLoading={dataLoading}
-            nftsLoading={nftsLoading}
-            defiLoading={defiLoading}
-            selectedAsset={selectedAsset}
-            selectedNFT={selectedNFT}
-            selectedDeFi={selectedDeFiPosition}
-            onAssetSelect={(asset) => onItemSelect(asset ? "asset" : null, asset)}
-            onNFTSelect={(nft) => onItemSelect(nft ? "nft" : null, nft)}
-            onDeFiSelect={(defi) => onItemSelect(defi ? "defi" : null, defi)}
-            totalValue={portfolioMetrics?.totalPortfolioValue || 0}
-            totalNFTCount={totalNFTCount}
-          />
+          <div className="bg-card border rounded-lg shadow-sm h-full">
+            <NewSidebar
+              assets={visibleAssets}
+              nfts={nfts}
+              defiPositions={groupedDeFiPositions}
+              assetsLoading={dataLoading}
+              nftsLoading={nftsLoading}
+              defiLoading={defiLoading}
+              selectedAsset={selectedAsset}
+              selectedNFT={selectedNFT}
+              selectedDeFi={selectedDeFiPosition}
+              onAssetSelect={(asset) => onItemSelect(asset ? "asset" : null, asset)}
+              onNFTSelect={(nft) => onItemSelect(nft ? "nft" : null, nft)}
+              onDeFiSelect={(defi) => onItemSelect(defi ? "defi" : null, defi)}
+              totalValue={portfolioMetrics?.totalPortfolioValue || 0}
+              totalNFTCount={totalNFTCount}
+            />
+          </div>
         </div>
 
         {/* Main Content - 6 columns (50%) */}
         <div className="col-span-6 h-full overflow-hidden">
+          <div className="bg-card border rounded-lg shadow-sm h-full">
           <PortfolioMainContent
             activeTab={activeTab}
             setActiveTab={onTabChange as any}
@@ -138,19 +141,23 @@ export function PortfolioLayout({
             hasMoreTransactions={hasMoreTransactions}
             loadMoreTransactions={loadMoreTransactions}
           />
+          </div>
         </div>
 
         {/* Price List - 3 columns (25%) */}
         <div className="col-span-3 h-full overflow-hidden">
-          <PriceList className="h-full" />
+          <div className="bg-card border rounded-lg shadow-sm h-full">
+            <PriceList className="h-full" />
+          </div>
         </div>
       </div>
 
       {/* Mobile Layout - Simplified */}
       <div className="lg:hidden h-full flex flex-col overflow-hidden">
         {/* Mobile Content */}
-        <div className="flex-1 overflow-y-auto px-4 py-4">
-          <div className="space-y-4">
+        <div className="flex-1 overflow-y-auto p-4">
+          <div className="bg-card border rounded-lg shadow-sm p-4">
+            <div className="space-y-4">
             {/* Portfolio Value */}
             <div>
               <p className="text-2xl font-bold">
@@ -261,6 +268,7 @@ export function PortfolioLayout({
                 </div>
               </div>
             )}
+            </div>
           </div>
         </div>
       </div>

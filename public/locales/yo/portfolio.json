@@ -1,0 +1,111 @@
+{
+  "page": {
+    "title": "Portfolio",
+    "description": "Tọpa portfolio Aptos rẹ pẹlu data akoko gidi",
+    "meta_description": "Tọpa ati ṣe iwadi portfolio apo-owo Aptos rẹ pẹlu awọn idogba token akoko gidi, awọn ipo DeFi, NFTs ati itan iṣowo"
+  },
+  "navigation": {
+    "overview": "Akopọ",
+    "tokens": "Awọn Token",
+    "defi": "DeFi",
+    "nfts": "NFTs",
+    "transactions": "Awọn Iṣowo",
+    "history": "Itan"
+  },
+  "landing": {
+    "track_your": "Tọpa",
+    "aptos_portfolio": "portfolio Aptos rẹ",
+    "track_tokens_defi_nfts": "Tọpa awọn token, awọn ipo DeFi, ati NFTs",
+    "enter_address": "Tẹ adirẹsi apo-owo sinu",
+    "placeholder": "0x1234...abcd",
+    "analyze": "Ṣe Iwadi Portfolio",
+    "features": {
+      "real_time": "Awọn idogba akoko gidi",
+      "defi_positions": "Awọn ipo DeFi",
+      "nft_collections": "Awọn ikojọpọ NFT",
+      "transaction_history": "Itan iṣowo"
+    }
+  },
+  "overview": {
+    "total_value": "Iye Portfolio Lapapọ",
+    "tokens": "Awọn Token",
+    "defi": "DeFi",
+    "nfts": "NFTs",
+    "24h_change": "Iyipada 24h",
+    "allocation": "Pinpin",
+    "assets": "Awọn Ohun-ini",
+    "collections": "Awọn Ikojọpọ",
+    "positions": "Awọn Ipo"
+  },
+  "tokens": {
+    "title": "Awọn Ohun-ini Token",
+    "balance": "Idogba",
+    "value": "Iye",
+    "price": "Owo",
+    "change_24h": "Iyipada 24h",
+    "no_tokens": "Ko si awọn token ti a ri",
+    "loading": "N gbe awọn token..."
+  },
+  "defi": {
+    "title": "Awọn Ipo DeFi",
+    "protocol": "Protocol",
+    "position": "Ipo",
+    "value": "Iye",
+    "apy": "APY",
+    "no_positions": "Ko si awọn ipo DeFi ti a ri",
+    "loading": "N gbe awọn ipo..."
+  },
+  "nfts": {
+    "title": "Awọn Ikojọpọ NFT",
+    "collection": "Ikojọpọ",
+    "items": "Awọn Ohun",
+    "floor_price": "Owo Ilẹ",
+    "no_nfts": "Ko si NFTs ti a ri",
+    "loading": "N gbe NFTs...",
+    "view_collection": "Wo Ikojọpọ"
+  },
+  "transactions": {
+    "title": "Itan Iṣowo",
+    "type": "Iru",
+    "amount": "Iye",
+    "timestamp": "Akoko",
+    "status": "Ipo",
+    "hash": "Hash",
+    "no_transactions": "Ko si awọn iṣowo ti a ri",
+    "loading": "N gbe awọn iṣowo...",
+    "view_explorer": "Wo ninu Explorer"
+  },
+  "filters": {
+    "all": "Gbogbo",
+    "tokens": "Awọn Token",
+    "defi": "DeFi",
+    "nfts": "NFTs",
+    "sort_by": "Ṣeto nipasẹ",
+    "value": "Iye",
+    "name": "Orukọ",
+    "recent": "Laipe"
+  },
+  "actions": {
+    "refresh": "Sọtun",
+    "export": "Gbe jade",
+    "share": "Pin",
+    "copy_address": "Daakọ Adirẹsi",
+    "view_details": "Wo Awọn Alaye"
+  },
+  "status": {
+    "loading": "N gbe portfolio...",
+    "error": "Aṣiṣe ninu gbigbe portfolio",
+    "retry": "Gbiyanju Lẹẹkansi",
+    "no_data": "Ko si data ti o wa",
+    "invalid_address": "Adirẹsi apo-owo ti ko tọ"
+  },
+  "tooltips": {
+    "total_value": "Iye lapapọ ti gbogbo ohun-ini ninu portfolio rẹ",
+    "24h_change": "Iyipada owo ninu awọn wakati 24 ti o kọja",
+    "allocation": "Pinpin awọn ohun-ini nipasẹ iye",
+    "refresh": "Sọtun data portfolio",
+    "export": "Gbe data portfolio jade",
+    "share": "Pin portfolio",
+    "copy_address": "Daakọ adirẹsi apo-owo si clipboard"
+  }
+}

@@ -22,6 +22,7 @@
     "placeholder": "Find protocols...",
     "results": "{{count}} protocols dey",
     "results_of": "of {{total}} protocols",
+    "showing_protocols": "We dey show {{count}} out of {{total}} protocols",
     "no_results": "We no find protocols wey match your criteria.",
     "clear_search": "Clear search",
     "search_hint": "Search by name, category, or description"

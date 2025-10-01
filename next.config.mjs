@@ -79,11 +79,6 @@ const nextConfig = {
         destination: "/tools/portfolio",
         permanent: true,
       },
-      {
-        source: "/metrics",
-        destination: "/tools/metrics",
-        permanent: true,
-      },
     ];
   },
 

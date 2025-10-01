@@ -1,0 +1,62 @@
+{
+  "page": {
+    "title": "Aptosのパフォーマンス",
+    "title_vs": "Aptos vs {{chains}}",
+    "description": "Aptosブロックチェーンのパフォーマンス指標を他の主要チェーンと比較"
+  },
+  "tabs": {
+    "performance": "チェーンパフォーマンス",
+    "performance_short": "パフォーマンス",
+    "usdt": "USDt比較",
+    "usdt_short": "USDt"
+  },
+  "sidebar": {
+    "compare": "比較",
+    "compare_count": "比較 ({{count}}/3)",
+    "clear": "クリア"
+  },
+  "metrics": {
+    "max_tps": "最大TPS",
+    "max_tps_100_blocks": "最大TPS (100ブロック)",
+    "max_tps_1_block": "最大TPS (1ブロック)",
+    "finality": "ファイナリティ",
+    "block_time": "ブロック時間",
+    "nakamoto": "ナカモト",
+    "validators": "バリデーター"
+  },
+  "comparison": {
+    "is_better": "は",
+    "better": "より良い",
+    "same_as": "同じ",
+    "aptos_is": "Aptosは",
+    "multiplier_better": "{{multiplier}}倍良い"
+  },
+  "chains": {
+    "aptos": "Aptos",
+    "ethereum": "Ethereum",
+    "solana": "Solana",
+    "bsc": "BSC",
+    "avalanche": "Avalanche",
+    "cardano": "Cardano",
+    "sui": "Sui",
+    "tron": "TRON",
+    "base": "Base",
+    "bitcoin": "Bitcoin"
+  },
+  "tooltips": {
+    "nakamoto_coefficient": "ネットワークリソースの50%以上を制御するのに必要な最小エンティティ数。高い = より分散化。",
+    "chainspect_data": "ChainspectはAPIを持たないため、これらの値は2025年9月11日にハードコードされました。"
+  },
+  "attribution": {
+    "data_powered_by": "データ提供元",
+    "chainspect": "Chainspect"
+  },
+  "usdt": {
+    "title": "USDTトランザクション比較",
+    "transactions": "トランザクション",
+    "daily_transactions": "日次トランザクション",
+    "market_share": "マーケットシェア",
+    "cost_comparison": "トランザクションコスト比較",
+    "aptos_dominance": "Aptosは主要ブロックチェーン間でUSDTトランザクションを支配している"
+  }
+}

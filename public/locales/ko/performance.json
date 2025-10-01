@@ -1,0 +1,62 @@
+{
+  "page": {
+    "title": "Aptos 성능",
+    "title_vs": "Aptos vs {{chains}}",
+    "description": "Aptos 블록체인 성능 지표를 다른 주요 체인과 비교"
+  },
+  "tabs": {
+    "performance": "체인 성능",
+    "performance_short": "성능",
+    "usdt": "USDt 비교",
+    "usdt_short": "USDt"
+  },
+  "sidebar": {
+    "compare": "비교",
+    "compare_count": "비교 ({{count}}/3)",
+    "clear": "지우기"
+  },
+  "metrics": {
+    "max_tps": "최대 TPS",
+    "max_tps_100_blocks": "최대 TPS (100블록)",
+    "max_tps_1_block": "최대 TPS (1블록)",
+    "finality": "최종성",
+    "block_time": "블록 시간",
+    "nakamoto": "나카모토 계수",
+    "validators": "검증자"
+  },
+  "comparison": {
+    "is_better": "이",
+    "better": "더 좋음",
+    "same_as": "와 동일",
+    "aptos_is": "Aptos가",
+    "multiplier_better": "{{multiplier}} 더 좋음"
+  },
+  "chains": {
+    "aptos": "Aptos",
+    "ethereum": "이더리움",
+    "solana": "솔라나",
+    "bsc": "바이낸스 스마트체인",
+    "avalanche": "아발란체", 
+    "cardano": "카르다노",
+    "sui": "Sui",
+    "tron": "트론",
+    "base": "Base",
+    "bitcoin": "비트코인"
+  },
+  "tooltips": {
+    "nakamoto_coefficient": "네트워크 자원의 >50%를 제어하는 데 필요한 최소 개체 수. 높을수록 = 더 분산됨.",
+    "chainspect_data": "Chainspect에는 API가 없어서 이 값들은 2025년 9월 11일에 하드코딩되었습니다."
+  },
+  "attribution": {
+    "data_powered_by": "데이터 제공",
+    "chainspect": "Chainspect"
+  },
+  "usdt": {
+    "title": "USDT 거래 비교",
+    "transactions": "거래",
+    "daily_transactions": "일일 거래",
+    "market_share": "시장 점유율",
+    "cost_comparison": "거래 비용 비교",
+    "aptos_dominance": "Aptos는 주요 블록체인에서 USDT 거래를 지배하고 있습니다"
+  }
+}

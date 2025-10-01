@@ -1,0 +1,111 @@
+{
+  "page": {
+    "title": "Portefeuille",
+    "description": "Suivez votre portefeuille Aptos avec des données en temps réel",
+    "meta_description": "Suivez et analysez votre portefeuille Aptos avec les soldes de tokens en temps réel, positions DeFi, NFTs et historique des transactions"
+  },
+  "navigation": {
+    "overview": "Aperçu",
+    "tokens": "Tokens",
+    "defi": "DeFi",
+    "nfts": "NFTs",
+    "transactions": "Transactions",
+    "history": "Historique"
+  },
+  "landing": {
+    "track_your": "Suivez votre",
+    "aptos_portfolio": "portefeuille Aptos",
+    "track_tokens_defi_nfts": "Suivez les tokens, positions DeFi et NFTs",
+    "enter_address": "Entrez l'adresse du portefeuille",
+    "placeholder": "0x1234...abcd",
+    "analyze": "Analyser le Portefeuille",
+    "features": {
+      "real_time": "Soldes en temps réel",
+      "defi_positions": "Positions DeFi",
+      "nft_collections": "Collections NFT",
+      "transaction_history": "Historique des transactions"
+    }
+  },
+  "overview": {
+    "total_value": "Valeur Totale du Portefeuille",
+    "tokens": "Tokens",
+    "defi": "DeFi",
+    "nfts": "NFTs",
+    "24h_change": "Variation 24h",
+    "allocation": "Allocation",
+    "assets": "Actifs",
+    "collections": "Collections",
+    "positions": "Positions"
+  },
+  "tokens": {
+    "title": "Avoirs en Tokens",
+    "balance": "Solde",
+    "value": "Valeur",
+    "price": "Prix",
+    "change_24h": "Variation 24h",
+    "no_tokens": "Aucun token trouvé",
+    "loading": "Chargement des tokens..."
+  },
+  "defi": {
+    "title": "Positions DeFi",
+    "protocol": "Protocole",
+    "position": "Position",
+    "value": "Valeur",
+    "apy": "APY",
+    "no_positions": "Aucune position DeFi trouvée",
+    "loading": "Chargement des positions..."
+  },
+  "nfts": {
+    "title": "Collections NFT",
+    "collection": "Collection",
+    "items": "Articles",
+    "floor_price": "Prix Plancher",
+    "no_nfts": "Aucun NFT trouvé",
+    "loading": "Chargement des NFTs...",
+    "view_collection": "Voir la Collection"
+  },
+  "transactions": {
+    "title": "Historique des Transactions",
+    "type": "Type",
+    "amount": "Montant",
+    "timestamp": "Heure",
+    "status": "Statut",
+    "hash": "Hash",
+    "no_transactions": "Aucune transaction trouvée",
+    "loading": "Chargement des transactions...",
+    "view_explorer": "Voir dans l'Explorateur"
+  },
+  "filters": {
+    "all": "Tous",
+    "tokens": "Tokens",
+    "defi": "DeFi",
+    "nfts": "NFTs",
+    "sort_by": "Trier par",
+    "value": "Valeur",
+    "name": "Nom",
+    "recent": "Récent"
+  },
+  "actions": {
+    "refresh": "Actualiser",
+    "export": "Exporter",
+    "share": "Partager",
+    "copy_address": "Copier l'Adresse",
+    "view_details": "Voir les Détails"
+  },
+  "status": {
+    "loading": "Chargement du portefeuille...",
+    "error": "Erreur lors du chargement du portefeuille",
+    "retry": "Réessayer",
+    "no_data": "Aucune donnée disponible",
+    "invalid_address": "Adresse de portefeuille invalide"
+  },
+  "tooltips": {
+    "total_value": "Valeur totale de tous les actifs de votre portefeuille",
+    "24h_change": "Variation de prix au cours des dernières 24 heures",
+    "allocation": "Répartition des actifs par valeur",
+    "refresh": "Actualiser les données du portefeuille",
+    "export": "Exporter les données du portefeuille",
+    "share": "Partager le portefeuille",
+    "copy_address": "Copier l'adresse du portefeuille dans le presse-papiers"
+  }
+}

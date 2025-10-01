@@ -1,0 +1,62 @@
+{
+  "page": {
+    "title": "Производительность Aptos",
+    "title_vs": "Aptos против {{chains}}",
+    "description": "Сравните метрики производительности блокчейна Aptos с другими ведущими цепями"
+  },
+  "tabs": {
+    "performance": "Производительность Сети",
+    "performance_short": "Производительность",
+    "usdt": "Сравнение USDt",
+    "usdt_short": "USDt"
+  },
+  "sidebar": {
+    "compare": "Сравнить",
+    "compare_count": "Сравнить ({{count}}/3)",
+    "clear": "Очистить"
+  },
+  "metrics": {
+    "max_tps": "Макс. TPS",
+    "max_tps_100_blocks": "Макс. TPS (100 блоков)",
+    "max_tps_1_block": "Макс. TPS (1 блок)",
+    "finality": "Финальность",
+    "block_time": "Время Блока",
+    "nakamoto": "Накамото",
+    "validators": "Валидаторы"
+  },
+  "comparison": {
+    "is_better": "является",
+    "better": "лучше",
+    "same_as": "Так же как",
+    "aptos_is": "Aptos является",
+    "multiplier_better": "в {{multiplier}} раз лучше"
+  },
+  "chains": {
+    "aptos": "Aptos",
+    "ethereum": "Ethereum",
+    "solana": "Solana",
+    "bsc": "BSC",
+    "avalanche": "Avalanche",
+    "cardano": "Cardano",
+    "sui": "Sui",
+    "tron": "TRON",
+    "base": "Base",
+    "bitcoin": "Bitcoin"
+  },
+  "tooltips": {
+    "nakamoto_coefficient": "Минимальное количество сущностей, необходимых для контроля >50% ресурсов сети. Выше = более децентрализованная.",
+    "chainspect_data": "У Chainspect нет API, поэтому эти значения были жестко запрограммированы 11 сентября 2025 года."
+  },
+  "attribution": {
+    "data_powered_by": "Данные предоставлены",
+    "chainspect": "Chainspect"
+  },
+  "usdt": {
+    "title": "Сравнение Транзакций USDT",
+    "transactions": "Транзакции",
+    "daily_transactions": "Ежедневные Транзакции",
+    "market_share": "Доля Рынка",
+    "cost_comparison": "Сравнение Стоимости Транзакций",
+    "aptos_dominance": "Aptos доминирует в транзакциях USDT среди основных блокчейнов"
+  }
+}

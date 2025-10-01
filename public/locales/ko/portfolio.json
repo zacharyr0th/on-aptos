@@ -1,0 +1,111 @@
+{
+  "page": {
+    "title": "포트폴리오",
+    "description": "실시간 데이터로 Aptos 포트폴리오 추적",
+    "meta_description": "실시간 토큰 잔액, DeFi 포지션, NFT 및 거래 내역으로 Aptos 지갑 포트폴리오를 추적하고 분석하세요"
+  },
+  "navigation": {
+    "overview": "개요",
+    "tokens": "토큰",
+    "defi": "DeFi",
+    "nfts": "NFT",
+    "transactions": "거래",
+    "history": "내역"
+  },
+  "landing": {
+    "track_your": "당신의",
+    "aptos_portfolio": "Aptos 포트폴리오를 추적하세요",
+    "track_tokens_defi_nfts": "토큰, DeFi 포지션, NFT를 추적하세요",
+    "enter_address": "지갑 주소 입력",
+    "placeholder": "0x1234...abcd",
+    "analyze": "포트폴리오 분석",
+    "features": {
+      "real_time": "실시간 잔액",
+      "defi_positions": "DeFi 포지션",
+      "nft_collections": "NFT 컬렉션",
+      "transaction_history": "거래 내역"
+    }
+  },
+  "overview": {
+    "total_value": "총 포트폴리오 가치",
+    "tokens": "토큰",
+    "defi": "DeFi",
+    "nfts": "NFT",
+    "24h_change": "24시간 변동",
+    "allocation": "할당",
+    "assets": "자산",
+    "collections": "컬렉션",
+    "positions": "포지션"
+  },
+  "tokens": {
+    "title": "토큰 보유량",
+    "balance": "잔액",
+    "value": "가치",
+    "price": "가격",
+    "change_24h": "24시간 변동",
+    "no_tokens": "토큰을 찾을 수 없습니다",
+    "loading": "토큰 로딩 중..."
+  },
+  "defi": {
+    "title": "DeFi 포지션",
+    "protocol": "프로토콜",
+    "position": "포지션",
+    "value": "가치",
+    "apy": "APY",
+    "no_positions": "DeFi 포지션을 찾을 수 없습니다",
+    "loading": "포지션 로딩 중..."
+  },
+  "nfts": {
+    "title": "NFT 컬렉션",
+    "collection": "컬렉션",
+    "items": "아이템",
+    "floor_price": "플로어 프라이스",
+    "no_nfts": "NFT를 찾을 수 없습니다",
+    "loading": "NFT 로딩 중...",
+    "view_collection": "컬렉션 보기"
+  },
+  "transactions": {
+    "title": "거래 내역",
+    "type": "유형",
+    "amount": "금액",
+    "timestamp": "시간",
+    "status": "상태",
+    "hash": "해시",
+    "no_transactions": "거래를 찾을 수 없습니다",
+    "loading": "거래 로딩 중...",
+    "view_explorer": "익스플로러에서 보기"
+  },
+  "filters": {
+    "all": "전체",
+    "tokens": "토큰",
+    "defi": "DeFi",
+    "nfts": "NFT",
+    "sort_by": "정렬 기준",
+    "value": "가치",
+    "name": "이름",
+    "recent": "최근"
+  },
+  "actions": {
+    "refresh": "새로고침",
+    "export": "내보내기",
+    "share": "공유",
+    "copy_address": "주소 복사",
+    "view_details": "세부 정보 보기"
+  },
+  "status": {
+    "loading": "포트폴리오 로딩 중...",
+    "error": "포트폴리오 로딩 오류",
+    "retry": "다시 시도",
+    "no_data": "사용 가능한 데이터 없음",
+    "invalid_address": "유효하지 않은 지갑 주소"
+  },
+  "tooltips": {
+    "total_value": "포트폴리오 내 모든 자산의 총 가치",
+    "24h_change": "지난 24시간 동안의 가격 변동",
+    "allocation": "가치별 자산 분포",
+    "refresh": "포트폴리오 데이터 새로고침",
+    "export": "포트폴리오 데이터 내보내기",
+    "share": "포트폴리오 공유",
+    "copy_address": "지갑 주소를 클립보드에 복사"
+  }
+}

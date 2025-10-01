@@ -465,13 +465,12 @@ export default function TokensPage() {
         throw new Error(`Failed to fetch token data: ${response.statusText}`);
       }
 
-      const result = await response.json();
+      const data = await response.json();
 
-      if (!result.success || !result.data) {
+      if (!data.tokens) {
         throw new Error("Invalid response format from tokens API");
       }
 
-      const { data } = result;
       const { tokens, totalMarketCap, aptPrice, totalTokens, categories, distribution } = data;
 
       // Convert API data format to component format

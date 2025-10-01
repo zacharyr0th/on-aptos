@@ -22,6 +22,7 @@
     "placeholder": "Rechercher des protocoles...",
     "results": "{{count}} protocoles trouvés",
     "results_of": "sur {{total}} protocoles",
+    "showing_protocols": "Affichage de {{count}} sur {{total}} protocoles",
     "no_results": "Aucun protocole correspondant à vos critères.",
     "clear_search": "Effacer la recherche",
     "search_hint": "Rechercher par nom, catégorie ou description"

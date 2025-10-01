@@ -22,6 +22,7 @@
     "placeholder": "Bincika ka'ida...",
     "results": "An samo ka'idojin {{count}}",
     "results_of": "na {{total}} ka'idoji",
+    "showing_protocols": "Ana nuna {{count}} daga {{total}} ka'idoji",
     "no_results": "Ba a sami ka'idojin da suka dace da ma'aunin ku ba.",
     "clear_search": "Share bincike",
     "search_hint": "Bincika da suna, nau'i, ko bayanin"

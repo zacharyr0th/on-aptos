@@ -22,6 +22,7 @@
     "placeholder": "Szukaj protokołów...",
     "results": "Znaleziono {{count}} protokołów",
     "results_of": "z {{total}} protokołów",
+    "showing_protocols": "Pokazuje {{count}} z {{total}} protokołów",
     "no_results": "Nie znaleziono protokołów spełniających kryteria.",
     "clear_search": "Wyczyść wyszukiwanie",
     "search_hint": "Szukaj po nazwie, kategorii lub opisie"

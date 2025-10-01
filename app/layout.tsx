@@ -15,7 +15,6 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { WalletProvider } from "@/components/wallet/WalletProvider";
 import { APP_CONFIG, DEVELOPER_CONFIG } from "@/lib/config/app";
-import { APP_ROUTES } from "@/lib/config/routes";
 
 import "./globals.css";
 
@@ -74,8 +73,8 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
     types: {
-      "application/ld+json": APP_ROUTES.API.SEO.LLM_METADATA,
-      "text/plain": APP_ROUTES.API.SEO.LLM_README,
+      "application/ld+json": "/api/seo/llm-metadata",
+      "text/plain": "/api/seo/llm-readme",
     },
   },
   openGraph: {
@@ -217,8 +216,8 @@ export default function RootLayout({ children }: RootLayoutProps): React.ReactEl
     <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="apple-touch-icon" href="/icons/app/icon-192x192.png" />
-        <link rel="alternate" type="text/plain" href={APP_ROUTES.API.SEO.LLM_README} />
-        <link rel="alternate" type="application/ld+json" href={APP_ROUTES.API.SEO.LLM_METADATA} />
+        <link rel="alternate" type="text/plain" href="/api/seo/llm-readme" />
+        <link rel="alternate" type="application/ld+json" href="/api/seo/llm-metadata" />
         <meta name="author" content={DEVELOPER_CONFIG.name} />
         <Script
           id="structured-data"
@@ -229,7 +228,7 @@ export default function RootLayout({ children }: RootLayoutProps): React.ReactEl
           }}
         />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased bg-background text-foreground`}>
         <I18nProvider>
           <ThemeProvider
             attribute="class"

@@ -1,0 +1,111 @@
+{
+  "page": {
+    "title": "Portfolio",
+    "description": "Track your Aptos portfolio with real-time data",
+    "meta_description": "Track and check your Aptos wallet portfolio with real-time token balance, DeFi positions, NFTs and transaction history"
+  },
+  "navigation": {
+    "overview": "Overview",
+    "tokens": "Tokens",
+    "defi": "DeFi",
+    "nfts": "NFTs",
+    "transactions": "Transactions",
+    "history": "History"
+  },
+  "landing": {
+    "track_your": "Track your",
+    "aptos_portfolio": "Aptos portfolio",
+    "track_tokens_defi_nfts": "Track tokens, DeFi positions, and NFTs",
+    "enter_address": "Enter wallet address",
+    "placeholder": "0x1234...abcd",
+    "analyze": "Check Portfolio",
+    "features": {
+      "real_time": "Real-time balance",
+      "defi_positions": "DeFi positions",
+      "nft_collections": "NFT collections",
+      "transaction_history": "Transaction history"
+    }
+  },
+  "overview": {
+    "total_value": "Total Portfolio Value",
+    "tokens": "Tokens",
+    "defi": "DeFi",
+    "nfts": "NFTs",
+    "24h_change": "24h Change",
+    "allocation": "Allocation",
+    "assets": "Assets",
+    "collections": "Collections",
+    "positions": "Positions"
+  },
+  "tokens": {
+    "title": "Token Wey You Get",
+    "balance": "Balance",
+    "value": "Value",
+    "price": "Price",
+    "change_24h": "24h Change",
+    "no_tokens": "No tokens dey",
+    "loading": "Dey load tokens..."
+  },
+  "defi": {
+    "title": "DeFi Positions",
+    "protocol": "Protocol",
+    "position": "Position",
+    "value": "Value",
+    "apy": "APY",
+    "no_positions": "No DeFi positions dey",
+    "loading": "Dey load positions..."
+  },
+  "nfts": {
+    "title": "NFT Collections",
+    "collection": "Collection",
+    "items": "Items",
+    "floor_price": "Floor Price",
+    "no_nfts": "No NFTs dey",
+    "loading": "Dey load NFTs...",
+    "view_collection": "See Collection"
+  },
+  "transactions": {
+    "title": "Transaction History",
+    "type": "Type",
+    "amount": "Amount",
+    "timestamp": "Time",
+    "status": "Status",
+    "hash": "Hash",
+    "no_transactions": "No transactions dey",
+    "loading": "Dey load transactions...",
+    "view_explorer": "See for Explorer"
+  },
+  "filters": {
+    "all": "All",
+    "tokens": "Tokens",
+    "defi": "DeFi",
+    "nfts": "NFTs",
+    "sort_by": "Sort by",
+    "value": "Value",
+    "name": "Name",
+    "recent": "Recent"
+  },
+  "actions": {
+    "refresh": "Refresh",
+    "export": "Export",
+    "share": "Share",
+    "copy_address": "Copy Address",
+    "view_details": "See Details"
+  },
+  "status": {
+    "loading": "Dey load portfolio...",
+    "error": "Error for loading portfolio",
+    "retry": "Try Again",
+    "no_data": "No data dey available",
+    "invalid_address": "Invalid wallet address"
+  },
+  "tooltips": {
+    "total_value": "Total value of all assets wey dey your portfolio",
+    "24h_change": "Price change for the last 24 hours",
+    "allocation": "How assets distribute by value",
+    "refresh": "Refresh portfolio data",
+    "export": "Export portfolio data",
+    "share": "Share portfolio",
+    "copy_address": "Copy wallet address to clipboard"
+  }
+}

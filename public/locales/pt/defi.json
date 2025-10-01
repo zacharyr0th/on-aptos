@@ -20,9 +20,10 @@
   },
   "search": {
     "placeholder": "Protocolos de pesquisa ...",
-    "results": "__PlaceHolder_0__ Protocolos encontrados",
-    "results_of": "dos protocolos __PlaceHolder_0__",
-    "no_results": "Nenhum protocolo encontrou correspondência de seus critérios.",
+    "results": "{{count}} protocolos encontrados",
+    "results_of": "de {{total}} protocolos",
+    "showing_protocols": "Mostrando {{count}} de {{total}} protocolos",
+    "no_results": "Nenhum protocolo encontrado que atenda aos seus critérios.",
     "clear_search": "Pesquisa clara",
     "search_hint": "Pesquise por nome, categoria ou descrição"
   },

@@ -1,0 +1,111 @@
+{
+  "page": {
+    "title": "Portfolio",
+    "description": "Subaybayan ang inyong Aptos portfolio na may real-time na data",
+    "meta_description": "Subaybayan at suriin ang inyong Aptos wallet portfolio na may real-time na token balances, DeFi positions, NFTs, at transaction history"
+  },
+  "navigation": {
+    "overview": "Buod",
+    "tokens": "Mga Token",
+    "defi": "DeFi",
+    "nfts": "NFTs",
+    "transactions": "Mga Transaksyon",
+    "history": "Kasaysayan"
+  },
+  "landing": {
+    "track_your": "Subaybayan ang inyong",
+    "aptos_portfolio": "Aptos portfolio",
+    "track_tokens_defi_nfts": "Subaybayan ang mga token, DeFi positions, at NFTs",
+    "enter_address": "Ilagay ang wallet address",
+    "placeholder": "0x1234...abcd",
+    "analyze": "Suriin ang Portfolio",
+    "features": {
+      "real_time": "Real-time na balances",
+      "defi_positions": "DeFi positions",
+      "nft_collections": "NFT collections",
+      "transaction_history": "Transaction history"
+    }
+  },
+  "overview": {
+    "total_value": "Kabuuang Halaga ng Portfolio",
+    "tokens": "Mga Token",
+    "defi": "DeFi",
+    "nfts": "NFTs",
+    "24h_change": "Pagbabago sa 24h",
+    "allocation": "Alokasyon",
+    "assets": "Mga Asset",
+    "collections": "Mga Koleksyon",
+    "positions": "Mga Posisyon"
+  },
+  "tokens": {
+    "title": "Mga Token Holdings",
+    "balance": "Balance",
+    "value": "Halaga",
+    "price": "Presyo",
+    "change_24h": "Pagbabago sa 24h",
+    "no_tokens": "Walang nahanap na mga token",
+    "loading": "Nilo-load ang mga token..."
+  },
+  "defi": {
+    "title": "DeFi Positions",
+    "protocol": "Protocol",
+    "position": "Posisyon",
+    "value": "Halaga",
+    "apy": "APY",
+    "no_positions": "Walang nahanap na DeFi positions",
+    "loading": "Nilo-load ang mga positions..."
+  },
+  "nfts": {
+    "title": "NFT Collections",
+    "collection": "Koleksyon",
+    "items": "Mga Item",
+    "floor_price": "Floor Price",
+    "no_nfts": "Walang nahanap na NFTs",
+    "loading": "Nilo-load ang mga NFT...",
+    "view_collection": "Tingnan ang Koleksyon"
+  },
+  "transactions": {
+    "title": "Transaction History",
+    "type": "Uri",
+    "amount": "Halaga",
+    "timestamp": "Oras",
+    "status": "Status",
+    "hash": "Hash",
+    "no_transactions": "Walang nahanap na mga transaksyon",
+    "loading": "Nilo-load ang mga transaksyon...",
+    "view_explorer": "Tingnan sa Explorer"
+  },
+  "filters": {
+    "all": "Lahat",
+    "tokens": "Mga Token",
+    "defi": "DeFi",
+    "nfts": "NFTs",
+    "sort_by": "Ayusin ayon sa",
+    "value": "Halaga",
+    "name": "Pangalan",
+    "recent": "Kamakailan"
+  },
+  "actions": {
+    "refresh": "I-refresh",
+    "export": "I-export",
+    "share": "Ibahagi",
+    "copy_address": "Kopyahin ang Address",
+    "view_details": "Tingnan ang mga Detalye"
+  },
+  "status": {
+    "loading": "Nilo-load ang portfolio...",
+    "error": "May error sa pag-load ng portfolio",
+    "retry": "Subukan Ulit",
+    "no_data": "Walang available na data",
+    "invalid_address": "Hindi valid na wallet address"
+  },
+  "tooltips": {
+    "total_value": "Kabuuang halaga ng lahat ng assets sa inyong portfolio",
+    "24h_change": "Pagbabago ng presyo sa nakaraang 24 oras",
+    "allocation": "Distribusyon ng mga assets ayon sa halaga",
+    "refresh": "I-refresh ang portfolio data",
+    "export": "I-export ang portfolio data",
+    "share": "Ibahagi ang portfolio",
+    "copy_address": "Kopyahin ang wallet address sa clipboard"
+  }
+}

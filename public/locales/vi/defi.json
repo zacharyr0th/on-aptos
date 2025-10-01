@@ -22,6 +22,7 @@
     "placeholder": "Tìm kiếm giao thức...",
     "results": "Tìm thấy {{count}} giao thức",
     "results_of": "trong tổng số {{total}} giao thức",
+    "showing_protocols": "Đang hiển thị {{count}} trong {{total}} giao thức",
     "no_results": "Không tìm thấy giao thức nào phù hợp với tiêu chí của bạn.",
     "clear_search": "Xóa tìm kiếm",
     "search_hint": "Tìm kiếm theo tên, danh mục hoặc mô tả"

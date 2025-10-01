@@ -1,5 +1,4 @@
 import type { MetadataRoute } from "next";
-import { PWA_SHORTCUTS } from "@/lib/config/routes";
 
 // Force Node.js runtime instead of edge runtime
 export const runtime = "nodejs";
@@ -41,7 +40,28 @@ export default function manifest(): MetadataRoute.Manifest {
         purpose: "maskable",
       },
     ],
-    shortcuts: PWA_SHORTCUTS as any,
+    shortcuts: [
+      {
+        name: "DeFi",
+        url: "/protocols/defi",
+        icons: [{ src: "/icons/defi.png", sizes: "192x192", type: "image/png" }],
+      },
+      {
+        name: "Bitcoin",
+        url: "/markets/bitcoin",
+        icons: [{ src: "/icons/bitcoin.png", sizes: "192x192", type: "image/png" }],
+      },
+      {
+        name: "Stablecoins",
+        url: "/markets/stables",
+        icons: [{ src: "/icons/stablecoins.png", sizes: "192x192", type: "image/png" }],
+      },
+      {
+        name: "RWAs",
+        url: "/markets/rwas",
+        icons: [{ src: "/icons/rwas.png", sizes: "192x192", type: "image/png" }],
+      },
+    ],
     screenshots: [
       {
         src: "/screenshots/screenshot-1.png",

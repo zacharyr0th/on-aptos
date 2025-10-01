@@ -219,7 +219,10 @@
       "powered_by": "Поддерживается",
       "built_by": "Создано",
       "complete": "Полный",
-      "subtitle_desc": "Отслеживайте все свои активы, позиции DeFi и NFT в реальном времени во всей экосистеме Aptos"
+      "subtitle_desc": "Отслеживайте все свои активы, позиции DeFi и NFT в реальном времени во всей экосистеме Aptos",
+      "track_your": "Отслеживайте ваш",
+      "aptos_portfolio": "портфель Aptos",
+      "track_tokens_defi_nfts": "Отслеживайте токены, позиции DeFi и NFT"
     },
     "features": {
       "title": "Отслеживание портфеля",

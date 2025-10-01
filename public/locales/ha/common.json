@@ -219,7 +219,10 @@
       "powered_by": "An yi ta",
       "built_by": "An gina ta",
       "complete": "Cikakkiyar",
-      "subtitle_desc": "Kula duk kadarorinka, matsayinka na DeFi, da NFTs a lokaci gaskiya a cikin tsarin Aptos"
+      "subtitle_desc": "Kula duk kadarorinka, matsayinka na DeFi, da NFTs a lokaci gaskiya a cikin tsarin Aptos",
+      "track_your": "Bi",
+      "aptos_portfolio": "portfolio ɗin ku na Aptos",
+      "track_tokens_defi_nfts": "Bi tokens, matsayinka na DeFi, da NFTs"
     },
     "features": {
       "title": "Bin Portfolio",

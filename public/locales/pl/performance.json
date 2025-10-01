@@ -1,0 +1,62 @@
+{
+  "page": {
+    "title": "Wydajność Aptos",
+    "title_vs": "Aptos vs {{chains}}",
+    "description": "Porównaj metryki wydajności blockchain Aptos z innymi wiodącymi sieciami"
+  },
+  "tabs": {
+    "performance": "Wydajność Sieci",
+    "performance_short": "Wydajność",
+    "usdt": "Porównanie USDt",
+    "usdt_short": "USDt"
+  },
+  "sidebar": {
+    "compare": "Porównaj",
+    "compare_count": "Porównaj ({{count}}/3)",
+    "clear": "Wyczyść"
+  },
+  "metrics": {
+    "max_tps": "Maks. TPS",
+    "max_tps_100_blocks": "Maks. TPS (100 bloków)",
+    "max_tps_1_block": "Maks. TPS (1 blok)",
+    "finality": "Finalizacja",
+    "block_time": "Czas Bloku",
+    "nakamoto": "Nakamoto",
+    "validators": "Walidatory"
+  },
+  "comparison": {
+    "is_better": "jest",
+    "better": "lepszy",
+    "same_as": "Taki sam jak",
+    "aptos_is": "Aptos jest",
+    "multiplier_better": "{{multiplier}} lepszy"
+  },
+  "chains": {
+    "aptos": "Aptos",
+    "ethereum": "Ethereum",
+    "solana": "Solana",
+    "bsc": "BSC",
+    "avalanche": "Avalanche",
+    "cardano": "Cardano",
+    "sui": "Sui",
+    "tron": "TRON",
+    "base": "Base",
+    "bitcoin": "Bitcoin"
+  },
+  "tooltips": {
+    "nakamoto_coefficient": "Minimalna liczba podmiotów potrzebnych do kontroli >50% zasobów sieciowych. Wyższy = bardziej zdecentralizowany.",
+    "chainspect_data": "Chainspect nie ma API, więc te wartości zostały zakodowane na stałe 11 września 2025 roku."
+  },
+  "attribution": {
+    "data_powered_by": "Dane dostarczone przez",
+    "chainspect": "Chainspect"
+  },
+  "usdt": {
+    "title": "Porównanie Transakcji USDT",
+    "transactions": "Transakcje",
+    "daily_transactions": "Transakcje Dzienne",
+    "market_share": "Udział w Rynku",
+    "cost_comparison": "Porównanie Kosztów Transakcji",
+    "aptos_dominance": "Aptos dominuje w transakcjach USDT wśród głównych blockchainów"
+  }
+}

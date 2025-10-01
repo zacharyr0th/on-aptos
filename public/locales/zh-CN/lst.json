@@ -1,23 +1,23 @@
 {
   "page": {
-    "title": "LSTs on Aptos",
-    "description": "Liquid Staking Tokens on Aptos blockchain"
+    "title": "Aptos 上的 LST",
+    "description": "Aptos 区块链上的流动性质押代币"
   },
   "stats": {
-    "total_lst_value": "Total LST Value",
-    "liquid_staking_tokens": "Liquid Staking Tokens",
-    "market_share": "Market Share",
-    "apr": "APR",
-    "staked_apt": "Staked APT",
-    "validators": "Validators",
-    "total_stakers": "Total Stakers",
-    "average_apr": "Average APR"
+    "total_lst_value": "总 LST 价值",
+    "liquid_staking_tokens": "流动性质押代币",
+    "market_share": "市场份额",
+    "apr": "年化收益率",
+    "staked_apt": "已质押 APT",
+    "validators": "验证者",
+    "total_stakers": "总质押者",
+    "average_apr": "平均年化收益率"
   },
   "providers": {
-    "all": "All",
+    "all": "全部",
     "amnis": "Amnis Finance",
     "thala": "Thala Labs",
-    "other": "Other"
+    "other": "其他"
   },
   "table": {
     "token": "Token",

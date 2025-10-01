@@ -1,0 +1,111 @@
+{
+  "page": {
+    "title": "Portafolio",
+    "description": "Rastrea tu portafolio de Aptos con datos en tiempo real",
+    "meta_description": "Rastrea y analiza tu portafolio de billetera Aptos con balances de tokens en tiempo real, posiciones DeFi, NFTs e historial de transacciones"
+  },
+  "navigation": {
+    "overview": "Resumen",
+    "tokens": "Tokens",
+    "defi": "DeFi",
+    "nfts": "NFTs",
+    "transactions": "Transacciones",
+    "history": "Historial"
+  },
+  "landing": {
+    "track_your": "Rastrea tu",
+    "aptos_portfolio": "portafolio de Aptos",
+    "track_tokens_defi_nfts": "Rastrea tokens, posiciones DeFi y NFTs",
+    "enter_address": "Ingresa dirección de billetera",
+    "placeholder": "0x1234...abcd",
+    "analyze": "Analizar Portafolio",
+    "features": {
+      "real_time": "Balances en tiempo real",
+      "defi_positions": "Posiciones DeFi",
+      "nft_collections": "Colecciones NFT",
+      "transaction_history": "Historial de transacciones"
+    }
+  },
+  "overview": {
+    "total_value": "Valor Total del Portafolio",
+    "tokens": "Tokens",
+    "defi": "DeFi",
+    "nfts": "NFTs",
+    "24h_change": "Cambio 24h",
+    "allocation": "Asignación",
+    "assets": "Activos",
+    "collections": "Colecciones",
+    "positions": "Posiciones"
+  },
+  "tokens": {
+    "title": "Tenencias de Tokens",
+    "balance": "Balance",
+    "value": "Valor",
+    "price": "Precio",
+    "change_24h": "Cambio 24h",
+    "no_tokens": "No se encontraron tokens",
+    "loading": "Cargando tokens..."
+  },
+  "defi": {
+    "title": "Posiciones DeFi",
+    "protocol": "Protocolo",
+    "position": "Posición",
+    "value": "Valor",
+    "apy": "APY",
+    "no_positions": "No se encontraron posiciones DeFi",
+    "loading": "Cargando posiciones..."
+  },
+  "nfts": {
+    "title": "Colecciones NFT",
+    "collection": "Colección",
+    "items": "Artículos",
+    "floor_price": "Precio Mínimo",
+    "no_nfts": "No se encontraron NFTs",
+    "loading": "Cargando NFTs...",
+    "view_collection": "Ver Colección"
+  },
+  "transactions": {
+    "title": "Historial de Transacciones",
+    "type": "Tipo",
+    "amount": "Cantidad",
+    "timestamp": "Hora",
+    "status": "Estado",
+    "hash": "Hash",
+    "no_transactions": "No se encontraron transacciones",
+    "loading": "Cargando transacciones...",
+    "view_explorer": "Ver en Explorador"
+  },
+  "filters": {
+    "all": "Todos",
+    "tokens": "Tokens",
+    "defi": "DeFi",
+    "nfts": "NFTs",
+    "sort_by": "Ordenar por",
+    "value": "Valor",
+    "name": "Nombre",
+    "recent": "Reciente"
+  },
+  "actions": {
+    "refresh": "Actualizar",
+    "export": "Exportar",
+    "share": "Compartir",
+    "copy_address": "Copiar Dirección",
+    "view_details": "Ver Detalles"
+  },
+  "status": {
+    "loading": "Cargando portafolio...",
+    "error": "Error cargando portafolio",
+    "retry": "Reintentar",
+    "no_data": "No hay datos disponibles",
+    "invalid_address": "Dirección de billetera inválida"
+  },
+  "tooltips": {
+    "total_value": "Valor total de todos los activos en tu portafolio",
+    "24h_change": "Cambio de precio en las últimas 24 horas",
+    "allocation": "Distribución de activos por valor",
+    "refresh": "Actualizar datos del portafolio",
+    "export": "Exportar datos del portafolio",
+    "share": "Compartir portafolio",
+    "copy_address": "Copiar dirección de billetera al portapapeles"
+  }
+}

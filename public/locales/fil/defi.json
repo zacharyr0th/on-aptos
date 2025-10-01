@@ -22,6 +22,7 @@
     "placeholder": "Maghanap ng mga protocol...",
     "results": "{{count}} protocol ang nahanap",
     "results_of": "ng {{total}} mga protocol",
+    "showing_protocols": "Pinapakita ang {{count}} sa {{total}} mga protocol",
     "no_results": "Walang nahanap na protocol na tumutugma sa iyong criteria.",
     "clear_search": "I-clear ang paghahanap",
     "search_hint": "Maghanap ayon sa pangalan, kategorya, o paglalarawan"

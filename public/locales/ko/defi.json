@@ -22,6 +22,7 @@
     "placeholder": "프로토콜 검색...",
     "results": "{{count}}개 프로토콜 발견",
     "results_of": "총 {{total}}개 프로토콜 중",
+    "showing_protocols": "{{total}}개 중 {{count}}개 프로토콜 표시",
     "no_results": "검색 조건에 맞는 프로토콜이 없습니다.",
     "clear_search": "검색 초기화",
     "search_hint": "이름, 카테고리 또는 설명으로 검색"

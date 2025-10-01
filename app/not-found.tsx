@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { APP_ROUTES } from "@/lib/config/routes";
 
 export default function NotFound() {
   return (
@@ -12,13 +11,13 @@ export default function NotFound() {
       </p>
       <div className="flex gap-4 mt-4">
         <Link
-          href={APP_ROUTES.HOME}
+          href="/"
           className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
         >
           Home
         </Link>
         <Link
-          href={APP_ROUTES.TOOLS.PORTFOLIO}
+          href="/tools/portfolio"
           className="px-4 py-2 border border-border rounded-md hover:bg-muted transition-colors"
         >
           Portfolio

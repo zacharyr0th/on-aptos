@@ -1,0 +1,111 @@
+{
+  "page": {
+    "title": "المحفظة",
+    "description": "تتبع محفظة Aptos الخاصة بك مع البيانات الفورية",
+    "meta_description": "تتبع وحلل محفظة Aptos الخاصة بك مع أرصدة الرموز المميزة الفورية ومواضع DeFi و NFTs وتاريخ المعاملات"
+  },
+  "navigation": {
+    "overview": "نظرة عامة",
+    "tokens": "الرموز المميزة",
+    "defi": "DeFi",
+    "nfts": "NFTs",
+    "transactions": "المعاملات",
+    "history": "التاريخ"
+  },
+  "landing": {
+    "track_your": "تتبع",
+    "aptos_portfolio": "محفظة Aptos الخاصة بك",
+    "track_tokens_defi_nfts": "تتبع الرموز المميزة ومواضع DeFi و NFTs",
+    "enter_address": "أدخل عنوان المحفظة",
+    "placeholder": "0x1234...abcd",
+    "analyze": "تحليل المحفظة",
+    "features": {
+      "real_time": "الأرصدة الفورية",
+      "defi_positions": "مواضع DeFi",
+      "nft_collections": "مجموعات NFT",
+      "transaction_history": "تاريخ المعاملات"
+    }
+  },
+  "overview": {
+    "total_value": "إجمالي قيمة المحفظة",
+    "tokens": "الرموز المميزة",
+    "defi": "DeFi",
+    "nfts": "NFTs",
+    "24h_change": "تغيير 24 ساعة",
+    "allocation": "التوزيع",
+    "assets": "الأصول",
+    "collections": "المجموعات",
+    "positions": "المواضع"
+  },
+  "tokens": {
+    "title": "حيازات الرموز المميزة",
+    "balance": "الرصيد",
+    "value": "القيمة",
+    "price": "السعر",
+    "change_24h": "تغيير 24 ساعة",
+    "no_tokens": "لم يتم العثور على رموز مميزة",
+    "loading": "جاري تحميل الرموز المميزة..."
+  },
+  "defi": {
+    "title": "مواضع DeFi",
+    "protocol": "البروتوكول",
+    "position": "الموضع",
+    "value": "القيمة",
+    "apy": "APY",
+    "no_positions": "لم يتم العثور على مواضع DeFi",
+    "loading": "جاري تحميل المواضع..."
+  },
+  "nfts": {
+    "title": "مجموعات NFT",
+    "collection": "المجموعة",
+    "items": "العناصر",
+    "floor_price": "السعر الأدنى",
+    "no_nfts": "لم يتم العثور على NFTs",
+    "loading": "جاري تحميل NFTs...",
+    "view_collection": "عرض المجموعة"
+  },
+  "transactions": {
+    "title": "تاريخ المعاملات",
+    "type": "النوع",
+    "amount": "المبلغ",
+    "timestamp": "الوقت",
+    "status": "الحالة",
+    "hash": "الهاش",
+    "no_transactions": "لم يتم العثور على معاملات",
+    "loading": "جاري تحميل المعاملات...",
+    "view_explorer": "عرض في المستكشف"
+  },
+  "filters": {
+    "all": "الكل",
+    "tokens": "الرموز المميزة",
+    "defi": "DeFi",
+    "nfts": "NFTs",
+    "sort_by": "ترتيب حسب",
+    "value": "القيمة",
+    "name": "الاسم",
+    "recent": "الأحدث"
+  },
+  "actions": {
+    "refresh": "تحديث",
+    "export": "تصدير",
+    "share": "مشاركة",
+    "copy_address": "نسخ العنوان",
+    "view_details": "عرض التفاصيل"
+  },
+  "status": {
+    "loading": "جاري تحميل المحفظة...",
+    "error": "خطأ في تحميل المحفظة",
+    "retry": "إعادة المحاولة",
+    "no_data": "لا توجد بيانات متاحة",
+    "invalid_address": "عنوان محفظة غير صحيح"
+  },
+  "tooltips": {
+    "total_value": "إجمالي قيمة جميع الأصول في محفظتك",
+    "24h_change": "تغيير السعر في آخر 24 ساعة",
+    "allocation": "توزيع الأصول حسب القيمة",
+    "refresh": "تحديث بيانات المحفظة",
+    "export": "تصدير بيانات المحفظة",
+    "share": "مشاركة المحفظة",
+    "copy_address": "نسخ عنوان المحفظة إلى الحافظة"
+  }
+}

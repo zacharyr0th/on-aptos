@@ -1,0 +1,111 @@
+{
+  "page": {
+    "title": "Portfolio",
+    "description": "Verfolgen Sie Ihr Aptos-Portfolio mit Echtzeitdaten",
+    "meta_description": "Verfolgen und analysieren Sie Ihr Aptos-Wallet-Portfolio mit Echtzeit-Token-Salden, DeFi-Positionen, NFTs und Transaktionsverlauf"
+  },
+  "navigation": {
+    "overview": "Übersicht",
+    "tokens": "Token",
+    "defi": "DeFi",
+    "nfts": "NFTs",
+    "transactions": "Transaktionen",
+    "history": "Verlauf"
+  },
+  "landing": {
+    "track_your": "Verfolgen Sie Ihr",
+    "aptos_portfolio": "Aptos-Portfolio",
+    "track_tokens_defi_nfts": "Verfolgen Sie Token, DeFi-Positionen und NFTs",
+    "enter_address": "Wallet-Adresse eingeben",
+    "placeholder": "0x1234...abcd",
+    "analyze": "Portfolio analysieren",
+    "features": {
+      "real_time": "Echtzeit-Salden",
+      "defi_positions": "DeFi-Positionen",
+      "nft_collections": "NFT-Sammlungen",
+      "transaction_history": "Transaktionsverlauf"
+    }
+  },
+  "overview": {
+    "total_value": "Gesamter Portfolio-Wert",
+    "tokens": "Token",
+    "defi": "DeFi",
+    "nfts": "NFTs",
+    "24h_change": "24h-Änderung",
+    "allocation": "Allokation",
+    "assets": "Vermögenswerte",
+    "collections": "Sammlungen",
+    "positions": "Positionen"
+  },
+  "tokens": {
+    "title": "Token-Bestände",
+    "balance": "Saldo",
+    "value": "Wert",
+    "price": "Preis",
+    "change_24h": "24h-Änderung",
+    "no_tokens": "Keine Token gefunden",
+    "loading": "Token werden geladen..."
+  },
+  "defi": {
+    "title": "DeFi-Positionen",
+    "protocol": "Protokoll",
+    "position": "Position",
+    "value": "Wert",
+    "apy": "APY",
+    "no_positions": "Keine DeFi-Positionen gefunden",
+    "loading": "Positionen werden geladen..."
+  },
+  "nfts": {
+    "title": "NFT-Sammlungen",
+    "collection": "Sammlung",
+    "items": "Artikel",
+    "floor_price": "Mindestpreis",
+    "no_nfts": "Keine NFTs gefunden",
+    "loading": "NFTs werden geladen...",
+    "view_collection": "Sammlung anzeigen"
+  },
+  "transactions": {
+    "title": "Transaktionsverlauf",
+    "type": "Typ",
+    "amount": "Betrag",
+    "timestamp": "Zeit",
+    "status": "Status",
+    "hash": "Hash",
+    "no_transactions": "Keine Transaktionen gefunden",
+    "loading": "Transaktionen werden geladen...",
+    "view_explorer": "Im Explorer anzeigen"
+  },
+  "filters": {
+    "all": "Alle",
+    "tokens": "Token",
+    "defi": "DeFi",
+    "nfts": "NFTs",
+    "sort_by": "Sortieren nach",
+    "value": "Wert",
+    "name": "Name",
+    "recent": "Neueste"
+  },
+  "actions": {
+    "refresh": "Aktualisieren",
+    "export": "Exportieren",
+    "share": "Teilen",
+    "copy_address": "Adresse kopieren",
+    "view_details": "Details anzeigen"
+  },
+  "status": {
+    "loading": "Portfolio wird geladen...",
+    "error": "Fehler beim Laden des Portfolios",
+    "retry": "Wiederholen",
+    "no_data": "Keine Daten verfügbar",
+    "invalid_address": "Ungültige Wallet-Adresse"
+  },
+  "tooltips": {
+    "total_value": "Gesamtwert aller Vermögenswerte in Ihrem Portfolio",
+    "24h_change": "Preisänderung in den letzten 24 Stunden",
+    "allocation": "Verteilung der Vermögenswerte nach Wert",
+    "refresh": "Portfolio-Daten aktualisieren",
+    "export": "Portfolio-Daten exportieren",
+    "share": "Portfolio teilen",
+    "copy_address": "Wallet-Adresse in die Zwischenablage kopieren"
+  }
+}

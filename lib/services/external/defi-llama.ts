@@ -723,38 +723,46 @@ class DeFiLlamaService extends BaseAssetService {
 
     return DeFiLlamaService.getCachedOrFetch(cacheKey, async () => {
       try {
-        const [chainData, volumeData, feesData] = await Promise.allSettled([
-          DeFiLlamaService.getAptosChainData(),
-          DeFiLlamaService.getAptosVolumeData(),
-          DeFiLlamaService.getAptosFeesData(),
-        ]);
+        // Use API route to avoid CORS issues
+        const response = await fetch("/api/defi/metrics");
+        
+        if (!response.ok) {
+          // Fallback to direct API calls (for server-side rendering)
+          const [chainData, volumeData, feesData] = await Promise.allSettled([
+            DeFiLlamaService.getAptosChainData(),
+            DeFiLlamaService.getAptosVolumeData(),
+            DeFiLlamaService.getAptosFeesData(),
+          ]);
 
-        const tvlResult = chainData.status === "fulfilled" ? chainData.value : null;
-        const volResult = volumeData.status === "fulfilled" ? volumeData.value : null;
-        const feesResult = feesData.status === "fulfilled" ? feesData.value : null;
+          const tvlResult = chainData.status === "fulfilled" ? chainData.value : null;
+          const volResult = volumeData.status === "fulfilled" ? volumeData.value : null;
+          const feesResult = feesData.status === "fulfilled" ? feesData.value : null;
 
-        if (!tvlResult && !volResult && !feesResult) {
-          return null;
+          if (!tvlResult && !volResult && !feesResult) {
+            return null;
+          }
+
+          return {
+            tvl: tvlResult?.tvl || 0,
+            tvlChange24h: tvlResult?.change24h,
+            tvlChange7d: tvlResult?.change7d,
+            spotVolume: volResult?.volume24h || 0,
+            volumeChange24h: volResult?.change24h,
+            fees: {
+              total24h: feesResult?.fees24h || 0,
+              change24h: feesResult?.change24h,
+            },
+            protocols: 0,
+            lastUpdated: new Date().toISOString(),
+          };
         }
 
-        const metrics: AptosDefiMetrics = {
-          tvl: tvlResult?.tvl || 0,
-          tvlChange24h: tvlResult?.change24h,
-          tvlChange7d: tvlResult?.change7d,
-          spotVolume: volResult?.volume24h || 0,
-          volumeChange24h: volResult?.change24h,
-          fees: {
-            total24h: feesResult?.fees24h || 0,
-            change24h: feesResult?.change24h,
-          },
-          protocols: 0, // Will be updated from protocols endpoint
-          lastUpdated: new Date().toISOString(),
-        };
-
-        serviceLogger.debug("DeFi metrics compiled:", {
-          tvlChange: tvlResult?.change24h,
-          volumeChange: volResult?.change24h,
-          feesChange: feesResult?.change24h,
+        const metrics = await response.json();
+        
+        serviceLogger.debug("DeFi metrics fetched from API route:", {
+          tvl: metrics.tvl,
+          volume: metrics.spotVolume,
+          fees: metrics.fees?.total24h,
         });
 
         return metrics;

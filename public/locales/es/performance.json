@@ -1,0 +1,62 @@
+{
+  "page": {
+    "title": "Rendimiento de Aptos",
+    "title_vs": "Aptos vs {{chains}}",
+    "description": "Compara las métricas de rendimiento de la blockchain Aptos con otras cadenas líderes"
+  },
+  "tabs": {
+    "performance": "Rendimiento de Cadena",
+    "performance_short": "Rendimiento",
+    "usdt": "Comparación USDt",
+    "usdt_short": "USDt"
+  },
+  "sidebar": {
+    "compare": "Comparar",
+    "compare_count": "Comparar ({{count}}/3)",
+    "clear": "Limpiar"
+  },
+  "metrics": {
+    "max_tps": "TPS Máx",
+    "max_tps_100_blocks": "TPS Máx (100 bloques)",
+    "max_tps_1_block": "TPS Máx (1 bloque)",
+    "finality": "Finalidad",
+    "block_time": "Tiempo de Bloque",
+    "nakamoto": "Nakamoto",
+    "validators": "Validadores"
+  },
+  "comparison": {
+    "is_better": "es",
+    "better": "mejor",
+    "same_as": "Igual que",
+    "aptos_is": "Aptos es",
+    "multiplier_better": "{{multiplier}} mejor"
+  },
+  "chains": {
+    "aptos": "Aptos",
+    "ethereum": "Ethereum",
+    "solana": "Solana",
+    "bsc": "BSC",
+    "avalanche": "Avalanche", 
+    "cardano": "Cardano",
+    "sui": "Sui",
+    "tron": "TRON",
+    "base": "Base",
+    "bitcoin": "Bitcoin"
+  },
+  "tooltips": {
+    "nakamoto_coefficient": "Entidades mínimas necesarias para controlar >50% de los recursos de la red. Mayor = más descentralizado.",
+    "chainspect_data": "Chainspect no tiene una API, por lo que estos valores se codificaron el 11 de septiembre de 2025."
+  },
+  "attribution": {
+    "data_powered_by": "Datos proporcionados por",
+    "chainspect": "Chainspect"
+  },
+  "usdt": {
+    "title": "Comparación de Transacciones USDT",
+    "transactions": "Transacciones",
+    "daily_transactions": "Transacciones Diarias",
+    "market_share": "Participación de Mercado",
+    "cost_comparison": "Comparación de Costos de Transacción",
+    "aptos_dominance": "Aptos domina las transacciones USDT en las principales blockchains"
+  }
+}

@@ -465,28 +465,60 @@ async function calculateMarketCaps(
       };
     }
 
-    // If fetchAll is true, process all tokens
-    const selectedTokens = tokens;
-    const addresses = selectedTokens
+    // If fetchAll is true, process tokens up to limit
+    // For performance, only fetch metadata for the first batch
+    const metadataLimit = 600;
+    const tokensForMetadata = tokens.slice(0, metadataLimit);
+    const addresses = tokensForMetadata
       .map((t) => t.faAddress || t.tokenAddress)
       .filter(Boolean) as string[];
     const metadataMap = await fetchTokenMetadata(addresses);
-    const processedTokens = await processTokensBatch(selectedTokens, metadataMap);
+    
+    // Process tokens with metadata
+    const tokensWithMetadata = await processTokensBatch(tokensForMetadata, metadataMap);
+    
+    // For remaining tokens, just use basic data without supply/FDV
+    const remainingTokens = tokens.slice(metadataLimit, offset + limit).map((token, index) =>
+      createTokenMarketData(
+        token,
+        token.usdPrice ? parseFloat(token.usdPrice) : 0,
+        undefined, // No supply data for these
+        metadataLimit + index + 1
+      )
+    );
+    
+    // Combine all tokens
+    const allProcessedTokens = [...tokensWithMetadata, ...remainingTokens];
+    
+    // Sort by FDV/market cap descending
+    allProcessedTokens.sort((a, b) => {
+      // First, sort by verification status (verified tokens first)
+      if (a.isVerified && !b.isVerified) return -1;
+      if (!a.isVerified && b.isVerified) return 1;
+      
+      // Then sort by FDV within each group
+      const aFdv = a.fullyDilutedValuation || a.marketCap || 0;
+      const bFdv = b.fullyDilutedValuation || b.marketCap || 0;
+      return bFdv - aFdv;
+    });
+    
+    // Apply pagination after sorting
+    const processedTokens = allProcessedTokens.slice(offset, offset + limit);
 
-    // Calculate totals and distribution
-    const totalMarketCap = processedTokens.reduce((sum, t) => sum + (t.marketCap || 0), 0);
+    // Calculate totals and distribution using all processed tokens for accurate stats
+    const totalMarketCap = allProcessedTokens.reduce((sum, t) => sum + (t.marketCap || 0), 0);
 
-    const aptToken = processedTokens.find((t) => t.symbol === "APT");
+    const aptToken = allProcessedTokens.find((t) => t.symbol === "APT");
     const aptPrice = aptToken?.price ? parseFloat(aptToken.price) : 0;
 
     const categories = {
-      native: processedTokens.filter((t) => t.category === "native").length,
-      meme: processedTokens.filter((t) => t.category === "meme").length,
-      bridged: processedTokens.filter((t) => t.category === "bridged").length,
-      other: processedTokens.filter((t) => t.category === "other").length,
+      native: allProcessedTokens.filter((t) => t.category === "native").length,
+      meme: allProcessedTokens.filter((t) => t.category === "meme").length,
+      bridged: allProcessedTokens.filter((t) => t.category === "bridged").length,
+      other: allProcessedTokens.filter((t) => t.category === "other").length,
     };
 
-    const distribution = calculateDistribution(processedTokens);
+    const distribution = calculateDistribution(allProcessedTokens);
 
     return {
       tokens: processedTokens,
@@ -543,10 +575,7 @@ async function handleTokensRequest(request: NextRequest) {
     tokenCache.set(cacheKey, data);
 
     return successResponse(
-      {
-        success: true,
-        data,
-      },
+      data,
       CACHE_DURATIONS.MEDIUM,
       {
         "X-Total-Tokens": data.totalTokens.toString(),

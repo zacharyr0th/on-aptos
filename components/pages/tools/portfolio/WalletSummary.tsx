@@ -6,6 +6,7 @@ import React, { lazy, Suspense, useCallback, useMemo } from "react";
 import { LoadingSkeleton, NFTTreemapSkeleton } from "@/components/shared/pages";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/utils/format";
+import { logger } from "@/lib/utils/core/logger";
 import {
   CHART_COLORS_DARK,
   CHART_COLORS_LIGHT,
@@ -125,7 +126,7 @@ export const WalletSummary: React.FC<WalletSummaryProps> = ({
   // Optimized calculations with single pass
   const { portfolioMetrics, calculatedTotalValue, allAssetsData, legendData, nftStats } =
     useMemo(() => {
-      console.log("[WalletSummary] Calculating with:", {
+      logger.debug("[WalletSummary] Calculating with:", {
         assetsLength: assets.length,
         defiPositionsLength: defiPositions.length,
         nftTotalValue,
@@ -235,7 +236,6 @@ export const WalletSummary: React.FC<WalletSummaryProps> = ({
               </Suspense>
             ) : (
               <>
-                {console.log("[WalletSummary] Showing EmptyChart because allAssetsData is empty")}
                 <EmptyChart />
               </>
             )}
@@ -272,7 +272,7 @@ export const WalletSummary: React.FC<WalletSummaryProps> = ({
         </div>
       </div>
 
-      <div className="border-b-2 border-border/50" />
+      <div className="border-b" />
 
       {nftsLoading ? (
         <NFTTreemapSkeleton />

@@ -1,0 +1,111 @@
+{
+  "page": {
+    "title": "Портфолио",
+    "description": "Отслеживайте свой Aptos портфолио с данными в реальном времени",
+    "meta_description": "Отслеживайте и анализируйте свой Aptos кошелек портфолио с балансами токенов в реальном времени, DeFi позициями, NFT и историей транзакций"
+  },
+  "navigation": {
+    "overview": "Обзор",
+    "tokens": "Токены",
+    "defi": "DeFi",
+    "nfts": "NFT",
+    "transactions": "Транзакции",
+    "history": "История"
+  },
+  "landing": {
+    "track_your": "Отслеживайте свой",
+    "aptos_portfolio": "Aptos портфолио",
+    "track_tokens_defi_nfts": "Отслеживайте токены, DeFi позиции и NFT",
+    "enter_address": "Введите адрес кошелька",
+    "placeholder": "0x1234...abcd",
+    "analyze": "Анализировать Портфолио",
+    "features": {
+      "real_time": "Балансы в реальном времени",
+      "defi_positions": "DeFi позиции",
+      "nft_collections": "NFT коллекции",
+      "transaction_history": "История транзакций"
+    }
+  },
+  "overview": {
+    "total_value": "Общая Стоимость Портфолио",
+    "tokens": "Токены",
+    "defi": "DeFi",
+    "nfts": "NFT",
+    "24h_change": "Изменение за 24ч",
+    "allocation": "Распределение",
+    "assets": "Активы",
+    "collections": "Коллекции",
+    "positions": "Позиции"
+  },
+  "tokens": {
+    "title": "Токеновые Активы",
+    "balance": "Баланс",
+    "value": "Стоимость",
+    "price": "Цена",
+    "change_24h": "Изменение за 24ч",
+    "no_tokens": "Токены не найдены",
+    "loading": "Загружаем токены..."
+  },
+  "defi": {
+    "title": "DeFi Позиции",
+    "protocol": "Протокол",
+    "position": "Позиция",
+    "value": "Стоимость",
+    "apy": "APY",
+    "no_positions": "DeFi позиции не найдены",
+    "loading": "Загружаем позиции..."
+  },
+  "nfts": {
+    "title": "NFT Коллекции",
+    "collection": "Коллекция",
+    "items": "Предметы",
+    "floor_price": "Минимальная Цена",
+    "no_nfts": "NFT не найдены",
+    "loading": "Загружаем NFT...",
+    "view_collection": "Посмотреть Коллекцию"
+  },
+  "transactions": {
+    "title": "История Транзакций",
+    "type": "Тип",
+    "amount": "Сумма",
+    "timestamp": "Время",
+    "status": "Статус",
+    "hash": "Хеш",
+    "no_transactions": "Транзакции не найдены",
+    "loading": "Загружаем транзакции...",
+    "view_explorer": "Посмотреть в Проводнике"
+  },
+  "filters": {
+    "all": "Все",
+    "tokens": "Токены",
+    "defi": "DeFi",
+    "nfts": "NFT",
+    "sort_by": "Сортировать по",
+    "value": "Стоимость",
+    "name": "Имя",
+    "recent": "Недавние"
+  },
+  "actions": {
+    "refresh": "Обновить",
+    "export": "Экспорт",
+    "share": "Поделиться",
+    "copy_address": "Копировать Адрес",
+    "view_details": "Посмотреть Детали"
+  },
+  "status": {
+    "loading": "Загружаем портфолио...",
+    "error": "Ошибка загрузки портфолио",
+    "retry": "Повторить",
+    "no_data": "Данные недоступны",
+    "invalid_address": "Неверный адрес кошелька"
+  },
+  "tooltips": {
+    "total_value": "Общая стоимость всех активов в вашем портфолио",
+    "24h_change": "Изменение цены за последние 24 часа",
+    "allocation": "Распределение активов по стоимости",
+    "refresh": "Обновить данные портфолио",
+    "export": "Экспортировать данные портфолио",
+    "share": "Поделиться портфолио",
+    "copy_address": "Копировать адрес кошелька в буфер обмена"
+  }
+}

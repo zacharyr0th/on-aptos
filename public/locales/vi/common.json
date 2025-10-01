@@ -219,7 +219,10 @@
       "powered_by": "Được hỗ trợ bởi",
       "built_by": "Được xây dựng bởi",
       "complete": "Một Cái Nhìn Hoàn Chỉnh",
-      "subtitle_desc": "Theo dõi tất cả tài sản, vị thế DeFi và NFT của bạn theo thời gian thực trên toàn bộ hệ sinh thái Aptos"
+      "subtitle_desc": "Theo dõi tất cả tài sản, vị thế DeFi và NFT của bạn theo thời gian thực trên toàn bộ hệ sinh thái Aptos",
+      "track_your": "Theo dõi",
+      "aptos_portfolio": "danh mục Aptos của bạn",
+      "track_tokens_defi_nfts": "Theo dõi token, vị thế DeFi và NFT"
     },
     "features": {
       "title": "Theo dõi danh mục",

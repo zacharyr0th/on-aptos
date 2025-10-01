@@ -1,0 +1,111 @@
+{
+  "page": {
+    "title": "पोर्टफोलियो",
+    "description": "रियल-टाइम डेटा के साथ अपने Aptos पोर्टफोलियो को ट्रैक करें",
+    "meta_description": "रियल-टाइम टोकन बैलेंस, DeFi पोजीशन, NFTs और लेनदेन इतिहास के साथ अपने Aptos वॉलेट पोर्टफोलियो को ट्रैक और विश्लेषित करें"
+  },
+  "navigation": {
+    "overview": "अवलोकन",
+    "tokens": "टोकन्स",
+    "defi": "DeFi",
+    "nfts": "NFTs",
+    "transactions": "लेनदेन",
+    "history": "इतिहास"
+  },
+  "landing": {
+    "track_your": "अपने",
+    "aptos_portfolio": "Aptos पोर्टफोलियो को ट्रैक करें",
+    "track_tokens_defi_nfts": "टोकन्स, DeFi पोजीशन और NFTs को ट्रैक करें",
+    "enter_address": "वॉलेट पता दर्ज करें",
+    "placeholder": "0x1234...abcd",
+    "analyze": "पोर्टफोलियो का विश्लेषण करें",
+    "features": {
+      "real_time": "रियल-टाइम बैलेंस",
+      "defi_positions": "DeFi पोजीशन",
+      "nft_collections": "NFT संग्रह",
+      "transaction_history": "लेनदेन इतिहास"
+    }
+  },
+  "overview": {
+    "total_value": "कुल पोर्टफोलियो मूल्य",
+    "tokens": "टोकन्स",
+    "defi": "DeFi",
+    "nfts": "NFTs",
+    "24h_change": "24घंटे का परिवर्तन",
+    "allocation": "आवंटन",
+    "assets": "संपत्ति",
+    "collections": "संग्रह",
+    "positions": "पोजीशन"
+  },
+  "tokens": {
+    "title": "टोकन होल्डिंग्स",
+    "balance": "बैलेंस",
+    "value": "मूल्य",
+    "price": "कीमत",
+    "change_24h": "24घंटे का परिवर्तन",
+    "no_tokens": "कोई टोकन नहीं मिले",
+    "loading": "टोकन्स लोड हो रहे हैं..."
+  },
+  "defi": {
+    "title": "DeFi पोजीशन",
+    "protocol": "प्रोटोकॉल",
+    "position": "पोजीशन",
+    "value": "मूल्य",
+    "apy": "APY",
+    "no_positions": "कोई DeFi पोजीशन नहीं मिली",
+    "loading": "पोजीशन लोड हो रही हैं..."
+  },
+  "nfts": {
+    "title": "NFT संग्रह",
+    "collection": "संग्रह",
+    "items": "आइटम्स",
+    "floor_price": "फ्लोर प्राइस",
+    "no_nfts": "कोई NFTs नहीं मिले",
+    "loading": "NFTs लोड हो रहे हैं...",
+    "view_collection": "संग्रह देखें"
+  },
+  "transactions": {
+    "title": "लेनदेन इतिहास",
+    "type": "प्रकार",
+    "amount": "राशि",
+    "timestamp": "समय",
+    "status": "स्थिति",
+    "hash": "हैश",
+    "no_transactions": "कोई लेनदेन नहीं मिले",
+    "loading": "लेनदेन लोड हो रहे हैं...",
+    "view_explorer": "एक्सप्लोरर में देखें"
+  },
+  "filters": {
+    "all": "सभी",
+    "tokens": "टोकन्स",
+    "defi": "DeFi",
+    "nfts": "NFTs",
+    "sort_by": "के द्वारा क्रमबद्ध करें",
+    "value": "मूल्य",
+    "name": "नाम",
+    "recent": "हाल का"
+  },
+  "actions": {
+    "refresh": "रिफ्रेश",
+    "export": "निर्यात",
+    "share": "साझा करें",
+    "copy_address": "पता कॉपी करें",
+    "view_details": "विवरण देखें"
+  },
+  "status": {
+    "loading": "पोर्टफोलियो लोड हो रहा है...",
+    "error": "पोर्टफोलियो लोड करने में त्रुटि",
+    "retry": "पुनः प्रयास",
+    "no_data": "कोई डेटा उपलब्ध नहीं",
+    "invalid_address": "अमान्य वॉलेट पता"
+  },
+  "tooltips": {
+    "total_value": "आपके पोर्टफोलियो में सभी संपत्तियों का कुल मूल्य",
+    "24h_change": "पिछले 24 घंटों में मूल्य परिवर्तन",
+    "allocation": "मूल्य के आधार पर संपत्तियों का वितरण",
+    "refresh": "पोर्टफोलियो डेटा रिफ्रेश करें",
+    "export": "पोर्टफोलियो डेटा निर्यात करें",
+    "share": "पोर्टफोलियो साझा करें",
+    "copy_address": "वॉलेट पता क्लिपबोर्ड में कॉपी करें"
+  }
+}

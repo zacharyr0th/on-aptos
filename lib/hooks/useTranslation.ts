@@ -202,6 +202,6 @@ export function useTranslation(namespace: Namespace | Namespace[] = "common") {
 }
 
 // Single hook for page-specific translations
-export function usePageTranslation(page: "defi" | "btc" | "rwas" | "stables" | "lst") {
+export function usePageTranslation(page: "defi" | "btc" | "rwas" | "stables" | "lst" | "performance" | "portfolio") {
   return useTranslation(["common", page]);
 }

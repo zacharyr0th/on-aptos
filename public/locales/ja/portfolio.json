@@ -1,0 +1,111 @@
+{
+  "page": {
+    "title": "ポートフォリオ",
+    "description": "リアルタイムデータでAptosポートフォリオを追跡",
+    "meta_description": "リアルタイムトークン残高、DeFiポジション、NFT、取引履歴でAptosウォレットポートフォリオを追跡・分析"
+  },
+  "navigation": {
+    "overview": "概要",
+    "tokens": "トークン",
+    "defi": "DeFi",
+    "nfts": "NFTs",
+    "transactions": "取引",
+    "history": "履歴"
+  },
+  "landing": {
+    "track_your": "あなたの",
+    "aptos_portfolio": "Aptosポートフォリオを追跡",
+    "track_tokens_defi_nfts": "トークン、DeFiポジション、NFTを追跡",
+    "enter_address": "ウォレットアドレスを入力",
+    "placeholder": "0x1234...abcd",
+    "analyze": "ポートフォリオを分析",
+    "features": {
+      "real_time": "リアルタイム残高",
+      "defi_positions": "DeFiポジション",
+      "nft_collections": "NFTコレクション",
+      "transaction_history": "取引履歴"
+    }
+  },
+  "overview": {
+    "total_value": "総ポートフォリオ価値",
+    "tokens": "トークン",
+    "defi": "DeFi",
+    "nfts": "NFTs",
+    "24h_change": "24時間変動",
+    "allocation": "配分",
+    "assets": "資産",
+    "collections": "コレクション",
+    "positions": "ポジション"
+  },
+  "tokens": {
+    "title": "トークン保有量",
+    "balance": "残高",
+    "value": "価値",
+    "price": "価格",
+    "change_24h": "24時間変動",
+    "no_tokens": "トークンが見つかりません",
+    "loading": "トークンを読み込み中..."
+  },
+  "defi": {
+    "title": "DeFiポジション",
+    "protocol": "プロトコル",
+    "position": "ポジション",
+    "value": "価値",
+    "apy": "APY",
+    "no_positions": "DeFiポジションが見つかりません",
+    "loading": "ポジションを読み込み中..."
+  },
+  "nfts": {
+    "title": "NFTコレクション",
+    "collection": "コレクション",
+    "items": "アイテム",
+    "floor_price": "フロアプライス",
+    "no_nfts": "NFTが見つかりません",
+    "loading": "NFTを読み込み中...",
+    "view_collection": "コレクションを表示"
+  },
+  "transactions": {
+    "title": "取引履歴",
+    "type": "タイプ",
+    "amount": "金額",
+    "timestamp": "時刻",
+    "status": "ステータス",
+    "hash": "ハッシュ",
+    "no_transactions": "取引が見つかりません",
+    "loading": "取引を読み込み中...",
+    "view_explorer": "エクスプローラーで表示"
+  },
+  "filters": {
+    "all": "すべて",
+    "tokens": "トークン",
+    "defi": "DeFi",
+    "nfts": "NFTs",
+    "sort_by": "並び順",
+    "value": "価値",
+    "name": "名前",
+    "recent": "最新"
+  },
+  "actions": {
+    "refresh": "更新",
+    "export": "エクスポート",
+    "share": "共有",
+    "copy_address": "アドレスをコピー",
+    "view_details": "詳細を表示"
+  },
+  "status": {
+    "loading": "ポートフォリオを読み込み中...",
+    "error": "ポートフォリオの読み込みエラー",
+    "retry": "再試行",
+    "no_data": "データがありません",
+    "invalid_address": "無効なウォレットアドレス"
+  },
+  "tooltips": {
+    "total_value": "ポートフォリオ内のすべての資産の総価値",
+    "24h_change": "過去24時間の価格変動",
+    "allocation": "価値による資産の分布",
+    "refresh": "ポートフォリオデータを更新",
+    "export": "ポートフォリオデータをエクスポート",
+    "share": "ポートフォリオを共有",
+    "copy_address": "ウォレットアドレスをクリップボードにコピー"
+  }
+}

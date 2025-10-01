@@ -1,113 +1,113 @@
 {
   "page": {
-    "title": "LSTs on Aptos",
-    "description": "Liquid Staking Tokens on Aptos blockchain"
+    "title": "LSTs sur Aptos",
+    "description": "Tokens de Staking Liquide sur la blockchain Aptos"
   },
   "stats": {
-    "total_lst_value": "Total LST Value",
-    "liquid_staking_tokens": "Liquid Staking Tokens",
-    "market_share": "Market Share",
-    "apr": "APR",
-    "staked_apt": "Staked APT",
-    "validators": "Validators",
-    "total_stakers": "Total Stakers",
-    "average_apr": "Average APR"
+    "total_lst_value": "Valeur Totale LST",
+    "liquid_staking_tokens": "Tokens de Staking Liquide",
+    "market_share": "Part de Marché",
+    "apr": "TAR",
+    "staked_apt": "APT Staké",
+    "validators": "Validateurs",
+    "total_stakers": "Total des Stakers",
+    "average_apr": "TAR Moyen"
   },
   "providers": {
-    "all": "All",
+    "all": "Tous",
     "amnis": "Amnis Finance",
     "thala": "Thala Labs",
-    "other": "Other"
+    "other": "Autres"
   },
   "table": {
     "token": "Token",
-    "provider": "Provider",
-    "apr": "APR",
+    "provider": "Fournisseur",
+    "apr": "TAR",
     "tvl": "TVL",
-    "market_cap": "Market Cap",
-    "price": "Price",
+    "market_cap": "Capitalisation Boursière",
+    "price": "Prix",
     "stakers": "Stakers",
-    "validators": "Validators",
-    "liquidity": "Liquidity",
-    "exchange_rate": "Exchange Rate"
+    "validators": "Validateurs",
+    "liquidity": "Liquidité",
+    "exchange_rate": "Taux de Change"
   },
   "details": {
-    "overview": "Overview",
-    "staking_info": "Staking Info",
-    "validators": "Validators",
-    "rewards": "Rewards",
+    "overview": "Aperçu",
+    "staking_info": "Infos de Staking",
+    "validators": "Validateurs",
+    "rewards": "Récompenses",
     "unstaking": "Unstaking",
-    "governance": "Governance",
-    "security": "Security",
+    "governance": "Gouvernance",
+    "security": "Sécurité",
     "documentation": "Documentation",
-    "contracts": "Contracts"
+    "contracts": "Contrats"
   },
   "staking": {
-    "stake_apt": "Stake APT",
-    "unstake": "Unstake",
-    "claim_rewards": "Claim Rewards",
-    "auto_compound": "Auto-Compound",
-    "staking_period": "Staking Period",
-    "unbonding_period": "Unbonding Period",
-    "minimum_stake": "Minimum Stake",
-    "current_apr": "Current APR"
+    "stake_apt": "Staker APT",
+    "unstake": "Unstaker",
+    "claim_rewards": "Réclamer les Récompenses",
+    "auto_compound": "Composition Automatique",
+    "staking_period": "Période de Staking",
+    "unbonding_period": "Période de Déblocage",
+    "minimum_stake": "Stake Minimum",
+    "current_apr": "TAR Actuel"
   },
   "validators": {
-    "validator": "Validator",
+    "validator": "Validateur",
     "commission": "Commission",
-    "delegation": "Delegation",
-    "uptime": "Uptime",
-    "voting_power": "Voting Power",
-    "self_stake": "Self Stake",
-    "delegators": "Delegators",
+    "delegation": "Délégation",
+    "uptime": "Temps de Fonctionnement",
+    "voting_power": "Pouvoir de Vote",
+    "self_stake": "Stake Propre",
+    "delegators": "Délégateurs",
     "performance": "Performance"
   },
   "messages": {
-    "loading": "Loading liquid staking data...",
-    "error": "Error loading data",
-    "no_data": "No LST data available",
-    "coming_soon": "More liquid staking providers coming soon",
-    "refresh": "Refresh Data",
-    "last_updated": "Last updated",
-    "stake_success": "Successfully staked APT",
-    "unstake_success": "Unstaking process initiated"
+    "loading": "Chargement des données de staking liquide...",
+    "error": "Erreur de chargement des données",
+    "no_data": "Aucune donnée LST disponible",
+    "coming_soon": "Plus de fournisseurs de staking liquide bientôt",
+    "refresh": "Actualiser les Données",
+    "last_updated": "Dernière mise à jour",
+    "stake_success": "APT staké avec succès",
+    "unstake_success": "Processus d'unstaking initié"
   },
   "tooltips": {
-    "lst": "Liquid Staking Tokens allow stakers to earn rewards while maintaining liquidity",
-    "apr": "Annual Percentage Rate based on current staking rewards",
-    "tvl": "Total value locked in the liquid staking protocol",
-    "exchange_rate": "Current exchange rate between LST and APT",
-    "unbonding": "Time required to fully unstake and receive your APT",
-    "validators": "Number of validators staking on behalf of token holders",
-    "auto_compound": "Rewards are automatically reinvested to maximize returns"
+    "lst": "Les Tokens de Staking Liquide permettent aux stakers de gagner des récompenses tout en maintenant la liquidité",
+    "apr": "Taux de Rendement Annuel basé sur les récompenses de staking actuelles",
+    "tvl": "Valeur totale bloquée dans le protocole de staking liquide",
+    "exchange_rate": "Taux de change actuel entre LST et APT",
+    "unbonding": "Temps requis pour unstaker complètement et recevoir vos APT",
+    "validators": "Nombre de validateurs stakant au nom des détenteurs de tokens",
+    "auto_compound": "Les récompenses sont automatiquement réinvesties pour maximiser les rendements"
   },
   "risks": {
-    "title": "Risks & Considerations",
-    "slashing": "Slashing Risk",
-    "liquidity": "Liquidity Risk",
-    "smart_contract": "Smart Contract Risk",
-    "validator": "Validator Risk",
-    "depeg": "Depeg Risk",
-    "low": "Low",
-    "medium": "Medium",
-    "high": "High"
+    "title": "Risques et Considérations",
+    "slashing": "Risque de Slashing",
+    "liquidity": "Risque de Liquidité",
+    "smart_contract": "Risque de Contrat Intelligent",
+    "validator": "Risque de Validateur",
+    "depeg": "Risque de Dé-ancrage",
+    "low": "Faible",
+    "medium": "Moyen",
+    "high": "Élevé"
   },
   "rewards": {
-    "current_rewards": "Current Rewards",
-    "pending_rewards": "Pending Rewards",
-    "claimed_rewards": "Claimed Rewards",
-    "next_distribution": "Next Distribution",
-    "reward_history": "Reward History",
-    "compound_earnings": "Compound Earnings",
-    "total_earned": "Total Earned"
+    "current_rewards": "Récompenses Actuelles",
+    "pending_rewards": "Récompenses En Attente",
+    "claimed_rewards": "Récompenses Réclamées",
+    "next_distribution": "Prochaine Distribution",
+    "reward_history": "Historique des Récompenses",
+    "compound_earnings": "Gains Composés",
+    "total_earned": "Total Gagné"
   },
   "analytics": {
-    "staking_ratio": "Staking Ratio",
-    "growth_rate": "Growth Rate",
-    "market_dominance": "Market Dominance",
-    "holder_distribution": "Holder Distribution",
-    "whale_concentration": "Whale Concentration",
-    "daily_volume": "Daily Volume",
-    "liquidity_depth": "Liquidity Depth"
+    "staking_ratio": "Ratio de Staking",
+    "growth_rate": "Taux de Croissance",
+    "market_dominance": "Domination du Marché",
+    "holder_distribution": "Distribution des Détenteurs",
+    "whale_concentration": "Concentration de Baleines",
+    "daily_volume": "Volume Quotidien",
+    "liquidity_depth": "Profondeur de Liquidité"
   }
 }

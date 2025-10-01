@@ -179,8 +179,8 @@ export const UnifiedNFTGrid: React.FC<UnifiedNFTGridProps> = ({
         <div
           key={uniqueKey}
           className={cn(
-            "group relative rounded-xl border bg-card overflow-hidden cursor-pointer transition-all duration-200",
-            "hover:shadow-lg hover:border-primary/50 hover:-translate-y-1",
+            "group relative rounded-xl bg-card border overflow-hidden cursor-pointer transition-all duration-200 shadow-sm",
+            "hover:shadow-lg hover:ring-1 hover:ring-primary/30 hover:-translate-y-1",
             isSelected && "ring-2 ring-primary ring-offset-2",
             className
           )}
@@ -216,7 +216,7 @@ export const UnifiedNFTGrid: React.FC<UnifiedNFTGridProps> = ({
         )}
         onClick={() => onNFTSelect(nft)}
       >
-        <div className="aspect-square rounded-lg overflow-hidden border hover:border-primary transition-colors">
+        <div className="aspect-square rounded-lg overflow-hidden border hover:border-primary/50 transition-colors">
           <NFTImage
             src={imageUrl}
             alt={sanitizedNFT.token_name || "NFT"}

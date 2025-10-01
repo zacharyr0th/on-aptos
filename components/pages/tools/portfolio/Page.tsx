@@ -198,7 +198,8 @@ function PortfolioPageContent() {
           />
         </div>
 
-        <div className="flex-1 overflow-hidden min-h-0">
+
+        <div className="flex-1 overflow-hidden min-h-0" style={{ paddingTop: '0px' }}>
           <Suspense fallback={<PortfolioLoadingSkeleton />}>
             <PortfolioLayout
               normalizedAddress={normalizedAddress || ""}

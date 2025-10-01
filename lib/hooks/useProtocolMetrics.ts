@@ -9,13 +9,13 @@ type EnrichedProtocol = DefiProtocol;
 const protocolMetricsCache = new Map<string, Promise<any>>();
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
-export function useProtocolMetrics(protocols: DefiProtocol[]): {
+export function useProtocolMetrics(protocols: DefiProtocol[], options?: { skipFetch?: boolean }): {
   enrichedProtocols: EnrichedProtocol[];
   loading: boolean;
   error: Error | null;
 } {
   const [enrichedProtocols, setEnrichedProtocols] = useState<EnrichedProtocol[]>(protocols);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!options?.skipFetch);
   const [error, setError] = useState<Error | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -211,7 +211,7 @@ export function useProtocolMetrics(protocols: DefiProtocol[]): {
       }
     }
 
-    if (protocols.length > 0) {
+    if (protocols.length > 0 && !options?.skipFetch) {
       fetchMetrics();
     } else {
       setLoading(false);
@@ -222,7 +222,7 @@ export function useProtocolMetrics(protocols: DefiProtocol[]): {
         abortControllerRef.current.abort();
       }
     };
-  }, [protocolsKey]);
+  }, [protocolsKey, options?.skipFetch]);
 
   return { enrichedProtocols, loading, error };
 }

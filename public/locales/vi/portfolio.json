@@ -1,0 +1,111 @@
+{
+  "page": {
+    "title": "Danh mục đầu tư",
+    "description": "Theo dõi danh mục Aptos của bạn với dữ liệu thời gian thực",
+    "meta_description": "Theo dõi và phân tích danh mục ví Aptos của bạn với số dư token thời gian thực, vị thế DeFi, NFT và lịch sử giao dịch"
+  },
+  "navigation": {
+    "overview": "Tổng quan",
+    "tokens": "Token",
+    "defi": "DeFi",
+    "nfts": "NFT",
+    "transactions": "Giao dịch",
+    "history": "Lịch sử"
+  },
+  "landing": {
+    "track_your": "Theo dõi",
+    "aptos_portfolio": "danh mục Aptos của bạn",
+    "track_tokens_defi_nfts": "Theo dõi token, vị thế DeFi và NFT",
+    "enter_address": "Nhập địa chỉ ví",
+    "placeholder": "0x1234...abcd",
+    "analyze": "Phân tích Danh mục",
+    "features": {
+      "real_time": "Số dư thời gian thực",
+      "defi_positions": "Vị thế DeFi",
+      "nft_collections": "Bộ sưu tập NFT",
+      "transaction_history": "Lịch sử giao dịch"
+    }
+  },
+  "overview": {
+    "total_value": "Tổng Giá trị Danh mục",
+    "tokens": "Token",
+    "defi": "DeFi",
+    "nfts": "NFT",
+    "24h_change": "Thay đổi 24h",
+    "allocation": "Phân bổ",
+    "assets": "Tài sản",
+    "collections": "Bộ sưu tập",
+    "positions": "Vị thế"
+  },
+  "tokens": {
+    "title": "Nắm giữ Token",
+    "balance": "Số dư",
+    "value": "Giá trị",
+    "price": "Giá",
+    "change_24h": "Thay đổi 24h",
+    "no_tokens": "Không tìm thấy token nào",
+    "loading": "Đang tải token..."
+  },
+  "defi": {
+    "title": "Vị thế DeFi",
+    "protocol": "Giao thức",
+    "position": "Vị thế",
+    "value": "Giá trị",
+    "apy": "APY",
+    "no_positions": "Không tìm thấy vị thế DeFi nào",
+    "loading": "Đang tải vị thế..."
+  },
+  "nfts": {
+    "title": "Bộ sưu tập NFT",
+    "collection": "Bộ sưu tập",
+    "items": "Mục",
+    "floor_price": "Giá sàn",
+    "no_nfts": "Không tìm thấy NFT nào",
+    "loading": "Đang tải NFT...",
+    "view_collection": "Xem Bộ sưu tập"
+  },
+  "transactions": {
+    "title": "Lịch sử Giao dịch",
+    "type": "Loại",
+    "amount": "Số lượng",
+    "timestamp": "Thời gian",
+    "status": "Trạng thái",
+    "hash": "Hash",
+    "no_transactions": "Không tìm thấy giao dịch nào",
+    "loading": "Đang tải giao dịch...",
+    "view_explorer": "Xem trong Explorer"
+  },
+  "filters": {
+    "all": "Tất cả",
+    "tokens": "Token",
+    "defi": "DeFi",
+    "nfts": "NFT",
+    "sort_by": "Sắp xếp theo",
+    "value": "Giá trị",
+    "name": "Tên",
+    "recent": "Gần đây"
+  },
+  "actions": {
+    "refresh": "Làm mới",
+    "export": "Xuất",
+    "share": "Chia sẻ",
+    "copy_address": "Sao chép Địa chỉ",
+    "view_details": "Xem Chi tiết"
+  },
+  "status": {
+    "loading": "Đang tải danh mục...",
+    "error": "Lỗi tải danh mục",
+    "retry": "Thử lại",
+    "no_data": "Không có dữ liệu",
+    "invalid_address": "Địa chỉ ví không hợp lệ"
+  },
+  "tooltips": {
+    "total_value": "Tổng giá trị của tất cả tài sản trong danh mục của bạn",
+    "24h_change": "Thay đổi giá trong 24 giờ qua",
+    "allocation": "Phân bổ tài sản theo giá trị",
+    "refresh": "Làm mới dữ liệu danh mục",
+    "export": "Xuất dữ liệu danh mục",
+    "share": "Chia sẻ danh mục",
+    "copy_address": "Sao chép địa chỉ ví vào clipboard"
+  }
+}

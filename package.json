@@ -25,6 +25,7 @@
     "analyze:server": "BUNDLE_ANALYZE=server bun run build",
     "analyze:browser": "BUNDLE_ANALYZE=browser bun run build",
     "kill": "lsof -ti :3001 | xargs kill -9",
+    "web": "lsof -ti:3001 | xargs kill -9 2>/dev/null || echo 'No processes on port 3001' && sleep 1 && bun run dev",
     "commitlint": "commitlint --edit",
     "security:scan": "gitleaks detect --source . --config .gitleaks.toml",
     "security:baseline": "detect-secrets scan --baseline .secrets.baseline --update",

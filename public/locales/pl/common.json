@@ -219,7 +219,10 @@
       "powered_by": "Zasilane przez",
       "built_by": "Stworzone przez",
       "complete": "Kompletny",
-      "subtitle_desc": "Śledź wszystkie swoje aktywa, pozycje DeFi i NFT w czasie rzeczywistym w całym ekosystemie Aptos"
+      "subtitle_desc": "Śledź wszystkie swoje aktywa, pozycje DeFi i NFT w czasie rzeczywistym w całym ekosystemie Aptos",
+      "track_your": "Śledź swoje",
+      "aptos_portfolio": "portfolio Aptos",
+      "track_tokens_defi_nfts": "Śledź tokeny, pozycje DeFi i NFT"
     },
     "features": {
       "title": "Śledzenie portfolio",

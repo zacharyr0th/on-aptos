@@ -2,8 +2,7 @@
 
 import { GeistMono } from "geist/font/mono";
 import { Search } from "lucide-react";
-import type React from "react";
-import { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { ErrorBoundary } from "@/components/errors/ErrorBoundary";
 import { Input } from "@/components/ui/input";
 import { useProtocolMetrics } from "@/lib/hooks/useProtocolMetrics";
@@ -20,8 +19,42 @@ export default function DefiPage(): React.ReactElement {
   const [refreshing] = useState(false);
   const { t } = usePageTranslation("defi");
 
-  // Enrich protocols with real-time metrics
-  const { enrichedProtocols, loading: metricsLoading } = useProtocolMetrics(defiProtocols);
+  // Skip initial fetch - we'll load metrics on demand
+  const { enrichedProtocols, loading: metricsLoading } = useProtocolMetrics(defiProtocols, { skipFetch: true });
+
+  // Calculate protocol counts per category
+  const protocolCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    categories.forEach(category => {
+      if (category !== "All") {
+        counts[category] = enrichedProtocols.filter(p => p.category === category).length;
+      }
+    });
+    return counts;
+  }, [enrichedProtocols]);
+
+  // Calculate subcategory counts per category
+  const subcategoryCounts = useMemo(() => {
+    const counts: Record<string, Record<string, number>> = {};
+    categories.forEach(category => {
+      if (category !== "All") {
+        counts[category] = {};
+        // Get all unique subcategories for this category
+        const protocolsInCategory = enrichedProtocols.filter(p => p.category === category);
+        protocolsInCategory.forEach(protocol => {
+          // Handle comma-separated subcategories
+          const subcategories = protocol.subcategory.split(", ").map(s => s.trim());
+          subcategories.forEach(subcategory => {
+            if (!counts[category][subcategory]) {
+              counts[category][subcategory] = 0;
+            }
+            counts[category][subcategory]++;
+          });
+        });
+      }
+    });
+    return counts;
+  }, [enrichedProtocols]);
 
   // Filter protocols based on category, subcategory, and search
   const filteredProtocols = enrichedProtocols.filter((protocol) => {
@@ -73,10 +106,7 @@ export default function DefiPage(): React.ReactElement {
         </div>
 
         <main className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20 py-8 flex-1 relative">
-          {metricsLoading ? (
-            <LoadingState />
-          ) : (
-            <>
+          <>
               <ErrorBoundary
                 fallback={
                   <div className="p-4 rounded-md bg-destructive/10 text-destructive mb-6">
@@ -109,6 +139,8 @@ export default function DefiPage(): React.ReactElement {
                       selectedSubcategory={selectedSubcategory}
                       onCategoryChange={handleCategoryChange}
                       onSubcategoryChange={setSelectedSubcategory}
+                      protocolCounts={protocolCounts}
+                      subcategoryCounts={subcategoryCounts}
                     />
                   </div>
 
@@ -130,7 +162,10 @@ export default function DefiPage(): React.ReactElement {
                     {(selectedCategory !== "All" || selectedSubcategory) && (
                       <div className="mt-3 text-right">
                         <p className="text-sm text-muted-foreground">
-                          Showing {filteredProtocols.length} of {defiProtocols.length} protocols
+{t("defi:search.showing_protocols", "Showing {{count}} of {{total}} protocols", {
+                            count: filteredProtocols.length,
+                            total: defiProtocols.length
+                          })}
                         </p>
                       </div>
                     )}
@@ -146,6 +181,8 @@ export default function DefiPage(): React.ReactElement {
                   selectedSubcategory={selectedSubcategory}
                   onCategoryChange={handleCategoryChange}
                   onSubcategoryChange={setSelectedSubcategory}
+                  protocolCounts={protocolCounts}
+                  subcategoryCounts={subcategoryCounts}
                 />
               </div>
 
@@ -169,7 +206,10 @@ export default function DefiPage(): React.ReactElement {
                   {(selectedCategory !== "All" || selectedSubcategory || searchQuery) && (
                     <div className="mt-2 text-center">
                       <p className="text-sm text-muted-foreground">
-                        Showing {filteredProtocols.length} of {defiProtocols.length} protocols
+{t("defi:search.showing_protocols", "Showing {{count}} of {{total}} protocols", {
+                          count: filteredProtocols.length,
+                          total: defiProtocols.length
+                        })}
                       </p>
                     </div>
                   )}
@@ -180,8 +220,7 @@ export default function DefiPage(): React.ReactElement {
                   onClearFilters={handleClearFilters}
                 />
               </div>
-            </>
-          )}
+          </>
         </main>
       </div>
     </ErrorBoundary>

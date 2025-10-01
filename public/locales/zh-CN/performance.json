@@ -1,0 +1,62 @@
+{
+  "page": {
+    "title": "Aptos 性能",
+    "title_vs": "Aptos vs {{chains}}",
+    "description": "比较 Aptos 区块链性能指标与其他领先链"
+  },
+  "tabs": {
+    "performance": "链性能",
+    "performance_short": "性能",
+    "usdt": "USDt 比较",
+    "usdt_short": "USDt"
+  },
+  "sidebar": {
+    "compare": "比较",
+    "compare_count": "比较 ({{count}}/3)",
+    "clear": "清除"
+  },
+  "metrics": {
+    "max_tps": "最大 TPS",
+    "max_tps_100_blocks": "最大 TPS (100个区块)",
+    "max_tps_1_block": "最大 TPS (1个区块)",
+    "finality": "最终性",
+    "block_time": "出块时间",
+    "nakamoto": "中本聪系数",
+    "validators": "验证者"
+  },
+  "comparison": {
+    "is_better": "比",
+    "better": "更好",
+    "same_as": "与...相同",
+    "aptos_is": "Aptos 比",
+    "multiplier_better": "好 {{multiplier}}"
+  },
+  "chains": {
+    "aptos": "Aptos",
+    "ethereum": "以太坊",
+    "solana": "Solana",
+    "bsc": "币安智能链",
+    "avalanche": "雪崩", 
+    "cardano": "卡尔达诺",
+    "sui": "Sui",
+    "tron": "波场",
+    "base": "Base",
+    "bitcoin": "比特币"
+  },
+  "tooltips": {
+    "nakamoto_coefficient": "控制 >50% 网络资源所需的最少实体数量。越高 = 越去中心化。",
+    "chainspect_data": "Chainspect 没有 API，因此这些值在 2025 年 9 月 11 日被硬编码。"
+  },
+  "attribution": {
+    "data_powered_by": "数据提供方",
+    "chainspect": "Chainspect"
+  },
+  "usdt": {
+    "title": "USDT 交易比较",
+    "transactions": "交易",
+    "daily_transactions": "每日交易",
+    "market_share": "市场份额",
+    "cost_comparison": "交易成本比较",
+    "aptos_dominance": "Aptos 在主要区块链的 USDT 交易中占主导地位"
+  }
+}

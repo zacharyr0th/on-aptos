@@ -219,7 +219,10 @@
       "powered_by": "Powered by",
       "built_by": "Ginawa ng",
       "complete": "Isang Kumpletong",
-      "subtitle_desc": "Subaybayan ang lahat ng iyong mga assets, DeFi positions, at NFTs sa real-time sa buong Aptos ecosystem"
+      "subtitle_desc": "Subaybayan ang lahat ng iyong mga assets, DeFi positions, at NFTs sa real-time sa buong Aptos ecosystem",
+      "track_your": "Subaybayan ang inyong",
+      "aptos_portfolio": "Aptos portfolio",
+      "track_tokens_defi_nfts": "Subaybayan ang mga token, DeFi positions, at NFTs"
     },
     "features": {
       "title": "Portfolio Tracking",

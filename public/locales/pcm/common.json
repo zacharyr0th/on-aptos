@@ -219,7 +219,10 @@
       "powered_by": "Na who power am",
       "built_by": "Na who build am",
       "complete": "One Complete",
-      "subtitle_desc": "Track all your assets, DeFi positions, and NFTs for real-time inside di Aptos ecosystem"
+      "subtitle_desc": "Track all your assets, DeFi positions, and NFTs for real-time inside di Aptos ecosystem",
+      "track_your": "Follow your",
+      "aptos_portfolio": "Aptos portfolio",
+      "track_tokens_defi_nfts": "Track tokens, DeFi positions, and NFTs"
     },
     "features": {
       "title": "Portfolio Tracking",

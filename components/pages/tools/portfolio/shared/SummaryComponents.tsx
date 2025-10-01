@@ -54,7 +54,7 @@ export const StatCard: React.FC<StatCardProps> = ({
 
   if (variant === "bordered") {
     return (
-      <div className={`p-3 sm:p-4 border-r border-border/30 last:border-r-0 ${className}`}>
+      <div className={`p-3 sm:p-4 border-r last:border-r-0 ${className}`}>
         {content}
       </div>
     );
@@ -90,7 +90,7 @@ export const StatsGrid: React.FC<StatsGridProps> = ({
 
   if (variant === "bordered") {
     return (
-      <div className={`border border-border/30 rounded-lg ${className}`}>
+      <div className={`bg-card border shadow-sm rounded-lg ${className}`}>
         <div className={`grid ${gridClass[columns]}`}>{children}</div>
       </div>
     );
@@ -141,7 +141,7 @@ export const ProtocolLogos: React.FC<ProtocolLogosProps> = ({
         {visibleProtocols.map((protocol, index) => (
           <div
             key={index}
-            className={`${sizeClasses[size]} rounded-lg bg-background/50 border border-border/30 flex items-center justify-center overflow-hidden hover:border-border/60 transition-colors ${
+            className={`${sizeClasses[size]} rounded-lg bg-background border flex items-center justify-center overflow-hidden hover:border-muted-foreground/50 transition-colors ${
               onProtocolClick ? "cursor-pointer" : ""
             }`}
             onClick={() => onProtocolClick?.(protocol)}
@@ -162,7 +162,7 @@ export const ProtocolLogos: React.FC<ProtocolLogosProps> = ({
 
       {remainingCount > 0 && (
         <div
-          className={`${sizeClasses[size]} rounded-lg bg-muted border border-border/30 flex items-center justify-center`}
+          className={`${sizeClasses[size]} rounded-lg bg-muted border flex items-center justify-center`}
         >
           <span className="text-xs font-medium text-muted-foreground">+{remainingCount}</span>
         </div>
@@ -292,5 +292,5 @@ export const MetricBadge: React.FC<MetricBadgeProps> = ({
 
 // Divider component
 export const SectionDivider: React.FC<{ className?: string }> = ({ className = "" }) => (
-  <div className={`border-b-2 border-border/50 ${className}`} />
+  <div className={`border-b ${className}`} />
 );

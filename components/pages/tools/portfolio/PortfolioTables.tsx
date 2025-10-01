@@ -197,7 +197,7 @@ export const AssetsTable = (props: any) => {
           </div>
         </div>
       </div>
-      {showDivider && <div className="border-b border-border/30 my-6" />}
+      {showDivider && <div className="border-b my-6" />}
     </React.Fragment>
   );
 
@@ -301,11 +301,9 @@ export const AssetsTable = (props: any) => {
       </TableRow>
       {showDivider && (
         <TableRow className="h-0">
-          <TableCell colSpan={4} className="p-0 sm:table-cell">
-            <div className="w-full border-b-2 border-border/50" />
+          <TableCell colSpan={4} className="p-0 sm:table-cell border-t">
           </TableCell>
-          <TableCell colSpan={3} className="p-0 table-cell sm:hidden">
-            <div className="w-full border-b-2 border-border/50" />
+          <TableCell colSpan={3} className="p-0 table-cell sm:hidden border-t">
           </TableCell>
         </TableRow>
       )}
@@ -357,7 +355,7 @@ export const AssetsTable = (props: any) => {
             >
               <Table>
                 <TableHeader>
-                  <TableRow className="border-b border-border/50">
+                  <TableRow className="border-b">
                     <TableHead className="w-1/2 sm:w-2/5 text-left font-medium text-muted-foreground text-xs">
                       Ticker
                     </TableHead>
@@ -447,7 +445,7 @@ export const DeFiPositionsTable = (props: any) => {
         {/* Mobile Card Skeleton */}
         <div className="block md:hidden space-y-2">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="border rounded-lg p-3">
+            <div key={i} className="bg-card border rounded-lg p-3 shadow-sm">
               <div className="flex items-center gap-4">
                 <Skeleton className="h-12 w-12 rounded-full" />
                 <div className="flex-1">
@@ -470,14 +468,14 @@ export const DeFiPositionsTable = (props: any) => {
 
         {/* Desktop Table Skeleton */}
         <div className="hidden md:block">
-          <div className="border rounded-lg">
-            <div className="grid grid-cols-3 gap-4 p-3 border-b bg-muted/50">
+          <div className="bg-card border rounded-lg shadow-sm">
+            <div className="grid grid-cols-3 gap-4 p-3 bg-muted/30">
               <Skeleton className="h-4 w-16" />
               <Skeleton className="h-4 w-12" />
               <Skeleton className="h-4 w-12 ml-auto" />
             </div>
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="grid grid-cols-3 gap-4 p-3 border-b last:border-b-0">
+              <div key={i} className="grid grid-cols-3 gap-4 p-3">
                 <div className="flex items-center gap-3">
                   <Skeleton className="h-8 w-8 rounded-full" />
                   <Skeleton className="h-4 w-24" />
@@ -579,7 +577,7 @@ export const DeFiPositionsTable = (props: any) => {
       >
         <div className="flex items-center gap-4">
           <div className="flex-shrink-0">
-            <div className="relative w-12 h-12 rounded-full overflow-hidden bg-background border border-border/50">
+            <div className="relative w-12 h-12 rounded-full overflow-hidden bg-background border">
               <Image
                 src={getProtocolLogo(groupedPosition.protocol)}
                 alt={`${groupedPosition.protocol} logo`}
@@ -662,7 +660,7 @@ export const DeFiPositionsTable = (props: any) => {
         /* Desktop Table Layout */
         <Table>
           <TableHeader>
-            <TableRow className="border-b border-border/50">
+            <TableRow className="border-b">
               <TableHead className="h-10 text-xs font-medium text-muted-foreground">
                 Protocol
               </TableHead>
@@ -707,7 +705,7 @@ export const DeFiPositionsTable = (props: any) => {
                         {(() => {
                           const protocolInfo = getDetailedProtocolInfo(groupedPosition.protocol);
                           const logoElement = (
-                            <div className="relative w-8 h-8 rounded-full overflow-hidden bg-background border border-border/50">
+                            <div className="relative w-8 h-8 rounded-full overflow-hidden bg-background border">
                               <Image
                                 src={getProtocolLogo(groupedPosition.protocol)}
                                 alt={`${groupedPosition.protocol} logo`}

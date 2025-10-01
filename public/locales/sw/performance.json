@@ -1,0 +1,62 @@
+{
+  "page": {
+    "title": "Utendaji wa Aptos",
+    "title_vs": "Aptos dhidi ya {{chains}}",
+    "description": "Linganisha vipimo vya utendaji wa blockchain ya Aptos na mikondo mingine inayoongoza"
+  },
+  "tabs": {
+    "performance": "Utendaji wa Mkondo",
+    "performance_short": "Utendaji",
+    "usdt": "Ulinganishi wa USDt",
+    "usdt_short": "USDt"
+  },
+  "sidebar": {
+    "compare": "Linganisha",
+    "compare_count": "Linganisha ({{count}}/3)",
+    "clear": "Futa"
+  },
+  "metrics": {
+    "max_tps": "TPS ya Juu Zaidi",
+    "max_tps_100_blocks": "TPS ya Juu Zaidi (vitalu 100)",
+    "max_tps_1_block": "TPS ya Juu Zaidi (kitalu 1)",
+    "finality": "Umalizio",
+    "block_time": "Muda wa Kitalu",
+    "nakamoto": "Nakamoto",
+    "validators": "Wathibitishaji"
+  },
+  "comparison": {
+    "is_better": "ni",
+    "better": "bora zaidi",
+    "same_as": "Sawa na",
+    "aptos_is": "Aptos ni",
+    "multiplier_better": "{{multiplier}} bora zaidi"
+  },
+  "chains": {
+    "aptos": "Aptos",
+    "ethereum": "Ethereum",
+    "solana": "Solana",
+    "bsc": "BSC",
+    "avalanche": "Avalanche",
+    "cardano": "Cardano",
+    "sui": "Sui",
+    "tron": "TRON",
+    "base": "Base",
+    "bitcoin": "Bitcoin"
+  },
+  "tooltips": {
+    "nakamoto_coefficient": "Idadi ya chini ya vyombo vinavyohitajika kudhibiti >50% ya rasilimali za mtandao. Juu = zaidi ya kutengana.",
+    "chainspect_data": "Chainspect haina API kwa hiyo maadili haya yaliwekwa kwa nguvu mnamo Septemba 11, 2025."
+  },
+  "attribution": {
+    "data_powered_by": "Data inayoendeshwa na",
+    "chainspect": "Chainspect"
+  },
+  "usdt": {
+    "title": "Ulinganishi wa Miamala ya USDT",
+    "transactions": "Miamala",
+    "daily_transactions": "Miamala ya Kila Siku",
+    "market_share": "Hisa ya Soko",
+    "cost_comparison": "Ulinganishi wa Gharama za Miamala",
+    "aptos_dominance": "Aptos inatawala miamala ya USDT katika blockchain kuu"
+  }
+}

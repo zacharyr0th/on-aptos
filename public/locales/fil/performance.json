@@ -1,0 +1,62 @@
+{
+  "page": {
+    "title": "Pagganap ng Aptos",
+    "title_vs": "Aptos laban sa {{chains}}",
+    "description": "Ikumpara ang mga sukatan ng pagganap ng Aptos blockchain sa iba pang nangunguna na chains"
+  },
+  "tabs": {
+    "performance": "Pagganap ng Chain",
+    "performance_short": "Pagganap",
+    "usdt": "Paghahambing ng USDt",
+    "usdt_short": "USDt"
+  },
+  "sidebar": {
+    "compare": "Ikumpara",
+    "compare_count": "Ikumpara ({{count}}/3)",
+    "clear": "Linisin"
+  },
+  "metrics": {
+    "max_tps": "Pinakamataas na TPS",
+    "max_tps_100_blocks": "Pinakamataas na TPS (100 blocks)",
+    "max_tps_1_block": "Pinakamataas na TPS (1 block)",
+    "finality": "Katapusan",
+    "block_time": "Oras ng Block",
+    "nakamoto": "Nakamoto",
+    "validators": "Mga Validator"
+  },
+  "comparison": {
+    "is_better": "ay",
+    "better": "mas maganda",
+    "same_as": "Kapareho ng",
+    "aptos_is": "Ang Aptos ay",
+    "multiplier_better": "{{multiplier}} na mas maganda"
+  },
+  "chains": {
+    "aptos": "Aptos",
+    "ethereum": "Ethereum",
+    "solana": "Solana",
+    "bsc": "BSC",
+    "avalanche": "Avalanche",
+    "cardano": "Cardano",
+    "sui": "Sui",
+    "tron": "TRON",
+    "base": "Base",
+    "bitcoin": "Bitcoin"
+  },
+  "tooltips": {
+    "nakamoto_coefficient": "Pinakakaunting entities na kailangan para makontrol ang >50% ng mga resources ng network. Mataas = mas decentralized.",
+    "chainspect_data": "Walang API ang Chainspect kaya ang mga values na ito ay na-hardcode noong September 11, 2025."
+  },
+  "attribution": {
+    "data_powered_by": "Data na pinagana ng",
+    "chainspect": "Chainspect"
+  },
+  "usdt": {
+    "title": "Paghahambing ng USDT Transaction",
+    "transactions": "Mga Transaksyon",
+    "daily_transactions": "Araw-araw na Transaksyon",
+    "market_share": "Market Share",
+    "cost_comparison": "Paghahambing ng Gastos sa Transaksyon",
+    "aptos_dominance": "Nangingibabaw ang Aptos sa mga USDT transactions sa mga pangunahing blockchains"
+  }
+}

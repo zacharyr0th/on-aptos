@@ -1,0 +1,111 @@
+{
+  "page": {
+    "title": "Portfolio",
+    "description": "Fuatilia portfolio yako ya Aptos na data ya wakati halisi",
+    "meta_description": "Fuatilia na uchambuzi portfolio ya mkoba wako wa Aptos na mizani ya tokeni za wakati halisi, nafasi za DeFi, NFTs na historia ya miamala"
+  },
+  "navigation": {
+    "overview": "Muhtasari",
+    "tokens": "Tokeni",
+    "defi": "DeFi",
+    "nfts": "NFTs",
+    "transactions": "Miamala",
+    "history": "Historia"
+  },
+  "landing": {
+    "track_your": "Fuatilia",
+    "aptos_portfolio": "portfolio yako ya Aptos",
+    "track_tokens_defi_nfts": "Fuatilia tokeni, nafasi za DeFi, na NFTs",
+    "enter_address": "Ingiza anwani ya mkoba",
+    "placeholder": "0x1234...abcd",
+    "analyze": "Chambuzi Portfolio",
+    "features": {
+      "real_time": "Mizani ya wakati halisi",
+      "defi_positions": "Nafasi za DeFi",
+      "nft_collections": "Makusanyo ya NFT",
+      "transaction_history": "Historia ya miamala"
+    }
+  },
+  "overview": {
+    "total_value": "Thamani Jumla ya Portfolio",
+    "tokens": "Tokeni",
+    "defi": "DeFi",
+    "nfts": "NFTs",
+    "24h_change": "Mabadiliko ya Saa 24",
+    "allocation": "Mgao",
+    "assets": "Mali",
+    "collections": "Makusanyo",
+    "positions": "Nafasi"
+  },
+  "tokens": {
+    "title": "Milki ya Tokeni",
+    "balance": "Mizani",
+    "value": "Thamani",
+    "price": "Bei",
+    "change_24h": "Mabadiliko ya Saa 24",
+    "no_tokens": "Hakuna tokeni zilizopatikana",
+    "loading": "Inapakia tokeni..."
+  },
+  "defi": {
+    "title": "Nafasi za DeFi",
+    "protocol": "Itifaki",
+    "position": "Nafasi",
+    "value": "Thamani",
+    "apy": "APY",
+    "no_positions": "Hakuna nafasi za DeFi zilizopatikana",
+    "loading": "Inapakia nafasi..."
+  },
+  "nfts": {
+    "title": "Makusanyo ya NFT",
+    "collection": "Mkusanyiko",
+    "items": "Vipengee",
+    "floor_price": "Bei ya Chini",
+    "no_nfts": "Hakuna NFTs zilizopatikana",
+    "loading": "Inapakia NFTs...",
+    "view_collection": "Ona Mkusanyiko"
+  },
+  "transactions": {
+    "title": "Historia ya Miamala",
+    "type": "Aina",
+    "amount": "Kiasi",
+    "timestamp": "Wakati",
+    "status": "Hali",
+    "hash": "Hash",
+    "no_transactions": "Hakuna miamala iliyopatikana",
+    "loading": "Inapakia miamala...",
+    "view_explorer": "Ona katika Kichunguzi"
+  },
+  "filters": {
+    "all": "Zote",
+    "tokens": "Tokeni",
+    "defi": "DeFi",
+    "nfts": "NFTs",
+    "sort_by": "Panga kwa",
+    "value": "Thamani",
+    "name": "Jina",
+    "recent": "Hivi karibuni"
+  },
+  "actions": {
+    "refresh": "Onyesha upya",
+    "export": "Hamisha",
+    "share": "Shiriki",
+    "copy_address": "Nakili Anwani",
+    "view_details": "Ona Maelezo"
+  },
+  "status": {
+    "loading": "Inapakia portfolio...",
+    "error": "Hitilafu katika kupakia portfolio",
+    "retry": "Jaribu Tena",
+    "no_data": "Hakuna data inayopatikana",
+    "invalid_address": "Anwani ya mkoba si sahihi"
+  },
+  "tooltips": {
+    "total_value": "Thamani jumla ya mali zote katika portfolio yako",
+    "24h_change": "Mabadiliko ya bei katika saa 24 zilizopita",
+    "allocation": "Usambazaji wa mali kwa thamani",
+    "refresh": "Onyesha upya data za portfolio",
+    "export": "Hamisha data za portfolio",
+    "share": "Shiriki portfolio",
+    "copy_address": "Nakili anwani ya mkoba kwenye ubao wa kunakili"
+  }
+}

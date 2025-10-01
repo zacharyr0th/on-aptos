@@ -1,23 +1,23 @@
 {
   "page": {
-    "title": "LSTs on Aptos",
-    "description": "Liquid Staking Tokens on Aptos blockchain"
+    "title": "Aptos의 LST",
+    "description": "Aptos 블록체인의 유동성 스테이킹 토큰"
   },
   "stats": {
-    "total_lst_value": "Total LST Value",
-    "liquid_staking_tokens": "Liquid Staking Tokens",
-    "market_share": "Market Share",
-    "apr": "APR",
-    "staked_apt": "Staked APT",
-    "validators": "Validators",
-    "total_stakers": "Total Stakers",
-    "average_apr": "Average APR"
+    "total_lst_value": "총 LST 가치",
+    "liquid_staking_tokens": "유동성 스테이킹 토큰",
+    "market_share": "시장 점유율",
+    "apr": "연수익률",
+    "staked_apt": "스테이킹된 APT",
+    "validators": "검증자",
+    "total_stakers": "총 스테이커",
+    "average_apr": "평균 연수익률"
   },
   "providers": {
-    "all": "All",
+    "all": "전체",
     "amnis": "Amnis Finance",
     "thala": "Thala Labs",
-    "other": "Other"
+    "other": "기타"
   },
   "table": {
     "token": "Token",

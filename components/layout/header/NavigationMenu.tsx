@@ -1,6 +1,6 @@
 "use client";
 
-import { BarChart, BarChart3, GitBranch, TrendingUp } from "lucide-react";
+import { BarChart, BarChart3, GitBranch, Network, TrendingUp } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -37,10 +37,11 @@ export function DesktopNavigationMenu({ navigationItems, onMenuClose }: Navigati
   const { t } = useTranslation(["common", "defi"]);
 
   return (
-    <div className="hidden md:flex items-center gap-4">
+    <div className="hidden md:flex items-center gap-4 ml-auto">
       <div className="relative">
         <NavigationMenu delayDuration={0} viewport={false}>
           <NavigationMenuList>
+
             {/* Assets Dropdown */}
             <NavigationMenuItem>
               <NavigationMenuTrigger className="text-sm font-medium">
@@ -117,7 +118,7 @@ export function DesktopNavigationMenu({ navigationItems, onMenuClose }: Navigati
 
                           return (
                             <div key={category}>
-                              <h4 className="sticky top-0 bg-popover z-10 text-xs font-semibold text-muted-foreground uppercase tracking-wider py-2 px-1">
+                              <h4 className="sticky top-0 bg-popover/90 backdrop-blur-sm z-10 text-xs font-semibold text-muted-foreground uppercase tracking-wider py-2 px-1">
                                 {t(`defi.categories.${category}.name`, category)}
                               </h4>
                               <div className="grid gap-1 pb-2">
@@ -189,18 +190,41 @@ export function DesktopNavigationMenu({ navigationItems, onMenuClose }: Navigati
               </NavigationMenuContent>
             </NavigationMenuItem>
 
-            {/* Performance Link */}
+            {/* Blockchain Dropdown */}
             <NavigationMenuItem>
-              <Link
-                href="/performance"
-                className={cn(
-                  navigationMenuTriggerStyle(),
-                  "text-sm font-medium",
-                  pathname === "/performance" && "bg-accent"
-                )}
-              >
-                Performance
-              </Link>
+              <NavigationMenuTrigger className="text-sm font-medium">
+                Blockchain
+              </NavigationMenuTrigger>
+              <NavigationMenuContent>
+                <div className="w-[160px] p-4">
+                  <div className="grid gap-1">
+                    <Link
+                      href="/performance"
+                      className={cn(
+                        "flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-accent",
+                        "border border-transparent hover:border-border",
+                        pathname === "/performance" && "bg-accent border-border"
+                      )}
+                      onClick={onMenuClose}
+                    >
+                      <BarChart3 className="h-4 w-4" />
+                      <div className="font-medium">Performance</div>
+                    </Link>
+                    <Link
+                      href="/network"
+                      className={cn(
+                        "flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-accent",
+                        "border border-transparent hover:border-border",
+                        pathname === "/network" && "bg-accent border-border"
+                      )}
+                      onClick={onMenuClose}
+                    >
+                      <Network className="h-4 w-4" />
+                      <div className="font-medium">Network</div>
+                    </Link>
+                  </div>
+                </div>
+              </NavigationMenuContent>
             </NavigationMenuItem>
 
             {/* Portfolio/Wallet Button */}

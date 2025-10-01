@@ -81,7 +81,7 @@ export function HeaderLogo() {
               />
               <span>
                 <span className="text-muted-foreground">On </span>
-                <span className="text-white">Aptos</span>
+                <span className="text-foreground">Aptos</span>
               </span>
             </>
           ) : (

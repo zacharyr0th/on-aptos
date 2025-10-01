@@ -8,6 +8,7 @@ import { useState } from "react";
 import { ErrorBoundary } from "@/components/errors/ErrorBoundary";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { useTranslation } from "@/lib/hooks/useTranslation";
 import USDTChart from "./USDTChart";
 import USDTCostChart from "./USDTCostChart";
 
@@ -401,6 +402,7 @@ function MetricBox({
   chainLogo = null,
   chainName = null,
   percentageDifference = null,
+  t,
 }: {
   value: string;
   label: string | React.ReactNode;
@@ -415,6 +417,7 @@ function MetricBox({
     advantageText: string;
     severity: "moderate" | "severe" | "critical" | "extreme";
   } | null;
+  t: (key: string, fallback: string) => string;
 }) {
   const baseClasses =
     "text-center p-3 sm:p-4 lg:p-5 border rounded relative transition-all duration-200 min-h-[120px] sm:min-h-[140px] flex flex-col justify-center overflow-hidden";
@@ -502,7 +505,7 @@ function MetricBox({
             {/* Check if this is equivalent performance */}
             {percentageDifference && parseFloat(percentageDifference.multiplier.replace('x', '')) === 1.0 ? (
               <div className="flex items-center justify-center gap-1">
-                <span>Same as</span>
+                <span>{t("comparison.same_as", "Same as")}</span>
                 <Image
                   src="/icons/apt.png"
                   alt="Aptos"
@@ -524,9 +527,9 @@ function MetricBox({
                         height={12}
                         className="dark:invert"
                       />
-                      <span>is</span>
+                      <span>{t("comparison.is_better", "is")}</span>
                       <span className="font-bold text-primary">{percentageDifference!.multiplier}</span>
-                      <span>better</span>
+                      <span>{t("comparison.better", "better")}</span>
                     </div>
                   ) : (
                     <div className="flex items-center justify-center gap-1">
@@ -537,9 +540,9 @@ function MetricBox({
                         height={12}
                         className={`${chainLogo?.includes("/apt.png") ? "dark:invert" : ""}`}
                       />
-                      <span>is</span>
+                      <span>{t("comparison.is_better", "is")}</span>
                       <span className="font-bold text-primary">{percentageDifference!.multiplier}</span>
-                      <span>better</span>
+                      <span>{t("comparison.better", "better")}</span>
                     </div>
                   )}
                 </div>
@@ -554,7 +557,7 @@ function MetricBox({
                       className="dark:invert"
                     />
                     <span className="font-bold text-primary">{percentageDifference!.multiplier}</span>
-                    <span>better</span>
+                    <span>{t("comparison.better", "better")}</span>
                   </div>
                 </div>
                 {/* Minimal text for small screens */}
@@ -568,9 +571,9 @@ function MetricBox({
                         height={12}
                         className="dark:invert"
                       />
-                      <span>is</span>
+                      <span>{t("comparison.is_better", "is")}</span>
                       <span className="font-bold text-primary">{percentageDifference!.multiplier}</span>
-                      <span>better</span>
+                      <span>{t("comparison.better", "better")}</span>
                     </div>
                   ) : (
                     <div className="flex items-center justify-center gap-1">
@@ -581,9 +584,9 @@ function MetricBox({
                         height={12}
                         className={`${chainLogo?.includes("/apt.png") ? "dark:invert" : ""}`}
                       />
-                      <span>is</span>
+                      <span>{t("comparison.is_better", "is")}</span>
                       <span className="font-bold text-primary">{percentageDifference!.multiplier}</span>
-                      <span>better</span>
+                      <span>{t("comparison.better", "better")}</span>
                     </div>
                   )}
                 </div>
@@ -606,6 +609,16 @@ export default function PerformancePage() {
     );
   });
   const router = useRouter();
+  const { t } = useTranslation("performance");
+  const { t: tCommon } = useTranslation("common");
+
+  // Safe translation function to prevent SSR errors
+  const safeT = (key: string, fallback: string) => {
+    if (typeof t === 'function') {
+      return t(key, fallback);
+    }
+    return fallback;
+  };
 
   const handleTabChange = (value: string) => {
     if (value === "usdt") {
@@ -641,14 +654,16 @@ export default function PerformancePage() {
               <aside className="hidden lg:block lg:w-48 lg:flex-shrink-0">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-                    Compare ({selectedEcosystems.length}/3)
+                    {t("sidebar.compare_count", "Compare ({{count}}/3)", {
+                      count: selectedEcosystems.length
+                    })}
                   </h2>
                   {selectedEcosystems.length > 0 && (
                     <button
                       onClick={clearAll}
                       className="text-xs text-muted-foreground hover:text-foreground transition-colors"
                     >
-                      Clear
+                      {t("sidebar.clear", "Clear")}
                     </button>
                   )}
                 </div>
@@ -700,15 +715,17 @@ export default function PerformancePage() {
                   <div className="flex-1 min-w-0">
                     <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold break-words">
                       {selectedEcosystems.length > 0
-                        ? `Aptos vs ${selectedEcosystems.map((e) => e.name).join(" vs ")}`
-                        : "Aptos Performance"}
+                        ? t("page.title_vs", "Aptos vs {{chains}}", {
+                            chains: selectedEcosystems.map((e) => e.name).join(" vs ")
+                          })
+                        : t("page.title", "Aptos Performance")}
                     </h1>
                   </div>
 
                   {/* Data Attribution */}
                   <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-xs sm:text-sm text-muted-foreground flex-shrink-0">
                     <div className="flex items-center gap-1.5">
-                      <span className="whitespace-nowrap">Data powered by</span>
+                      <span className="whitespace-nowrap">{t("attribution.data_powered_by", "Data powered by")}</span>
                       <a
                         href="https://chainspect.app/"
                         target="_blank"
@@ -723,7 +740,7 @@ export default function PerformancePage() {
                           className="sm:w-[18px] sm:h-[18px] rounded-sm flex-shrink-0"
                         />
                         <span className="font-medium text-foreground whitespace-nowrap">
-                          Chainspect
+                          {t("attribution.chainspect", "Chainspect")}
                         </span>
                       </a>
                       <Tooltip>
@@ -732,8 +749,7 @@ export default function PerformancePage() {
                         </TooltipTrigger>
                         <TooltipContent>
                           <p className="text-sm max-w-xs">
-                            Chainspect does not have an API so these values were hardcoded on
-                            September 11th, 2025.
+                            {t("tooltips.chainspect_data", "Chainspect does not have an API so these values were hardcoded on September 11th, 2025.")}
                           </p>
                         </TooltipContent>
                       </Tooltip>
@@ -745,12 +761,12 @@ export default function PerformancePage() {
               <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="performance" className="text-xs sm:text-sm px-2 sm:px-3">
-                    <span className="hidden sm:inline">Chain Performance</span>
-                    <span className="sm:hidden">Performance</span>
+                    <span className="hidden sm:inline">{t("tabs.performance", "Chain Performance")}</span>
+                    <span className="sm:hidden">{t("tabs.performance_short", "Performance")}</span>
                   </TabsTrigger>
                   <TabsTrigger value="usdt" className="text-xs sm:text-sm px-2 sm:px-3">
-                    <span className="hidden sm:inline">USDt Comparison</span>
-                    <span className="sm:hidden">USDt</span>
+                    <span className="hidden sm:inline">{t("tabs.usdt", "USDt Comparison")}</span>
+                    <span className="sm:hidden">{t("tabs.usdt_short", "USDt")}</span>
                   </TabsTrigger>
                 </TabsList>
 
@@ -823,10 +839,11 @@ export default function PerformancePage() {
                             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                               <MetricBox
                                 value={formatTPS(chain.metrics.maxTps)}
-                                label="Max TPS (100 blocks)"
+                                label={t("metrics.max_tps_100_blocks", "Max TPS (100 blocks)")}
                                 isPrimary={chain.isPrimary}
                                 isWinner={metricWinners.maxTps.includes(chain.name)}
                                 chainLogo={chain.logo}
+                                t={safeT}
                                 chainName={chain.name}
                                 percentageDifference={(() => {
                                   if (chain.isPrimary) {
@@ -873,10 +890,11 @@ export default function PerformancePage() {
                               />
                               <MetricBox
                                 value={formatTPS(chain.metrics.maxTpsOneBlock)}
-                                label="Max TPS (1 block)"
+                                label={t("metrics.max_tps_1_block", "Max TPS (1 block)")}
                                 isPrimary={chain.isPrimary}
                                 isWinner={metricWinners.maxTpsOneBlock.includes(chain.name)}
                                 chainLogo={chain.logo}
+                                t={safeT}
                                 chainName={chain.name}
                                 percentageDifference={(() => {
                                   if (chain.isPrimary) {
@@ -922,10 +940,11 @@ export default function PerformancePage() {
                               />
                               <MetricBox
                                 value={chain.metrics.finality}
-                                label="Finality"
+                                label={t("metrics.finality", "Finality")}
                                 isPrimary={chain.isPrimary}
                                 isWinner={metricWinners.finality.includes(chain.name)}
                                 chainLogo={chain.logo}
+                                t={safeT}
                                 chainName={chain.name}
                                 percentageDifference={(() => {
                                   if (chain.isPrimary) {
@@ -969,10 +988,11 @@ export default function PerformancePage() {
                               />
                               <MetricBox
                                 value={chain.metrics.blockTime}
-                                label="Block Time"
+                                label={t("metrics.block_time", "Block Time")}
                                 isPrimary={chain.isPrimary}
                                 isWinner={metricWinners.blockTime.includes(chain.name)}
                                 chainLogo={chain.logo}
+                                t={safeT}
                                 chainName={chain.name}
                                 percentageDifference={(() => {
                                   if (chain.isPrimary) {
@@ -1016,10 +1036,11 @@ export default function PerformancePage() {
                               />
                               <MetricBox
                                 value={chain.metrics.nakamotoCoeff}
-                                label="Nakamoto"
+                                label={t("metrics.nakamoto", "Nakamoto")}
                                 isPrimary={chain.isPrimary}
                                 isWinner={metricWinners.nakamotoCoeff.includes(chain.name)}
                                 chainLogo={chain.logo}
+                                t={safeT}
                                 chainName={chain.name}
                                 percentageDifference={(() => {
                                   if (chain.isPrimary) {
@@ -1069,8 +1090,7 @@ export default function PerformancePage() {
                                     </TooltipTrigger>
                                     <TooltipContent>
                                       <p className="text-sm max-w-xs">
-                                        Minimum entities needed to control &gt;50% of network
-                                        resources. Higher = more decentralized.
+                                        {t("tooltips.nakamoto_coefficient", "Minimum entities needed to control >50% of network resources. Higher = more decentralized.")}
                                       </p>
                                     </TooltipContent>
                                   </Tooltip>
@@ -1078,10 +1098,11 @@ export default function PerformancePage() {
                               />
                               <MetricBox
                                 value={chain.metrics.validators}
-                                label="Validators"
+                                label={t("metrics.validators", "Validators")}
                                 isPrimary={chain.isPrimary}
                                 isWinner={metricWinners.validators.includes(chain.name)}
                                 chainLogo={chain.logo}
+                                t={safeT}
                                 chainName={chain.name}
                                 percentageDifference={(() => {
                                   if (chain.isPrimary) {
@@ -1132,29 +1153,28 @@ export default function PerformancePage() {
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                       <MetricBox
                         value={formatTPS(aptosMetrics.maxTps)}
-                        label={
-                          <>
-                            <span>Max TPS</span>
-                            <span>(100 blocks)</span>
-                          </>
-                        }
+                        label={t("metrics.max_tps_100_blocks", "Max TPS (100 blocks)")}
                         isPrimary={true}
+                        t={safeT}
                       />
                       <MetricBox
                         value={formatTPS(aptosMetrics.maxTpsOneBlock)}
-                        label="Max TPS (1 block)"
+                        label={t("metrics.max_tps_1_block", "Max TPS (1 block)")}
                         isPrimary={true}
+                        t={safeT}
                       />
-                      <MetricBox value={aptosMetrics.finality} label="Finality" isPrimary={true} />
+                      <MetricBox value={aptosMetrics.finality} label={t("metrics.finality", "Finality")} isPrimary={true} t={t} />
                       <MetricBox
                         value={aptosMetrics.blockTime}
-                        label="Block Time"
+                        label={t("metrics.block_time", "Block Time")}
                         isPrimary={true}
+                        t={safeT}
                       />
                       <MetricBox
                         value={aptosMetrics.nakamotoCoeff}
-                        label="Nakamoto"
+                        label={t("metrics.nakamoto", "Nakamoto")}
                         isPrimary={true}
+                        t={safeT}
                         tooltip={
                           <Tooltip>
                             <TooltipTrigger asChild>
@@ -1162,8 +1182,7 @@ export default function PerformancePage() {
                             </TooltipTrigger>
                             <TooltipContent>
                               <p className="text-sm max-w-xs">
-                                Minimum entities needed to control &gt;50% of network resources.
-                                Higher = more decentralized.
+                                {t("tooltips.nakamoto_coefficient", "Minimum entities needed to control >50% of network resources. Higher = more decentralized.")}
                               </p>
                             </TooltipContent>
                           </Tooltip>
@@ -1171,8 +1190,9 @@ export default function PerformancePage() {
                       />
                       <MetricBox
                         value={aptosMetrics.validators}
-                        label="Validators"
+                        label={t("metrics.validators", "Validators")}
                         isPrimary={true}
+                        t={safeT}
                       />
                     </div>
                   )}

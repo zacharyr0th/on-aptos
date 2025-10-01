@@ -1,0 +1,62 @@
+{
+  "page": {
+    "title": "أداء أبتوس",
+    "title_vs": "أبتوس مقابل {{chains}}",
+    "description": "قارن مقاييس أداء بلوك تشين أبتوس مع السلاسل الرائدة الأخرى"
+  },
+  "tabs": {
+    "performance": "أداء السلسلة",
+    "performance_short": "الأداء",
+    "usdt": "مقارنة USDt",
+    "usdt_short": "USDt"
+  },
+  "sidebar": {
+    "compare": "قارن",
+    "compare_count": "قارن ({{count}}/3)",
+    "clear": "مسح"
+  },
+  "metrics": {
+    "max_tps": "أقصى TPS",
+    "max_tps_100_blocks": "أقصى TPS (100 كتلة)",
+    "max_tps_1_block": "أقصى TPS (كتلة واحدة)",
+    "finality": "النهائية",
+    "block_time": "زمن الكتلة",
+    "nakamoto": "ناكاموتو",
+    "validators": "المدققون"
+  },
+  "comparison": {
+    "is_better": "هو",
+    "better": "أفضل",
+    "same_as": "نفس",
+    "aptos_is": "أبتوس",
+    "multiplier_better": "أفضل بـ {{multiplier}}"
+  },
+  "chains": {
+    "aptos": "أبتوس",
+    "ethereum": "إيثيريوم",
+    "solana": "سولانا",
+    "bsc": "BSC",
+    "avalanche": "أفالانش", 
+    "cardano": "كاردانو",
+    "sui": "Sui",
+    "tron": "ترون",
+    "base": "Base",
+    "bitcoin": "بيتكوين"
+  },
+  "tooltips": {
+    "nakamoto_coefficient": "الحد الأدنى من الكيانات المطلوبة للتحكم في >50% من موارد الشبكة. أعلى = أكثر لامركزية.",
+    "chainspect_data": "Chainspect ليس لديه API لذا تم ترميز هذه القيم في 11 سبتمبر 2025."
+  },
+  "attribution": {
+    "data_powered_by": "البيانات مقدمة من",
+    "chainspect": "Chainspect"
+  },
+  "usdt": {
+    "title": "مقارنة معاملات USDT",
+    "transactions": "المعاملات",
+    "daily_transactions": "المعاملات اليومية",
+    "market_share": "الحصة السوقية",
+    "cost_comparison": "مقارنة تكلفة المعاملة",
+    "aptos_dominance": "أبتوس يهيمن على معاملات USDT عبر البلوك تشين الرئيسية"
+  }
+}

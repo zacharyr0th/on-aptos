@@ -1,0 +1,62 @@
+{
+  "page": {
+    "title": "Aptos Performance",
+    "title_vs": "Aptos vs {{chains}}",
+    "description": "Compare how Aptos blockchain dey perform with oda big chains"
+  },
+  "tabs": {
+    "performance": "Chain Performance",
+    "performance_short": "Performance",
+    "usdt": "USDt Comparison",
+    "usdt_short": "USDt"
+  },
+  "sidebar": {
+    "compare": "Compare",
+    "compare_count": "Compare ({{count}}/3)",
+    "clear": "Clear am"
+  },
+  "metrics": {
+    "max_tps": "Max TPS",
+    "max_tps_100_blocks": "Max TPS (100 blocks)",
+    "max_tps_1_block": "Max TPS (1 block)",
+    "finality": "Final stage",
+    "block_time": "Block Time",
+    "nakamoto": "Nakamoto",
+    "validators": "Validators"
+  },
+  "comparison": {
+    "is_better": "dey",
+    "better": "better",
+    "same_as": "Same as",
+    "aptos_is": "Aptos dey",
+    "multiplier_better": "{{multiplier}} better"
+  },
+  "chains": {
+    "aptos": "Aptos",
+    "ethereum": "Ethereum",
+    "solana": "Solana",
+    "bsc": "BSC",
+    "avalanche": "Avalanche",
+    "cardano": "Cardano",
+    "sui": "Sui",
+    "tron": "TRON",
+    "base": "Base",
+    "bitcoin": "Bitcoin"
+  },
+  "tooltips": {
+    "nakamoto_coefficient": "Small small entities wey need to control >50% of network resources. Higher number = more decentralized.",
+    "chainspect_data": "Chainspect no get API so we hardcode these values for September 11th, 2025."
+  },
+  "attribution": {
+    "data_powered_by": "Data powered by",
+    "chainspect": "Chainspect"
+  },
+  "usdt": {
+    "title": "USDT Transaction Comparison",
+    "transactions": "Transactions",
+    "daily_transactions": "Daily Transactions",
+    "market_share": "Market Share",
+    "cost_comparison": "Transaction Cost Comparison",
+    "aptos_dominance": "Aptos dey dominate USDT transactions for major blockchains"
+  }
+}

@@ -1,11 +1,11 @@
-import MetricsPage from "@/components/pages/metrics/MetricsSimple";
+import PortfolioPage from "@/components/pages/tools/portfolio/Page";
 import { createPage } from "@/lib/utils/page-factory";
 
 const pageConfig = createPage({
-  title: "Ecosystem Metrics",
+  title: "Portfolio Analytics",
   description:
-    "Real-time metrics and analytics for the Aptos blockchain ecosystem. Track network performance, transaction volume, token statistics, and ecosystem growth.",
-  Component: MetricsPage,
+    "Track your Aptos wallet portfolio with real-time analytics. View your fungible assets, NFTs, and portfolio performance over time.",
+  Component: PortfolioPage,
   dynamic: "force-static",
 });
 
