@@ -1,0 +1,1991 @@
+"use client";
+
+import { ArrowRight, ExternalLink, Wallet, Zap, Shield, Code, TrendingUp, Layers, Users, Globe, GitBranch, BookOpen, FileText, Github, Wrench, Search, Terminal, Key, Settings, Eye, Info, DollarSign, Coins, Bitcoin, Package, Menu, X } from "lucide-react";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import Image from "next/image";
+import Link from "next/link";
+import dynamic from "next/dynamic";
+import { useState, useMemo, useEffect, memo, useRef } from "react";
+import Autoplay from "embla-carousel-autoplay";
+import { defiProtocols } from "@/components/pages/protocols/defi/data/protocols";
+import { categories } from "@/components/pages/protocols/defi/data/categories";
+import { FilterControls, ProtocolDisplay, StatsSection } from "@/components/pages/protocols/defi/components";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { StatCard } from "@/components/ui/StatCard";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import type { TokenData } from "@/lib/types/tokens";
+import { STABLECOIN_SYMBOLS } from "@/lib/constants/tokens/stablecoins";
+import { formatCurrency, formatNumber } from "@/lib/utils/format";
+import { motion, useInView } from "framer-motion";
+import { useTranslation } from "@/lib/hooks/useTranslation";
+
+const TokenTreemap = dynamic(() => import("@/components/pages/markets/tokens/TokenTreemap").then(m => m.TokenTreemap));
+
+const wallets = [
+  {
+    name: "Petra",
+    description: "Most popular Aptos wallet with NFT gallery, hardware wallet support, and built-in token swaps",
+    href: "https://petra.app/",
+    logo: "/icons/petra.webp",
+    platforms: ["Chrome", "iOS", "Android"],
+    recommended: true
+  },
+  {
+    name: "Backpack",
+    description: "Multi-chain wallet supporting Aptos, Solana, and Ethereum ecosystems",
+    href: "https://chromewebstore.google.com/detail/backpack/aflkmfhebedbjioipglgcbcmnbpgliof",
+    logo: "/icons/cex/backpack.jpg",
+    platforms: ["Chrome", "Mobile"]
+  },
+  {
+    name: "Aptos Connect",
+    description: "Official wallet adapter for seamless dApp integration",
+    href: "https://aptosconnect.app/",
+    logo: "/icons/apt.png",
+    platforms: ["Web"]
+  },
+];
+
+// Removed static protocols - using defiProtocols from data/protocols instead
+
+const bridges = [
+  {
+    name: "Stargate (LayerZero)",
+    description: "Seamless transfers of LayerZero-wrapped stablecoins and Omnichain Fungible Tokens (OFT assets)",
+    href: "https://stargate.finance",
+    logo: "/icons/protocols/lz.png",
+    bridgeTime: "1-5 min",
+    fees: "~0.06%",
+    networks: "39+",
+    protocol: "LAYERZERO",
+    status: "Live",
+  },
+  {
+    name: "Circle CCTP",
+    description: "Facilitates native USDC transfers across 10+ blockchain networks",
+    href: "https://www.circle.com/cross-chain-transfer-protocol",
+    logo: "/icons/stables/usdc.webp",
+    bridgeTime: "10-20 min",
+    fees: "0%",
+    networks: "10+",
+    protocol: "CIRCLE NATIVE",
+    status: "Live",
+  },
+  {
+    name: "Wormhole Portal",
+    description: "Cross-chain bridge with CCTP integration for native USDC, accessible via Stargate",
+    href: "https://portalbridge.com",
+    logo: "/icons/protocols/wormhole.png",
+    bridgeTime: "5-15 min",
+    fees: "~0.1%",
+    networks: "30+",
+    protocol: "WORMHOLE",
+    status: "Live",
+  },
+  {
+    name: "Echo aBTC Bridge",
+    description: "Allows bridging Bitcoin onto Aptos as aBTC, powered by the BSquared Network",
+    href: "https://www.echo-protocol.xyz",
+    logo: "/icons/btc/echo.webp",
+    bridgeTime: "15-30 min",
+    fees: "~0.3%",
+    networks: "5+",
+    protocol: "BSQUARED",
+    status: "Live",
+  },
+  {
+    name: "Gas.zip",
+    description: "Integrated with Stargate, quickly 'refuels' Aptos wallets with APT tokens for covering gas fees",
+    href: "https://gas.zip",
+    logo: "/icons/protocols/gas-zip.png",
+    bridgeTime: "1-5 min",
+    fees: "Variable",
+    networks: "Multiple",
+    protocol: "GAS REFUEL",
+    status: "Live",
+  },
+  {
+    name: "Zach's Bridging Guide",
+    description: "Complete guide to bridging assets onto Aptos with detailed instructions and best practices",
+    href: "https://x.com/zacharyr0th/status/1915031084976451596",
+    logo: "/icons/apt.png",
+    bridgeTime: "N/A",
+    fees: "N/A",
+    networks: "Guide",
+    protocol: "EDUCATIONAL",
+    status: "Guide",
+  },
+];
+
+const exchanges = [
+  // Coinbase (US)
+  { region: "US", name: "Coinbase", chain: "Aptos", usdt: "N", usdc: "Y", link: "https://www.coinbase.com", logo: "/icons/cex/coinbase.web.png" },
+  { region: "US", name: "Coinbase", chain: "Solana", usdt: "N", usdc: "Y", link: "https://www.coinbase.com" },
+  { region: "US", name: "Coinbase", chain: "ETH", usdt: "Y", usdc: "Y", link: "https://www.coinbase.com" },
+  { region: "US", name: "Coinbase", chain: "Base", usdt: "N", usdc: "Y", link: "https://www.coinbase.com" },
+
+  // Upbit (KR)
+  { region: "KR", name: "Upbit", chain: "Aptos", usdt: "Y", usdc: "N", link: "https://upbit.com", logo: "/icons/cex/upbit.jpg" },
+  { region: "KR", name: "Upbit", chain: "Solana", usdt: "N", usdc: "Y", link: "https://upbit.com" },
+  { region: "KR", name: "Upbit", chain: "Tron", usdt: "Y", usdc: "N", link: "https://upbit.com" },
+  { region: "KR", name: "Upbit", chain: "Base", usdt: "N", usdc: "N", link: "https://upbit.com" },
+
+  // Bithumb (KR)
+  { region: "KR", name: "Bithumb", chain: "Solana", usdt: "", usdc: "", link: "https://www.bithumb.com" },
+
+  // Binance (Global)
+  { region: "Global", name: "Binance", chain: "Aptos", usdt: "Y", usdc: "Y", link: "https://www.binance.com", logo: "/icons/cex/binance.webp" },
+  { region: "Global", name: "Binance", chain: "Solana", usdt: "Y", usdc: "Y", link: "https://www.binance.com" },
+  { region: "Global", name: "Binance", chain: "Tron", usdt: "Y", usdc: "N", link: "https://www.binance.com" },
+  { region: "Global", name: "Binance", chain: "Base", usdt: "N", usdc: "Y", link: "https://www.binance.com" },
+
+  // Bybit (Global)
+  { region: "Global", name: "Bybit", chain: "Aptos", usdt: "Y", usdc: "Y", link: "https://www.bybit.com", logo: "/icons/cex/bybit.jpg" },
+  { region: "Global", name: "Bybit", chain: "Solana", usdt: "Y", usdc: "Y", link: "https://www.bybit.com" },
+  { region: "Global", name: "Bybit", chain: "Tron", usdt: "Y", usdc: "N", link: "https://www.bybit.com" },
+  { region: "Global", name: "Bybit", chain: "Base", usdt: "N", usdc: "Y", link: "https://www.bybit.com" },
+
+  // OKX (Global)
+  { region: "Global", name: "OKX", chain: "Aptos", usdt: "Y", usdc: "Y", link: "https://www.okx.com", logo: "/icons/cex/okx.jpg" },
+  { region: "Global", name: "OKX", chain: "Solana", usdt: "Y", usdc: "Y", link: "https://www.okx.com" },
+  { region: "Global", name: "OKX", chain: "Tron", usdt: "Y", usdc: "N", link: "https://www.okx.com" },
+  { region: "Global", name: "OKX", chain: "Base", usdt: "N", usdc: "Y", link: "https://www.okx.com" },
+
+  // Bitget (Global)
+  { region: "Global", name: "Bitget", chain: "Aptos", usdt: "Y", usdc: "Y", link: "https://www.bitget.com", logo: "/icons/cex/bitget.jpg" },
+  { region: "Global", name: "Bitget", chain: "Solana", usdt: "Y", usdc: "Y", link: "https://www.bitget.com" },
+  { region: "Global", name: "Bitget", chain: "Tron", usdt: "Y", usdc: "N", link: "https://www.bitget.com" },
+  { region: "Global", name: "Bitget", chain: "Base", usdt: "N", usdc: "Y", link: "https://www.bitget.com" },
+
+  // MEXC (Global)
+  { region: "Global", name: "MEXC", chain: "Aptos", usdt: "Y", usdc: "Y", link: "https://www.mexc.com", logo: "/icons/cex/mexc.webp" },
+  { region: "Global", name: "MEXC", chain: "Solana", usdt: "Y", usdc: "Y", link: "https://www.mexc.com" },
+  { region: "Global", name: "MEXC", chain: "Tron", usdt: "Y", usdc: "N", link: "https://www.mexc.com" },
+  { region: "Global", name: "MEXC", chain: "Base", usdt: "N", usdc: "Y", link: "https://www.mexc.com" },
+
+  // Bitfinex (Global)
+  { region: "Global", name: "Bitfinex", chain: "Aptos", usdt: "Y", usdc: "N", link: "https://www.bitfinex.com", logo: "/icons/cex/bitfinex.webp" },
+  { region: "Global", name: "Bitfinex", chain: "Solana", usdt: "Y", usdc: "N", link: "https://www.bitfinex.com" },
+  { region: "Global", name: "Bitfinex", chain: "Tron", usdt: "Y", usdc: "N", link: "https://www.bitfinex.com" },
+
+  // KuCoin (Global)
+  { region: "Global", name: "KuCoin", chain: "Aptos", usdt: "Y", usdc: "N", link: "https://www.kucoin.com", logo: "/icons/cex/kucoin.jpg" },
+  { region: "Global", name: "KuCoin", chain: "Solana", usdt: "Y", usdc: "Y", link: "https://www.kucoin.com" },
+  { region: "Global", name: "KuCoin", chain: "Tron", usdt: "Y", usdc: "N", link: "https://www.kucoin.com" },
+
+  // Backpack (Global)
+  { region: "Global", name: "Backpack", chain: "Aptos", usdt: "N", usdc: "Y", link: "https://backpack.exchange", logo: "/icons/cex/backpack.jpg" },
+  { region: "Global", name: "Backpack", chain: "Solana", usdt: "N", usdc: "Y", link: "https://backpack.exchange" },
+  { region: "Global", name: "Backpack", chain: "Tron", usdt: "N", usdc: "N", link: "https://backpack.exchange" },
+
+  // Flipster (KR)
+  { region: "KR", name: "Flipster", chain: "Aptos", usdt: "Y", usdc: "N", link: "https://flipster.io", logo: "/icons/cex/flipster.jpg" },
+  { region: "KR", name: "Flipster", chain: "Solana", usdt: "Y", usdc: "Y", link: "https://flipster.io" },
+  { region: "KR", name: "Flipster", chain: "Tron", usdt: "Y", usdc: "N", link: "https://flipster.io" },
+  { region: "KR", name: "Flipster", chain: "Base", usdt: "N", usdc: "Y", link: "https://flipster.io" },
+
+  // Gate.io
+  { region: "Global", name: "Gate.io", chain: "Aptos", usdt: "Y", usdc: "Y", link: "https://www.gate.io", logo: "/icons/cex/gate.jpg" },
+  { region: "Global", name: "Gate.io", chain: "Solana", usdt: "Y", usdc: "Y", link: "https://www.gate.io" },
+  { region: "Global", name: "Gate.io", chain: "Tron", usdt: "Y", usdc: "N", link: "https://www.gate.io" },
+  { region: "Global", name: "Gate.io", chain: "Base", usdt: "N", usdc: "Y", link: "https://www.gate.io" },
+];
+
+const developerTools = [
+  {
+    name: "Gas Profiler",
+    description: "Analyze transaction gas usage with flamegraphs and cost breakdowns",
+    href: "https://aptos.dev/gas-profiling/sample-report/",
+    icon: TrendingUp,
+  },
+  {
+    name: "Aptos Explorer",
+    description: "Explore transactions, accounts, events, and network activities",
+    href: "https://explorer.aptoslabs.com/",
+    icon: Search,
+  },
+  {
+    name: "Create Aptos DApp",
+    description: "Bootstrap dapps with starter templates and Move modules",
+    href: "https://github.com/aptos-labs/create-aptos-dapp",
+    icon: Terminal,
+  },
+  {
+    name: "Developer Portal",
+    description: "API keys, Transaction Stream, and Indexer API access",
+    href: "https://developers.aptoslabs.com/",
+    icon: Settings,
+  },
+  {
+    name: "Identity Connect",
+    description: "Single sign-on with Gmail, Facebook, or Twitter for dapps",
+    href: "https://identity-connect.staging.gcp.aptosdev.com/",
+    icon: Key,
+  },
+  {
+    name: "Aptos Names Service",
+    description: "Human-readable addresses and digital identity framework",
+    href: "https://www.aptosnames.com/",
+    icon: Users,
+  },
+  {
+    name: "Revela Decompiler",
+    description: "Decompile Move bytecode back to source code",
+    href: "https://revela.verichains.io/",
+    icon: Eye,
+  },
+  {
+    name: "Aptos Assistant",
+    description: "AI chatbot for development assistance",
+    href: "https://assistant.aptosfoundation.org/",
+    icon: Info,
+  },
+];
+
+const developerResources = [
+  {
+    name: "Aptos Core",
+    description: "Main Aptos blockchain repository",
+    href: "https://github.com/aptos-labs/aptos-core",
+    type: "GitHub",
+  },
+  {
+    name: "Aptos Developer Documentation",
+    description: "Complete developer guide and API reference",
+    href: "https://aptos.dev/",
+    type: "Docs",
+  },
+  {
+    name: "Move Reference Docs",
+    description: "Move programming language documentation",
+    href: "https://aptos.dev/reference/move/",
+    type: "Docs",
+  },
+];
+
+// Animation variants
+const fadeInUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 }
+};
+
+const fadeIn = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1 }
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
+
+const scaleIn = {
+  hidden: { opacity: 0, scale: 0.9 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: {
+      type: "spring" as const,
+      stiffness: 100
+    }
+  }
+};
+
+const slideDown = {
+  hidden: { opacity: 0, y: -20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: "spring" as const,
+      stiffness: 100
+    }
+  }
+};
+
+function OnboardingPageComponent() {
+  const { t } = useTranslation("common");
+  const heroRef = useRef(null);
+  const whyAptosRef = useRef(null);
+  const walletsRef = useRef(null);
+  const defiRef = useRef(null);
+  const bridgesRef = useRef(null);
+  const tokensRef = useRef(null);
+
+  const heroInView = useInView(heroRef, { once: true, margin: "-50px" });
+  const whyAptosInView = useInView(whyAptosRef, { once: true, margin: "-100px" });
+  const walletsInView = useInView(walletsRef, { once: true, margin: "-100px" });
+  const defiInView = useInView(defiRef, { once: true, margin: "-100px" });
+  const bridgesInView = useInView(bridgesRef, { once: true, margin: "-100px" });
+  const tokensInView = useInView(tokensRef, { once: true, margin: "-100px" });
+
+  const navigationSections = [
+    { id: "overview", label: t("onboarding.navigation.overview") },
+    { id: "why-aptos", label: t("onboarding.navigation.whyAptos") },
+    { id: "getting-started", label: t("onboarding.navigation.gettingStarted") },
+    { id: "defi", label: t("onboarding.navigation.defi") },
+    { id: "tokens", label: t("onboarding.navigation.markets") },
+    { id: "developers", label: t("onboarding.navigation.developers") },
+    { id: "community", label: t("onboarding.navigation.community") },
+  ];
+
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string | undefined>(undefined);
+  const [tokens, setTokens] = useState<TokenData[]>([]);
+  const [loadingTokens, setLoadingTokens] = useState(false);
+  const [includeStablecoins, setIncludeStablecoins] = useState(true);
+  const [includeAPT, setIncludeAPT] = useState(true);
+  const [assetValues, setAssetValues] = useState<{
+    stables: { value: number; label: string; description: string };
+    rwas: { value: number; label: string; description: string };
+    btc: { value: number; label: string; description: string };
+    tokens: { value: number; label: string; description: string };
+  } | null>(null);
+  const [isLoadingValues, setIsLoadingValues] = useState(true);
+  const [activeSection, setActiveSection] = useState("overview");
+  const [isNavOpen, setIsNavOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [totalTokenCount, setTotalTokenCount] = useState<number>(0);
+  const [animatedValues, setAnimatedValues] = useState({
+    stables: 0,
+    rwas: 0,
+    btc: 0,
+    tokens: 0,
+  });
+
+  useEffect(() => {
+    fetchInitialData();
+  }, []);
+
+  // Animate values when assetValues change
+  useEffect(() => {
+    if (!assetValues) return;
+
+    const duration = 1500; // 1.5 seconds
+    const steps = 60;
+    const stepDuration = duration / steps;
+
+    let currentStep = 0;
+
+    const interval = setInterval(() => {
+      currentStep++;
+      const progress = currentStep / steps;
+      const easeOutProgress = 1 - Math.pow(1 - progress, 3); // Ease out cubic
+
+      setAnimatedValues({
+        stables: Math.floor(assetValues.stables.value * easeOutProgress),
+        rwas: Math.floor(assetValues.rwas.value * easeOutProgress),
+        btc: Math.floor(assetValues.btc.value * easeOutProgress),
+        tokens: Math.floor(assetValues.tokens.value * easeOutProgress),
+      });
+
+      if (currentStep >= steps) {
+        clearInterval(interval);
+        // Set final exact values
+        setAnimatedValues({
+          stables: assetValues.stables.value,
+          rwas: assetValues.rwas.value,
+          btc: assetValues.btc.value,
+          tokens: assetValues.tokens.value,
+        });
+      }
+    }, stepDuration);
+
+    return () => clearInterval(interval);
+  }, [assetValues]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const sections = navigationSections.map(section => document.getElementById(section.id));
+      const scrollPosition = window.scrollY + 100;
+
+      for (let i = sections.length - 1; i >= 0; i--) {
+        const section = sections[i];
+        if (section && section.offsetTop <= scrollPosition) {
+          setActiveSection(navigationSections[i].id);
+          break;
+        }
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const fetchInitialData = async () => {
+    try {
+      setLoadingTokens(true);
+      setIsLoadingValues(true);
+      setError(null);
+
+      // Fetch both APIs in parallel for faster loading - REDUCED TOKEN LIMIT
+      const [tokensResponse, assetValuesResponse] = await Promise.all([
+        fetch("/api/markets/tokens?limit=100&all=true"),
+        fetch("/api/defi/asset-values")
+      ]);
+
+      // Process tokens
+      if (tokensResponse.ok) {
+        const tokensData = await tokensResponse.json();
+        if (tokensData.tokens) {
+          // Convert API data format to component format (same as tokens page)
+          const processedTokens = tokensData.tokens.map((token: any) => ({
+            name: token.name,
+            symbol: token.symbol,
+            price: token.price ? parseFloat(token.price) : 0,
+            marketCap: token.marketCap || 0,
+            fdv: token.fullyDilutedValuation || token.marketCap || 0,
+            supply: token.supply || 0,
+            priceChange: token.priceChange24H || 0,
+            category: token.category || "other",
+            bridge: token.bridge || null,
+            logoUrl: token.logoUrl,
+            panoraSymbol: token.panoraSymbol,
+            panoraTags: token.panoraTags || [],
+            panoraUI: token.panoraUI,
+            websiteUrl: token.websiteUrl,
+            faAddress: token.faAddress,
+            tokenAddress: token.tokenAddress,
+            coinGeckoId: token.coinGeckoId,
+            rank: token.rank || 0,
+            isVerified: token.isVerified || false,
+          }));
+          setTokens(processedTokens);
+          // Store the total token count from Panora's API
+          setTotalTokenCount(tokensData.totalTokens || 0);
+        }
+      } else {
+        throw new Error("Failed to fetch tokens");
+      }
+
+      // Process asset values
+      if (assetValuesResponse.ok) {
+        const assetData = await assetValuesResponse.json();
+        setAssetValues(assetData);
+      } else {
+        throw new Error("Failed to fetch asset values");
+      }
+
+    } catch (err) {
+      console.error("Failed to fetch data:", err);
+      setError(err instanceof Error ? err.message : "Failed to load data");
+    } finally {
+      setLoadingTokens(false);
+      setIsLoadingValues(false);
+    }
+  };
+
+  const scrollToSection = (sectionId: string) => {
+    const section = document.getElementById(sectionId);
+    if (section) {
+      const offset = 80;
+      const sectionPosition = section.offsetTop - offset;
+      window.scrollTo({ top: sectionPosition, behavior: "smooth" });
+      setIsNavOpen(false);
+    }
+  };
+  
+  // Calculate protocol counts per category
+  const protocolCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    categories.forEach(category => {
+      if (category !== "All") {
+        counts[category] = defiProtocols.filter(p => p.category === category).length;
+      }
+    });
+    return counts;
+  }, []);
+
+  // Calculate subcategory counts per category
+  const subcategoryCounts = useMemo(() => {
+    const counts: Record<string, Record<string, number>> = {};
+    categories.forEach(category => {
+      if (category !== "All") {
+        counts[category] = {};
+        // Get all unique subcategories for this category
+        const protocolsInCategory = defiProtocols.filter(p => p.category === category);
+        protocolsInCategory.forEach(protocol => {
+          // Handle comma-separated subcategories
+          const subcategories = protocol.subcategory.split(", ").map(s => s.trim());
+          subcategories.forEach(subcategory => {
+            if (!counts[category][subcategory]) {
+              counts[category][subcategory] = 0;
+            }
+            counts[category][subcategory]++;
+          });
+        });
+      }
+    });
+    return counts;
+  }, []);
+
+  // STABLE TOKENS - only update when toggles change
+  const stableTokens = useMemo(() => {
+    if (tokens.length === 0) return [];
+    
+    let filtered = tokens;
+    
+    if (!includeStablecoins) {
+      filtered = filtered.filter(
+        token => !token.symbol || !STABLECOIN_SYMBOLS.includes(token.symbol as any)
+      );
+    }
+    
+    if (!includeAPT) {
+      filtered = filtered.filter(
+        token => token.symbol !== "APT"
+      );
+    }
+    
+    // Return the EXACT same reference if no change
+    return filtered;
+  }, [tokens.length, includeStablecoins, includeAPT]);
+
+  // Calculate metrics based on APT and stablecoin toggles (EXACT COPY FROM TOKENS PAGE)
+  const displayMetrics = useMemo(() => {
+    if (!tokens.length)
+      return {
+        marketCap: 0,
+        tokenCount: 0,
+        averageMarketCap: 0,
+        medianMarketCap: 0,
+      };
+
+    const relevantTokens = stableTokens;
+
+    // Calculate market caps
+    const tokenMarketCaps = relevantTokens
+      .map((token) => token.fdv || token.marketCap || 0)
+      .filter((cap) => cap > 0);
+
+    // Total market cap
+    const totalMarketCap = tokenMarketCaps.reduce((sum, cap) => sum + cap, 0);
+
+    // Token count
+    const tokenCount = relevantTokens.length;
+
+    // Average market cap
+    const averageMarketCap = tokenCount > 0 ? totalMarketCap / tokenCount : 0;
+
+    // Median market cap
+    const sortedCaps = [...tokenMarketCaps].sort((a, b) => a - b);
+    const medianMarketCap =
+      sortedCaps.length > 0
+        ? sortedCaps.length % 2 === 0
+          ? (sortedCaps[sortedCaps.length / 2 - 1] + sortedCaps[sortedCaps.length / 2]) / 2
+          : sortedCaps[Math.floor(sortedCaps.length / 2)]
+        : 0;
+
+    return {
+      marketCap: totalMarketCap,
+      tokenCount,
+      averageMarketCap,
+      medianMarketCap,
+    };
+  }, [tokens, stableTokens]);
+  
+  // Format value for display
+  const formatValue = (value: number) => {
+    if (value >= 1000000000) {
+      return `$${(value / 1000000000).toFixed(2)}B`;
+    } else if (value >= 1000000) {
+      return `$${(value / 1000000).toFixed(1)}M`;
+    } else if (value >= 1000) {
+      return `$${(value / 1000).toFixed(1)}K`;
+    } else {
+      return `$${value.toFixed(0)}`;
+    }
+  };
+
+  return (
+    <div className="min-h-screen">
+      {/* Sticky Navigation */}
+      <motion.nav
+        className="sticky top-0 z-50"
+        initial="hidden"
+        animate="visible"
+        variants={slideDown}
+      >
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-center h-16">
+            {/* Desktop Navigation */}
+            <motion.div
+              className="hidden lg:flex items-center gap-2 bg-background/30 backdrop-blur-lg rounded-full px-2 py-2 border border-border/30"
+              variants={fadeIn}
+              transition={{ delay: 0.2 }}
+            >
+              {navigationSections.map((section, index) => (
+                <motion.button
+                  key={section.id}
+                  onClick={() => scrollToSection(section.id)}
+                  className={`px-4 py-2 text-sm rounded-full transition-all duration-200 ${
+                    activeSection === section.id
+                      ? "bg-background/80 text-foreground font-medium shadow-sm"
+                      : "text-foreground/70 hover:text-foreground hover:bg-background/40"
+                  }`}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 + index * 0.05 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  {section.label}
+                </motion.button>
+              ))}
+            </motion.div>
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setIsNavOpen(!isNavOpen)}
+              className="lg:hidden p-2 text-foreground hover:bg-muted rounded-md"
+            >
+              {isNavOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
+
+          {/* Mobile Navigation */}
+          {isNavOpen && (
+            <div className="lg:hidden py-4 border-t border-border">
+              <div className="grid grid-cols-2 gap-2">
+                {navigationSections.map((section) => (
+                  <button
+                    key={section.id}
+                    onClick={() => scrollToSection(section.id)}
+                    className={`px-3 py-2 text-sm rounded-md transition-colors text-left ${
+                      activeSection === section.id
+                        ? "bg-primary/10 text-primary font-medium"
+                        : "text-foreground/70 hover:text-foreground hover:bg-muted"
+                    }`}
+                  >
+                    {section.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </motion.nav>
+
+      <div className="relative">
+        {/* Hero Section */}
+        <section id="overview" className="pt-12 md:pt-16 pb-12 md:pb-20 px-4 md:px-6 relative overflow-hidden" ref={heroRef}>
+          {/* Background gradient */}
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/50 to-background/80 pointer-events-none" />
+
+          <div className="container mx-auto text-center relative z-10">
+            <div className="max-w-5xl mx-auto">
+              {/* Main heading */}
+              <motion.h1
+                className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold mb-4 md:mb-6 text-foreground leading-tight tracking-tight px-4"
+                initial={{ opacity: 0, y: 30 }}
+                animate={heroInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+              >
+                {t("onboarding.hero.title")}
+                <br />
+                <motion.span
+                  className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={heroInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }}
+                  transition={{ delay: 0.3, duration: 0.8, ease: "easeOut" }}
+                >
+                  {t("onboarding.hero.titleHighlight")}
+                </motion.span>
+              </motion.h1>
+
+              {/* Subheading */}
+              <motion.p
+                className="text-base md:text-lg lg:text-xl text-foreground/70 mb-8 md:mb-12 max-w-3xl mx-auto leading-relaxed px-4"
+                initial={{ opacity: 0, y: 20 }}
+                animate={heroInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                transition={{ delay: 0.4, duration: 0.8, ease: "easeOut" }}
+              >
+                {t("onboarding.hero.subtitle")}
+              </motion.p>
+
+              {/* CTA Buttons */}
+              <motion.div
+                className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center mb-12 md:mb-16 px-4"
+                initial={{ opacity: 0, y: 20 }}
+                animate={heroInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                transition={{ delay: 0.6, duration: 0.8, ease: "easeOut" }}
+              >
+                <Link href="/portfolio" className="w-full sm:w-auto">
+                  <motion.button
+                    className="w-full group px-6 md:px-8 py-3 md:py-4 bg-primary text-primary-foreground font-semibold rounded-lg hover:bg-primary/90 transition-all shadow-lg hover:shadow-xl hover:scale-105"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <span className="flex items-center justify-center gap-2">
+                      <TrendingUp className="w-4 h-4 md:w-5 md:h-5 group-hover:scale-110 transition-transform" />
+                      {t("onboarding.hero.ctaViewPortfolio")}
+                    </span>
+                  </motion.button>
+                </Link>
+                <Link href="#defi" className="w-full sm:w-auto">
+                  <motion.button
+                    className="w-full px-6 md:px-8 py-3 md:py-4 bg-card border border-border text-foreground font-medium rounded-lg hover:bg-muted transition-all hover:shadow-md"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    {t("onboarding.hero.ctaExploreDeFi")}
+                  </motion.button>
+                </Link>
+              </motion.div>
+
+              {/* Asset Value Cards - Integrated into Hero */}
+              <motion.div
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto"
+                variants={staggerContainer}
+                initial="hidden"
+                animate={heroInView ? "visible" : "hidden"}
+              >
+                {/* Stablecoins Card */}
+                <motion.div variants={fadeInUp}>
+                  <Link href="/markets/stables">
+                    <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer h-full bg-card/50 backdrop-blur-sm border-border/50">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex -space-x-2">
+                        <img src="/icons/stables/usdc.png" alt="USDC" className="w-8 h-8 rounded-full border-2 border-background" />
+                        <img src="/icons/stables/usdt.png" alt="USDT" className="w-8 h-8 rounded-full border-2 border-background" />
+                        <img src="/icons/stables/usde.png" alt="USDe" className="w-8 h-8 rounded-full border-2 border-background" />
+                        <img src="/icons/stables/USDA.png" alt="USDA" className="w-8 h-8 rounded-full border-2 border-background" />
+                      </div>
+                      <Badge variant="outline" className="text-xs">{t("onboarding.assetCards.badgeLive")}</Badge>
+                    </div>
+                    <div className="space-y-2">
+                      <p className="text-sm text-muted-foreground">{t("onboarding.assetCards.stablecoinsLabel")}</p>
+                      <p className="text-2xl font-bold text-foreground tabular-nums">
+                        {isLoadingValues ? (
+                          <span className="animate-pulse bg-muted rounded h-8 w-24 inline-block" />
+                        ) : (
+                          formatValue(animatedValues.stables)
+                        )}
+                      </p>
+                      <p className="text-xs text-muted-foreground">{t("onboarding.assetCards.stablecoinsDescription")}</p>
+                    </div>
+                  </Card>
+                  </Link>
+                </motion.div>
+
+                {/* RWAs Card */}
+                <motion.div variants={fadeInUp}>
+                  <Link href="/markets/rwas">
+                    <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer h-full bg-card/50 backdrop-blur-sm border-border/50">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex -space-x-2">
+                        <img src="/icons/rwas/blackrock.webp" alt="BlackRock" className="w-8 h-8 rounded-full border-2 border-background bg-white" />
+                        <img src="/icons/rwas/ft.webp" alt="Franklin Templeton" className="w-8 h-8 rounded-full border-2 border-background" />
+                        <img src="/icons/rwas/ondo.webp" alt="Ondo" className="w-8 h-8 rounded-full border-2 border-background" />
+                        <img src="/icons/rwas/pact.webp" alt="Pact" className="w-8 h-8 rounded-full border-2 border-background" />
+                      </div>
+                      <Badge variant="outline" className="text-xs">{t("onboarding.assetCards.badgeGrowing")}</Badge>
+                    </div>
+                    <div className="space-y-2">
+                      <p className="text-sm text-muted-foreground">{t("onboarding.assetCards.rwasLabel")}</p>
+                      <p className="text-2xl font-bold text-foreground tabular-nums">
+                        {isLoadingValues ? (
+                          <span className="animate-pulse bg-muted rounded h-8 w-24 inline-block" />
+                        ) : (
+                          formatValue(animatedValues.rwas)
+                        )}
+                      </p>
+                      <p className="text-xs text-muted-foreground">{t("onboarding.assetCards.rwasDescription")}</p>
+                    </div>
+                  </Card>
+                  </Link>
+                </motion.div>
+
+                {/* BTC Card */}
+                <motion.div variants={fadeInUp}>
+                  <Link href="/markets/bitcoin">
+                    <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer h-full bg-card/50 backdrop-blur-sm border-border/50">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex -space-x-2">
+                        <img src="/icons/btc/echo.webp" alt="aBTC" className="w-8 h-8 rounded-full border-2 border-background" />
+                        <img src="/icons/btc/stakestone.webp" alt="SBTC" className="w-8 h-8 rounded-full border-2 border-background" />
+                        <img src="/icons/btc/okx.webp" alt="xBTC" className="w-8 h-8 rounded-full border-2 border-background bg-white" />
+                        <img src="/icons/btc/WBTC.webp" alt="WBTC" className="w-8 h-8 rounded-full border-2 border-background bg-white" />
+                      </div>
+                      <Badge variant="outline" className="text-xs">{t("onboarding.assetCards.badgeActive")}</Badge>
+                    </div>
+                    <div className="space-y-2">
+                      <p className="text-sm text-muted-foreground">{t("onboarding.assetCards.bitcoinLabel")}</p>
+                      <p className="text-2xl font-bold text-foreground tabular-nums">
+                        {isLoadingValues ? (
+                          <span className="animate-pulse bg-muted rounded h-8 w-24 inline-block" />
+                        ) : (
+                          formatValue(animatedValues.btc)
+                        )}
+                      </p>
+                      <p className="text-xs text-muted-foreground">{t("onboarding.assetCards.bitcoinDescription")}</p>
+                    </div>
+                  </Card>
+                  </Link>
+                </motion.div>
+
+                {/* TVL Card */}
+                <motion.div variants={fadeInUp}>
+                  <Link href="/protocols/defi">
+                    <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer h-full bg-card/50 backdrop-blur-sm border-border/50">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex -space-x-2">
+                        <img src="/icons/protocols/echelon.avif" alt="Echelon" className="w-8 h-8 rounded-full border-2 border-background" />
+                        <img src="/icons/protocols/panora.webp" alt="Panora" className="w-8 h-8 rounded-full border-2 border-background" />
+                        <img src="/icons/protocols/thala.avif" alt="Thala" className="w-8 h-8 rounded-full border-2 border-background" />
+                        <img src="/icons/protocols/merkle.webp" alt="Merkle" className="w-8 h-8 rounded-full border-2 border-background" />
+                      </div>
+                      <Badge variant="outline" className="text-xs">{t("onboarding.assetCards.badgeTVL")}</Badge>
+                    </div>
+                    <div className="space-y-2">
+                      <p className="text-sm text-muted-foreground">{t("onboarding.assetCards.tvlLabel")}</p>
+                      <p className="text-2xl font-bold text-foreground tabular-nums">
+                        {isLoadingValues ? (
+                          <span className="animate-pulse bg-muted rounded h-8 w-24 inline-block" />
+                        ) : (
+                          formatValue(animatedValues.tokens)
+                        )}
+                      </p>
+                      <p className="text-xs text-muted-foreground">{t("onboarding.assetCards.tvlDescription")}</p>
+                    </div>
+                  </Card>
+                  </Link>
+                </motion.div>
+              </motion.div>
+            </div>
+          </div>
+        </section>
+
+        {/* Why Aptos Section */}
+        <section id="why-aptos" className="py-12 md:py-20 px-4 md:px-6 relative overflow-hidden" ref={whyAptosRef}>
+          <div className="absolute inset-0 bg-gradient-to-b from-background via-primary/5 to-background pointer-events-none" />
+          <div className="container mx-auto relative z-10">
+            <div className="max-w-6xl mx-auto">
+              {/* Header */}
+              <motion.div
+                className="mb-12 text-center"
+                initial={{ opacity: 0, y: 30 }}
+                animate={whyAptosInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+                transition={{ duration: 0.6 }}
+              >
+                <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
+                  {t("onboarding.whyAptos.title")}
+                </h2>
+                <p className="text-xl text-foreground/70 max-w-3xl mx-auto leading-relaxed">
+                  {t("onboarding.whyAptos.subtitle")} <strong className="text-foreground">{t("onboarding.whyAptos.subtitleHighlight1")}</strong>, <strong className="text-foreground">{t("onboarding.whyAptos.subtitleHighlight2")}</strong>, {t("onboarding.whyAptos.subtitleHighlight3")} {t("onboarding.whyAptos.subtitleEnd")}
+                </p>
+              </motion.div>
+
+              {/* Feature Cards - Grid Layout */}
+              <motion.div
+                className="space-y-4"
+                variants={staggerContainer}
+                initial="hidden"
+                animate={whyAptosInView ? "visible" : "hidden"}
+              >
+                {/* Row 1 */}
+                <div className="grid md:grid-cols-3 gap-4">
+                  <motion.div variants={fadeInUp}>
+                    <Card className="p-6 bg-card border border-border h-full">
+                      <div className="flex items-start gap-4">
+                        <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                          <Zap className="w-6 h-6 text-primary" />
+                        </div>
+                        <div>
+                          <h3 className="font-bold text-lg text-foreground mb-1">{t("onboarding.whyAptos.lightningFastTitle")}</h3>
+                          <p className="text-sm text-foreground/70">{t("onboarding.whyAptos.lightningFastDescription")}</p>
+                        </div>
+                      </div>
+                    </Card>
+                  </motion.div>
+
+                  <motion.div variants={fadeInUp}>
+                    <Card className="p-6 bg-card border border-border h-full">
+                      <div className="flex items-start gap-4">
+                        <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                          <Shield className="w-6 h-6 text-primary" />
+                        </div>
+                        <div>
+                          <h3 className="font-bold text-lg text-foreground mb-1">{t("onboarding.whyAptos.secureByDesignTitle")}</h3>
+                          <p className="text-sm text-foreground/70">{t("onboarding.whyAptos.secureByDesignDescription")}</p>
+                        </div>
+                      </div>
+                    </Card>
+                  </motion.div>
+
+                  <motion.div variants={fadeInUp}>
+                    <Card className="p-6 bg-card border border-border h-full">
+                      <div className="flex items-start gap-4">
+                        <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                          <TrendingUp className="w-6 h-6 text-primary" />
+                        </div>
+                        <div>
+                          <h3 className="font-bold text-lg text-foreground mb-1">{t("onboarding.whyAptos.highPerformanceTitle")}</h3>
+                          <p className="text-sm text-foreground/70">{t("onboarding.whyAptos.highPerformanceDescription")}</p>
+                        </div>
+                      </div>
+                    </Card>
+                  </motion.div>
+                </div>
+
+                {/* Row 2 */}
+                <div className="grid md:grid-cols-3 gap-4">
+                  <motion.div variants={fadeInUp}>
+                    <Card className="p-6 bg-card border border-border h-full">
+                      <div className="flex items-start gap-4">
+                        <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                          <Code className="w-6 h-6 text-primary" />
+                        </div>
+                        <div>
+                          <h3 className="font-bold text-lg text-foreground mb-1">{t("onboarding.whyAptos.developerFriendlyTitle")}</h3>
+                          <p className="text-sm text-foreground/70">{t("onboarding.whyAptos.developerFriendlyDescription")}</p>
+                      </div>
+                    </div>
+                  </Card>
+                  </motion.div>
+
+                  <motion.div variants={fadeInUp}>
+                    <Card className="p-6 bg-card border border-border h-full">
+                      <div className="flex items-start gap-4">
+                        <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                          <Layers className="w-6 h-6 text-primary" />
+                        </div>
+                        <div>
+                          <h3 className="font-bold text-lg text-foreground mb-1">{t("onboarding.whyAptos.modularComposableTitle")}</h3>
+                          <p className="text-sm text-foreground/70">{t("onboarding.whyAptos.modularComposableDescription")}</p>
+                        </div>
+                      </div>
+                    </Card>
+                  </motion.div>
+
+                  <motion.div variants={fadeInUp}>
+                    <Card className="p-6 bg-card border border-border h-full">
+                      <div className="flex items-start gap-4">
+                        <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                          <Users className="w-6 h-6 text-primary" />
+                        </div>
+                        <div>
+                          <h3 className="font-bold text-lg text-foreground mb-1">{t("onboarding.whyAptos.thrivingCommunityTitle")}</h3>
+                          <p className="text-sm text-foreground/70">{t("onboarding.whyAptos.thrivingCommunityDescription")}</p>
+                        </div>
+                      </div>
+                    </Card>
+                  </motion.div>
+                </div>
+              </motion.div>
+
+              {/* Network Stats */}
+              <div className="mt-12">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                  <div className="text-center">
+                    <div className="text-3xl md:text-4xl font-bold text-primary mb-2">{t("onboarding.whyAptos.statTps")}</div>
+                    <div className="text-sm text-foreground/70">{t("onboarding.whyAptos.statTpsLabel")}</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-3xl md:text-4xl font-bold text-primary mb-2">&lt;1s</div>
+                    <div className="text-sm text-foreground/70">{t("onboarding.whyAptos.statFinalityLabel")}</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-3xl md:text-4xl font-bold text-primary mb-2">{t("onboarding.whyAptos.statLanguage")}</div>
+                    <div className="text-sm text-foreground/70">{t("onboarding.whyAptos.statLanguageLabel")}</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-3xl md:text-4xl font-bold text-primary mb-2">{t("onboarding.whyAptos.statCost")}</div>
+                    <div className="text-sm text-foreground/70">{t("onboarding.whyAptos.statCostLabel")}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Getting Started Section */}
+        <section id="getting-started" className="py-12 md:py-20 px-4 md:px-6 relative overflow-hidden" ref={walletsRef}>
+          <div className="absolute inset-0 bg-gradient-to-b from-background via-muted/20 to-background pointer-events-none" />
+          <div className="container mx-auto relative z-10">
+            <div className="max-w-6xl mx-auto">
+              <motion.div
+                className="text-center mb-10 md:mb-16"
+                initial={{ opacity: 0, y: 30 }}
+                animate={walletsInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+                transition={{ duration: 0.6 }}
+              >
+                <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 text-foreground px-4">
+                  {t("onboarding.gettingStarted.title")}
+                </h2>
+                <p className="text-base md:text-lg lg:text-xl text-foreground/70 max-w-3xl mx-auto leading-relaxed px-4">
+                  {t("onboarding.gettingStarted.subtitle")}
+                </p>
+              </motion.div>
+
+              {/* Wallets First */}
+              <div className="mb-12 md:mb-20">
+                <motion.h3
+                  className="text-xl md:text-2xl font-bold text-foreground mb-3 md:mb-4 text-center px-4"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={walletsInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                  transition={{ delay: 0.2, duration: 0.6 }}
+                >
+                  {t("onboarding.gettingStarted.chooseWalletTitle")}
+                </motion.h3>
+                <motion.p
+                  className="text-center text-sm md:text-base text-foreground/70 mb-6 md:mb-8 max-w-2xl mx-auto px-4"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={walletsInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                  transition={{ delay: 0.3, duration: 0.6 }}
+                >
+                  {t("onboarding.gettingStarted.chooseWalletDescription")}
+                </motion.p>
+
+                <motion.div
+                  className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8"
+                  variants={staggerContainer}
+                  initial="hidden"
+                  animate={walletsInView ? "visible" : "hidden"}
+                >
+                  {wallets.map((wallet, index) => (
+                    <motion.div key={index} variants={scaleIn}>
+                      <Link href={wallet.href} target="_blank" rel="noopener noreferrer">
+                        <Card className="group relative p-5 md:p-8 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 h-full bg-gradient-to-br from-card to-card/50 border-2 hover:border-primary/30">
+                        {wallet.recommended && (
+                          <Badge variant="default" className="absolute top-3 right-3 text-xs">
+                            {t("onboarding.gettingStarted.badgeRecommended")}
+                          </Badge>
+                        )}
+
+                        <div className="flex flex-col items-center text-center space-y-4">
+                          <div className="relative mt-2">
+                            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-background to-muted p-3 shadow-md group-hover:shadow-xl transition-all duration-300 flex items-center justify-center">
+                              <img
+                                src={wallet.logo}
+                                alt={wallet.name}
+                                className={`w-full h-full object-contain ${wallet.name === "Aptos Connect" ? "dark:invert" : ""}`}
+                              />
+                            </div>
+                          </div>
+
+                          <div className="space-y-2">
+                            <h3 className="font-bold text-xl text-foreground group-hover:text-primary transition-colors">
+                              {wallet.name === "Petra" ? t("onboarding.gettingStarted.walletPetraName") : wallet.name === "Backpack" ? t("onboarding.gettingStarted.walletBackpackName") : t("onboarding.gettingStarted.walletAptosConnectName")}
+                            </h3>
+                            <p className="text-sm text-muted-foreground leading-relaxed min-h-[3rem]">
+                              {wallet.name === "Petra" ? t("onboarding.gettingStarted.walletPetraDescription") : wallet.name === "Backpack" ? t("onboarding.gettingStarted.walletBackpackDescription") : t("onboarding.gettingStarted.walletAptosConnectDescription")}
+                            </p>
+                            {wallet.platforms && (
+                              <div className="flex gap-2 justify-center flex-wrap pt-2">
+                                {wallet.platforms.map((platform, i) => (
+                                  <Badge key={i} variant="outline" className="text-xs">
+                                    {t(`onboarding.gettingStarted.platform${platform.replace(/\s+/g, '')}`)}
+                                  </Badge>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                      </Card>
+                      </Link>
+                    </motion.div>
+                  ))}
+                </motion.div>
+
+                {/* Quick Setup Guide */}
+                <Card className="bg-gradient-to-br from-primary/5 to-card border-primary/20">
+                  <div className="p-6">
+                    <h4 className="font-bold text-foreground mb-4 text-center">{t("onboarding.gettingStarted.setupGuideTitle")}</h4>
+                    <div className="grid md:grid-cols-5 gap-4 max-w-5xl mx-auto text-center">
+                      <div>
+                        <div className="w-10 h-10 rounded-full bg-primary/20 text-primary font-bold flex items-center justify-center mx-auto mb-2">1</div>
+                        <p className="text-sm font-semibold text-foreground mb-1">{t("onboarding.gettingStarted.setupStep1Title")}</p>
+                        <p className="text-xs text-muted-foreground">{t("onboarding.gettingStarted.setupStep1Description")}</p>
+                      </div>
+                      <div>
+                        <div className="w-10 h-10 rounded-full bg-primary/20 text-primary font-bold flex items-center justify-center mx-auto mb-2">2</div>
+                        <p className="text-sm font-semibold text-foreground mb-1">{t("onboarding.gettingStarted.setupStep2Title")}</p>
+                        <p className="text-xs text-muted-foreground">{t("onboarding.gettingStarted.setupStep2Description")}</p>
+                      </div>
+                      <div>
+                        <div className="w-10 h-10 rounded-full bg-primary/20 text-primary font-bold flex items-center justify-center mx-auto mb-2">3</div>
+                        <p className="text-sm font-semibold text-foreground mb-1">{t("onboarding.gettingStarted.setupStep3Title")}</p>
+                        <p className="text-xs text-muted-foreground">{t("onboarding.gettingStarted.setupStep3Description")}</p>
+                      </div>
+                      <div>
+                        <div className="w-10 h-10 rounded-full bg-primary/20 text-primary font-bold flex items-center justify-center mx-auto mb-2">4</div>
+                        <p className="text-sm font-semibold text-foreground mb-1">{t("onboarding.gettingStarted.setupStep4Title")}</p>
+                        <p className="text-xs text-muted-foreground">{t("onboarding.gettingStarted.setupStep4Description")}</p>
+                      </div>
+                      <div>
+                        <div className="w-10 h-10 rounded-full bg-primary/20 text-primary font-bold flex items-center justify-center mx-auto mb-2">5</div>
+                        <p className="text-sm font-semibold text-foreground mb-1">{t("onboarding.gettingStarted.setupStep5Title")}</p>
+                        <p className="text-xs text-muted-foreground">
+                          <Link href="https://www.aptosnames.com/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                            {t("onboarding.gettingStarted.setupStep5LinkText")}
+                          </Link> {t("onboarding.gettingStarted.setupStep5Description")}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              </div>
+
+              {/* Exchanges */}
+              <div className="mb-12 md:mb-20">
+                <h3 className="text-xl md:text-2xl font-bold text-foreground mb-3 md:mb-4 text-center px-4">{t("onboarding.exchanges.title")}</h3>
+                <p className="text-center text-sm md:text-base text-foreground/70 mb-6 md:mb-8 max-w-2xl mx-auto px-4">
+                  {t("onboarding.exchanges.description")}
+                </p>
+
+            <div className="max-w-6xl mx-auto">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
+                {exchanges.filter(ex => ex.chain === "Aptos").map((exchange, index) => {
+                  const content = (
+                    <Card className="group relative p-3 md:p-6 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 h-full bg-gradient-to-br from-card to-card/50 border-2 hover:border-primary/30">
+                      <div className="flex flex-col items-center text-center space-y-2 md:space-y-4">
+                        {/* Regional Badge */}
+                        <Badge
+                          variant={exchange.region === "US" ? "default" : exchange.region === "KR" ? "secondary" : "outline"}
+                          className="absolute top-3 right-3 text-xs"
+                        >
+                          {exchange.region === "US" ? t("onboarding.exchanges.regionUS") : exchange.region === "KR" ? t("onboarding.exchanges.regionKR") : t("onboarding.exchanges.regionGlobal")}
+                        </Badge>
+
+                        {/* Exchange Logo with enhanced styling */}
+                        <div className="relative mt-2">
+                          {exchange.logo ? (
+                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-background to-muted p-2.5 shadow-md group-hover:shadow-xl transition-all duration-300 flex items-center justify-center">
+                              <img src={exchange.logo} alt={exchange.name} className="w-full h-full object-contain rounded-lg" />
+                            </div>
+                          ) : (
+                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center shadow-md">
+                              <Globe className="w-8 h-8 text-primary" />
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="space-y-1">
+                          <h3 className="font-bold text-lg text-foreground group-hover:text-primary transition-colors">
+                            {exchange.name}
+                          </h3>
+                        </div>
+
+                        {/* Supported Assets Icons */}
+                        <div className="w-full pt-3">
+                          <div className="flex gap-2 justify-center items-center">
+                            <div className="relative group/icon">
+                              <img src="/icons/apt.png" alt="APT" className="w-8 h-8 rounded-full dark:invert transition-transform group-hover/icon:scale-110" />
+                            </div>
+                            {exchange.usdt === "Y" && (
+                              <div className="relative group/icon">
+                                <img src="/icons/stables/usdt.png" alt="USDT" className="w-8 h-8 rounded-full transition-transform group-hover/icon:scale-110" />
+                              </div>
+                            )}
+                            {exchange.usdc === "Y" && (
+                              <div className="relative group/icon">
+                                <img src="/icons/stables/usdc.png" alt="USDC" className="w-8 h-8 rounded-full transition-transform group-hover/icon:scale-110" />
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Hover effect overlay */}
+                      <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                    </Card>
+                  );
+
+                  return exchange.link ? (
+                    <Link
+                      key={index}
+                      href={exchange.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {content}
+                    </Link>
+                  ) : (
+                    <div key={index}>
+                      {content}
+                    </div>
+                  );
+                })}
+              </div>
+              </div>
+            </div>
+
+              {/* Bridges */}
+              <div>
+                <h3 className="text-2xl font-bold text-foreground mb-4 text-center">{t("onboarding.bridges.title")}</h3>
+                <p className="text-center text-foreground/70 mb-8 max-w-2xl mx-auto">
+                  {t("onboarding.bridges.description")}
+                </p>
+
+              {/* Bridge Comparison Grid */}
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                {bridges.filter(b => b.status === "Live").map((bridge, index) => (
+                  <Link key={index} href={bridge.href} target="_blank" rel="noopener noreferrer">
+                    <Card className="group relative p-6 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 h-full bg-gradient-to-br from-card to-card/50 border-2 hover:border-primary/30">
+                      {/* Status Badge */}
+                      <Badge variant="default" className="absolute top-3 right-3 text-xs bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20">
+                        {t("onboarding.bridges.badgeLive")}
+                      </Badge>
+
+                      <div className="flex flex-col space-y-4">
+                        {/* Logo and Name */}
+                        <div className="flex items-start gap-3">
+                          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-background to-muted p-2 shadow-md flex items-center justify-center flex-shrink-0">
+                            <img src={bridge.logo} alt={bridge.name} className="w-full h-full object-contain rounded-lg" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-bold text-foreground group-hover:text-primary transition-colors mb-1">
+                              {bridge.name}
+                            </h3>
+                            <Badge variant="secondary" className="text-[10px]">
+                              {bridge.protocol}
+                            </Badge>
+                          </div>
+                        </div>
+
+                        {/* Bridge Stats */}
+                        <div className="grid grid-cols-3 gap-3 pt-3 border-t border-border/50">
+                          <div className="text-center">
+                            <p className="text-xs text-muted-foreground mb-1">{t("onboarding.bridges.statsTimeLabel")}</p>
+                            <p className="text-sm font-semibold text-foreground">{bridge.bridgeTime}</p>
+                          </div>
+                          <div className="text-center">
+                            <p className="text-xs text-muted-foreground mb-1">{t("onboarding.bridges.statsFeesLabel")}</p>
+                            <p className="text-sm font-semibold text-foreground">{bridge.fees}</p>
+                          </div>
+                          <div className="text-center">
+                            <p className="text-xs text-muted-foreground mb-1">{t("onboarding.bridges.statsNetworksLabel")}</p>
+                            <p className="text-sm font-semibold text-foreground">{bridge.networks}</p>
+                          </div>
+                        </div>
+
+                        {/* Description */}
+                        <p className="text-sm text-foreground/70 leading-relaxed line-clamp-2">
+                          {bridge.description}
+                        </p>
+                      </div>
+
+                      {/* Hover effect overlay */}
+                      <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                    </Card>
+                  </Link>
+                ))}
+
+                {/* Bridging Guide Card */}
+                {bridges.filter(b => b.status === "Guide").map((bridge, index) => (
+                  <Link key={`guide-${index}`} href={bridge.href} target="_blank" rel="noopener noreferrer">
+                    <Card className="group relative p-6 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 h-full bg-gradient-to-br from-primary/5 to-card border-2 border-primary/20 hover:border-primary/40">
+                      <Badge variant="default" className="absolute top-3 right-3 text-xs">
+                        {t("onboarding.bridges.badgeGuide")}
+                      </Badge>
+
+                      <div className="flex flex-col items-center text-center space-y-4 justify-center h-full">
+                        <div className="w-16 h-16 rounded-xl bg-primary/10 p-3 flex items-center justify-center">
+                          <img src={bridge.logo} alt={bridge.name} className="w-full h-full object-contain dark:invert rounded-lg" />
+                        </div>
+                        <div className="space-y-2">
+                          <h3 className="font-bold text-lg text-foreground group-hover:text-primary transition-colors">
+                            {bridge.name}
+                          </h3>
+                          <p className="text-sm text-foreground/70 leading-relaxed">
+                            {bridge.description}
+                          </p>
+                        </div>
+                      </div>
+                    </Card>
+                  </Link>
+                ))}
+              </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Explore DeFi Section */}
+        <section id="defi" className="py-12 md:py-20 px-4 md:px-6 relative overflow-hidden" ref={defiRef}>
+          <div className="absolute inset-0 bg-gradient-to-b from-background via-primary/5 to-background pointer-events-none" />
+          <div className="container mx-auto relative z-10">
+            <div className="max-w-6xl mx-auto">
+              <div className="text-center mb-10 md:mb-16">
+                <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 text-foreground px-4">
+                  {t("onboarding.defi.title")}
+                </h2>
+                <p className="text-base md:text-lg lg:text-xl text-foreground/70 max-w-3xl mx-auto leading-relaxed px-4">
+                  {t("onboarding.defi.subtitle")}
+                </p>
+              </div>
+
+              {/* Why Trade on Aptos - Standalone */}
+              <Card className="mb-12 md:mb-20 bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20">
+                <div className="p-4 md:p-6">
+                  <h3 className="font-bold text-base md:text-lg text-foreground mb-4 md:mb-6 text-center">Why Trade on Aptos?</h3>
+                  <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <Shield className="w-4 h-4 text-primary" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-foreground text-sm mb-1">No MEV / Sandwich Attacks</h4>
+                        <p className="text-xs text-muted-foreground">Fair transaction ordering prevents frontrunning and MEV extraction</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <DollarSign className="w-4 h-4 text-primary" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-foreground text-sm mb-1">Low, Fixed Network Fees</h4>
+                        <p className="text-xs text-muted-foreground">Predictable costs with fees priced in USD, paid in APT</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <Zap className="w-4 h-4 text-primary" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-foreground text-sm mb-1">Insanely Fast Swaps</h4>
+                        <p className="text-xs text-muted-foreground">Sub-second finality means instant swap confirmation</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+
+              {/* Trading Protocols */}
+              <div className="mb-12 md:mb-20">
+                <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-foreground mb-3 md:mb-4 text-center px-4">Decentralized Exchanges</h3>
+                <p className="text-center text-sm md:text-base text-foreground/70 mb-6 md:mb-8 max-w-2xl mx-auto px-4">
+                  Trade, swap tokens, provide liquidity, and earn fees on lightning-fast DEXs with zero MEV risk and predictable low fees
+                </p>
+
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                {defiProtocols.filter(p => p.category === "Trading" || p.category === "Multiple").map((protocol, idx) => {
+                  const content = (
+                    <Card className="group relative p-4 md:p-6 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 h-full bg-gradient-to-br from-card to-card/50 border-2 hover:border-primary/30">
+                      <div className="flex items-start gap-3 md:gap-4">
+                        <div className="relative">
+                          <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-background to-muted p-2 shadow-md group-hover:shadow-xl transition-all duration-300 flex items-center justify-center flex-shrink-0">
+                            <img
+                              src={protocol.logo}
+                              alt={protocol.title}
+                              className="w-full h-full object-contain rounded-lg"
+                            />
+                          </div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-bold text-lg text-foreground group-hover:text-primary transition-colors mb-1 truncate">
+                            {protocol.title}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {protocol.subcategory}
+                          </p>
+                        </div>
+                      </div>
+                      {/* Hover effect overlay */}
+                      <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                    </Card>
+                  );
+
+                  return protocol.href ? (
+                    <Link
+                      key={`trading-${protocol.title}-${idx}`}
+                      href={protocol.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {content}
+                    </Link>
+                  ) : (
+                    <div key={`trading-${protocol.title}-${idx}`}>
+                      {content}
+                    </div>
+                  );
+                })}
+              </div>
+              </div>
+
+              {/* Credit Protocols */}
+              <div className="mb-12 md:mb-20">
+                <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-foreground mb-3 md:mb-4 text-center px-4">Lending & Borrowing</h3>
+                <p className="text-center text-sm md:text-base text-foreground/70 mb-6 md:mb-8 max-w-2xl mx-auto px-4">
+                  Supply assets to earn interest or borrow against your collateral with overcollateralized lending protocols secured by audited smart contracts
+                </p>
+
+              {/* Grid with protocols on left, explainer on right */}
+              <div className="grid lg:grid-cols-3 gap-4 md:gap-6">
+                {/* Protocol cards - 2 columns */}
+                <div className="lg:col-span-2 grid sm:grid-cols-2 gap-4 md:gap-6">
+                  {defiProtocols.filter(p => p.category === "Credit").map((protocol, idx) => {
+                    const content = (
+                      <Card className="group relative p-4 md:p-6 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 h-full bg-gradient-to-br from-card to-card/50 border-2 hover:border-primary/30">
+                        <div className="flex items-start gap-3 md:gap-4">
+                          <div className="relative">
+                            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-background to-muted p-2 shadow-md group-hover:shadow-xl transition-all duration-300 flex items-center justify-center flex-shrink-0">
+                              <img
+                                src={protocol.logo}
+                                alt={protocol.title}
+                                className="w-full h-full object-contain rounded-lg"
+                              />
+                            </div>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-bold text-lg text-foreground group-hover:text-primary transition-colors mb-1 truncate">
+                              {protocol.title}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              {protocol.subcategory}
+                            </p>
+                          </div>
+                        </div>
+                        {/* Hover effect overlay */}
+                        <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                      </Card>
+                    );
+
+                    return protocol.href ? (
+                      <Link
+                        key={`credit-${protocol.title}-${idx}`}
+                        href={protocol.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {content}
+                      </Link>
+                    ) : (
+                      <div key={`credit-${protocol.title}-${idx}`}>
+                        {content}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Explainer card - 1 column */}
+                <div className="lg:col-span-1">
+                  <Card className="h-full bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
+                    <div className="p-4 md:p-6 h-full flex flex-col">
+                      <h3 className="font-bold text-base md:text-lg text-foreground mb-3">How Lending Works</h3>
+                      <p className="text-xs md:text-sm text-foreground/70 leading-relaxed mb-4">
+                        Supply assets to earn interest or borrow against your collateral. All lending is overcollateralized with dynamic interest rates that adjust based on supply and demand.
+                      </p>
+                      <div className="space-y-2 text-xs md:text-sm mt-auto">
+                        <div className="flex items-start gap-2">
+                          <span className="text-primary mt-0.5">✓</span>
+                          <span className="text-foreground/70">Earn passive income on deposits</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <span className="text-primary mt-0.5">✓</span>
+                          <span className="text-foreground/70">Borrow without selling assets</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <span className="text-primary mt-0.5">✓</span>
+                          <span className="text-foreground/70">Secured by audited contracts</span>
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                </div>
+              </div>
+              </div>
+
+              {/* Yield Protocols */}
+              <div className="mb-12">
+                <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-foreground mb-3 md:mb-4 text-center px-4">Staking & Yield</h3>
+                <p className="text-center text-sm md:text-base text-foreground/70 mb-6 md:mb-8 max-w-2xl mx-auto px-4">
+                  Earn staking rewards by securing the network through liquid staking tokens that unlock additional DeFi opportunities while earning ~7% APY
+                </p>
+
+              {/* Grid with protocols on left, explainer on right */}
+              <div className="grid lg:grid-cols-3 gap-4 md:gap-6">
+                {/* Protocol cards - 2 columns */}
+                <div className="lg:col-span-2 grid sm:grid-cols-2 gap-4 md:gap-6">
+                  {defiProtocols.filter(p => p.category === "Yield").map((protocol, idx) => {
+                    const content = (
+                      <Card className="group relative p-4 md:p-6 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 h-full bg-gradient-to-br from-card to-card/50 border-2 hover:border-primary/30">
+                        <div className="flex items-start gap-3 md:gap-4">
+                          <div className="relative">
+                            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-background to-muted p-2 shadow-md group-hover:shadow-xl transition-all duration-300 flex items-center justify-center flex-shrink-0">
+                              <img
+                                src={protocol.logo}
+                                alt={protocol.title}
+                                className="w-full h-full object-contain rounded-lg"
+                              />
+                            </div>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-bold text-lg text-foreground group-hover:text-primary transition-colors mb-1 truncate">
+                              {protocol.title}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              {protocol.subcategory}
+                            </p>
+                          </div>
+                        </div>
+                        {/* Hover effect overlay */}
+                        <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                      </Card>
+                    );
+
+                    return protocol.href ? (
+                      <Link
+                        key={`yield-${protocol.title}-${idx}`}
+                        href={protocol.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {content}
+                      </Link>
+                    ) : (
+                      <div key={`yield-${protocol.title}-${idx}`}>
+                        {content}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Explainer card - 1 column */}
+                <div className="lg:col-span-1">
+                  <Card className="h-full bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
+                    <div className="p-4 md:p-6 h-full flex flex-col">
+                      <h3 className="font-bold text-base md:text-lg text-foreground mb-3">Why Liquid Staking?</h3>
+                      <p className="text-xs md:text-sm text-foreground/70 leading-relaxed mb-4">
+                        Earn staking rewards while keeping your tokens liquid. Liquid staking tokens (LSTs) can be traded, used as collateral, or deployed in DeFi — all while earning rewards.
+                      </p>
+                      <div className="space-y-2 text-xs md:text-sm mt-auto">
+                        <div className="flex items-start gap-2">
+                          <span className="text-primary mt-0.5">✓</span>
+                          <span className="text-foreground/70">Earn ~7% APY staking rewards</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <span className="text-primary mt-0.5">✓</span>
+                          <span className="text-foreground/70">Trade instantly on DEXs</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <span className="text-primary mt-0.5">✓</span>
+                          <span className="text-foreground/70">Use across all DeFi protocols</span>
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                </div>
+              </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Tokens on Aptos */}
+        <section id="tokens" className="py-16 px-0 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-background via-muted/20 to-background pointer-events-none" />
+          <div className="container mx-auto relative z-10">
+            <div className="max-w-6xl mx-auto">
+              {/* Header */}
+              <div className="text-center mb-12">
+                <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
+                  Tokens on Aptos
+                </h2>
+                <p className="text-xl text-foreground/70 max-w-3xl mx-auto leading-relaxed">
+                  Comprehensive view of the Aptos token ecosystem with real-time market data
+                </p>
+              </div>
+
+              {/* Stats Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+              <Card className="p-6 bg-card hover:shadow-lg transition-shadow">
+                <div className="space-y-3">
+                  <div className="flex items-start justify-between">
+                    <h3 className="text-lg font-semibold text-foreground/80">
+                      {includeAPT ? "Total Market Cap" : "Non-APT Market Cap"}
+                    </h3>
+                    <Badge variant="secondary" className="px-3 py-1">
+                      {includeAPT ? "Total" : "Non-APT"}
+                    </Badge>
+                  </div>
+                  <p className="text-3xl font-bold text-foreground">
+                    {formatCurrency(displayMetrics.marketCap)}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {includeAPT ? "Combined market capitalization of all tokens" : "Market capitalization excluding APT"}
+                  </p>
+                </div>
+              </Card>
+
+              <Card className="p-6 bg-card hover:shadow-lg transition-shadow">
+                <div className="space-y-3">
+                  <div className="flex items-start justify-between">
+                    <h3 className="text-lg font-semibold text-foreground/80">
+                      Token Count
+                    </h3>
+                    <Badge variant="outline" className="px-3 py-1">
+                      Active
+                    </Badge>
+                  </div>
+                  <p className="text-3xl font-bold text-foreground">
+                    {formatNumber(totalTokenCount)}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Total number of tokens in the ecosystem
+                  </p>
+                </div>
+              </Card>
+            </div>
+
+
+              {/* Treemap */}
+              {error ? (
+                <div className="flex items-center justify-center py-20">
+                  <Card className="p-8 max-w-md">
+                    <div className="flex flex-col items-center gap-4 text-center">
+                      <div className="w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center">
+                        <X className="w-6 h-6 text-destructive" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-foreground mb-2">Failed to load data</h3>
+                        <p className="text-sm text-muted-foreground mb-4">{error}</p>
+                      </div>
+                      <button
+                        onClick={fetchInitialData}
+                        className="px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+                      >
+                        Retry
+                      </button>
+                    </div>
+                  </Card>
+                </div>
+              ) : loadingTokens ? (
+                <div className="flex items-center justify-center py-20">
+                  <div className="flex flex-col items-center gap-4">
+                    <div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+                    <p className="text-foreground/70">Loading token data...</p>
+                  </div>
+                </div>
+              ) : tokens.length > 0 ? (
+                <div className="w-full">
+                  <TokenTreemap tokens={stableTokens} />
+                </div>
+              ) : (
+                <div className="flex items-center justify-center py-20">
+                  <p className="text-foreground/70">No token data available</p>
+                </div>
+              )}
+            </div>
+
+          </div>
+        </section>
+
+        {/* Developer Section */}
+        <section id="developers" className="py-20 px-0 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-background via-muted/20 to-background pointer-events-none" />
+          <div className="container mx-auto relative z-10">
+            <div className="max-w-6xl mx-auto">
+              {/* Header */}
+              <div className="text-center mb-16">
+                <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
+                  For Developers
+                </h2>
+                <p className="text-xl text-foreground/70 max-w-3xl mx-auto leading-relaxed">
+                  Build safer, faster apps with Move. Access open-source tools, APIs, and comprehensive guides to launch in days, not months.
+                </p>
+              </div>
+
+              {/* Developer Tools Carousel */}
+              <div className="mb-16">
+                <h3 className="text-2xl font-bold text-foreground mb-6 text-center">
+                  Developer Tools
+                </h3>
+                <Carousel
+                  opts={{
+                    align: "start",
+                    loop: true,
+                  }}
+                  plugins={[
+                    Autoplay({
+                      delay: 3000,
+                    }),
+                  ]}
+                  className="w-full"
+                >
+                  <CarouselContent>
+                    {developerTools.map((tool, index) => {
+                      const Icon = tool.icon;
+                      return (
+                        <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/4">
+                          <Link href={tool.href} target="_blank" rel="noopener noreferrer">
+                            <Card className="group p-6 h-full hover:shadow-xl hover:border-primary/50 transition-all duration-300 hover:scale-105">
+                              <div className="space-y-4">
+                                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center group-hover:from-primary/30 group-hover:to-primary/10 transition-all">
+                                  <Icon className="w-7 h-7 text-primary" />
+                                </div>
+                                <div>
+                                  <h4 className="font-bold text-foreground mb-2 group-hover:text-primary transition-colors flex items-center gap-2">
+                                    {tool.name}
+                                    <ExternalLink className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                  </h4>
+                                  <p className="text-sm text-foreground/70 leading-relaxed">
+                                    {tool.description}
+                                  </p>
+                                </div>
+                              </div>
+                            </Card>
+                          </Link>
+                        </CarouselItem>
+                      );
+                    })}
+                  </CarouselContent>
+                  <CarouselPrevious className="left-0" />
+                  <CarouselNext className="right-0" />
+                </Carousel>
+              </div>
+
+              {/* Documentation & Guides - Static */}
+              <div className="mb-12">
+                <h3 className="text-2xl font-bold text-foreground mb-6 text-center">
+                  Documentation &amp; Guides
+                </h3>
+                <div className="grid md:grid-cols-3 gap-6">
+                  {developerResources.map((resource, index) => {
+                    const getIcon = (type: string) => {
+                      switch (type) {
+                        case "GitHub": return Github;
+                        case "PDF": return FileText;
+                        default: return BookOpen;
+                      }
+                    };
+                    const Icon = getIcon(resource.type);
+
+                    return (
+                      <Link key={index} href={resource.href} target="_blank" rel="noopener noreferrer">
+                        <Card className="group p-6 h-full hover:shadow-xl hover:border-primary/50 transition-all duration-300 hover:scale-105">
+                          <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center group-hover:from-primary/30 group-hover:to-primary/10 transition-all">
+                                <Icon className="w-7 h-7 text-primary" />
+                              </div>
+                              <Badge variant="secondary" className="text-xs font-medium">
+                                {resource.type}
+                              </Badge>
+                            </div>
+                            <div>
+                              <h4 className="font-bold text-foreground mb-2 group-hover:text-primary transition-colors flex items-center gap-2">
+                                {resource.name}
+                                <ExternalLink className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+                              </h4>
+                              <p className="text-sm text-foreground/70 leading-relaxed">
+                                {resource.description}
+                              </p>
+                            </div>
+                          </div>
+                        </Card>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* CTA Banner */}
+              <Card className="bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20">
+                <div className="p-8 text-center">
+                  <h3 className="text-2xl font-bold text-foreground mb-3">
+                    Ready to Start Building?
+                  </h3>
+                  <p className="text-lg text-foreground/70 mb-6">
+                    Move makes it safe to build scalable apps. Check out the docs and start developing today!
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <Link href="https://aptos.dev/" target="_blank" rel="noopener noreferrer">
+                      <Button size="lg" className="gap-2">
+                        <BookOpen className="w-5 h-5" />
+                        View Documentation
+                      </Button>
+                    </Link>
+                    <Link href="https://github.com/aptos-labs/create-aptos-dapp" target="_blank" rel="noopener noreferrer">
+                      <Button size="lg" variant="outline" className="gap-2">
+                        <Terminal className="w-5 h-5" />
+                        Create a DApp
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              </Card>
+            </div>
+          </div>
+        </section>
+
+        {/* Community Section */}
+        <section id="community" className="py-16 px-0 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-background via-primary/5 to-background pointer-events-none" />
+          <div className="container mx-auto relative z-10">
+            <div className="text-center mb-12">
+              <div className="flex items-center justify-center gap-3 mb-4">
+                <Users className="w-6 h-6 text-primary" />
+                <h2 className="text-3xl md:text-4xl font-bold text-foreground">
+                  Join the Community
+                </h2>
+              </div>
+              <p className="text-lg text-foreground/70 max-w-5xl mx-auto">
+                Connect with the global Aptos community across Discord, Twitter, and regional channels
+              </p>
+            </div>
+
+            <div className="max-w-6xl mx-auto">
+              <div className="grid md:grid-cols-3 gap-6">
+                {/* Official Links Column */}
+                <Card className="p-6">
+                  <h3 className="font-bold text-lg text-foreground mb-4 flex items-center gap-2">
+                    <Globe className="w-5 h-5 text-primary" />
+                    Official Links
+                  </h3>
+                  <div className="space-y-3">
+                    <Link href="https://aptoslabs.com/" target="_blank" rel="noopener noreferrer" className="block text-sm text-foreground/70 hover:text-primary transition-colors">
+                      Aptos Labs Website
+                    </Link>
+                    <Link href="https://aptosfoundation.org/" target="_blank" rel="noopener noreferrer" className="block text-sm text-foreground/70 hover:text-primary transition-colors">
+                      Aptos Foundation
+                    </Link>
+                    <Link href="https://aptosfoundation.org/ecosystem/projects/all" target="_blank" rel="noopener noreferrer" className="block text-sm text-foreground/70 hover:text-primary transition-colors">
+                      Ecosystem Projects
+                    </Link>
+                    <Link href="https://aptos.dev/" target="_blank" rel="noopener noreferrer" className="block text-sm text-foreground/70 hover:text-primary transition-colors">
+                      Developer Docs
+                    </Link>
+                    <Link href="https://explorer.aptoslabs.com/?network=mainnet" target="_blank" rel="noopener noreferrer" className="block text-sm text-foreground/70 hover:text-primary transition-colors">
+                      Explorer
+                    </Link>
+                    <Link href="https://github.com/aptos-labs" target="_blank" rel="noopener noreferrer" className="block text-sm text-foreground/70 hover:text-primary transition-colors">
+                      GitHub Profile
+                    </Link>
+                    <Link href="https://github.com/aptos-labs/aptos-core" target="_blank" rel="noopener noreferrer" className="block text-sm text-foreground/70 hover:text-primary transition-colors">
+                      Source Code
+                    </Link>
+                    <Link href="https://aptosfoundation.org/currents" target="_blank" rel="noopener noreferrer" className="block text-sm text-foreground/70 hover:text-primary transition-colors">
+                      Foundation Blog
+                    </Link>
+                    <Link href="https://aptoslabs.com/careers" target="_blank" rel="noopener noreferrer" className="block text-sm text-foreground/70 hover:text-primary transition-colors">
+                      Open Roles
+                    </Link>
+                  </div>
+                </Card>
+
+                {/* Socials Column */}
+                <Card className="p-6">
+                  <h3 className="font-bold text-lg text-foreground mb-4 flex items-center gap-2">
+                    <Users className="w-5 h-5 text-primary" />
+                    Socials
+                  </h3>
+                  <div className="space-y-3">
+                    <Link href="https://discord.gg/aptosnetwork" target="_blank" rel="noopener noreferrer" className="block text-sm text-foreground/70 hover:text-primary transition-colors">
+                      Discord
+                    </Link>
+                    <Link href="https://twitter.com/aptoslabs" target="_blank" rel="noopener noreferrer" className="block text-sm text-foreground/70 hover:text-primary transition-colors">
+                      Aptos Labs Twitter
+                    </Link>
+                    <Link href="https://twitter.com/Aptos_Network" target="_blank" rel="noopener noreferrer" className="block text-sm text-foreground/70 hover:text-primary transition-colors">
+                      Aptos Network Twitter
+                    </Link>
+                    <Link href="https://www.youtube.com/@aptosnetwork" target="_blank" rel="noopener noreferrer" className="block text-sm text-foreground/70 hover:text-primary transition-colors">
+                      YouTube
+                    </Link>
+                    <Link href="https://www.linkedin.com/company/aptoslabs" target="_blank" rel="noopener noreferrer" className="block text-sm text-foreground/70 hover:text-primary transition-colors">
+                      LinkedIn
+                    </Link>
+                    <Link href="https://forum.aptoslabs.com/" target="_blank" rel="noopener noreferrer" className="block text-sm text-foreground/70 hover:text-primary transition-colors">
+                      Community Forum
+                    </Link>
+                    <Link href="https://medium.com/aptoslabs" target="_blank" rel="noopener noreferrer" className="block text-sm text-foreground/70 hover:text-primary transition-colors">
+                      Medium
+                    </Link>
+                    <Link href="https://aptosfoundation.org/currents/join-the-aptos-collective" target="_blank" rel="noopener noreferrer" className="block text-sm text-foreground/70 hover:text-primary transition-colors">
+                      Aptos Collective
+                    </Link>
+                  </div>
+                </Card>
+
+                {/* Communities Column */}
+                <Card className="p-6">
+                  <h3 className="font-bold text-lg text-foreground mb-4 flex items-center gap-2">
+                    <Globe className="w-5 h-5 text-primary" />
+                    Communities
+                  </h3>
+                  <div className="space-y-3">
+                    <Link href="https://twitter.com/Aptos_polska" target="_blank" rel="noopener noreferrer" className="block text-sm text-foreground/70 hover:text-primary transition-colors">
+                      Aptos Poland
+                    </Link>
+                    <Link href="https://twitter.com/aptos_ind" target="_blank" rel="noopener noreferrer" className="block text-sm text-foreground/70 hover:text-primary transition-colors">
+                      Aptos India
+                    </Link>
+                    <Link href="https://twitter.com/Aptos_Indonesia" target="_blank" rel="noopener noreferrer" className="block text-sm text-foreground/70 hover:text-primary transition-colors">
+                      Aptos Indonesia
+                    </Link>
+                    <Link href="https://twitter.com/aptos_japan" target="_blank" rel="noopener noreferrer" className="block text-sm text-foreground/70 hover:text-primary transition-colors">
+                      Aptos Japan
+                    </Link>
+                    <Link href="https://twitter.com/aptoscnofficial" target="_blank" rel="noopener noreferrer" className="block text-sm text-foreground/70 hover:text-primary transition-colors">
+                      Aptos China
+                    </Link>
+                    <Link href="https://twitter.com/aptosfrance" target="_blank" rel="noopener noreferrer" className="block text-sm text-foreground/70 hover:text-primary transition-colors">
+                      Aptos France
+                    </Link>
+                    <Link href="https://twitter.com/aptos_ru" target="_blank" rel="noopener noreferrer" className="block text-sm text-foreground/70 hover:text-primary transition-colors">
+                      Aptos Russia
+                    </Link>
+                    <Link href="https://twitter.com/AptosTurkiye" target="_blank" rel="noopener noreferrer" className="block text-sm text-foreground/70 hover:text-primary transition-colors">
+                      Aptos Turkey
+                    </Link>
+                    <Link href="https://twitter.com/Aptos_Africa" target="_blank" rel="noopener noreferrer" className="block text-sm text-foreground/70 hover:text-primary transition-colors">
+                      Aptos Africa
+                    </Link>
+                  </div>
+                </Card>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="py-20 px-0 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-background via-primary/5 to-background pointer-events-none" />
+          <div className="container mx-auto text-center relative z-10">
+            <div className="max-w-3xl mx-auto">
+              <h2 className="text-3xl md:text-5xl font-bold mb-4 text-foreground">
+                Ready to Explore Aptos?
+              </h2>
+              <p className="text-lg text-foreground/70 mb-8">
+                Start building, investing, or trading on the fastest blockchain with sub-second finality
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link href="/portfolio">
+                  <button className="group px-8 py-4 bg-primary text-primary-foreground font-semibold rounded-lg hover:bg-primary/90 transition-all shadow-lg hover:shadow-xl">
+                    <span className="flex items-center justify-center gap-2">
+                      Track Your Portfolio
+                      <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    </span>
+                  </button>
+                </Link>
+                <Link href="/protocols/defi">
+                  <button className="px-8 py-4 bg-card border border-border text-foreground font-medium rounded-lg hover:bg-muted transition-all hover:shadow-md">
+                    Explore DeFi Protocols
+                  </button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+}
+
+export const OnboardingPage = memo(OnboardingPageComponent);
