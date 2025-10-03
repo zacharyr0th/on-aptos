@@ -44,7 +44,6 @@ function StableTreemapComponent({ tokens }: StableTreemapProps) {
         nameKey="name"
         animationDuration={0}
         stroke="#fff"
-        strokeWidth={2}
       />
     </ResponsiveContainer>
   );
