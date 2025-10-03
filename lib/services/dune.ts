@@ -49,6 +49,9 @@ export class DuneAnalyticsService {
 
   constructor(apiKey?: string) {
     this.apiKey = apiKey || process.env.DUNE_API_KEY_TOKEN || "";
+  }
+
+  private ensureApiKey(): void {
     if (!this.apiKey) {
       throw new Error("Dune API key not configured");
     }
@@ -58,6 +61,7 @@ export class DuneAnalyticsService {
    * Execute a Dune query programmatically
    */
   async executeQuery(queryId: number, parameters?: Record<string, any>): Promise<string> {
+    this.ensureApiKey();
     try {
       apiLogger.info(`Executing Dune query ${queryId}`, { parameters });
 
@@ -88,6 +92,7 @@ export class DuneAnalyticsService {
    * Check the status of a query execution
    */
   async getExecutionStatus(executionId: string): Promise<DuneStatusResponse> {
+    this.ensureApiKey();
     try {
       const response = await fetch(`${this.baseUrl}/execution/${executionId}/status`, {
         headers: {
@@ -110,6 +115,7 @@ export class DuneAnalyticsService {
    * Get the results of a completed query execution
    */
   async getExecutionResults(executionId: string): Promise<any[]> {
+    this.ensureApiKey();
     try {
       const response = await fetch(`${this.baseUrl}/execution/${executionId}/results`, {
         headers: {
@@ -133,6 +139,7 @@ export class DuneAnalyticsService {
    * Get cached results of a query without executing
    */
   async getCachedResults(queryId: number): Promise<any[]> {
+    this.ensureApiKey();
     try {
       const response = await fetch(`${this.baseUrl}/query/${queryId}/results`, {
         headers: {
@@ -211,10 +218,11 @@ export class DuneAnalyticsService {
    * - Otherwise triggers a refresh
    */
   async getSmartResults(
-    queryId: number, 
+    queryId: number,
     maxAge: number = 300, // Max age in seconds (5 minutes default)
     parameters?: Record<string, any>
   ): Promise<any[]> {
+    this.ensureApiKey();
     try {
       // First, try to get cached results to check freshness
       const cachedResponse = await fetch(`${this.baseUrl}/query/${queryId}/results`, {
