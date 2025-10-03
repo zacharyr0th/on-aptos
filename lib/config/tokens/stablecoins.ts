@@ -96,6 +96,18 @@ const STABLECOIN_CONFIGS: Record<string, BaseTokenConfig> = {
     auditLink: "https://www.ethena.fi/transparency",
     tags: ["algorithmic", "delta-hedged", "synthetic"],
   },
+  USD1: {
+    name: "World Liberty Financial USD",
+    symbol: "USD1",
+    thumbnail: "https://assets.panora.exchange/tokens/aptos/USD1.png",
+    type: "Native Aptos issuance",
+    issuer: "World Liberty Financial",
+    assetAddress: "0x05fabd1b12e39967a3c24e91b7b8f67719a6dacee74f3c8b9fb7d93e855437d2",
+    decimals: 6,
+    website: "https://worldlibertyfinancial.com",
+    auditLink: "#",
+    tags: ["collateralized", "fiat-backed"],
+  },
   // LayerZero bridged
   lzUSDC: {
     name: "LayerZero USDC",
@@ -108,6 +120,19 @@ const STABLECOIN_CONFIGS: Record<string, BaseTokenConfig> = {
     website: "https://layerzero.network",
     auditLink: "https://www.circle.com/en/transparency",
     tags: ["bridged", "layerzero"],
+  },
+  // Multichain bridged
+  multiUSDC: {
+    name: "Multichain USDC",
+    symbol: "multiUSDC",
+    thumbnail: "/icons/stables/usdc.webp",
+    type: "Bridged via Multichain",
+    issuer: "Circle (via Multichain)",
+    assetAddress: "0xd6d6372c8bde72a7ab825c00b9edd35e643fb94a61c55d9d94a9db3010098548::USDC::Coin",
+    decimals: 6,
+    website: "https://multichain.org",
+    auditLink: "https://www.circle.com/en/transparency",
+    tags: ["bridged", "multichain"],
   },
   lzUSDT: {
     name: "LayerZero USDT",

@@ -4,6 +4,7 @@ import {
   ALGO_STABLECOINS,
   CELER_STABLECOINS,
   LAYERZERO_STABLECOINS,
+  MULTICHAIN_STABLECOINS,
   STABLECOINS,
   WORMHOLE_STABLECOINS,
 } from "@/lib/constants/tokens/stablecoins";
@@ -89,6 +90,7 @@ export async function GET() {
       [STABLECOINS.USDE]: "USDe",
       [STABLECOINS.SUSDE]: "sUSDe",
       [STABLECOINS.USDA]: "USDA",
+      [STABLECOINS.USD1]: "USD1",
       [ALGO_STABLECOINS.MOD]: "MOD",
     };
 
@@ -98,6 +100,7 @@ export async function GET() {
       USDT: 6,
       USDe: 6,
       sUSDe: 6,
+      USD1: 6,
       MOD: 8, // MOD has 8 decimals
       USDA: 8, // USDA has 8 decimals, not 6
     };
@@ -187,6 +190,13 @@ export async function GET() {
         name: "Celer USDT",
         asset_type: CELER_STABLECOINS.CELER_USDT,
         account: "0x8d87a65ba30e09357fa2edea2c80dbac296e5dec2b18287113500b902942929d",
+        decimals: 6,
+      },
+      {
+        symbol: "multiUSDC",
+        name: "Multichain USDC",
+        asset_type: MULTICHAIN_STABLECOINS.MULTI_USDC,
+        account: "0xd6d6372c8bde72a7ab825c00b9edd35e643fb94a61c55d9d94a9db3010098548",
         decimals: 6,
       },
     ];

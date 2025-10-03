@@ -107,27 +107,6 @@ export default function DefiPage(): React.ReactElement {
 
         <main className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20 py-8 flex-1 relative">
           <>
-              <ErrorBoundary
-                fallback={
-                  <div className="p-4 rounded-md bg-destructive/10 text-destructive mb-6">
-                    <h3 className="font-semibold mb-2">
-                      {t("defi:errors.failed_load_metrics", "Failed to load DeFi metrics")}
-                    </h3>
-                    <p className="text-sm">
-                      {t("defi:errors.please_refresh", "Please refresh the page to try again")}
-                    </p>
-                  </div>
-                }
-              >
-                <StatsSection
-                  protocolCount={defiProtocols.length}
-                  filteredCount={filteredProtocols.length}
-                  totalCount={defiProtocols.length}
-                  selectedCategory={selectedCategory}
-                  selectedSubcategory={selectedSubcategory}
-                />
-              </ErrorBoundary>
-
               {/* Desktop: Filter Controls and Search on same line */}
               <div className="hidden md:block">
                 <div className="flex items-start justify-between gap-4">

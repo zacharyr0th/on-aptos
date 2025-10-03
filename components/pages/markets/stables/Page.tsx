@@ -390,7 +390,7 @@ function StablesPage(): React.ReactElement {
 
   // Consolidated token type helper
   const getTokenType = (symbol: string): string => {
-    if (["USDT", "USDC", "USDA"].includes(symbol)) {
+    if (["USDT", "USDC", "USDA", "USD1"].includes(symbol)) {
       return "Native Stablecoin";
     }
     if (["MOD"].includes(symbol)) {
@@ -404,6 +404,9 @@ function StablesPage(): React.ReactElement {
     }
     if (symbol.includes(".ce")) {
       return "Bridged via Celer";
+    }
+    if (symbol === "multiUSDC") {
+      return "Bridged via Multichain";
     }
     return "Stablecoin";
   };
@@ -435,32 +438,6 @@ function StablesPage(): React.ReactElement {
         suppliesMap[supply.symbol] = supply.supply_raw ?? supply.supply ?? "0";
       });
     }
-
-    // Calculate adjusted total for display purposes (with sUSDe price)
-    let adjustedTotalValue = BigInt(0);
-
-    if (Array.isArray(supplies)) {
-      for (const token of supplies) {
-        const dollarSupply = token.supply || "0";
-        let tokenValue = BigInt(dollarSupply);
-        if (token.symbol === "sUSDe" && susdePrice !== 1) {
-          // Convert to a scaled integer value for BigInt math
-          const priceScaled = Math.round(susdePrice * 1000000);
-          tokenValue = (tokenValue * BigInt(priceScaled)) / BigInt(1000000);
-        }
-        adjustedTotalValue += tokenValue;
-      }
-    }
-
-    const formatTotal = () => {
-      // adjustedTotalValue is already in dollars
-      const dollars = Number(adjustedTotalValue);
-      return new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-        maximumFractionDigits: 2,
-      }).format(dollars);
-    };
 
     // Shared sorting function
     const sortBySupply = (tokens: DisplayToken[]) => {
@@ -505,11 +482,15 @@ function StablesPage(): React.ReactElement {
       return sortBySupply([...supplies]);
     };
 
-    // Calculate raw total for TokenCard market share calculations
-    // Need to normalize to 6 decimals for tokens with 8 decimals
+    // Process supplies for display
+    const processedSuppliesForCards = processSuppliesForCards();
+    const processedSuppliesForTable = processSuppliesForTable();
+
+    // Calculate raw total for TokenCard market share calculations from processedSupplies
+    // This ensures the total matches what's actually displayed
     let rawSupplyTotal = BigInt(0);
-    if (Array.isArray(supplies)) {
-      for (const token of supplies) {
+    if (Array.isArray(processedSuppliesForCards)) {
+      for (const token of processedSuppliesForCards) {
         const rawSupply = BigInt(token.supply_raw || token.supply || "0");
         // Normalize 8-decimal tokens to 6 decimals
         if (token.symbol === "MOD" || token.symbol === "USDA") {
@@ -520,10 +501,23 @@ function StablesPage(): React.ReactElement {
       }
     }
 
+    // Format total from processedSupplies to match pie chart
+    const formatTotalFromProcessed = () => {
+      const dollars = Number(processedSuppliesForCards.reduce(
+        (sum: number, t: any) => sum + parseFloat(t.supply || "0"),
+        0
+      ));
+      return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+        maximumFractionDigits: 2,
+      }).format(dollars);
+    };
+
     return {
-      formattedTotalSupply: formatTotal(),
-      processedSupplies: processSuppliesForCards(),
-      processedSuppliesForTable: processSuppliesForTable(),
+      formattedTotalSupply: formatTotalFromProcessed(),
+      processedSupplies: processedSuppliesForCards,
+      processedSuppliesForTable,
       adjustedTotal: rawSupplyTotal.toString(),
       suppliesDataMap: suppliesMap,
     };

@@ -3,6 +3,7 @@ import {
   ALGO_STABLECOINS,
   CELER_STABLECOINS,
   LAYERZERO_STABLECOINS,
+  MULTICHAIN_STABLECOINS,
   STABLECOINS,
   WORMHOLE_STABLECOINS,
 } from "@/lib/constants";
@@ -32,6 +33,7 @@ const STABLECOIN_METADATA: Record<string, { symbol: string; decimals: number }> 
   [STABLECOINS.USDE]: { symbol: "USDe", decimals: 6 },
   [STABLECOINS.SUSDE]: { symbol: "sUSDe", decimals: 6 },
   [STABLECOINS.USDA]: { symbol: "USDA", decimals: 8 },
+  [STABLECOINS.USD1]: { symbol: "USD1", decimals: 6 },
   [ALGO_STABLECOINS.MOD]: { symbol: "MOD", decimals: 8 },
 };
 
@@ -76,6 +78,13 @@ const BRIDGED_COINS: BridgedCoinConfig[] = [
     name: "Celer USDT",
     asset_type: CELER_STABLECOINS.CELER_USDT,
     account: "0x8d87a65ba30e09357fa2edea2c80dbac296e5dec2b18287113500b902942929d",
+    decimals: 6,
+  },
+  {
+    symbol: "multiUSDC",
+    name: "Multichain USDC",
+    asset_type: MULTICHAIN_STABLECOINS.MULTI_USDC,
+    account: "0xd6d6372c8bde72a7ab825c00b9edd35e643fb94a61c55d9d94a9db3010098548",
     decimals: 6,
   },
 ];

@@ -42,6 +42,20 @@ export function DesktopNavigationMenu({ navigationItems, onMenuClose }: Navigati
         <NavigationMenu delayDuration={0} viewport={false}>
           <NavigationMenuList>
 
+            {/* Welcome Link */}
+            <NavigationMenuItem>
+              <Link
+                href="/welcome"
+                className={cn(
+                  navigationMenuTriggerStyle(),
+                  "text-sm font-medium",
+                  pathname === "/welcome" && "bg-accent"
+                )}
+              >
+                Welcome
+              </Link>
+            </NavigationMenuItem>
+
             {/* Assets Dropdown */}
             <NavigationMenuItem>
               <NavigationMenuTrigger className="text-sm font-medium">

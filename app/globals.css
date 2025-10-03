@@ -139,27 +139,27 @@
 
 /* === Dark Theme === */
 .dark {
-  --background: oklch(0.145 0 0);
+  --background: oklch(0.18 0 0);
   --foreground: oklch(0.985 0 0);
 
-  --card: oklch(0.205 0 0);
+  --card: oklch(0.24 0 0);
   --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
+  --popover: oklch(0.24 0 0);
   --popover-foreground: oklch(0.985 0 0);
 
   --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
+  --primary-foreground: oklch(0.24 0 0);
+  --secondary: oklch(0.3 0 0);
   --secondary-foreground: oklch(0.985 0 0);
 
-  --muted: oklch(0.269 0 0);
+  --muted: oklch(0.3 0 0);
   --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
+  --accent: oklch(0.3 0 0);
   --accent-foreground: oklch(0.985 0 0);
 
   --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 18%);
   --ring: oklch(0.556 0 0);
 
   --chart-1: oklch(0.488 0.243 264.376);
@@ -174,13 +174,13 @@
   --color-error: oklch(0.645 0.246 16); /* red */
   --color-info: oklch(0.488 0.243 264); /* blue */
 
-  --sidebar: oklch(0.205 0 0);
+  --sidebar: oklch(0.24 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.488 0.243 264.376);
   --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent: oklch(0.3 0 0);
   --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-border: oklch(1 0 0 / 12%);
   --sidebar-ring: oklch(0.556 0 0);
 }
 
@@ -229,11 +229,11 @@
   }
 
   .dark body {
-    /* Soft muted dark mode background with pastel undertones */
-    background: 
-      radial-gradient(ellipse at top left, hsl(240 8% 15% / 0.6) 0%, transparent 50%),
-      radial-gradient(ellipse at bottom right, hsl(220 6% 18% / 0.4) 0%, transparent 50%),
-      radial-gradient(ellipse at center bottom, hsl(200 4% 12% / 0.3) 0%, transparent 60%),
+    /* Lighter dark mode background with subtle gradients */
+    background:
+      radial-gradient(ellipse at top left, hsl(240 8% 22% / 0.6) 0%, transparent 50%),
+      radial-gradient(ellipse at bottom right, hsl(220 6% 24% / 0.4) 0%, transparent 50%),
+      radial-gradient(ellipse at center bottom, hsl(200 4% 20% / 0.3) 0%, transparent 60%),
       hsl(var(--background));
   }
 
