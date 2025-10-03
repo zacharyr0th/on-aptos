@@ -12,10 +12,9 @@ interface LayoutContentProps {
 export function LayoutContent({ children }: LayoutContentProps) {
   const pathname = usePathname();
 
-  // Portfolio and home pages need special handling for single viewport
+  // Portfolio page needs special handling for single viewport
   const isPortfolioPage = pathname === "/tools/portfolio";
-  const isHomePage = pathname === "/";
-  const isSingleViewport = isPortfolioPage || isHomePage;
+  const isSingleViewport = isPortfolioPage;
 
   // Show header and footer on all pages now (consolidated layout)
   const showHeader = true;
