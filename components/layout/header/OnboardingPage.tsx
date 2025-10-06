@@ -54,6 +54,14 @@ export function OnboardingPage() {
 
   useEffect(() => {
     fetchInitialData();
+
+    // Ensure page loads at the top (overview section)
+    window.scrollTo(0, 0);
+
+    // Clear any hash in the URL
+    if (window.location.hash) {
+      window.history.replaceState(null, '', window.location.pathname);
+    }
   }, []);
 
   useEffect(() => {
@@ -87,9 +95,6 @@ export function OnboardingPage() {
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
-
-    // Set initial hash based on current scroll position
-    handleScroll();
 
     return () => {
       window.removeEventListener("scroll", handleScroll);

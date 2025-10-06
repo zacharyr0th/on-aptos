@@ -2,7 +2,12 @@ import { NextResponse } from "next/server";
 import { apiLogger } from "@/lib/utils/core/logger";
 
 export const dynamic = "force-dynamic";
-export const revalidate = 60; // 1 minute cache
+export const revalidate = 300; // 5 minute cache
+
+// In-memory cache to reduce API calls
+let cachedData: any = null;
+let cacheTimestamp: number = 0;
+const CACHE_DURATION = 300000; // 5 minutes in milliseconds
 
 interface AssetMetrics {
   stables: {
@@ -29,7 +34,18 @@ interface AssetMetrics {
 
 export async function GET(request: Request) {
   try {
-    apiLogger.info("Fetching asset values for Aptos");
+    // Check cache first
+    const now = Date.now();
+    if (cachedData && (now - cacheTimestamp) < CACHE_DURATION) {
+      apiLogger.info("Returning cached asset values");
+      return NextResponse.json(cachedData, {
+        headers: {
+          "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
+        },
+      });
+    }
+
+    apiLogger.info("Fetching fresh asset values for Aptos");
 
     // Get the base URL from the request headers
     const host = request.headers.get('host') || 'localhost:3001';
@@ -132,9 +148,13 @@ export async function GET(request: Request) {
 
     apiLogger.info("Asset values fetched successfully", metrics);
 
+    // Update cache
+    cachedData = metrics;
+    cacheTimestamp = Date.now();
+
     return NextResponse.json(metrics, {
       headers: {
-        "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+        "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
       },
     });
   } catch (error) {
