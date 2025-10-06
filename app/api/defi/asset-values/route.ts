@@ -39,8 +39,8 @@ export async function GET(request: Request) {
     // xBTC address for fetching Bitcoin price
     const xBTCAddress = "0x81214a80d82035a190fcb76b6ff3c0145161c3a9f33d137f2bbaee4cfec8a387";
 
-    // Fetch all real data in parallel
-    const [stablesRes, rwaRes, btcRes, defiRes, btcPriceRes] = await Promise.all([
+    // Fetch all real data in parallel with error handling
+    const [stablesRes, rwaRes, btcRes, defiRes, btcPriceRes] = await Promise.allSettled([
       fetch(`${baseUrl}/api/aptos/stables`, { cache: 'no-store' }),
       fetch(`${baseUrl}/api/aptos/rwa`, { cache: 'no-store' }),
       fetch(`${baseUrl}/api/aptos/btc`, { cache: 'no-store' }),
@@ -48,23 +48,62 @@ export async function GET(request: Request) {
       fetch(`${baseUrl}/api/unified/prices?tokens=${xBTCAddress}`, { cache: 'no-store' })
     ]);
 
-    // Parse responses
-    const stablesData = await stablesRes.json();
-    const rwaData = await rwaRes.json();
-    const btcData = await btcRes.json();
-    const defiData = await defiRes.json();
-    const btcPriceData = await btcPriceRes.json();
+    // Safely parse responses with fallbacks
+    let stablesData: any = {};
+    let rwaData: any = {};
+    let btcData: any = {};
+    let defiData: any = {};
+    let btcPriceData: any = {};
 
-    // Extract actual values
-    // Stables total is already in dollar units (e.g., "1038744887" = $1.038B)
+    try {
+      if (stablesRes.status === 'fulfilled' && stablesRes.value.ok) {
+        stablesData = await stablesRes.value.json();
+      }
+    } catch (e) {
+      apiLogger.warn("Failed to parse stables data", e);
+    }
+
+    try {
+      if (rwaRes.status === 'fulfilled' && rwaRes.value.ok) {
+        rwaData = await rwaRes.value.json();
+      }
+    } catch (e) {
+      apiLogger.warn("Failed to parse RWA data", e);
+    }
+
+    try {
+      if (btcRes.status === 'fulfilled' && btcRes.value.ok) {
+        btcData = await btcRes.value.json();
+      }
+    } catch (e) {
+      apiLogger.warn("Failed to parse BTC data", e);
+    }
+
+    try {
+      if (defiRes.status === 'fulfilled' && defiRes.value.ok) {
+        defiData = await defiRes.value.json();
+      }
+    } catch (e) {
+      apiLogger.warn("Failed to parse DeFi data", e);
+    }
+
+    try {
+      if (btcPriceRes.status === 'fulfilled' && btcPriceRes.value.ok) {
+        btcPriceData = await btcPriceRes.value.json();
+      }
+    } catch (e) {
+      apiLogger.warn("Failed to parse BTC price data", e);
+    }
+
+    // Extract actual values with fallbacks
     const stablesValue = stablesData?.data?.total ? parseInt(stablesData.data.total) : 0;
     const rwasValue = rwaData?.data?.totalAptosValue ? Math.round(rwaData.data.totalAptosValue) : 0;
-    
+
     // Calculate BTC value using REAL price from the same source as BTC page
     const btcSupply = parseFloat(btcData?.data?.total_supply_formatted || "0");
-    const btcPrice = btcPriceData?.prices?.[xBTCAddress] || 96000; // Use real price, fallback to 96k
+    const btcPrice = btcPriceData?.prices?.[xBTCAddress] || 96000;
     const btcValue = Math.round(btcSupply * btcPrice);
-    
+
     const totalTokensValue = defiData?.tvl ? Math.round(defiData.tvl) : 0;
 
     // Format the response with REAL values from your APIs
