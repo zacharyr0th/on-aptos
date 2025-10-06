@@ -27,22 +27,25 @@ interface AssetMetrics {
   };
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     apiLogger.info("Fetching asset values for Aptos");
 
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001';
-    
+    // Get the base URL from the request headers
+    const host = request.headers.get('host') || 'localhost:3001';
+    const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
+    const baseUrl = `${protocol}://${host}`;
+
     // xBTC address for fetching Bitcoin price
     const xBTCAddress = "0x81214a80d82035a190fcb76b6ff3c0145161c3a9f33d137f2bbaee4cfec8a387";
-    
+
     // Fetch all real data in parallel
     const [stablesRes, rwaRes, btcRes, defiRes, btcPriceRes] = await Promise.all([
-      fetch(`${baseUrl}/api/aptos/stables`),
-      fetch(`${baseUrl}/api/aptos/rwa`),
-      fetch(`${baseUrl}/api/aptos/btc`),
-      fetch(`${baseUrl}/api/defi/metrics`),
-      fetch(`${baseUrl}/api/unified/prices?tokens=${xBTCAddress}`)
+      fetch(`${baseUrl}/api/aptos/stables`, { cache: 'no-store' }),
+      fetch(`${baseUrl}/api/aptos/rwa`, { cache: 'no-store' }),
+      fetch(`${baseUrl}/api/aptos/btc`, { cache: 'no-store' }),
+      fetch(`${baseUrl}/api/defi/metrics`, { cache: 'no-store' }),
+      fetch(`${baseUrl}/api/unified/prices?tokens=${xBTCAddress}`, { cache: 'no-store' })
     ]);
 
     // Parse responses
