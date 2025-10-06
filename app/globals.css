@@ -213,7 +213,7 @@
 
     -webkit-text-size-adjust: 100%;
     touch-action: manipulation;
-    scroll-padding-top: 1rem;
+    scroll-padding-top: 5rem;
     -webkit-tap-highlight-color: transparent;
 
     /* Improve mobile performance */
@@ -253,8 +253,14 @@
   .table-cell-numeric,
   td:has(.text-right),
   .text-right {
-    font-family: var(--font-mono), monospace;
+    font-family: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
     font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1, "cv02" 1;
+  }
+
+  /* Scroll margin for anchor links */
+  section[id] {
+    scroll-margin-top: 5rem;
   }
 }
 

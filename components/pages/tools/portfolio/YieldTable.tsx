@@ -58,7 +58,7 @@ import { safeWindowOpen } from "@/lib/utils/core/security";
 import { formatCurrency, formatPercentage } from "@/lib/utils/format";
 
 interface YieldTableProps extends BaseYieldTableProps {
-  // walletAddress is inherited from BaseYieldTableProps
+  // walletAddress, limit, and compact are inherited from BaseYieldTableProps
 }
 
 function SortableHeader({ column, title }: { column: any; title: string }) {
@@ -92,6 +92,7 @@ const getProtocolDisplayName = (protocolName: string): string => {
   const displayNameMap: Record<string, string> = {
     thala: "Thala",
     thalav: "Thala",
+    thalaswap: "Thala",
     pancakeswap: "PancakeSwap",
     pancake: "PancakeSwap",
     liquidswap: "LiquidSwap",
@@ -99,7 +100,9 @@ const getProtocolDisplayName = (protocolName: string): string => {
     aries: "Aries",
     merkle: "Merkle",
     echelon: "Echelon",
+    echelonmarket: "Echelon",
     amnis: "Amnis",
+    amnisfinance: "Amnis",
     sushi: "Sushi",
     sushiswap: "Sushi",
     kana: "Kana",
@@ -107,6 +110,8 @@ const getProtocolDisplayName = (protocolName: string): string => {
     joule: "Joule",
     thetis: "Thetis",
     hyperion: "Hyperion",
+    tapp: "Tapp",
+    tappexchange: "Tapp",
   };
 
   return displayNameMap[normalized] || protocolName.charAt(0).toUpperCase() + protocolName.slice(1);
@@ -119,12 +124,15 @@ const getProtocolLogoPath = (protocolName: string): string | null => {
     pancake: "/icons/protocols/pancake.webp",
     thala: "/icons/protocols/thala.avif",
     thalav: "/icons/protocols/thala.avif", // Covers thala v2, etc
+    thalaswap: "/icons/protocols/thala.avif", // thalaswap-v2
     liquidswap: "/icons/protocols/liquidswap.webp",
     cellana: "/icons/protocols/cellana.webp",
     aries: "/icons/protocols/aries.avif",
     merkle: "/icons/protocols/merkle.webp",
     echelon: "/icons/protocols/echelon.avif",
+    echelonmarket: "/icons/protocols/echelon.avif",
     amnis: "/icons/protocols/amnis.avif",
+    amnisfinance: "/icons/protocols/amnis.avif",
     sushi: "/icons/protocols/sushi.webp",
     sushiswap: "/icons/protocols/sushi.webp",
     kana: "/icons/protocols/kana.webp",
@@ -150,6 +158,7 @@ const getProtocolLogoPath = (protocolName: string): string | null => {
     pumpuptos: "/icons/protocols/pump-uptos.webp",
     superposition: "/icons/protocols/superposition.webp",
     tapp: "/icons/protocols/tapp.webp",
+    tappexchange: "/icons/protocols/tapp.webp",
     tradeport: "/icons/protocols/tradeport.webp",
     trufin: "/icons/protocols/trufin.webp",
     vibrantx: "/icons/protocols/vibrantx.webp",
@@ -200,26 +209,26 @@ const getTypeBadge = (type: string) => {
   );
 };
 
-export function YieldTable({ walletAddress }: YieldTableProps) {
+export function YieldTable({ walletAddress, limit, compact = false }: YieldTableProps) {
   const [opportunities, setOpportunities] = useState<YieldOpportunity[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // Table state
   const [sorting, setSorting] = useState<SortingState>([
-    { id: "apy", desc: true }, // Default sort by APY descending
+    { id: "tvl", desc: true }, // Default sort by TVL descending
   ]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [expanded, setExpanded] = useState<ExpandedState>({});
 
   // Filter states
-  const [selectedType, setSelectedType] = useState<string>("all");
+  const [selectedAsset, setSelectedAsset] = useState<string>("all");
   const [selectedProtocol, setSelectedProtocol] = useState<string>("all");
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 200;
+  const itemsPerPage = limit || 200;
 
   const yieldService = YieldAggregatorService.getInstance();
 
@@ -236,8 +245,13 @@ export function YieldTable({ walletAddress }: YieldTableProps) {
         includeInactive: false,
       });
 
-      setOpportunities(allOpps);
-      logger.info(`Loaded ${allOpps.length} yield opportunities`);
+      // Filter out Tortuga opportunities and sort by TVL (highest first)
+      const filteredOpps = allOpps
+        .filter((opp) => !opp.protocol.toLowerCase().includes('tortuga'))
+        .sort((a, b) => b.tvl - a.tvl);
+
+      setOpportunities(filteredOpps);
+      logger.info(`Loaded ${filteredOpps.length} yield opportunities`);
     } catch (err) {
       logger.error(
         `Failed to load yield opportunities: ${err instanceof Error ? err.message : String(err)}`
@@ -253,11 +267,16 @@ export function YieldTable({ walletAddress }: YieldTableProps) {
     let filtered = [...opportunities];
 
     if (selectedProtocol !== "all") {
-      filtered = filtered.filter((o) => o.protocol === selectedProtocol);
+      filtered = filtered.filter((o) =>
+        getProtocolDisplayName(o.protocol).toLowerCase() === selectedProtocol
+      );
     }
 
-    if (selectedType !== "all") {
-      filtered = filtered.filter((o) => o.opportunityType === selectedType);
+    if (selectedAsset !== "all") {
+      filtered = filtered.filter((o) =>
+        o.assetSymbol === selectedAsset ||
+        o.pairedAssetSymbol === selectedAsset
+      );
     }
 
     if (searchQuery) {
@@ -282,7 +301,7 @@ export function YieldTable({ walletAddress }: YieldTableProps) {
       displayOpportunities,
       totalPages,
     };
-  }, [opportunities, selectedProtocol, selectedType, searchQuery, currentPage, itemsPerPage]);
+  }, [opportunities, selectedProtocol, selectedAsset, searchQuery, currentPage, itemsPerPage]);
 
   // Generate protocol options with counts
   const protocolOptions = React.useMemo(() => {
@@ -307,69 +326,147 @@ export function YieldTable({ walletAddress }: YieldTableProps) {
       });
   }, [opportunities]);
 
-  // Calculate counts for each type
-  const typeCounts = React.useMemo(() => {
+  // Calculate counts for each asset
+  const assetCounts = React.useMemo(() => {
     const counts: Record<string, number> = {
       all: opportunities.length,
-      liquidity: 0,
-      lending: 0,
-      staking: 0,
-      farming: 0,
-      vault: 0,
     };
 
     opportunities.forEach((opp) => {
-      const type = opp.opportunityType.toLowerCase();
-      counts[type] = (counts[type] || 0) + 1;
+      // Count primary asset
+      counts[opp.assetSymbol] = (counts[opp.assetSymbol] || 0) + 1;
+
+      // Count paired asset if exists
+      if (opp.pairedAssetSymbol) {
+        counts[opp.pairedAssetSymbol] = (counts[opp.pairedAssetSymbol] || 0) + 1;
+      }
     });
 
     return counts;
   }, [opportunities]);
 
-  // Split types into top categories and dropdown
-  const { topTypes, dropdownTypes } = React.useMemo(() => {
-    const allTypes = [
-      { value: "all", label: "All", count: typeCounts.all },
-      { value: "liquidity", label: "LP", count: typeCounts.liquidity },
-      { value: "lending", label: "Lending", count: typeCounts.lending },
-      { value: "staking", label: "LST", count: typeCounts.staking },
-      { value: "farming", label: "Farming", count: typeCounts.farming },
-      { value: "vault", label: "Vault", count: typeCounts.vault },
+  // Format asset symbol for display
+  const formatAssetSymbol = (symbol: string): string => {
+    if (symbol === "all" || symbol === "All") return symbol;
+
+    // Explicit mappings for specific assets
+    const explicitMappings: Record<string, string> = {
+      'TRUAPT': 'truAPT',
+      'AMAPT': 'amAPT',
+      'STAPT': 'stAPT',
+      'KAPT': 'kAPT',
+      'THAPT': 'thAPT',
+      'STKAPT': 'stkAPT',
+      'SUSDE': 'sUSDe',
+      'USDE': 'USDe',
+      'USDT': 'USDt',
+      'USDC': 'USDC',
+      'ZUSDT': 'zUSDt',
+      'ZUSDC': 'zUSDC',
+      'ZWETH': 'zWETH',
+      'USD1': 'USD1',
+      'APT': 'APT',
+      'MOD': 'MOD',
+      'XBTC': 'xBTC',
+      'SBTC': 'sBTC',
+      'BRBTC': 'brBTC',
+      'FIABTC': 'fiaBTC',
+      'UNIBTC': 'uniBTC',
+      'ABTC': 'aBTC',
+      'BTC': 'BTC',
+      'ETH': 'ETH',
+      'WETH': 'WETH',
+      'DAI': 'DAI',
+      'WBTC': 'WBTC',
+      'THL': 'THL',
+      'USDA': 'USDA',
+      'USDY': 'USDY',
+      'MKLP': 'MKLP',
+    };
+
+    // Check explicit mappings first
+    if (explicitMappings[symbol]) {
+      return explicitMappings[symbol];
+    }
+
+    // For other bridged/derivative assets, try pattern matching
+    // Check if it starts with 1-3 uppercase letters followed by more uppercase
+    const prefixMatch = symbol.match(/^([A-Z]{1,3})([A-Z]+)$/);
+    if (prefixMatch) {
+      const [, prefix, rest] = prefixMatch;
+      // Convert prefix to lowercase for derivatives
+      return prefix.toLowerCase() + rest;
+    }
+
+    return symbol;
+  };
+
+  // Split assets into top categories and dropdown
+  const { topAssets, dropdownAssets } = React.useMemo(() => {
+    // Priority assets to show as buttons (in order)
+    const priorityAssets = [
+      'all', 'APT', 'STAPT', 'THAPT', 'KAPT',
+      'WBTC', 'XBTC', 'FIABTC', 'ABTC', 'BRBTC',
+      'USDT', 'USDC', 'SUSDE', 'USD1'
     ];
 
-    // Filter out types with zero count (except "All")
-    const nonZeroTypes = allTypes.filter((type) => type.value === "all" || type.count > 0);
+    const allAssets = Object.entries(assetCounts)
+      .map(([value, count]) => ({
+        value,
+        label: value === "all" ? "All" : formatAssetSymbol(value),
+        count,
+      }))
+      .filter((asset) => asset.value === "all" || asset.count > 0);
 
-    // Sort by count (descending) but keep "All" first
-    const sortedTypes = nonZeroTypes.sort((a, b) => {
-      if (a.value === "all") return -1;
-      if (b.value === "all") return 1;
-      return b.count - a.count;
+    // Separate priority assets and others
+    const topAssets = priorityAssets
+      .map(priority => allAssets.find(asset => asset.value === priority))
+      .filter((asset): asset is { value: string; label: string; count: number } => asset !== undefined);
+
+    // Remaining assets sorted by count for dropdown
+    const dropdownAssets = allAssets
+      .filter(asset => !priorityAssets.includes(asset.value))
+      .sort((a, b) => b.count - a.count);
+
+    return { topAssets, dropdownAssets };
+  }, [assetCounts]);
+
+  // Get top protocols
+  const topProtocols = React.useMemo(() => {
+    const protocolCounts: Record<string, number> = {};
+
+    opportunities.forEach((opp) => {
+      const displayName = getProtocolDisplayName(opp.protocol);
+      protocolCounts[displayName] = (protocolCounts[displayName] || 0) + 1;
     });
 
-    // Top 5 types as buttons
-    const topTypes = sortedTypes.slice(0, 5);
-
-    // Remaining types for dropdown
-    const dropdownTypes = sortedTypes.slice(5);
-
-    return { topTypes, dropdownTypes };
-  }, [typeCounts]);
+    return [
+      { value: "all", label: "All", count: opportunities.length },
+      ...Object.entries(protocolCounts)
+        .map(([label, count]) => ({
+          value: label.toLowerCase(),
+          label,
+          count,
+        }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 6)
+    ];
+  }, [opportunities]);
 
   // Clear all filters
   const clearFilters = () => {
     setSelectedProtocol("all");
-    setSelectedType("all");
+    setSelectedAsset("all");
     setSearchQuery("");
   };
 
   const hasActiveFilters =
-    selectedProtocol !== "all" || selectedType !== "all" || searchQuery !== "";
+    selectedProtocol !== "all" || selectedAsset !== "all" || searchQuery !== "";
 
   // Reset to first page when filters change
   React.useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, selectedType, selectedProtocol]);
+  }, [searchQuery, selectedAsset, selectedProtocol]);
 
   // Table columns
   const columns = React.useMemo<ColumnDef<YieldOpportunity>[]>(
@@ -384,25 +481,21 @@ export function YieldTable({ walletAddress }: YieldTableProps) {
 
           return (
             <div className="flex items-center gap-2 w-[200px] flex-shrink-0">
-              <div className="rounded-full p-2 bg-muted flex-shrink-0">
-                {logoPath ? (
-                  <>
-                    <img
-                      src={logoPath}
-                      alt={protocol}
-                      className="h-4 w-4 rounded-full object-cover"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.style.display = "none";
-                        const iconSpan = target.nextElementSibling as HTMLElement;
-                        if (iconSpan) iconSpan.style.display = "block";
-                      }}
-                    />
-                    <TypeIcon className="h-4 w-4 hidden text-muted-foreground" />
-                  </>
-                ) : (
-                  <TypeIcon className="h-4 w-4 text-muted-foreground" />
-                )}
+              {logoPath ? (
+                <img
+                  src={logoPath}
+                  alt={protocol}
+                  className="h-8 w-8 rounded-full object-cover flex-shrink-0"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = "none";
+                    const iconSpan = target.nextElementSibling as HTMLElement;
+                    if (iconSpan) iconSpan.style.display = "flex";
+                  }}
+                />
+              ) : null}
+              <div className="rounded-full p-2 bg-muted flex-shrink-0" style={{ display: logoPath ? 'none' : 'flex' }}>
+                <TypeIcon className="h-4 w-4 text-muted-foreground" />
               </div>
               <div className="min-w-0 flex-1">
                 <div className="font-medium text-sm truncate">
@@ -433,11 +526,11 @@ export function YieldTable({ walletAddress }: YieldTableProps) {
           return (
             <div className="w-[140px] flex-shrink-0">
               <div className="flex items-center gap-1">
-                <span className="font-mono text-sm">{asset}</span>
+                <span className="font-mono text-sm">{formatAssetSymbol(asset)}</span>
                 {paired && (
                   <>
                     <span className="text-muted-foreground">/</span>
-                    <span className="font-mono text-sm">{paired}</span>
+                    <span className="font-mono text-sm">{formatAssetSymbol(paired)}</span>
                   </>
                 )}
               </div>
@@ -455,7 +548,7 @@ export function YieldTable({ walletAddress }: YieldTableProps) {
           const apy = row.getValue("apy") as number;
           return (
             <div className="w-[100px] flex-shrink-0">
-              <span className="font-mono text-sm font-bold text-green-600 dark:text-green-400">
+              <span className="font-mono text-sm font-bold text-emerald-500 dark:text-emerald-400">
                 {formatPercentage(apy)}
               </span>
             </div>
@@ -476,18 +569,6 @@ export function YieldTable({ walletAddress }: YieldTableProps) {
         size: 120,
         minSize: 120,
         maxSize: 120,
-      },
-      {
-        accessorKey: "opportunityType",
-        header: ({ column }) => <SortableHeader column={column} title="Type" />,
-        cell: ({ row }) => (
-          <div className="w-[100px] flex-shrink-0">
-            {getTypeBadge(row.getValue("opportunityType"))}
-          </div>
-        ),
-        size: 100,
-        minSize: 100,
-        maxSize: 100,
       },
       {
         id: "actions",
@@ -634,7 +715,7 @@ export function YieldTable({ walletAddress }: YieldTableProps) {
       {/* Mobile: Yields Header */}
       <div className="flex items-center gap-2 mb-6 lg:hidden flex-shrink-0">
         <TrendingUp className="h-4 w-4" />
-        <h2 className="text-base font-medium">Yield Opportunities</h2>
+        <h2 className="text-base font-medium">Yields</h2>
       </div>
 
       {/* Filters Section */}
@@ -662,13 +743,13 @@ export function YieldTable({ walletAddress }: YieldTableProps) {
             </SelectContent>
           </Select>
 
-          {/* Type Dropdown - Mobile */}
-          <Select value={selectedType} onValueChange={setSelectedType}>
+          {/* Asset Dropdown - Mobile */}
+          <Select value={selectedAsset} onValueChange={setSelectedAsset}>
             <SelectTrigger className="w-full bg-transparent border-border hover:bg-accent hover:text-accent-foreground">
-              <SelectValue placeholder="All Types" />
+              <SelectValue placeholder="All Assets" />
             </SelectTrigger>
             <SelectContent>
-              {[...topTypes, ...dropdownTypes].map((option) => (
+              {topAssets.map((option) => (
                 <SelectItem key={option.value} value={option.value}>
                   <div className="flex items-center justify-between w-full">
                     <span>{option.label}</span>
@@ -681,108 +762,35 @@ export function YieldTable({ walletAddress }: YieldTableProps) {
             </SelectContent>
           </Select>
 
-          {/* Clear Filters */}
-          {hasActiveFilters && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={clearFilters}
-              className="text-muted-foreground hover:text-foreground w-full"
-            >
-              <X className="h-4 w-4 mr-2" />
-              Clear filters
-            </Button>
-          )}
         </div>
 
-        {/* Desktop Layout - Clear filters only */}
-        <div className="hidden lg:flex lg:items-center lg:justify-start gap-4">
-          {hasActiveFilters && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={clearFilters}
-              className="text-muted-foreground hover:text-foreground"
-            >
-              <X className="h-4 w-4 mr-2" />
-              Clear filters
-            </Button>
-          )}
-        </div>
       </div>
 
-      {/* Type Filter - Top types as buttons + dropdowns */}
+      {/* Filter Buttons */}
       <div className="w-full">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          {/* Left side - Type filters */}
-          <div className="flex flex-wrap items-center gap-2 flex-1 min-w-0">
-            {/* Top type buttons */}
-            {topTypes.map((option) => (
+        {/* Asset Filters */}
+        <div className="flex flex-wrap items-center gap-1.5">
+          {topAssets.map((option, index) => (
+            <React.Fragment key={option.value}>
               <Button
-                key={option.value}
-                variant={selectedType === option.value ? "default" : "outline"}
+                variant={selectedAsset === option.value ? "default" : "ghost"}
                 size="sm"
-                onClick={() => setSelectedType(option.value)}
+                onClick={() => setSelectedAsset(option.value)}
                 className={cn(
-                  "text-xs h-10 border transition-colors",
-                  selectedType === option.value
-                    ? "bg-primary text-primary-foreground border-primary hover:bg-primary/90"
-                    : "bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground"
+                  "text-xs h-8 px-3 font-medium transition-all",
+                  selectedAsset === option.value
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
                 )}
               >
                 {option.label} ({option.count})
               </Button>
-            ))}
-
-            {/* Dropdown for additional types */}
-            {dropdownTypes.length > 0 && (
-              <Select
-                value={
-                  dropdownTypes.find((type) => type.value === selectedType) ? selectedType : ""
-                }
-                onValueChange={setSelectedType}
-              >
-                <SelectTrigger className="w-[140px] h-10 text-xs">
-                  <SelectValue placeholder="More..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {dropdownTypes.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      <div className="flex items-center justify-between w-full">
-                        <span>{option.label}</span>
-                        <Badge variant="secondary" className="ml-2 h-4 px-2 text-xs">
-                          {option.count}
-                        </Badge>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-          </div>
-
-          {/* Right side - Protocol dropdown */}
-          <div className="flex items-center gap-2 flex-shrink-0">
-            <Select value={selectedProtocol} onValueChange={setSelectedProtocol}>
-              <SelectTrigger className="w-[160px] lg:w-[180px] h-10 text-xs bg-transparent border-border hover:bg-accent hover:text-accent-foreground">
-                <SelectValue placeholder="All Protocols" />
-              </SelectTrigger>
-              <SelectContent>
-                {protocolOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    <div className="flex items-center justify-between w-full">
-                      <span>{option.label}</span>
-                      {option.count > 0 && (
-                        <Badge variant="secondary" className="ml-2 h-4 px-2 text-xs">
-                          {option.count}
-                        </Badge>
-                      )}
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+              {/* Add dividers after kAPT and brBTC */}
+              {(option.value === 'KAPT' || option.value === 'BRBTC') && (
+                <div className="h-6 w-px bg-border" />
+              )}
+            </React.Fragment>
+          ))}
         </div>
       </div>
 
@@ -810,25 +818,21 @@ export function YieldTable({ walletAddress }: YieldTableProps) {
                     {/* Header Row */}
                     <div className="flex items-start justify-between min-h-[56px]">
                       <div className="flex items-start gap-3 flex-1 min-w-0">
-                        <div className="rounded-full p-2 bg-muted flex-shrink-0 w-10 h-10 flex items-center justify-center">
-                          {logoPath ? (
-                            <>
-                              <img
-                                src={logoPath}
-                                alt={opportunity.protocol}
-                                className="h-5 w-5 rounded-full object-cover"
-                                onError={(e) => {
-                                  const target = e.target as HTMLImageElement;
-                                  target.style.display = "none";
-                                  const iconSpan = target.nextElementSibling as HTMLElement;
-                                  if (iconSpan) iconSpan.style.display = "block";
-                                }}
-                              />
-                              <TypeIcon className="h-5 w-5 hidden text-muted-foreground" />
-                            </>
-                          ) : (
-                            <TypeIcon className="h-5 w-5 text-muted-foreground" />
-                          )}
+                        {logoPath ? (
+                          <img
+                            src={logoPath}
+                            alt={opportunity.protocol}
+                            className="h-10 w-10 rounded-full object-cover flex-shrink-0"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = "none";
+                              const iconSpan = target.nextElementSibling as HTMLElement;
+                              if (iconSpan) iconSpan.style.display = "flex";
+                            }}
+                          />
+                        ) : null}
+                        <div className="rounded-full p-2 bg-muted flex-shrink-0 w-10 h-10 items-center justify-center" style={{ display: logoPath ? 'none' : 'flex' }}>
+                          <TypeIcon className="h-5 w-5 text-muted-foreground" />
                         </div>
                         <div className="flex-1 min-w-0 py-1">
                           <div className="font-medium text-sm truncate">
@@ -854,16 +858,16 @@ export function YieldTable({ walletAddress }: YieldTableProps) {
                       <div className="flex items-center gap-2 flex-1 min-w-0">
                         {getTypeBadge(opportunity.opportunityType)}
                         <span className="text-xs font-mono flex-shrink-0">
-                          {opportunity.assetSymbol}
+                          {formatAssetSymbol(opportunity.assetSymbol)}
                           {opportunity.pairedAssetSymbol && (
                             <span className="text-muted-foreground">
-                              /{opportunity.pairedAssetSymbol}
+                              /{formatAssetSymbol(opportunity.pairedAssetSymbol)}
                             </span>
                           )}
                         </span>
                       </div>
                       <div className="text-right flex-shrink-0 ml-2">
-                        <div className="text-sm font-bold text-green-600 dark:text-green-400">
+                        <div className="text-sm font-bold text-emerald-500 dark:text-emerald-400">
                           {formatPercentage(opportunity.apy)}
                         </div>
                         <div className="text-xs text-muted-foreground">

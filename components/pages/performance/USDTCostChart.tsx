@@ -233,8 +233,7 @@ const USDTCostChart = memo(function USDTCostChart({ data }: USDTCostChartProps) 
       .attr("stroke", (d) => chainColors[d.chain as keyof typeof chainColors]?.base || "#4b5563")
       .attr("stroke-width", 1)
       .attr("rx", 4)
-      .attr("ry", 4)
-      .style("filter", "drop-shadow(0 2px 4px rgba(0,0,0,0.1))");
+      .attr("ry", 4);
 
     // Animate bars
     bars

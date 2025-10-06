@@ -19,7 +19,14 @@
     "defi_dashboard": "Àtẹ DeFi",
     "stablecoins_desc": "Tọpinpin USDT, USDC, USDe àti àwọn owó ìdúró mìíràn",
     "bitcoin_desc": "Ṣàyẹ̀wò àwọn ohun-ìní Bitcoin tí a fi pamọ́ lórí Aptos",
-    "rwas_desc": "Wo àwọn ohun-ìní ayé gidi tí a sọ di token"
+    "rwas_desc": "Wo àwọn ohun-ìní ayé gidi tí a sọ di token",
+    "welcome": "Káàbọ̀",
+    "blockchain": "Blockchain",
+    "performance": "Iṣẹ́",
+    "network": "Nẹ́tíwọ̀ọ̀kì",
+    "yield_opportunities": "Àwọn àǹfààní Èrè",
+    "usdt_performance": "Iṣẹ́ USDT",
+    "launch_app": "Ṣíi App"
   },
   "actions": {
     "clear_filters": "Fọ àwọn àjẹ́kù",

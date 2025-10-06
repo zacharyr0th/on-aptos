@@ -19,7 +19,14 @@
     "defi_dashboard": "DeFi дашборд",
     "stablecoins_desc": "Отслеживайте USDT, USDC, USDe и другие стейблкоины",
     "bitcoin_desc": "Мониторинг завёрнутых Bitcoin-активов на Aptos",
-    "rwas_desc": "Просмотр токенизированных реальных активов"
+    "rwas_desc": "Просмотр токенизированных реальных активов",
+    "welcome": "Добро пожаловать",
+    "blockchain": "Блокчейн",
+    "performance": "Производительность",
+    "network": "Сеть",
+    "yield_opportunities": "Возможности доходности",
+    "usdt_performance": "Производительность USDT",
+    "launch_app": "Запустить приложение"
   },
   "actions": {
     "clear_filters": "Очистить фильтры",

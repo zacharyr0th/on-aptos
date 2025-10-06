@@ -19,7 +19,14 @@
     "defi_dashboard": "DeFi डैशबोर्ड",
     "stablecoins_desc": "USDT, USDC, USDe और अन्य स्थिर सिक्कों को ट्रैक करें",
     "bitcoin_desc": "Aptos पर wrapped बिटकॉइन संपत्ति की निगरानी करें",
-    "rwas_desc": "वास्तविक दुनिया की टोकनीकृत संपत्तियों को देखें"
+    "rwas_desc": "वास्तविक दुनिया की टोकनीकृत संपत्तियों को देखें",
+    "welcome": "स्वागत है",
+    "blockchain": "ब्लॉकचेन",
+    "performance": "प्रदर्शन",
+    "network": "नेटवर्क",
+    "yield_opportunities": "उपज के अवसर",
+    "usdt_performance": "USDT प्रदर्शन",
+    "launch_app": "ऐप लॉन्च करें"
   },
   "actions": {
     "clear_filters": "फिल्टर साफ़ करें",

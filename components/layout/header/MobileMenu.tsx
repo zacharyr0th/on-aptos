@@ -84,7 +84,7 @@ export function MobileMenu({ isOpen, onToggle, onClose, navigationItems }: Mobil
             </button>
           </TooltipTrigger>
           <TooltipContent>
-            <p>{isOpen ? "Close menu" : "Open navigation menu"}</p>
+            <p>{isOpen ? t("navigation.close_menu", "Close menu") : t("navigation.toggle_menu", "Open navigation menu")}</p>
           </TooltipContent>
         </Tooltip>
       </div>
@@ -123,7 +123,7 @@ export function MobileMenu({ isOpen, onToggle, onClose, navigationItems }: Mobil
                     </button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Close navigation menu</p>
+                    <p>{t("navigation.close_menu", "Close navigation menu")}</p>
                   </TooltipContent>
                 </Tooltip>
               </div>
@@ -133,7 +133,7 @@ export function MobileMenu({ isOpen, onToggle, onClose, navigationItems }: Mobil
                 <div className="py-2 border-t border-border">
                   <div className="px-4 py-2">
                     <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                      Assets
+                      {t("navigation.assets", "Assets")}
                     </h3>
                   </div>
                   {navigationItems.map((item) => (
@@ -151,7 +151,7 @@ export function MobileMenu({ isOpen, onToggle, onClose, navigationItems }: Mobil
                 <div className="py-2 border-t border-border">
                   <div className="px-4 py-2">
                     <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                      Performance
+                      {t("navigation.performance", "Performance")}
                     </h3>
                   </div>
                   <MobileNavLink
@@ -159,14 +159,14 @@ export function MobileMenu({ isOpen, onToggle, onClose, navigationItems }: Mobil
                     active={pathname === "/performance"}
                     onClick={onClose}
                   >
-                    USDT Performance
+                    {t("navigation.usdt_performance", "USDT Performance")}
                   </MobileNavLink>
                 </div>
 
                 <div className="py-2 border-t border-border">
                   <div className="px-4 py-2">
                     <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                      DeFi
+                      {t("navigation.defi", "DeFi")}
                     </h3>
                   </div>
                   <MobileNavLink
@@ -174,14 +174,14 @@ export function MobileMenu({ isOpen, onToggle, onClose, navigationItems }: Mobil
                     active={pathname === "/protocols/defi"}
                     onClick={onClose}
                   >
-                    DeFi Dashboard
+                    {t("navigation.defi_dashboard", "DeFi Dashboard")}
                   </MobileNavLink>
                   <MobileNavLink
                     href="/protocols/yields"
                     active={pathname === "/protocols/yields"}
                     onClick={onClose}
                   >
-                    Yield Opportunities
+                    {t("navigation.yield_opportunities", "Yield Opportunities")}
                   </MobileNavLink>
                 </div>
 
@@ -193,7 +193,7 @@ export function MobileMenu({ isOpen, onToggle, onClose, navigationItems }: Mobil
                         active={pathname === "/tools/portfolio"}
                         onClick={onClose}
                       >
-                        Portfolio
+                        {t("navigation.portfolio", "Portfolio")}
                       </MobileNavLink>
                       <div className="px-4 py-2">
                         <p className="text-xs text-muted-foreground">
@@ -224,7 +224,7 @@ export function MobileMenu({ isOpen, onToggle, onClose, navigationItems }: Mobil
                       active={pathname === "/tools/portfolio"}
                       onClick={onClose}
                     >
-                      {pathname === "/" ? "Launch App" : "Portfolio"}
+                      {pathname === "/" ? t("navigation.launch_app", "Launch App") : t("navigation.portfolio", "Portfolio")}
                     </MobileNavLink>
                   )}
                 </div>

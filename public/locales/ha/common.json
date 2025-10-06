@@ -19,7 +19,14 @@
     "defi_dashboard": "Dashboard na DeFi",
     "stablecoins_desc": "Bi USDT, USDC, USDe da sauran stablecoins",
     "bitcoin_desc": "Lura da kadarorin Bitcoin da aka lulluɓe akan Aptos",
-    "rwas_desc": "Duba kadarorin alamar duniya na gaske"
+    "rwas_desc": "Duba kadarorin alamar duniya na gaske",
+    "welcome": "Barka da zuwa",
+    "blockchain": "Blockchain",
+    "performance": "Aiki",
+    "network": "Hanyar sadarwa",
+    "yield_opportunities": "Damar Samun Riba",
+    "usdt_performance": "Ayyukan USDT",
+    "launch_app": "Kunna App"
   },
   "actions": {
     "clear_filters": "Share Tacewa",

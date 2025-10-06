@@ -19,7 +19,14 @@
     "defi_dashboard": "DeFiダッシュボード",
     "stablecoins_desc": "USDT、USDC、USDe、その他のステーブルコインを追跡",
     "bitcoin_desc": "Aptos上のラップされたビットコイン資産を監視",
-    "rwas_desc": "現実世界のトークン化資産を表示"
+    "rwas_desc": "現実世界のトークン化資産を表示",
+    "welcome": "ようこそ",
+    "blockchain": "ブロックチェーン",
+    "performance": "パフォーマンス",
+    "network": "ネットワーク",
+    "yield_opportunities": "利回り機会",
+    "usdt_performance": "USDTパフォーマンス",
+    "launch_app": "アプリを起動"
   },
   "actions": {
     "clear_filters": "フィルターをクリア",

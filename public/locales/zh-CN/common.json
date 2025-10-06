@@ -19,7 +19,14 @@
     "defi_dashboard": "DeFi 仪表板",
     "stablecoins_desc": "跟踪 USDT、USDC、USDe 和其他稳定币",
     "bitcoin_desc": "监控 Aptos 上的包装比特币资产",
-    "rwas_desc": "查看现实世界代币化资产"
+    "rwas_desc": "查看现实世界代币化资产",
+    "welcome": "欢迎",
+    "blockchain": "区块链",
+    "performance": "性能",
+    "network": "网络",
+    "yield_opportunities": "收益机会",
+    "usdt_performance": "USDT 性能",
+    "launch_app": "启动应用"
   },
   "actions": {
     "clear_filters": "清除筛选",

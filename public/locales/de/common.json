@@ -19,7 +19,14 @@
     "defi_dashboard": "DeFi-Dashboard",
     "stablecoins_desc": "Verfolgen Sie USDT, USDC, USDe und andere Stablecoins",
     "bitcoin_desc": "Überwachen Sie Wrapped-Bitcoin-Assets auf Aptos",
-    "rwas_desc": "Tokenisierte Vermögenswerte aus der realen Welt anzeigen"
+    "rwas_desc": "Tokenisierte Vermögenswerte aus der realen Welt anzeigen",
+    "welcome": "Willkommen",
+    "blockchain": "Blockchain",
+    "performance": "Leistung",
+    "network": "Netzwerk",
+    "yield_opportunities": "Renditemöglichkeiten",
+    "usdt_performance": "USDT-Performance",
+    "launch_app": "App starten"
   },
   "actions": {
     "clear_filters": "Filter zurücksetzen",

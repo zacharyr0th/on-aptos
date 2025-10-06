@@ -19,7 +19,14 @@
     "defi_dashboard": "لوحة التمويل اللامركزي",
     "stablecoins_desc": "تتبع USDT وUSDC وUSDe والعملات المستقرة الأخرى",
     "bitcoin_desc": "مراقبة أصول البيتكوين المغلفة على أبتوس",
-    "rwas_desc": "عرض الأصول المرمزة من العالم الحقيقي"
+    "rwas_desc": "عرض الأصول المرمزة من العالم الحقيقي",
+    "welcome": "مرحباً",
+    "blockchain": "البلوكتشين",
+    "performance": "الأداء",
+    "network": "الشبكة",
+    "yield_opportunities": "فرص العائد",
+    "usdt_performance": "أداء USDT",
+    "launch_app": "إطلاق التطبيق"
   },
   "actions": {
     "clear_filters": "مسح المرشحات",

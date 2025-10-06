@@ -19,7 +19,14 @@
     "defi_dashboard": "DeFi Dashboard",
     "stablecoins_desc": "Track USDT, USDC, USDe and other stablecoins",
     "bitcoin_desc": "Monitor wrapped Bitcoin assets on Aptos",
-    "rwas_desc": "View real-world tokenized assets"
+    "rwas_desc": "View real-world tokenized assets",
+    "welcome": "Welcome",
+    "blockchain": "Blockchain",
+    "performance": "Performance",
+    "network": "Network",
+    "yield_opportunities": "Yield Opportunities",
+    "usdt_performance": "USDT Performance",
+    "launch_app": "Launch App"
   },
   "actions": {
     "clear_filters": "Clear Filters",

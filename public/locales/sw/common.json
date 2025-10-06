@@ -19,7 +19,14 @@
     "defi_dashboard": "Dashibodi ya DeFi",
     "stablecoins_desc": "Fuatilia USDT, USDC, USDe na stablecoins nyingine",
     "bitcoin_desc": "Fuatilia mali za Bitcoin zilizofungwa kwenye Aptos",
-    "rwas_desc": "Tazama mali za ulimwengu halisi zilizotokeneishwa"
+    "rwas_desc": "Tazama mali za ulimwengu halisi zilizotokeneishwa",
+    "welcome": "Karibu",
+    "blockchain": "Blockchain",
+    "performance": "Utendaji",
+    "network": "Mtandao",
+    "yield_opportunities": "Fursa za Mapato",
+    "usdt_performance": "Utendaji wa USDT",
+    "launch_app": "Zindua Programu"
   },
   "actions": {
     "clear_filters": "Ondoa Vichujio",

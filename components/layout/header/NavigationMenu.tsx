@@ -42,20 +42,6 @@ export function DesktopNavigationMenu({ navigationItems, onMenuClose }: Navigati
         <NavigationMenu delayDuration={0} viewport={false}>
           <NavigationMenuList>
 
-            {/* Welcome Link */}
-            <NavigationMenuItem>
-              <Link
-                href="/welcome"
-                className={cn(
-                  navigationMenuTriggerStyle(),
-                  "text-sm font-medium",
-                  pathname === "/welcome" && "bg-accent"
-                )}
-              >
-                Welcome
-              </Link>
-            </NavigationMenuItem>
-
             {/* Assets Dropdown */}
             <NavigationMenuItem>
               <NavigationMenuTrigger className="text-sm font-medium">
@@ -105,7 +91,7 @@ export function DesktopNavigationMenu({ navigationItems, onMenuClose }: Navigati
                           onClick={onMenuClose}
                         >
                           <BarChart className="h-4 w-4" />
-                          <span>DeFi Dashboard</span>
+                          <span>{t("navigation.defi_dashboard", "DeFi Dashboard")}</span>
                         </Link>
                         {/* Yields Link */}
                         <Link
@@ -118,7 +104,7 @@ export function DesktopNavigationMenu({ navigationItems, onMenuClose }: Navigati
                           onClick={onMenuClose}
                         >
                           <TrendingUp className="h-4 w-4" />
-                          <span>Yield Opportunities</span>
+                          <span>{t("navigation.yield_opportunities", "Yield Opportunities")}</span>
                         </Link>
                       </div>
                       {/* Group protocols by category */}
@@ -207,7 +193,7 @@ export function DesktopNavigationMenu({ navigationItems, onMenuClose }: Navigati
             {/* Blockchain Dropdown */}
             <NavigationMenuItem>
               <NavigationMenuTrigger className="text-sm font-medium">
-                Blockchain
+                {t("navigation.blockchain", "Blockchain")}
               </NavigationMenuTrigger>
               <NavigationMenuContent>
                 <div className="w-[160px] p-4">
@@ -222,7 +208,7 @@ export function DesktopNavigationMenu({ navigationItems, onMenuClose }: Navigati
                       onClick={onMenuClose}
                     >
                       <BarChart3 className="h-4 w-4" />
-                      <div className="font-medium">Performance</div>
+                      <div className="font-medium">{t("navigation.performance", "Performance")}</div>
                     </Link>
                     <Link
                       href="/network"
@@ -234,7 +220,7 @@ export function DesktopNavigationMenu({ navigationItems, onMenuClose }: Navigati
                       onClick={onMenuClose}
                     >
                       <Network className="h-4 w-4" />
-                      <div className="font-medium">Network</div>
+                      <div className="font-medium">{t("navigation.network", "Network")}</div>
                     </Link>
                   </div>
                 </div>

@@ -106,11 +106,11 @@ export function TokenTreemap({ tokens }: TokenTreemapProps) {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-2">
                   <div>
                     <p className="text-xs text-muted-foreground">Price</p>
-                    <p className="font-medium">{formatTokenPrice(selectedToken.price)}</p>
+                    <p className="font-medium font-mono">{formatTokenPrice(selectedToken.price)}</p>
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">FDV</p>
-                    <p className="font-medium">
+                    <p className="font-medium font-mono">
                       {formatCurrency(selectedToken.fdv, "USD", {
                         compact: true,
                       })}
@@ -119,7 +119,7 @@ export function TokenTreemap({ tokens }: TokenTreemapProps) {
                   {selectedToken.marketCap && (
                     <div>
                       <p className="text-xs text-muted-foreground">Market Cap</p>
-                      <p className="font-medium">
+                      <p className="font-medium font-mono">
                         {formatCurrency(selectedToken.marketCap, "USD", {
                           compact: true,
                         })}
@@ -129,7 +129,7 @@ export function TokenTreemap({ tokens }: TokenTreemapProps) {
                   {selectedToken.volume24h && (
                     <div>
                       <p className="text-xs text-muted-foreground">24h Volume</p>
-                      <p className="font-medium">
+                      <p className="font-medium font-mono">
                         {formatCurrency(selectedToken.volume24h, "USD", {
                           compact: true,
                         })}
@@ -141,7 +141,7 @@ export function TokenTreemap({ tokens }: TokenTreemapProps) {
                       <p className="text-xs text-muted-foreground">24h Change</p>
                       <p
                         className={cn(
-                          "font-medium",
+                          "font-medium font-mono",
                           selectedToken.priceChange24h >= 0 ? "text-green-600" : "text-red-600"
                         )}
                       >
@@ -153,7 +153,7 @@ export function TokenTreemap({ tokens }: TokenTreemapProps) {
                   {selectedToken.supply && (
                     <div>
                       <p className="text-xs text-muted-foreground">Supply</p>
-                      <p className="font-medium">
+                      <p className="font-medium font-mono">
                         {formatNumber(selectedToken.supply, {
                           notation: "compact",
                           maximumFractionDigits: 1,
@@ -163,7 +163,7 @@ export function TokenTreemap({ tokens }: TokenTreemapProps) {
                   )}
                   <div>
                     <p className="text-xs text-muted-foreground">Market Share</p>
-                    <p className="font-medium">{formatPercentage(selectedToken.percentage)}%</p>
+                    <p className="font-medium font-mono">{formatPercentage(selectedToken.percentage)}%</p>
                   </div>
                 </div>
               </div>
@@ -224,16 +224,16 @@ const TreemapTooltip = ({ active, payload }: any) => {
       <div className="space-y-1">
         <div className="flex justify-between text-xs">
           <span className="text-neutral-600 dark:text-neutral-400">Price:</span>
-          <span className="font-medium">{formatTokenPrice(data.price)}</span>
+          <span className="font-medium font-mono">{formatTokenPrice(data.price)}</span>
         </div>
         <div className="flex justify-between text-xs">
           <span className="text-neutral-600 dark:text-neutral-400">FDV:</span>
-          <span className="font-medium">{formatCurrency(data.fdv, "USD", { compact: true })}</span>
+          <span className="font-medium font-mono">{formatCurrency(data.fdv, "USD", { compact: true })}</span>
         </div>
         {data.marketCap && (
           <div className="flex justify-between text-xs">
             <span className="text-neutral-600 dark:text-neutral-400">Market Cap:</span>
-            <span className="font-medium">
+            <span className="font-medium font-mono">
               {formatCurrency(data.marketCap, "USD", { compact: true })}
             </span>
           </div>
@@ -241,7 +241,7 @@ const TreemapTooltip = ({ active, payload }: any) => {
         {data.volume24h && (
           <div className="flex justify-between text-xs">
             <span className="text-neutral-600 dark:text-neutral-400">24h Volume:</span>
-            <span className="font-medium">
+            <span className="font-medium font-mono">
               {formatCurrency(data.volume24h, "USD", { compact: true })}
             </span>
           </div>
@@ -251,7 +251,7 @@ const TreemapTooltip = ({ active, payload }: any) => {
             <span className="text-neutral-600 dark:text-neutral-400">24h Change:</span>
             <span
               className={cn(
-                "font-medium",
+                "font-medium font-mono",
                 data.priceChange24h >= 0 ? "text-green-600" : "text-red-600"
               )}
             >
@@ -262,12 +262,12 @@ const TreemapTooltip = ({ active, payload }: any) => {
         )}
         <div className="flex justify-between text-xs border-t pt-1 mt-1">
           <span className="text-neutral-600 dark:text-neutral-400">Market Share:</span>
-          <span className="font-medium">{formatPercentage(data.percentage)}%</span>
+          <span className="font-medium font-mono">{formatPercentage(data.percentage)}%</span>
         </div>
         {data.supply && (
           <div className="flex justify-between text-xs">
             <span className="text-neutral-600 dark:text-neutral-400">Supply:</span>
-            <span className="font-medium">
+            <span className="font-medium font-mono">
               {formatNumber(data.supply, {
                 notation: "compact",
                 maximumFractionDigits: 1,

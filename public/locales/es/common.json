@@ -19,7 +19,14 @@
     "defi_dashboard": "Panel DeFi",
     "stablecoins_desc": "Rastrea USDT, USDC, USDe y otras stablecoins",
     "bitcoin_desc": "Monitorea activos de Bitcoin envueltos en Aptos",
-    "rwas_desc": "Ver activos tokenizados del mundo real"
+    "rwas_desc": "Ver activos tokenizados del mundo real",
+    "welcome": "Bienvenido",
+    "blockchain": "Blockchain",
+    "performance": "Rendimiento",
+    "network": "Red",
+    "yield_opportunities": "Oportunidades de Rendimiento",
+    "usdt_performance": "Rendimiento de USDT",
+    "launch_app": "Lanzar App"
   },
   "actions": {
     "clear_filters": "Limpiar Filtros",

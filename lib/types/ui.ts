@@ -166,6 +166,8 @@ export interface DeFiTableProps extends SortableTableProps {
 
 export interface YieldTableProps {
   walletAddress?: string;
+  limit?: number;
+  compact?: boolean;
 }
 
 // Card types

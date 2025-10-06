@@ -75,7 +75,7 @@ export const getProtocolLogo = (protocol: string): string => {
     ichi: "/icons/protocols/ichi.jpg",
     metamove: "/icons/protocols/metamove.png",
     moar: "/icons/protocols/moar.webp",
-    tapp: "/icons/protocols/tapp.jpg",
+    tapp: "/icons/protocols/tapp.webp",
     crossmint: "/icons/protocols/crossmint.jpeg",
     eliza: "/icons/protocols/eliza.jpeg",
     tradeport: "/icons/protocols/tradeport.jpg",

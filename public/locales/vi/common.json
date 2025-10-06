@@ -19,7 +19,14 @@
     "defi_dashboard": "Bảng điều khiển DeFi",
     "stablecoins_desc": "Theo dõi USDT, USDC, USDe và các stablecoin khác",
     "bitcoin_desc": "Giám sát tài sản Bitcoin được bọc trên Aptos",
-    "rwas_desc": "Xem tài sản thực được token hóa"
+    "rwas_desc": "Xem tài sản thực được token hóa",
+    "welcome": "Chào mừng",
+    "blockchain": "Blockchain",
+    "performance": "Hiệu suất",
+    "network": "Mạng lưới",
+    "yield_opportunities": "Cơ hội lợi nhuận",
+    "usdt_performance": "Hiệu suất USDT",
+    "launch_app": "Khởi chạy ứng dụng"
   },
   "actions": {
     "clear_filters": "Xóa bộ lọc",

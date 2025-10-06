@@ -19,7 +19,14 @@
     "defi_dashboard": "DeFi Dashboard",
     "stablecoins_desc": "Subaybayan ang USDT, USDC, USDe at iba pang stablecoins",
     "bitcoin_desc": "I-monitor ang mga wrapped Bitcoin assets sa Aptos",
-    "rwas_desc": "Tingnan ang mga tokenized real-world assets"
+    "rwas_desc": "Tingnan ang mga tokenized real-world assets",
+    "welcome": "Maligayang pagdating",
+    "blockchain": "Blockchain",
+    "performance": "Performance",
+    "network": "Network",
+    "yield_opportunities": "Mga Pagkakataon sa Kita",
+    "usdt_performance": "Performance ng USDT",
+    "launch_app": "Ilunsad ang App"
   },
   "actions": {
     "clear_filters": "I-clear ang mga Filter",

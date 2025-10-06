@@ -19,7 +19,14 @@
     "defi_dashboard": "DeFi 대시보드",
     "stablecoins_desc": "USDT, USDC, USDe 및 기타 스테이블코인 추적",
     "bitcoin_desc": "Aptos의 랩핑된 비트코인 자산 모니터링",
-    "rwas_desc": "실물 토큰화 자산 보기"
+    "rwas_desc": "실물 토큰화 자산 보기",
+    "welcome": "환영합니다",
+    "blockchain": "블록체인",
+    "performance": "성능",
+    "network": "네트워크",
+    "yield_opportunities": "수익 기회",
+    "usdt_performance": "USDT 성능",
+    "launch_app": "앱 실행"
   },
   "actions": {
     "clear_filters": "필터 초기화",

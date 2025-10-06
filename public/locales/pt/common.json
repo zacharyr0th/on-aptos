@@ -19,7 +19,14 @@
     "defi_dashboard": "Painel DeFi",
     "stablecoins_desc": "Acompanhe USDT, USDC, USDe e outras stablecoins",
     "bitcoin_desc": "Monitore ativos Bitcoin encapsulados na Aptos",
-    "rwas_desc": "Veja ativos tokenizados do mundo real"
+    "rwas_desc": "Veja ativos tokenizados do mundo real",
+    "welcome": "Bem-vindo",
+    "blockchain": "Blockchain",
+    "performance": "Desempenho",
+    "network": "Rede",
+    "yield_opportunities": "Oportunidades de Rendimento",
+    "usdt_performance": "Desempenho USDT",
+    "launch_app": "Lançar App"
   },
   "actions": {
     "clear_filters": "Filtros claros",
