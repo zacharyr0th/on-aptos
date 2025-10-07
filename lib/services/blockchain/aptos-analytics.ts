@@ -36,7 +36,7 @@
  */
 
 import { logger } from "@/lib/utils/core/logger";
-import { SimpleCache } from "@/lib/utils/cache/simple-cache";
+import { UnifiedCache } from "@/lib/utils/cache/unified-cache";
 
 const APTOS_ANALYTICS_BASE_URL = "https://api.mainnet.aptoslabs.com/v1/analytics";
 
@@ -137,7 +137,7 @@ export interface AriesPoolAPRData {
 }
 
 export class AptosAnalyticsService {
-  private static readonly cache = new SimpleCache(5 * 60 * 1000); // 5 minutes TTL
+  private static readonly cache = new UnifiedCache({ ttl: 5 * 60 * 1000 }); // 5 minutes TTL
 
   private classifyError(error: unknown): RetryableError {
     if (error instanceof TypeError && error.message.includes("fetch")) {
@@ -418,7 +418,7 @@ export class AptosAnalyticsService {
    * Clear cache for specific patterns or all analytics data
    */
   static clearCache(pattern?: string): void {
-    // SimpleCache only supports clearing all entries
+    // UnifiedCache supports clearing all entries
     AptosAnalyticsService.cache.clear();
   }
 
@@ -426,8 +426,9 @@ export class AptosAnalyticsService {
    * Get cache statistics for monitoring
    */
   static getCacheStats(): { size: number; analytics_entries: number } {
-    // SimpleCache doesn't expose all entries, so we'll use a simplified approach
-    const analyticsEntries = 0; // Could track this separately if needed
+    // UnifiedCache exposes stats via getStats()
+    const stats = AptosAnalyticsService.cache.getStats();
+    const analyticsEntries = stats.size || 0;
 
     return {
       size: 0, // Could track this separately if needed

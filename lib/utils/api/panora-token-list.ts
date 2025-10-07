@@ -1,11 +1,8 @@
 import { cacheFirst } from "@/lib/utils";
 import { logger } from "@/lib/utils/core/logger";
+import { getPanoraAuthHeaders } from "./common";
 
 const PANORA_TOKEN_LIST_ENDPOINT = "https://api.panora.exchange/tokenlist";
-
-// Use default API key if not provided
-const PANORA_API_KEY =
-  process.env.PANORA_API_KEY || "a4^KV_EaTf4MW#ZdvgGKX#HUD^3IFEAOV_kzpIE^3BQGA8pDnrkT7JcIy#HNlLGi";
 
 export interface PanoraToken {
   chainId: number;
@@ -48,7 +45,7 @@ export class PanoraTokenListService {
         const response = await fetch(PANORA_TOKEN_LIST_ENDPOINT, {
           method: "GET",
           headers: {
-            "x-api-key": PANORA_API_KEY,
+            ...getPanoraAuthHeaders(),
             "Accept-Encoding": "gzip",
           },
         });

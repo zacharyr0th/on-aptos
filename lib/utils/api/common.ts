@@ -1,28 +1,10 @@
 import { type NextRequest, NextResponse } from "next/server";
 
 import { logger } from "@/lib/utils/core/logger";
+import { errorResponse, successResponse } from "./response";
 
-/**
- * Standard cache durations in seconds
- */
-export const CACHE_DURATIONS = {
-  INSTANT: 0,
-  VERY_SHORT: 60, // 1 minute - for highly volatile data like prices
-  SHORT: 120, // 2 minutes - for frequently changing data
-  MEDIUM: 300, // 5 minutes - standard cache duration
-  LONG: 600, // 10 minutes - for stable data
-  VERY_LONG: 1800, // 30 minutes - for rarely changing data
-  HOUR: 3600, // 1 hour - for static data
-} as const;
-
-/**
- * Generate standard cache headers
- */
-export function getCacheHeaders(duration: number = CACHE_DURATIONS.MEDIUM): Record<string, string> {
-  return {
-    "Cache-Control": `public, s-maxage=${duration}, stale-while-revalidate=${duration * 2}`,
-  };
-}
+// Cache durations and headers moved to cache-headers.ts
+export { CACHE_DURATIONS, getCacheHeaders } from "./cache-headers";
 
 /**
  * Extract and validate common query parameters
@@ -46,42 +28,8 @@ export function extractParams(request: NextRequest): CommonParams {
   };
 }
 
-/**
- * Standard error response
- */
-export function errorResponse(message: string, status: number = 500, details?: any): NextResponse {
-  const response = {
-    error: message,
-    status,
-    ...(details && { details }),
-  };
-
-  logger.error("API Error", {
-    message,
-    status,
-    details,
-  });
-
-  return NextResponse.json(response, { status });
-}
-
-/**
- * Standard success response with optional caching
- */
-export function successResponse<T>(
-  data: T,
-  cacheDuration?: number,
-  headers?: Record<string, string>
-): NextResponse {
-  const responseHeaders = {
-    ...headers,
-    ...(cacheDuration !== undefined && getCacheHeaders(cacheDuration)),
-  };
-
-  return NextResponse.json(data, {
-    headers: responseHeaders,
-  });
-}
+// Response builders moved to response.ts - re-exported for backward compatibility
+export { errorResponse, successResponse };
 
 /**
  * Get API authentication headers

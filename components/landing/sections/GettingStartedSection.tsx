@@ -152,7 +152,7 @@ export default function GettingStartedSection() {
 
           {/* Exchanges */}
           <motion.div className="mb-20" {...slideInRight}>
-            <div className="flex items-center justify-between mb-4 max-w-6xl mx-auto">
+            <div className="flex items-center justify-between mb-4">
               <h3 className="text-2xl font-bold text-foreground">Buy APT on Exchanges</h3>
               <Button
                 variant="ghost"
@@ -171,30 +171,30 @@ export default function GettingStartedSection() {
                 )}
               </Button>
             </div>
-            <p className="text-center text-foreground/70 mb-8 max-w-2xl mx-auto">
-              Trade Aptos tokens globally on leading exchanges
-            </p>
+            {!showAllExchanges && (
+              <p className="text-center text-foreground/70 mb-8 max-w-2xl mx-auto">
+                Trade Aptos tokens globally on leading exchanges
+              </p>
+            )}
 
-            <div className="max-w-6xl mx-auto">
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-                {aptosExchanges.slice(0, showAllExchanges ? undefined : 4).map((exchange, index) => (
-                  <ExchangeCard
-                    key={index}
-                    logo={exchange.logo}
-                    name={exchange.name}
-                    region={exchange.region}
-                    usdt={exchange.usdt}
-                    usdc={exchange.usdc}
-                    link={exchange.link}
-                  />
-                ))}
-              </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+              {aptosExchanges.slice(0, showAllExchanges ? undefined : 4).map((exchange, index) => (
+                <ExchangeCard
+                  key={index}
+                  logo={exchange.logo}
+                  name={exchange.name}
+                  region={exchange.region}
+                  usdt={exchange.usdt}
+                  usdc={exchange.usdc}
+                  link={exchange.link}
+                />
+              ))}
             </div>
           </motion.div>
 
           {/* Bridges */}
           <motion.div {...scaleBlur}>
-            <div className="flex items-center justify-between mb-4 max-w-6xl mx-auto">
+            <div className="flex items-center justify-between mb-4">
               <h3 className="text-2xl font-bold text-foreground">Bridge Assets to Aptos</h3>
               <Button
                 variant="ghost"
@@ -213,10 +213,12 @@ export default function GettingStartedSection() {
                 )}
               </Button>
             </div>
-            <p className="text-center text-foreground/70 mb-8 max-w-2xl mx-auto">
-              Transfer assets from Ethereum, Solana, and other chains using secure, audited bridges
-              powered by LayerZero, Circle CCTP, and Wormhole
-            </p>
+            {!showAllBridges && (
+              <p className="text-center text-foreground/70 mb-8 max-w-2xl mx-auto">
+                Transfer assets from Ethereum, Solana, and other chains using secure, audited bridges
+                powered by LayerZero, Circle CCTP, and Wormhole
+              </p>
+            )}
 
             {/* Bridge Comparison Grid */}
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-8">

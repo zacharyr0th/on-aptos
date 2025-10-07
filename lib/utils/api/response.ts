@@ -52,41 +52,11 @@ export interface ErrorContext {
 
 // ===== CONSTANTS =====
 
-/**
- * Standard cache durations in seconds
- */
-export const CACHE_DURATIONS = {
-  INSTANT: 0,
-  VERY_SHORT: 60, // 1 minute - for highly volatile data like prices
-  SHORT: 120, // 2 minutes - for frequently changing data
-  MEDIUM: 300, // 5 minutes - standard cache duration
-  LONG: 600, // 10 minutes - for stable data
-  VERY_LONG: 1800, // 30 minutes - for rarely changing data
-  HOUR: 3600, // 1 hour - for static data
-} as const;
+// Cache durations and headers consolidated in cache-headers.ts
+export { CACHE_DURATIONS, CACHE_HEADERS } from "./cache-headers";
 
-/**
- * Standard cache headers for different scenarios
- */
-export const CACHE_HEADERS = {
-  SHORT: "public, s-maxage=60, stale-while-revalidate=300", // 1 min cache, 5 min stale
-  MEDIUM: "public, s-maxage=300, stale-while-revalidate=600", // 5 min cache, 10 min stale
-  LONG: "public, s-maxage=900, stale-while-revalidate=1800", // 15 min cache, 30 min stale
-  VERY_LONG: "public, s-maxage=3600, stale-while-revalidate=7200", // 1 hr cache, 2 hr stale
-  NO_CACHE: "no-cache, no-store, must-revalidate",
-  REVALIDATE: "public, must-revalidate, stale-while-revalidate=60",
-  ERROR: "public, max-age=60, stale-while-revalidate=120", // Error response cache (1 minute)
-} as const;
-
-/**
- * CORS headers
- */
-export const CORS_HEADERS = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization, X-API-Key",
-  "Access-Control-Max-Age": "86400", // 24 hours
-} as const;
+// CORS headers consolidated in cors-handler.ts
+export { STANDARD_CORS_HEADERS as CORS_HEADERS } from "./cors-handler";
 
 // ===== CORE RESPONSE BUILDERS =====
 

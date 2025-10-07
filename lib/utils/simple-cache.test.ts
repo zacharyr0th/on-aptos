@@ -1,12 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { SimpleCache } from "./cache/simple-cache";
+import { UnifiedCache } from "./cache/unified-cache";
 
-describe("SimpleCache", () => {
-  let cache: SimpleCache<string>;
+describe("UnifiedCache (SimpleCache compatibility)", () => {
+  let cache: UnifiedCache<string>;
 
   beforeEach(() => {
-    cache = new SimpleCache<string>(100); // 100ms TTL
+    cache = new UnifiedCache<string>({ ttl: 100 }); // 100ms TTL
     vi.useFakeTimers();
   });
 
@@ -69,12 +69,12 @@ describe("SimpleCache", () => {
   });
 
   it("should handle different data types", () => {
-    const objectCache = new SimpleCache<{ data: string }>(100);
+    const objectCache = new UnifiedCache<{ data: string }>({ ttl: 100 });
     const obj = { data: "test" };
     objectCache.set("key1", obj);
     expect(objectCache.get("key1")).toEqual(obj);
 
-    const arrayCache = new SimpleCache<number[]>(100);
+    const arrayCache = new UnifiedCache<number[]>({ ttl: 100 });
     const arr = [1, 2, 3];
     arrayCache.set("key1", arr);
     expect(arrayCache.get("key1")).toEqual(arr);

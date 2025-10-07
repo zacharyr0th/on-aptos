@@ -26,7 +26,7 @@
  */
 
 import { logger } from "@/lib/utils/core/logger";
-import { SimpleCache } from "@/lib/utils/cache/simple-cache";
+import { UnifiedCache } from "@/lib/utils/cache/unified-cache";
 
 export interface AnsResolveResult {
   address: string | null;
@@ -55,7 +55,7 @@ export class AnsService {
   private static readonly DEFAULT_TIMEOUT = 5000;
   private static readonly MAX_DOMAIN_LENGTH = 63; // DNS limit per label
   private static readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutes
-  private static readonly cache = new SimpleCache(5 * 60 * 1000); // 5 minutes TTL
+  private static readonly cache = new UnifiedCache({ ttl: 5 * 60 * 1000 }); // 5 minutes TTL
 
   /**
    * Validate domain format and return validation errors if any

@@ -9,7 +9,7 @@ import {
   withErrorHandling,
 } from "@/lib/utils";
 import { apiLogger } from "@/lib/utils/core/logger";
-import { withApiEnhancements } from "@/lib/utils/server";
+import { withApiEnhancements } from "@/lib/utils/api/server-api";
 
 export async function GET(request: NextRequest) {
   const errorContext: ErrorContext = {

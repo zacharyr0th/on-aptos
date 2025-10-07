@@ -106,56 +106,32 @@ export default function DefiSection() {
                 )}
               </Button>
             </div>
-            <p className="text-center text-foreground/70 mb-8 max-w-2xl mx-auto">
-              Supply assets to earn interest or borrow against collateral
-            </p>
+            {!showAllLending && (
+              <p className="text-center text-foreground/70 mb-8 max-w-2xl mx-auto">
+                Supply assets to earn interest or borrow against collateral
+              </p>
+            )}
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-              <div className={showAllLending ? "md:col-span-3 grid md:grid-cols-2 lg:grid-cols-3 gap-6" : "md:col-span-2 grid md:grid-cols-2 gap-6"}>
-                {defiProtocols
-                  .filter((p) => p.category === "Credit")
-                  .slice(0, showAllLending ? undefined : 2)
-                  .map((protocol, idx) => (
-                    <ProtocolCard
-                      key={`credit-${protocol.title}-${idx}`}
-                      logo={protocol.logo}
-                      name={protocol.title}
-                      category={protocol.subcategory}
-                      href={protocol.href}
-                      statsPosition="inline"
-                    >
-                      <ProtocolStats
-                        protocolName={protocol.title}
-                        showVolume={false}
-                        inline={true}
-                      />
-                    </ProtocolCard>
-                  ))}
-              </div>
-
-              {!showAllLending && (
-                <Card className="bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20 p-6 flex flex-col justify-start h-full">
-                  <h3 className="font-bold text-lg text-foreground mb-3">How DeFi Lending Works</h3>
-                  <p className="text-sm text-foreground/70 leading-relaxed mb-4">
-                    Supply assets to earn interest or borrow against collateral. Overcollateralized
-                    loans governed by smart contracts.
-                  </p>
-                  <div className="grid grid-cols-1 gap-2 text-sm">
-                    <div className="flex items-start gap-2">
-                      <span className="text-primary mt-0.5">✓</span>
-                      <span className="text-foreground/70">Overcollateralized loans</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <span className="text-primary mt-0.5">✓</span>
-                      <span className="text-foreground/70">Transparent smart contracts</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <span className="text-primary mt-0.5">✓</span>
-                      <span className="text-foreground/70">Earn interest on deposits</span>
-                    </div>
-                  </div>
-                </Card>
-              )}
+              {defiProtocols
+                .filter((p) => p.category === "Credit")
+                .slice(0, showAllLending ? undefined : 3)
+                .map((protocol, idx) => (
+                  <ProtocolCard
+                    key={`credit-${protocol.title}-${idx}`}
+                    logo={protocol.logo}
+                    name={protocol.title}
+                    category={protocol.subcategory}
+                    href={protocol.href}
+                    statsPosition="inline"
+                  >
+                    <ProtocolStats
+                      protocolName={protocol.title}
+                      showVolume={false}
+                      inline={true}
+                    />
+                  </ProtocolCard>
+                ))}
             </div>
           </motion.div>
 
@@ -189,57 +165,32 @@ export default function DefiSection() {
                 )}
               </Button>
             </div>
-            <p className="text-center text-foreground/70 mb-8 max-w-2xl mx-auto">
-              Auto-compounding vaults, liquid staking, optimized strategies
-            </p>
+            {!showAllYield && (
+              <p className="text-center text-foreground/70 mb-8 max-w-2xl mx-auto">
+                Auto-compounding vaults, liquid staking, optimized strategies
+              </p>
+            )}
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-              <div className={showAllYield ? "md:col-span-3 grid md:grid-cols-2 lg:grid-cols-3 gap-6" : "md:col-span-2 grid md:grid-cols-2 gap-6"}>
-                {defiProtocols
-                  .filter((p) => p.category === "Yield")
-                  .slice(0, showAllYield ? undefined : 2)
-                  .map((protocol, idx) => (
-                    <ProtocolCard
-                      key={`yield-${protocol.title}-${idx}`}
-                      logo={protocol.logo}
-                      name={protocol.title}
-                      category={protocol.subcategory}
-                      href={protocol.href}
-                      statsPosition="inline"
-                    >
-                      <ProtocolStats
-                        protocolName={protocol.title}
-                        showVolume={false}
-                        inline={true}
-                      />
-                    </ProtocolCard>
-                  ))}
-              </div>
-
-              {!showAllYield && (
-                <Card className="bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20 p-6 flex flex-col justify-center h-full">
-                <h3 className="font-bold text-lg text-foreground mb-3">Maximize Your Returns</h3>
-                <p className="text-sm text-foreground/70 leading-relaxed mb-4">
-                  Yield protocols on Aptos offer auto-compounding strategies, liquid staking
-                  derivatives, and optimized vault strategies to maximize your returns while
-                  maintaining security through audited smart contracts.
-                </p>
-                <div className="grid grid-cols-1 gap-2 text-sm">
-                  <div className="flex items-start gap-2">
-                    <span className="text-primary mt-0.5">✓</span>
-                    <span className="text-foreground/70">Auto-compounding rewards</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <span className="text-primary mt-0.5">✓</span>
-                    <span className="text-foreground/70">Liquid staking tokens</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <span className="text-primary mt-0.5">✓</span>
-                    <span className="text-foreground/70">Optimized yield strategies</span>
-                  </div>
-                </div>
-              </Card>
-              )}
+              {defiProtocols
+                .filter((p) => p.category === "Yield")
+                .slice(0, showAllYield ? undefined : 3)
+                .map((protocol, idx) => (
+                  <ProtocolCard
+                    key={`yield-${protocol.title}-${idx}`}
+                    logo={protocol.logo}
+                    name={protocol.title}
+                    category={protocol.subcategory}
+                    href={protocol.href}
+                    statsPosition="inline"
+                  >
+                    <ProtocolStats
+                      protocolName={protocol.title}
+                      showVolume={false}
+                      inline={true}
+                    />
+                  </ProtocolCard>
+                ))}
             </div>
           </motion.div>
         </div>

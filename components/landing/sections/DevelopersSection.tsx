@@ -154,27 +154,24 @@ export default function DevelopersSection() {
               <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
                 Developer Tools
               </h3>
-              <p className="text-foreground/60 max-w-2xl mx-auto leading-relaxed">
-                Everything you need to build, debug, and ship production-ready applications
-              </p>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               {developerTools.map((tool, index) => {
                 const Icon = tool.icon;
                 return (
                   <motion.div key={index} variants={cardEntrance}>
                     <Link href={tool.href} target="_blank" rel="noopener noreferrer">
                       <Card className="group relative h-full overflow-hidden border-2 border-border hover:border-primary/50 transition-all duration-200 bg-gradient-to-br from-card via-card to-muted/20">
-                        <div className="p-6 md:p-8">
-                          <div className="flex items-start gap-5">
+                        <div className="p-4 sm:p-6">
+                          <div className="flex items-start gap-4">
                             <IconContainer icon={Icon} />
-                            <div className="flex-1 min-w-0 space-y-2">
-                              <div className="flex items-start justify-between gap-3">
-                                <h4 className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-start justify-between gap-2 mb-2">
+                                <h4 className="text-base font-semibold text-foreground group-hover:text-primary transition-colors">
                                   {tool.name}
                                 </h4>
-                                <ExternalLink className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 mt-1" />
+                                <ExternalLink className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
                               </div>
                               <p className="text-sm text-foreground/70 leading-relaxed">
                                 {tool.description}
