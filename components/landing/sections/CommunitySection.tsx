@@ -67,7 +67,7 @@ export default function CommunitySection() {
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.6, delay: 0.1, ease: [0.25, 0.1, 0.25, 1] }}
           >
-            <Card className="p-6">
+            <Card className="p-4 sm:p-6">
               <h3 className="font-bold text-lg text-foreground mb-4 flex items-center gap-2">
                 <Hash className="w-5 h-5 text-primary" />
                 Social Media
@@ -97,7 +97,7 @@ export default function CommunitySection() {
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.6, delay: 0.15, ease: [0.25, 0.1, 0.25, 1] }}
           >
-            <Card className="p-6">
+            <Card className="p-4 sm:p-6">
               <h3 className="font-bold text-lg text-foreground mb-4 flex items-center gap-2">
                 <MapPin className="w-5 h-5 text-primary" />
                 Regional Communities
@@ -130,7 +130,7 @@ export default function CommunitySection() {
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.6, delay: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
           >
-            <Card className="p-6">
+            <Card className="p-4 sm:p-6">
               <h3 className="font-bold text-lg text-foreground mb-4 flex items-center gap-2">
                 <Globe className="w-5 h-5 text-primary" />
                 Official Resources

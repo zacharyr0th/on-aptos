@@ -34,7 +34,7 @@ export default function WhyAptosSection() {
   return (
     <section
       id="why-aptos"
-      className="py-16 md:py-20 lg:py-24 px-4 sm:px-6 relative overflow-hidden"
+      className="py-12 md:py-16 lg:py-20 px-4 sm:px-6 relative overflow-hidden"
     >
       {/* Gradient Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-primary/3 to-background pointer-events-none" />
@@ -177,7 +177,7 @@ export default function WhyAptosSection() {
             </div>
 
             {/* USDT Cost Comparison Chart */}
-            <div className="w-full h-[300px] sm:text-[400px] md:h-[500px] lg:h-[600px]">
+            <div className="w-full h-[300px] sm:h-[400px] md:h-[500px] lg:h-[600px]">
               <Suspense
                 fallback={
                   <div className="h-full flex items-center justify-center">Loading chart...</div>
@@ -208,10 +208,10 @@ export default function WhyAptosSection() {
                 Chain Performance Comparison
               </h3>
               <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
-                <div className="space-y-4 min-w-[900px] md:min-w-0">
+                <div className="space-y-4 min-w-[820px] md:min-w-0">
                   {/* Aptos Row */}
                   <div className="flex gap-3 md:gap-4 items-center">
-                    <div className="flex-shrink-0 w-20 md:w-24 flex flex-col items-center justify-center">
+                    <div className="flex-shrink-0 w-16 md:w-20 flex flex-col items-center justify-center">
                       <Image
                         src="/icons/apt.png"
                         alt="Aptos"
@@ -221,7 +221,7 @@ export default function WhyAptosSection() {
                       />
                       <div className="text-xs font-semibold text-center font-mono">Aptos</div>
                     </div>
-                    <div className="flex-1 grid grid-cols-6 gap-2 md:gap-3">
+                    <div className="flex-1 grid grid-cols-6 items-stretch gap-1.5 md:gap-3 [&>div]:h-full">
                       <div className="border border-emerald-300 bg-emerald-50 dark:border-emerald-800/50 dark:bg-emerald-950/5 rounded-lg p-2 md:p-3 text-center relative">
                         <Check className="absolute top-1 right-1 md:top-2 md:right-2 h-3 w-3 text-emerald-600 dark:text-emerald-400" />
                         <div className="text-lg md:text-xl font-bold text-emerald-800 dark:text-emerald-500 mb-1 font-mono">
@@ -281,7 +281,7 @@ export default function WhyAptosSection() {
 
                   {/* Sui Row */}
                   <div className="flex gap-3 md:gap-4 items-center">
-                    <div className="flex-shrink-0 w-20 md:w-24 flex flex-col items-center justify-center">
+                    <div className="flex-shrink-0 w-16 md:w-20 flex flex-col items-center justify-center">
                       <Image
                         src="/icons/performance/sui.png"
                         alt="Sui"
@@ -291,7 +291,7 @@ export default function WhyAptosSection() {
                       />
                       <div className="text-xs font-semibold text-center font-mono">Sui</div>
                     </div>
-                    <div className="flex-1 grid grid-cols-6 gap-2 md:gap-3">
+                    <div className="flex-1 grid grid-cols-6 items-stretch gap-1.5 md:gap-3 [&>div]:h-full">
                       <div className="border border-orange-300 bg-orange-50 dark:border-orange-800/40 dark:bg-orange-950/5 rounded-lg p-2 md:p-3 text-center">
                         <div className="text-lg md:text-xl font-bold text-orange-800 dark:text-orange-600 mb-1 font-mono">
                           926
@@ -364,7 +364,7 @@ export default function WhyAptosSection() {
 
                   {/* TRON Row */}
                   <div className="flex gap-3 md:gap-4 items-center">
-                    <div className="flex-shrink-0 w-20 md:w-24 flex flex-col items-center justify-center">
+                    <div className="flex-shrink-0 w-16 md:w-20 flex flex-col items-center justify-center">
                       <Image
                         src="/icons/performance/trx.png"
                         alt="TRON"
@@ -374,7 +374,7 @@ export default function WhyAptosSection() {
                       />
                       <div className="text-xs font-semibold text-center font-mono">TRON</div>
                     </div>
-                    <div className="flex-1 grid grid-cols-6 gap-2 md:gap-3">
+                    <div className="flex-1 grid grid-cols-6 items-stretch gap-1.5 md:gap-3 [&>div]:h-full">
                       <div className="border border-red-400 bg-red-100 dark:border-red-800/40 dark:bg-red-950/5 rounded-lg p-2 md:p-3 text-center">
                         <div className="text-lg md:text-xl font-bold text-red-800 dark:text-red-600 mb-1 font-mono">
                           272
@@ -446,7 +446,7 @@ export default function WhyAptosSection() {
 
                   {/* Base Row */}
                   <div className="flex gap-3 md:gap-4 items-center">
-                    <div className="flex-shrink-0 w-20 md:w-24 flex flex-col items-center justify-center">
+                    <div className="flex-shrink-0 w-16 md:w-20 flex flex-col items-center justify-center">
                       <Image
                         src="/icons/performance/base.png"
                         alt="Base"
@@ -456,7 +456,7 @@ export default function WhyAptosSection() {
                       />
                       <div className="text-xs font-semibold text-center font-mono">Base</div>
                     </div>
-                    <div className="flex-1 grid grid-cols-6 gap-2 md:gap-3">
+                    <div className="flex-1 grid grid-cols-6 items-stretch gap-1.5 md:gap-3 [&>div]:h-full">
                       <div className="border border-red-400 bg-red-100 dark:border-red-800/40 dark:bg-red-950/5 rounded-lg p-2 md:p-3 text-center">
                         <div className="text-lg md:text-xl font-bold text-red-800 dark:text-red-600 mb-1 font-mono">
                           1.3k

@@ -53,10 +53,13 @@ export interface ErrorContext {
 // ===== CONSTANTS =====
 
 // Cache durations and headers consolidated in cache-headers.ts
-export { CACHE_DURATIONS, CACHE_HEADERS } from "./cache-headers";
+import { CACHE_DURATIONS, CACHE_HEADERS } from "./cache-headers";
+export { CACHE_DURATIONS, CACHE_HEADERS };
 
 // CORS headers consolidated in cors-handler.ts
-export { STANDARD_CORS_HEADERS as CORS_HEADERS } from "./cors-handler";
+import { STANDARD_CORS_HEADERS } from "./cors-handler";
+export { STANDARD_CORS_HEADERS as CORS_HEADERS };
+const CORS_HEADERS = STANDARD_CORS_HEADERS;
 
 // ===== CORE RESPONSE BUILDERS =====
 

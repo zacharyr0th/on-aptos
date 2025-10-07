@@ -10,6 +10,15 @@ interface CacheEntry<T> {
   timestamp: number;
   lastAccessed: number;
   hits: number;
+  prev?: CacheNode<T>;
+  next?: CacheNode<T>;
+}
+
+interface CacheNode<T> {
+  key: string;
+  entry: CacheEntry<T>;
+  prev: CacheNode<T> | null;
+  next: CacheNode<T> | null;
 }
 
 export interface CacheStats {
@@ -28,7 +37,9 @@ export interface CacheOptions {
 }
 
 export class UnifiedCache<T = any> {
-  private cache = new Map<string, CacheEntry<T>>();
+  private cache = new Map<string, CacheNode<T>>();
+  private head: CacheNode<T> | null = null; // Most recently used
+  private tail: CacheNode<T> | null = null; // Least recently used
   private readonly maxSize: number;
   public readonly ttl: number;
   private readonly enableLRU: boolean;
@@ -46,45 +57,85 @@ export class UnifiedCache<T = any> {
     this.enableStats = options.enableStats ?? true;
   }
 
+  private moveToHead(node: CacheNode<T>): void {
+    if (node === this.head) return;
+
+    // Remove from current position
+    if (node.prev) node.prev.next = node.next;
+    if (node.next) node.next.prev = node.prev;
+    if (node === this.tail) this.tail = node.prev;
+
+    // Move to head
+    node.prev = null;
+    node.next = this.head;
+    if (this.head) this.head.prev = node;
+    this.head = node;
+    if (!this.tail) this.tail = node;
+  }
+
+  private removeTail(): void {
+    if (!this.tail) return;
+
+    const key = this.tail.key;
+    if (this.tail.prev) {
+      this.tail.prev.next = null;
+      this.tail = this.tail.prev;
+    } else {
+      this.head = null;
+      this.tail = null;
+    }
+    this.cache.delete(key);
+    if (this.enableStats) this.stats.evictions++;
+  }
+
   get<U = T>(key: string): U | null {
-    const entry = this.cache.get(key);
-    if (!entry) {
+    const node = this.cache.get(key);
+    if (!node) {
       if (this.enableStats) this.stats.misses++;
       return null;
     }
 
     const now = Date.now();
-    const age = now - entry.timestamp;
+    const age = now - node.entry.timestamp;
 
     // Check if entry has expired
     if (age >= this.ttl) {
-      this.cache.delete(key);
+      this.delete(key);
       if (this.enableStats) this.stats.misses++;
       return null;
     }
 
     // Update access statistics
     if (this.enableStats) {
-      entry.lastAccessed = now;
-      entry.hits++;
+      node.entry.lastAccessed = now;
+      node.entry.hits++;
       this.stats.hits++;
     }
 
-    // Move to end (most recently used) for LRU
+    // Move to head (most recently used) for LRU - O(1)
     if (this.enableLRU) {
-      this.cache.delete(key);
-      this.cache.set(key, entry);
+      this.moveToHead(node);
     }
 
-    return entry.data as unknown as U;
+    return node.entry.data as unknown as U;
   }
 
   set(key: string, data: T, customTTL?: number): void {
     const now = Date.now();
+    const existingNode = this.cache.get(key);
 
-    // If at capacity and adding new key, evict LRU
-    if (this.enableLRU && this.cache.size >= this.maxSize && !this.cache.has(key)) {
-      this.evictLRU();
+    // If updating existing key
+    if (existingNode) {
+      existingNode.entry.data = data;
+      existingNode.entry.timestamp = now;
+      existingNode.entry.lastAccessed = now;
+      if (this.enableLRU) this.moveToHead(existingNode);
+      return;
+    }
+
+    // If at capacity, evict LRU (tail) - O(1)
+    if (this.enableLRU && this.cache.size >= this.maxSize) {
+      this.removeTail();
     }
 
     const entry: CacheEntry<T> = {
@@ -94,46 +145,37 @@ export class UnifiedCache<T = any> {
       hits: 0,
     };
 
-    this.cache.set(key, entry);
+    const node: CacheNode<T> = {
+      key,
+      entry,
+      prev: null,
+      next: this.head,
+    };
+
+    if (this.head) this.head.prev = node;
+    this.head = node;
+    if (!this.tail) this.tail = node;
+
+    this.cache.set(key, node);
 
     // Auto-cleanup for custom TTL
     if (customTTL) {
       setTimeout(() => {
-        const currentEntry = this.cache.get(key);
-        if (currentEntry && Date.now() - currentEntry.timestamp >= customTTL) {
-          this.cache.delete(key);
+        const currentNode = this.cache.get(key);
+        if (currentNode && Date.now() - currentNode.entry.timestamp >= customTTL) {
+          this.delete(key);
         }
       }, customTTL);
     }
   }
 
-  private evictLRU(): void {
-    if (this.cache.size === 0) return;
-
-    // Find the least recently used entry
-    let lruKey: string | null = null;
-    let lruTime = Date.now();
-
-    for (const [key, entry] of this.cache.entries()) {
-      if (entry.lastAccessed < lruTime) {
-        lruTime = entry.lastAccessed;
-        lruKey = key;
-      }
-    }
-
-    if (lruKey) {
-      this.cache.delete(lruKey);
-      if (this.enableStats) this.stats.evictions++;
-    }
-  }
-
   has(key: string): boolean {
-    const entry = this.cache.get(key);
-    if (!entry) return false;
+    const node = this.cache.get(key);
+    if (!node) return false;
 
     const now = Date.now();
-    if (now - entry.timestamp >= this.ttl) {
-      this.cache.delete(key);
+    if (now - node.entry.timestamp >= this.ttl) {
+      this.delete(key);
       return false;
     }
 
@@ -141,11 +183,22 @@ export class UnifiedCache<T = any> {
   }
 
   delete(key: string): boolean {
+    const node = this.cache.get(key);
+    if (!node) return false;
+
+    // Remove from linked list
+    if (node.prev) node.prev.next = node.next;
+    if (node.next) node.next.prev = node.prev;
+    if (node === this.head) this.head = node.next;
+    if (node === this.tail) this.tail = node.prev;
+
     return this.cache.delete(key);
   }
 
   clear(): void {
     this.cache.clear();
+    this.head = null;
+    this.tail = null;
     if (this.enableStats) this.resetStats();
   }
 
@@ -176,9 +229,9 @@ export class UnifiedCache<T = any> {
     const now = Date.now();
     let cleaned = 0;
 
-    for (const [key, entry] of this.cache.entries()) {
-      if (now - entry.timestamp >= this.ttl) {
-        this.cache.delete(key);
+    for (const [key, node] of this.cache.entries()) {
+      if (now - node.entry.timestamp >= this.ttl) {
+        this.delete(key);
         cleaned++;
       }
     }
@@ -193,14 +246,25 @@ export class UnifiedCache<T = any> {
 
   getEntries(): Array<[string, { age: number; hits: number; size: number }]> {
     const now = Date.now();
-    return Array.from(this.cache.entries()).map(([key, entry]) => [
+    return Array.from(this.cache.entries()).map(([key, node]) => [
       key,
       {
-        age: now - entry.timestamp,
-        hits: entry.hits,
-        size: JSON.stringify(entry.data).length,
+        age: now - node.entry.timestamp,
+        hits: node.entry.hits,
+        size: JSON.stringify(node.entry.data).length,
       },
     ]);
+  }
+
+  // Public method to get entry details (fixes private property access)
+  getEntryDetails(key: string): { timestamp: number; lastAccessed: number; hits: number } | null {
+    const node = this.cache.get(key);
+    if (!node) return null;
+    return {
+      timestamp: node.entry.timestamp,
+      lastAccessed: node.entry.lastAccessed,
+      hits: node.entry.hits,
+    };
   }
 }
 
@@ -376,10 +440,10 @@ export const EnhancedLRUCache = UnifiedCache;
 
 // Add missing utility functions for backward compatibility
 export function isNearingExpiration(cacheName: CacheInstanceName, key: string): boolean {
-  const entry = cacheInstances[cacheName]["cache"]?.get(key);
-  if (!entry) return false;
+  const details = cacheInstances[cacheName].getEntryDetails(key);
+  if (!details) return false;
 
-  const age = Date.now() - entry.timestamp;
+  const age = Date.now() - details.timestamp;
   const ttl = cacheInstances[cacheName].ttl;
   return age > ttl * 0.8; // Consider "nearing" at 80% of TTL
 }

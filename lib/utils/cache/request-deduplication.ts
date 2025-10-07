@@ -6,10 +6,24 @@
 type RequestKey = string;
 type RequestPromise<T = unknown> = Promise<T>;
 
+export interface DeduplicatorOptions {
+  maxCacheSize?: number;
+  cleanupDelay?: number; // ms to keep response cached for deduplication
+  defaultTTL?: number; // default timeout for async functions
+}
+
 export class RequestDeduplicator {
   private pendingRequests = new Map<RequestKey, RequestPromise>();
-  private readonly maxCacheSize = 1000; // Prevent memory leaks
+  private readonly maxCacheSize: number;
+  private readonly cleanupDelay: number;
+  private readonly defaultTTL: number;
   private requestCount = 0;
+
+  constructor(options: DeduplicatorOptions = {}) {
+    this.maxCacheSize = options.maxCacheSize ?? 1000;
+    this.cleanupDelay = options.cleanupDelay ?? 100;
+    this.defaultTTL = options.defaultTTL ?? 30000;
+  }
 
   /**
    * Creates a unique key for a request based on URL and method
@@ -81,7 +95,7 @@ export class RequestDeduplicator {
     // Clean up after completion
     setTimeout(() => {
       this.pendingRequests.delete(key);
-    }, 100); // Small delay to allow other consumers to get the cached data
+    }, this.cleanupDelay); // Configurable delay to allow other consumers to get the cached data
 
     return new Response(responseData.body, {
       status: responseData.status,
@@ -96,8 +110,9 @@ export class RequestDeduplicator {
   async dedupeFunction<T>(
     key: string,
     fn: () => Promise<T>,
-    ttl: number = 30000 // 30 seconds default TTL
+    ttl?: number // Uses defaultTTL if not specified
   ): Promise<T> {
+    const timeout = ttl ?? this.defaultTTL;
     // Check if there's already a pending request for this key
     if (this.pendingRequests.has(key)) {
       return this.pendingRequests.get(key) as Promise<T>;
@@ -111,7 +126,7 @@ export class RequestDeduplicator {
     // Create the request promise with TTL
     const requestPromise = Promise.race([
       fn(),
-      new Promise<T>((_, reject) => setTimeout(() => reject(new Error("Request timeout")), ttl)),
+      new Promise<T>((_, reject) => setTimeout(() => reject(new Error("Request timeout")), timeout)),
     ]).finally(() => {
       // Remove from pending requests when done
       this.pendingRequests.delete(key);

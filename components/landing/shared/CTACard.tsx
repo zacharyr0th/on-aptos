@@ -19,7 +19,7 @@ export default function CTACard({ icon, title, description, href, className }: C
     <Link href={href}>
       <Card
         className={cn(
-          "group p-6 hover:shadow-lg transition-all duration-200 h-full bg-gradient-to-br from-card to-card/50 border-2 hover:border-primary/30",
+          "group p-4 sm:p-6 hover:shadow-lg transition-all duration-200 h-full bg-gradient-to-br from-card to-card/50 border-2 hover:border-primary/30",
           className
         )}
       >

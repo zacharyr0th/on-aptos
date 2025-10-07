@@ -17,7 +17,7 @@ export default function FeatureCard({ icon, title, description, className }: Fea
   return (
     <Card
       className={cn(
-        "group p-4 sm:p-6 md:p-8 bg-gradient-to-br from-card via-card to-card/80 border-border/50 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-200",
+        "group h-full min-h-[200px] sm:min-h-[220px] p-4 sm:p-6 md:p-8 bg-gradient-to-br from-card via-card to-card/80 border-border/50 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-200",
         className
       )}
     >

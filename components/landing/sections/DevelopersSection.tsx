@@ -73,7 +73,7 @@ export default function DevelopersSection() {
           >
             <div className="max-w-4xl mx-auto">
               <Card className="border-2 border-border bg-card/50 backdrop-blur-sm">
-                <div className="p-8 md:p-10">
+                <div className="p-6 sm:p-8 md:p-10">
                   <div className="text-center mb-8">
                     <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-3">
                       Create a dApp in One Command

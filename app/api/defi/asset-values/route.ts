@@ -112,8 +112,10 @@ export async function GET(request: Request) {
     }
 
     // Extract actual values with fallbacks
-    const stablesValue = stablesData?.data?.total ? parseInt(stablesData.data.total) : 0;
-    const rwasValue = rwaData?.data?.totalAptosValue ? Math.round(rwaData.data.totalAptosValue) : 0;
+    let stablesValue = stablesData?.total
+      ? Math.round(parseFloat(stablesData.total))
+      : 0;
+    const rwasValue = rwaData?.totalAptosValue ? Math.round(rwaData.totalAptosValue) : 0;
 
     // Calculate BTC value using REAL price from the same source as BTC page
     const btcSupply = parseFloat(btcData?.data?.total_supply_formatted || "0");
@@ -121,6 +123,24 @@ export async function GET(request: Request) {
     const btcValue = Math.round(btcSupply * btcPrice);
 
     const totalTokensValue = defiData?.tvl ? Math.round(defiData.tvl) : 0;
+
+    // Fallback: if stablecoin value missing, try analytics stablecoin TVL endpoint
+    if (!stablesValue) {
+      try {
+        const fallbackRes = await fetch(`${baseUrl}/api/analytics/tvl/stablecoins`, {
+          cache: "no-store",
+        });
+        if (fallbackRes.ok) {
+          const fallbackData = await fallbackRes.json();
+          const aptosStable = fallbackData?.aptos?.totalMarketCap;
+          if (typeof aptosStable === "number" && aptosStable > 0) {
+            stablesValue = Math.round(aptosStable);
+          }
+        }
+      } catch (e) {
+        apiLogger.warn("Stablecoin fallback fetch failed", e);
+      }
+    }
 
     // Format the response with REAL values from your APIs
     const metrics: AssetMetrics = {

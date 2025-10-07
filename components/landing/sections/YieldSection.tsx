@@ -42,7 +42,7 @@ export default function YieldSection() {
           <motion.div {...rotateScale}>
             <Suspense
               fallback={
-                <Card className="p-6">
+                <Card className="p-4 sm:p-6">
                   <div className="space-y-4">
                     {[...Array(10)].map((_, i) => (
                       <div key={i} className="h-16 bg-muted rounded animate-pulse" />

@@ -224,7 +224,7 @@ export default function HeroSection({ assetValues, isLoadingValues }: HeroSectio
               }}
             >
               <Link href="/markets/stables">
-                <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer h-full bg-card/50 backdrop-blur-sm border-border/50">
+                <Card className="p-4 sm:p-6 hover:shadow-lg transition-shadow cursor-pointer h-full bg-card/50 backdrop-blur-sm border-border/50">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex -space-x-2">
                       <img
@@ -284,7 +284,7 @@ export default function HeroSection({ assetValues, isLoadingValues }: HeroSectio
               }}
             >
               <Link href="/markets/rwas">
-                <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer h-full bg-card/50 backdrop-blur-sm border-border/50">
+                <Card className="p-4 sm:p-6 hover:shadow-lg transition-shadow cursor-pointer h-full bg-card/50 backdrop-blur-sm border-border/50">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex -space-x-2">
                       <img
@@ -344,7 +344,7 @@ export default function HeroSection({ assetValues, isLoadingValues }: HeroSectio
               }}
             >
               <Link href="/markets/bitcoin">
-                <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer h-full bg-card/50 backdrop-blur-sm border-border/50">
+                <Card className="p-4 sm:p-6 hover:shadow-lg transition-shadow cursor-pointer h-full bg-card/50 backdrop-blur-sm border-border/50">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex -space-x-2">
                       <img
@@ -402,7 +402,7 @@ export default function HeroSection({ assetValues, isLoadingValues }: HeroSectio
               }}
             >
               <Link href="/protocols/defi">
-                <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer h-full bg-card/50 backdrop-blur-sm border-border/50">
+                <Card className="p-4 sm:p-6 hover:shadow-lg transition-shadow cursor-pointer h-full bg-card/50 backdrop-blur-sm border-border/50">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex -space-x-2">
                       <img

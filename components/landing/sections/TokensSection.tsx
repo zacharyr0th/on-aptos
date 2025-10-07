@@ -64,9 +64,9 @@ export default function TokensSection({
           </motion.div>
 
           {/* Stats Cards */}
-          <motion.div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12" {...staggerContainer}>
+          <motion.div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-12" {...staggerContainer}>
             <motion.div variants={cardSlideLeft}>
-              <Card className="p-6 bg-card hover:shadow-lg transition-shadow">
+              <Card className="p-4 sm:p-6 bg-card hover:shadow-lg transition-shadow">
                 <div className="space-y-3">
                   <div className="flex items-start justify-between">
                     <h3 className="text-lg font-semibold text-foreground/80">Non-APT Market Cap</h3>
@@ -85,7 +85,7 @@ export default function TokensSection({
             </motion.div>
 
             <motion.div variants={cardSlideRight}>
-              <Card className="p-6 bg-card hover:shadow-lg transition-shadow">
+              <Card className="p-4 sm:p-6 bg-card hover:shadow-lg transition-shadow">
                 <div className="space-y-3">
                   <div className="flex items-start justify-between">
                     <h3 className="text-lg font-semibold text-foreground/80">Token Count</h3>
