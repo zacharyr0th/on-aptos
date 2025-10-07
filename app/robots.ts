@@ -8,7 +8,6 @@ export default function robots(): MetadataRoute.Robots {
 
   const allowedPaths = [
     "/",
-    "/api/markets/bitcoin",
     "/api/markets/stables",
     "/api/markets/rwas",
     "/api/prices",

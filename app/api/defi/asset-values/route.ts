@@ -57,7 +57,7 @@ export async function GET(request: Request) {
 
     // Fetch all real data in parallel with error handling
     const [stablesRes, rwaRes, btcRes, defiRes, btcPriceRes] = await Promise.allSettled([
-      fetch(`${baseUrl}/api/aptos/stables`, { cache: "no-store" }),
+      fetch(`${baseUrl}/api/markets/stables`, { cache: "no-store" }),
       fetch(`${baseUrl}/api/markets/rwas`, { cache: "no-store" }),
       fetch(`${baseUrl}/api/aptos/btc`, { cache: "no-store" }),
       fetch(`${baseUrl}/api/defi/metrics`, { cache: "no-store" }),

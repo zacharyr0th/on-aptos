@@ -21,7 +21,7 @@ export {
   buildFallbackResponse,
   buildFreshResponse,
   buildSuccessResponse,
-  type CacheOptions,
+  type CacheOptions as ResponseCacheOptions,
   type ErrorContext,
   errorResponse,
   type ResponseOptions,

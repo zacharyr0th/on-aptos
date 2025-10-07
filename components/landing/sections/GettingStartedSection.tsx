@@ -1,10 +1,12 @@
 "use client";
 
-import { TrendingUp } from "lucide-react";
+import { useState } from "react";
+import { TrendingUp, ChevronDown, ChevronUp } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   wallets,
   aptosExchanges,
@@ -23,6 +25,8 @@ import {
 } from "../shared/animations";
 
 export default function GettingStartedSection() {
+  const [showAllExchanges, setShowAllExchanges] = useState(false);
+  const [showAllBridges, setShowAllBridges] = useState(false);
   return (
     <section
       id="getting-started"
@@ -148,17 +152,32 @@ export default function GettingStartedSection() {
 
           {/* Exchanges */}
           <motion.div className="mb-20" {...slideInRight}>
-            <h3 className="text-2xl font-bold text-foreground mb-4 text-center">
-              Buy APT on Exchanges
-            </h3>
+            <div className="flex items-center justify-between mb-4 max-w-6xl mx-auto">
+              <h3 className="text-2xl font-bold text-foreground">Buy APT on Exchanges</h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowAllExchanges(!showAllExchanges)}
+                className="gap-2"
+              >
+                {showAllExchanges ? (
+                  <>
+                    Show Less <ChevronUp className="w-4 h-4" />
+                  </>
+                ) : (
+                  <>
+                    Show All <ChevronDown className="w-4 h-4" />
+                  </>
+                )}
+              </Button>
+            </div>
             <p className="text-center text-foreground/70 mb-8 max-w-2xl mx-auto">
-              Trade Aptos tokens globally on leading exchanges like Coinbase, Binance, and Upbit
-              with instant access to liquidity in USD, USDC, and USDT
+              Trade Aptos tokens globally on leading exchanges
             </p>
 
             <div className="max-w-6xl mx-auto">
               <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-                {aptosExchanges.map((exchange, index) => (
+                {aptosExchanges.slice(0, showAllExchanges ? undefined : 4).map((exchange, index) => (
                   <ExchangeCard
                     key={index}
                     logo={exchange.logo}
@@ -175,9 +194,25 @@ export default function GettingStartedSection() {
 
           {/* Bridges */}
           <motion.div {...scaleBlur}>
-            <h3 className="text-2xl font-bold text-foreground mb-4 text-center">
-              Bridge Assets to Aptos
-            </h3>
+            <div className="flex items-center justify-between mb-4 max-w-6xl mx-auto">
+              <h3 className="text-2xl font-bold text-foreground">Bridge Assets to Aptos</h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowAllBridges(!showAllBridges)}
+                className="gap-2"
+              >
+                {showAllBridges ? (
+                  <>
+                    Show Less <ChevronUp className="w-4 h-4" />
+                  </>
+                ) : (
+                  <>
+                    Show All <ChevronDown className="w-4 h-4" />
+                  </>
+                )}
+              </Button>
+            </div>
             <p className="text-center text-foreground/70 mb-8 max-w-2xl mx-auto">
               Transfer assets from Ethereum, Solana, and other chains using secure, audited bridges
               powered by LayerZero, Circle CCTP, and Wormhole
@@ -185,7 +220,7 @@ export default function GettingStartedSection() {
 
             {/* Bridge Comparison Grid */}
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-8">
-              {liveBridges.map((bridge, index) => (
+              {liveBridges.slice(0, showAllBridges ? undefined : 3).map((bridge, index) => (
                 <Link key={index} href={bridge.href} target="_blank" rel="noopener noreferrer">
                   <Card className="group relative p-4 sm:p-6 hover:shadow-lg transition-all duration-200 h-full bg-gradient-to-br from-card to-card/50 border-2 hover:border-primary/30">
                     {/* Status Badge */}
@@ -253,7 +288,7 @@ export default function GettingStartedSection() {
               ))}
 
               {/* Bridging Guide Card */}
-              {bridgeGuides.map((bridge, index) => (
+              {(showAllBridges ? bridgeGuides : []).map((bridge, index) => (
                 <Link
                   key={`guide-${index}`}
                   href={bridge.href}

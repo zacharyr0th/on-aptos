@@ -10,7 +10,7 @@ import {
   formatAmount,
   formatCurrency,
   formatNumber,
-} from "../format";
+} from "../format/format";
 
 // Shared format cache for memoization
 const formatCache = new UnifiedCache<string>({ ttl: 30 * 60 * 1000 }); // 30 min cache
@@ -323,4 +323,4 @@ export {
   formatAmount,
   formatCurrency,
   formatNumber,
-} from "../format";
+} from "../format/format";

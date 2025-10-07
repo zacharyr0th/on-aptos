@@ -321,7 +321,7 @@ function LSTPage(): React.ReactElement {
       setLstSupplyFetching(true);
       setLstSupplyError(null);
 
-      const response = await fetch(`/api/aptos/lst?t=${Date.now()}`);
+      const response = await fetch(`/api/protocols/lst?t=${Date.now()}`);
       if (!response.ok) {
         throw new Error(`Failed to fetch LST data: ${response.status}`);
       }

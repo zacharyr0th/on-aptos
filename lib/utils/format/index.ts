@@ -15,7 +15,6 @@ export {
   formatLargeNumber,
   formatNumber,
   formatNumberBigInt,
-  formatPercent,
   formatPercentage,
   formatRelativeTime,
   getDecimalPlaces,
@@ -25,6 +24,7 @@ export {
 } from "./format";
 
 // Currency types are re-exported from format.ts
+export type { Currency, FiatCurrency } from "./format";
 
 // Chart utilities
 export * from "./chart-utils";

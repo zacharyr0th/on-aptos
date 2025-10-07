@@ -30,12 +30,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // API endpoints for data access
   const apiPages = [
     {
-      url: `${baseUrl}/api/markets/bitcoin`,
-      lastModified: isoDate,
-      changeFrequency: "hourly" as const,
-      priority: 0.8,
-    },
-    {
       url: `${baseUrl}/api/markets/stables`,
       lastModified: isoDate,
       changeFrequency: "hourly" as const,
