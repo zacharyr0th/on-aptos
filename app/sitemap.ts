@@ -20,7 +20,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: "/protocols/lst", priority: 0.8, changeFreq: "weekly" as const },
     { path: "/tools/portfolio", priority: 0.8, changeFreq: "daily" as const },
     { path: "/metrics", priority: 0.7, changeFreq: "weekly" as const },
-    { path: "/network", priority: 0.7, changeFreq: "weekly" as const },
   ].map((route) => ({
     url: `${baseUrl}${route.path}`,
     lastModified: isoDate,

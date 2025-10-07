@@ -3,7 +3,7 @@
 import React from "react";
 import { Cell, Pie, PieChart as RechartsPieChart, ResponsiveContainer, Tooltip } from "recharts";
 
-import { formatCurrency } from "@/lib/utils/format";
+import { formatCurrency } from "@/lib/utils/format/format";
 
 // Shared color schemes - Modern gradient palette that adapts to light/dark mode
 export const CHART_COLORS_DARK = [

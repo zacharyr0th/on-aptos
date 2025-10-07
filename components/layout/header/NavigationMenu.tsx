@@ -41,7 +41,6 @@ export function DesktopNavigationMenu({ navigationItems, onMenuClose }: Navigati
       <div className="relative">
         <NavigationMenu delayDuration={0} viewport={false}>
           <NavigationMenuList>
-
             {/* Assets Dropdown */}
             <NavigationMenuItem>
               <NavigationMenuTrigger className="text-sm font-medium">
@@ -208,14 +207,16 @@ export function DesktopNavigationMenu({ navigationItems, onMenuClose }: Navigati
                       onClick={onMenuClose}
                     >
                       <BarChart3 className="h-4 w-4" />
-                      <div className="font-medium">{t("navigation.performance", "Performance")}</div>
+                      <div className="font-medium">
+                        {t("navigation.performance", "Performance")}
+                      </div>
                     </Link>
                     <Link
-                      href="/network"
+                      href="/metrics"
                       className={cn(
                         "flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-accent",
                         "border border-transparent hover:border-border",
-                        pathname === "/network" && "bg-accent border-border"
+                        pathname === "/metrics" && "bg-accent border-border"
                       )}
                       onClick={onMenuClose}
                     >

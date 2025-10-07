@@ -12,9 +12,9 @@ export async function GET() {
         return data;
       } catch (error) {
         if (error instanceof Error) {
-          throw new ApiError(`LST supplies fetch failed: ${error.message}`, undefined, "LST-Route");
+          throw new ApiError(`LST supplies fetch failed: ${error.message}`, 500, "LST_ERROR");
         }
-        throw new ApiError("LST supplies fetch failed: Unknown error", undefined, "LST-Route");
+        throw new ApiError("LST supplies fetch failed: Unknown error", 500, "LST_ERROR");
       }
     },
     {

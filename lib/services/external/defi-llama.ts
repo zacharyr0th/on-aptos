@@ -725,7 +725,7 @@ class DeFiLlamaService extends BaseAssetService {
       try {
         // Use API route to avoid CORS issues
         const response = await fetch("/api/defi/metrics");
-        
+
         if (!response.ok) {
           // Fallback to direct API calls (for server-side rendering)
           const [chainData, volumeData, feesData] = await Promise.allSettled([
@@ -758,7 +758,7 @@ class DeFiLlamaService extends BaseAssetService {
         }
 
         const metrics = await response.json();
-        
+
         serviceLogger.debug("DeFi metrics fetched from API route:", {
           tvl: metrics.tvl,
           volume: metrics.spotVolume,

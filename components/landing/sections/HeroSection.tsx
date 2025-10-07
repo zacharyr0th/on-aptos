@@ -76,13 +76,16 @@ export default function HeroSection({ assetValues, isLoadingValues }: HeroSectio
   };
 
   return (
-    <section id="overview" className="pt-12 pb-16 md:pt-16 md:pb-20 lg:pt-20 lg:pb-24 px-4 sm:px-6 relative overflow-hidden">
+    <section
+      id="overview"
+      className="pt-12 pb-16 md:pt-16 md:pb-20 lg:pt-20 lg:pb-24 px-4 sm:px-6 relative overflow-hidden"
+    >
       {/* Subtle gradient background */}
       <div className="absolute inset-0 bg-gradient-to-b from-muted/20 via-background/50 to-background pointer-events-none" />
 
       {/* Background Aptos Logo - Semi Globe */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 translate-y-[5%] pointer-events-none z-0">
-        <div className="relative w-[3000px] h-[1500px]">
+        <div className="relative w-[1200px] sm:w-[1800px] md:w-[2400px] lg:w-[3000px] h-[600px] sm:h-[900px] md:h-[1200px] lg:h-[1500px]">
           {/* Light mode logo */}
           <div className="dark:hidden">
             <Image
@@ -93,9 +96,11 @@ export default function HeroSection({ assetValues, isLoadingValues }: HeroSectio
               priority
               style={{
                 opacity: 0.18,
-                filter: 'blur(2px)',
-                maskImage: 'radial-gradient(ellipse 80% 60% at center top, black 30%, transparent 65%)',
-                WebkitMaskImage: 'radial-gradient(ellipse 80% 60% at center top, black 30%, transparent 65%)'
+                filter: "blur(2px)",
+                maskImage:
+                  "radial-gradient(ellipse 80% 60% at center top, black 30%, transparent 65%)",
+                WebkitMaskImage:
+                  "radial-gradient(ellipse 80% 60% at center top, black 30%, transparent 65%)",
               }}
             />
           </div>
@@ -109,10 +114,12 @@ export default function HeroSection({ assetValues, isLoadingValues }: HeroSectio
               className="object-contain"
               priority
               style={{
-                opacity: 0.20,
-                filter: 'blur(2px) invert(1)',
-                maskImage: 'radial-gradient(ellipse 80% 60% at center top, black 30%, transparent 65%)',
-                WebkitMaskImage: 'radial-gradient(ellipse 80% 60% at center top, black 30%, transparent 65%)'
+                opacity: 0.2,
+                filter: "blur(2px) invert(1)",
+                maskImage:
+                  "radial-gradient(ellipse 80% 60% at center top, black 30%, transparent 65%)",
+                WebkitMaskImage:
+                  "radial-gradient(ellipse 80% 60% at center top, black 30%, transparent 65%)",
               }}
             />
           </div>
@@ -132,12 +139,11 @@ export default function HeroSection({ assetValues, isLoadingValues }: HeroSectio
           {/* Main heading */}
           <motion.h1
             className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold mb-6 text-foreground leading-tight tracking-tight"
-            initial={{ opacity: 0, scale: 0.9, y: 30 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{
-              duration: 1.2,
-              ease: [0.16, 1, 0.3, 1],
-              opacity: { duration: 0.9 }
+              duration: 0.8,
+              ease: [0.25, 0.1, 0.25, 1],
             }}
           >
             Welcome to the
@@ -150,39 +156,39 @@ export default function HeroSection({ assetValues, isLoadingValues }: HeroSectio
           {/* Subheading */}
           <motion.p
             className="text-base sm:text-lg md:text-xl text-foreground/70 mb-12 max-w-3xl mx-auto leading-relaxed"
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{
-              duration: 1.0,
-              delay: 0.2,
-              ease: [0.16, 1, 0.3, 1]
+              duration: 0.6,
+              delay: 0.15,
+              ease: [0.25, 0.1, 0.25, 1],
             }}
           >
-            Explore DeFi protocols, track your portfolio, and discover tools on the fastest blockchain — 20k+ TPS with sub-second finality
+            Track your portfolio, explore DeFi, discover tools
           </motion.p>
 
           {/* CTA Buttons */}
           <motion.div
             className="flex flex-col sm:flex-row gap-4 justify-center mb-16"
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{
-              duration: 1.0,
-              delay: 0.4,
-              ease: [0.16, 1, 0.3, 1]
+              duration: 0.6,
+              delay: 0.25,
+              ease: [0.25, 0.1, 0.25, 1],
             }}
           >
             <Link href="/portfolio">
-              <button className="group px-8 py-4 bg-primary text-primary-foreground font-semibold rounded-lg hover:bg-primary/90 transition-all shadow-lg hover:shadow-xl hover:scale-105">
+              <button className="group px-8 py-4 bg-primary text-primary-foreground font-semibold rounded-lg hover:bg-primary/90 transition-all duration-200 shadow-lg hover:shadow-xl">
                 <span className="flex items-center justify-center gap-2">
-                  <TrendingUp className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                  Launch Portfolio Tracker
+                  <TrendingUp className="w-5 h-5 group-hover:scale-105 transition-transform duration-200" />
+                  Portfolio
                 </span>
               </button>
             </Link>
             <Link href="#defi">
-              <button className="px-8 py-4 bg-card border border-border text-foreground font-medium rounded-lg hover:bg-muted transition-all hover:shadow-md">
-                Browse Protocols
+              <button className="px-8 py-4 bg-card border border-border text-foreground font-medium rounded-lg hover:bg-muted transition-all duration-200 hover:shadow-md">
+                Protocols
               </button>
             </Link>
           </motion.div>
@@ -197,178 +203,246 @@ export default function HeroSection({ assetValues, isLoadingValues }: HeroSectio
               visible: {
                 opacity: 1,
                 transition: {
-                  delayChildren: 0.7,
-                  staggerChildren: 0.15
-                }
-              }
+                  delayChildren: 0.4,
+                  staggerChildren: 0.08,
+                },
+              },
             }}
           >
             {/* Stablecoins Card */}
             <motion.div
               variants={{
-                hidden: { opacity: 0, y: 20, scale: 0.95 },
+                hidden: { opacity: 0, y: 15 },
                 visible: {
                   opacity: 1,
                   y: 0,
-                  scale: 1,
                   transition: {
-                    type: "spring",
-                    stiffness: 80,
-                    damping: 18
-                  }
-                }
+                    duration: 0.5,
+                    ease: [0.25, 0.1, 0.25, 1],
+                  },
+                },
               }}
             >
-            <Link href="/markets/stables">
-              <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer h-full bg-card/50 backdrop-blur-sm border-border/50">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex -space-x-2">
-                    <img src="/icons/stables/usdc.png" alt="USDC" className="w-8 h-8 rounded-full border-2 border-background" />
-                    <img src="/icons/stables/usdt.png" alt="USDT" className="w-8 h-8 rounded-full border-2 border-background" />
-                    <img src="/icons/stables/usde.png" alt="USDe" className="w-8 h-8 rounded-full border-2 border-background" />
-                    <img src="/icons/stables/USDA.png" alt="USDA" className="w-8 h-8 rounded-full border-2 border-background" />
+              <Link href="/markets/stables">
+                <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer h-full bg-card/50 backdrop-blur-sm border-border/50">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex -space-x-2">
+                      <img
+                        src="/icons/stables/usdc.png"
+                        alt="USDC"
+                        className="w-8 h-8 rounded-full border-2 border-background"
+                      />
+                      <img
+                        src="/icons/stables/usdt.png"
+                        alt="USDT"
+                        className="w-8 h-8 rounded-full border-2 border-background"
+                      />
+                      <img
+                        src="/icons/stables/usde.png"
+                        alt="USDe"
+                        className="w-8 h-8 rounded-full border-2 border-background"
+                      />
+                      <img
+                        src="/icons/stables/USDA.png"
+                        alt="USDA"
+                        className="w-8 h-8 rounded-full border-2 border-background"
+                      />
+                    </div>
+                    <Badge variant="outline" className="text-xs">
+                      Live
+                    </Badge>
                   </div>
-                  <Badge variant="outline" className="text-xs">Live</Badge>
-                </div>
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">Stablecoins</p>
-                  <p className="text-2xl font-bold text-foreground font-mono">
-                    {isLoadingValues ? (
-                      <span className="animate-pulse bg-muted rounded h-8 w-24 inline-block" />
-                    ) : (
-                      formatValue(animatedValues.stables)
-                    )}
-                  </p>
-                  <p className="text-xs text-muted-foreground font-mono">USDC, USDT, USDe, USDA</p>
-                </div>
-              </Card>
-            </Link>
+                  <div className="space-y-2">
+                    <p className="text-sm text-muted-foreground">Stablecoins</p>
+                    <p className="text-2xl font-bold text-foreground font-mono">
+                      {isLoadingValues ? (
+                        <span className="animate-pulse bg-muted rounded h-8 w-24 inline-block" />
+                      ) : (
+                        formatValue(animatedValues.stables)
+                      )}
+                    </p>
+                    <p className="text-xs text-muted-foreground font-mono">
+                      USDC, USDT, USDe, USDA
+                    </p>
+                  </div>
+                </Card>
+              </Link>
             </motion.div>
 
             {/* RWAs Card */}
             <motion.div
               variants={{
-                hidden: { opacity: 0, y: 20, scale: 0.95 },
+                hidden: { opacity: 0, y: 15 },
                 visible: {
                   opacity: 1,
                   y: 0,
-                  scale: 1,
                   transition: {
-                    type: "spring",
-                    stiffness: 80,
-                    damping: 18
-                  }
-                }
+                    duration: 0.5,
+                    ease: [0.25, 0.1, 0.25, 1],
+                  },
+                },
               }}
             >
-            <Link href="/markets/rwas">
-              <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer h-full bg-card/50 backdrop-blur-sm border-border/50">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex -space-x-2">
-                    <img src="/icons/rwas/blackrock.webp" alt="BlackRock" className="w-8 h-8 rounded-full border-2 border-background bg-white" />
-                    <img src="/icons/rwas/ft.webp" alt="Franklin Templeton" className="w-8 h-8 rounded-full border-2 border-background" />
-                    <img src="/icons/rwas/ondo.webp" alt="Ondo" className="w-8 h-8 rounded-full border-2 border-background" />
-                    <img src="/icons/rwas/pact.webp" alt="Pact" className="w-8 h-8 rounded-full border-2 border-background" />
+              <Link href="/markets/rwas">
+                <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer h-full bg-card/50 backdrop-blur-sm border-border/50">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex -space-x-2">
+                      <img
+                        src="/icons/rwas/blackrock.webp"
+                        alt="BlackRock"
+                        className="w-8 h-8 rounded-full border-2 border-background bg-white"
+                      />
+                      <img
+                        src="/icons/rwas/ft.webp"
+                        alt="Franklin Templeton"
+                        className="w-8 h-8 rounded-full border-2 border-background"
+                      />
+                      <img
+                        src="/icons/rwas/ondo.webp"
+                        alt="Ondo"
+                        className="w-8 h-8 rounded-full border-2 border-background"
+                      />
+                      <img
+                        src="/icons/rwas/pact.webp"
+                        alt="Pact"
+                        className="w-8 h-8 rounded-full border-2 border-background"
+                      />
+                    </div>
+                    <Badge variant="outline" className="text-xs">
+                      Growing
+                    </Badge>
                   </div>
-                  <Badge variant="outline" className="text-xs">Growing</Badge>
-                </div>
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">Real World Assets</p>
-                  <p className="text-2xl font-bold text-foreground font-mono">
-                    {isLoadingValues ? (
-                      <span className="animate-pulse bg-muted rounded h-8 w-24 inline-block" />
-                    ) : (
-                      formatValue(animatedValues.rwas)
-                    )}
-                  </p>
-                  <p className="text-xs text-muted-foreground font-mono">BlackRock, Franklin Templeton</p>
-                </div>
-              </Card>
-            </Link>
+                  <div className="space-y-2">
+                    <p className="text-sm text-muted-foreground">Real World Assets</p>
+                    <p className="text-2xl font-bold text-foreground font-mono">
+                      {isLoadingValues ? (
+                        <span className="animate-pulse bg-muted rounded h-8 w-24 inline-block" />
+                      ) : (
+                        formatValue(animatedValues.rwas)
+                      )}
+                    </p>
+                    <p className="text-xs text-muted-foreground font-mono">
+                      BlackRock, Franklin Templeton
+                    </p>
+                  </div>
+                </Card>
+              </Link>
             </motion.div>
 
             {/* BTC Card */}
             <motion.div
               variants={{
-                hidden: { opacity: 0, y: 20, scale: 0.95 },
+                hidden: { opacity: 0, y: 15 },
                 visible: {
                   opacity: 1,
                   y: 0,
-                  scale: 1,
                   transition: {
-                    type: "spring",
-                    stiffness: 80,
-                    damping: 18
-                  }
-                }
+                    duration: 0.5,
+                    ease: [0.25, 0.1, 0.25, 1],
+                  },
+                },
               }}
             >
-            <Link href="/markets/bitcoin">
-              <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer h-full bg-card/50 backdrop-blur-sm border-border/50">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex -space-x-2">
-                    <img src="/icons/btc/echo.webp" alt="aBTC" className="w-8 h-8 rounded-full border-2 border-background" />
-                    <img src="/icons/btc/stakestone.webp" alt="SBTC" className="w-8 h-8 rounded-full border-2 border-background" />
-                    <img src="/icons/btc/okx.webp" alt="xBTC" className="w-8 h-8 rounded-full border-2 border-background bg-white" />
-                    <img src="/icons/btc/WBTC.webp" alt="WBTC" className="w-8 h-8 rounded-full border-2 border-background bg-white" />
+              <Link href="/markets/bitcoin">
+                <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer h-full bg-card/50 backdrop-blur-sm border-border/50">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex -space-x-2">
+                      <img
+                        src="/icons/btc/echo.webp"
+                        alt="aBTC"
+                        className="w-8 h-8 rounded-full border-2 border-background"
+                      />
+                      <img
+                        src="/icons/btc/stakestone.webp"
+                        alt="SBTC"
+                        className="w-8 h-8 rounded-full border-2 border-background"
+                      />
+                      <img
+                        src="/icons/btc/okx.webp"
+                        alt="xBTC"
+                        className="w-8 h-8 rounded-full border-2 border-background bg-white"
+                      />
+                      <img
+                        src="/icons/btc/WBTC.webp"
+                        alt="WBTC"
+                        className="w-8 h-8 rounded-full border-2 border-background bg-white"
+                      />
+                    </div>
+                    <Badge variant="outline" className="text-xs">
+                      Active
+                    </Badge>
                   </div>
-                  <Badge variant="outline" className="text-xs">Active</Badge>
-                </div>
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">Bitcoin</p>
-                  <p className="text-2xl font-bold text-foreground font-mono">
-                    {isLoadingValues ? (
-                      <span className="animate-pulse bg-muted rounded h-8 w-24 inline-block" />
-                    ) : (
-                      formatValue(animatedValues.btc)
-                    )}
-                  </p>
-                  <p className="text-xs text-muted-foreground font-mono">aBTC, SBTC, xBTC</p>
-                </div>
-              </Card>
-            </Link>
+                  <div className="space-y-2">
+                    <p className="text-sm text-muted-foreground">Bitcoin</p>
+                    <p className="text-2xl font-bold text-foreground font-mono">
+                      {isLoadingValues ? (
+                        <span className="animate-pulse bg-muted rounded h-8 w-24 inline-block" />
+                      ) : (
+                        formatValue(animatedValues.btc)
+                      )}
+                    </p>
+                    <p className="text-xs text-muted-foreground font-mono">aBTC, SBTC, xBTC</p>
+                  </div>
+                </Card>
+              </Link>
             </motion.div>
 
             {/* TVL Card */}
             <motion.div
               variants={{
-                hidden: { opacity: 0, y: 20, scale: 0.95 },
+                hidden: { opacity: 0, y: 15 },
                 visible: {
                   opacity: 1,
                   y: 0,
-                  scale: 1,
                   transition: {
-                    type: "spring",
-                    stiffness: 80,
-                    damping: 18
-                  }
-                }
+                    duration: 0.5,
+                    ease: [0.25, 0.1, 0.25, 1],
+                  },
+                },
               }}
             >
-            <Link href="/protocols/defi">
-              <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer h-full bg-card/50 backdrop-blur-sm border-border/50">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex -space-x-2">
-                    <img src="/icons/protocols/echelon.avif" alt="Echelon" className="w-8 h-8 rounded-full border-2 border-background" />
-                    <img src="/icons/protocols/panora.webp" alt="Panora" className="w-8 h-8 rounded-full border-2 border-background" />
-                    <img src="/icons/protocols/thala.avif" alt="Thala" className="w-8 h-8 rounded-full border-2 border-background" />
-                    <img src="/icons/protocols/merkle.webp" alt="Merkle" className="w-8 h-8 rounded-full border-2 border-background" />
+              <Link href="/protocols/defi">
+                <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer h-full bg-card/50 backdrop-blur-sm border-border/50">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex -space-x-2">
+                      <img
+                        src="/icons/protocols/echelon.avif"
+                        alt="Echelon"
+                        className="w-8 h-8 rounded-full border-2 border-background"
+                      />
+                      <img
+                        src="/icons/protocols/panora.webp"
+                        alt="Panora"
+                        className="w-8 h-8 rounded-full border-2 border-background"
+                      />
+                      <img
+                        src="/icons/protocols/thala.avif"
+                        alt="Thala"
+                        className="w-8 h-8 rounded-full border-2 border-background"
+                      />
+                      <img
+                        src="/icons/protocols/merkle.webp"
+                        alt="Merkle"
+                        className="w-8 h-8 rounded-full border-2 border-background"
+                      />
+                    </div>
+                    <Badge variant="outline" className="text-xs">
+                      TVL
+                    </Badge>
                   </div>
-                  <Badge variant="outline" className="text-xs">TVL</Badge>
-                </div>
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">Total Value Locked</p>
-                  <p className="text-2xl font-bold text-foreground font-mono">
-                    {isLoadingValues ? (
-                      <span className="animate-pulse bg-muted rounded h-8 w-24 inline-block" />
-                    ) : (
-                      formatValue(animatedValues.tokens)
-                    )}
-                  </p>
-                  <p className="text-xs text-muted-foreground font-mono">Across all protocols</p>
-                </div>
-              </Card>
-            </Link>
+                  <div className="space-y-2">
+                    <p className="text-sm text-muted-foreground">Total Value Locked</p>
+                    <p className="text-2xl font-bold text-foreground font-mono">
+                      {isLoadingValues ? (
+                        <span className="animate-pulse bg-muted rounded h-8 w-24 inline-block" />
+                      ) : (
+                        formatValue(animatedValues.tokens)
+                      )}
+                    </p>
+                    <p className="text-xs text-muted-foreground font-mono">Across all protocols</p>
+                  </div>
+                </Card>
+              </Link>
             </motion.div>
           </motion.div>
         </div>

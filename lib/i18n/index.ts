@@ -31,7 +31,16 @@ export const supportedLanguages = [
 export type SupportedLanguage = (typeof supportedLanguages)[number];
 
 export const defaultLanguage: SupportedLanguage = "en";
-export const namespaces = ["common", "defi", "rwas", "stables", "btc", "lst", "performance", "portfolio"] as const;
+export const namespaces = [
+  "common",
+  "defi",
+  "rwas",
+  "stables",
+  "btc",
+  "lst",
+  "performance",
+  "portfolio",
+] as const;
 export type Namespace = (typeof namespaces)[number];
 
 // Critical namespaces that should be preloaded for better UX (currently unused)

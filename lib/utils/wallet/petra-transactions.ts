@@ -3,14 +3,14 @@
  * Based on: https://petra.app/docs/sending-a-transaction
  */
 
-import { PetraWindow } from './petra-events';
-import { handlePetraError } from './petra-errors';
+import { PetraWindow } from "./petra-events";
+import { handlePetraError } from "./petra-errors";
 
 export interface EntryFunctionPayload {
   function: string;
   type_arguments: string[];
   arguments: (string | number | boolean)[];
-  type: 'entry_function_payload';
+  type: "entry_function_payload";
 }
 
 export interface PendingTransaction {
@@ -31,21 +31,21 @@ export interface PendingTransaction {
 export async function signAndSubmitTransaction(
   transaction: EntryFunctionPayload
 ): Promise<PendingTransaction> {
-  if (typeof window === 'undefined') {
-    throw new Error('Window is not defined');
+  if (typeof window === "undefined") {
+    throw new Error("Window is not defined");
   }
 
   const petraWindow = window as PetraWindow;
 
   if (!petraWindow.aptos) {
-    throw new Error('Petra wallet not detected');
+    throw new Error("Petra wallet not detected");
   }
 
   try {
     const pendingTransaction = await petraWindow.aptos.signAndSubmitTransaction(transaction);
     return pendingTransaction;
   } catch (error) {
-    const errorMessage = handlePetraError(error, 'Failed to sign and submit transaction');
+    const errorMessage = handlePetraError(error, "Failed to sign and submit transaction");
     throw new Error(errorMessage);
   }
 }
@@ -54,24 +54,22 @@ export async function signAndSubmitTransaction(
  * Sign a transaction without submitting it to the blockchain
  * WARNING: Not recommended for most use cases. Users will receive an extra warning.
  */
-export async function signTransaction(
-  transaction: EntryFunctionPayload
-): Promise<any> {
-  if (typeof window === 'undefined') {
-    throw new Error('Window is not defined');
+export async function signTransaction(transaction: EntryFunctionPayload): Promise<any> {
+  if (typeof window === "undefined") {
+    throw new Error("Window is not defined");
   }
 
   const petraWindow = window as PetraWindow;
 
   if (!petraWindow.aptos) {
-    throw new Error('Petra wallet not detected');
+    throw new Error("Petra wallet not detected");
   }
 
   try {
     const signedTransaction = await petraWindow.aptos.signTransaction(transaction);
     return signedTransaction;
   } catch (error) {
-    const errorMessage = handlePetraError(error, 'Failed to sign transaction');
+    const errorMessage = handlePetraError(error, "Failed to sign transaction");
     throw new Error(errorMessage);
   }
 }
@@ -82,13 +80,13 @@ export async function signTransaction(
 export function createCoinTransferTransaction(
   recipientAddress: string,
   amount: number | string,
-  coinType: string = '0x1::aptos_coin::AptosCoin'
+  coinType: string = "0x1::aptos_coin::AptosCoin"
 ): EntryFunctionPayload {
   return {
-    function: '0x1::coin::transfer',
+    function: "0x1::coin::transfer",
     type_arguments: [coinType],
     arguments: [recipientAddress, amount],
-    type: 'entry_function_payload',
+    type: "entry_function_payload",
   };
 }
 
@@ -105,6 +103,8 @@ export async function waitForTransaction(
     const txn = await client.waitForTransactionWithResult(txHash, options);
     return txn;
   } catch (error) {
-    throw new Error(`Failed to wait for transaction: ${error instanceof Error ? error.message : String(error)}`);
+    throw new Error(
+      `Failed to wait for transaction: ${error instanceof Error ? error.message : String(error)}`
+    );
   }
 }

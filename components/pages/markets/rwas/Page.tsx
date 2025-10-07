@@ -309,7 +309,7 @@ function RWAsPage(): React.ReactElement {
       setIsFetching(true);
       setRwaError(null);
 
-      const response = await fetch("/api/aptos/rwa", {
+      const response = await fetch("/api/markets/rwas", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

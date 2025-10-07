@@ -33,16 +33,16 @@ const LANGUAGE_LABELS: Record<SupportedLanguage, string> = {
 const LANGUAGES_BY_CONTINENT = {
   "North America & Europe": {
     languages: ["en", "es", "fr", "de", "pl", "ru", "pt"] as SupportedLanguage[],
-    icon: "🌍"
+    icon: "🌍",
   },
   "Asia & Pacific": {
     languages: ["zh-CN", "ja", "ko", "hi", "vi", "fil"] as SupportedLanguage[],
-    icon: "🌏"
+    icon: "🌏",
   },
   "Middle East & Africa": {
     languages: ["ar", "sw", "ha", "yo", "pcm"] as SupportedLanguage[],
-    icon: "🌍"
-  }
+    icon: "🌍",
+  },
 };
 
 export function LanguageToggle() {
@@ -77,10 +77,10 @@ export function LanguageToggle() {
       document.addEventListener("click", handleClick);
       document.addEventListener("touchstart", handleClick);
       document.addEventListener("keydown", handleEscape);
-      
+
       // Prevent body scroll when menu is open on mobile
       document.body.style.overflow = "hidden";
-      
+
       return () => {
         document.removeEventListener("click", handleClick);
         document.removeEventListener("touchstart", handleClick);
@@ -125,32 +125,33 @@ export function LanguageToggle() {
       {showMenu && (
         <>
           {/* Mobile backdrop overlay */}
-          <div 
-            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[90] sm:hidden" 
+          <div
+            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[90] sm:hidden"
             onClick={() => setShowMenu(false)}
             aria-hidden="true"
           />
-          
+
           {/* Language menu */}
-          <div className={cn(
-            "absolute bottom-full mb-2 bg-popover border rounded-lg shadow-xl z-[100]",
-            "animate-in fade-in-0 slide-in-from-bottom-2",
-            // Mobile: Full width with margins, Desktop: Fixed width
-            "left-0 right-0 mx-2 sm:left-0 sm:right-auto sm:mx-0",
-            "w-auto sm:w-[700px] max-w-[95vw]",
-            // Mobile: Max height with scroll, Desktop: Auto height
-            "max-h-[70vh] sm:max-h-none overflow-y-auto sm:overflow-visible"
-          )}>
+          <div
+            className={cn(
+              "absolute bottom-full mb-2 bg-popover border rounded-lg shadow-xl z-[100]",
+              "animate-in fade-in-0 slide-in-from-bottom-2",
+              // Mobile: Full width with margins, Desktop: Fixed width
+              "left-0 right-0 mx-2 sm:left-0 sm:right-auto sm:mx-0",
+              "w-auto sm:w-[700px] max-w-[95vw]",
+              // Mobile: Max height with scroll, Desktop: Auto height
+              "max-h-[70vh] sm:max-h-none overflow-y-auto sm:overflow-visible"
+            )}
+          >
             {/* Mobile header */}
             <div className="flex items-center justify-between p-3 border-b sm:hidden">
               <h3 className="font-semibold text-sm">Select Language</h3>
-              <button 
+              <button
                 onClick={() => setShowMenu(false)}
                 className="p-1 rounded-md hover:bg-accent text-muted-foreground"
                 aria-label="Close language menu"
               >
-                <span className="sr-only">Close</span>
-                ✕
+                <span className="sr-only">Close</span>✕
               </button>
             </div>
 
@@ -178,7 +179,9 @@ export function LanguageToggle() {
                         )}
                         disabled={lang === currentLang}
                       >
-                        <span className="text-left truncate flex-1 mr-2">{LANGUAGE_LABELS[lang]}</span>
+                        <span className="text-left truncate flex-1 mr-2">
+                          {LANGUAGE_LABELS[lang]}
+                        </span>
                         <div className="flex items-center gap-1 flex-shrink-0">
                           {lang !== "en" && (
                             <Badge variant="secondary" className="text-xs h-4 px-1">

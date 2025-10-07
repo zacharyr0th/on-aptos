@@ -11,7 +11,7 @@ export async function GET() {
     // Fetch Aptos chain data
     const chainsResponse = await fetch("https://api.llama.fi/v2/chains", {
       headers: {
-        "Accept": "application/json",
+        Accept: "application/json",
       },
     });
 
@@ -58,9 +58,7 @@ export async function GET() {
     let tvlChange24h = undefined;
     let tvlChange7d = undefined;
     try {
-      const historicalResponse = await fetch(
-        "https://api.llama.fi/v2/historicalChainTvl/Aptos"
-      );
+      const historicalResponse = await fetch("https://api.llama.fi/v2/historicalChainTvl/Aptos");
       if (historicalResponse.ok) {
         const historicalData = await historicalResponse.json();
         if (Array.isArray(historicalData) && historicalData.length > 0) {
@@ -103,9 +101,6 @@ export async function GET() {
     });
   } catch (error) {
     apiLogger.error("Error fetching DeFi metrics:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch DeFi metrics" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch DeFi metrics" }, { status: 500 });
   }
 }

@@ -125,7 +125,10 @@ export function FilterControls({
         {/* Categories with their subcategories as indented items */}
         {categories
           .filter((cat) => cat !== "All")
-          .filter((cat) => !protocolCounts || Object.keys(protocolCounts).length === 0 || protocolCounts[cat] > 0) // Filter out empty categories only if counts exist
+          .filter(
+            (cat) =>
+              !protocolCounts || Object.keys(protocolCounts).length === 0 || protocolCounts[cat] > 0
+          ) // Filter out empty categories only if counts exist
           .map((category) => {
             const categoryDef = getCategoryDefinition(category);
             const hasSubcategories =
@@ -209,63 +212,69 @@ export function FilterControls({
     <>
       <div className="flex flex-wrap items-center gap-1.5 md:gap-2">
         {categories
-          .filter((category) => category === "All" || !protocolCounts || Object.keys(protocolCounts).length === 0 || protocolCounts[category] > 0) // Show all if no counts provided
+          .filter(
+            (category) =>
+              category === "All" ||
+              !protocolCounts ||
+              Object.keys(protocolCounts).length === 0 ||
+              protocolCounts[category] > 0
+          ) // Show all if no counts provided
           .map((category) => {
-          const isSelected = selectedCategory === category;
-          const isExpanded = expandedCategory === category;
-          const categoryDef = getCategoryDefinition(category);
-          const hasSubcategories =
-            category !== "All" &&
-            categoryDef &&
-            "subcategories" in categoryDef &&
-            categoryDef.subcategories &&
-            Object.keys(categoryDef.subcategories).length > 0;
+            const isSelected = selectedCategory === category;
+            const isExpanded = expandedCategory === category;
+            const categoryDef = getCategoryDefinition(category);
+            const hasSubcategories =
+              category !== "All" &&
+              categoryDef &&
+              "subcategories" in categoryDef &&
+              categoryDef.subcategories &&
+              Object.keys(categoryDef.subcategories).length > 0;
 
-          return (
-            <Tooltip key={category}>
-              <TooltipTrigger asChild>
-                <button
-                  onClick={() => handleCategoryClick(category)}
-                  className={`flex items-center gap-1.5 h-10 px-4 rounded-md text-sm font-medium transition-all duration-200 ${
-                    isSelected
-                      ? "bg-primary text-primary-foreground shadow-sm"
-                      : "bg-secondary/60 hover:bg-secondary text-secondary-foreground hover:shadow-sm"
-                  }`}
+            return (
+              <Tooltip key={category}>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => handleCategoryClick(category)}
+                    className={`flex items-center gap-1.5 h-10 px-4 rounded-md text-sm font-medium transition-all duration-200 ${
+                      isSelected
+                        ? "bg-primary text-primary-foreground shadow-sm"
+                        : "bg-secondary/60 hover:bg-secondary text-secondary-foreground hover:shadow-sm"
+                    }`}
+                  >
+                    {category === "All"
+                      ? t("filters.all", "All")
+                      : t(`categories.${category}.name`, category)}
+                    {hasSubcategories && (
+                      <div className="transition-transform duration-200">
+                        {isExpanded ? (
+                          <ChevronUp className="h-3 w-3" />
+                        ) : (
+                          <ChevronDown className="h-3 w-3" />
+                        )}
+                      </div>
+                    )}
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent
+                  side="bottom"
+                  className="max-w-xs bg-popover text-popover-foreground border border-border shadow-md [&>svg]:hidden"
                 >
-                  {category === "All"
-                    ? t("filters.all", "All")
-                    : t(`categories.${category}.name`, category)}
-                  {hasSubcategories && (
-                    <div className="transition-transform duration-200">
-                      {isExpanded ? (
-                        <ChevronUp className="h-3 w-3" />
-                      ) : (
-                        <ChevronDown className="h-3 w-3" />
-                      )}
-                    </div>
-                  )}
-                </button>
-              </TooltipTrigger>
-              <TooltipContent
-                side="bottom"
-                className="max-w-xs bg-popover text-popover-foreground border border-border shadow-md [&>svg]:hidden"
-              >
-                <p className="text-sm font-medium mb-1">
-                  {category === "All"
-                    ? t("filters.all", "All")
-                    : t(`categories.${category}.name`, category)}
-                </p>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  {category === "All"
-                    ? t("tooltips.category_filter")
-                    : categoryDef?.description
-                      ? getText(categoryDef.description)
-                      : t("fallbacks.defi_protocol_category")}
-                </p>
-              </TooltipContent>
-            </Tooltip>
-          );
-        })}
+                  <p className="text-sm font-medium mb-1">
+                    {category === "All"
+                      ? t("filters.all", "All")
+                      : t(`categories.${category}.name`, category)}
+                  </p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    {category === "All"
+                      ? t("tooltips.category_filter")
+                      : categoryDef?.description
+                        ? getText(categoryDef.description)
+                        : t("fallbacks.defi_protocol_category")}
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            );
+          })}
       </div>
 
       {/* Desktop Subcategory Dropdown */}

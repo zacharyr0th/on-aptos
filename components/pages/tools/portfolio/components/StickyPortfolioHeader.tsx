@@ -20,10 +20,7 @@ interface StickyPortfolioHeaderProps {
 
 const portfolioTabs = ["portfolio", "transactions", "yield"];
 
-export function StickyPortfolioHeader({ 
-  activeTab, 
-  onTabChange
-}: StickyPortfolioHeaderProps) {
+export function StickyPortfolioHeader({ activeTab, onTabChange }: StickyPortfolioHeaderProps) {
   const currentIndex = portfolioTabs.indexOf(activeTab);
   const canGoPrevious = currentIndex > 0;
   const canGoNext = currentIndex < portfolioTabs.length - 1;
@@ -51,7 +48,7 @@ export function StickyPortfolioHeader({
       >
         <ChevronLeft className="h-4 w-4" />
       </Button>
-      
+
       <div className="flex items-center gap-1">
         {portfolioTabs.map((tab, index) => (
           <Button
@@ -59,10 +56,7 @@ export function StickyPortfolioHeader({
             variant={activeTab === tab ? "default" : "outline"}
             size="sm"
             onClick={() => onTabChange(tab)}
-            className={cn(
-              "h-8 w-8 p-0 capitalize",
-              activeTab === tab && "pointer-events-none"
-            )}
+            className={cn("h-8 w-8 p-0 capitalize", activeTab === tab && "pointer-events-none")}
           >
             {index + 1}
           </Button>

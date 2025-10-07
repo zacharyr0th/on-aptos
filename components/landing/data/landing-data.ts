@@ -1,11 +1,25 @@
-import { Zap, Shield, Code, TrendingUp, Layers, Users, Search, Terminal, Settings, Key, Eye, Info } from "lucide-react";
+import {
+  Zap,
+  Shield,
+  Code,
+  TrendingUp,
+  Layers,
+  Users,
+  Search,
+  Terminal,
+  Settings,
+  Key,
+  Eye,
+  Info,
+} from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 export const features = [
   {
     icon: Zap,
     title: "Lightning Fast",
-    description: "Process 100k+ transactions per second with sub-second finality — 6,000x faster than Ethereum",
+    description:
+      "Process 100k+ transactions per second with sub-second finality — 6,000x faster than Ethereum",
   },
   {
     icon: Shield,
@@ -35,15 +49,31 @@ export const features = [
 ];
 
 export const wallets = [
-  { name: "Petra", description: "The most popular Aptos wallet", href: "https://petra.app/", logo: "/icons/petra.webp" },
-  { name: "Backpack", description: "Multi-chain wallet with Aptos support", href: "https://chromewebstore.google.com/detail/backpack/aflkmfhebedbjioipglgcbcmnbpgliof", logo: "/icons/cex/backpack.jpg" },
-  { name: "Aptos Connect", description: "Login with Apple or Google", href: "https://aptosconnect.app/", logo: "/icons/apt.png" },
+  {
+    name: "Petra",
+    description: "The most popular Aptos wallet",
+    href: "https://petra.app/",
+    logo: "/icons/petra.webp",
+  },
+  {
+    name: "Backpack",
+    description: "Multi-chain wallet with Aptos support",
+    href: "https://chromewebstore.google.com/detail/backpack/aflkmfhebedbjioipglgcbcmnbpgliof",
+    logo: "/icons/cex/backpack.jpg",
+  },
+  {
+    name: "Aptos Connect",
+    description: "Login with Apple or Google",
+    href: "https://aptosconnect.app/",
+    logo: "/icons/apt.png",
+  },
 ];
 
 const allBridges = [
   {
     name: "Stargate (LayerZero)",
-    description: "Seamless transfers of LayerZero-wrapped stablecoins and Omnichain Fungible Tokens (OFT assets)",
+    description:
+      "Seamless transfers of LayerZero-wrapped stablecoins and Omnichain Fungible Tokens (OFT assets)",
     href: "https://stargate.finance",
     logo: "/icons/protocols/lz.png",
     bridgeTime: "1-5 min",
@@ -65,7 +95,8 @@ const allBridges = [
   },
   {
     name: "Wormhole Portal",
-    description: "Cross-chain bridge with CCTP integration for native USDC, accessible via Stargate",
+    description:
+      "Cross-chain bridge with CCTP integration for native USDC, accessible via Stargate",
     href: "https://portalbridge.com",
     logo: "/icons/protocols/wormhole.png",
     bridgeTime: "5-15 min",
@@ -87,7 +118,8 @@ const allBridges = [
   },
   {
     name: "Gas.zip",
-    description: "Integrated with Stargate, quickly 'refuels' Aptos wallets with APT tokens for covering gas fees",
+    description:
+      "Integrated with Stargate, quickly 'refuels' Aptos wallets with APT tokens for covering gas fees",
     href: "https://gas.zip",
     logo: "/icons/protocols/gas-zip.png",
     bridgeTime: "1-5 min",
@@ -98,7 +130,8 @@ const allBridges = [
   },
   {
     name: "Zach's Bridging Guide",
-    description: "Complete guide to bridging assets onto Aptos with detailed instructions and best practices",
+    description:
+      "Complete guide to bridging assets onto Aptos with detailed instructions and best practices",
     href: "https://x.com/zacharyr0th/status/1915031084976451596",
     logo: "/icons/apt.png",
     bridgeTime: "N/A",
@@ -111,85 +144,410 @@ const allBridges = [
 
 // Pre-filtered static exports for performance
 export const bridges = allBridges;
-export const liveBridges = allBridges.filter(b => b.status === "Live");
-export const bridgeGuides = allBridges.filter(b => b.status === "Guide");
+export const liveBridges = allBridges.filter((b) => b.status === "Live");
+export const bridgeGuides = allBridges.filter((b) => b.status === "Guide");
 
-export const exchanges = [
+type Region = "US" | "KR" | "Global";
+
+interface Exchange {
+  region: Region;
+  name: string;
+  chain: string;
+  usdt: "Y" | "N" | "";
+  usdc: "Y" | "N" | "";
+  link: string;
+  logo?: string;
+}
+
+export const exchanges: Exchange[] = [
   // Coinbase (US)
-  { region: "US", name: "Coinbase", chain: "Aptos", usdt: "N", usdc: "Y", link: "https://www.coinbase.com", logo: "/icons/cex/coinbase.web.png" },
-  { region: "US", name: "Coinbase", chain: "Solana", usdt: "N", usdc: "Y", link: "https://www.coinbase.com" },
-  { region: "US", name: "Coinbase", chain: "ETH", usdt: "Y", usdc: "Y", link: "https://www.coinbase.com" },
-  { region: "US", name: "Coinbase", chain: "Base", usdt: "N", usdc: "Y", link: "https://www.coinbase.com" },
+  {
+    region: "US",
+    name: "Coinbase",
+    chain: "Aptos",
+    usdt: "N",
+    usdc: "Y",
+    link: "https://www.coinbase.com",
+    logo: "/icons/cex/coinbase.web.png",
+  },
+  {
+    region: "US",
+    name: "Coinbase",
+    chain: "Solana",
+    usdt: "N",
+    usdc: "Y",
+    link: "https://www.coinbase.com",
+  },
+  {
+    region: "US",
+    name: "Coinbase",
+    chain: "ETH",
+    usdt: "Y",
+    usdc: "Y",
+    link: "https://www.coinbase.com",
+  },
+  {
+    region: "US",
+    name: "Coinbase",
+    chain: "Base",
+    usdt: "N",
+    usdc: "Y",
+    link: "https://www.coinbase.com",
+  },
 
   // Upbit (KR)
-  { region: "KR", name: "Upbit", chain: "Aptos", usdt: "Y", usdc: "N", link: "https://upbit.com", logo: "/icons/cex/upbit.jpg" },
+  {
+    region: "KR",
+    name: "Upbit",
+    chain: "Aptos",
+    usdt: "Y",
+    usdc: "N",
+    link: "https://upbit.com",
+    logo: "/icons/cex/upbit.jpg",
+  },
   { region: "KR", name: "Upbit", chain: "Solana", usdt: "N", usdc: "Y", link: "https://upbit.com" },
   { region: "KR", name: "Upbit", chain: "Tron", usdt: "Y", usdc: "N", link: "https://upbit.com" },
   { region: "KR", name: "Upbit", chain: "Base", usdt: "N", usdc: "N", link: "https://upbit.com" },
 
   // Bithumb (KR)
-  { region: "KR", name: "Bithumb", chain: "Solana", usdt: "", usdc: "", link: "https://www.bithumb.com" },
+  {
+    region: "KR",
+    name: "Bithumb",
+    chain: "Solana",
+    usdt: "",
+    usdc: "",
+    link: "https://www.bithumb.com",
+  },
 
   // Binance (Global)
-  { region: "Global", name: "Binance", chain: "Aptos", usdt: "Y", usdc: "Y", link: "https://www.binance.com", logo: "/icons/cex/binance.webp" },
-  { region: "Global", name: "Binance", chain: "Solana", usdt: "Y", usdc: "Y", link: "https://www.binance.com" },
-  { region: "Global", name: "Binance", chain: "Tron", usdt: "Y", usdc: "N", link: "https://www.binance.com" },
-  { region: "Global", name: "Binance", chain: "Base", usdt: "N", usdc: "Y", link: "https://www.binance.com" },
+  {
+    region: "Global",
+    name: "Binance",
+    chain: "Aptos",
+    usdt: "Y",
+    usdc: "Y",
+    link: "https://www.binance.com",
+    logo: "/icons/cex/binance.webp",
+  },
+  {
+    region: "Global",
+    name: "Binance",
+    chain: "Solana",
+    usdt: "Y",
+    usdc: "Y",
+    link: "https://www.binance.com",
+  },
+  {
+    region: "Global",
+    name: "Binance",
+    chain: "Tron",
+    usdt: "Y",
+    usdc: "N",
+    link: "https://www.binance.com",
+  },
+  {
+    region: "Global",
+    name: "Binance",
+    chain: "Base",
+    usdt: "N",
+    usdc: "Y",
+    link: "https://www.binance.com",
+  },
 
   // Bybit (Global)
-  { region: "Global", name: "Bybit", chain: "Aptos", usdt: "Y", usdc: "Y", link: "https://www.bybit.com", logo: "/icons/cex/bybit.jpg" },
-  { region: "Global", name: "Bybit", chain: "Solana", usdt: "Y", usdc: "Y", link: "https://www.bybit.com" },
-  { region: "Global", name: "Bybit", chain: "Tron", usdt: "Y", usdc: "N", link: "https://www.bybit.com" },
-  { region: "Global", name: "Bybit", chain: "Base", usdt: "N", usdc: "Y", link: "https://www.bybit.com" },
+  {
+    region: "Global",
+    name: "Bybit",
+    chain: "Aptos",
+    usdt: "Y",
+    usdc: "Y",
+    link: "https://www.bybit.com",
+    logo: "/icons/cex/bybit.jpg",
+  },
+  {
+    region: "Global",
+    name: "Bybit",
+    chain: "Solana",
+    usdt: "Y",
+    usdc: "Y",
+    link: "https://www.bybit.com",
+  },
+  {
+    region: "Global",
+    name: "Bybit",
+    chain: "Tron",
+    usdt: "Y",
+    usdc: "N",
+    link: "https://www.bybit.com",
+  },
+  {
+    region: "Global",
+    name: "Bybit",
+    chain: "Base",
+    usdt: "N",
+    usdc: "Y",
+    link: "https://www.bybit.com",
+  },
 
   // OKX (Global)
-  { region: "Global", name: "OKX", chain: "Aptos", usdt: "Y", usdc: "Y", link: "https://www.okx.com", logo: "/icons/cex/okx.jpg" },
-  { region: "Global", name: "OKX", chain: "Solana", usdt: "Y", usdc: "Y", link: "https://www.okx.com" },
-  { region: "Global", name: "OKX", chain: "Tron", usdt: "Y", usdc: "N", link: "https://www.okx.com" },
-  { region: "Global", name: "OKX", chain: "Base", usdt: "N", usdc: "Y", link: "https://www.okx.com" },
+  {
+    region: "Global",
+    name: "OKX",
+    chain: "Aptos",
+    usdt: "Y",
+    usdc: "Y",
+    link: "https://www.okx.com",
+    logo: "/icons/cex/okx.jpg",
+  },
+  {
+    region: "Global",
+    name: "OKX",
+    chain: "Solana",
+    usdt: "Y",
+    usdc: "Y",
+    link: "https://www.okx.com",
+  },
+  {
+    region: "Global",
+    name: "OKX",
+    chain: "Tron",
+    usdt: "Y",
+    usdc: "N",
+    link: "https://www.okx.com",
+  },
+  {
+    region: "Global",
+    name: "OKX",
+    chain: "Base",
+    usdt: "N",
+    usdc: "Y",
+    link: "https://www.okx.com",
+  },
 
   // Bitget (Global)
-  { region: "Global", name: "Bitget", chain: "Aptos", usdt: "Y", usdc: "Y", link: "https://www.bitget.com", logo: "/icons/cex/bitget.jpg" },
-  { region: "Global", name: "Bitget", chain: "Solana", usdt: "Y", usdc: "Y", link: "https://www.bitget.com" },
-  { region: "Global", name: "Bitget", chain: "Tron", usdt: "Y", usdc: "N", link: "https://www.bitget.com" },
-  { region: "Global", name: "Bitget", chain: "Base", usdt: "N", usdc: "Y", link: "https://www.bitget.com" },
+  {
+    region: "Global",
+    name: "Bitget",
+    chain: "Aptos",
+    usdt: "Y",
+    usdc: "Y",
+    link: "https://www.bitget.com",
+    logo: "/icons/cex/bitget.jpg",
+  },
+  {
+    region: "Global",
+    name: "Bitget",
+    chain: "Solana",
+    usdt: "Y",
+    usdc: "Y",
+    link: "https://www.bitget.com",
+  },
+  {
+    region: "Global",
+    name: "Bitget",
+    chain: "Tron",
+    usdt: "Y",
+    usdc: "N",
+    link: "https://www.bitget.com",
+  },
+  {
+    region: "Global",
+    name: "Bitget",
+    chain: "Base",
+    usdt: "N",
+    usdc: "Y",
+    link: "https://www.bitget.com",
+  },
 
   // MEXC (Global)
-  { region: "Global", name: "MEXC", chain: "Aptos", usdt: "Y", usdc: "Y", link: "https://www.mexc.com", logo: "/icons/cex/mexc.webp" },
-  { region: "Global", name: "MEXC", chain: "Solana", usdt: "Y", usdc: "Y", link: "https://www.mexc.com" },
-  { region: "Global", name: "MEXC", chain: "Tron", usdt: "Y", usdc: "N", link: "https://www.mexc.com" },
-  { region: "Global", name: "MEXC", chain: "Base", usdt: "N", usdc: "Y", link: "https://www.mexc.com" },
+  {
+    region: "Global",
+    name: "MEXC",
+    chain: "Aptos",
+    usdt: "Y",
+    usdc: "Y",
+    link: "https://www.mexc.com",
+    logo: "/icons/cex/mexc.webp",
+  },
+  {
+    region: "Global",
+    name: "MEXC",
+    chain: "Solana",
+    usdt: "Y",
+    usdc: "Y",
+    link: "https://www.mexc.com",
+  },
+  {
+    region: "Global",
+    name: "MEXC",
+    chain: "Tron",
+    usdt: "Y",
+    usdc: "N",
+    link: "https://www.mexc.com",
+  },
+  {
+    region: "Global",
+    name: "MEXC",
+    chain: "Base",
+    usdt: "N",
+    usdc: "Y",
+    link: "https://www.mexc.com",
+  },
 
   // Bitfinex (Global)
-  { region: "Global", name: "Bitfinex", chain: "Aptos", usdt: "Y", usdc: "N", link: "https://www.bitfinex.com", logo: "/icons/cex/bitfinex.webp" },
-  { region: "Global", name: "Bitfinex", chain: "Solana", usdt: "Y", usdc: "N", link: "https://www.bitfinex.com" },
-  { region: "Global", name: "Bitfinex", chain: "Tron", usdt: "Y", usdc: "N", link: "https://www.bitfinex.com" },
+  {
+    region: "Global",
+    name: "Bitfinex",
+    chain: "Aptos",
+    usdt: "Y",
+    usdc: "N",
+    link: "https://www.bitfinex.com",
+    logo: "/icons/cex/bitfinex.webp",
+  },
+  {
+    region: "Global",
+    name: "Bitfinex",
+    chain: "Solana",
+    usdt: "Y",
+    usdc: "N",
+    link: "https://www.bitfinex.com",
+  },
+  {
+    region: "Global",
+    name: "Bitfinex",
+    chain: "Tron",
+    usdt: "Y",
+    usdc: "N",
+    link: "https://www.bitfinex.com",
+  },
 
   // KuCoin (Global)
-  { region: "Global", name: "KuCoin", chain: "Aptos", usdt: "Y", usdc: "N", link: "https://www.kucoin.com", logo: "/icons/cex/kucoin.jpg" },
-  { region: "Global", name: "KuCoin", chain: "Solana", usdt: "Y", usdc: "Y", link: "https://www.kucoin.com" },
-  { region: "Global", name: "KuCoin", chain: "Tron", usdt: "Y", usdc: "N", link: "https://www.kucoin.com" },
+  {
+    region: "Global",
+    name: "KuCoin",
+    chain: "Aptos",
+    usdt: "Y",
+    usdc: "N",
+    link: "https://www.kucoin.com",
+    logo: "/icons/cex/kucoin.jpg",
+  },
+  {
+    region: "Global",
+    name: "KuCoin",
+    chain: "Solana",
+    usdt: "Y",
+    usdc: "Y",
+    link: "https://www.kucoin.com",
+  },
+  {
+    region: "Global",
+    name: "KuCoin",
+    chain: "Tron",
+    usdt: "Y",
+    usdc: "N",
+    link: "https://www.kucoin.com",
+  },
 
   // Backpack (Global)
-  { region: "Global", name: "Backpack", chain: "Aptos", usdt: "N", usdc: "Y", link: "https://backpack.exchange", logo: "/icons/cex/backpack.jpg" },
-  { region: "Global", name: "Backpack", chain: "Solana", usdt: "N", usdc: "Y", link: "https://backpack.exchange" },
-  { region: "Global", name: "Backpack", chain: "Tron", usdt: "N", usdc: "N", link: "https://backpack.exchange" },
+  {
+    region: "Global",
+    name: "Backpack",
+    chain: "Aptos",
+    usdt: "N",
+    usdc: "Y",
+    link: "https://backpack.exchange",
+    logo: "/icons/cex/backpack.jpg",
+  },
+  {
+    region: "Global",
+    name: "Backpack",
+    chain: "Solana",
+    usdt: "N",
+    usdc: "Y",
+    link: "https://backpack.exchange",
+  },
+  {
+    region: "Global",
+    name: "Backpack",
+    chain: "Tron",
+    usdt: "N",
+    usdc: "N",
+    link: "https://backpack.exchange",
+  },
 
   // Flipster (KR)
-  { region: "KR", name: "Flipster", chain: "Aptos", usdt: "Y", usdc: "N", link: "https://flipster.io", logo: "/icons/cex/flipster.jpg" },
-  { region: "KR", name: "Flipster", chain: "Solana", usdt: "Y", usdc: "Y", link: "https://flipster.io" },
-  { region: "KR", name: "Flipster", chain: "Tron", usdt: "Y", usdc: "N", link: "https://flipster.io" },
-  { region: "KR", name: "Flipster", chain: "Base", usdt: "N", usdc: "Y", link: "https://flipster.io" },
+  {
+    region: "KR",
+    name: "Flipster",
+    chain: "Aptos",
+    usdt: "Y",
+    usdc: "N",
+    link: "https://flipster.io",
+    logo: "/icons/cex/flipster.jpg",
+  },
+  {
+    region: "KR",
+    name: "Flipster",
+    chain: "Solana",
+    usdt: "Y",
+    usdc: "Y",
+    link: "https://flipster.io",
+  },
+  {
+    region: "KR",
+    name: "Flipster",
+    chain: "Tron",
+    usdt: "Y",
+    usdc: "N",
+    link: "https://flipster.io",
+  },
+  {
+    region: "KR",
+    name: "Flipster",
+    chain: "Base",
+    usdt: "N",
+    usdc: "Y",
+    link: "https://flipster.io",
+  },
 
   // Gate.io
-  { region: "Global", name: "Gate.io", chain: "Aptos", usdt: "Y", usdc: "Y", link: "https://www.gate.io", logo: "/icons/cex/gate.jpg" },
-  { region: "Global", name: "Gate.io", chain: "Solana", usdt: "Y", usdc: "Y", link: "https://www.gate.io" },
-  { region: "Global", name: "Gate.io", chain: "Tron", usdt: "Y", usdc: "N", link: "https://www.gate.io" },
-  { region: "Global", name: "Gate.io", chain: "Base", usdt: "N", usdc: "Y", link: "https://www.gate.io" },
+  {
+    region: "Global",
+    name: "Gate.io",
+    chain: "Aptos",
+    usdt: "Y",
+    usdc: "Y",
+    link: "https://www.gate.io",
+    logo: "/icons/cex/gate.jpg",
+  },
+  {
+    region: "Global",
+    name: "Gate.io",
+    chain: "Solana",
+    usdt: "Y",
+    usdc: "Y",
+    link: "https://www.gate.io",
+  },
+  {
+    region: "Global",
+    name: "Gate.io",
+    chain: "Tron",
+    usdt: "Y",
+    usdc: "N",
+    link: "https://www.gate.io",
+  },
+  {
+    region: "Global",
+    name: "Gate.io",
+    chain: "Base",
+    usdt: "N",
+    usdc: "Y",
+    link: "https://www.gate.io",
+  },
 ];
 
 // Pre-filtered exchanges for performance
-export const aptosExchanges = exchanges.filter(ex => ex.chain === "Aptos");
+export const aptosExchanges = exchanges.filter((ex) => ex.chain === "Aptos");
 
 export const developerTools = [
   {

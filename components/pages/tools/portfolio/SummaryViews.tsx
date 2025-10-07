@@ -29,7 +29,7 @@ import type { DeFiPosition } from "@/lib/types/defi";
 import { cn } from "@/lib/utils";
 import { logger } from "@/lib/utils/core/logger";
 import { sanitizeImageUrl, sanitizeNFTMetadata } from "@/lib/utils/core/security";
-import { formatCurrency, formatTokenAmount } from "@/lib/utils/format";
+import { formatCurrency, formatTokenAmount } from "@/lib/utils/format/format";
 import { cleanProtocolName, getProtocolLogo } from "./shared/PortfolioMetrics";
 import { UnifiedNFTGrid } from "./shared/UnifiedNFTGrid";
 import { NFTTreemap } from "./shared/WalletSummaryComponents";

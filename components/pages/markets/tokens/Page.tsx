@@ -76,7 +76,7 @@ import {
 import { LEGITIMATE_STABLECOINS } from "@/lib/constants/tokens/stablecoins";
 import { cn } from "@/lib/utils";
 import { copyToClipboard } from "@/lib/utils/clipboard";
-import { formatCurrency, formatNumber, formatTokenPrice } from "@/lib/utils/format";
+import { formatCurrency, formatNumber, formatTokenPrice } from "@/lib/utils/format/format";
 
 interface TokenData {
   chainId: number;

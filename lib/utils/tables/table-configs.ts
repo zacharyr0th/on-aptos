@@ -1,5 +1,5 @@
 import type { TableColumn } from "@/lib/types/ui";
-import { formatCurrency, formatTokenAmount } from "@/lib/utils/format";
+import { formatCurrency, formatTokenAmount } from "@/lib/utils/format/format";
 import { createSortableColumn } from "./table-utils";
 
 export const ASSET_TABLE_COLUMNS: TableColumn[] = [

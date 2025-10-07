@@ -9,7 +9,10 @@ type EnrichedProtocol = DefiProtocol;
 const protocolMetricsCache = new Map<string, Promise<any>>();
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
-export function useProtocolMetrics(protocols: DefiProtocol[], options?: { skipFetch?: boolean }): {
+export function useProtocolMetrics(
+  protocols: DefiProtocol[],
+  options?: { skipFetch?: boolean }
+): {
   enrichedProtocols: EnrichedProtocol[];
   loading: boolean;
   error: Error | null;

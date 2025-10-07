@@ -34,13 +34,9 @@ export async function GET(request: NextRequest) {
           apiLogger.error("BTC API route error:", formatApiError(error));
 
           if (error instanceof Error) {
-            throw new ApiError(
-              `BTC supplies fetch failed: ${error.message}`,
-              undefined,
-              "BTC-Route"
-            );
+            throw new ApiError(`BTC supplies fetch failed: ${error.message}`, 500, "BTC_ERROR");
           }
-          throw new ApiError("BTC supplies fetch failed: Unknown error", undefined, "BTC-Route");
+          throw new ApiError("BTC supplies fetch failed: Unknown error", 500, "BTC_ERROR");
         }
       }, errorContext),
     {

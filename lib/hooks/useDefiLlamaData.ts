@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 interface DefiLlamaProtocol {
   name: string;
@@ -25,12 +25,12 @@ let allProtocolsCache: { data: DefiLlamaProtocol[]; timestamp: number } | null =
 
 // Map protocol names to their DefiLlama slugs
 const PROTOCOL_SLUG_MAP: Record<string, string> = {
-  'Thala': 'thala',
-  'Panora': 'panora-exchange',
-  'Echelon': 'echelon-market',
-  'Merkle Trade': 'merkle-trade',
-  'Amnis': 'amnis-finance',
-  'Aries Markets': 'aries-markets',
+  Thala: "thala",
+  Panora: "panora-exchange",
+  Echelon: "echelon-market",
+  "Merkle Trade": "merkle-trade",
+  Amnis: "amnis-finance",
+  "Aries Markets": "aries-markets",
   // Add more mappings as needed
 };
 
@@ -43,7 +43,7 @@ export function useDefiLlamaData(protocolName: string) {
     const fetchData = async () => {
       try {
         // Exclude certain protocols from showing data
-        const excludedProtocols = ['PancakeSwap', 'SushiSwap'];
+        const excludedProtocols = ["PancakeSwap", "SushiSwap"];
         if (excludedProtocols.includes(protocolName)) {
           setData(null);
           setLoading(false);
@@ -59,23 +59,25 @@ export function useDefiLlamaData(protocolName: string) {
         }
 
         // Get the slug for this protocol
-        const slug = PROTOCOL_SLUG_MAP[protocolName] || protocolName.toLowerCase().replace(/\s+/g, '-');
+        const slug =
+          PROTOCOL_SLUG_MAP[protocolName] || protocolName.toLowerCase().replace(/\s+/g, "-");
 
         // Fetch all protocols with global caching to reduce API calls
         let protocols: DefiLlamaProtocol[];
         if (allProtocolsCache && Date.now() - allProtocolsCache.timestamp < CACHE_DURATION) {
           protocols = allProtocolsCache.data;
         } else {
-          const response = await fetch('https://api.llama.fi/protocols');
-          if (!response.ok) throw new Error('Failed to fetch data');
+          const response = await fetch("https://api.llama.fi/protocols");
+          if (!response.ok) throw new Error("Failed to fetch data");
           protocols = await response.json();
           allProtocolsCache = { data: protocols, timestamp: Date.now() };
         }
 
         // Find the protocol (case-insensitive match on name)
         const protocol = protocols.find(
-          p => p.name.toLowerCase() === protocolName.toLowerCase() ||
-               p.name.toLowerCase().includes(slug)
+          (p) =>
+            p.name.toLowerCase() === protocolName.toLowerCase() ||
+            p.name.toLowerCase().includes(slug)
         );
 
         if (!protocol) {
@@ -89,7 +91,9 @@ export function useDefiLlamaData(protocolName: string) {
 
         const result: DefiLlamaData = {
           tvl: formatNumber(aptosTvl),
-          change7d: protocol.change_7d ? `${protocol.change_7d > 0 ? '+' : ''}${protocol.change_7d.toFixed(2)}%` : undefined,
+          change7d: protocol.change_7d
+            ? `${protocol.change_7d > 0 ? "+" : ""}${protocol.change_7d.toFixed(2)}%`
+            : undefined,
         };
 
         // Try to fetch volume data from the dexs endpoint if it's a trading protocol
@@ -100,7 +104,7 @@ export function useDefiLlamaData(protocolName: string) {
             if (volumeData.total24h) {
               result.volume24h = formatNumber(volumeData.total24h);
               result.volumeChange24h = volumeData.change_1d
-                ? `${volumeData.change_1d > 0 ? '+' : ''}${volumeData.change_1d.toFixed(2)}%`
+                ? `${volumeData.change_1d > 0 ? "+" : ""}${volumeData.change_1d.toFixed(2)}%`
                 : undefined;
             }
           }
@@ -114,7 +118,7 @@ export function useDefiLlamaData(protocolName: string) {
         setData(result);
         setError(null);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error');
+        setError(err instanceof Error ? err.message : "Unknown error");
         setData(null);
       } finally {
         setLoading(false);

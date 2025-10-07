@@ -228,7 +228,9 @@ export default function RootLayout({ children }: RootLayoutProps): React.ReactEl
           }}
         />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased bg-gradient-to-b from-primary/5 via-background to-background text-foreground`}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased bg-gradient-to-b from-primary/5 via-background to-background text-foreground`}
+      >
         <I18nProvider>
           <ThemeProvider
             attribute="class"

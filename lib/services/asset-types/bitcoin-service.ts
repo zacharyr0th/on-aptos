@@ -2,7 +2,11 @@ import { CACHE_CONFIG } from "@/lib/config/cache";
 import { BTC_TOKENS } from "@/lib/config/tokens/btc";
 import { UnifiedCache } from "@/lib/utils/cache/unified-cache";
 import { logger } from "@/lib/utils/core/logger";
-import { calculatePercentage, formatNumber, formatTokenAmountFromRaw } from "@/lib/utils/format";
+import {
+  calculatePercentage,
+  formatNumber,
+  formatTokenAmountFromRaw,
+} from "@/lib/utils/format/format";
 import type { BTCAnalytics, BTCSupply } from "../shared/types";
 import { BaseAssetService } from "../shared/utils/base-service";
 import { UnifiedGraphQLClient } from "../shared/utils/unified-graphql-client";

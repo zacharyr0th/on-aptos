@@ -23,7 +23,7 @@ function getProtocolByAddress(address: string): any {
 
 import { logger } from "@/lib/utils/core/logger";
 import { graphQLRequest } from "@/lib/utils/fetch-utils";
-import { convertRawTokenAmount } from "@/lib/utils/format";
+import { convertRawTokenAmount } from "@/lib/utils/format/format";
 
 import { AssetService } from "./services/asset-service";
 

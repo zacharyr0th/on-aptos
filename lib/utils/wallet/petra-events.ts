@@ -4,9 +4,9 @@
  */
 
 export enum Network {
-  Testnet = 'Testnet',
-  Mainnet = 'Mainnet',
-  Devnet = 'Devnet',
+  Testnet = "Testnet",
+  Mainnet = "Mainnet",
+  Devnet = "Devnet",
 }
 
 export interface PetraWindow extends Window {
@@ -19,7 +19,9 @@ export interface PetraWindow extends Window {
     signAndSubmitTransaction: (transaction: any) => Promise<any>;
     signTransaction: (transaction: any) => Promise<any>;
     signMessage: (payload: SignMessagePayload) => Promise<SignMessageResponse>;
-    onAccountChange: (callback: (newAccount: { address: string; publicKey: string } | null) => void) => void;
+    onAccountChange: (
+      callback: (newAccount: { address: string; publicKey: string } | null) => void
+    ) => void;
     onNetworkChange: (callback: (newNetwork: Network) => void) => void;
     onDisconnect: (callback: () => void) => void;
   };
@@ -45,7 +47,9 @@ export interface SignMessageResponse {
 }
 
 export interface PetraEventListeners {
-  onAccountChange: (callback: (newAccount: { address: string; publicKey: string } | null) => void) => void;
+  onAccountChange: (
+    callback: (newAccount: { address: string; publicKey: string } | null) => void
+  ) => void;
   onNetworkChange: (callback: (newNetwork: Network) => void) => void;
   onDisconnect: (callback: () => void) => void;
   getCurrentNetwork: () => Promise<Network>;
@@ -57,12 +61,12 @@ export interface PetraEventListeners {
  * Setup event listeners for Petra wallet
  */
 export function setupPetraEventListeners(): PetraEventListeners | null {
-  if (typeof window === 'undefined') return null;
+  if (typeof window === "undefined") return null;
 
   const petraWindow = window as PetraWindow;
 
   if (!petraWindow.aptos) {
-    console.warn('Petra wallet not detected');
+    console.warn("Petra wallet not detected");
     return null;
   }
 
@@ -77,7 +81,7 @@ export function setupPetraEventListeners(): PetraEventListeners | null {
       petraWindow.aptos?.onDisconnect(callback);
     },
     getCurrentNetwork: async () => {
-      if (!petraWindow.aptos) throw new Error('Petra wallet not detected');
+      if (!petraWindow.aptos) throw new Error("Petra wallet not detected");
       return await petraWindow.aptos.network();
     },
     getCurrentAccount: async () => {
@@ -103,7 +107,7 @@ export function usePetraEventListeners(
   onNetworkChange?: (newNetwork: Network) => void,
   onDisconnect?: () => void
 ) {
-  if (typeof window === 'undefined') return;
+  if (typeof window === "undefined") return;
 
   const petraWindow = window as PetraWindow;
 

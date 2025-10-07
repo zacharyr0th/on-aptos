@@ -19,7 +19,7 @@ import { ECHO_PROTOCOL_CONFIG, PROTOCOL_ICONS } from "@/lib/config/protocols/ech
 import { YIELD_COLORS } from "@/lib/constants/ui/colors";
 import { usePageTranslation } from "@/lib/hooks/useTranslation";
 import { errorLogger } from "@/lib/utils/core/logger";
-import { formatBigIntWithDecimals, formatCurrency } from "@/lib/utils/format";
+import { formatBigIntWithDecimals, formatCurrency } from "@/lib/utils/format/format";
 import type { Market, ProtocolData, SupplyData } from "./types";
 import { formatBTCAmountWithCommas } from "./utils";
 

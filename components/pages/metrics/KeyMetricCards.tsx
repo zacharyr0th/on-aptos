@@ -3,8 +3,8 @@
 import { Activity, Clock, DollarSign, Zap } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useKeyMetrics } from "@/hooks/useKeyMetrics";
-import { useMetricsData } from "@/hooks/useMetricsData";
+import { useKeyMetrics } from "@/lib/hooks/useKeyMetrics";
+import { useMetricsData } from "@/lib/hooks/useMetricsData";
 
 // Helper function to safely format numbers
 const safeToFixed = (value: any, decimals: number = 0): string => {

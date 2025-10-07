@@ -55,7 +55,7 @@ import type { YieldTableProps as BaseYieldTableProps } from "@/lib/types/ui";
 import { cn } from "@/lib/utils";
 import { logger } from "@/lib/utils/core/logger";
 import { safeWindowOpen } from "@/lib/utils/core/security";
-import { formatCurrency, formatPercentage } from "@/lib/utils/format";
+import { formatCurrency, formatPercentage } from "@/lib/utils/format/format";
 
 interface YieldTableProps extends BaseYieldTableProps {
   // walletAddress, limit, and compact are inherited from BaseYieldTableProps
@@ -247,7 +247,7 @@ export function YieldTable({ walletAddress, limit, compact = false }: YieldTable
 
       // Filter out Tortuga opportunities and sort by TVL (highest first)
       const filteredOpps = allOpps
-        .filter((opp) => !opp.protocol.toLowerCase().includes('tortuga'))
+        .filter((opp) => !opp.protocol.toLowerCase().includes("tortuga"))
         .sort((a, b) => b.tvl - a.tvl);
 
       setOpportunities(filteredOpps);
@@ -267,15 +267,14 @@ export function YieldTable({ walletAddress, limit, compact = false }: YieldTable
     let filtered = [...opportunities];
 
     if (selectedProtocol !== "all") {
-      filtered = filtered.filter((o) =>
-        getProtocolDisplayName(o.protocol).toLowerCase() === selectedProtocol
+      filtered = filtered.filter(
+        (o) => getProtocolDisplayName(o.protocol).toLowerCase() === selectedProtocol
       );
     }
 
     if (selectedAsset !== "all") {
-      filtered = filtered.filter((o) =>
-        o.assetSymbol === selectedAsset ||
-        o.pairedAssetSymbol === selectedAsset
+      filtered = filtered.filter(
+        (o) => o.assetSymbol === selectedAsset || o.pairedAssetSymbol === selectedAsset
       );
     }
 
@@ -351,37 +350,37 @@ export function YieldTable({ walletAddress, limit, compact = false }: YieldTable
 
     // Explicit mappings for specific assets
     const explicitMappings: Record<string, string> = {
-      'TRUAPT': 'truAPT',
-      'AMAPT': 'amAPT',
-      'STAPT': 'stAPT',
-      'KAPT': 'kAPT',
-      'THAPT': 'thAPT',
-      'STKAPT': 'stkAPT',
-      'SUSDE': 'sUSDe',
-      'USDE': 'USDe',
-      'USDT': 'USDt',
-      'USDC': 'USDC',
-      'ZUSDT': 'zUSDt',
-      'ZUSDC': 'zUSDC',
-      'ZWETH': 'zWETH',
-      'USD1': 'USD1',
-      'APT': 'APT',
-      'MOD': 'MOD',
-      'XBTC': 'xBTC',
-      'SBTC': 'sBTC',
-      'BRBTC': 'brBTC',
-      'FIABTC': 'fiaBTC',
-      'UNIBTC': 'uniBTC',
-      'ABTC': 'aBTC',
-      'BTC': 'BTC',
-      'ETH': 'ETH',
-      'WETH': 'WETH',
-      'DAI': 'DAI',
-      'WBTC': 'WBTC',
-      'THL': 'THL',
-      'USDA': 'USDA',
-      'USDY': 'USDY',
-      'MKLP': 'MKLP',
+      TRUAPT: "truAPT",
+      AMAPT: "amAPT",
+      STAPT: "stAPT",
+      KAPT: "kAPT",
+      THAPT: "thAPT",
+      STKAPT: "stkAPT",
+      SUSDE: "sUSDe",
+      USDE: "USDe",
+      USDT: "USDt",
+      USDC: "USDC",
+      ZUSDT: "zUSDt",
+      ZUSDC: "zUSDC",
+      ZWETH: "zWETH",
+      USD1: "USD1",
+      APT: "APT",
+      MOD: "MOD",
+      XBTC: "xBTC",
+      SBTC: "sBTC",
+      BRBTC: "brBTC",
+      FIABTC: "fiaBTC",
+      UNIBTC: "uniBTC",
+      ABTC: "aBTC",
+      BTC: "BTC",
+      ETH: "ETH",
+      WETH: "WETH",
+      DAI: "DAI",
+      WBTC: "WBTC",
+      THL: "THL",
+      USDA: "USDA",
+      USDY: "USDY",
+      MKLP: "MKLP",
     };
 
     // Check explicit mappings first
@@ -405,9 +404,20 @@ export function YieldTable({ walletAddress, limit, compact = false }: YieldTable
   const { topAssets, dropdownAssets } = React.useMemo(() => {
     // Priority assets to show as buttons (in order)
     const priorityAssets = [
-      'all', 'APT', 'STAPT', 'THAPT', 'KAPT',
-      'WBTC', 'XBTC', 'FIABTC', 'ABTC', 'BRBTC',
-      'USDT', 'USDC', 'SUSDE', 'USD1'
+      "all",
+      "APT",
+      "STAPT",
+      "THAPT",
+      "KAPT",
+      "WBTC",
+      "XBTC",
+      "FIABTC",
+      "ABTC",
+      "BRBTC",
+      "USDT",
+      "USDC",
+      "SUSDE",
+      "USD1",
     ];
 
     const allAssets = Object.entries(assetCounts)
@@ -420,12 +430,14 @@ export function YieldTable({ walletAddress, limit, compact = false }: YieldTable
 
     // Separate priority assets and others
     const topAssets = priorityAssets
-      .map(priority => allAssets.find(asset => asset.value === priority))
-      .filter((asset): asset is { value: string; label: string; count: number } => asset !== undefined);
+      .map((priority) => allAssets.find((asset) => asset.value === priority))
+      .filter(
+        (asset): asset is { value: string; label: string; count: number } => asset !== undefined
+      );
 
     // Remaining assets sorted by count for dropdown
     const dropdownAssets = allAssets
-      .filter(asset => !priorityAssets.includes(asset.value))
+      .filter((asset) => !priorityAssets.includes(asset.value))
       .sort((a, b) => b.count - a.count);
 
     return { topAssets, dropdownAssets };
@@ -449,7 +461,7 @@ export function YieldTable({ walletAddress, limit, compact = false }: YieldTable
           count,
         }))
         .sort((a, b) => b.count - a.count)
-        .slice(0, 6)
+        .slice(0, 6),
     ];
   }, [opportunities]);
 
@@ -494,7 +506,10 @@ export function YieldTable({ walletAddress, limit, compact = false }: YieldTable
                   }}
                 />
               ) : null}
-              <div className="rounded-full p-2 bg-muted flex-shrink-0" style={{ display: logoPath ? 'none' : 'flex' }}>
+              <div
+                className="rounded-full p-2 bg-muted flex-shrink-0"
+                style={{ display: logoPath ? "none" : "flex" }}
+              >
                 <TypeIcon className="h-4 w-4 text-muted-foreground" />
               </div>
               <div className="min-w-0 flex-1">
@@ -761,9 +776,7 @@ export function YieldTable({ walletAddress, limit, compact = false }: YieldTable
               ))}
             </SelectContent>
           </Select>
-
         </div>
-
       </div>
 
       {/* Filter Buttons */}
@@ -786,7 +799,7 @@ export function YieldTable({ walletAddress, limit, compact = false }: YieldTable
                 {option.label} ({option.count})
               </Button>
               {/* Add dividers after kAPT and brBTC */}
-              {(option.value === 'KAPT' || option.value === 'BRBTC') && (
+              {(option.value === "KAPT" || option.value === "BRBTC") && (
                 <div className="h-6 w-px bg-border" />
               )}
             </React.Fragment>
@@ -831,7 +844,10 @@ export function YieldTable({ walletAddress, limit, compact = false }: YieldTable
                             }}
                           />
                         ) : null}
-                        <div className="rounded-full p-2 bg-muted flex-shrink-0 w-10 h-10 items-center justify-center" style={{ display: logoPath ? 'none' : 'flex' }}>
+                        <div
+                          className="rounded-full p-2 bg-muted flex-shrink-0 w-10 h-10 items-center justify-center"
+                          style={{ display: logoPath ? "none" : "flex" }}
+                        >
                           <TypeIcon className="h-5 w-5 text-muted-foreground" />
                         </div>
                         <div className="flex-1 min-w-0 py-1">

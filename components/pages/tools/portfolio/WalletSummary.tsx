@@ -5,7 +5,7 @@ import { useTheme } from "next-themes";
 import React, { lazy, Suspense, useCallback, useMemo } from "react";
 import { LoadingSkeleton, NFTTreemapSkeleton } from "@/components/shared/pages";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { formatCurrency } from "@/lib/utils/format";
+import { formatCurrency } from "@/lib/utils/format/format";
 import { logger } from "@/lib/utils/core/logger";
 import {
   CHART_COLORS_DARK,

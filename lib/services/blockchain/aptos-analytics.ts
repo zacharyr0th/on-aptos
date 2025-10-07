@@ -36,7 +36,7 @@
  */
 
 import { logger } from "@/lib/utils/core/logger";
-import { SimpleCache } from "@/lib/utils/simple-cache";
+import { SimpleCache } from "@/lib/utils/cache/simple-cache";
 
 const APTOS_ANALYTICS_BASE_URL = "https://api.mainnet.aptoslabs.com/v1/analytics";
 

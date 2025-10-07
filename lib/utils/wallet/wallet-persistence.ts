@@ -3,10 +3,10 @@
  * Maintains wallet connection state across browser sessions
  */
 
-import { AptosWalletType } from './multi-wallet';
+import { AptosWalletType } from "./multi-wallet";
 
 export interface WalletConnectionState {
-  walletType: AptosWalletType | 'mobile-petra';
+  walletType: AptosWalletType | "mobile-petra";
   address: string;
   publicKey: string;
   connectedAt: number;
@@ -14,14 +14,16 @@ export interface WalletConnectionState {
   network?: string;
 }
 
-const STORAGE_KEY = 'aptos_wallet_connection_state';
+const STORAGE_KEY = "aptos_wallet_connection_state";
 const SESSION_TIMEOUT = 7 * 24 * 60 * 60 * 1000; // 7 days
 
 /**
  * Save wallet connection state
  */
-export function saveWalletConnection(state: Omit<WalletConnectionState, 'connectedAt' | 'lastActiveAt'>): void {
-  if (typeof window === 'undefined') return;
+export function saveWalletConnection(
+  state: Omit<WalletConnectionState, "connectedAt" | "lastActiveAt">
+): void {
+  if (typeof window === "undefined") return;
 
   const fullState: WalletConnectionState = {
     ...state,
@@ -32,7 +34,7 @@ export function saveWalletConnection(state: Omit<WalletConnectionState, 'connect
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(fullState));
   } catch (error) {
-    console.error('Failed to save wallet connection state:', error);
+    console.error("Failed to save wallet connection state:", error);
   }
 }
 
@@ -40,7 +42,7 @@ export function saveWalletConnection(state: Omit<WalletConnectionState, 'connect
  * Load wallet connection state
  */
 export function loadWalletConnection(): WalletConnectionState | null {
-  if (typeof window === 'undefined') return null;
+  if (typeof window === "undefined") return null;
 
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
@@ -57,7 +59,7 @@ export function loadWalletConnection(): WalletConnectionState | null {
 
     return state;
   } catch (error) {
-    console.error('Failed to load wallet connection state:', error);
+    console.error("Failed to load wallet connection state:", error);
     return null;
   }
 }
@@ -66,7 +68,7 @@ export function loadWalletConnection(): WalletConnectionState | null {
  * Update last active timestamp
  */
 export function updateLastActive(): void {
-  if (typeof window === 'undefined') return;
+  if (typeof window === "undefined") return;
 
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
@@ -77,7 +79,7 @@ export function updateLastActive(): void {
 
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   } catch (error) {
-    console.error('Failed to update last active timestamp:', error);
+    console.error("Failed to update last active timestamp:", error);
   }
 }
 
@@ -85,12 +87,12 @@ export function updateLastActive(): void {
  * Clear wallet connection state
  */
 export function clearWalletConnection(): void {
-  if (typeof window === 'undefined') return;
+  if (typeof window === "undefined") return;
 
   try {
     localStorage.removeItem(STORAGE_KEY);
   } catch (error) {
-    console.error('Failed to clear wallet connection state:', error);
+    console.error("Failed to clear wallet connection state:", error);
   }
 }
 
@@ -104,7 +106,7 @@ export function hasSavedConnection(): boolean {
 /**
  * Get saved wallet type
  */
-export function getSavedWalletType(): AptosWalletType | 'mobile-petra' | null {
+export function getSavedWalletType(): AptosWalletType | "mobile-petra" | null {
   const state = loadWalletConnection();
   return state?.walletType || null;
 }
@@ -121,7 +123,7 @@ export function getSavedWalletAddress(): string | null {
  * Update wallet network
  */
 export function updateWalletNetwork(network: string): void {
-  if (typeof window === 'undefined') return;
+  if (typeof window === "undefined") return;
 
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
@@ -133,7 +135,7 @@ export function updateWalletNetwork(network: string): void {
 
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   } catch (error) {
-    console.error('Failed to update wallet network:', error);
+    console.error("Failed to update wallet network:", error);
   }
 }
 
@@ -141,7 +143,7 @@ export function updateWalletNetwork(network: string): void {
  * React hook for wallet persistence
  */
 export function useWalletPersistence() {
-  if (typeof window === 'undefined') {
+  if (typeof window === "undefined") {
     return {
       saveConnection: () => {},
       loadConnection: () => null,
@@ -153,7 +155,7 @@ export function useWalletPersistence() {
     };
   }
 
-  const saveConnection = (state: Omit<WalletConnectionState, 'connectedAt' | 'lastActiveAt'>) => {
+  const saveConnection = (state: Omit<WalletConnectionState, "connectedAt" | "lastActiveAt">) => {
     saveWalletConnection(state);
   };
 
@@ -185,11 +187,11 @@ export function useWalletPersistence() {
  */
 export async function attemptAutoReconnect(
   connectFunction: (walletType: any) => Promise<any>
-): Promise<{ success: boolean; walletType?: AptosWalletType | 'mobile-petra'; error?: string }> {
+): Promise<{ success: boolean; walletType?: AptosWalletType | "mobile-petra"; error?: string }> {
   const savedState = loadWalletConnection();
 
   if (!savedState) {
-    return { success: false, error: 'No saved connection' };
+    return { success: false, error: "No saved connection" };
   }
 
   try {
@@ -200,7 +202,7 @@ export async function attemptAutoReconnect(
     clearWalletConnection();
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to reconnect',
+      error: error instanceof Error ? error.message : "Failed to reconnect",
     };
   }
 }

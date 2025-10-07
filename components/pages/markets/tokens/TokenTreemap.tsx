@@ -15,7 +15,7 @@ import {
   formatNumber,
   formatPercentage,
   formatTokenPrice,
-} from "@/lib/utils/format";
+} from "@/lib/utils/format/format";
 
 interface TokenTreemapProps {
   tokens: TokenData[];
@@ -78,7 +78,6 @@ export function TokenTreemap({ tokens }: TokenTreemapProps) {
 
   return (
     <div className="w-full">
-
       {/* Selected Token Details Row */}
       {selectedToken && (
         <div className="mb-4 p-4 bg-neutral-50 dark:bg-neutral-900/50 rounded-lg border">
@@ -163,7 +162,9 @@ export function TokenTreemap({ tokens }: TokenTreemapProps) {
                   )}
                   <div>
                     <p className="text-xs text-muted-foreground">Market Share</p>
-                    <p className="font-medium font-mono">{formatPercentage(selectedToken.percentage)}%</p>
+                    <p className="font-medium font-mono">
+                      {formatPercentage(selectedToken.percentage)}%
+                    </p>
                   </div>
                 </div>
               </div>
@@ -228,7 +229,9 @@ const TreemapTooltip = ({ active, payload }: any) => {
         </div>
         <div className="flex justify-between text-xs">
           <span className="text-neutral-600 dark:text-neutral-400">FDV:</span>
-          <span className="font-medium font-mono">{formatCurrency(data.fdv, "USD", { compact: true })}</span>
+          <span className="font-medium font-mono">
+            {formatCurrency(data.fdv, "USD", { compact: true })}
+          </span>
         </div>
         {data.marketCap && (
           <div className="flex justify-between text-xs">

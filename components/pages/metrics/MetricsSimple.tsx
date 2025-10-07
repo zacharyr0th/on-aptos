@@ -13,13 +13,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useMetricsData } from "@/hooks/useMetricsData";
-import AdvancedBlockchainAnalytics from "./AdvancedBlockchainAnalytics";
-import ComprehensiveAnalytics from "./ComprehensiveAnalytics";
-import FocusedDashboards from "./FocusedDashboards";
-import IntelligentAnalysis from "./IntelligentAnalysis";
+import { useMetricsData } from "@/lib/hooks/useMetricsData";
 import KeyMetricCards from "./KeyMetricCards";
-import SimpleDataDisplay from "./SimpleDataDisplay";
 
 export default function MetricsPage(): React.ReactElement {
   const { tableData, metrics, loading: metricsLoading, error } = useMetricsData();

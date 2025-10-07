@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTableState } from "@/lib/hooks/tables/useTableState";
 import { cn } from "@/lib/utils";
-import { formatCurrency, formatTokenAmount } from "@/lib/utils/format";
+import { formatCurrency, formatTokenAmount } from "@/lib/utils/format/format";
 import { ASSET_TABLE_COLUMNS, DEFI_TABLE_COLUMNS } from "@/lib/utils/tables/table-configs";
 import {
   renderAssetLogo,

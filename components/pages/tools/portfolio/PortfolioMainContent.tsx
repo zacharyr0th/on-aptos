@@ -22,7 +22,7 @@ import {
   sanitizeNFTMetadata,
   sanitizeText,
 } from "@/lib/utils/core/security";
-import { formatCurrency, formatTokenAmount } from "@/lib/utils/format";
+import { formatCurrency, formatTokenAmount } from "@/lib/utils/format/format";
 import { getTokenLogoUrlWithFallbackSync } from "@/lib/utils/token/token-utils";
 import { NFTSummaryView } from "./SummaryViews";
 import {

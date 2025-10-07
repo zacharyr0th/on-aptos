@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { Tooltip as RechartsTooltip, ResponsiveContainer, Treemap } from "recharts";
-import { formatCurrency, formatTokenAmount } from "@/lib/utils/format";
+import { formatCurrency, formatTokenAmount } from "@/lib/utils/format/format";
 import type { FungibleAsset } from "./PortfolioMetrics";
 import { TokenImage } from "./SmartImage";
 
@@ -52,14 +52,10 @@ export const TokenDetails = React.memo(
   }) => {
     const stats = useMemo(
       () => ({
-        balance: formatTokenAmount(
-          Number(asset.balance) || 0,
-          String(asset.metadata?.decimals || 8),
-          {
-            showSymbol: true,
-            useCompact: true,
-          }
-        ),
+        balance: formatTokenAmount(Number(asset.balance) || 0, asset.metadata?.decimals || 8, {
+          showSymbol: true,
+          useCompact: true,
+        }),
         value: formatCurrency(asset.value || 0),
         price: formatCurrency(asset.price || 0),
         percentage: totalValue > 0 ? (((asset.value || 0) / totalValue) * 100).toFixed(1) : "0",

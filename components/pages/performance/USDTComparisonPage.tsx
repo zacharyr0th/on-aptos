@@ -119,14 +119,16 @@ const USDTComparisonPage = memo(function USDTComparisonPage() {
       let badgeElement = null;
 
       if (item.isLowest) {
-        cardClasses = "border-emerald-300 bg-emerald-50 dark:border-emerald-800/50 dark:bg-emerald-950/5";
+        cardClasses =
+          "border-emerald-300 bg-emerald-50 dark:border-emerald-800/50 dark:bg-emerald-950/5";
         valueTextClasses = "text-emerald-800 dark:text-emerald-500";
       } else if (costComparison) {
         const { multiplier, severity } = costComparison;
 
         switch (severity) {
           case "moderate":
-            cardClasses = "border-amber-300 bg-amber-50 dark:border-amber-800/40 dark:bg-amber-950/5";
+            cardClasses =
+              "border-amber-300 bg-amber-50 dark:border-amber-800/40 dark:bg-amber-950/5";
             valueTextClasses = "text-amber-800 dark:text-amber-600";
             badgeElement = (
               <div className="bg-amber-200 dark:bg-amber-900/20 text-amber-900 dark:text-amber-500 px-1.5 py-0.5 rounded text-xs font-medium">
@@ -135,7 +137,8 @@ const USDTComparisonPage = memo(function USDTComparisonPage() {
             );
             break;
           case "severe":
-            cardClasses = "border-orange-300 bg-orange-50 dark:border-orange-800/40 dark:bg-orange-950/5";
+            cardClasses =
+              "border-orange-300 bg-orange-50 dark:border-orange-800/40 dark:bg-orange-950/5";
             valueTextClasses = "text-orange-800 dark:text-orange-600";
             badgeElement = (
               <div className="bg-orange-200 dark:bg-orange-900/20 text-orange-900 dark:text-orange-500 px-1.5 py-0.5 rounded text-xs font-medium">
@@ -187,7 +190,9 @@ const USDTComparisonPage = memo(function USDTComparisonPage() {
                   <h1 className="text-lg sm:text-2xl lg:text-3xl font-bold">
                     {/* Desktop version */}
                     <div className="hidden sm:flex items-center gap-3">
-                      <span className="break-words">Aptos is the Most Cost-Effective Blockchain for USDt</span>
+                      <span className="break-words">
+                        Aptos is the Most Cost-Effective Blockchain for USDt
+                      </span>
                       <Image
                         src="/icons/stables/usdt.png"
                         alt="USDt"
@@ -198,7 +203,9 @@ const USDTComparisonPage = memo(function USDTComparisonPage() {
                     </div>
                     {/* Mobile version */}
                     <div className="sm:hidden">
-                      <span className="break-words">Aptos is Most Cost-Effective Blockchain for P2P USDt Transfers</span>
+                      <span className="break-words">
+                        Aptos is Most Cost-Effective Blockchain for P2P USDt Transfers
+                      </span>
                     </div>
                   </h1>
                 </div>
@@ -247,11 +254,17 @@ const USDTComparisonPage = memo(function USDTComparisonPage() {
                     <div className="w-full lg:w-2/5 flex flex-col order-2 lg:order-1">
                       {/* Tabs positioned above cards only */}
                       <TabsList className="grid w-full grid-cols-2 mb-4">
-                        <TabsTrigger value="performance" className="text-xs sm:text-sm px-2 sm:px-3">
+                        <TabsTrigger
+                          value="performance"
+                          className="text-xs sm:text-sm px-2 sm:px-3"
+                        >
                           <span className="hidden sm:inline">Chain Performance</span>
                           <span className="sm:hidden">Performance</span>
                         </TabsTrigger>
-                        <TabsTrigger value="usdt" className="text-xs sm:text-sm px-2 sm:px-3 flex items-center gap-1">
+                        <TabsTrigger
+                          value="usdt"
+                          className="text-xs sm:text-sm px-2 sm:px-3 flex items-center gap-1"
+                        >
                           <span className="hidden sm:inline">USDt Comparison</span>
                           <span className="sm:hidden flex items-center gap-1">
                             <Image
@@ -287,19 +300,19 @@ const USDTComparisonPage = memo(function USDTComparisonPage() {
                               <Check className="absolute top-2 right-2 sm:top-3 sm:right-3 h-3 w-3 sm:h-4 sm:w-4 text-green-600 dark:text-green-400" />
                             )}
 
-                            <div className={`text-lg sm:text-xl xl:text-2xl font-bold font-mono mb-1 sm:mb-2 leading-tight break-words ${item.isLowest ? "text-primary" : valueTextClasses || "text-muted-foreground"}`}>
+                            <div
+                              className={`text-lg sm:text-xl xl:text-2xl font-bold font-mono mb-1 sm:mb-2 leading-tight break-words ${item.isLowest ? "text-primary" : valueTextClasses || "text-muted-foreground"}`}
+                            >
                               {item.cost}
                             </div>
-                            
+
                             <div className="font-medium text-xs sm:text-sm text-muted-foreground flex items-center justify-center gap-1 leading-relaxed">
                               <span className="truncate max-w-full px-1">{item.chain}</span>
                             </div>
-                            
+
                             {/* Badge below the chain name */}
                             {badgeElement && (
-                              <div className="mt-1 flex justify-center">
-                                {badgeElement}
-                              </div>
+                              <div className="mt-1 flex justify-center">{badgeElement}</div>
                             )}
                           </div>
                         ))}

@@ -89,12 +89,10 @@ export function DeveloperResourcesSection() {
   return (
     <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       <div className="text-center mb-12">
-        <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
-          For Developers
-        </h2>
+        <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">For Developers</h2>
         <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-          Build safer, faster apps with Move. Access open-source tools, APIs, and
-          comprehensive guides to launch in days, not months.
+          Build safer, faster apps with Move. Access open-source tools, APIs, and comprehensive
+          guides to launch in days, not months.
         </p>
       </div>
 
@@ -112,10 +110,7 @@ export function DeveloperResourcesSection() {
               {developerTools.map((tool) => {
                 const Icon = tool.icon;
                 return (
-                  <Card
-                    key={tool.name}
-                    className="p-5 hover:shadow-md transition-shadow"
-                  >
+                  <Card key={tool.name} className="p-5 hover:shadow-md transition-shadow">
                     <div className="flex items-start gap-3">
                       <div className="p-2 bg-primary/10 rounded-lg shrink-0">
                         <Icon className="size-5 text-primary" />
@@ -132,9 +127,7 @@ export function DeveloperResourcesSection() {
                             <ExternalLink className="size-4" />
                           </a>
                         </h3>
-                        <p className="text-sm text-muted-foreground">
-                          {tool.description}
-                        </p>
+                        <p className="text-sm text-muted-foreground">{tool.description}</p>
                       </div>
                     </div>
                   </Card>
@@ -157,10 +150,7 @@ export function DeveloperResourcesSection() {
               {documentation.map((doc) => {
                 const Icon = doc.icon;
                 return (
-                  <Card
-                    key={doc.name}
-                    className="p-5 hover:shadow-md transition-shadow"
-                  >
+                  <Card key={doc.name} className="p-5 hover:shadow-md transition-shadow">
                     <div className="flex flex-col gap-3">
                       <div className="flex items-center justify-between">
                         <div className="p-2 bg-primary/10 rounded-lg">
@@ -182,9 +172,7 @@ export function DeveloperResourcesSection() {
                             <ExternalLink className="size-4" />
                           </a>
                         </h3>
-                        <p className="text-sm text-muted-foreground">
-                          {doc.description}
-                        </p>
+                        <p className="text-sm text-muted-foreground">{doc.description}</p>
                       </div>
                     </div>
                   </Card>
@@ -200,16 +188,12 @@ export function DeveloperResourcesSection() {
         <Card className="p-8 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
           <h3 className="text-2xl font-bold mb-3">Ready to Start Building?</h3>
           <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
-            Move makes it safe to build scalable apps. Check out the docs and start
-            developing today!
+            Move makes it safe to build scalable apps. Check out the docs and start developing
+            today!
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" asChild>
-              <a
-                href="https://aptos.dev/"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <a href="https://aptos.dev/" target="_blank" rel="noopener noreferrer">
                 <BookOpen className="mr-2 size-5" />
                 View Documentation
               </a>

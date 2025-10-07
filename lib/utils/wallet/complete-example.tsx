@@ -3,34 +3,29 @@
  * Shows how to use all the new features together
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import {
   // Multi-wallet support
   AptosWalletType,
   detectAvailableWallets,
   connectToWallet,
   disconnectWallet,
-
   // Persistence
   useWalletPersistence,
   attemptAutoReconnect,
   saveWalletConnection,
-
   // Mobile deep linking
   usePetraMobileWallet,
   isMobileDevice,
-
   // Transactions
   signAndSubmitTransaction,
   createCoinTransferTransaction,
-
   // Error handling
   useWalletToast,
   handlePetraError,
-
   // Event listeners
   setupPetraEventListeners,
-} from '@/lib/utils/wallet';
+} from "@/lib/utils/wallet";
 
 export function CompleteWalletExample() {
   const [walletType, setWalletType] = useState<AptosWalletType | null>(null);
@@ -55,15 +50,15 @@ export function CompleteWalletExample() {
   useEffect(() => {
     const autoConnect = async () => {
       if (persistence.hasSaved && persistence.savedWalletType) {
-        showInfo('Reconnecting...', 'Attempting to reconnect to your wallet');
+        showInfo("Reconnecting...", "Attempting to reconnect to your wallet");
 
-        if (persistence.savedWalletType === 'mobile-petra') {
+        if (persistence.savedWalletType === "mobile-petra") {
           // Mobile Petra auto-reconnect
           if (petraMobile.isConnected) {
-            setWalletType('mobile-petra' as any);
+            setWalletType("mobile-petra" as any);
             setAddress(petraMobile.address);
             setIsConnected(true);
-            showSuccess('Reconnected!', 'Your wallet has been reconnected');
+            showSuccess("Reconnected!", "Your wallet has been reconnected");
           }
         } else {
           // Desktop wallet auto-reconnect
@@ -75,9 +70,9 @@ export function CompleteWalletExample() {
             setWalletType(result.walletType as AptosWalletType);
             setAddress(persistence.savedAddress);
             setIsConnected(true);
-            showSuccess('Reconnected!', 'Your wallet has been reconnected');
+            showSuccess("Reconnected!", "Your wallet has been reconnected");
           } else {
-            showError(result.error, 'Reconnection Failed');
+            showError(result.error, "Reconnection Failed");
           }
         }
       }
@@ -95,17 +90,17 @@ export function CompleteWalletExample() {
         listeners.onAccountChange((account) => {
           if (account) {
             setAddress(account.address);
-            showInfo('Account Changed', `Switched to ${account.address.slice(0, 10)}...`);
+            showInfo("Account Changed", `Switched to ${account.address.slice(0, 10)}...`);
           }
         });
 
         listeners.onNetworkChange((network) => {
-          showInfo('Network Changed', `Switched to ${network}`);
+          showInfo("Network Changed", `Switched to ${network}`);
         });
 
         listeners.onDisconnect(() => {
           handleDisconnect();
-          showInfo('Disconnected', 'Your wallet has been disconnected');
+          showInfo("Disconnected", "Your wallet has been disconnected");
         });
       }
     }
@@ -116,9 +111,9 @@ export function CompleteWalletExample() {
     if (petraMobile.onTransactionResult) {
       petraMobile.onTransactionResult((result) => {
         if (result.approved) {
-          showSuccess('Transaction Approved!', 'Your transaction was signed successfully');
+          showSuccess("Transaction Approved!", "Your transaction was signed successfully");
         } else {
-          showError('Transaction Rejected', 'You rejected the transaction');
+          showError("Transaction Rejected", "You rejected the transaction");
         }
       });
     }
@@ -138,24 +133,24 @@ export function CompleteWalletExample() {
         publicKey: result.publicKey,
       });
 
-      showSuccess('Connected!', `Connected to ${selectedWalletType}`);
+      showSuccess("Connected!", `Connected to ${selectedWalletType}`);
     } catch (error) {
-      showError(error, 'Connection Failed');
+      showError(error, "Connection Failed");
     }
   };
 
   const handleMobileConnect = () => {
     try {
       petraMobile.connect();
-      showInfo('Opening Petra...', 'Approve the connection in Petra app');
+      showInfo("Opening Petra...", "Approve the connection in Petra app");
     } catch (error) {
-      showError(error, 'Connection Failed');
+      showError(error, "Connection Failed");
     }
   };
 
   const handleDisconnect = async () => {
     try {
-      if (walletType && walletType !== 'mobile-petra' as any) {
+      if (walletType && walletType !== ("mobile-petra" as any)) {
         await disconnectWallet(walletType);
       } else {
         petraMobile.disconnect();
@@ -166,30 +161,30 @@ export function CompleteWalletExample() {
       setIsConnected(false);
       persistence.clearConnection();
 
-      showSuccess('Disconnected', 'Your wallet has been disconnected');
+      showSuccess("Disconnected", "Your wallet has been disconnected");
     } catch (error) {
-      showError(error, 'Disconnection Failed');
+      showError(error, "Disconnection Failed");
     }
   };
 
   const handleSendAPT = async () => {
     try {
-      const recipient = '0x0000000000000000000000000000000000000000000000000000000000000001';
+      const recipient = "0x0000000000000000000000000000000000000000000000000000000000000001";
       const amount = 10000000; // 0.1 APT
 
       if (isMobileDevice() && petraMobile.isConnected) {
         // Mobile transaction
         const tx = createCoinTransferTransaction(recipient, amount);
         await petraMobile.signAndSubmitTransaction(tx);
-        showInfo('Transaction Sent', 'Waiting for approval in Petra app...');
+        showInfo("Transaction Sent", "Waiting for approval in Petra app...");
       } else {
         // Desktop transaction
         const tx = createCoinTransferTransaction(recipient, amount);
         const pending = await signAndSubmitTransaction(tx);
-        showSuccess('Transaction Submitted!', `Hash: ${pending.hash.slice(0, 10)}...`);
+        showSuccess("Transaction Submitted!", `Hash: ${pending.hash.slice(0, 10)}...`);
       }
     } catch (error) {
-      showError(error, 'Transaction Failed');
+      showError(error, "Transaction Failed");
     }
   };
 
@@ -200,9 +195,13 @@ export function CompleteWalletExample() {
       {/* Connection Status */}
       <div className="p-4 border rounded-lg">
         <h3 className="font-semibold mb-2">Connection Status</h3>
-        <p>Connected: {isConnected ? 'Yes' : 'No'}</p>
+        <p>Connected: {isConnected ? "Yes" : "No"}</p>
         {walletType && <p>Wallet: {walletType}</p>}
-        {address && <p>Address: {address.slice(0, 10)}...{address.slice(-4)}</p>}
+        {address && (
+          <p>
+            Address: {address.slice(0, 10)}...{address.slice(-4)}
+          </p>
+        )}
       </div>
 
       {/* Connect Buttons */}

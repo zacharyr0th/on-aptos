@@ -24,7 +24,7 @@ import { useBitcoinPrice } from "@/lib/hooks/useMarketPrice";
 import { usePageTranslation } from "@/lib/hooks/useTranslation";
 import { copyToClipboard } from "@/lib/utils/clipboard";
 import { logger } from "@/lib/utils/core/logger";
-import { formatAmount, formatAmountFull, formatCurrency } from "@/lib/utils/format";
+import { formatAmount, formatAmountFull, formatCurrency } from "@/lib/utils/format/format";
 import { getTokenIcon, truncateAddress } from "./shared";
 import { ChartDataItem, type Token } from "./types";
 

@@ -457,17 +457,9 @@ export function withAPIHandler<T>(
 
 // ===== ERROR HANDLING UTILITIES =====
 
-// Define a simple ApiError class for backward compatibility
-export class ApiError extends Error {
-  constructor(
-    message: string,
-    public code: string = "UNKNOWN_ERROR",
-    public statusCode: number = 500
-  ) {
-    super(message);
-    this.name = "ApiError";
-  }
-}
+// Re-export ApiError from core/errors.ts for backward compatibility
+import { ApiError } from "@/lib/utils/core/errors";
+export { ApiError };
 
 /**
  * Log error with context

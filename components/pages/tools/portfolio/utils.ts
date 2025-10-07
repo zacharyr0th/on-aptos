@@ -14,7 +14,7 @@ export const cleanProtocolName = (name: string): string => {
 export { getProtocolLogo } from "@/lib/constants/protocols/protocol-logos";
 
 // Import date formatting from centralized utilities
-import { formatDate } from "@/lib/utils/format";
+import { formatDate } from "@/lib/utils/format/format";
 
 export const formatTimestamp = (timestamp: string | undefined) => {
   if (!timestamp) return "Unknown";

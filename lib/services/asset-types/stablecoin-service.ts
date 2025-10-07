@@ -9,7 +9,7 @@ import {
 } from "@/lib/constants";
 import { TETHER_RESERVES } from "@/lib/constants/tokens/addresses";
 import { logger } from "@/lib/utils/core/logger";
-import { formatBigIntWithDecimals } from "@/lib/utils/format";
+import { formatBigIntWithDecimals } from "@/lib/utils/format/format";
 import type {
   BridgedCoinConfig,
   CoinBalanceResponse,

@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { formatCurrency, formatTokenAmount } from "@/lib/utils/format";
+import { formatCurrency, formatTokenAmount } from "@/lib/utils/format/format";
 import { getTokenLogoUrlWithFallbackSync } from "@/lib/utils/token/token-utils";
 
 import { cleanProtocolName, getDetailedProtocolInfo } from "./shared/PortfolioMetrics";
@@ -301,10 +301,8 @@ export const AssetsTable = (props: any) => {
       </TableRow>
       {showDivider && (
         <TableRow className="h-0">
-          <TableCell colSpan={4} className="p-0 sm:table-cell border-t">
-          </TableCell>
-          <TableCell colSpan={3} className="p-0 table-cell sm:hidden border-t">
-          </TableCell>
+          <TableCell colSpan={4} className="p-0 sm:table-cell border-t"></TableCell>
+          <TableCell colSpan={3} className="p-0 table-cell sm:hidden border-t"></TableCell>
         </TableRow>
       )}
     </React.Fragment>

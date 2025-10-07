@@ -10,31 +10,31 @@ import { navigationSections } from "@/components/landing/data/landing-data";
 // Dynamic imports for code splitting - hero loads immediately, rest are lazy
 const HeroSection = dynamic(() => import("@/components/landing/sections/HeroSection"));
 const WhyAptosSection = dynamic(() => import("@/components/landing/sections/WhyAptosSection"), {
-  loading: () => <div className="h-96 animate-pulse bg-muted/20" />
+  loading: () => <div className="h-96 animate-pulse bg-muted/20" />,
 });
-const GettingStartedSection = dynamic(() => import("@/components/landing/sections/GettingStartedSection"), {
-  loading: () => <div className="h-96 animate-pulse bg-muted/20" />
-});
-const BridgesSection = dynamic(() => import("@/components/landing/sections/BridgesSection"), {
-  loading: () => <div className="h-96 animate-pulse bg-muted/20" />
-});
+const GettingStartedSection = dynamic(
+  () => import("@/components/landing/sections/GettingStartedSection"),
+  {
+    loading: () => <div className="h-96 animate-pulse bg-muted/20" />,
+  }
+);
 const DefiSection = dynamic(() => import("@/components/landing/sections/DefiSection"), {
-  loading: () => <div className="h-96 animate-pulse bg-muted/20" />
+  loading: () => <div className="h-96 animate-pulse bg-muted/20" />,
 });
 const TokensSection = dynamic(() => import("@/components/landing/sections/TokensSection"), {
-  loading: () => <div className="h-96 animate-pulse bg-muted/20" />
+  loading: () => <div className="h-96 animate-pulse bg-muted/20" />,
 });
 const YieldSection = dynamic(() => import("@/components/landing/sections/YieldSection"), {
-  loading: () => <div className="h-64 animate-pulse bg-muted/20" />
+  loading: () => <div className="h-64 animate-pulse bg-muted/20" />,
 });
 const DevelopersSection = dynamic(() => import("@/components/landing/sections/DevelopersSection"), {
-  loading: () => <div className="h-96 animate-pulse bg-muted/20" />
+  loading: () => <div className="h-96 animate-pulse bg-muted/20" />,
 });
 const CommunitySection = dynamic(() => import("@/components/landing/sections/CommunitySection"), {
-  loading: () => <div className="h-96 animate-pulse bg-muted/20" />
+  loading: () => <div className="h-96 animate-pulse bg-muted/20" />,
 });
 const CTASection = dynamic(() => import("@/components/landing/sections/CTASection"), {
-  loading: () => <div className="h-64 animate-pulse bg-muted/20" />
+  loading: () => <div className="h-64 animate-pulse bg-muted/20" />,
 });
 
 export function OnboardingPage() {
@@ -60,7 +60,7 @@ export function OnboardingPage() {
 
     // Clear any hash in the URL
     if (window.location.hash) {
-      window.history.replaceState(null, '', window.location.pathname);
+      window.history.replaceState(null, "", window.location.pathname);
     }
   }, []);
 
@@ -72,7 +72,7 @@ export function OnboardingPage() {
       if (rafId !== null) return;
 
       rafId = requestAnimationFrame(() => {
-        const sections = navigationSections.map(section => document.getElementById(section.id));
+        const sections = navigationSections.map((section) => document.getElementById(section.id));
         const scrollPosition = window.scrollY + 200;
 
         for (let i = sections.length - 1; i >= 0; i--) {
@@ -84,7 +84,7 @@ export function OnboardingPage() {
             // Update URL hash without triggering scroll
             const newHash = `#${newSection}`;
             if (window.location.hash !== newHash) {
-              window.history.replaceState(null, '', newHash);
+              window.history.replaceState(null, "", newHash);
             }
             break;
           }
@@ -111,7 +111,7 @@ export function OnboardingPage() {
       // Fetch both APIs in parallel for faster loading
       const [tokensResponse, assetValuesResponse] = await Promise.all([
         fetch("/api/markets/tokens?limit=100&all=true"),
-        fetch("/api/defi/asset-values")
+        fetch("/api/defi/asset-values"),
       ]);
 
       // Process tokens
@@ -151,9 +151,12 @@ export function OnboardingPage() {
         const assetData = await assetValuesResponse.json();
         setAssetValues(assetData);
       } else {
-        console.error("Failed to fetch asset values:", assetValuesResponse.status, assetValuesResponse.statusText);
+        console.error(
+          "Failed to fetch asset values:",
+          assetValuesResponse.status,
+          assetValuesResponse.statusText
+        );
       }
-
     } catch (err) {
       console.error("Failed to fetch data:", err);
       setError(err instanceof Error ? err.message : "Failed to load data");
@@ -174,7 +177,7 @@ export function OnboardingPage() {
   };
 
   const stableTokens = useMemo(() => {
-    return tokens.filter(token => token.symbol !== "APT");
+    return tokens.filter((token) => token.symbol !== "APT");
   }, [tokens]);
 
   const displayMetrics = useMemo(() => {
@@ -270,7 +273,6 @@ export function OnboardingPage() {
         <WhyAptosSection />
         <GettingStartedSection />
         <DefiSection />
-        <BridgesSection />
         <TokensSection
           tokens={tokens}
           loadingTokens={loadingTokens}

@@ -5,7 +5,7 @@ import type React from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { formatCurrency } from "@/lib/utils/format";
+import { formatCurrency } from "@/lib/utils/format/format";
 
 // Reusable stat card component
 interface StatCardProps {
@@ -53,11 +53,7 @@ export const StatCard: React.FC<StatCardProps> = ({
   }
 
   if (variant === "bordered") {
-    return (
-      <div className={`p-3 sm:p-4 border-r last:border-r-0 ${className}`}>
-        {content}
-      </div>
-    );
+    return <div className={`p-3 sm:p-4 border-r last:border-r-0 ${className}`}>{content}</div>;
   }
 
   // Default card variant

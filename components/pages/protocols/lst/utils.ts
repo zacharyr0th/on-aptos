@@ -5,7 +5,7 @@ import {
   formatAmount,
   formatCurrency,
   formatNumber,
-} from "@/lib/utils/format";
+} from "@/lib/utils/format/format";
 
 // APT-specific amount formatters
 export function formatAPTAmount(amount: number): string {

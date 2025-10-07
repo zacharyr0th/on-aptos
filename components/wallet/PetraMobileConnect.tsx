@@ -43,7 +43,9 @@ export function usePetraMobileWallet(): PetraMobileWallet {
   const [sharedKey, setSharedKey] = useState<Uint8Array | null>(null);
   const [address, setAddress] = useState<string | null>(null);
   const [publicKey, setPublicKey] = useState<string | null>(null);
-  const [transactionCallback, setTransactionCallback] = useState<((result: any) => void) | null>(null);
+  const [transactionCallback, setTransactionCallback] = useState<((result: any) => void) | null>(
+    null
+  );
 
   // Load stored keys on mount
   useEffect(() => {
@@ -59,8 +61,8 @@ export function usePetraMobileWallet(): PetraMobileWallet {
       setIsConnected(true);
 
       // Try to load stored address and public key
-      const storedAddress = localStorage.getItem('petra_wallet_address');
-      const storedPublicKey = localStorage.getItem('petra_wallet_public_key');
+      const storedAddress = localStorage.getItem("petra_wallet_address");
+      const storedPublicKey = localStorage.getItem("petra_wallet_public_key");
 
       if (storedAddress) setAddress(storedAddress);
       if (storedPublicKey) setPublicKey(storedPublicKey);
@@ -69,25 +71,22 @@ export function usePetraMobileWallet(): PetraMobileWallet {
 
   // Handle deep link responses via URL parameters
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === "undefined") return;
 
     const handleDeepLinkParams = () => {
       const params = new URLSearchParams(window.location.search);
-      const action = params.get('petra_action');
-      const response = params.get('petra_response');
-      const data = params.get('petra_data');
+      const action = params.get("petra_action");
+      const response = params.get("petra_response");
+      const data = params.get("petra_data");
 
       if (!action) return;
 
       switch (action) {
-        case 'connect': {
-          if (response === 'approved' && data && keyPair) {
+        case "connect": {
+          if (response === "approved" && data && keyPair) {
             try {
               const responseData = JSON.parse(atob(data));
-              const sharedEncryptionKey = handleConnectionApproval(
-                data,
-                keyPair.secretKey
-              );
+              const sharedEncryptionKey = handleConnectionApproval(data, keyPair.secretKey);
 
               saveSharedKey(sharedEncryptionKey);
               setSharedKey(sharedEncryptionKey);
@@ -97,25 +96,25 @@ export function usePetraMobileWallet(): PetraMobileWallet {
               // Extract and save wallet address and public key from response
               if (responseData.address) {
                 setAddress(responseData.address);
-                localStorage.setItem('petra_wallet_address', responseData.address);
+                localStorage.setItem("petra_wallet_address", responseData.address);
               }
 
               if (responseData.publicKey) {
                 setPublicKey(responseData.publicKey);
-                localStorage.setItem('petra_wallet_public_key', responseData.publicKey);
+                localStorage.setItem("petra_wallet_public_key", responseData.publicKey);
               }
 
               // Clean up URL params
               const newUrl = new URL(window.location.href);
-              newUrl.searchParams.delete('petra_action');
-              newUrl.searchParams.delete('petra_response');
-              newUrl.searchParams.delete('petra_data');
-              window.history.replaceState({}, '', newUrl);
+              newUrl.searchParams.delete("petra_action");
+              newUrl.searchParams.delete("petra_response");
+              newUrl.searchParams.delete("petra_data");
+              window.history.replaceState({}, "", newUrl);
             } catch (error) {
-              errorLogger.error('Failed to handle connection approval:', error);
+              errorLogger.error("Failed to handle connection approval:", error);
               setIsConnecting(false);
             }
-          } else if (response === 'rejected') {
+          } else if (response === "rejected") {
             clearStoredKeys();
             setKeyPair(null);
             setSharedKey(null);
@@ -123,39 +122,39 @@ export function usePetraMobileWallet(): PetraMobileWallet {
             setIsConnecting(false);
             setAddress(null);
             setPublicKey(null);
-            localStorage.removeItem('petra_wallet_address');
-            localStorage.removeItem('petra_wallet_public_key');
+            localStorage.removeItem("petra_wallet_address");
+            localStorage.removeItem("petra_wallet_public_key");
 
             // Clean up URL params
             const newUrl = new URL(window.location.href);
-            newUrl.searchParams.delete('petra_action');
-            newUrl.searchParams.delete('petra_response');
-            window.history.replaceState({}, '', newUrl);
+            newUrl.searchParams.delete("petra_action");
+            newUrl.searchParams.delete("petra_response");
+            window.history.replaceState({}, "", newUrl);
           }
           break;
         }
 
-        case 'disconnect': {
+        case "disconnect": {
           clearStoredKeys();
           setKeyPair(null);
           setSharedKey(null);
           setIsConnected(false);
           setAddress(null);
           setPublicKey(null);
-          localStorage.removeItem('petra_wallet_address');
-          localStorage.removeItem('petra_wallet_public_key');
+          localStorage.removeItem("petra_wallet_address");
+          localStorage.removeItem("petra_wallet_public_key");
 
           // Clean up URL params
           const newUrl = new URL(window.location.href);
-          newUrl.searchParams.delete('petra_action');
-          window.history.replaceState({}, '', newUrl);
+          newUrl.searchParams.delete("petra_action");
+          window.history.replaceState({}, "", newUrl);
           break;
         }
 
-        case 'response': {
+        case "response": {
           // Handle transaction/message signing responses
           const result = {
-            approved: response === 'approved',
+            approved: response === "approved",
             data: data ? JSON.parse(atob(data)) : null,
           };
 
@@ -166,10 +165,10 @@ export function usePetraMobileWallet(): PetraMobileWallet {
 
           // Clean up URL params
           const newUrl = new URL(window.location.href);
-          newUrl.searchParams.delete('petra_action');
-          newUrl.searchParams.delete('petra_response');
-          newUrl.searchParams.delete('petra_data');
-          window.history.replaceState({}, '', newUrl);
+          newUrl.searchParams.delete("petra_action");
+          newUrl.searchParams.delete("petra_response");
+          newUrl.searchParams.delete("petra_data");
+          window.history.replaceState({}, "", newUrl);
           break;
         }
       }
@@ -183,13 +182,13 @@ export function usePetraMobileWallet(): PetraMobileWallet {
       handleDeepLinkParams();
     };
 
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
   }, [keyPair]);
 
   const connect = useCallback(() => {
     if (!isMobileDevice()) {
-      errorLogger.error('Deep link connection is only available on mobile devices');
+      errorLogger.error("Deep link connection is only available on mobile devices");
       return;
     }
 
@@ -223,11 +222,11 @@ export function usePetraMobileWallet(): PetraMobileWallet {
   const signAndSubmitTransaction = useCallback(
     async (payload: any) => {
       if (!keyPair || !sharedKey) {
-        throw new Error('Not connected to Petra wallet');
+        throw new Error("Not connected to Petra wallet");
       }
 
       if (!isMobileDevice()) {
-        throw new Error('Deep link transactions are only available on mobile devices');
+        throw new Error("Deep link transactions are only available on mobile devices");
       }
 
       // Create and open transaction signing link
@@ -240,11 +239,11 @@ export function usePetraMobileWallet(): PetraMobileWallet {
   const signMessage = useCallback(
     async (message: string) => {
       if (!keyPair || !sharedKey) {
-        throw new Error('Not connected to Petra wallet');
+        throw new Error("Not connected to Petra wallet");
       }
 
       if (!isMobileDevice()) {
-        throw new Error('Deep link message signing is only available on mobile devices');
+        throw new Error("Deep link message signing is only available on mobile devices");
       }
 
       // Create and open message signing link

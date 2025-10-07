@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { SimpleCache } from "./simple-cache";
+import { SimpleCache } from "./cache/simple-cache";
 
 describe("SimpleCache", () => {
   let cache: SimpleCache<string>;

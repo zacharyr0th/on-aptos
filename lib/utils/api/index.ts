@@ -1,11 +1,36 @@
-// API response utilities
+// Consolidated API response utilities (from response.ts)
 export {
   APIResponses,
+  ApiError,
+  type CacheOptions,
+  CACHE_DURATIONS,
+  CACHE_HEADERS,
+  CORS_HEADERS,
+  buildCachedResponse,
   buildErrorResponse,
+  buildFallbackResponse,
+  buildFreshResponse,
   buildSuccessResponse,
+  buildTRPCResponse,
+  createApiResponse,
   createCacheHeaders,
+  createErrorResponse,
+  createSuccessResponse,
+  type ErrorContext,
+  errorResponse,
+  formatApiError,
+  handleApiError,
+  logError,
+  optionsResponse,
+  type ResponseMetrics,
+  type ResponseOptions,
+  successResponse,
+  validationError,
+  validateParams,
   withAPIHandler,
-} from "./api-response";
+  withErrorHandling,
+  withErrorHandlingAndFallback,
+} from "./response";
 // HTTP utilities
 export {
   apiRequest,
@@ -18,19 +43,6 @@ export {
   isRateLimited,
   parseRateLimitHeaders,
 } from "./fetch-utils";
-// Legacy response builders (for backward compatibility)
-export {
-  buildCachedResponse,
-  buildFallbackResponse,
-  buildFreshResponse,
-  buildTRPCResponse,
-  type ErrorContext,
-  formatApiError,
-  handleApiError,
-  type ResponseMetrics,
-  withErrorHandling,
-  withErrorHandlingAndFallback,
-} from "./response-builder";
 
 // Server utilities - DO NOT EXPORT HERE
 // Import these directly from their files when needed in server components:

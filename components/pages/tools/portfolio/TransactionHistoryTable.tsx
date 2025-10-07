@@ -56,7 +56,7 @@ import { useTranslation } from "@/lib/hooks/useTranslation";
 import { cn, getCachedData, setCachedData } from "@/lib/utils";
 import { logger } from "@/lib/utils/core/logger";
 import { safeWindowOpen } from "@/lib/utils/core/security";
-import { convertRawTokenAmount } from "@/lib/utils/format";
+import { convertRawTokenAmount } from "@/lib/utils/format/format";
 import {
   ActivityType,
   OptimizedTransactionAnalyzer as EnhancedTransactionAnalyzer,

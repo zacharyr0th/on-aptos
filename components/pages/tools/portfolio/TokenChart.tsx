@@ -16,7 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTokenChart } from "@/lib/hooks/portfolio/useTokenChart";
-import { formatCurrency } from "@/lib/utils/format";
+import { formatCurrency } from "@/lib/utils/format/format";
 
 interface TokenChartProps {
   tokenAddress: string;
@@ -184,7 +184,11 @@ export function TokenChart({
                 axisLine={false}
                 tickLine={false}
               />
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted-foreground))" opacity={0.1} />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="hsl(var(--muted-foreground))"
+                opacity={0.1}
+              />
               <RechartsTooltip content={<CustomTooltip />} />
               <Area
                 type="monotone"

@@ -36,7 +36,7 @@ export async function GET(request: Request) {
   try {
     // Check cache first
     const now = Date.now();
-    if (cachedData && (now - cacheTimestamp) < CACHE_DURATION) {
+    if (cachedData && now - cacheTimestamp < CACHE_DURATION) {
       apiLogger.info("Returning cached asset values");
       return NextResponse.json(cachedData, {
         headers: {
@@ -48,8 +48,8 @@ export async function GET(request: Request) {
     apiLogger.info("Fetching fresh asset values for Aptos");
 
     // Get the base URL from the request headers
-    const host = request.headers.get('host') || 'localhost:3001';
-    const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
+    const host = request.headers.get("host") || "localhost:3001";
+    const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
     const baseUrl = `${protocol}://${host}`;
 
     // xBTC address for fetching Bitcoin price
@@ -57,11 +57,11 @@ export async function GET(request: Request) {
 
     // Fetch all real data in parallel with error handling
     const [stablesRes, rwaRes, btcRes, defiRes, btcPriceRes] = await Promise.allSettled([
-      fetch(`${baseUrl}/api/aptos/stables`, { cache: 'no-store' }),
-      fetch(`${baseUrl}/api/aptos/rwa`, { cache: 'no-store' }),
-      fetch(`${baseUrl}/api/aptos/btc`, { cache: 'no-store' }),
-      fetch(`${baseUrl}/api/defi/metrics`, { cache: 'no-store' }),
-      fetch(`${baseUrl}/api/unified/prices?tokens=${xBTCAddress}`, { cache: 'no-store' })
+      fetch(`${baseUrl}/api/aptos/stables`, { cache: "no-store" }),
+      fetch(`${baseUrl}/api/markets/rwas`, { cache: "no-store" }),
+      fetch(`${baseUrl}/api/aptos/btc`, { cache: "no-store" }),
+      fetch(`${baseUrl}/api/defi/metrics`, { cache: "no-store" }),
+      fetch(`${baseUrl}/api/unified/prices?tokens=${xBTCAddress}`, { cache: "no-store" }),
     ]);
 
     // Safely parse responses with fallbacks
@@ -72,7 +72,7 @@ export async function GET(request: Request) {
     let btcPriceData: any = {};
 
     try {
-      if (stablesRes.status === 'fulfilled' && stablesRes.value.ok) {
+      if (stablesRes.status === "fulfilled" && stablesRes.value.ok) {
         stablesData = await stablesRes.value.json();
       }
     } catch (e) {
@@ -80,7 +80,7 @@ export async function GET(request: Request) {
     }
 
     try {
-      if (rwaRes.status === 'fulfilled' && rwaRes.value.ok) {
+      if (rwaRes.status === "fulfilled" && rwaRes.value.ok) {
         rwaData = await rwaRes.value.json();
       }
     } catch (e) {
@@ -88,7 +88,7 @@ export async function GET(request: Request) {
     }
 
     try {
-      if (btcRes.status === 'fulfilled' && btcRes.value.ok) {
+      if (btcRes.status === "fulfilled" && btcRes.value.ok) {
         btcData = await btcRes.value.json();
       }
     } catch (e) {
@@ -96,7 +96,7 @@ export async function GET(request: Request) {
     }
 
     try {
-      if (defiRes.status === 'fulfilled' && defiRes.value.ok) {
+      if (defiRes.status === "fulfilled" && defiRes.value.ok) {
         defiData = await defiRes.value.json();
       }
     } catch (e) {
@@ -104,7 +104,7 @@ export async function GET(request: Request) {
     }
 
     try {
-      if (btcPriceRes.status === 'fulfilled' && btcPriceRes.value.ok) {
+      if (btcPriceRes.status === "fulfilled" && btcPriceRes.value.ok) {
         btcPriceData = await btcPriceRes.value.json();
       }
     } catch (e) {
@@ -127,23 +127,23 @@ export async function GET(request: Request) {
       stables: {
         value: stablesValue,
         label: "Stablecoins",
-        description: "USDC, USDT, USDe, USDA & more on Aptos"
+        description: "USDC, USDT, USDe, USDA & more on Aptos",
       },
       rwas: {
         value: rwasValue,
         label: "Real World Assets",
-        description: "BlackRock BUIDL, Franklin Templeton & more"
+        description: "BlackRock BUIDL, Franklin Templeton & more",
       },
       btc: {
         value: btcValue,
         label: "Bitcoin",
-        description: "aBTC, SBTC, xBTC & wrapped variants"
+        description: "aBTC, SBTC, xBTC & wrapped variants",
       },
       tokens: {
         value: totalTokensValue,
         label: "Total Value Locked",
-        description: "Total value across all Aptos protocols"
-      }
+        description: "Total value across all Aptos protocols",
+      },
     };
 
     apiLogger.info("Asset values fetched successfully", metrics);
@@ -159,12 +159,12 @@ export async function GET(request: Request) {
     });
   } catch (error) {
     apiLogger.error("Error fetching asset values:", error);
-    
+
     // Return error response
     return NextResponse.json(
       {
         error: "Failed to fetch asset values",
-        message: error instanceof Error ? error.message : "Unknown error"
+        message: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 500 }
     );

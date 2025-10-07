@@ -24,7 +24,7 @@ import { useAptPrice } from "@/lib/hooks/portfolio/useAptPrice";
 import { usePageTranslation } from "@/lib/hooks/useTranslation";
 import { copyToClipboard } from "@/lib/utils/clipboard";
 import { logger } from "@/lib/utils/core/logger";
-import { formatAmount, formatAmountFull, formatCurrency } from "@/lib/utils/format";
+import { formatAmount, formatAmountFull, formatCurrency } from "@/lib/utils/format/format";
 import { truncateAddress } from "../../shared/utils";
 import type { LSTTokenSupply } from "./types";
 

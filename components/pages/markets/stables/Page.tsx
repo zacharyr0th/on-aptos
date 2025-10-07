@@ -503,10 +503,12 @@ function StablesPage(): React.ReactElement {
 
     // Format total from processedSupplies to match pie chart
     const formatTotalFromProcessed = () => {
-      const dollars = Number(processedSuppliesForCards.reduce(
-        (sum: number, t: any) => sum + parseFloat(t.supply || "0"),
-        0
-      ));
+      const dollars = Number(
+        processedSuppliesForCards.reduce(
+          (sum: number, t: any) => sum + parseFloat(t.supply || "0"),
+          0
+        )
+      );
       return new Intl.NumberFormat("en-US", {
         style: "currency",
         currency: "USD",

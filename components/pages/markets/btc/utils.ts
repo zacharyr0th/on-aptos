@@ -6,7 +6,7 @@ import {
   formatCurrency,
   formatNumber,
   formatPercentage,
-} from "@/lib/utils/format";
+} from "@/lib/utils/format/format";
 
 // Re-export common formatters for compatibility
 export {

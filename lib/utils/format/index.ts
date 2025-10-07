@@ -22,7 +22,7 @@ export {
   getSupportedFiatCurrencies,
   isFiatCurrency,
   isValidCurrencyCode,
-} from "../format";
+} from "./format";
 
 // Currency types are re-exported from format.ts
 

@@ -80,7 +80,7 @@ export class DuneAnalyticsService {
 
       const data: DuneExecutionResponse = await response.json();
       apiLogger.info(`Query ${queryId} execution started`, { execution_id: data.execution_id });
-      
+
       return data.execution_id;
     } catch (error) {
       apiLogger.error(`Error executing Dune query ${queryId}:`, error);
@@ -165,21 +165,25 @@ export class DuneAnalyticsService {
   private async waitForCompletion(executionId: string): Promise<void> {
     for (let i = 0; i < this.maxRetries; i++) {
       const status = await this.getExecutionStatus(executionId);
-      
+
       if (status.state === "QUERY_STATE_COMPLETED") {
         apiLogger.info(`Query execution ${executionId} completed`);
         return;
       }
-      
+
       if (status.state === "QUERY_STATE_FAILED" || status.state === "QUERY_STATE_CANCELLED") {
         throw new Error(`Query execution failed with state: ${status.state}`);
       }
-      
-      apiLogger.debug(`Query execution ${executionId} still running (${status.state}), retrying...`);
-      await new Promise(resolve => setTimeout(resolve, this.retryDelay));
+
+      apiLogger.debug(
+        `Query execution ${executionId} still running (${status.state}), retrying...`
+      );
+      await new Promise((resolve) => setTimeout(resolve, this.retryDelay));
     }
-    
-    throw new Error(`Query execution timed out after ${this.maxRetries * this.retryDelay / 1000} seconds`);
+
+    throw new Error(
+      `Query execution timed out after ${(this.maxRetries * this.retryDelay) / 1000} seconds`
+    );
   }
 
   /**
@@ -189,20 +193,20 @@ export class DuneAnalyticsService {
   async refresh(queryId: number, parameters?: Record<string, any>): Promise<any[]> {
     try {
       apiLogger.info(`Refreshing Dune query ${queryId}`);
-      
+
       // Execute the query
       const executionId = await this.executeQuery(queryId, parameters);
-      
+
       // Wait for completion
       await this.waitForCompletion(executionId);
-      
+
       // Get the results
       const results = await this.getExecutionResults(executionId);
-      
-      apiLogger.info(`Successfully refreshed query ${queryId}`, { 
-        resultCount: results.length 
+
+      apiLogger.info(`Successfully refreshed query ${queryId}`, {
+        resultCount: results.length,
       });
-      
+
       return results;
     } catch (error) {
       apiLogger.error(`Error refreshing query ${queryId}:`, error);
@@ -237,18 +241,20 @@ export class DuneAnalyticsService {
       }
 
       const cached: DuneResultResponse = await cachedResponse.json();
-      
+
       // Check if execution_ended_at exists and is recent enough
       if (cached.execution_ended_at) {
         const executionTime = new Date(cached.execution_ended_at);
         const ageInSeconds = (Date.now() - executionTime.getTime()) / 1000;
-        
+
         if (ageInSeconds <= maxAge) {
-          apiLogger.info(`Using cached results for query ${queryId} (${Math.round(ageInSeconds)}s old)`);
+          apiLogger.info(
+            `Using cached results for query ${queryId} (${Math.round(ageInSeconds)}s old)`
+          );
           return cached.result?.rows || [];
         }
       }
-      
+
       // Data is stale, trigger refresh
       apiLogger.info(`Cached data for query ${queryId} is stale, refreshing...`);
       return this.refresh(queryId, parameters);

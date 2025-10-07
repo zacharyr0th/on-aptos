@@ -15,7 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useMetricsData } from "@/hooks/useMetricsData";
+import { useMetricsData } from "@/lib/hooks/useMetricsData";
 import { formatCompactNumber } from "@/lib/utils";
 
 // Helper function to format numbers without currency symbol

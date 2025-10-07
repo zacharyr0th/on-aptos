@@ -12,7 +12,7 @@ const DUNE_THEMES = {
       TRANSACTION_ANALYSIS: { id: 4045024, name: "Transaction Performance", priority: 1 },
       BLOCK_TIMES: { id: 5699672, name: "Block Times & Finality", priority: 2 },
       NETWORK_OVERVIEW: { id: 5699670, name: "Network Overview", priority: 2 },
-    }
+    },
   },
   USER_ACTIVITY: {
     name: "User Activity & Engagement",
@@ -22,7 +22,7 @@ const DUNE_THEMES = {
       USER_BEHAVIOR: { id: 4045138, name: "User Behavior", priority: 1 },
       DEX_COMPARISON: { id: 3431742, name: "Daily Active Users", priority: 1 },
       ACTIVITY_PATTERNS: { id: 5699668, name: "Hourly Activity Patterns", priority: 2 },
-    }
+    },
   },
   DEFI_ECOSYSTEM: {
     name: "DeFi & Trading",
@@ -32,7 +32,7 @@ const DUNE_THEMES = {
       DEX_TRADING_VOLUME: { id: 5699630, name: "Trading Volume", priority: 1 },
       TOKEN_BALANCES: { id: 5699610, name: "Token Distribution", priority: 2 },
       STAKING_ANALYTICS: { id: 5091227, name: "Staking Analytics", priority: 3 },
-    }
+    },
   },
   PROTOCOL_ANALYTICS: {
     name: "Protocol Performance",
@@ -41,8 +41,8 @@ const DUNE_THEMES = {
       NETWORK_STATS: { id: 3468810, name: "Protocol Stats", priority: 1 },
       PROTOCOL_METRICS: { id: 3468830, name: "Protocol Metrics", priority: 1 },
       ALL_TIME_TRANSACTIONS: { id: 5699671, name: "Historical Transactions", priority: 2 },
-    }
-  }
+    },
+  },
 };
 
 // Query execution configuration
@@ -58,13 +58,11 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const theme = searchParams.get("theme") || "all";
     const refresh = searchParams.get("refresh") === "true";
-    
+
     apiLogger.info("Fetching comprehensive metrics v2", { theme, refresh });
 
     // Determine which themes to fetch
-    const themesToFetch = theme === "all" 
-      ? Object.keys(DUNE_THEMES) 
-      : [theme.toUpperCase()];
+    const themesToFetch = theme === "all" ? Object.keys(DUNE_THEMES) : [theme.toUpperCase()];
 
     // Collect all queries to execute
     const queriesToExecute: Array<{
@@ -87,21 +85,21 @@ export async function GET(request: Request) {
       queriesToExecute.map(async ({ theme, queryKey, queryInfo }) => {
         try {
           const startTime = Date.now();
-          
+
           // Use smart results to get fresh or cached data based on age
           const results = refresh
             ? await duneService.refresh(queryInfo.id)
             : await duneService.getSmartResults(queryInfo.id, EXECUTION_CONFIG.maxAge);
-          
+
           const executionTime = Date.now() - startTime;
-          
+
           return {
             theme,
             queryKey,
             queryInfo,
             results,
             executionTime,
-            status: "success"
+            status: "success",
           };
         } catch (error) {
           apiLogger.error(`Failed to fetch query ${queryInfo.id}:`, error);
@@ -111,7 +109,7 @@ export async function GET(request: Request) {
             queryInfo,
             results: [],
             error: error instanceof Error ? error.message : "Unknown error",
-            status: "error"
+            status: "error",
           };
         }
       })
@@ -120,27 +118,27 @@ export async function GET(request: Request) {
     // Process results by theme
     const themeData: Record<string, any> = {};
     const queryStatus: Record<string, any> = {};
-    
+
     for (const result of queryResults) {
       if (result.status === "fulfilled") {
         const { theme, queryKey, queryInfo, results, executionTime, status } = result.value;
-        
+
         if (!themeData[theme]) {
           themeData[theme] = {
             name: DUNE_THEMES[theme as keyof typeof DUNE_THEMES].name,
             icon: DUNE_THEMES[theme as keyof typeof DUNE_THEMES].icon,
             metrics: {},
-            rawData: {}
+            rawData: {},
           };
         }
-        
+
         themeData[theme].rawData[queryKey] = results;
         queryStatus[`${theme}_${queryKey}`] = {
           id: queryInfo.id,
           name: queryInfo.name,
           status,
           executionTime,
-          resultCount: results.length
+          resultCount: results.length,
         };
       }
     }
@@ -151,7 +149,7 @@ export async function GET(request: Request) {
         const protocolData = data.rawData.PROTOCOL_ACTIVITY?.[0] || {};
         const transactionData = data.rawData.TRANSACTION_ANALYSIS?.[0] || {};
         const blockData = data.rawData.BLOCK_TIMES?.[0] || {};
-        
+
         data.metrics = {
           totalTransactions: parseInt(protocolData.total_transactions || 0),
           uniqueUsers: parseInt(protocolData.unique_senders || 0),
@@ -163,13 +161,13 @@ export async function GET(request: Request) {
           networkReliability: parseFloat(blockData.network_reliability_pct || 0),
         };
       }
-      
+
       if (themeName === "USER_ACTIVITY") {
         const userAnalytics = data.rawData.USER_ANALYTICS?.[0] || {};
         const userBehavior = data.rawData.USER_BEHAVIOR?.[0] || {};
         const dexComparison = data.rawData.DEX_COMPARISON?.[0] || {};
         const activityPatterns = data.rawData.ACTIVITY_PATTERNS || [];
-        
+
         data.metrics = {
           dailyActiveAddresses: parseInt(dexComparison.daily_active_addresses || 0),
           dailyTransactions: parseInt(dexComparison.daily_transactions || 0),
@@ -180,12 +178,12 @@ export async function GET(request: Request) {
           activityPatterns: activityPatterns.slice(0, 24),
         };
       }
-      
+
       if (themeName === "DEFI_ECOSYSTEM") {
         const dexMetrics = data.rawData.DEX_METRICS?.[0] || {};
         const tradingVolume = data.rawData.DEX_TRADING_VOLUME || [];
         const tokenBalances = data.rawData.TOKEN_BALANCES || [];
-        
+
         data.metrics = {
           transactionCount: parseInt(dexMetrics.transaction_count || 0),
           totalGasFeesAPT: parseFloat(dexMetrics.sum_gas_fees_apt || 0),
@@ -196,12 +194,12 @@ export async function GET(request: Request) {
           topTokenHoldings: tokenBalances.slice(0, 10),
         };
       }
-      
+
       if (themeName === "PROTOCOL_ANALYTICS") {
         const networkStats = data.rawData.NETWORK_STATS || [];
         const protocolMetrics = data.rawData.PROTOCOL_METRICS || [];
         const allTimeData = data.rawData.ALL_TIME_TRANSACTIONS?.[0] || {};
-        
+
         data.metrics = {
           allTimeTransactions: parseInt(allTimeData.total_all_time_transactions || 0),
           networkAgeDays: parseInt(allTimeData.network_age_days || 0),
@@ -221,9 +219,14 @@ export async function GET(request: Request) {
       lastUpdated: new Date().toISOString(),
       themesLoaded: Object.keys(themeData).length,
       totalQueriesExecuted: queriesToExecute.length,
-      successfulQueries: Object.values(queryStatus).filter((q: any) => q.status === "success").length,
+      successfulQueries: Object.values(queryStatus).filter((q: any) => q.status === "success")
+        .length,
       failedQueries: Object.values(queryStatus).filter((q: any) => q.status === "error").length,
-      avgExecutionTime: Object.values(queryStatus).reduce((sum: number, q: any) => sum + (q.executionTime || 0), 0) / Object.keys(queryStatus).length,
+      avgExecutionTime:
+        Object.values(queryStatus).reduce(
+          (sum: number, q: any) => sum + (q.executionTime || 0),
+          0
+        ) / Object.keys(queryStatus).length,
       dataFreshness: refresh ? "fresh" : "smart-cached",
     };
 
@@ -233,7 +236,7 @@ export async function GET(request: Request) {
         themes: themeData,
         queryStatus,
         config: EXECUTION_CONFIG,
-        availableThemes: Object.keys(DUNE_THEMES).map(key => ({
+        availableThemes: Object.keys(DUNE_THEMES).map((key) => ({
           id: key.toLowerCase(),
           name: DUNE_THEMES[key as keyof typeof DUNE_THEMES].name,
           icon: DUNE_THEMES[key as keyof typeof DUNE_THEMES].icon,
@@ -242,9 +245,7 @@ export async function GET(request: Request) {
       },
       {
         headers: {
-          "Cache-Control": refresh 
-            ? "no-cache" 
-            : "public, s-maxage=60, stale-while-revalidate=300",
+          "Cache-Control": refresh ? "no-cache" : "public, s-maxage=60, stale-while-revalidate=300",
         },
       }
     );
@@ -265,11 +266,11 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const { queryIds, theme } = body;
-    
+
     apiLogger.info("Triggering manual refresh", { queryIds, theme });
-    
+
     const refreshPromises = [];
-    
+
     if (queryIds && Array.isArray(queryIds)) {
       // Refresh specific queries
       for (const queryId of queryIds) {
@@ -284,11 +285,11 @@ export async function POST(request: Request) {
         }
       }
     }
-    
+
     const results = await Promise.allSettled(refreshPromises);
-    const successful = results.filter(r => r.status === "fulfilled").length;
-    const failed = results.filter(r => r.status === "rejected").length;
-    
+    const successful = results.filter((r) => r.status === "fulfilled").length;
+    const failed = results.filter((r) => r.status === "rejected").length;
+
     return NextResponse.json({
       message: "Refresh triggered",
       successful,

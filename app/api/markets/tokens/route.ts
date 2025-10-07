@@ -473,10 +473,10 @@ async function calculateMarketCaps(
       .map((t) => t.faAddress || t.tokenAddress)
       .filter(Boolean) as string[];
     const metadataMap = await fetchTokenMetadata(addresses);
-    
+
     // Process tokens with metadata
     const tokensWithMetadata = await processTokensBatch(tokensForMetadata, metadataMap);
-    
+
     // For remaining tokens, just use basic data without supply/FDV
     const remainingTokens = tokens.slice(metadataLimit, offset + limit).map((token, index) =>
       createTokenMarketData(
@@ -486,22 +486,22 @@ async function calculateMarketCaps(
         metadataLimit + index + 1
       )
     );
-    
+
     // Combine all tokens
     const allProcessedTokens = [...tokensWithMetadata, ...remainingTokens];
-    
+
     // Sort by FDV/market cap descending
     allProcessedTokens.sort((a, b) => {
       // First, sort by verification status (verified tokens first)
       if (a.isVerified && !b.isVerified) return -1;
       if (!a.isVerified && b.isVerified) return 1;
-      
+
       // Then sort by FDV within each group
       const aFdv = a.fullyDilutedValuation || a.marketCap || 0;
       const bFdv = b.fullyDilutedValuation || b.marketCap || 0;
       return bFdv - aFdv;
     });
-    
+
     // Apply pagination after sorting
     const processedTokens = allProcessedTokens.slice(offset, offset + limit);
 
@@ -574,14 +574,10 @@ async function handleTokensRequest(request: NextRequest) {
     // Cache the result
     tokenCache.set(cacheKey, data);
 
-    return successResponse(
-      data,
-      CACHE_DURATIONS.MEDIUM,
-      {
-        "X-Total-Tokens": data.totalTokens.toString(),
-        "X-APT-Price": data.aptPrice.toString(),
-      }
-    );
+    return successResponse(data, CACHE_DURATIONS.MEDIUM, {
+      "X-Total-Tokens": data.totalTokens.toString(),
+      "X-APT-Price": data.aptPrice.toString(),
+    });
   } catch (error) {
     return errorResponse(
       "Failed to fetch token data",

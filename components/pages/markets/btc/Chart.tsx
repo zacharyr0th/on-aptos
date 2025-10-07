@@ -14,7 +14,7 @@ import { BTC_COLORS } from "@/lib/constants/ui/colors";
 import { useResponsive } from "@/lib/hooks/useResponsive";
 import { copyWithCustomMessage } from "@/lib/utils/clipboard";
 import { logger } from "@/lib/utils/core/logger";
-import { formatAmountFull, formatCurrency, formatCurrencyMobile } from "@/lib/utils/format";
+import { formatAmountFull, formatCurrency, formatCurrencyMobile } from "@/lib/utils/format/format";
 import type { ChartDataItem, Token } from "./types";
 import {
   batchConvertBTCAmounts,

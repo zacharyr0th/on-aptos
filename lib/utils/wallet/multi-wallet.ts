@@ -4,14 +4,14 @@
  */
 
 export enum AptosWalletType {
-  PETRA = 'Petra',
-  PONTEM = 'Pontem',
-  MARTIAN = 'Martian',
-  FEWCHA = 'Fewcha',
-  RISE = 'Rise',
-  MSafe = 'MSafe',
-  NIGHTLY = 'Nightly',
-  BLOCTO = 'Blocto',
+  PETRA = "Petra",
+  PONTEM = "Pontem",
+  MARTIAN = "Martian",
+  FEWCHA = "Fewcha",
+  RISE = "Rise",
+  MSafe = "MSafe",
+  NIGHTLY = "Nightly",
+  BLOCTO = "Blocto",
 }
 
 export interface WalletInfo {
@@ -25,52 +25,52 @@ export interface WalletInfo {
 
 export const APTOS_WALLETS: Record<AptosWalletType, WalletInfo> = {
   [AptosWalletType.PETRA]: {
-    name: 'Petra Wallet',
+    name: "Petra Wallet",
     type: AptosWalletType.PETRA,
-    downloadUrl: 'https://petra.app',
+    downloadUrl: "https://petra.app",
     deepLinkSupported: true,
-    deepLinkScheme: 'petra://',
+    deepLinkScheme: "petra://",
   },
   [AptosWalletType.PONTEM]: {
-    name: 'Pontem Wallet',
+    name: "Pontem Wallet",
     type: AptosWalletType.PONTEM,
-    downloadUrl: 'https://pontem.network/pontem-wallet',
+    downloadUrl: "https://pontem.network/pontem-wallet",
     deepLinkSupported: false,
   },
   [AptosWalletType.MARTIAN]: {
-    name: 'Martian Wallet',
+    name: "Martian Wallet",
     type: AptosWalletType.MARTIAN,
-    downloadUrl: 'https://martianwallet.xyz',
+    downloadUrl: "https://martianwallet.xyz",
     deepLinkSupported: false,
   },
   [AptosWalletType.FEWCHA]: {
-    name: 'Fewcha Wallet',
+    name: "Fewcha Wallet",
     type: AptosWalletType.FEWCHA,
-    downloadUrl: 'https://fewcha.app',
+    downloadUrl: "https://fewcha.app",
     deepLinkSupported: false,
   },
   [AptosWalletType.RISE]: {
-    name: 'Rise Wallet',
+    name: "Rise Wallet",
     type: AptosWalletType.RISE,
-    downloadUrl: 'https://risewallet.io',
+    downloadUrl: "https://risewallet.io",
     deepLinkSupported: false,
   },
   [AptosWalletType.MSafe]: {
-    name: 'MSafe',
+    name: "MSafe",
     type: AptosWalletType.MSafe,
-    downloadUrl: 'https://msafe.io',
+    downloadUrl: "https://msafe.io",
     deepLinkSupported: false,
   },
   [AptosWalletType.NIGHTLY]: {
-    name: 'Nightly',
+    name: "Nightly",
     type: AptosWalletType.NIGHTLY,
-    downloadUrl: 'https://nightly.app',
+    downloadUrl: "https://nightly.app",
     deepLinkSupported: false,
   },
   [AptosWalletType.BLOCTO]: {
-    name: 'Blocto',
+    name: "Blocto",
     type: AptosWalletType.BLOCTO,
-    downloadUrl: 'https://blocto.io',
+    downloadUrl: "https://blocto.io",
     deepLinkSupported: false,
   },
 };
@@ -79,7 +79,7 @@ export const APTOS_WALLETS: Record<AptosWalletType, WalletInfo> = {
  * Detect available Aptos wallets
  */
 export function detectAvailableWallets(): AptosWalletType[] {
-  if (typeof window === 'undefined') return [];
+  if (typeof window === "undefined") return [];
 
   const available: AptosWalletType[] = [];
 
@@ -130,7 +130,7 @@ export function detectAvailableWallets(): AptosWalletType[] {
  * Get wallet provider object
  */
 export function getWalletProvider(walletType: AptosWalletType): any {
-  if (typeof window === 'undefined') return null;
+  if (typeof window === "undefined") return null;
 
   switch (walletType) {
     case AptosWalletType.PETRA:
@@ -165,9 +165,9 @@ export function isWalletInstalled(walletType: AptosWalletType): boolean {
  * Get preferred wallet from local storage
  */
 export function getPreferredWallet(): AptosWalletType | null {
-  if (typeof window === 'undefined') return null;
+  if (typeof window === "undefined") return null;
 
-  const preferred = localStorage.getItem('preferred_aptos_wallet');
+  const preferred = localStorage.getItem("preferred_aptos_wallet");
   return preferred as AptosWalletType | null;
 }
 
@@ -175,18 +175,18 @@ export function getPreferredWallet(): AptosWalletType | null {
  * Set preferred wallet in local storage
  */
 export function setPreferredWallet(walletType: AptosWalletType): void {
-  if (typeof window === 'undefined') return;
+  if (typeof window === "undefined") return;
 
-  localStorage.setItem('preferred_aptos_wallet', walletType);
+  localStorage.setItem("preferred_aptos_wallet", walletType);
 }
 
 /**
  * Clear preferred wallet
  */
 export function clearPreferredWallet(): void {
-  if (typeof window === 'undefined') return;
+  if (typeof window === "undefined") return;
 
-  localStorage.removeItem('preferred_aptos_wallet');
+  localStorage.removeItem("preferred_aptos_wallet");
 }
 
 /**
@@ -206,7 +206,9 @@ export async function connectToWallet(
     setPreferredWallet(walletType);
     return result;
   } catch (error) {
-    throw new Error(`Failed to connect to ${walletType}: ${error instanceof Error ? error.message : String(error)}`);
+    throw new Error(
+      `Failed to connect to ${walletType}: ${error instanceof Error ? error.message : String(error)}`
+    );
   }
 }
 
@@ -217,7 +219,7 @@ export async function disconnectWallet(walletType?: AptosWalletType): Promise<vo
   const type = walletType || getPreferredWallet();
 
   if (!type) {
-    throw new Error('No wallet connected');
+    throw new Error("No wallet connected");
   }
 
   const provider = getWalletProvider(type);
@@ -230,18 +232,22 @@ export async function disconnectWallet(walletType?: AptosWalletType): Promise<vo
     await provider.disconnect();
     clearPreferredWallet();
   } catch (error) {
-    throw new Error(`Failed to disconnect from ${type}: ${error instanceof Error ? error.message : String(error)}`);
+    throw new Error(
+      `Failed to disconnect from ${type}: ${error instanceof Error ? error.message : String(error)}`
+    );
   }
 }
 
 /**
  * Get account info from current wallet
  */
-export async function getAccount(walletType?: AptosWalletType): Promise<{ address: string; publicKey: string }> {
+export async function getAccount(
+  walletType?: AptosWalletType
+): Promise<{ address: string; publicKey: string }> {
   const type = walletType || getPreferredWallet();
 
   if (!type) {
-    throw new Error('No wallet connected');
+    throw new Error("No wallet connected");
   }
 
   const provider = getWalletProvider(type);
@@ -253,7 +259,9 @@ export async function getAccount(walletType?: AptosWalletType): Promise<{ addres
   try {
     return await provider.account();
   } catch (error) {
-    throw new Error(`Failed to get account from ${type}: ${error instanceof Error ? error.message : String(error)}`);
+    throw new Error(
+      `Failed to get account from ${type}: ${error instanceof Error ? error.message : String(error)}`
+    );
   }
 }
 

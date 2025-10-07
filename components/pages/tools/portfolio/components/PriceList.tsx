@@ -7,7 +7,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { formatCompactNumber, formatCurrency, formatTokenPrice } from "@/lib/utils/format";
+import { formatCompactNumber, formatCurrency, formatTokenPrice } from "@/lib/utils/format/format";
 
 interface TokenData {
   symbol: string;

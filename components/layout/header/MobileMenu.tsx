@@ -84,7 +84,11 @@ export function MobileMenu({ isOpen, onToggle, onClose, navigationItems }: Mobil
             </button>
           </TooltipTrigger>
           <TooltipContent>
-            <p>{isOpen ? t("navigation.close_menu", "Close menu") : t("navigation.toggle_menu", "Open navigation menu")}</p>
+            <p>
+              {isOpen
+                ? t("navigation.close_menu", "Close menu")
+                : t("navigation.toggle_menu", "Open navigation menu")}
+            </p>
           </TooltipContent>
         </Tooltip>
       </div>
@@ -224,7 +228,9 @@ export function MobileMenu({ isOpen, onToggle, onClose, navigationItems }: Mobil
                       active={pathname === "/tools/portfolio"}
                       onClick={onClose}
                     >
-                      {pathname === "/" ? t("navigation.launch_app", "Launch App") : t("navigation.portfolio", "Portfolio")}
+                      {pathname === "/"
+                        ? t("navigation.launch_app", "Launch App")
+                        : t("navigation.portfolio", "Portfolio")}
                     </MobileNavLink>
                   )}
                 </div>

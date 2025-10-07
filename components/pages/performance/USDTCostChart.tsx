@@ -247,7 +247,11 @@ const USDTCostChart = memo(function USDTCostChart({ data }: USDTCostChartProps) 
     // Add multiplier text inside bars (hide on mobile completely)
     const multiplierText = g
       .selectAll(".multiplier-text")
-      .data(!isMobile && !isTinyScreen && !isTablet ? parsedData.filter((d) => d.multiplier && xScale.bandwidth() >= 40) : []) // Hide on mobile/tablet/tiny screens
+      .data(
+        !isMobile && !isTinyScreen && !isTablet
+          ? parsedData.filter((d) => d.multiplier && xScale.bandwidth() >= 40)
+          : []
+      ) // Hide on mobile/tablet/tiny screens
       .enter()
       .append("text")
       .attr("class", "multiplier-text")
@@ -308,7 +312,11 @@ const USDTCostChart = memo(function USDTCostChart({ data }: USDTCostChartProps) 
     // Add "sometimes" label text for lower bounds of Solana and TRON (hide on mobile)
     const sometimesLabelText = g
       .selectAll(".sometimes-label-text")
-      .data(!isMobile && !isTinyScreen ? parsedData.filter((d) => d.chain === "Solana" || d.chain === "TRON") : [])
+      .data(
+        !isMobile && !isTinyScreen
+          ? parsedData.filter((d) => d.chain === "Solana" || d.chain === "TRON")
+          : []
+      )
       .enter()
       .append("text")
       .attr("class", "sometimes-label-text")
@@ -343,7 +351,11 @@ const USDTCostChart = memo(function USDTCostChart({ data }: USDTCostChartProps) 
     // Add "sometimes" multiplier text for lower bounds of Solana and TRON (hide on mobile)
     const sometimesMultiplierText = g
       .selectAll(".sometimes-multiplier-text")
-      .data(!isMobile && !isTinyScreen ? parsedData.filter((d) => d.chain === "Solana" || d.chain === "TRON") : [])
+      .data(
+        !isMobile && !isTinyScreen
+          ? parsedData.filter((d) => d.chain === "Solana" || d.chain === "TRON")
+          : []
+      )
       .enter()
       .append("text")
       .attr("class", "sometimes-multiplier-text")

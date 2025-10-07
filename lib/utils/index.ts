@@ -11,22 +11,22 @@ export {
   panoraClient,
 } from "./api/panora-client";
 
-// Export unified API systems (NEW - use for new code) - after legacy to avoid conflicts
+// Export API response utilities (from consolidated response.ts)
 export {
-  buildCachedResponse as buildCachedResponseNew,
-  buildFallbackResponse as buildFallbackResponseNew,
-  buildFreshResponse as buildFreshResponseNew,
+  CACHE_DURATIONS,
   CACHE_HEADERS,
-  type CacheResponseOptions,
   CORS_HEADERS,
-  type ErrorResponse as UnifiedErrorResponse,
+  buildCachedResponse,
+  buildErrorResponse,
+  buildFallbackResponse,
+  buildFreshResponse,
+  buildSuccessResponse,
+  type CacheOptions,
+  type ErrorContext,
   errorResponse,
-  type PaginationMeta,
-  type ResponseMeta,
-  type StandardResponse,
+  type ResponseOptions,
   successResponse,
-  UnifiedResponseBuilder,
-} from "./api/unified-response-builder";
+} from "./api/response";
 // Request deduplication exports
 export * from "./cache/request-deduplication";
 // ===== CACHE UTILITIES =====
@@ -82,7 +82,7 @@ export {
   formatLargeNumber,
   formatNumber,
   formatPercentage,
-} from "./format";
+} from "./format/format";
 // ===== FORMAT UTILITIES =====
 // Export unified formatters (NEW - use for new code)
 export {

@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
     operation: "RWA Data API",
     service: "RWA-API",
     details: {
-      endpoint: "/api/rwa",
+      endpoint: "/api/markets/rwas",
       userAgent: request.headers.get("user-agent") || "unknown",
     },
   };

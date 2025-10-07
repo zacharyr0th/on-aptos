@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useDefiLlamaData } from '@/hooks/useDefiLlamaData';
+import { useDefiLlamaData } from "@/lib/hooks/useDefiLlamaData";
 
 interface ProtocolStatsProps {
   protocolName: string;
@@ -8,7 +8,11 @@ interface ProtocolStatsProps {
   inline?: boolean;
 }
 
-export function ProtocolStats({ protocolName, showVolume = true, inline = false }: ProtocolStatsProps) {
+export function ProtocolStats({
+  protocolName,
+  showVolume = true,
+  inline = false,
+}: ProtocolStatsProps) {
   const { data, loading, error } = useDefiLlamaData(protocolName);
 
   if (loading) {
@@ -29,7 +33,7 @@ export function ProtocolStats({ protocolName, showVolume = true, inline = false 
 
   const parseChange = (changeStr?: string) => {
     if (!changeStr) return null;
-    const value = parseFloat(changeStr.replace(/[+%]/g, ''));
+    const value = parseFloat(changeStr.replace(/[+%]/g, ""));
     return value;
   };
 
@@ -43,12 +47,15 @@ export function ProtocolStats({ protocolName, showVolume = true, inline = false 
         <span className="text-xs text-muted-foreground">TVL</span>
         <span className="text-xs font-semibold text-foreground font-mono">{data.tvl}</span>
         {tvlChange !== null && (
-          <span className={`text-[10px] font-medium font-mono px-1.5 py-0.5 rounded ${
-            tvlChange >= 0
-              ? 'bg-green-500/10 text-green-600 dark:text-green-400'
-              : 'bg-red-500/10 text-red-600 dark:text-red-400'
-          }`}>
-            {tvlChange >= 0 ? '+' : ''}{tvlChange.toFixed(1)}%
+          <span
+            className={`text-[10px] font-medium font-mono px-1.5 py-0.5 rounded ${
+              tvlChange >= 0
+                ? "bg-green-500/10 text-green-600 dark:text-green-400"
+                : "bg-red-500/10 text-red-600 dark:text-red-400"
+            }`}
+          >
+            {tvlChange >= 0 ? "+" : ""}
+            {tvlChange.toFixed(1)}%
           </span>
         )}
       </div>
@@ -64,12 +71,15 @@ export function ProtocolStats({ protocolName, showVolume = true, inline = false 
         <div className="flex items-center gap-1.5">
           <p className="font-semibold text-foreground font-mono">{data.tvl}</p>
           {tvlChange !== null && (
-            <span className={`text-[10px] font-medium font-mono px-1.5 py-0.5 rounded ${
-              tvlChange >= 0
-                ? 'bg-green-500/10 text-green-600 dark:text-green-400'
-                : 'bg-red-500/10 text-red-600 dark:text-red-400'
-            }`}>
-              {tvlChange >= 0 ? '+' : ''}{tvlChange.toFixed(1)}%
+            <span
+              className={`text-[10px] font-medium font-mono px-1.5 py-0.5 rounded ${
+                tvlChange >= 0
+                  ? "bg-green-500/10 text-green-600 dark:text-green-400"
+                  : "bg-red-500/10 text-red-600 dark:text-red-400"
+              }`}
+            >
+              {tvlChange >= 0 ? "+" : ""}
+              {tvlChange.toFixed(1)}%
             </span>
           )}
         </div>
@@ -82,12 +92,15 @@ export function ProtocolStats({ protocolName, showVolume = true, inline = false 
           <div className="flex items-center gap-1.5">
             <p className="font-semibold text-foreground font-mono">{data.volume24h}</p>
             {volumeChange !== null && (
-              <span className={`text-[10px] font-medium font-mono px-1.5 py-0.5 rounded ${
-                volumeChange >= 0
-                  ? 'bg-green-500/10 text-green-600 dark:text-green-400'
-                  : 'bg-red-500/10 text-red-600 dark:text-red-400'
-              }`}>
-                {volumeChange >= 0 ? '+' : ''}{volumeChange.toFixed(1)}%
+              <span
+                className={`text-[10px] font-medium font-mono px-1.5 py-0.5 rounded ${
+                  volumeChange >= 0
+                    ? "bg-green-500/10 text-green-600 dark:text-green-400"
+                    : "bg-red-500/10 text-red-600 dark:text-red-400"
+                }`}
+              >
+                {volumeChange >= 0 ? "+" : ""}
+                {volumeChange.toFixed(1)}%
               </span>
             )}
           </div>

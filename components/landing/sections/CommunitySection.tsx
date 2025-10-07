@@ -32,41 +32,40 @@ const officialLinks = [
   { name: "Aptos Labs", url: "https://aptoslabs.com/" },
   { name: "Aptos Foundation", url: "https://aptosfoundation.org/" },
   { name: "Ecosystem Projects", url: "https://aptosfoundation.org/ecosystem/projects/all" },
-  { name: "Developer Docs", url: "https://aptos.dev/" },
-  { name: "Explorer", url: "https://explorer.aptoslabs.com/?network=mainnet" },
-  { name: "GitHub Profile", url: "https://github.com/aptos-labs" },
-  { name: "Source Code", url: "https://github.com/aptos-labs/aptos-core" },
   { name: "Foundation Blog", url: "https://aptosfoundation.org/currents" },
   { name: "Open Roles", url: "https://aptoslabs.com/careers" },
 ];
 
 export default function CommunitySection() {
   return (
-    <section id="community" className="py-12 md:py-16 lg:py-20 px-4 sm:px-6 relative overflow-hidden">
+    <section
+      id="community"
+      className="py-12 md:py-16 lg:py-20 px-4 sm:px-6 relative overflow-hidden"
+    >
       <div className="absolute inset-0 bg-gradient-to-b from-background via-primary/5 to-background pointer-events-none" />
       <div className="container mx-auto relative z-10">
         <motion.div
           className="text-center mb-12"
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.9, ease: "easeOut" }}
+          transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
         >
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4">
             Community Hub
           </h2>
           <p className="text-base sm:text-lg text-foreground/70 max-w-5xl mx-auto">
-            Connect with the global Aptos community and access official resources
+            Connect with the community and access resources
           </p>
         </motion.div>
 
         <div className="max-w-6xl mx-auto space-y-6">
           {/* Social Media Hub */}
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.9, delay: 0.15, ease: "easeOut" }}
+            transition={{ duration: 0.6, delay: 0.1, ease: [0.25, 0.1, 0.25, 1] }}
           >
             <Card className="p-6">
               <h3 className="font-bold text-lg text-foreground mb-4 flex items-center gap-2">
@@ -80,9 +79,11 @@ export default function CommunitySection() {
                     href={social.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-3 rounded-lg border border-border/50 hover:border-primary/50 hover:bg-primary/5 transition-all text-center group"
+                    className="p-3 rounded-lg border border-border/50 hover:border-primary/50 hover:bg-primary/5 transition-all duration-200 text-center group"
                   >
-                    <span className="text-sm text-foreground/70 group-hover:text-primary transition-colors">{social.name}</span>
+                    <span className="text-sm text-foreground/70 group-hover:text-primary transition-colors">
+                      {social.name}
+                    </span>
                   </Link>
                 ))}
               </div>
@@ -91,10 +92,10 @@ export default function CommunitySection() {
 
           {/* Regional Communities Hub */}
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.9, delay: 0.3, ease: "easeOut" }}
+            transition={{ duration: 0.6, delay: 0.15, ease: [0.25, 0.1, 0.25, 1] }}
           >
             <Card className="p-6">
               <h3 className="font-bold text-lg text-foreground mb-4 flex items-center gap-2">
@@ -108,10 +109,14 @@ export default function CommunitySection() {
                     href={community.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 p-3 rounded-lg border border-border/50 hover:border-primary/50 hover:bg-primary/5 transition-all group"
+                    className="flex items-center gap-2 p-3 rounded-lg border border-border/50 hover:border-primary/50 hover:bg-primary/5 transition-all duration-200 group"
                   >
-                    <span className="text-xl group-hover:scale-110 transition-transform">{community.flag}</span>
-                    <span className="text-sm text-foreground/70 group-hover:text-primary transition-colors">{community.name}</span>
+                    <span className="text-xl group-hover:scale-105 transition-transform duration-200">
+                      {community.flag}
+                    </span>
+                    <span className="text-sm text-foreground/70 group-hover:text-primary transition-colors">
+                      {community.name}
+                    </span>
                   </Link>
                 ))}
               </div>
@@ -120,10 +125,10 @@ export default function CommunitySection() {
 
           {/* Official Resources */}
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.9, delay: 0.45, ease: "easeOut" }}
+            transition={{ duration: 0.6, delay: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
           >
             <Card className="p-6">
               <h3 className="font-bold text-lg text-foreground mb-4 flex items-center gap-2">
@@ -137,9 +142,11 @@ export default function CommunitySection() {
                     href={link.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-3 rounded-lg border border-border/50 hover:border-primary/50 hover:bg-primary/5 transition-all text-center group"
+                    className="p-3 rounded-lg border border-border/50 hover:border-primary/50 hover:bg-primary/5 transition-all duration-200 text-center group"
                   >
-                    <span className="text-sm text-foreground/70 group-hover:text-primary transition-colors">{link.name}</span>
+                    <span className="text-sm text-foreground/70 group-hover:text-primary transition-colors">
+                      {link.name}
+                    </span>
                   </Link>
                 ))}
               </div>

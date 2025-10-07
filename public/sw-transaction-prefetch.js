@@ -122,25 +122,14 @@ async function handlePrefetchRequest(data) {
 
   // Don't prefetch on slow connections
   if (connectionQuality === "slow" || connectionQuality === "offline") {
-    console.log(
-      "SW: Skipping prefetch due to connection quality:",
-      connectionQuality,
-    );
+    console.log("SW: Skipping prefetch due to connection quality:", connectionQuality);
     return;
   }
 
   // Determine prefetch strategy based on scroll direction
-  const windowsToPreload = calculatePrefetchWindows(
-    currentWindow,
-    scrollDirection,
-  );
+  const windowsToPreload = calculatePrefetchWindows(currentWindow, scrollDirection);
 
-  console.log(
-    "SW: Prefetching windows:",
-    windowsToPreload,
-    "for wallet:",
-    walletAddress,
-  );
+  console.log("SW: Prefetching windows:", windowsToPreload, "for wallet:", walletAddress);
 
   // Prefetch in background with minimal impact
   for (const windowIndex of windowsToPreload) {
@@ -204,12 +193,7 @@ async function prefetchWindow(walletAddress, windowIndex) {
     if (response.ok) {
       const data = await response.text();
       await cacheResponse(cacheKey, data);
-      console.log(
-        "SW: Prefetched window",
-        windowIndex,
-        "for wallet",
-        walletAddress,
-      );
+      console.log("SW: Prefetched window", windowIndex, "for wallet", walletAddress);
     }
   } catch (error) {
     console.warn("SW: Prefetch failed for window", windowIndex, error);
@@ -287,7 +271,7 @@ async function maintainCacheSize() {
           const response = await cache.match(key);
           const data = await response.json();
           return { key, timestamp: data.timestamp };
-        }),
+        })
       );
 
       // Sort by timestamp and remove oldest
@@ -365,8 +349,7 @@ async function getCacheStats() {
       totalEntries: keys.length,
       expiredEntries: expiredCount,
       totalSizeBytes: totalSize,
-      cacheEfficiency:
-        keys.length > 0 ? (keys.length - expiredCount) / keys.length : 0,
+      cacheEfficiency: keys.length > 0 ? (keys.length - expiredCount) / keys.length : 0,
     };
   } catch (error) {
     console.warn("SW: Failed to get cache stats:", error);

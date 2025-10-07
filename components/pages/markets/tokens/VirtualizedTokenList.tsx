@@ -12,13 +12,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { UI_CONSTANTS } from "@/lib/config/portfolio";
 import type { TokenListItem, TokensResponse } from "@/lib/types/tokens";
-import { formatCurrency, formatNumber, formatTokenPrice } from "@/lib/utils/format";
+import { formatCurrency, formatNumber, formatTokenPrice } from "@/lib/utils/format/format";
 
 const ITEM_HEIGHT = UI_CONSTANTS.ITEM_HEIGHT;
 const PAGE_SIZE = UI_CONSTANTS.PAGE_SIZE; // Load all tokens to show verified ones first
 
 async function fetchTokens({ pageParam = 0 }): Promise<TokensResponse> {
-  const response = await fetch(`/api/aptos/tokens?limit=${PAGE_SIZE}&offset=${pageParam}`);
+  const response = await fetch(`/api/markets/tokens?limit=${PAGE_SIZE}&offset=${pageParam}`);
 
   if (!response.ok) {
     throw new Error("Failed to fetch tokens");

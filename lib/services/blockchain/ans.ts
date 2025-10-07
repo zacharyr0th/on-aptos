@@ -26,7 +26,7 @@
  */
 
 import { logger } from "@/lib/utils/core/logger";
-import { SimpleCache } from "@/lib/utils/simple-cache";
+import { SimpleCache } from "@/lib/utils/cache/simple-cache";
 
 export interface AnsResolveResult {
   address: string | null;

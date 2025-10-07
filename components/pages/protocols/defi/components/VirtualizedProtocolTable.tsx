@@ -75,9 +75,7 @@ export const VirtualizedProtocolTable = React.memo(function VirtualizedProtocolT
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[30%] px-6">
-              {t("table.protocol", "Protocol")}
-            </TableHead>
+            <TableHead className="w-[30%] px-6">{t("table.protocol", "Protocol")}</TableHead>
             <TableHead className="w-[20%] hidden sm:table-cell px-6">
               {t("table.category", "Category")}
             </TableHead>

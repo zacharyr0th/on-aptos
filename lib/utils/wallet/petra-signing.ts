@@ -3,29 +3,29 @@
  * Based on: https://petra.app/docs/signing-messages
  */
 
-import nacl from 'tweetnacl';
-import { PetraWindow, SignMessagePayload, SignMessageResponse } from './petra-events';
-import { handlePetraError } from './petra-errors';
+import nacl from "tweetnacl";
+import { PetraWindow, SignMessagePayload, SignMessageResponse } from "./petra-events";
+import { handlePetraError } from "./petra-errors";
 
 /**
  * Sign a message with Petra wallet
  */
 export async function signMessage(payload: SignMessagePayload): Promise<SignMessageResponse> {
-  if (typeof window === 'undefined') {
-    throw new Error('Window is not defined');
+  if (typeof window === "undefined") {
+    throw new Error("Window is not defined");
   }
 
   const petraWindow = window as PetraWindow;
 
   if (!petraWindow.aptos) {
-    throw new Error('Petra wallet not detected');
+    throw new Error("Petra wallet not detected");
   }
 
   try {
     const response = await petraWindow.aptos.signMessage(payload);
     return response;
   } catch (error) {
-    const errorMessage = handlePetraError(error, 'Failed to sign message');
+    const errorMessage = handlePetraError(error, "Failed to sign message");
     throw new Error(errorMessage);
   }
 }
@@ -38,14 +38,14 @@ export async function verifySignedMessage(
   message: string,
   nonce: string
 ): Promise<{ verified: boolean; response?: SignMessageResponse }> {
-  if (typeof window === 'undefined') {
-    throw new Error('Window is not defined');
+  if (typeof window === "undefined") {
+    throw new Error("Window is not defined");
   }
 
   const petraWindow = window as PetraWindow;
 
   if (!petraWindow.aptos) {
-    throw new Error('Petra wallet not detected');
+    throw new Error("Petra wallet not detected");
   }
 
   try {
@@ -71,7 +71,7 @@ export async function verifySignedMessage(
 
     return { verified, response };
   } catch (error) {
-    const errorMessage = handlePetraError(error, 'Failed to verify signed message');
+    const errorMessage = handlePetraError(error, "Failed to verify signed message");
     throw new Error(errorMessage);
   }
 }
@@ -81,7 +81,7 @@ export async function verifySignedMessage(
  */
 function hexToUint8Array(hexString: string): Uint8Array {
   // Remove 0x prefix if present
-  const hex = hexString.startsWith('0x') ? hexString.slice(2) : hexString;
+  const hex = hexString.startsWith("0x") ? hexString.slice(2) : hexString;
 
   // Convert hex string to Uint8Array
   const bytes = new Uint8Array(hex.length / 2);
@@ -118,7 +118,7 @@ export function createSignMessagePayload(
  */
 export async function verifyWalletOwnership(
   expectedAddress: string,
-  message: string = 'Verify wallet ownership'
+  message: string = "Verify wallet ownership"
 ): Promise<boolean> {
   try {
     const nonce = Math.random().toString(36).substring(7);
@@ -131,7 +131,7 @@ export async function verifyWalletOwnership(
     // Check if the address matches
     return response.address.toLowerCase() === expectedAddress.toLowerCase();
   } catch (error) {
-    console.error('Failed to verify wallet ownership:', error);
+    console.error("Failed to verify wallet ownership:", error);
     return false;
   }
 }
