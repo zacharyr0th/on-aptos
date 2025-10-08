@@ -1,13 +1,13 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
+import { YieldTable } from "@/components/pages/tools/portfolio/YieldTable";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { YieldTable } from "@/components/pages/tools/portfolio/YieldTable";
-import { motion } from "framer-motion";
-import { slideInLeft, rotateScale } from "../shared/animations";
+import { rotateScale, slideInLeft } from "../shared/animations";
 
 export default function YieldSection() {
   return (

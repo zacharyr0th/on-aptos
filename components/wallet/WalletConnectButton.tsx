@@ -185,7 +185,7 @@ export function WalletConnectButton({ size = "sm", className }: WalletConnectBut
         </Button>
 
         <Dialog open={showWalletModal} onOpenChange={setShowWalletModal}>
-          <DialogContent className="w-[calc(100%-2rem)] sm:max-w-md max-h-[85vh] overflow-y-auto fixed top-[50vh] left-[50%] translate-x-[-50%] translate-y-[-50%]">
+          <DialogContent className="w-[calc(100%-2rem)] sm:max-w-md max-h-[85vh] overflow-y-auto fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
             <DialogTitle>Connect Your Portfolio</DialogTitle>
             <div className="grid gap-3 py-4">
               {/* Extension Wallets */}

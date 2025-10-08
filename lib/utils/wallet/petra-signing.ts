@@ -4,8 +4,9 @@
  */
 
 import nacl from "tweetnacl";
-import { PetraWindow, SignMessagePayload, SignMessageResponse } from "./petra-events";
+import { errorLogger } from "@/lib/utils/core/logger";
 import { handlePetraError } from "./petra-errors";
+import type { PetraWindow, SignMessagePayload, SignMessageResponse } from "./petra-events";
 
 /**
  * Sign a message with Petra wallet
@@ -131,7 +132,7 @@ export async function verifyWalletOwnership(
     // Check if the address matches
     return response.address.toLowerCase() === expectedAddress.toLowerCase();
   } catch (error) {
-    console.error("Failed to verify wallet ownership:", error);
+    errorLogger.error("Failed to verify wallet ownership", { error });
     return false;
   }
 }

@@ -22,7 +22,7 @@ const SUPPORTED_PROTOCOLS: Protocol[] = [
     name: "Thala",
     logo: "/icons/protocols/thala.avif",
     type: "DEX",
-    website: "https://thala.fi",
+    website: "https://www.thala.fi",
   },
   {
     id: "liquidswap",
@@ -131,14 +131,14 @@ const SUPPORTED_PROTOCOLS: Protocol[] = [
     name: "Thala LSD",
     logo: "/icons/protocols/thala.avif",
     type: "Liquid Staking",
-    website: "https://thala.fi",
+    website: "https://www.thala.fi",
   },
   {
     id: "trufin",
     name: "Trufin",
     logo: "/icons/protocols/trufin.webp",
     type: "Liquid Staking",
-    website: "https://trufin.io",
+    website: "https://www.trufin.io",
   },
 
   // Derivatives & Perps

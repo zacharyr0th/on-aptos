@@ -1,10 +1,10 @@
 "use client";
 
-import { LucideIcon } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import type { ReactNode } from "react";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import IconContainer from "./IconContainer";
-import { ReactNode } from "react";
 
 interface FeatureCardProps {
   icon: LucideIcon;

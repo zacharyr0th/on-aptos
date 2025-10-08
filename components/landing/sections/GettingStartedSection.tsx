@@ -1,28 +1,28 @@
 "use client";
 
-import { useState } from "react";
-import { TrendingUp, ChevronDown, ChevronUp } from "lucide-react";
-import Link from "next/link";
+import { motion } from "framer-motion";
+import { ChevronDown, ChevronUp, TrendingUp } from "lucide-react";
 import Image from "next/image";
-import { Card } from "@/components/ui/card";
+import Link from "next/link";
+import { useState } from "react";
+import {
+  aptosExchanges,
+  bridgeGuides,
+  liveBridges,
+  wallets,
+} from "@/components/landing/data/landing-data";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import {
-  wallets,
-  aptosExchanges,
-  liveBridges,
-  bridgeGuides,
-} from "@/components/landing/data/landing-data";
-import { motion } from "framer-motion";
-import WalletCard from "../shared/WalletCard";
-import ExchangeCard from "../shared/ExchangeCard";
-import {
-  sectionHeader,
-  staggerContainer,
   cardEntrance,
   scaleBlur,
+  sectionHeader,
   slideInRight,
+  staggerContainer,
 } from "../shared/animations";
+import ExchangeCard from "../shared/ExchangeCard";
+import WalletCard from "../shared/WalletCard";
 
 export default function GettingStartedSection() {
   const [showAllExchanges, setShowAllExchanges] = useState(false);
@@ -78,7 +78,7 @@ export default function GettingStartedSection() {
               <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 max-w-6xl mx-auto">
                 <div className="flex flex-col items-center text-center space-y-4 group relative min-h-[44px]">
                   <div className="absolute -top-2 -right-2 w-10 h-10 md:w-8 md:h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                    <span className="text-base md:text-sm font-bold text-primary">1</span>
+                    <span className="text-base md:text-sm font-bold text-primary font-mono">1</span>
                   </div>
                   <div className="w-20 h-20 mb-2 flex items-center justify-center group-hover:scale-105 transition-transform duration-200 bg-gradient-to-br from-muted/40 to-muted/20 rounded-2xl p-3 min-w-[44px] min-h-[44px]">
                     <img
@@ -94,7 +94,7 @@ export default function GettingStartedSection() {
                 </div>
                 <div className="flex flex-col items-center text-center space-y-4 group relative">
                   <div className="absolute -top-2 -right-2 w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                    <span className="text-sm font-bold text-primary">2</span>
+                    <span className="text-sm font-bold text-primary font-mono">2</span>
                   </div>
                   <div className="w-20 h-20 mb-2 flex items-center justify-center group-hover:scale-105 transition-transform duration-200 bg-gradient-to-br from-muted/40 to-muted/20 rounded-2xl p-3">
                     <Image
@@ -112,7 +112,7 @@ export default function GettingStartedSection() {
                 </div>
                 <div className="flex flex-col items-center text-center space-y-4 group relative">
                   <div className="absolute -top-2 -right-2 w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                    <span className="text-sm font-bold text-primary">3</span>
+                    <span className="text-sm font-bold text-primary font-mono">3</span>
                   </div>
                   <div className="w-20 h-20 mb-2 flex items-center justify-center group-hover:scale-105 transition-transform duration-200 bg-gradient-to-br from-muted/40 to-muted/20 rounded-2xl p-3">
                     <img
@@ -136,7 +136,7 @@ export default function GettingStartedSection() {
                 </div>
                 <div className="flex flex-col items-center text-center space-y-4 group relative">
                   <div className="absolute -top-2 -right-2 w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                    <span className="text-sm font-bold text-primary">4</span>
+                    <span className="text-sm font-bold text-primary font-mono">4</span>
                   </div>
                   <div className="w-20 h-20 mb-2 flex items-center justify-center group-hover:scale-105 transition-transform duration-200 bg-gradient-to-br from-primary/20 to-primary/10 rounded-2xl p-3">
                     <TrendingUp className="w-12 h-12 text-primary" />
@@ -152,8 +152,13 @@ export default function GettingStartedSection() {
 
           {/* Exchanges */}
           <motion.div className="mb-20" {...slideInRight}>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-2xl font-bold text-foreground">Buy APT on Exchanges</h3>
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h3 className="text-2xl font-bold text-foreground">Buy APT on Exchanges</h3>
+                <p className="text-sm text-foreground/70 mt-1">
+                  Trade Aptos tokens globally on leading exchanges
+                </p>
+              </div>
               <Button
                 variant="ghost"
                 size="sm"
@@ -171,11 +176,6 @@ export default function GettingStartedSection() {
                 )}
               </Button>
             </div>
-            {!showAllExchanges && (
-              <p className="text-center text-foreground/70 mb-8 max-w-2xl mx-auto">
-                Trade Aptos tokens globally on leading exchanges
-              </p>
-            )}
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
               {aptosExchanges.slice(0, showAllExchanges ? undefined : 4).map((exchange, index) => (
@@ -194,8 +194,13 @@ export default function GettingStartedSection() {
 
           {/* Bridges */}
           <motion.div {...scaleBlur}>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-2xl font-bold text-foreground">Bridge Assets to Aptos</h3>
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h3 className="text-2xl font-bold text-foreground">Bridge Assets to Aptos</h3>
+                <p className="text-sm text-foreground/70 mt-1">
+                  Transfer from Ethereum, Solana, and more with LayerZero, Circle CCTP, and Wormhole
+                </p>
+              </div>
               <Button
                 variant="ghost"
                 size="sm"
@@ -213,12 +218,6 @@ export default function GettingStartedSection() {
                 )}
               </Button>
             </div>
-            {!showAllBridges && (
-              <p className="text-center text-foreground/70 mb-8 max-w-2xl mx-auto">
-                Transfer assets from Ethereum, Solana, and other chains using secure, audited bridges
-                powered by LayerZero, Circle CCTP, and Wormhole
-              </p>
-            )}
 
             {/* Bridge Comparison Grid */}
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-8">
@@ -257,13 +256,13 @@ export default function GettingStartedSection() {
                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 md:gap-3 pt-3 border-t border-border/50">
                         <div className="text-center">
                           <p className="text-[10px] sm:text-xs text-muted-foreground mb-1">Time</p>
-                          <p className="text-xs sm:text-sm font-semibold text-foreground">
+                          <p className="text-xs sm:text-sm font-semibold text-foreground font-mono">
                             {bridge.bridgeTime}
                           </p>
                         </div>
                         <div className="text-center">
                           <p className="text-[10px] sm:text-xs text-muted-foreground mb-1">Fees</p>
-                          <p className="text-xs sm:text-sm font-semibold text-foreground">
+                          <p className="text-xs sm:text-sm font-semibold text-foreground font-mono">
                             {bridge.fees}
                           </p>
                         </div>
@@ -271,7 +270,7 @@ export default function GettingStartedSection() {
                           <p className="text-[10px] sm:text-xs text-muted-foreground mb-1">
                             Networks
                           </p>
-                          <p className="text-xs sm:text-sm font-semibold text-foreground">
+                          <p className="text-xs sm:text-sm font-semibold text-foreground font-mono">
                             {bridge.networks}
                           </p>
                         </div>

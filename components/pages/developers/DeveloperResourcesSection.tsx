@@ -1,6 +1,6 @@
 "use client";
 
-import { ExternalLink, Github, BookOpen, Code2, Wrench } from "lucide-react";
+import { BookOpen, Code2, ExternalLink, Github, Wrench } from "lucide-react";
 import {
   Accordion,
   AccordionContent,
@@ -32,7 +32,7 @@ const developerTools = [
   {
     name: "Developer Portal",
     description: "API keys, Transaction Stream, and Indexer API access",
-    href: "https://developers.aptoslabs.com/",
+    href: "https://geomi.dev/",
     icon: Wrench,
   },
   {

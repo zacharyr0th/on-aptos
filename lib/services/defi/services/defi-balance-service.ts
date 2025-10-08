@@ -31,7 +31,7 @@ import {
   mapProtocolTypeToDefiType,
 } from "./utils";
 
-const INDEXER = "https://indexer.mainnet.aptoslabs.com/v1/graphql";
+const INDEXER = "https://api.mainnet.aptoslabs.com/v1/graphql";
 const APTOS_API_KEY = getEnvVar("APTOS_BUILD_SECRET");
 
 export class DeFiBalanceService {

@@ -1,12 +1,13 @@
 "use client";
 
+import { GeistMono } from "geist/font/mono";
 import { Layers, Loader2, PieChart as PieChartIcon, Wallet } from "lucide-react";
 import { useTheme } from "next-themes";
 import React, { lazy, Suspense, useCallback, useMemo } from "react";
 import { LoadingSkeleton, NFTTreemapSkeleton } from "@/components/shared/pages";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { formatCurrency } from "@/lib/utils/format/format";
 import { logger } from "@/lib/utils/core/logger";
+import { formatCurrency } from "@/lib/utils/format/format";
 import {
   CHART_COLORS_DARK,
   CHART_COLORS_LIGHT,
@@ -76,7 +77,7 @@ const StatItem = ({ label, value }: any) => (
     <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-0.5">
       {label}
     </p>
-    <p className="text-xl font-normal">{value}</p>
+    <p className={`text-xl font-normal ${GeistMono.className}`}>{value}</p>
   </div>
 );
 
@@ -227,7 +228,9 @@ export const WalletSummary: React.FC<WalletSummaryProps> = ({
                   outerRadius="92%"
                   centerContent={
                     <div className="text-center">
-                      <div className="text-2xl sm:text-3xl lg:text-2xl font-bold">
+                      <div
+                        className={`text-2xl sm:text-3xl lg:text-2xl font-bold ${GeistMono.className}`}
+                      >
                         {formatCurrency(calculatedTotalValue || totalValue)}
                       </div>
                     </div>

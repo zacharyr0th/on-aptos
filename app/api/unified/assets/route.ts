@@ -115,19 +115,11 @@ async function unifiedAssetsHandler(request: NextRequest) {
     // Format response
     const response = assetType === "all" ? data : data[assetType];
 
-    return successResponse(
-      {
-        assetType,
-        ...response,
-        timestamp: new Date().toISOString(),
-      },
-      CACHE_DURATIONS.MEDIUM,
-      {
-        "X-Data-Source": "aptos-indexer",
-        "X-Asset-Type": assetType,
-        "X-Include-Metrics": includeMetrics ? "true" : "false",
-      }
-    );
+    return successResponse(response, CACHE_DURATIONS.MEDIUM, {
+      "X-Data-Source": "aptos-indexer",
+      "X-Asset-Type": assetType,
+      "X-Include-Metrics": includeMetrics ? "true" : "false",
+    });
   } catch (error) {
     logger.error("Unified assets API error", {
       error: error instanceof Error ? error.message : String(error),

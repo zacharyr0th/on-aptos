@@ -25,9 +25,14 @@ export const BaseDialog = memo<BaseDialogProps>(
   ({ isOpen, onClose, title, children, className = "", size = "md", showErrorBoundary = true }) => {
     const { isMobile } = useResponsive();
 
-    const handleClose = useCallback(() => {
-      onClose();
-    }, [onClose]);
+    const handleClose = useCallback(
+      (open: boolean) => {
+        if (!open) {
+          onClose();
+        }
+      },
+      [onClose]
+    );
 
     // Size classes based on size prop and responsive design
     const getSizeClass = () => {
@@ -50,7 +55,7 @@ export const BaseDialog = memo<BaseDialogProps>(
     };
 
     const content = showErrorBoundary ? (
-      <ErrorBoundary fallback={<ErrorFallback level="dialog" onClose={handleClose} />}>
+      <ErrorBoundary fallback={<ErrorFallback level="dialog" onClose={onClose} />}>
         {children}
       </ErrorBoundary>
     ) : (
@@ -60,7 +65,7 @@ export const BaseDialog = memo<BaseDialogProps>(
     return (
       <Dialog open={isOpen} onOpenChange={handleClose}>
         <DialogContent
-          className={`${getSizeClass()} ${className} fixed top-[50vh] left-[50%] translate-x-[-50%] translate-y-[-50%] overflow-y-auto ${!isMobile && "sm:max-h-[85vh]"}`}
+          className={`${getSizeClass()} ${className} fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 overflow-y-auto ${!isMobile && "sm:max-h-[85vh]"}`}
         >
           {title && (
             <DialogHeader>

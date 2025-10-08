@@ -1,7 +1,7 @@
 import { CACHE_CONFIG } from "@/lib/config/cache";
 import { errorLogger } from "@/lib/utils/core/logger";
 import { dedupeFetch } from "./cache/request-deduplication";
-import { ApiError, TimeoutError } from "./errors";
+import { ApiError, TimeoutError } from "./core/errors";
 import type { BatchRequestOptions, FetchOptions, GraphQLRequest, RateLimitInfo } from "./types";
 
 /**

@@ -35,8 +35,8 @@
  * ```
  */
 
-import { logger } from "@/lib/utils/core/logger";
 import { UnifiedCache } from "@/lib/utils/cache/unified-cache";
+import { logger } from "@/lib/utils/core/logger";
 
 const APTOS_ANALYTICS_BASE_URL = "https://api.mainnet.aptoslabs.com/v1/analytics";
 

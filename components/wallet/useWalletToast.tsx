@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { WalletErrorToast, type ToastMessage } from "./WalletErrorToast";
+import { useCallback, useState } from "react";
 import { handlePetraError, PetraErrorCode } from "@/lib/utils/wallet/petra-errors";
+import { type ToastMessage, WalletErrorToast } from "./WalletErrorToast";
 
 export function useWalletToast() {
   const [toast, setToast] = useState<ToastMessage | null>(null);

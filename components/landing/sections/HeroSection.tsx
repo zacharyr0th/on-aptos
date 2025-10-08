@@ -1,12 +1,12 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { TrendingUp } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect } from "react";
-import { Card } from "@/components/ui/card";
+import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import { motion } from "framer-motion";
+import { Card } from "@/components/ui/card";
 
 interface HeroSectionProps {
   assetValues: {
@@ -37,7 +37,7 @@ export default function HeroSection({ assetValues, isLoadingValues }: HeroSectio
     const animate = () => {
       const elapsed = Date.now() - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      const easeOutProgress = 1 - Math.pow(1 - progress, 3);
+      const easeOutProgress = 1 - (1 - progress) ** 3;
 
       setAnimatedValues({
         stables: Math.floor(assetValues.stables.value * easeOutProgress),

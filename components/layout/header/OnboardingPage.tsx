@@ -1,11 +1,11 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import { Menu, X } from "lucide-react";
-import { useState, useMemo, useEffect } from "react";
-import type { TokenData } from "@/lib/types/tokens";
-import { STABLECOIN_SYMBOLS } from "@/lib/constants/tokens/stablecoins";
+import dynamic from "next/dynamic";
+import { useEffect, useMemo, useState } from "react";
 import { navigationSections } from "@/components/landing/data/landing-data";
+import { STABLECOIN_SYMBOLS } from "@/lib/constants/tokens/stablecoins";
+import type { TokenData } from "@/lib/types/tokens";
 
 // Dynamic imports for code splitting - hero loads immediately, rest are lazy
 const HeroSection = dynamic(() => import("@/components/landing/sections/HeroSection"));

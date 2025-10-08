@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { Card } from "@/components/ui/card";
+import type { ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { ReactNode } from "react";
 
 interface ProtocolCardProps {
   logo: string;

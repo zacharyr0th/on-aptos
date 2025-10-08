@@ -1,18 +1,18 @@
+import type { LucideIcon } from "lucide-react";
 import {
-  Zap,
-  Shield,
   Code,
-  TrendingUp,
-  Layers,
-  Users,
-  Search,
-  Terminal,
-  Settings,
-  Key,
   Eye,
   Info,
+  Key,
+  Layers,
+  Search,
+  Settings,
+  Shield,
+  Terminal,
+  TrendingUp,
+  Users,
+  Zap,
 } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
 
 export const features = [
   {
@@ -571,7 +571,7 @@ export const developerTools = [
   {
     name: "Geomi (Developer Portal)",
     description: "API keys, Transaction Stream, and Indexer API access",
-    href: "https://developers.aptoslabs.com/",
+    href: "https://geomi.dev/",
     icon: Settings,
   },
   {

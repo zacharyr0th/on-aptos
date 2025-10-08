@@ -32,8 +32,8 @@ const STABLECOIN_CONFIGS: Record<string, BaseTokenConfig> = {
     issuer: "Tether Operations Ltd.",
     assetAddress: "0x357b0b74bc833e95a115ad22604854d6b0fca151cecd94111770e5d6ffc9dc2b",
     decimals: 6,
-    website: "https://tether.to",
-    auditLink: "https://tether.to/en/supported-protocols/?utm_source=chatgpt.com",
+    website: "https://tether.to/",
+    auditLink: "https://tether.to/en/transparency/",
     tags: ["collateralized", "fiat-backed"],
   },
   USDC: {
@@ -45,7 +45,7 @@ const STABLECOIN_CONFIGS: Record<string, BaseTokenConfig> = {
     assetAddress: "0xbae207659db88bea0cbead6da0ed00aac12edcdda169e591cd41c94180b46f3b",
     decimals: 6,
     website: "https://www.circle.com/usdc",
-    auditLink: "https://www.circle.com/en/transparency",
+    auditLink: "https://www.circle.com/transparency",
     tags: ["collateralized", "fiat-backed"],
   },
   USDA: {
@@ -81,7 +81,7 @@ const STABLECOIN_CONFIGS: Record<string, BaseTokenConfig> = {
     assetAddress: "0xb30a694a344edee467d9f82330bbe7c3b89f440a1ecd2da1f3bca266560fce69",
     decimals: 6,
     website: "https://ethena.fi",
-    auditLink: "https://www.ethena.fi/transparency",
+    auditLink: "https://ethena.fi/transparency",
     tags: ["algorithmic", "delta-hedged", "synthetic"],
   },
   USDe: {
@@ -93,7 +93,7 @@ const STABLECOIN_CONFIGS: Record<string, BaseTokenConfig> = {
     assetAddress: "0xf37a8864fe737eb8ec2c2931047047cbaed1beed3fb0e5b7c5526dafd3b9c2e9",
     decimals: 6,
     website: "https://ethena.fi",
-    auditLink: "https://www.ethena.fi/transparency",
+    auditLink: "https://ethena.fi/transparency",
     tags: ["algorithmic", "delta-hedged", "synthetic"],
   },
   USD1: {
@@ -118,7 +118,7 @@ const STABLECOIN_CONFIGS: Record<string, BaseTokenConfig> = {
     assetAddress: "0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDC",
     decimals: 6,
     website: "https://layerzero.network",
-    auditLink: "https://www.circle.com/en/transparency",
+    auditLink: "https://www.circle.com/transparency",
     tags: ["bridged", "layerzero"],
   },
   // Multichain bridged
@@ -131,7 +131,7 @@ const STABLECOIN_CONFIGS: Record<string, BaseTokenConfig> = {
     assetAddress: "0xd6d6372c8bde72a7ab825c00b9edd35e643fb94a61c55d9d94a9db3010098548::USDC::Coin",
     decimals: 6,
     website: "https://multichain.org",
-    auditLink: "https://www.circle.com/en/transparency",
+    auditLink: "https://www.circle.com/transparency",
     tags: ["bridged", "multichain"],
   },
   lzUSDT: {
@@ -143,7 +143,7 @@ const STABLECOIN_CONFIGS: Record<string, BaseTokenConfig> = {
     assetAddress: "0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDT",
     decimals: 6,
     website: "https://layerzero.network",
-    auditLink: "https://tether.to/en/transparency",
+    auditLink: "https://tether.to/en/transparency/",
     tags: ["bridged", "layerzero"],
   },
   // Wormhole bridged
@@ -156,7 +156,7 @@ const STABLECOIN_CONFIGS: Record<string, BaseTokenConfig> = {
     assetAddress: "0x5e156f1207d0ebfa19a9eeff00d62a282278fb8719f4fab3a586a0a2c0fffbea::coin::T",
     decimals: 6,
     website: "https://wormhole.com",
-    auditLink: "https://www.circle.com/en/transparency",
+    auditLink: "https://www.circle.com/transparency",
     tags: ["bridged", "wormhole"],
   },
   whUSDT: {
@@ -168,7 +168,7 @@ const STABLECOIN_CONFIGS: Record<string, BaseTokenConfig> = {
     assetAddress: "0xa2eda21a58856fda86451436513b867c97eecb4ba099da5775520e0f7492e852::coin::T",
     decimals: 6,
     website: "https://wormhole.com",
-    auditLink: "https://tether.to/en/transparency",
+    auditLink: "https://tether.to/en/transparency/",
     tags: ["bridged", "wormhole"],
   },
   // Celer bridged
@@ -182,7 +182,7 @@ const STABLECOIN_CONFIGS: Record<string, BaseTokenConfig> = {
       "0x8d87a65ba30e09357fa2edea2c80dbac296e5dec2b18287113500b902942929d::celer_coin_manager::UsdcCoin",
     decimals: 6,
     website: "https://celer.network",
-    auditLink: "https://www.circle.com/en/transparency",
+    auditLink: "https://www.circle.com/transparency",
     tags: ["bridged", "celer"],
   },
   ceUSDT: {
@@ -195,7 +195,7 @@ const STABLECOIN_CONFIGS: Record<string, BaseTokenConfig> = {
       "0x8d87a65ba30e09357fa2edea2c80dbac296e5dec2b18287113500b902942929d::celer_coin_manager::UsdtCoin",
     decimals: 6,
     website: "https://celer.network",
-    auditLink: "https://tether.to/en/transparency",
+    auditLink: "https://tether.to/en/transparency/",
     tags: ["bridged", "celer"],
   },
 };
@@ -221,7 +221,7 @@ STABLECOIN_METADATA["sUSDe / USDe"] = {
   decimals: 6,
   explorerLink: `${generateExplorerLink(STABLECOIN_CONFIGS.sUSDe.assetAddress)}\n${generateExplorerLink(STABLECOIN_CONFIGS.USDe.assetAddress)}`,
   website: "https://ethena.fi",
-  auditLink: "https://www.ethena.fi/transparency",
+  auditLink: "https://ethena.fi/transparency",
   tags: ["algorithmic", "delta-hedged", "synthetic"],
 };
 

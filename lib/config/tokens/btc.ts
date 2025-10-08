@@ -65,7 +65,7 @@ const BTC_CONFIGS: Record<string, BaseTokenConfig> = {
     assetAddress: "0x68844a0d7f2587e726ad0579f3d640865bb4162c08a4589eeda3f9689ec52a3d",
     decimals: 8,
     website: "https://wbtc.network",
-    auditLink: "https://www.bitgo.com/resources/learn/wbtc-audit",
+    auditLink: "https://wbtc.network/dashboard/audit",
     tags: ["wrapped", "layerzero"],
   },
   FiaBTC: {
@@ -76,8 +76,8 @@ const BTC_CONFIGS: Record<string, BaseTokenConfig> = {
     issuer: "Fiamma",
     assetAddress: "0x75de592a7e62e6224d13763c392190fda8635ebb79c798a5e9dd0840102f3f93",
     decimals: 8,
-    website: "https://fiamma.io",
-    auditLink: "https://fiamma.io/audit",
+    website: "https://www.fiammalabs.io",
+    auditLink: "https://www.openzeppelin.com/news/fiamma-bridge-audit",
     tags: ["wrapped", "bridged"],
   },
 };

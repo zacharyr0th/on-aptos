@@ -1,21 +1,21 @@
 "use client";
 
-import { Zap, Shield, Code, TrendingUp, Layers, Users, ArrowRight, Check } from "lucide-react";
-import Link from "next/link";
-import Image from "next/image";
-import { Suspense } from "react";
-import { Card } from "@/components/ui/card";
-import USDTCostChart from "@/components/pages/performance/USDTCostChart";
 import { motion } from "framer-motion";
-import SectionHeader from "../shared/SectionHeader";
-import FeatureCard from "../shared/FeatureCard";
+import { ArrowRight, Check, Code, Layers, Shield, TrendingUp, Users, Zap } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { Suspense } from "react";
+import USDTCostChart from "@/components/pages/performance/USDTCostChart";
+import { Card } from "@/components/ui/card";
 import {
   cardEntranceLeft,
-  staggerContainer,
+  rotateEntrance,
   scaleBlur,
   slideInLeft,
-  rotateEntrance,
+  staggerContainer,
 } from "../shared/animations";
+import FeatureCard from "../shared/FeatureCard";
+import SectionHeader from "../shared/SectionHeader";
 
 // Pre-sorted static data for performance
 const USDT_COST_DATA = [
@@ -78,7 +78,7 @@ export default function WhyAptosSection() {
               <FeatureCard
                 icon={Shield}
                 title="Secure by Design"
-                description="Move language with fair ordering eliminates MEV and sandwich attacks"
+                description="Move language with fair ordering ensures secure transactions"
               />
             </motion.div>
 
@@ -198,31 +198,31 @@ export default function WhyAptosSection() {
 
             {/* Chain Performance Comparison Grid */}
             <motion.div
-              className="mt-16"
+              className="mt-20 py-12"
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, margin: "-50px" }}
               variants={rotateEntrance}
             >
-              <h3 className="text-2xl md:text-3xl font-bold text-center mb-8">
+              <h3 className="text-3xl md:text-4xl font-bold text-center mb-12">
                 Chain Performance Comparison
               </h3>
               <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
-                <div className="space-y-4 min-w-[820px] md:min-w-0">
+                <div className="space-y-6 min-w-[820px] md:min-w-0">
                   {/* Aptos Row */}
                   <div className="flex gap-3 md:gap-4 items-center">
-                    <div className="flex-shrink-0 w-16 md:w-20 flex flex-col items-center justify-center">
+                    <div className="flex-shrink-0 w-20 md:w-24 flex flex-col items-center justify-center">
                       <Image
                         src="/icons/apt.png"
                         alt="Aptos"
-                        width={32}
-                        height={32}
-                        className="dark:invert mb-1"
+                        width={40}
+                        height={40}
+                        className="dark:invert mb-2"
                       />
-                      <div className="text-xs font-semibold text-center font-mono">Aptos</div>
+                      <div className="text-sm font-semibold text-center font-mono">Aptos</div>
                     </div>
-                    <div className="flex-1 grid grid-cols-6 items-stretch gap-1.5 md:gap-3 [&>div]:h-full">
-                      <div className="border border-emerald-300 bg-emerald-50 dark:border-emerald-800/50 dark:bg-emerald-950/5 rounded-lg p-2 md:p-3 text-center relative">
+                    <div className="flex-1 grid grid-cols-6 items-stretch gap-2 md:gap-4 [&>div]:h-full">
+                      <div className="border border-emerald-300 bg-emerald-50 dark:border-emerald-800/50 dark:bg-emerald-950/5 rounded-lg p-3 md:p-4 text-center relative">
                         <Check className="absolute top-1 right-1 md:top-2 md:right-2 h-3 w-3 text-emerald-600 dark:text-emerald-400" />
                         <div className="text-lg md:text-xl font-bold text-emerald-800 dark:text-emerald-500 mb-1 font-mono">
                           12.9k
@@ -281,18 +281,18 @@ export default function WhyAptosSection() {
 
                   {/* Sui Row */}
                   <div className="flex gap-3 md:gap-4 items-center">
-                    <div className="flex-shrink-0 w-16 md:w-20 flex flex-col items-center justify-center">
+                    <div className="flex-shrink-0 w-20 md:w-24 flex flex-col items-center justify-center">
                       <Image
                         src="/icons/performance/sui.png"
                         alt="Sui"
-                        width={32}
-                        height={32}
-                        className="mb-1"
+                        width={40}
+                        height={40}
+                        className="mb-2"
                       />
-                      <div className="text-xs font-semibold text-center font-mono">Sui</div>
+                      <div className="text-sm font-semibold text-center font-mono">Sui</div>
                     </div>
-                    <div className="flex-1 grid grid-cols-6 items-stretch gap-1.5 md:gap-3 [&>div]:h-full">
-                      <div className="border border-orange-300 bg-orange-50 dark:border-orange-800/40 dark:bg-orange-950/5 rounded-lg p-2 md:p-3 text-center">
+                    <div className="flex-1 grid grid-cols-6 items-stretch gap-2 md:gap-4 [&>div]:h-full">
+                      <div className="border border-orange-300 bg-orange-50 dark:border-orange-800/40 dark:bg-orange-950/5 rounded-lg p-3 md:p-4 text-center">
                         <div className="text-lg md:text-xl font-bold text-orange-800 dark:text-orange-600 mb-1 font-mono">
                           926
                         </div>
@@ -364,18 +364,18 @@ export default function WhyAptosSection() {
 
                   {/* TRON Row */}
                   <div className="flex gap-3 md:gap-4 items-center">
-                    <div className="flex-shrink-0 w-16 md:w-20 flex flex-col items-center justify-center">
+                    <div className="flex-shrink-0 w-20 md:w-24 flex flex-col items-center justify-center">
                       <Image
                         src="/icons/performance/trx.png"
                         alt="TRON"
-                        width={32}
-                        height={32}
-                        className="mb-1"
+                        width={40}
+                        height={40}
+                        className="mb-2"
                       />
-                      <div className="text-xs font-semibold text-center font-mono">TRON</div>
+                      <div className="text-sm font-semibold text-center font-mono">TRON</div>
                     </div>
-                    <div className="flex-1 grid grid-cols-6 items-stretch gap-1.5 md:gap-3 [&>div]:h-full">
-                      <div className="border border-red-400 bg-red-100 dark:border-red-800/40 dark:bg-red-950/5 rounded-lg p-2 md:p-3 text-center">
+                    <div className="flex-1 grid grid-cols-6 items-stretch gap-2 md:gap-4 [&>div]:h-full">
+                      <div className="border border-red-400 bg-red-100 dark:border-red-800/40 dark:bg-red-950/5 rounded-lg p-3 md:p-4 text-center">
                         <div className="text-lg md:text-xl font-bold text-red-800 dark:text-red-600 mb-1 font-mono">
                           272
                         </div>
@@ -446,18 +446,18 @@ export default function WhyAptosSection() {
 
                   {/* Base Row */}
                   <div className="flex gap-3 md:gap-4 items-center">
-                    <div className="flex-shrink-0 w-16 md:w-20 flex flex-col items-center justify-center">
+                    <div className="flex-shrink-0 w-20 md:w-24 flex flex-col items-center justify-center">
                       <Image
                         src="/icons/performance/base.png"
                         alt="Base"
-                        width={32}
-                        height={32}
-                        className="mb-1"
+                        width={40}
+                        height={40}
+                        className="mb-2"
                       />
-                      <div className="text-xs font-semibold text-center font-mono">Base</div>
+                      <div className="text-sm font-semibold text-center font-mono">Base</div>
                     </div>
-                    <div className="flex-1 grid grid-cols-6 items-stretch gap-1.5 md:gap-3 [&>div]:h-full">
-                      <div className="border border-red-400 bg-red-100 dark:border-red-800/40 dark:bg-red-950/5 rounded-lg p-2 md:p-3 text-center">
+                    <div className="flex-1 grid grid-cols-6 items-stretch gap-2 md:gap-4 [&>div]:h-full">
+                      <div className="border border-red-400 bg-red-100 dark:border-red-800/40 dark:bg-red-950/5 rounded-lg p-3 md:p-4 text-center">
                         <div className="text-lg md:text-xl font-bold text-red-800 dark:text-red-600 mb-1 font-mono">
                           1.3k
                         </div>
@@ -527,10 +527,10 @@ export default function WhyAptosSection() {
                   </div>
                 </div>
               </div>
-              <div className="text-center mt-8">
+              <div className="text-center mt-12">
                 <Link
                   href="/performance"
-                  className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
+                  className="inline-flex items-center gap-2 text-base text-muted-foreground hover:text-primary transition-colors font-medium"
                 >
                   Click here to compare with more chains →
                 </Link>

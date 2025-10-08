@@ -1,3 +1,4 @@
+import { GeistMono } from "geist/font/mono";
 import React, { useMemo } from "react";
 import { Tooltip as RechartsTooltip, ResponsiveContainer, Treemap } from "recharts";
 import { formatCurrency, formatTokenAmount } from "@/lib/utils/format/format";
@@ -23,11 +24,15 @@ export const LegendItem = React.memo(
       <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
       <div className="text-sm font-medium min-w-[40px]">{symbol}</div>
       {showValue && value !== undefined && (
-        <div className="text-xs text-muted-foreground hidden lg:block ml-auto mr-2">
+        <div
+          className={`text-xs text-muted-foreground hidden lg:block ml-auto mr-2 ${GeistMono.className}`}
+        >
           {formatCurrency(value)}
         </div>
       )}
-      <div className="text-sm text-muted-foreground text-right">{percentage.toFixed(1)}%</div>
+      <div className={`text-sm text-muted-foreground text-right ${GeistMono.className}`}>
+        {percentage.toFixed(1)}%
+      </div>
     </div>
   ),
   (prev, next) =>

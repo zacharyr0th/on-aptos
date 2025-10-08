@@ -1,4 +1,4 @@
-import { type NextRequest, NextResponse } from "next/server";
+import type { NextRequest, NextResponse } from "next/server";
 
 import { logger } from "@/lib/utils/core/logger";
 import { errorResponse, successResponse } from "./response";

@@ -65,7 +65,7 @@ async function portfolioANSHandler(request: NextRequest) {
   }
 
   // Fallback to GraphQL if ANS API fails
-  const INDEXER = "https://indexer.mainnet.aptoslabs.com/v1/graphql";
+  const INDEXER = "https://api.mainnet.aptoslabs.com/v1/graphql";
 
   // Query for ANS name
   const query = `

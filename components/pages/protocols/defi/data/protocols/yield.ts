@@ -12,7 +12,7 @@ export const yieldProtocols: DefiProtocol[] = [
   // LIQUID STAKING
   {
     title: "TruFin",
-    href: "https://trufin.io",
+    href: "https://www.trufin.io",
     description: "defi:protocol_descriptions.TruFin",
     category: "Yield",
     subcategory: "Liquid Staking",

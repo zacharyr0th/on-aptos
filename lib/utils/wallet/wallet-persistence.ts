@@ -3,7 +3,7 @@
  * Maintains wallet connection state across browser sessions
  */
 
-import { AptosWalletType } from "./multi-wallet";
+import type { AptosWalletType } from "./multi-wallet";
 
 export interface WalletConnectionState {
   walletType: AptosWalletType | "mobile-petra";

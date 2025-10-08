@@ -1,14 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, ChevronUp } from "lucide-react";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { useState } from "react";
 import { defiProtocols } from "@/components/pages/protocols/defi/data/protocols";
 import { ProtocolStats } from "@/components/protocols/ProtocolStats";
-import { motion, AnimatePresence } from "framer-motion";
-import SectionHeader from "../shared/SectionHeader";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import ProtocolCard from "../shared/ProtocolCard";
+import SectionHeader from "../shared/SectionHeader";
 
 export default function DefiSection() {
   const [showAllTrading, setShowAllTrading] = useState(false);
@@ -35,8 +35,13 @@ export default function DefiSection() {
               ease: [0.25, 0.1, 0.25, 1],
             }}
           >
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-2xl font-bold text-foreground">Trading & DEXs</h3>
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h3 className="text-2xl font-bold text-foreground">Trading & DEXs</h3>
+                <p className="text-sm text-foreground/70 mt-1">
+                  Swap, provide liquidity, and trade seamlessly
+                </p>
+              </div>
               <Button
                 variant="ghost"
                 size="sm"
@@ -54,9 +59,6 @@ export default function DefiSection() {
                 )}
               </Button>
             </div>
-            <p className="text-center text-foreground/70 mb-8 max-w-2xl mx-auto">
-              Swap, provide liquidity, trade with zero MEV
-            </p>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               {defiProtocols
@@ -87,8 +89,13 @@ export default function DefiSection() {
               ease: [0.25, 0.1, 0.25, 1],
             }}
           >
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-2xl font-bold text-foreground">Lending & Borrowing</h3>
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h3 className="text-2xl font-bold text-foreground">Lending & Borrowing</h3>
+                <p className="text-sm text-foreground/70 mt-1">
+                  Supply assets to earn interest or borrow against collateral
+                </p>
+              </div>
               <Button
                 variant="ghost"
                 size="sm"
@@ -106,11 +113,6 @@ export default function DefiSection() {
                 )}
               </Button>
             </div>
-            {!showAllLending && (
-              <p className="text-center text-foreground/70 mb-8 max-w-2xl mx-auto">
-                Supply assets to earn interest or borrow against collateral
-              </p>
-            )}
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               {defiProtocols
@@ -125,11 +127,7 @@ export default function DefiSection() {
                     href={protocol.href}
                     statsPosition="inline"
                   >
-                    <ProtocolStats
-                      protocolName={protocol.title}
-                      showVolume={false}
-                      inline={true}
-                    />
+                    <ProtocolStats protocolName={protocol.title} showVolume={false} inline={true} />
                   </ProtocolCard>
                 ))}
             </div>
@@ -146,8 +144,13 @@ export default function DefiSection() {
               ease: [0.25, 0.1, 0.25, 1],
             }}
           >
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-2xl font-bold text-foreground">Yield & Staking</h3>
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h3 className="text-2xl font-bold text-foreground">Yield & Staking</h3>
+                <p className="text-sm text-foreground/70 mt-1">
+                  Auto-compounding vaults, liquid staking, and optimized strategies
+                </p>
+              </div>
               <Button
                 variant="ghost"
                 size="sm"
@@ -165,11 +168,6 @@ export default function DefiSection() {
                 )}
               </Button>
             </div>
-            {!showAllYield && (
-              <p className="text-center text-foreground/70 mb-8 max-w-2xl mx-auto">
-                Auto-compounding vaults, liquid staking, optimized strategies
-              </p>
-            )}
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               {defiProtocols
@@ -184,11 +182,7 @@ export default function DefiSection() {
                     href={protocol.href}
                     statsPosition="inline"
                   >
-                    <ProtocolStats
-                      protocolName={protocol.title}
-                      showVolume={false}
-                      inline={true}
-                    />
+                    <ProtocolStats protocolName={protocol.title} showVolume={false} inline={true} />
                   </ProtocolCard>
                 ))}
             </div>

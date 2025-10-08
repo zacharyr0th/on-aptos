@@ -25,8 +25,8 @@
  * ```
  */
 
-import { logger } from "@/lib/utils/core/logger";
 import { UnifiedCache } from "@/lib/utils/cache/unified-cache";
+import { logger } from "@/lib/utils/core/logger";
 
 export interface AnsResolveResult {
   address: string | null;
@@ -51,7 +51,7 @@ export type AnsResolveOptions = {
 
 export class AnsService {
   private static readonly ANS_API_BASE = "https://www.aptosnames.com/api/mainnet/v1";
-  private static readonly GRAPHQL_URL = "https://indexer.mainnet.aptoslabs.com/v1/graphql";
+  private static readonly GRAPHQL_URL = "https://api.mainnet.aptoslabs.com/v1/graphql";
   private static readonly DEFAULT_TIMEOUT = 5000;
   private static readonly MAX_DOMAIN_LENGTH = 63; // DNS limit per label
   private static readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutes

@@ -1,9 +1,9 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { Globe, Hash, MapPin } from "lucide-react";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
-import { motion } from "framer-motion";
 
 const socialLinks = [
   { name: "Discord", url: "https://discord.gg/aptosnetwork" },

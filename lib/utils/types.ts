@@ -13,16 +13,6 @@ export interface RateLimitInfo {
   burstRemaining: number;
 }
 
-export class RateLimitError extends Error {
-  constructor(
-    message: string,
-    public resetInSeconds?: number
-  ) {
-    super(message);
-    this.name = "RateLimitError";
-  }
-}
-
 export interface CacheEntry<T> {
   value: T;
   timestamp: number;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-
+import { errorLogger } from "@/lib/utils/core/logger";
 import {
   clearStoredKeys,
   createConnectLink,
@@ -11,15 +11,14 @@ import {
   generateKeyPair,
   handleConnectionApproval,
   isMobileDevice,
+  type KeyPair,
   loadKeyPair,
   loadSharedKey,
   openPetraDeepLink,
   parseDeepLinkResponse,
   saveKeyPair,
   saveSharedKey,
-  type KeyPair,
 } from "@/lib/utils/wallet/petra-deeplink";
-import { errorLogger } from "@/lib/utils/core/logger";
 
 export interface PetraMobileWallet {
   isConnected: boolean;

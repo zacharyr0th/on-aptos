@@ -20,7 +20,7 @@ import type {
 import { BaseAssetService } from "../shared/utils/base-service";
 
 // Constants
-const INDEXER_URL = "https://indexer.mainnet.aptoslabs.com/v1/graphql";
+const INDEXER_URL = "https://api.mainnet.aptoslabs.com/v1/graphql";
 const REST_API_URL = "https://api.mainnet.aptoslabs.com/v1";
 
 // Configuration

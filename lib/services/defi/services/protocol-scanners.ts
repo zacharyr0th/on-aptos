@@ -8,7 +8,7 @@ import { graphQLRequest } from "@/lib/utils/api/fetch-utils";
 import { logger } from "@/lib/utils/core/logger";
 import { getTokenDecimals, getTokenSymbol, identifyProtocol } from "./utils";
 
-const INDEXER = "https://indexer.mainnet.aptoslabs.com/v1/graphql";
+const INDEXER = "https://api.mainnet.aptoslabs.com/v1/graphql";
 
 interface CoinBalance {
   coin_type: string;

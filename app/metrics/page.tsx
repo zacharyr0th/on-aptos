@@ -1,23 +1,23 @@
 "use client";
 
 import { GeistMono } from "geist/font/mono";
-import { useState, useEffect } from "react";
 import {
   Activity,
+  Clock,
+  Coins,
+  Database,
+  RefreshCw,
+  Shield,
   TrendingUp,
   Users,
-  Coins,
-  RefreshCw,
   Zap,
-  Shield,
-  Clock,
-  Database,
 } from "lucide-react";
+import { useEffect, useState } from "react";
 
 import { ErrorBoundary } from "@/components/errors/ErrorBoundary";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import {

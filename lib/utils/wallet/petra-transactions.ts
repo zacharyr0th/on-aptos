@@ -3,8 +3,8 @@
  * Based on: https://petra.app/docs/sending-a-transaction
  */
 
-import { PetraWindow } from "./petra-events";
 import { handlePetraError } from "./petra-errors";
+import type { PetraWindow } from "./petra-events";
 
 export interface EntryFunctionPayload {
   function: string;

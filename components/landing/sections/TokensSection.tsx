@@ -1,18 +1,18 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { TrendingUp, X } from "lucide-react";
 import dynamic from "next/dynamic";
-import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { formatCurrency, formatNumber } from "@/lib/utils/format/format";
+import { Card } from "@/components/ui/card";
 import type { TokenData } from "@/lib/types/tokens";
-import { motion } from "framer-motion";
+import { formatCurrency, formatNumber } from "@/lib/utils/format/format";
 import {
-  sectionHeader,
-  staggerContainer,
   cardSlideLeft,
   cardSlideRight,
   scaleBlur,
+  sectionHeader,
+  staggerContainer,
 } from "../shared/animations";
 
 const TokenTreemap = dynamic(() =>
@@ -64,7 +64,10 @@ export default function TokensSection({
           </motion.div>
 
           {/* Stats Cards */}
-          <motion.div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-12" {...staggerContainer}>
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-12"
+            {...staggerContainer}
+          >
             <motion.div variants={cardSlideLeft}>
               <Card className="p-4 sm:p-6 bg-card hover:shadow-lg transition-shadow">
                 <div className="space-y-3">

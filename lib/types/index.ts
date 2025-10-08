@@ -10,7 +10,6 @@ export type {
   CacheStats,
   FetchOptions,
   GraphQLRequest,
-  RateLimitError,
   RateLimitInfo,
   RetryOptions,
 } from "../utils/core/types";

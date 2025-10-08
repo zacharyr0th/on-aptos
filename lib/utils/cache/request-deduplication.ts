@@ -126,7 +126,9 @@ export class RequestDeduplicator {
     // Create the request promise with TTL
     const requestPromise = Promise.race([
       fn(),
-      new Promise<T>((_, reject) => setTimeout(() => reject(new Error("Request timeout")), timeout)),
+      new Promise<T>((_, reject) =>
+        setTimeout(() => reject(new Error("Request timeout")), timeout)
+      ),
     ]).finally(() => {
       // Remove from pending requests when done
       this.pendingRequests.delete(key);

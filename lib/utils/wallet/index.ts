@@ -3,111 +3,103 @@
  * Complete utilities for integrating Petra wallet in web and mobile apps
  */
 
+// React hook for mobile deep linking
+export {
+  type PetraMobileWallet,
+  usePetraMobileWallet,
+} from "@/components/wallet/PetraMobileConnect";
+export { useWalletToast } from "@/components/wallet/useWalletToast";
+// Error toast UI
+export {
+  type ToastMessage,
+  type ToastType,
+  WalletErrorToast,
+} from "@/components/wallet/WalletErrorToast";
+// Multi-wallet support
+export {
+  APTOS_WALLETS,
+  AptosWalletType,
+  clearPreferredWallet,
+  connectToWallet,
+  detectAvailableWallets,
+  disconnectWallet,
+  getAccount,
+  getPreferredWallet,
+  getWalletProvider,
+  isWalletConnected,
+  isWalletInstalled,
+  setPreferredWallet,
+  type WalletInfo,
+} from "./multi-wallet";
 // Deep linking for mobile
 export {
-  generateKeyPair,
-  saveKeyPair,
-  loadKeyPair,
-  saveSharedKey,
-  loadSharedKey,
+  APP_INFO,
+  type ConnectionData,
   clearStoredKeys,
   createConnectLink,
   createDisconnectLink,
-  createSignTransactionLink,
   createSignMessageLink,
+  createSignTransactionLink,
+  generateKeyPair,
   handleConnectionApproval,
-  parseDeepLinkResponse,
   isMobileDevice,
-  openPetraDeepLink,
-  APP_INFO,
   type KeyPair,
-  type ConnectionData,
-  type SignTransactionData,
-  type SignMessageData,
+  loadKeyPair,
+  loadSharedKey,
+  openPetraDeepLink,
   type PetraConnectionResponse,
+  parseDeepLinkResponse,
+  type SignMessageData,
+  type SignTransactionData,
+  saveKeyPair,
+  saveSharedKey,
 } from "./petra-deeplink";
-
+// Error handling
+export {
+  getPetraErrorMessage,
+  handlePetraError,
+  isPetraError,
+  type PetraError,
+  PetraErrorCode,
+  PetraWalletError,
+} from "./petra-errors";
 // Event listeners
 export {
-  setupPetraEventListeners,
-  usePetraEventListeners,
   Network,
+  type PetraEventListeners,
   type PetraWindow,
   type SignMessagePayload,
   type SignMessageResponse,
-  type PetraEventListeners,
+  setupPetraEventListeners,
+  usePetraEventListeners,
 } from "./petra-events";
-
-// Error handling
-export {
-  PetraErrorCode,
-  isPetraError,
-  getPetraErrorMessage,
-  handlePetraError,
-  PetraWalletError,
-  type PetraError,
-} from "./petra-errors";
-
-// Transactions
-export {
-  signAndSubmitTransaction,
-  signTransaction,
-  createCoinTransferTransaction,
-  waitForTransaction,
-  type EntryFunctionPayload,
-  type PendingTransaction,
-} from "./petra-transactions";
-
 // Message signing
 export {
+  createSignMessagePayload,
   signMessage,
   verifySignedMessage,
-  createSignMessagePayload,
   verifyWalletOwnership,
 } from "./petra-signing";
-
-// React hook for mobile deep linking
+// Transactions
 export {
-  usePetraMobileWallet,
-  type PetraMobileWallet,
-} from "@/components/wallet/PetraMobileConnect";
-
-// Multi-wallet support
-export {
-  AptosWalletType,
-  APTOS_WALLETS,
-  detectAvailableWallets,
-  getWalletProvider,
-  isWalletInstalled,
-  getPreferredWallet,
-  setPreferredWallet,
-  clearPreferredWallet,
-  connectToWallet,
-  disconnectWallet,
-  getAccount,
-  isWalletConnected,
-  type WalletInfo,
-} from "./multi-wallet";
-
+  createCoinTransferTransaction,
+  type EntryFunctionPayload,
+  type PendingTransaction,
+  signAndSubmitTransaction,
+  signTransaction,
+  waitForTransaction,
+} from "./petra-transactions";
 // Wallet persistence
 export {
-  saveWalletConnection,
-  loadWalletConnection,
-  updateLastActive,
+  attemptAutoReconnect,
   clearWalletConnection,
-  hasSavedConnection,
-  getSavedWalletType,
   getSavedWalletAddress,
+  getSavedWalletType,
+  hasSavedConnection,
+  loadWalletConnection,
+  saveWalletConnection,
+  updateLastActive,
   updateWalletNetwork,
   useWalletPersistence,
-  attemptAutoReconnect,
   type WalletConnectionState,
 } from "./wallet-persistence";
-
-// Error toast UI
-export {
-  WalletErrorToast,
-  type ToastMessage,
-  type ToastType,
-} from "@/components/wallet/WalletErrorToast";
-export { useWalletToast } from "@/components/wallet/useWalletToast";

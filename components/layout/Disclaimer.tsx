@@ -14,7 +14,7 @@ import { Separator } from "@/components/ui/separator";
 
 export function Disclaimer() {
   return (
-    <DialogContent className="sm:max-w-md md:max-w-lg fixed top-[50vh] left-[50%] translate-x-[-50%] translate-y-[-50%]">
+    <DialogContent className="sm:max-w-md md:max-w-lg fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
       <DialogHeader>
         <DialogTitle>Bitcoin Money Markets - Information</DialogTitle>
         <DialogDescription className="text-xs pt-1">

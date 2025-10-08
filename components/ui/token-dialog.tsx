@@ -299,9 +299,14 @@ export const TokenDialog = memo<TokenDialogProps>(
       await copyToClipboard(text, label);
     }, []);
 
-    const handleClose = useCallback(() => {
-      onClose();
-    }, [onClose]);
+    const handleClose = useCallback(
+      (open: boolean) => {
+        if (!open) {
+          onClose();
+        }
+      },
+      [onClose]
+    );
 
     // Memoized symbol parts for multi-token dialogs
     const symbolParts = useMemo(
@@ -340,9 +345,9 @@ export const TokenDialog = memo<TokenDialogProps>(
     );
 
     return (
-      <ErrorBoundary fallback={<DialogErrorFallback level="dialog" onClose={handleClose} />}>
+      <ErrorBoundary fallback={<DialogErrorFallback level="dialog" onClose={onClose} />}>
         <Dialog open={isOpen} onOpenChange={handleClose}>
-          <DialogContent className="sm:max-w-md fixed top-[50vh] left-[50%] translate-x-[-50%] translate-y-[-50%]">
+          <DialogContent className="sm:max-w-md fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-3">
                 <div className="relative w-8 h-8">

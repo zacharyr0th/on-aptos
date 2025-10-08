@@ -45,7 +45,7 @@ cp .env.example .env.local
 
 ```env
 NEXT_PUBLIC_SITE_URL=https://on-aptos.com
-APTOS_BUILD_SECRET=your_key    # From developers.aptoslabs.com
+APTOS_BUILD_SECRET=your_key    # From geomi.dev
 PANORA_API_KEY=your_key        # See CLAUDE.md for public key
 CMC_API_KEY=your_key           # From coinmarketcap.com/api
 RWA_API_KEY=your_key           # Contact for access

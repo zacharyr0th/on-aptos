@@ -1,4 +1,10 @@
 // Formatting utilities
+
+// Chart utilities
+export * from "./chart-utils";
+
+// Currency types are re-exported from format.ts
+export type { Currency, FiatCurrency } from "./format";
 export {
   calculateMarketShare,
   convertRawTokenAmount,
@@ -22,9 +28,3 @@ export {
   isFiatCurrency,
   isValidCurrencyCode,
 } from "./format";
-
-// Currency types are re-exported from format.ts
-export type { Currency, FiatCurrency } from "./format";
-
-// Chart utilities
-export * from "./chart-utils";

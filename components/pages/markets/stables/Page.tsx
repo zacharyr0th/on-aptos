@@ -317,7 +317,7 @@ function StablesPage(): React.ReactElement {
       setIsFetching(true);
       setStablesError(null);
 
-      const response = await fetch(`/api/aptos/stables?t=${Date.now()}`, {
+      const response = await fetch(`/api/markets/stables?t=${Date.now()}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

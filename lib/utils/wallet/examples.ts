@@ -4,18 +4,19 @@
  */
 
 import { Aptos, AptosConfig, Network } from "@aptos-labs/ts-sdk";
-import { setupPetraEventListeners, Network as PetraNetwork } from "./petra-events";
+import { errorLogger, logger } from "@/lib/utils/core/logger";
+import { Network as PetraNetwork, setupPetraEventListeners } from "./petra-events";
 import {
-  signAndSubmitTransaction,
-  createCoinTransferTransaction,
-  waitForTransaction,
-} from "./petra-transactions";
-import {
+  createSignMessagePayload,
   signMessage,
   verifySignedMessage,
-  createSignMessagePayload,
   verifyWalletOwnership,
 } from "./petra-signing";
+import {
+  createCoinTransferTransaction,
+  signAndSubmitTransaction,
+  waitForTransaction,
+} from "./petra-transactions";
 
 /**
  * Example 1: Setup event listeners to track wallet state changes
@@ -24,24 +25,24 @@ export function exampleSetupEventListeners() {
   const listeners = setupPetraEventListeners();
 
   if (!listeners) {
-    console.error("Petra wallet not detected");
+    errorLogger.error("Petra wallet not detected");
     return;
   }
 
   // Listen for account changes
   listeners.onAccountChange((newAccount) => {
     if (newAccount) {
-      console.log("Account changed:", newAccount.address);
+      logger.debug("Account changed", { address: newAccount.address });
       // Update your app state with the new account
     } else {
-      console.log("Account disconnected, need to reconnect");
+      logger.info("Account disconnected, need to reconnect");
       // Prompt user to reconnect
     }
   });
 
   // Listen for network changes
   listeners.onNetworkChange((newNetwork) => {
-    console.log("Network changed to:", newNetwork);
+    logger.info("Network changed", { network: newNetwork });
     // Update your app to use the new network
     if (newNetwork === PetraNetwork.Mainnet) {
       // Switch to mainnet endpoints
@@ -52,26 +53,26 @@ export function exampleSetupEventListeners() {
 
   // Listen for disconnection
   listeners.onDisconnect(() => {
-    console.log("Wallet disconnected");
+    logger.info("Wallet disconnected");
     // Clear your app state
     // Show connect wallet button
   });
 
   // Get current network
   listeners.getCurrentNetwork().then((network) => {
-    console.log("Current network:", network);
+    logger.debug("Current network", { network });
   });
 
   // Get current account
   listeners.getCurrentAccount().then((account) => {
     if (account) {
-      console.log("Current account:", account.address);
+      logger.debug("Current account", { address: account.address });
     }
   });
 
   // Check if connected
   listeners.isConnected().then((connected) => {
-    console.log("Is connected:", connected);
+    logger.debug("Connection status", { connected });
   });
 }
 
@@ -90,7 +91,7 @@ export async function exampleSendAPT(recipientAddress: string, amountInOctas: nu
     // Sign and submit the transaction
     const pendingTx = await signAndSubmitTransaction(transaction);
 
-    console.log("Transaction submitted:", pendingTx.hash);
+    logger.info("Transaction submitted", { hash: pendingTx.hash });
 
     // Wait for the transaction to be confirmed
     const config = new AptosConfig({ network: Network.MAINNET });
@@ -101,10 +102,10 @@ export async function exampleSendAPT(recipientAddress: string, amountInOctas: nu
       checkSuccess: true,
     });
 
-    console.log("Transaction confirmed:", result);
+    logger.info("Transaction confirmed", { result });
     return result;
   } catch (error) {
-    console.error("Failed to send APT:", error);
+    errorLogger.error("Failed to send APT", { error });
     throw error;
   }
 }
@@ -129,7 +130,7 @@ export async function exampleCallSmartContract(
 
     const pendingTx = await signAndSubmitTransaction(transaction);
 
-    console.log("Transaction submitted:", pendingTx.hash);
+    logger.info("Transaction submitted", { hash: pendingTx.hash });
 
     // Wait for confirmation
     const config = new AptosConfig({ network: Network.MAINNET });
@@ -137,10 +138,10 @@ export async function exampleCallSmartContract(
 
     const result = await waitForTransaction(client, pendingTx.hash);
 
-    console.log("Transaction confirmed:", result);
+    logger.info("Transaction confirmed", { result });
     return result;
   } catch (error) {
-    console.error("Failed to call smart contract:", error);
+    errorLogger.error("Failed to call smart contract", { error });
     throw error;
   }
 }
@@ -161,14 +162,15 @@ export async function exampleSignForAuth() {
 
     const response = await signMessage(payload);
 
-    console.log("Message signed:", response);
-    console.log("Full message:", response.fullMessage);
-    console.log("Signature:", response.signature);
+    logger.info("Message signed", {
+      fullMessage: response.fullMessage,
+      signature: response.signature,
+    });
 
     // Send the signature to your backend for verification
     return response;
   } catch (error) {
-    console.error("Failed to sign message:", error);
+    errorLogger.error("Failed to sign message", { error });
     throw error;
   }
 }
@@ -184,15 +186,14 @@ export async function exampleVerifySignature() {
     const { verified, response } = await verifySignedMessage(message, nonce);
 
     if (verified) {
-      console.log("Signature is valid!");
-      console.log("Signed by:", response?.address);
+      logger.info("Signature is valid", { address: response?.address });
       return true;
     } else {
-      console.log("Signature is invalid!");
+      logger.warn("Signature is invalid");
       return false;
     }
   } catch (error) {
-    console.error("Failed to verify signature:", error);
+    errorLogger.error("Failed to verify signature", { error });
     return false;
   }
 }
@@ -208,16 +209,16 @@ export async function exampleAccessControl(expectedAddress: string) {
     );
 
     if (isOwner) {
-      console.log("Wallet ownership verified!");
+      logger.info("Wallet ownership verified");
       // Grant access to premium features
       return true;
     } else {
-      console.log("Wallet ownership verification failed!");
+      logger.warn("Wallet ownership verification failed");
       // Deny access
       return false;
     }
   } catch (error) {
-    console.error("Failed to verify wallet ownership:", error);
+    errorLogger.error("Failed to verify wallet ownership", { error });
     return false;
   }
 }
@@ -298,17 +299,17 @@ export async function exampleSendCustomToken(
 
     const pendingTx = await signAndSubmitTransaction(transaction);
 
-    console.log("Custom token transfer submitted:", pendingTx.hash);
+    logger.info("Custom token transfer submitted", { hash: pendingTx.hash });
 
     const config = new AptosConfig({ network: Network.MAINNET });
     const client = new Aptos(config);
 
     const result = await waitForTransaction(client, pendingTx.hash);
 
-    console.log("Custom token transfer confirmed:", result);
+    logger.info("Custom token transfer confirmed", { result });
     return result;
   } catch (error) {
-    console.error("Failed to send custom token:", error);
+    errorLogger.error("Failed to send custom token", { error });
     throw error;
   }
 }

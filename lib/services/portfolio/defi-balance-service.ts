@@ -27,7 +27,7 @@ import { convertRawTokenAmount } from "@/lib/utils/format/format";
 
 import { AssetService } from "./services/asset-service";
 
-const INDEXER = "https://indexer.mainnet.aptoslabs.com/v1/graphql";
+const INDEXER = "https://api.mainnet.aptoslabs.com/v1/graphql";
 const APTOS_API_KEY = getEnvVar("APTOS_BUILD_SECRET");
 
 // Token addresses for better parsing

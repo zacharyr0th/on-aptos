@@ -112,9 +112,7 @@ export async function GET(request: Request) {
     }
 
     // Extract actual values with fallbacks
-    let stablesValue = stablesData?.total
-      ? Math.round(parseFloat(stablesData.total))
-      : 0;
+    let stablesValue = stablesData?.total ? Math.round(parseFloat(stablesData.total)) : 0;
     const rwasValue = rwaData?.totalAptosValue ? Math.round(rwaData.totalAptosValue) : 0;
 
     // Calculate BTC value using REAL price from the same source as BTC page

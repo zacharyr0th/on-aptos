@@ -6,25 +6,25 @@
 import { useEffect, useState } from "react";
 import {
   // Multi-wallet support
-  AptosWalletType,
-  detectAvailableWallets,
-  connectToWallet,
-  disconnectWallet,
-  // Persistence
-  useWalletPersistence,
+  type AptosWalletType,
   attemptAutoReconnect,
-  saveWalletConnection,
-  // Mobile deep linking
-  usePetraMobileWallet,
-  isMobileDevice,
-  // Transactions
-  signAndSubmitTransaction,
+  connectToWallet,
   createCoinTransferTransaction,
-  // Error handling
-  useWalletToast,
+  detectAvailableWallets,
+  disconnectWallet,
   handlePetraError,
+  isMobileDevice,
+  saveWalletConnection,
   // Event listeners
   setupPetraEventListeners,
+  // Transactions
+  signAndSubmitTransaction,
+  // Mobile deep linking
+  usePetraMobileWallet,
+  // Persistence
+  useWalletPersistence,
+  // Error handling
+  useWalletToast,
 } from "@/lib/utils/wallet";
 
 export function CompleteWalletExample() {

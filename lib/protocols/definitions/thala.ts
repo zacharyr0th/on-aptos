@@ -12,7 +12,7 @@ export const ThalaProtocol: ProtocolDefinition = {
     displayName: "Thala Labs",
     type: ProtocolType.DEX,
     logo: "/icons/protocols/thala.avif",
-    website: "https://thala.fi",
+    website: "https://www.thala.fi",
     docs: "https://docs.thala.fi",
     twitter: "https://twitter.com/ThalaLabs",
     tags: ["dex", "amm", "stable-pool", "weighted-pool", "cdp", "mod"],

@@ -8,8 +8,8 @@ import {
   formatApiError,
   withErrorHandling,
 } from "@/lib/utils";
-import { apiLogger } from "@/lib/utils/core/logger";
 import { withApiEnhancements } from "@/lib/utils/api/server-api";
+import { apiLogger } from "@/lib/utils/core/logger";
 
 export async function GET(request: NextRequest) {
   const errorContext: ErrorContext = {

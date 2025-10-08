@@ -1,4 +1,4 @@
-import { Variants, Transition } from "framer-motion";
+import type { Transition, Variants } from "framer-motion";
 
 /**
  * Shared animation variants and configurations for landing page sections

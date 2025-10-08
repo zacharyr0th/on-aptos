@@ -55,8 +55,8 @@ export async function GET() {
     }
 
     // Fetch historical TVL for change calculation
-    let tvlChange24h = undefined;
-    let tvlChange7d = undefined;
+    let tvlChange24h;
+    let tvlChange7d;
     try {
       const historicalResponse = await fetch("https://api.llama.fi/v2/historicalChainTvl/Aptos");
       if (historicalResponse.ok) {

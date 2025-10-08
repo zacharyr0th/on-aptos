@@ -2,8 +2,8 @@
 
 import { motion } from "framer-motion";
 import { TrendingUp, Wallet } from "lucide-react";
-import CTACard from "../shared/CTACard";
 import { cardEntranceSubtle } from "../shared/animations";
+import CTACard from "../shared/CTACard";
 
 export default function CTASection() {
   return (
