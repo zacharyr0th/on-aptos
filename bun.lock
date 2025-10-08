@@ -4,7 +4,7 @@
     "": {
       "name": "on-aptos",
       "dependencies": {
-        "@aptos-labs/ts-sdk": "^3.1.3",
+        "@aptos-labs/ts-sdk": "^4.0.0",
         "@aptos-labs/wallet-adapter-react": "^7.0.4",
         "@radix-ui/react-accordion": "^1.2.12",
         "@radix-ui/react-alert-dialog": "^1.1.15",
@@ -120,7 +120,7 @@
 
     "@aptos-labs/aptos-client": ["@aptos-labs/aptos-client@2.0.0", "", { "peerDependencies": { "got": "^11.8.6" } }, "sha512-A23T3zTCRXEKURodp00dkadVtIrhWjC9uo08dRDBkh69OhCnBAxkENmUy/rcBarfLoFr60nRWt7cBkc8wxr1mg=="],
 
-    "@aptos-labs/ts-sdk": ["@aptos-labs/ts-sdk@3.1.3", "", { "dependencies": { "@aptos-labs/aptos-cli": "^1.0.2", "@aptos-labs/aptos-client": "^2.0.0", "@noble/curves": "^1.6.0", "@noble/hashes": "^1.5.0", "@scure/bip32": "^1.4.0", "@scure/bip39": "^1.3.0", "eventemitter3": "^5.0.1", "form-data": "^4.0.0", "js-base64": "^3.7.7", "jwt-decode": "^4.0.0", "poseidon-lite": "^0.2.0" } }, "sha512-42CiChUnHzsZXE25p3gPiETFUTlchTd20zl9vAiq6es1vQaaf95LvVQ0q3GxeOgmW9ENn2q72gAsuGLIOYRohg=="],
+    "@aptos-labs/ts-sdk": ["@aptos-labs/ts-sdk@4.0.0", "", { "dependencies": { "@aptos-labs/aptos-cli": "^1.0.2", "@aptos-labs/aptos-client": "^2.0.0", "@noble/curves": "^1.6.0", "@noble/hashes": "^1.5.0", "@scure/bip32": "^1.4.0", "@scure/bip39": "^1.3.0", "eventemitter3": "^5.0.1", "form-data": "^4.0.0", "js-base64": "^3.7.7", "jwt-decode": "^4.0.0", "poseidon-lite": "^0.2.0" } }, "sha512-bRB9fT0t86btGyL/b5I4c3K1gZvldSvFv2KkV+1kEHt+yDbDrWI43wsfHLv0fFAVatCrH610NpLONMCnQSqQhA=="],
 
     "@aptos-labs/wallet-adapter-core": ["@aptos-labs/wallet-adapter-core@7.1.2", "", { "dependencies": { "@aptos-connect/wallet-adapter-plugin": "2.5.1", "@aptos-labs/wallet-standard": "^0.5.1", "buffer": "^6.0.3", "eventemitter3": "^4.0.7", "tweetnacl": "^1.0.3" }, "peerDependencies": { "@aptos-labs/ts-sdk": "^3.1.3" } }, "sha512-e7wkEiBNiDrEhkDx0ig69/jgskv811vTimNnpOCQM06XHCPbVCRjqEIgzAVvj11clcbT8PQh3HVDAA/WmdyNTQ=="],
 

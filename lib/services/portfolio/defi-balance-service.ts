@@ -145,28 +145,6 @@ const PROTOCOL_COIN_BALANCES_QUERY = `
   }
 `;
 
-// Query to get user's events related to DeFi protocols
-const DEFI_EVENTS_QUERY = `
-  query GetDeFiEvents($ownerAddress: String!, $protocolAddresses: [String!]!, $limit: Int!) {
-    events(
-      where: {
-        account_address: { _in: $protocolAddresses },
-        data: { _has_key: $ownerAddress }
-      }
-      order_by: { transaction_version: desc }
-      limit: $limit
-    ) {
-      account_address
-      creation_number
-      data
-      sequence_number
-      type
-      transaction_version
-      transaction_block_height
-    }
-  }
-`;
-
 // Query to get user's resources at specific protocol addresses
 const PROTOCOL_RESOURCES_QUERY = `
   query GetProtocolResources($ownerAddress: String!, $resourceTypes: [String!]!) {

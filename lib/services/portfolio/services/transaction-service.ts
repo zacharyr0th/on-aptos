@@ -187,14 +187,15 @@ export class TransactionService {
             timestamp
             epoch
           }
-          events(
+          fungible_asset_activities(
             where: { transaction_version: { _in: $versions } }
             order_by: { transaction_version: desc, event_index: asc }
             limit: 500
           ) {
             transaction_version
             type
-            data
+            amount
+            asset_type
           }
           signatures(
             where: { transaction_version: { _in: $versions } }
@@ -226,7 +227,7 @@ export class TransactionService {
       }
 
       allTransactions = allTransactions.concat(detailsResult.data?.user_transactions || []);
-      allEvents = allEvents.concat(detailsResult.data?.events || []);
+      allEvents = allEvents.concat(detailsResult.data?.fungible_asset_activities || []);
       allSignatures = allSignatures.concat(detailsResult.data?.signatures || []);
       allBlockMetadata = allBlockMetadata.concat(
         detailsResult.data?.block_metadata_transactions || []
@@ -322,32 +323,17 @@ export class TransactionService {
     );
 
     return sortedTransactions.map((tx: any) => {
-      // Extract amount from events
+      // Extract amount from fungible_asset_activities
       let amount = "0";
       let assetType = "APT";
       const txEvents = eventsByVersion[tx.version] || [];
 
-      for (const event of txEvents) {
-        if (event.type && event.data) {
-          try {
-            const eventData = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
-
-            if (
-              event.type.includes("CoinWithdrawEvent") ||
-              event.type.includes("CoinDepositEvent") ||
-              event.type.includes("WithdrawEvent") ||
-              event.type.includes("DepositEvent")
-            ) {
-              amount = eventData.amount || "0";
-              const typeMatch = event.type.match(/<([^>]+)>/);
-              if (typeMatch) {
-                assetType = typeMatch[1].includes("aptos_coin") ? "APT" : typeMatch[1];
-              }
-              break;
-            }
-          } catch {
-            // Failed to parse event data
-          }
+      for (const activity of txEvents) {
+        if (activity.amount && activity.asset_type) {
+          // fungible_asset_activities has amount and asset_type directly
+          amount = activity.amount;
+          assetType = activity.asset_type.includes("aptos_coin") ? "APT" : activity.asset_type;
+          break;
         }
       }
 
