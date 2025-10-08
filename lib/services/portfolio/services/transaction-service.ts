@@ -440,7 +440,6 @@ export class TransactionService {
     try {
       const response = await UnifiedGraphQLClient.query<{
         fungible_asset_activities: any[];
-        coin_activities: any[];
       }>(
         UNIFIED_QUERIES.HISTORICAL_ACTIVITIES,
         {
@@ -454,7 +453,7 @@ export class TransactionService {
 
       return {
         fungibleActivities: response.fungible_asset_activities || [],
-        coinActivities: response.coin_activities || [],
+        coinActivities: [], // Legacy field, no longer used
       };
     } catch (error) {
       logger.error("Failed to fetch historical activities:", error);
