@@ -1,9 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { StablecoinService } from "@/lib/services/asset-types";
 import { RATE_LIMIT_TIERS, withRateLimit } from "@/lib/utils/api/rate-limiter";
 import { logger } from "@/lib/utils/core/logger";
 
-// This endpoint is deprecated - redirecting to unified assets endpoint
-// Kept for backward compatibility
+// Cache stablecoin data for 10 minutes
 export const revalidate = 600;
 
 // Deprecation date: March 1, 2025
@@ -11,28 +11,19 @@ const SUNSET_DATE = "2025-03-01T00:00:00Z";
 
 async function handler(request: NextRequest) {
   try {
-    const baseUrl = request.nextUrl.origin;
-
     // Log usage of deprecated endpoint
     logger.warn("Deprecated endpoint accessed", {
-      endpoint: "/api/data/aptos/stables",
+      endpoint: "/api/markets/stables",
       userAgent: request.headers.get("user-agent"),
       referer: request.headers.get("referer"),
       redirectTo: "/api/unified/assets?type=stables",
     });
 
-    const redirectUrl = new URL(`${baseUrl}/api/unified/assets`);
-    redirectUrl.searchParams.set("type", "stables");
+    // Fetch stablecoin data directly from service
+    const data = await StablecoinService.getStablecoinSupplies();
 
-    // Fetch from unified endpoint
-    const response = await fetch(redirectUrl.toString());
-    const data = await response.json();
-
-    // Return data in original format with full structure
-    const stableData = data;
-
-    return NextResponse.json(stableData, {
-      status: response.status,
+    return NextResponse.json(data, {
+      status: 200,
       headers: {
         "X-Deprecated": "true",
         "X-Redirect-To": "/api/unified/assets?type=stables",
@@ -45,12 +36,13 @@ async function handler(request: NextRequest) {
         "X-API-Version": "2.0",
         "X-Data-Source": "Aptos Indexer",
         Vary: "Accept-Encoding",
+        "Cache-Control": "public, s-maxage=600, stale-while-revalidate=1200",
       },
     });
   } catch (error) {
-    logger.error("Stablecoin Supply API redirect error", {
+    logger.error("Stablecoin Supply API error", {
       error: error instanceof Error ? error.message : String(error),
-      endpoint: "/api/data/aptos/stables",
+      endpoint: "/api/markets/stables",
     });
     return NextResponse.json({ error: "Failed to fetch stablecoin data" }, { status: 500 });
   }

@@ -24,10 +24,12 @@
   "loading": {
     "loading_stablecoin_data": "Loading stablecoin data...",
     "loading": "Loading...",
+    "error_title": "Unable to Load Data",
     "rate_limit_message": "Woah! Please slow down there.",
     "try_again_in": "Try again in",
     "try_again": "Try Again",
-    "request_failed": "The request could not be completed."
+    "request_failed": "The request could not be completed.",
+    "chart_error": "Failed to load chart"
   },
   "error": {
     "error_loading_stablecoin_data": "Error Loading Stablecoin Data",
