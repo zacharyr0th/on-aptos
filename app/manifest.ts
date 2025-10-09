@@ -62,26 +62,27 @@ export default function manifest(): MetadataRoute.Manifest {
         icons: [{ src: "/icons/rwas.png", sizes: "192x192", type: "image/png" }],
       },
     ],
-    screenshots: [
-      {
-        src: "/screenshots/screenshot-1.png",
-        sizes: "1080x1920",
-        type: "image/png",
-        form_factor: "narrow",
-      },
-      {
-        src: "/screenshots/screenshot-2.png",
-        sizes: "1080x1920",
-        type: "image/png",
-        form_factor: "narrow",
-      },
-      {
-        src: "/screenshots/screenshot-desktop.png",
-        sizes: "1920x1080",
-        type: "image/png",
-        form_factor: "wide",
-      },
-    ],
+    // Screenshots removed - add back when screenshot files are created
+    // screenshots: [
+    //   {
+    //     src: "/screenshots/screenshot-1.png",
+    //     sizes: "1080x1920",
+    //     type: "image/png",
+    //     form_factor: "narrow",
+    //   },
+    //   {
+    //     src: "/screenshots/screenshot-2.png",
+    //     sizes: "1080x1920",
+    //     type: "image/png",
+    //     form_factor: "narrow",
+    //   },
+    //   {
+    //     src: "/screenshots/screenshot-desktop.png",
+    //     sizes: "1920x1080",
+    //     type: "image/png",
+    //     form_factor: "wide",
+    //   },
+    // ],
     categories: ["finance", "utilities"],
     lang: "en-US",
     dir: "ltr",
