@@ -1,33 +1,13 @@
 "use client";
 
 import { GeistMono } from "geist/font/mono";
-import {
-  Activity,
-  Clock,
-  Coins,
-  Database,
-  RefreshCw,
-  Shield,
-  TrendingUp,
-  Users,
-  Zap,
-} from "lucide-react";
+import { RefreshCw, Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useTheme } from "next-themes";
 
 import { ErrorBoundary } from "@/components/errors/ErrorBoundary";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { logger } from "@/lib/utils/core/logger";
 import { formatCompactNumber } from "@/lib/utils/formatters";
 
@@ -80,33 +60,7 @@ interface DashboardData {
   }>;
 }
 
-// Theme configuration with icons and colors
-const THEME_CONFIG = {
-  NETWORK_HEALTH: {
-    icon: <Activity className="w-5 h-5" />,
-    color: "text-blue-500",
-    bgColor: "bg-blue-500/10",
-    borderColor: "border-blue-500/20",
-  },
-  USER_ACTIVITY: {
-    icon: <Users className="w-5 h-5" />,
-    color: "text-green-500",
-    bgColor: "bg-green-500/10",
-    borderColor: "border-green-500/20",
-  },
-  DEFI_ECOSYSTEM: {
-    icon: <Coins className="w-5 h-5" />,
-    color: "text-purple-500",
-    bgColor: "bg-purple-500/10",
-    borderColor: "border-purple-500/20",
-  },
-  PROTOCOL_ANALYTICS: {
-    icon: <Database className="w-5 h-5" />,
-    color: "text-orange-500",
-    bgColor: "bg-orange-500/10",
-    borderColor: "border-orange-500/20",
-  },
-};
+// Theme configuration removed - no longer needed with new design
 
 // Collect all metrics into a single array with query URLs
 function collectMetrics(data: DashboardData): Array<{
@@ -288,13 +242,7 @@ function collectMetrics(data: DashboardData): Array<{
         queryUrl: getDuneQueryUrl(DUNE_QUERY_IDS.ALL_TIME_TRANSACTIONS),
       });
     }
-    if (data.themes.PROTOCOL_ANALYTICS.metrics.protocolCount) {
-      metrics.push({
-        metric: "Active Protocols",
-        value: formatCompactNumber(data.themes.PROTOCOL_ANALYTICS.metrics.protocolCount),
-        queryUrl: getDuneQueryUrl(DUNE_QUERY_IDS.NETWORK_STATS),
-      });
-    }
+    // Active Protocols metric removed
     if (data.themes.PROTOCOL_ANALYTICS.metrics.topProtocols?.[0]?.transactions) {
       metrics.push({
         metric: "Top Protocol Volume",
@@ -313,8 +261,13 @@ export default function MetricsPage() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [selectedTheme, setSelectedTheme] = useState("all");
   const [error, setError] = useState<string | null>(null);
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const fetchDashboardData = async (refresh = false) => {
     try {
@@ -325,7 +278,16 @@ export default function MetricsPage() {
       const response = await fetch(`/api/metrics/comprehensive`);
 
       if (!response.ok) {
-        throw new Error(`Failed to fetch data: ${response.status}`);
+        const errorData = await response.json().catch(() => ({}));
+
+        // Check if it's a configuration error
+        if (errorData.configurationRequired) {
+          throw new Error(
+            "Dune Analytics API key not configured. Please add DUNE_API_KEY_TOKEN to your environment variables. See PRODUCTION_SETUP.md for details."
+          );
+        }
+
+        throw new Error(`Failed to fetch data: ${response.status} - ${errorData.message || response.statusText}`);
       }
 
       const result = await response.json();
@@ -470,13 +432,13 @@ export default function MetricsPage() {
 
   useEffect(() => {
     fetchDashboardData();
-  }, [selectedTheme]);
+  }, []);
 
   // Auto-refresh every 5 minutes
   useEffect(() => {
     const interval = setInterval(() => fetchDashboardData(false), 300000);
     return () => clearInterval(interval);
-  }, [selectedTheme]);
+  }, []);
 
   const handleManualRefresh = () => {
     fetchDashboardData(true);
@@ -484,12 +446,13 @@ export default function MetricsPage() {
 
   if (loading) {
     return (
-      <div className={`min-h-screen p-8 ${GeistMono.className}`}>
-        <div className="max-w-7xl mx-auto space-y-6">
-          <Skeleton className="h-12 w-64" />
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {[...Array(8)].map((_, i) => (
-              <Skeleton key={i} className="h-32" />
+      <div className="min-h-screen p-6" style={{ background: "var(--bg)" }}>
+        <div className="max-w-7xl mx-auto space-y-4">
+          <Skeleton className="h-16 w-full" />
+          <Skeleton className="h-12 w-full" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {[...Array(12)].map((_, i) => (
+              <Skeleton key={i} className="h-28" />
             ))}
           </div>
         </div>
@@ -499,97 +462,62 @@ export default function MetricsPage() {
 
   if (error) {
     return (
-      <div className={`min-h-screen p-8 ${GeistMono.className}`}>
-        <Card className="max-w-2xl mx-auto">
-          <CardHeader>
-            <CardTitle className="text-red-500">Error Loading Dashboard</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground">{error}</p>
-            <Button onClick={() => fetchDashboardData()} className="mt-4">
-              Retry
-            </Button>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen p-6 flex items-center justify-center" style={{ background: "var(--bg)" }}>
+        <div className="max-w-2xl w-full p-6 rounded-2xl" style={{ background: "var(--surface)", border: "1px solid var(--grid)" }}>
+          <h2 className="text-xl font-semibold mb-4" style={{ color: "var(--danger)" }}>Error Loading Dashboard</h2>
+          <p className="mb-4" style={{ color: "var(--muted-text)" }}>{error}</p>
+          <Button onClick={() => fetchDashboardData()}>Retry</Button>
+        </div>
       </div>
     );
   }
 
   if (!data) return null;
 
+  const metrics = collectMetrics(data);
+
   return (
     <ErrorBoundary>
-      <div className={`min-h-screen textured-bg ${GeistMono.className}`}>
-        {/* Minimal Header */}
-        <div className="border-b bg-background/80 backdrop-blur-sm">
-          <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20 py-4">
-            <div className="flex justify-between items-center">
-              <div>
-                <h1 className="text-2xl font-semibold tracking-tight">Network Analytics</h1>
-                <p className="text-sm text-muted-foreground">
-                  {data.summary.successfulQueries} live queries •{" "}
-                  {new Date(data.summary.lastUpdated).toLocaleTimeString()}
-                </p>
-              </div>
-              <Button
-                onClick={handleManualRefresh}
-                disabled={refreshing}
-                size="sm"
-                variant="ghost"
-                className="h-8 px-3"
-              >
-                <RefreshCw className={`w-3 h-3 ${refreshing ? "animate-spin" : ""}`} />
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        {/* Main Content - Simple Table */}
+      <div className={`min-h-screen ${GeistMono.className}`} style={{ background: "var(--bg)", color: "var(--text)" }}>
         <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20 py-6">
-          <div className="max-w-6xl">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-1/3">Metric</TableHead>
-                  <TableHead className="w-1/3">Value</TableHead>
-                  <TableHead className="w-1/3">Dune Query</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {collectMetrics(data).map((metric, index) => (
-                  <TableRow key={index}>
-                    <TableCell className="font-medium">{metric.metric}</TableCell>
-                    <TableCell
-                      className={`font-mono ${
-                        metric.status === "success"
-                          ? "text-green-600"
-                          : metric.status === "warning"
-                            ? "text-yellow-600"
-                            : metric.status === "error"
-                              ? "text-red-600"
-                              : ""
-                      }`}
+          <div style={{ maxWidth: 1400, margin: "0 auto" }}>
+            {/* Stats Grid */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 }}>
+              {metrics.map((m, idx) => (
+                <div
+                  key={idx}
+                  style={{
+                    padding: 14,
+                    background: "var(--surface)",
+                    border: "1px solid var(--grid)",
+                    borderRadius: 16,
+                    boxShadow: "0 1px 2px rgba(0,0,0,.06)"
+                  }}
+                >
+                  <div style={{ color: "var(--muted-text)", fontSize: "0.8rem" }}>{m.metric}</div>
+                  <div
+                    style={{
+                      fontFamily: "JetBrains Mono, ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",
+                      fontSize: "1.6rem",
+                      marginTop: 6,
+                      color: m.status === "success" ? "var(--accent)" : m.status === "warning" ? "var(--warn)" : m.status === "error" ? "var(--danger)" : "var(--text)"
+                    }}
+                  >
+                    {m.value}
+                  </div>
+                  {m.queryUrl && (
+                    <a
+                      href={m.queryUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: "var(--accent)", textDecoration: "none", fontSize: "0.85rem" }}
                     >
-                      {metric.value}
-                    </TableCell>
-                    <TableCell>
-                      {metric.queryUrl ? (
-                        <a
-                          href={metric.queryUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-800 underline text-sm"
-                        >
-                          View Query
-                        </a>
-                      ) : (
-                        <span className="text-muted-foreground text-sm">—</span>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                      View Query →
+                    </a>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

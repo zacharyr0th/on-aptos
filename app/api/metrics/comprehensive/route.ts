@@ -11,7 +11,8 @@ async function fetchDuneData(queryId: number) {
   try {
     const duneApiKey = process.env.DUNE_API_KEY_TOKEN;
     if (!duneApiKey) {
-      throw new Error("DUNE_API_KEY_TOKEN not found in environment variables");
+      apiLogger.warn("DUNE_API_KEY_TOKEN not configured - returning empty data");
+      throw new Error("DUNE_API_KEY_TOKEN not configured");
     }
 
     const response = await fetch(`https://api.dune.com/api/v1/query/${queryId}/results`, {
@@ -60,6 +61,21 @@ const getDuneQueryUrl = (queryId: number) => `https://dune.com/queries/${queryId
 
 export async function GET() {
   try {
+    // Check if API key is configured first
+    const duneApiKey = process.env.DUNE_API_KEY_TOKEN;
+    if (!duneApiKey) {
+      apiLogger.warn("DUNE_API_KEY_TOKEN not configured - returning configuration error");
+      return NextResponse.json(
+        {
+          error: "Configuration Error",
+          message: "DUNE_API_KEY_TOKEN environment variable is not configured",
+          configurationRequired: true,
+          instructions: "Please add DUNE_API_KEY_TOKEN to your environment variables",
+        },
+        { status: 503 }
+      );
+    }
+
     apiLogger.info(
       "Fetching COMPREHENSIVE analytics optimized for existing Dune queries with enhanced processing"
     );

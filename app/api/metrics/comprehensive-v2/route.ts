@@ -55,6 +55,21 @@ const EXECUTION_CONFIG = {
 
 export async function GET(request: Request) {
   try {
+    // Check if API key is configured first
+    const duneApiKey = process.env.DUNE_API_KEY_TOKEN;
+    if (!duneApiKey) {
+      apiLogger.warn("DUNE_API_KEY_TOKEN not configured - returning configuration error");
+      return NextResponse.json(
+        {
+          error: "Configuration Error",
+          message: "DUNE_API_KEY_TOKEN environment variable is not configured",
+          configurationRequired: true,
+          instructions: "Please add DUNE_API_KEY_TOKEN to your environment variables",
+        },
+        { status: 503 }
+      );
+    }
+
     const { searchParams } = new URL(request.url);
     const theme = searchParams.get("theme") || "all";
     const refresh = searchParams.get("refresh") === "true";

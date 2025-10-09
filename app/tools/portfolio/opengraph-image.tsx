@@ -7,13 +7,13 @@ export const runtime = "edge";
 
 export default async function Image() {
   return createOgImage({
-    title: "DeFi Analytics",
-    subtitle: "Track protocols, TVL, and yields across Aptos DeFi ecosystem",
-    badge: "Protocols",
+    title: "Portfolio Tracker",
+    subtitle: "Track your Aptos assets, yields, and performance in real-time",
+    badge: "Tools",
     stats: [
-      { label: "DEXs & Perps", value: "Trading" },
-      { label: "Borrow & Earn", value: "Lending" },
-      { label: "Farms & Vaults", value: "Yield" },
+      { label: "Live", value: "Tracking" },
+      { label: "Multi-Wallet", value: "Support" },
+      { label: "Performance", value: "Analytics" },
     ],
   });
 }

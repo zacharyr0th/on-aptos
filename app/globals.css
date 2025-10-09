@@ -91,6 +91,16 @@
 :root {
   --radius: 0.625rem;
 
+  /* Aptos Slate Light Theme */
+  --bg: #F7F8FA;
+  --surface: #FFFFFF;
+  --text: #1B2430;
+  --muted-text: #5C6B7A;
+  --grid: #E6EBF0;
+  --accent: #2BD4A5;
+  --warn: #FFC857;
+  --danger: #FF6B6B;
+
   /* Typography */
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -107,7 +117,7 @@
 
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
+  --accent-old: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
 
   --destructive: oklch(0.577 0.245 27.325);
@@ -139,6 +149,16 @@
 
 /* === Dark Theme === */
 .dark {
+  /* Aptos Slate Dark Theme */
+  --bg: #0B0F14;
+  --surface: #10161D;
+  --text: #E6EEF7;
+  --muted-text: #9FB0C3;
+  --grid: #1C2530;
+  --accent: #2BD4A5;
+  --warn: #FFC857;
+  --danger: #FF6B6B;
+
   --background: oklch(0.18 0 0);
   --foreground: oklch(0.985 0 0);
 
@@ -154,7 +174,7 @@
 
   --muted: oklch(0.3 0 0);
   --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.3 0 0);
+  --accent-old: oklch(0.3 0 0);
   --accent-foreground: oklch(0.985 0 0);
 
   --destructive: oklch(0.704 0.191 22.216);
