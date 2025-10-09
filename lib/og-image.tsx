@@ -54,10 +54,7 @@ export function createOgImage({ title, subtitle, stats, badge }: OgImageProps) {
           xmlns="http://www.w3.org/2000/svg"
         >
           <circle cx="12" cy="12" r="10" fill="#00D7D5" opacity="0.2" />
-          <path
-            d="M12 2L6 8L12 14L18 8L12 2Z M12 10L8 14L12 18L16 14L12 10Z"
-            fill="#00D7D5"
-          />
+          <path d="M12 2L6 8L12 14L18 8L12 2Z M12 10L8 14L12 18L16 14L12 10Z" fill="#00D7D5" />
         </svg>
         <span
           style={{

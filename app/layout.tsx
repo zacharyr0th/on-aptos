@@ -85,14 +85,6 @@ export const metadata: Metadata = {
     description:
       "Institutional-grade portfolio tracking and DeFi intelligence. Professional analytics for advanced traders and institutional investors on Aptos blockchain.",
     siteName: "On Aptos",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "On Aptos - Professional Blockchain Analytics Platform",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
@@ -101,7 +93,6 @@ export const metadata: Metadata = {
       "Institutional-grade portfolio tracking and professional DeFi analytics for advanced traders and institutional investors.",
     creator: DEVELOPER_CONFIG.twitter,
     site: "@onaptos",
-    images: ["/og-image.png"],
   },
   robots: {
     index: true,
