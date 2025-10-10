@@ -34,6 +34,16 @@ const PROTOCOL_SLUG_MAP: Record<string, string> = {
   // Add more mappings as needed
 };
 
+// Protocols that are known to have DEX volume data on DefiLlama
+const PROTOCOLS_WITH_DEX_DATA = new Set([
+  "liquidswap",
+  "pancakeswap",
+  "sushiswap",
+  "panora-exchange",
+  "thala",
+  // Add more as you discover them
+]);
+
 export function useDefiLlamaData(protocolName: string) {
   const [data, setData] = useState<DefiLlamaData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -96,20 +106,26 @@ export function useDefiLlamaData(protocolName: string) {
             : undefined,
         };
 
-        // Try to fetch volume data from the dexs endpoint if it's a trading protocol
-        try {
-          const volumeResponse = await fetch(`https://api.llama.fi/summary/dexs/${slug}`);
-          if (volumeResponse.ok) {
-            const volumeData = await volumeResponse.json();
-            if (volumeData.total24h) {
-              result.volume24h = formatNumber(volumeData.total24h);
-              result.volumeChange24h = volumeData.change_1d
-                ? `${volumeData.change_1d > 0 ? "+" : ""}${volumeData.change_1d.toFixed(2)}%`
-                : undefined;
+        // Only fetch volume data for protocols known to have DEX data
+        if (PROTOCOLS_WITH_DEX_DATA.has(slug)) {
+          try {
+            const volumeResponse = await fetch(`https://api.llama.fi/summary/dexs/${slug}`, {
+              // Add cache to reduce duplicate requests
+              cache: "force-cache",
+              next: { revalidate: 300 }, // 5 minutes
+            });
+            if (volumeResponse.ok) {
+              const volumeData = await volumeResponse.json();
+              if (volumeData.total24h) {
+                result.volume24h = formatNumber(volumeData.total24h);
+                result.volumeChange24h = volumeData.change_1d
+                  ? `${volumeData.change_1d > 0 ? "+" : ""}${volumeData.change_1d.toFixed(2)}%`
+                  : undefined;
+              }
             }
+          } catch {
+            // Volume data not available - this is expected for some protocols
           }
-        } catch {
-          // Volume data not available for this protocol
         }
 
         // Cache the result

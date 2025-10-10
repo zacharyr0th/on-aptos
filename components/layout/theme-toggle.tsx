@@ -16,11 +16,11 @@ export function ThemeToggle() {
   if (!mounted) {
     return (
       <button
-        className="bg-primary border-border shadow-lg text-primary-foreground rounded-md p-2 hover:bg-primary/80 transition-colors duration-200"
+        className="rounded-lg p-2 bg-gradient-to-r from-[#F4603E]/10 to-[#1E1870]/10 hover:from-[#F4603E]/20 hover:to-[#1E1870]/20 transition-all duration-200 border-2 border-[#F4603E]/20"
         aria-label="Toggle theme"
         disabled
       >
-        <Moon className="h-4 w-4 transition-all" />
+        <Moon className="h-4 w-4 text-[#F4603E]" />
         <span className="sr-only">Toggle theme</span>
       </button>
     );
@@ -31,14 +31,14 @@ export function ThemeToggle() {
 
   return (
     <button
-      className="bg-primary border-border shadow-lg text-primary-foreground rounded-md p-2 hover:bg-primary/80 transition-colors duration-200"
+      className="rounded-lg p-2 bg-gradient-to-r from-[#F4603E]/10 to-[#1E1870]/10 hover:from-[#F4603E]/20 hover:to-[#1E1870]/20 transition-all duration-200 border-2 border-[#F4603E]/20 hover:border-[#F4603E]/40"
       aria-label={`Switch to ${nextTheme} mode`}
       onClick={() => setTheme(nextTheme)}
     >
       {isDark ? (
-        <Sun className="h-4 w-4 transition-all" />
+        <Sun className="h-4 w-4 text-[#F4603E]" />
       ) : (
-        <Moon className="h-4 w-4 transition-all" />
+        <Moon className="h-4 w-4 text-[#1E1870]" />
       )}
       <span className="sr-only">Toggle theme</span>
     </button>

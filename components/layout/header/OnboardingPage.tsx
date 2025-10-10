@@ -3,6 +3,7 @@
 import { Menu, X } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useEffect, useMemo, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { navigationSections } from "@/components/landing/data/landing-data";
 import { STABLECOIN_SYMBOLS } from "@/lib/constants/tokens/stablecoins";
 import type { TokenData } from "@/lib/types/tokens";
@@ -86,6 +87,23 @@ export function OnboardingPage() {
             if (window.location.hash !== newHash) {
               window.history.replaceState(null, "", newHash);
             }
+
+            // Auto-scroll mobile nav to center active button
+            const mobileNav = document.getElementById("mobile-nav-container");
+            const activeButton = document.getElementById(`mobile-nav-${newSection}`);
+            if (mobileNav && activeButton && window.innerWidth < 1024) {
+              const navRect = mobileNav.getBoundingClientRect();
+              const buttonRect = activeButton.getBoundingClientRect();
+              const scrollLeft =
+                mobileNav.scrollLeft +
+                buttonRect.left -
+                navRect.left -
+                navRect.width / 2 +
+                buttonRect.width / 2;
+
+              mobileNav.scrollTo({ left: scrollLeft, behavior: "smooth" });
+            }
+
             break;
           }
         }
@@ -216,9 +234,9 @@ export function OnboardingPage() {
   return (
     <div className="min-h-screen">
       {/* Sticky Navigation */}
-      <nav className="sticky top-0 z-50">
+      <nav className="sticky top-0 z-50 backdrop-blur-md">
         <div className="container mx-auto px-4">
-          <div className="flex items-center justify-center h-16">
+          <div className="flex items-center justify-center h-16 relative">
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center gap-2 bg-background/30 backdrop-blur-lg rounded-full px-2 py-2 border border-border/30">
               {navigationSections.map((section) => (
@@ -236,35 +254,40 @@ export function OnboardingPage() {
               ))}
             </div>
 
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setIsNavOpen(!isNavOpen)}
-              className="lg:hidden p-2 text-foreground hover:bg-muted rounded-md"
+            {/* Mobile Navigation - Horizontal Scrollable with Auto-Centering */}
+            <div
+              id="mobile-nav-container"
+              className="lg:hidden w-full overflow-x-auto scrollbar-hide"
             >
-              {isNavOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
-          </div>
-
-          {/* Mobile Navigation */}
-          {isNavOpen && (
-            <div className="lg:hidden py-4 border-t border-border">
-              <div className="grid grid-cols-2 gap-2">
-                {navigationSections.map((section) => (
-                  <button
-                    key={section.id}
-                    onClick={() => scrollToSection(section.id)}
-                    className={`px-3 py-2 text-sm rounded-md transition-colors text-left ${
-                      activeSection === section.id
-                        ? "bg-primary/10 text-primary font-medium"
-                        : "text-foreground/70 hover:text-foreground hover:bg-muted"
-                    }`}
-                  >
-                    {section.label}
-                  </button>
-                ))}
+              <div className="flex items-center gap-2 px-4 py-2 min-w-max">
+                {navigationSections.map((section) => {
+                  const isActive = section.id === activeSection;
+                  return (
+                    <motion.button
+                      key={section.id}
+                      id={`mobile-nav-${section.id}`}
+                      onClick={() => scrollToSection(section.id)}
+                      animate={{
+                        scale: isActive ? 1 : 0.9,
+                        opacity: isActive ? 1 : 0.6,
+                      }}
+                      transition={{
+                        duration: 0.3,
+                        ease: [0.4, 0, 0.2, 1],
+                      }}
+                      className={`px-5 py-2.5 text-sm font-medium rounded-full whitespace-nowrap transition-all duration-300 ${
+                        isActive
+                          ? "bg-background/95 text-foreground shadow-lg border border-border/60 backdrop-blur-md"
+                          : "bg-background/40 text-foreground/70 border border-border/30 backdrop-blur-sm"
+                      }`}
+                    >
+                      {section.label}
+                    </motion.button>
+                  );
+                })}
               </div>
             </div>
-          )}
+          </div>
         </div>
       </nav>
 

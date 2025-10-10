@@ -95,8 +95,8 @@ export function HeaderLogo() {
         </Link>
       </h1>
       <GitHubStarCount
-        owner={process.env.DEVELOPER_GITHUB?.split("/").slice(-2, -1)[0] || "yourusername"}
-        repo={process.env.DEVELOPER_GITHUB?.split("/").slice(-1)[0] || "on-aptos"}
+        owner="zacharyr0th"
+        repo="on-aptos"
         className="hidden sm:flex"
         showGithubLogo={true}
       />

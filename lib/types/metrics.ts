@@ -311,3 +311,18 @@ export function formatMetricValue(
       return new Intl.NumberFormat("en-US").format(value);
   }
 }
+
+// Additional interfaces for metrics page components
+export interface MetricCardData {
+  name: string;
+  value: string;
+  queryUrl?: string;
+}
+
+export interface CategorizedMetrics {
+  "Network Activity": any[];
+  "Network Performance": any[];
+  "Gas Economics": any[];
+  "DEX Analytics": any[];
+  "Protocol Analytics": any[];
+}

@@ -14,11 +14,12 @@ export function LayoutContent({ children }: LayoutContentProps) {
 
   // Portfolio page needs special handling for single viewport
   const isPortfolioPage = pathname === "/tools/portfolio";
+  const isMetricsPage = pathname === "/metrics";
   const isSingleViewport = isPortfolioPage;
 
-  // Show header and footer on all pages now (consolidated layout)
-  const showHeader = true;
-  const showFooter = true;
+  // Hide header and footer on metrics page (it has its own rotation)
+  const showHeader = !isMetricsPage;
+  const showFooter = !isMetricsPage;
 
   // Use h-screen for portfolio and home pages to enforce single viewport
   const containerClass = isSingleViewport

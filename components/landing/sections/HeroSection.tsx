@@ -87,7 +87,7 @@ export default function HeroSection({ assetValues, isLoadingValues }: HeroSectio
       <div className="absolute top-0 left-1/2 -translate-x-1/2 translate-y-[5%] pointer-events-none z-0">
         <div className="relative w-[1200px] sm:w-[1800px] md:w-[2400px] lg:w-[3000px] h-[600px] sm:h-[900px] md:h-[1200px] lg:h-[1500px]">
           {/* Light mode logo */}
-          <div className="dark:hidden">
+          <div className="dark:hidden relative w-full h-full">
             <Image
               src="/icons/apt.png"
               alt=""
@@ -106,7 +106,7 @@ export default function HeroSection({ assetValues, isLoadingValues }: HeroSectio
           </div>
 
           {/* Dark mode logo */}
-          <div className="hidden dark:block">
+          <div className="hidden dark:block relative w-full h-full">
             <Image
               src="/icons/apt.png"
               alt=""

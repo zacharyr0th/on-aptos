@@ -528,20 +528,6 @@ export async function GET() {
         queryId: DUNE_QUERY_IDS.DEX_COMPARISON,
       },
 
-      // Unique signature data only
-      ...(totalSignatures > 0
-        ? [
-            {
-              name: "Total Network Signatures",
-              value: formatMetricValue(totalSignatures),
-              change: "—",
-              category: "Network Performance",
-              queryUrl: getDuneQueryUrl(DUNE_QUERY_IDS.USER_BEHAVIOR),
-              queryId: DUNE_QUERY_IDS.USER_BEHAVIOR,
-            },
-          ]
-        : []),
-
       // Network Performance - Keep unique metrics only
       ...(maxTPS > 0
         ? [
@@ -562,6 +548,30 @@ export async function GET() {
         category: "Network Performance",
         queryUrl: getDuneQueryUrl(DUNE_QUERY_IDS.PROTOCOL_ACTIVITY),
         queryId: DUNE_QUERY_IDS.PROTOCOL_ACTIVITY,
+      },
+
+      // Unique signature data only
+      ...(totalSignatures > 0
+        ? [
+            {
+              name: "Total Network Signatures",
+              value: formatMetricValue(totalSignatures),
+              change: "—",
+              category: "Network Performance",
+              queryUrl: getDuneQueryUrl(DUNE_QUERY_IDS.USER_BEHAVIOR),
+              queryId: DUNE_QUERY_IDS.USER_BEHAVIOR,
+            },
+          ]
+        : []),
+      // Combined gas fees in both USD and APT
+      {
+        name: "Daily Gas Fees",
+        value: `$${formatMetricValue(dailyGasFeesUSD)}`,
+        secondaryValue: netGasAPT > 0 ? `${formatMetricValue(netGasAPT)} APT` : undefined,
+        change: "—",
+        category: "Network Performance",
+        queryUrl: getDuneQueryUrl(DUNE_QUERY_IDS.USER_ANALYTICS),
+        queryId: DUNE_QUERY_IDS.USER_ANALYTICS,
       },
       ...(avgGasPrice > 0
         ? [
@@ -611,10 +621,11 @@ export async function GET() {
             },
           ]
         : []),
-      // Keep only USD gas fees (most useful)
+      // Combined gas fees in Gas Economics category
       {
-        name: "Daily Gas Fees (24h USD)",
+        name: "Daily Gas Fees",
         value: `$${formatMetricValue(dailyGasFeesUSD)}`,
+        secondaryValue: netGasAPT > 0 ? `${formatMetricValue(netGasAPT)} APT` : undefined,
         change: "—",
         category: "Gas Economics",
         queryUrl: getDuneQueryUrl(DUNE_QUERY_IDS.USER_ANALYTICS),
@@ -697,18 +708,6 @@ export async function GET() {
               category: "Network Performance",
               queryUrl: getDuneQueryUrl(DUNE_QUERY_IDS.ACTIVITY_PATTERNS),
               queryId: DUNE_QUERY_IDS.ACTIVITY_PATTERNS,
-            },
-          ]
-        : []),
-      ...(netGasAPT > 0
-        ? [
-            {
-              name: "Net Daily Gas (24h APT)",
-              value: `${formatMetricValue(netGasAPT)} APT`,
-              change: "—",
-              category: "Gas Economics",
-              queryUrl: getDuneQueryUrl(DUNE_QUERY_IDS.USER_ANALYTICS),
-              queryId: DUNE_QUERY_IDS.USER_ANALYTICS,
             },
           ]
         : []),

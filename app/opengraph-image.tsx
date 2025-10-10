@@ -8,7 +8,8 @@ export const runtime = "edge";
 export default async function Image() {
   return createOgImage({
     title: "Professional Blockchain Analytics",
-    subtitle: "Institutional-grade portfolio tracking and professional DeFi analytics for advanced traders",
+    subtitle:
+      "Institutional-grade portfolio tracking and professional DeFi analytics for advanced traders",
     badge: "Analytics Platform",
     stats: [
       { label: "Real-time", value: "Data" },
