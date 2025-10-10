@@ -16,7 +16,7 @@ export function RefreshButton() {
       router.refresh();
 
       // Keep spinner active for a minimum time to show feedback
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
     } finally {
       setIsRefreshing(false);
     }
@@ -33,9 +33,9 @@ export function RefreshButton() {
         transition-all duration-200
         disabled:opacity-50 disabled:cursor-not-allowed
         shadow-sm hover:shadow-md"
-      aria-label={isRefreshing ? 'Refreshing...' : 'Refresh Data'}
+      aria-label={isRefreshing ? "Refreshing..." : "Refresh Data"}
     >
-      <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+      <RefreshCw className={`w-4 h-4 ${isRefreshing ? "animate-spin" : ""}`} />
     </button>
   );
 }

@@ -17,7 +17,7 @@ export function MetricsCharts({ activityPatterns }: MetricsChartsProps) {
     if (!hourlyChartRef.current || !activityPatterns || activityPatterns.length === 0) return;
 
     // Detect dark mode
-    const isDarkMode = document.documentElement.classList.contains('dark');
+    const isDarkMode = document.documentElement.classList.contains("dark");
 
     const rawData = activityPatterns.slice(0, 24);
     if (rawData.length === 0) return;
@@ -76,13 +76,13 @@ export function MetricsCharts({ activityPatterns }: MetricsChartsProps) {
     }
 
     // Filter to only show blocks with data
-    const hourlyData = allBlocks.filter(block => block.hasData && block.transactions > 0);
+    const hourlyData = allBlocks.filter((block) => block.hasData && block.transactions > 0);
 
     // Log for debugging
-    console.log('Hourly chart data (4-hour blocks):', {
+    console.log("Hourly chart data (4-hour blocks):", {
       totalBlocks: hourlyData.length,
-      blocksWithData: hourlyData.filter(h => h.hasData).length,
-      data: hourlyData
+      blocksWithData: hourlyData.filter((h) => h.hasData).length,
+      data: hourlyData,
     });
 
     const svg = d3.select(hourlyChartRef.current);
@@ -115,25 +115,28 @@ export function MetricsCharts({ activityPatterns }: MetricsChartsProps) {
 
     // Color scale based on transaction volume
     const maxTransactions = d3.max(hourlyData, (d) => d.transactions) || 1;
-    const minTransactions = d3.min(hourlyData.filter(d => d.transactions > 0), (d) => d.transactions) || 0;
+    const minTransactions =
+      d3.min(
+        hourlyData.filter((d) => d.transactions > 0),
+        (d) => d.transactions
+      ) || 0;
 
     // Use quantile scale for better color distribution
-    const transactionValues = hourlyData.filter(d => d.transactions > 0).map(d => d.transactions);
+    const transactionValues = hourlyData
+      .filter((d) => d.transactions > 0)
+      .map((d) => d.transactions);
 
     // Create a color scale using official Dune brand colors
-    const colorScale = d3
-      .scaleQuantile<string>()
-      .domain(transactionValues)
-      .range([
-        "#FEEFEC", // Dune Orange 100 (very light)
-        "#FDD4C7", // light orange
-        "#FCB9A2", // medium light orange
-        "#FA9E7D", // medium orange
-        "#F88358", // orange
-        "#F4603E", // Dune Orange 500 (primary)
-        "#9B3C56", // orange-blue transition
-        "#1E1870", // Dune Blue 500 (primary)
-      ]);
+    const colorScale = d3.scaleQuantile<string>().domain(transactionValues).range([
+      "#FEEFEC", // Dune Orange 100 (very light)
+      "#FDD4C7", // light orange
+      "#FCB9A2", // medium light orange
+      "#FA9E7D", // medium orange
+      "#F88358", // orange
+      "#F4603E", // Dune Orange 500 (primary)
+      "#9B3C56", // orange-blue transition
+      "#1E1870", // Dune Blue 500 (primary)
+    ]);
 
     // Draw heatmap cells
     g.selectAll(".cell")
@@ -179,12 +182,10 @@ export function MetricsCharts({ activityPatterns }: MetricsChartsProps) {
       .text((d) => (d.transactions > 0 ? formatCompactNumber(d.transactions) : ""));
 
     // X axis with time block labels
-    const xAxis = d3
-      .axisBottom(x)
-      .tickFormat((d) => {
-        const block = hourlyData.find(h => h.timeBlock.toString() === d);
-        return block ? block.label : '';
-      });
+    const xAxis = d3.axisBottom(x).tickFormat((d) => {
+      const block = hourlyData.find((h) => h.timeBlock.toString() === d);
+      return block ? block.label : "";
+    });
 
     g.append("g")
       .attr("transform", `translate(0,${cellHeight + 8})`)
@@ -215,7 +216,10 @@ export function MetricsCharts({ activityPatterns }: MetricsChartsProps) {
     const legendX = width / 2 - legendWidth / 2;
     const legendY = cellHeight + 38;
 
-    const legendScale = d3.scaleLinear().domain([minTransactions, maxTransactions]).range([0, legendWidth]);
+    const legendScale = d3
+      .scaleLinear()
+      .domain([minTransactions, maxTransactions])
+      .range([0, legendWidth]);
 
     const legendAxis = d3
       .axisBottom(legendScale)

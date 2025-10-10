@@ -24,13 +24,21 @@ async function fetchDuneData(queryId: number) {
     });
 
     if (!response.ok) {
-      throw new Error(`Dune API error: ${response.status}`);
+      const errorText = await response.text().catch(() => "Unable to read error response");
+      throw new Error(`Dune API error: ${response.status} ${response.statusText} - ${errorText}`);
     }
 
     const data = await response.json();
     return data.result?.rows || [];
   } catch (error) {
-    apiLogger.error("Error fetching from Dune API:", { error, queryId });
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    apiLogger.error(
+      "Error fetching from Dune API:",
+      "QueryID:", queryId,
+      "Message:", errorMessage,
+      "Stack:", errorStack
+    );
     return [];
   }
 }
@@ -569,7 +577,7 @@ export async function GET() {
         value: `$${formatMetricValue(dailyGasFeesUSD)}`,
         secondaryValue: netGasAPT > 0 ? `${formatMetricValue(netGasAPT)} APT` : undefined,
         change: "—",
-        category: "Network Performance",
+        category: "Network Activity",
         queryUrl: getDuneQueryUrl(DUNE_QUERY_IDS.USER_ANALYTICS),
         queryId: DUNE_QUERY_IDS.USER_ANALYTICS,
       },
@@ -621,16 +629,6 @@ export async function GET() {
             },
           ]
         : []),
-      // Combined gas fees in Gas Economics category
-      {
-        name: "Daily Gas Fees",
-        value: `$${formatMetricValue(dailyGasFeesUSD)}`,
-        secondaryValue: netGasAPT > 0 ? `${formatMetricValue(netGasAPT)} APT` : undefined,
-        change: "—",
-        category: "Gas Economics",
-        queryUrl: getDuneQueryUrl(DUNE_QUERY_IDS.USER_ANALYTICS),
-        queryId: DUNE_QUERY_IDS.USER_ANALYTICS,
-      },
 
       // DEX Analytics - Consolidate swap metrics
       ...(totalSwapEvents > 0

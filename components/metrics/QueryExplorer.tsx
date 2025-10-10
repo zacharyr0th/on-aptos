@@ -80,7 +80,7 @@ WHERE block_timestamp >= CURRENT_DATE - INTERVAL '1' DAY`,
 };
 
 export function QueryExplorer() {
-  const [expandedQuery, setExpandedQuery] = useState<string | null>(null);
+  const [expandedQuery, setExpandedQuery] = useState<string | null>("Max TPS Analysis");
 
   const toggleQuery = (queryName: string) => {
     setExpandedQuery(expandedQuery === queryName ? null : queryName);
@@ -93,7 +93,9 @@ export function QueryExplorer() {
         <img src="/Dune-IconLarge.png" alt="Dune" className="w-8 h-8" />
         <div>
           <div className="text-sm font-bold text-[#F4603E]">Dune Analytics</div>
-          <div className="text-[10px] text-muted-foreground font-mono">Blockchain data, query ready.</div>
+          <div className="text-[10px] text-muted-foreground font-mono">
+            Blockchain data, query ready.
+          </div>
         </div>
       </div>
 
@@ -123,7 +125,8 @@ export function QueryExplorer() {
             <span className="text-[10px] font-semibold text-[#F4603E]">1</span>
           </div>
           <p className="leading-relaxed">
-            <strong className="text-foreground">Index:</strong> Blockchain data is continuously indexed into SQL tables
+            <strong className="text-foreground">Index:</strong> Blockchain data is continuously
+            indexed into SQL tables
           </p>
         </div>
         <div className="flex items-start gap-2">
@@ -131,7 +134,8 @@ export function QueryExplorer() {
             <span className="text-[10px] font-semibold text-[#1E1870]">2</span>
           </div>
           <p className="leading-relaxed">
-            <strong className="text-foreground">Query:</strong> SQL aggregates and analyzes data to generate metrics
+            <strong className="text-foreground">Query:</strong> SQL aggregates and analyzes data to
+            generate metrics
           </p>
         </div>
         <div className="flex items-start gap-2">

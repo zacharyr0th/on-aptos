@@ -28,25 +28,33 @@ export function MetricCard({ metric, compact = false }: MetricCardProps) {
         {/* Header with icon */}
         <div className="flex items-start justify-between mb-1.5">
           <div className="flex-1 min-w-0 pr-2">
-            <div className={`text-muted-foreground/80 font-semibold tracking-tight leading-tight ${compact ? "text-[10px]" : "text-xs"}`}>
+            <div
+              className={`text-muted-foreground/80 font-semibold tracking-tight leading-tight ${compact ? "text-[10px]" : "text-xs"}`}
+            >
               {shortenMetricName(metric.name)}
             </div>
           </div>
           <div className="flex-shrink-0">
-            <div className={`rounded-lg bg-gradient-to-br from-[#F4603E]/10 to-[#1E1870]/10 flex items-center justify-center ${compact ? "w-5 h-5" : "w-6 h-6"}`}>
+            <div
+              className={`rounded-lg bg-gradient-to-br from-[#F4603E]/10 to-[#1E1870]/10 flex items-center justify-center ${compact ? "w-5 h-5" : "w-6 h-6"}`}
+            >
               <TrendingUp className={`text-[#F4603E] ${compact ? "w-3 h-3" : "w-3.5 h-3.5"}`} />
             </div>
           </div>
         </div>
 
         {/* Value */}
-        <div className={`font-bold bg-gradient-to-br from-[#1E1870] to-[#F4603E] bg-clip-text text-transparent leading-none ${compact ? "text-lg mb-1.5" : "text-xl mb-2"}`}>
+        <div
+          className={`font-bold bg-gradient-to-br from-[#1E1870] to-[#F4603E] bg-clip-text text-transparent leading-none ${compact ? "text-lg mb-1.5" : "text-xl mb-2"}`}
+        >
           {metric.value}
         </div>
 
         {/* Secondary Value (if present) */}
         {metric.secondaryValue && (
-          <div className={`font-semibold text-muted-foreground/70 leading-none ${compact ? "text-sm mb-1.5" : "text-base mb-2"}`}>
+          <div
+            className={`font-semibold text-muted-foreground/70 leading-none ${compact ? "text-sm mb-1.5" : "text-base mb-2"}`}
+          >
             {metric.secondaryValue}
           </div>
         )}
