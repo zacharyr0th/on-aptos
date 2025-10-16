@@ -1,26 +1,66 @@
+"use client";
+
 import { GeistMono } from "geist/font/mono";
+import { useState, useEffect } from "react";
 import { ErrorBoundary } from "@/components/errors/ErrorBoundary";
 import { MetricsCharts } from "@/components/metrics/MetricsCharts";
 import { QueryExplorer } from "@/components/metrics/QueryExplorer";
 import { MetricsCategory } from "@/components/metrics/MetricsCategory";
 import { RefreshButton } from "@/components/metrics/RefreshButton";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
-import { getMetricsData } from "@/lib/services/metrics";
+import { Button } from "@/components/ui/button";
+import { useMetricsData } from "@/lib/hooks/useMetricsData";
 import { categorizeMetrics } from "@/lib/utils/metrics";
 
-// Enable ISR with 60 second revalidation
-export const revalidate = 60;
+export default function MetricsPage() {
+  const [isRotated, setIsRotated] = useState(false);
+  const [showButton, setShowButton] = useState(false);
+  const { metrics, tableData, loading, error } = useMetricsData();
+  const categorizedMetrics = categorizeMetrics(tableData || []);
 
-export default async function MetricsPage() {
-  const apiData = await getMetricsData();
-  const metrics = apiData.metrics || {};
-  const categorizedMetrics = categorizeMetrics(apiData.tableData || []);
+  // Show button when mouse is near bottom-left corner
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      const threshold = 150; // pixels from corner
+      const isNearCorner =
+        e.clientX < threshold &&
+        e.clientY > window.innerHeight - threshold;
+      setShowButton(isNearCorner);
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
+  // Show loading state
+  if (loading && !metrics) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading metrics data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error && !metrics) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center max-w-md">
+          <p className="text-destructive mb-4">Failed to load metrics data</p>
+          <p className="text-sm text-muted-foreground">{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <ErrorBoundary>
       <div
         className={GeistMono.className}
-        style={{
+        style={isRotated ? {
           transform: "rotate(90deg)",
           transformOrigin: "center",
           width: "100vh",
@@ -30,6 +70,10 @@ export default async function MetricsPage() {
           left: "50%",
           marginTop: "-50vw",
           marginLeft: "-50vh",
+        } : {
+          width: "100vw",
+          height: "100vh",
+          position: "relative",
         }}
       >
         {/* Mobile/Tablet Layout (< lg) */}
@@ -55,7 +99,7 @@ export default async function MetricsPage() {
           <div className="pb-12 sm:pb-16">
             {/* Activity Chart */}
             <div className="mb-8 sm:mb-10">
-              <MetricsCharts activityPatterns={metrics.activityPatterns || []} />
+              <MetricsCharts activityPatterns={metrics?.activityPatterns || []} />
             </div>
 
             <div className="space-y-8 sm:space-y-10">
@@ -121,7 +165,7 @@ export default async function MetricsPage() {
           <div className="flex-1 overflow-auto px-8 py-5 space-y-4">
             {/* Activity Chart */}
             <div className="w-full">
-              <MetricsCharts activityPatterns={metrics.activityPatterns || []} />
+              <MetricsCharts activityPatterns={metrics?.activityPatterns || []} />
             </div>
 
             {/* All Metrics Categories - Stacked vertically */}
@@ -143,6 +187,19 @@ export default async function MetricsPage() {
             </div>
           </div>
         </div>
+
+        {/* Orientation Toggle Button - Fixed bottom-left (Auto-hide) */}
+        <Button
+          onClick={() => setIsRotated(!isRotated)}
+          className={`fixed bottom-6 left-6 z-50 shadow-lg transition-all duration-300 ${
+            showButton ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-20 pointer-events-none'
+          }`}
+          size="lg"
+          variant="default"
+          title={isRotated ? "Switch to Standard View" : "Switch to Rotated View"}
+        >
+          {isRotated ? "Standard" : "Rotated"}
+        </Button>
       </div>
     </ErrorBoundary>
   );

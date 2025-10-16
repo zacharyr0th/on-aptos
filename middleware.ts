@@ -5,7 +5,7 @@ import { logger } from "@/lib/utils/core/logger";
 // Configuration
 const MAX_URL_LENGTH = 2048;
 const MAX_QUERY_PARAMS = 50;
-const MAX_HEADER_SIZE = 8192;
+const MAX_HEADER_SIZE = 16384; // Match NODE_OPTIONS max-http-header-size
 
 /**
  * Security middleware for API routes

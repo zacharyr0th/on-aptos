@@ -7,6 +7,7 @@ export function useMetricsData() {
   const [tableData, setTableData] = useState<TableData[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   useEffect(() => {
     const fetchMetrics = async () => {
@@ -21,17 +22,27 @@ export function useMetricsData() {
           headers: {
             "Content-Type": "application/json",
           },
-          // Add cache busting for development
-          ...(process.env.NODE_ENV === "development" && {
-            cache: "no-cache",
-          }),
+          cache: "no-store", // Force fresh data
         });
 
+        console.log("Response status:", response.status, response.statusText);
+
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          const errorText = await response.text();
+          console.error("API request failed - status:", response.status);
+          console.error("API request failed - statusText:", response.statusText);
+          console.error("API request failed - errorText:", errorText.substring(0, 500));
+          throw new Error(`HTTP ${response.status}: ${response.statusText} - ${errorText.substring(0, 200)}`);
         }
 
         const data: ComprehensiveMetricsResponse = await response.json();
+
+        console.log("Successfully fetched metrics data", {
+          hasMetrics: !!data.metrics,
+          hasTableData: !!data.tableData,
+          tableRows: data.tableData?.length || 0,
+          metricsKeys: data.metrics ? Object.keys(data.metrics).length : 0,
+        });
 
         logger.info("Successfully fetched metrics data", {
           queriesUsed: data.queriesUsed?.length || 0,
@@ -42,19 +53,17 @@ export function useMetricsData() {
         setMetrics(data.metrics);
         setTableData(data.tableData || []);
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : "Unknown error";
-        logger.error("Error fetching metrics data:", {
-          error: errorMessage,
-          errorType: error instanceof Error ? error.name : typeof error,
-          stack: error instanceof Error ? error.stack : undefined,
-        });
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        console.error("Error fetching metrics data:", error);
+        logger.error("Error fetching metrics data:", error);
         setError(errorMessage);
 
-        // Don't set to null - keep previous data if available
-        if (!metrics) {
+        // Don't clear data - keep previous data if available
+        // Only set empty data if we have no data at all
+        if (metrics === null) {
           setMetrics({});
         }
-        if (!tableData) {
+        if (tableData === null) {
           setTableData([]);
         }
       } finally {
@@ -68,7 +77,7 @@ export function useMetricsData() {
     const interval = setInterval(fetchMetrics, 300000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [refreshTrigger]);
 
   return {
     metrics,
@@ -76,10 +85,7 @@ export function useMetricsData() {
     loading,
     error,
     refresh: () => {
-      setLoading(true);
-      // Trigger re-fetch by changing state
-      setMetrics(null);
-      setTableData(null);
+      setRefreshTrigger(prev => prev + 1);
     },
   };
 }
